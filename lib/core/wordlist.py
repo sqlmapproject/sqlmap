@@ -18,7 +18,9 @@ class Wordlist(six.Iterator):
     Iterator for looping over a large dictionaries
 
     >>> from lib.core.option import paths
-    >>> isinstance(next(Wordlist(paths.SMALL_DICT)), six.string_types)
+    >>> isinstance(next(Wordlist(paths.SMALL_DICT)), six.binary_type)
+    True
+    >>> isinstance(next(Wordlist(paths.WORDLIST)), six.binary_type)
     True
     """
 
@@ -58,7 +60,7 @@ class Wordlist(six.Iterator):
                     raise SqlmapDataException(errMsg)
                 self.fp = _.open(_.namelist()[0])
             else:
-                self.fp = open(self.current, 'r')
+                self.fp = open(self.current, "rb")
             self.iter = iter(self.fp)
 
         self.index += 1

@@ -51,6 +51,11 @@ class Cache(object):
 class BigArray(list):
     """
     List-like class used for storing large amounts of data (disk cached)
+
+    >>> _ = BigArray(xrange(100000))
+    >>> _[20] = 0
+    >>> _[100]
+    100
     """
 
     def __init__(self, items=None):

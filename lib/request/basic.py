@@ -34,6 +34,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.decorators import cachedmethod
+from lib.core.dicts import HTML_ENTITIES
 from lib.core.enums import DBMS
 from lib.core.enums import HTTP_HEADER
 from lib.core.enums import PLACE
@@ -49,7 +50,6 @@ from lib.core.settings import SELECT_FROM_TABLE_REGEX
 from lib.core.settings import VIEWSTATE_REGEX
 from lib.parse.headers import headersParser
 from lib.parse.html import htmlParser
-from lib.utils.htmlentities import htmlEntities
 from thirdparty import six
 from thirdparty.chardet import detect
 from thirdparty.identywaf import identYwaf
@@ -341,7 +341,7 @@ def decodePage(page, contentEncoding, contentType):
             page = re.sub(b"%([0-9a-fA-F]{2})", lambda _: decodeHex(_.group(1)), page)
 
         # e.g. &amp;
-        page = re.sub(b"&([^;]+);", lambda _: six.int2byte(htmlEntities[getText(_.group(1))]) if htmlEntities.get(getText(_.group(1)), 256) < 256 else _.group(0), page)
+        page = re.sub(b"&([^;]+);", lambda _: six.int2byte(HTML_ENTITIES[getText(_.group(1))]) if HTML_ENTITIES.get(getText(_.group(1)), 256) < 256 else _.group(0), page)
 
         kb.pageEncoding = kb.pageEncoding or checkCharEncoding(getHeuristicCharEncoding(page))
 
@@ -364,7 +364,7 @@ def decodePage(page, contentEncoding, contentType):
             page = re.sub(r"&#(\d+);", _, page)
 
         # e.g. &zeta;
-        page = re.sub(r"&([^;]+);", lambda _: _unichr(htmlEntities[_.group(1)]) if htmlEntities.get(_.group(1), 0) > 255 else _.group(0), page)
+        page = re.sub(r"&([^;]+);", lambda _: _unichr(HTML_ENTITIES[_.group(1)]) if HTML_ENTITIES.get(_.group(1), 0) > 255 else _.group(0), page)
 
     return page
 
