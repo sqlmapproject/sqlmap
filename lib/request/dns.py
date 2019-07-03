@@ -84,7 +84,7 @@ class DNSServer(object):
         except:
             pass
         finally:
-            if response and "google" in response:
+            if response and b"google" in response:
                 raise socket.error("another DNS service already running on *:53")
 
     def pop(self, prefix=None, suffix=None):
