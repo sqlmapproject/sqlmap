@@ -10,6 +10,7 @@ import os
 from lib.core.common import Backend
 from lib.core.common import getSafeExString
 from lib.core.common import isStackingAvailable
+from lib.core.common import openFile
 from lib.core.common import readInput
 from lib.core.common import runningAsAdmin
 from lib.core.data import conf
@@ -137,7 +138,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
 
             if os.path.exists(filename):
                 try:
-                    with open(filename, "wb") as f:
+                    with openFile(filename, "wb") as f:
                         f.write("1")
                 except IOError as ex:
                     errMsg = "there has been a file opening/writing error "

@@ -620,6 +620,7 @@ class Dump(object):
                                 with open(filepath, "wb") as f:
                                     _ = safechardecode(value, True)
                                     f.write(_)
+
                         except magic.MagicException as ex:
                             logger.debug(getSafeExString(ex))
 

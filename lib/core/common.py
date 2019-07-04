@@ -3762,7 +3762,7 @@ def createGithubIssue(errMsg, excMsg):
             logger.info(infoMsg)
 
             try:
-                with open(paths.GITHUB_HISTORY, "a+b") as f:
+                with openFile(paths.GITHUB_HISTORY, "a+b") as f:
                     f.write("%s\n" % key)
             except:
                 pass
