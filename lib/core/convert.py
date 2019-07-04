@@ -164,7 +164,12 @@ def encodeHex(value, binary=True):
     True
     >>> encodeHex("123", binary=False)
     '313233'
+    >>> encodeHex(b"123"[0]) == b"31"
+    True
     """
+
+    if isinstance(value, int):
+        value = six.unichr(value)
 
     if isinstance(value, six.text_type):
         value = value.encode(UNICODE_ENCODING)
