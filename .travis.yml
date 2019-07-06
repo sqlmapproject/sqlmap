@@ -1,12 +1,12 @@
 language: python
+dist: xenial
 sudo: false
 git:
     depth: 1
 python:
-    - "2.6"
     - "2.7"
-    - "3.3"
     - "3.6"
+    - "3.7"
 script:
     - python -c "import sqlmap; import sqlmapapi"
     - python sqlmap.py --smoke
