@@ -38,7 +38,7 @@ def getRevisionNumber():
     while True:
         if filePath and os.path.isfile(filePath):
             with openFile(filePath, "r") as f:
-                content = f.read()
+                content = getText(f.read())
                 filePath = None
                 if content.startswith("ref: "):
                     filePath = os.path.join(_, ".git", content.replace("ref: ", "")).strip()
