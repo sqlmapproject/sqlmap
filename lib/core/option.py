@@ -522,7 +522,7 @@ def _setMetasploit():
             errMsg = "sqlmap requires third-party module 'pywin32' "
             errMsg += "in order to use Metasploit functionalities on "
             errMsg += "Windows. You can download it from "
-            errMsg += "'https://sourceforge.net/projects/pywin32/files/pywin32/'"
+            errMsg += "'https://github.com/mhammond/pywin32'"
             raise SqlmapMissingDependence(errMsg)
 
         if not conf.msfPath:
