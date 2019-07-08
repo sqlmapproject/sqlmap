@@ -52,7 +52,7 @@ class Filesystem(GenericFilesystem):
                 else:
                     scrString += " %s" % strLineChar
 
-                lineAddr += len(lineChar)
+                lineAddr += len(strLineChar) // 2
 
             fileLines.append(scrString)
 
