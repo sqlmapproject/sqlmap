@@ -99,7 +99,7 @@ def exceptionHandledFunction(threadFunction, silent=False):
             errMsg = ex.message if isinstance(ex, SqlmapBaseException) else "%s: %s" % (type(ex).__name__, ex.message)
             logger.error("thread %s: '%s'" % (threading.currentThread().getName(), errMsg))
 
-            if conf.get("verbose") > 1 and not isinstance(ex, (SqlmapUserQuitException,)):
+            if conf.get("verbose") > 1 and not isinstance(ex, (SqlmapUserQuitException, SqlmapConnectionException)):
                 traceback.print_exc()
 
 def setDaemon(thread):
