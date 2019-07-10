@@ -677,6 +677,12 @@
             "signatures": [],
             "note": "Uses Incapsula (Reference: https://www.whitefirdesign.com/blog/2016/11/08/more-evidence-that-sitelocks-trueshield-web-application-firewall-is-really-incapsulas-waf/)"
         },
+        "sniper": {
+            "company": "Wins",
+            "name": "Sniper",
+            "regex": "document\\.title = [^;]+Sniper WAF",
+            "signatures": []
+        },
         "sonicwall": {
             "company": "Dell",
             "name": "SonicWALL",
@@ -777,6 +783,14 @@
                 "c02b:RVZXu261OElCWapBYKcPk4JzWOpohM4JiUcMr2RWg1uQJbX3uhdOnthsOj+hXrAB16FcPxJOdLsXo2tKaK99n+i7c4RmkgI2FZjxtDtAeq+c36A4chW1XaTC"
             ]
         },
+        "wapples": {
+            "company": "Penta Security",
+            "name": "Wapples",
+            "regex": "",
+            "signatures": [
+                "60b7:RVZXum60OEhCWKpAYKYPkoJyWOpohM4IiUYMrmRWg1uQJLX2uhZOnthtOj+hXrAA16FcPhJOdLoXomtKaK59nui7c4RmkgI2FZjxtDtAeq+c3qA4chW1XKTC"
+            ]
+        },
         "watchguard": {
             "company": "WatchGuard Technologies",
             "name": "WatchGuard",
@@ -807,6 +821,14 @@
                 "902b:RVdXum60OEhCWKpAYKYPk4JyWOpohM4IiUYMrmRXg1qQJbX2uhdOn9htOj+hXrAB16FcPxJPdLsXomtKaK59nui7c4RmkgI2FZjxtDtAeq+c36A4chW1XaTC",
                 "4d4d:RVdXum60OEhCWKpAYKYPkoJyWOpohM4IiUYMrmRWg1qQJbX2uhdOn9htOj+hXrAB16FcPxJPdLsXomtKaK59nui7c4RmkgI2FZjxtDtAeq+c3qA4chS1XKTC",
                 "17a8:RVZXum60OEhCWKpAYKYPkoJyWOpohM4JiUcMrmRXg1qQJbX3uhdOnthtOj+hXrAB16FcPhJPdLoXomtKaK59nui6c4RmkgI2FZjxtDtAeq+c3qA4chS1XKTC"
+            ]
+        },
+        "webland": {
+            "company": "WebLand",
+            "name": "WebLand",
+            "regex": "Server: Apache Protected by Webland WAF",
+            "signatures": [
+                "4ba0:RVZXum60OEhCWKpAYKYPkoJzWOpohc4IiUYMr2RWg1uQJLX3uhZOnthsOj6hXrAA16BcPhJOdLoXomtKaK59nui6c4RmkgI2FZjxtDtAeq6c3qA4chS1XKTC"
             ]
         },
         "webseal": {
