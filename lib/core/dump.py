@@ -617,7 +617,7 @@ class Dump(object):
                                 warnMsg = "writing binary ('%s') content to file '%s' " % (mimetype, filepath)
                                 logger.warn(warnMsg)
 
-                                with open(filepath, "wb") as f:
+                                with openFile(filepath, "w+b", None) as f:
                                     _ = safechardecode(value, True)
                                     f.write(_)
 
