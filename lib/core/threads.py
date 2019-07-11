@@ -193,7 +193,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
         kb.threadException = True
         logger.error("thread %s: '%s'" % (threading.currentThread().getName(), ex))
 
-        if conf.get("verbose") > 1:
+        if conf.get("verbose") > 1 and isinstance(ex, SqlmapValueException):
             traceback.print_exc()
 
     except:
