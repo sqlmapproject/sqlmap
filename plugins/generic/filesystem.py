@@ -21,6 +21,8 @@ from lib.core.common import isStackingAvailable
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import readInput
 from lib.core.compat import xrange
+from lib.core.convert import encodeBase64
+from lib.core.convert import encodeHex
 from lib.core.convert import getText
 from lib.core.convert import getUnicode
 from lib.core.data import conf
@@ -134,8 +136,14 @@ class Filesystem(object):
     def fileContentEncode(self, content, encoding, single, chunkSize=256):
         retVal = []
 
-        if encoding:
-            content = getText(codecs.encode(content, encoding)).replace("\n", "")
+        if encoding == "hex":
+            content = encodeHex(content)
+        elif encoding == "base64":
+            content = encodeBase64(content)
+        else:
+            content = codecs.encode(content, encoding)
+
+        content = getText(content).replace("\n", "")
 
         if not single:
             if len(content) > chunkSize:
