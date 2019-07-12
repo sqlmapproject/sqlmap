@@ -88,691 +88,689 @@ def cmdLineParser(argv=None):
     parser = ArgumentParser(usage=usage)
 
     try:
-        parser.add_argument("--hh", dest="advancedHelp",
-                          action="store_true",
-                          help="Show advanced help message and exit")
+        parser.add_argument("--hh", dest="advancedHelp", action="store_true",
+            help="Show advanced help message and exit")
 
-        parser.add_argument("--version", dest="showVersion",
-                          action="store_true",
-                          help="Show program's version number and exit")
+        parser.add_argument("--version", dest="showVersion", action="store_true",
+            help="Show program's version number and exit")
 
         parser.add_argument("-v", dest="verbose", type=int,
-                          help="Verbosity level: 0-6 (default %d)" % defaults.verbose)
+            help="Verbosity level: 0-6 (default %d)" % defaults.verbose)
 
         # Target options
-        target = parser.add_argument_group("Target", "At least one of these "
-                             "options has to be provided to define the target(s)")
+        target = parser.add_argument_group("Target", "At least one of these options has to be provided to define the target(s)")
 
-        target.add_argument("-d", dest="direct", help="Connection string "
-                          "for direct database connection")
+        target.add_argument("-d", dest="direct",
+            help="Connection string for direct database connection")
 
-        target.add_argument("-u", "--url", dest="url", help="Target URL (e.g. \"http://www.site.com/vuln.php?id=1\")")
+        target.add_argument("-u", "--url", dest="url",
+            help="Target URL (e.g. \"http://www.site.com/vuln.php?id=1\")")
 
-        target.add_argument("-l", dest="logFile", help="Parse target(s) from Burp "
-                          "or WebScarab proxy log file")
+        target.add_argument("-l", dest="logFile",
+            help="Parse target(s) from Burp or WebScarab proxy log file")
 
-        target.add_argument("-x", dest="sitemapUrl", help="Parse target(s) from remote sitemap(.xml) file")
+        target.add_argument("-x", dest="sitemapUrl",
+            help="Parse target(s) from remote sitemap(.xml) file")
 
-        target.add_argument("-m", dest="bulkFile", help="Scan multiple targets given "
-                          "in a textual file ")
+        target.add_argument("-m", dest="bulkFile",
+            help="Scan multiple targets given in a textual file ")
 
         target.add_argument("-r", dest="requestFile",
-                          help="Load HTTP request from a file")
+            help="Load HTTP request from a file")
 
         target.add_argument("-g", dest="googleDork",
-                          help="Process Google dork results as target URLs")
+            help="Process Google dork results as target URLs")
 
         target.add_argument("-c", dest="configFile",
-                          help="Load options from a configuration INI file")
+            help="Load options from a configuration INI file")
 
         # Request options
-        request = parser.add_argument_group("Request", "These options can be used "
-                              "to specify how to connect to the target URL")
+        request = parser.add_argument_group("Request", "These options can be used to specify how to connect to the target URL")
 
         request.add_argument("--method", dest="method",
-                           help="Force usage of given HTTP method (e.g. PUT)")
+            help="Force usage of given HTTP method (e.g. PUT)")
 
         request.add_argument("--data", dest="data",
-                           help="Data string to be sent through POST (e.g. \"id=1\")")
+            help="Data string to be sent through POST (e.g. \"id=1\")")
 
         request.add_argument("--param-del", dest="paramDel",
-                           help="Character used for splitting parameter values (e.g. &)")
+            help="Character used for splitting parameter values (e.g. &)")
 
         request.add_argument("--cookie", dest="cookie",
-                           help="HTTP Cookie header value (e.g. \"PHPSESSID=a8d127e..\")")
+            help="HTTP Cookie header value (e.g. \"PHPSESSID=a8d127e..\")")
 
         request.add_argument("--cookie-del", dest="cookieDel",
-                           help="Character used for splitting cookie values (e.g. ;)")
+            help="Character used for splitting cookie values (e.g. ;)")
 
         request.add_argument("--load-cookies", dest="loadCookies",
-                           help="File containing cookies in Netscape/wget format")
+            help="File containing cookies in Netscape/wget format")
 
         request.add_argument("--drop-set-cookie", dest="dropSetCookie", action="store_true",
-                           help="Ignore Set-Cookie header from response")
+            help="Ignore Set-Cookie header from response")
 
         request.add_argument("--user-agent", dest="agent",
-                           help="HTTP User-Agent header value")
+            help="HTTP User-Agent header value")
 
         request.add_argument("--random-agent", dest="randomAgent", action="store_true",
-                           help="Use randomly selected HTTP User-Agent header value")
+            help="Use randomly selected HTTP User-Agent header value")
 
         request.add_argument("--host", dest="host",
-                           help="HTTP Host header value")
+            help="HTTP Host header value")
 
         request.add_argument("--referer", dest="referer",
-                           help="HTTP Referer header value")
+            help="HTTP Referer header value")
 
         request.add_argument("-H", "--header", dest="header",
-                           help="Extra header (e.g. \"X-Forwarded-For: 127.0.0.1\")")
+            help="Extra header (e.g. \"X-Forwarded-For: 127.0.0.1\")")
 
         request.add_argument("--headers", dest="headers",
-                           help="Extra headers (e.g. \"Accept-Language: fr\\nETag: 123\")")
+            help="Extra headers (e.g. \"Accept-Language: fr\\nETag: 123\")")
 
         request.add_argument("--auth-type", dest="authType",
-                           help="HTTP authentication type (Basic, Digest, NTLM or PKI)")
+            help="HTTP authentication type (Basic, Digest, NTLM or PKI)")
 
         request.add_argument("--auth-cred", dest="authCred",
-                           help="HTTP authentication credentials (name:password)")
+            help="HTTP authentication credentials (name:password)")
 
         request.add_argument("--auth-file", dest="authFile",
-                           help="HTTP authentication PEM cert/private key file")
+            help="HTTP authentication PEM cert/private key file")
 
         request.add_argument("--ignore-code", dest="ignoreCode", type=int,
-                           help="Ignore (problematic) HTTP error code (e.g. 401)")
+            help="Ignore (problematic) HTTP error code (e.g. 401)")
 
         request.add_argument("--ignore-proxy", dest="ignoreProxy", action="store_true",
-                           help="Ignore system default proxy settings")
+            help="Ignore system default proxy settings")
 
         request.add_argument("--ignore-redirects", dest="ignoreRedirects", action="store_true",
-                           help="Ignore redirection attempts")
+            help="Ignore redirection attempts")
 
         request.add_argument("--ignore-timeouts", dest="ignoreTimeouts", action="store_true",
-                           help="Ignore connection timeouts")
+            help="Ignore connection timeouts")
 
         request.add_argument("--proxy", dest="proxy",
-                           help="Use a proxy to connect to the target URL")
+            help="Use a proxy to connect to the target URL")
 
         request.add_argument("--proxy-cred", dest="proxyCred",
-                           help="Proxy authentication credentials (name:password)")
+            help="Proxy authentication credentials (name:password)")
 
         request.add_argument("--proxy-file", dest="proxyFile",
-                           help="Load proxy list from a file")
+            help="Load proxy list from a file")
 
         request.add_argument("--tor", dest="tor", action="store_true",
-                           help="Use Tor anonymity network")
+            help="Use Tor anonymity network")
 
         request.add_argument("--tor-port", dest="torPort",
-                           help="Set Tor proxy port other than default")
+            help="Set Tor proxy port other than default")
 
         request.add_argument("--tor-type", dest="torType",
-                           help="Set Tor proxy type (HTTP, SOCKS4 or SOCKS5 (default))")
+            help="Set Tor proxy type (HTTP, SOCKS4 or SOCKS5 (default))")
 
         request.add_argument("--check-tor", dest="checkTor", action="store_true",
-                           help="Check to see if Tor is used properly")
+            help="Check to see if Tor is used properly")
 
         request.add_argument("--delay", dest="delay", type=float,
-                           help="Delay in seconds between each HTTP request")
+            help="Delay in seconds between each HTTP request")
 
         request.add_argument("--timeout", dest="timeout", type=float,
-                           help="Seconds to wait before timeout connection (default %d)" % defaults.timeout)
+            help="Seconds to wait before timeout connection (default %d)" % defaults.timeout)
 
         request.add_argument("--retries", dest="retries", type=int,
-                           help="Retries when the connection timeouts (default %d)" % defaults.retries)
+            help="Retries when the connection timeouts (default %d)" % defaults.retries)
 
         request.add_argument("--randomize", dest="rParam",
-                           help="Randomly change value for given parameter(s)")
+            help="Randomly change value for given parameter(s)")
 
         request.add_argument("--safe-url", dest="safeUrl",
-                           help="URL address to visit frequently during testing")
+            help="URL address to visit frequently during testing")
 
         request.add_argument("--safe-post", dest="safePost",
-                           help="POST data to send to a safe URL")
+            help="POST data to send to a safe URL")
 
         request.add_argument("--safe-req", dest="safeReqFile",
-                           help="Load safe HTTP request from a file")
+            help="Load safe HTTP request from a file")
 
         request.add_argument("--safe-freq", dest="safeFreq", type=int,
-                           help="Test requests between two visits to a given safe URL")
+            help="Test requests between two visits to a given safe URL")
 
         request.add_argument("--skip-urlencode", dest="skipUrlEncode", action="store_true",
-                           help="Skip URL encoding of payload data")
+            help="Skip URL encoding of payload data")
 
         request.add_argument("--csrf-token", dest="csrfToken",
-                           help="Parameter used to hold anti-CSRF token")
+            help="Parameter used to hold anti-CSRF token")
 
         request.add_argument("--csrf-url", dest="csrfUrl",
-                           help="URL address to visit for extraction of anti-CSRF token")
+            help="URL address to visit for extraction of anti-CSRF token")
 
         request.add_argument("--force-ssl", dest="forceSSL", action="store_true",
-                           help="Force usage of SSL/HTTPS")
+            help="Force usage of SSL/HTTPS")
 
         request.add_argument("--chunked", dest="chunked", action="store_true",
-                           help="Use HTTP chunked transfer encoded (POST) requests")
+            help="Use HTTP chunked transfer encoded (POST) requests")
 
         request.add_argument("--hpp", dest="hpp", action="store_true",
-                           help="Use HTTP parameter pollution method")
+            help="Use HTTP parameter pollution method")
 
         request.add_argument("--eval", dest="evalCode",
-                           help="Evaluate provided Python code before the request (e.g. \"import hashlib;id2=hashlib.md5(id).hexdigest()\")")
+            help="Evaluate provided Python code before the request (e.g. \"import hashlib;id2=hashlib.md5(id).hexdigest()\")")
 
         # Optimization options
         optimization = parser.add_argument_group("Optimization", "These options can be used to optimize the performance of sqlmap")
 
         optimization.add_argument("-o", dest="optimize", action="store_true",
-                                help="Turn on all optimization switches")
+            help="Turn on all optimization switches")
 
         optimization.add_argument("--predict-output", dest="predictOutput", action="store_true",
-                                help="Predict common queries output")
+            help="Predict common queries output")
 
         optimization.add_argument("--keep-alive", dest="keepAlive", action="store_true",
-                                help="Use persistent HTTP(s) connections")
+            help="Use persistent HTTP(s) connections")
 
         optimization.add_argument("--null-connection", dest="nullConnection", action="store_true",
-                                help="Retrieve page length without actual HTTP response body")
+            help="Retrieve page length without actual HTTP response body")
 
         optimization.add_argument("--threads", dest="threads", type=int,
-                                help="Max number of concurrent HTTP(s) "
-                                "requests (default %d)" % defaults.threads)
+            help="Max number of concurrent HTTP(s) requests (default %d)" % defaults.threads)
 
         # Injection options
         injection = parser.add_argument_group("Injection", "These options can be used to specify which parameters to test for, provide custom injection payloads and optional tampering scripts")
 
         injection.add_argument("-p", dest="testParameter",
-                             help="Testable parameter(s)")
+            help="Testable parameter(s)")
 
         injection.add_argument("--skip", dest="skip",
-                             help="Skip testing for given parameter(s)")
+            help="Skip testing for given parameter(s)")
 
         injection.add_argument("--skip-static", dest="skipStatic", action="store_true",
-                             help="Skip testing parameters that not appear to be dynamic")
+            help="Skip testing parameters that not appear to be dynamic")
 
         injection.add_argument("--param-exclude", dest="paramExclude",
-                             help="Regexp to exclude parameters from testing (e.g. \"ses\")")
+            help="Regexp to exclude parameters from testing (e.g. \"ses\")")
 
         injection.add_argument("--param-filter", dest="paramFilter",
-                             help="Select testable parameter(s) by place (e.g. \"POST\")")
+            help="Select testable parameter(s) by place (e.g. \"POST\")")
 
         injection.add_argument("--dbms", dest="dbms",
-                             help="Force back-end DBMS to provided value")
+            help="Force back-end DBMS to provided value")
 
         injection.add_argument("--dbms-cred", dest="dbmsCred",
-                             help="DBMS authentication credentials (user:password)")
+            help="DBMS authentication credentials (user:password)")
 
         injection.add_argument("--os", dest="os",
-                             help="Force back-end DBMS operating system to provided value")
+            help="Force back-end DBMS operating system to provided value")
 
         injection.add_argument("--invalid-bignum", dest="invalidBignum", action="store_true",
-                             help="Use big numbers for invalidating values")
+            help="Use big numbers for invalidating values")
 
         injection.add_argument("--invalid-logical", dest="invalidLogical", action="store_true",
-                             help="Use logical operations for invalidating values")
+            help="Use logical operations for invalidating values")
 
         injection.add_argument("--invalid-string", dest="invalidString", action="store_true",
-                             help="Use random strings for invalidating values")
+            help="Use random strings for invalidating values")
 
         injection.add_argument("--no-cast", dest="noCast", action="store_true",
-                             help="Turn off payload casting mechanism")
+            help="Turn off payload casting mechanism")
 
         injection.add_argument("--no-escape", dest="noEscape", action="store_true",
-                             help="Turn off string escaping mechanism")
+            help="Turn off string escaping mechanism")
 
         injection.add_argument("--prefix", dest="prefix",
-                             help="Injection payload prefix string")
+            help="Injection payload prefix string")
 
         injection.add_argument("--suffix", dest="suffix",
-                             help="Injection payload suffix string")
+            help="Injection payload suffix string")
 
         injection.add_argument("--tamper", dest="tamper",
-                             help="Use given script(s) for tampering injection data")
+            help="Use given script(s) for tampering injection data")
 
         # Detection options
         detection = parser.add_argument_group("Detection", "These options can be used to customize the detection phase")
 
         detection.add_argument("--level", dest="level", type=int,
-                             help="Level of tests to perform (1-5, default %d)" % defaults.level)
+            help="Level of tests to perform (1-5, default %d)" % defaults.level)
 
         detection.add_argument("--risk", dest="risk", type=int,
-                             help="Risk of tests to perform (1-3, default %d)" % defaults.risk)
+            help="Risk of tests to perform (1-3, default %d)" % defaults.risk)
 
         detection.add_argument("--string", dest="string",
-                             help="String to match when query is evaluated to True")
+            help="String to match when query is evaluated to True")
 
         detection.add_argument("--not-string", dest="notString",
-                             help="String to match when query is evaluated to False")
+            help="String to match when query is evaluated to False")
 
         detection.add_argument("--regexp", dest="regexp",
-                             help="Regexp to match when query is evaluated to True")
+            help="Regexp to match when query is evaluated to True")
 
         detection.add_argument("--code", dest="code", type=int,
-                             help="HTTP code to match when query is evaluated to True")
+            help="HTTP code to match when query is evaluated to True")
 
         detection.add_argument("--text-only", dest="textOnly", action="store_true",
-                             help="Compare pages based only on the textual content")
+            help="Compare pages based only on the textual content")
 
         detection.add_argument("--titles", dest="titles", action="store_true",
-                             help="Compare pages based only on their titles")
+            help="Compare pages based only on their titles")
 
         # Techniques options
         techniques = parser.add_argument_group("Techniques", "These options can be used to tweak testing of specific SQL injection techniques")
 
         techniques.add_argument("--technique", dest="technique",
-                              help="SQL injection techniques to use (default \"%s\")" % defaults.technique)
+            help="SQL injection techniques to use (default \"%s\")" % defaults.technique)
 
         techniques.add_argument("--time-sec", dest="timeSec", type=int,
-                              help="Seconds to delay the DBMS response (default %d)" % defaults.timeSec)
+            help="Seconds to delay the DBMS response (default %d)" % defaults.timeSec)
 
         techniques.add_argument("--union-cols", dest="uCols",
-                              help="Range of columns to test for UNION query SQL injection")
+            help="Range of columns to test for UNION query SQL injection")
 
         techniques.add_argument("--union-char", dest="uChar",
-                              help="Character to use for bruteforcing number of columns")
+            help="Character to use for bruteforcing number of columns")
 
         techniques.add_argument("--union-from", dest="uFrom",
-                              help="Table to use in FROM part of UNION query SQL injection")
+            help="Table to use in FROM part of UNION query SQL injection")
 
         techniques.add_argument("--dns-domain", dest="dnsDomain",
-                              help="Domain name used for DNS exfiltration attack")
+            help="Domain name used for DNS exfiltration attack")
 
         techniques.add_argument("--second-url", dest="secondUrl",
-                              help="Resulting page URL searched for second-order response")
+            help="Resulting page URL searched for second-order response")
 
         techniques.add_argument("--second-req", dest="secondReq",
-                              help="Load second-order HTTP request from file")
+            help="Load second-order HTTP request from file")
 
         # Fingerprint options
         fingerprint = parser.add_argument_group("Fingerprint")
 
         fingerprint.add_argument("-f", "--fingerprint", dest="extensiveFp", action="store_true",
-                               help="Perform an extensive DBMS version fingerprint")
+            help="Perform an extensive DBMS version fingerprint")
 
         # Enumeration options
         enumeration = parser.add_argument_group("Enumeration", "These options can be used to enumerate the back-end database management system information, structure and data contained in the tables. Moreover you can run your own SQL statements")
 
         enumeration.add_argument("-a", "--all", dest="getAll", action="store_true",
-                               help="Retrieve everything")
+            help="Retrieve everything")
 
         enumeration.add_argument("-b", "--banner", dest="getBanner", action="store_true",
-                               help="Retrieve DBMS banner")
+            help="Retrieve DBMS banner")
 
         enumeration.add_argument("--current-user", dest="getCurrentUser", action="store_true",
-                               help="Retrieve DBMS current user")
+            help="Retrieve DBMS current user")
 
         enumeration.add_argument("--current-db", dest="getCurrentDb", action="store_true",
-                               help="Retrieve DBMS current database")
+            help="Retrieve DBMS current database")
 
         enumeration.add_argument("--hostname", dest="getHostname", action="store_true",
-                               help="Retrieve DBMS server hostname")
+            help="Retrieve DBMS server hostname")
 
         enumeration.add_argument("--is-dba", dest="isDba", action="store_true",
-                               help="Detect if the DBMS current user is DBA")
+            help="Detect if the DBMS current user is DBA")
 
         enumeration.add_argument("--users", dest="getUsers", action="store_true",
-                               help="Enumerate DBMS users")
+            help="Enumerate DBMS users")
 
         enumeration.add_argument("--passwords", dest="getPasswordHashes", action="store_true",
-                               help="Enumerate DBMS users password hashes")
+            help="Enumerate DBMS users password hashes")
 
         enumeration.add_argument("--privileges", dest="getPrivileges", action="store_true",
-                               help="Enumerate DBMS users privileges")
+            help="Enumerate DBMS users privileges")
 
         enumeration.add_argument("--roles", dest="getRoles", action="store_true",
-                               help="Enumerate DBMS users roles")
+            help="Enumerate DBMS users roles")
 
         enumeration.add_argument("--dbs", dest="getDbs", action="store_true",
-                               help="Enumerate DBMS databases")
+            help="Enumerate DBMS databases")
 
         enumeration.add_argument("--tables", dest="getTables", action="store_true",
-                               help="Enumerate DBMS database tables")
+            help="Enumerate DBMS database tables")
 
         enumeration.add_argument("--columns", dest="getColumns", action="store_true",
-                               help="Enumerate DBMS database table columns")
+            help="Enumerate DBMS database table columns")
 
         enumeration.add_argument("--schema", dest="getSchema", action="store_true",
-                               help="Enumerate DBMS schema")
+            help="Enumerate DBMS schema")
 
         enumeration.add_argument("--count", dest="getCount", action="store_true",
-                               help="Retrieve number of entries for table(s)")
+            help="Retrieve number of entries for table(s)")
 
         enumeration.add_argument("--dump", dest="dumpTable", action="store_true",
-                               help="Dump DBMS database table entries")
+            help="Dump DBMS database table entries")
 
         enumeration.add_argument("--dump-all", dest="dumpAll", action="store_true",
-                               help="Dump all DBMS databases tables entries")
+            help="Dump all DBMS databases tables entries")
 
         enumeration.add_argument("--search", dest="search", action="store_true",
-                               help="Search column(s), table(s) and/or database name(s)")
+            help="Search column(s), table(s) and/or database name(s)")
 
         enumeration.add_argument("--comments", dest="getComments", action="store_true",
-                               help="Check for DBMS comments during enumeration")
+            help="Check for DBMS comments during enumeration")
 
         enumeration.add_argument("--statements", dest="getStatements", action="store_true",
-                               help="Retrieve SQL statements being run on DBMS")
+            help="Retrieve SQL statements being run on DBMS")
 
         enumeration.add_argument("-D", dest="db",
-                               help="DBMS database to enumerate")
+            help="DBMS database to enumerate")
 
         enumeration.add_argument("-T", dest="tbl",
-                               help="DBMS database table(s) to enumerate")
+            help="DBMS database table(s) to enumerate")
 
         enumeration.add_argument("-C", dest="col",
-                               help="DBMS database table column(s) to enumerate")
+            help="DBMS database table column(s) to enumerate")
 
         enumeration.add_argument("-X", dest="exclude",
-                               help="DBMS database identifier(s) to not enumerate")
+            help="DBMS database identifier(s) to not enumerate")
 
         enumeration.add_argument("-U", dest="user",
-                               help="DBMS user to enumerate")
+            help="DBMS user to enumerate")
 
         enumeration.add_argument("--exclude-sysdbs", dest="excludeSysDbs", action="store_true",
-                               help="Exclude DBMS system databases when enumerating tables")
+            help="Exclude DBMS system databases when enumerating tables")
 
         enumeration.add_argument("--pivot-column", dest="pivotColumn",
-                               help="Pivot column name")
+            help="Pivot column name")
 
         enumeration.add_argument("--where", dest="dumpWhere",
-                               help="Use WHERE condition while table dumping")
+            help="Use WHERE condition while table dumping")
 
         enumeration.add_argument("--start", dest="limitStart", type=int,
-                               help="First dump table entry to retrieve")
+            help="First dump table entry to retrieve")
 
         enumeration.add_argument("--stop", dest="limitStop", type=int,
-                               help="Last dump table entry to retrieve")
+            help="Last dump table entry to retrieve")
 
         enumeration.add_argument("--first", dest="firstChar", type=int,
-                               help="First query output word character to retrieve")
+            help="First query output word character to retrieve")
 
         enumeration.add_argument("--last", dest="lastChar", type=int,
-                               help="Last query output word character to retrieve")
+            help="Last query output word character to retrieve")
 
         enumeration.add_argument("--sql-query", dest="sqlQuery",
-                               help="SQL statement to be executed")
+            help="SQL statement to be executed")
 
         enumeration.add_argument("--sql-shell", dest="sqlShell", action="store_true",
-                               help="Prompt for an interactive SQL shell")
+            help="Prompt for an interactive SQL shell")
 
         enumeration.add_argument("--sql-file", dest="sqlFile",
-                               help="Execute SQL statements from given file(s)")
+            help="Execute SQL statements from given file(s)")
 
         # Brute force options
         brute = parser.add_argument_group("Brute force", "These options can be used to run brute force checks")
 
         brute.add_argument("--common-tables", dest="commonTables", action="store_true",
-                         help="Check existence of common tables")
+            help="Check existence of common tables")
 
         brute.add_argument("--common-columns", dest="commonColumns", action="store_true",
-                         help="Check existence of common columns")
+            help="Check existence of common columns")
 
         brute.add_argument("--common-files", dest="commonFiles", action="store_true",
-                         help="Check existence of common files")
+            help="Check existence of common files")
 
         # User-defined function options
         udf = parser.add_argument_group("User-defined function injection", "These options can be used to create custom user-defined functions")
 
         udf.add_argument("--udf-inject", dest="udfInject", action="store_true",
-                       help="Inject custom user-defined functions")
+            help="Inject custom user-defined functions")
 
         udf.add_argument("--shared-lib", dest="shLib",
-                       help="Local path of the shared library")
+            help="Local path of the shared library")
 
         # File system options
         filesystem = parser.add_argument_group("File system access", "These options can be used to access the back-end database management system underlying file system")
 
         filesystem.add_argument("--file-read", dest="fileRead",
-                              help="Read a file from the back-end DBMS file system")
+            help="Read a file from the back-end DBMS file system")
 
         filesystem.add_argument("--file-write", dest="fileWrite",
-                              help="Write a local file on the back-end DBMS file system")
+            help="Write a local file on the back-end DBMS file system")
 
         filesystem.add_argument("--file-dest", dest="fileDest",
-                              help="Back-end DBMS absolute filepath to write to")
+            help="Back-end DBMS absolute filepath to write to")
 
         # Takeover options
         takeover = parser.add_argument_group("Operating system access", "These options can be used to access the back-end database management system underlying operating system")
 
         takeover.add_argument("--os-cmd", dest="osCmd",
-                            help="Execute an operating system command")
+            help="Execute an operating system command")
 
         takeover.add_argument("--os-shell", dest="osShell", action="store_true",
-                            help="Prompt for an interactive operating system shell")
+            help="Prompt for an interactive operating system shell")
 
         takeover.add_argument("--os-pwn", dest="osPwn", action="store_true",
-                            help="Prompt for an OOB shell, Meterpreter or VNC")
+            help="Prompt for an OOB shell, Meterpreter or VNC")
 
         takeover.add_argument("--os-smbrelay", dest="osSmb", action="store_true",
-                            help="One click prompt for an OOB shell, Meterpreter or VNC")
+            help="One click prompt for an OOB shell, Meterpreter or VNC")
 
         takeover.add_argument("--os-bof", dest="osBof", action="store_true",
-                            help="Stored procedure buffer overflow "
+            help="Stored procedure buffer overflow "
                                  "exploitation")
 
         takeover.add_argument("--priv-esc", dest="privEsc", action="store_true",
-                            help="Database process user privilege escalation")
+            help="Database process user privilege escalation")
 
         takeover.add_argument("--msf-path", dest="msfPath",
-                            help="Local path where Metasploit Framework is installed")
+            help="Local path where Metasploit Framework is installed")
 
         takeover.add_argument("--tmp-path", dest="tmpPath",
-                            help="Remote absolute path of temporary files directory")
+            help="Remote absolute path of temporary files directory")
 
         # Windows registry options
         windows = parser.add_argument_group("Windows registry access", "These options can be used to access the back-end database management system Windows registry")
 
         windows.add_argument("--reg-read", dest="regRead", action="store_true",
-                           help="Read a Windows registry key value")
+            help="Read a Windows registry key value")
 
         windows.add_argument("--reg-add", dest="regAdd", action="store_true",
-                           help="Write a Windows registry key value data")
+            help="Write a Windows registry key value data")
 
         windows.add_argument("--reg-del", dest="regDel", action="store_true",
-                           help="Delete a Windows registry key value")
+            help="Delete a Windows registry key value")
 
         windows.add_argument("--reg-key", dest="regKey",
-                           help="Windows registry key")
+            help="Windows registry key")
 
         windows.add_argument("--reg-value", dest="regVal",
-                           help="Windows registry key value")
+            help="Windows registry key value")
 
         windows.add_argument("--reg-data", dest="regData",
-                           help="Windows registry key value data")
+            help="Windows registry key value data")
 
         windows.add_argument("--reg-type", dest="regType",
-                           help="Windows registry key value type")
+            help="Windows registry key value type")
 
         # General options
         general = parser.add_argument_group("General", "These options can be used to set some general working parameters")
 
         general.add_argument("-s", dest="sessionFile",
-                           help="Load session from a stored (.sqlite) file")
+            help="Load session from a stored (.sqlite) file")
 
         general.add_argument("-t", dest="trafficFile",
-                           help="Log all HTTP traffic into a textual file")
+            help="Log all HTTP traffic into a textual file")
 
         general.add_argument("--batch", dest="batch", action="store_true",
-                           help="Never ask for user input, use the default behavior")
+            help="Never ask for user input, use the default behavior")
 
         general.add_argument("--binary-fields", dest="binaryFields",
-                           help="Result fields having binary values (e.g. \"digest\")")
+            help="Result fields having binary values (e.g. \"digest\")")
 
         general.add_argument("--check-internet", dest="checkInternet", action="store_true",
-                           help="Check Internet connection before assessing the target")
+            help="Check Internet connection before assessing the target")
 
         general.add_argument("--crawl", dest="crawlDepth", type=int,
-                           help="Crawl the website starting from the target URL")
+            help="Crawl the website starting from the target URL")
 
         general.add_argument("--crawl-exclude", dest="crawlExclude",
-                           help="Regexp to exclude pages from crawling (e.g. \"logout\")")
+            help="Regexp to exclude pages from crawling (e.g. \"logout\")")
 
         general.add_argument("--csv-del", dest="csvDel",
-                           help="Delimiting character used in CSV output (default \"%s\")" % defaults.csvDel)
+            help="Delimiting character used in CSV output (default \"%s\")" % defaults.csvDel)
 
         general.add_argument("--charset", dest="charset",
-                           help="Blind SQL injection charset (e.g. \"0123456789abcdef\")")
+            help="Blind SQL injection charset (e.g. \"0123456789abcdef\")")
 
         general.add_argument("--dump-format", dest="dumpFormat",
-                           help="Format of dumped data (CSV (default), HTML or SQLITE)")
+            help="Format of dumped data (CSV (default), HTML or SQLITE)")
 
         general.add_argument("--encoding", dest="encoding",
-                           help="Character encoding used for data retrieval (e.g. GBK)")
+            help="Character encoding used for data retrieval (e.g. GBK)")
 
         general.add_argument("--eta", dest="eta", action="store_true",
-                           help="Display for each output the estimated time of arrival")
+            help="Display for each output the estimated time of arrival")
 
         general.add_argument("--flush-session", dest="flushSession", action="store_true",
-                           help="Flush session files for current target")
+            help="Flush session files for current target")
 
         general.add_argument("--forms", dest="forms", action="store_true",
-                           help="Parse and test forms on target URL")
+            help="Parse and test forms on target URL")
 
         general.add_argument("--fresh-queries", dest="freshQueries", action="store_true",
-                           help="Ignore query results stored in session file")
+            help="Ignore query results stored in session file")
 
         general.add_argument("--har", dest="harFile",
-                           help="Log all HTTP traffic into a HAR file")
+            help="Log all HTTP traffic into a HAR file")
 
         general.add_argument("--hex", dest="hexConvert", action="store_true",
-                           help="Use hex conversion during data retrieval")
+            help="Use hex conversion during data retrieval")
 
         general.add_argument("--output-dir", dest="outputDir", action="store",
-                           help="Custom output directory path")
+            help="Custom output directory path")
 
         general.add_argument("--parse-errors", dest="parseErrors", action="store_true",
-                           help="Parse and display DBMS error messages from responses")
+            help="Parse and display DBMS error messages from responses")
 
         general.add_argument("--preprocess", dest="preprocess",
-                           help="Use given script(s) for preprocessing of response data")
+            help="Use given script(s) for preprocessing of response data")
 
         general.add_argument("--repair", dest="repair", action="store_true",
-                           help="Redump entries having unknown character marker (%s)" % INFERENCE_UNKNOWN_CHAR)
+            help="Redump entries having unknown character marker (%s)" % INFERENCE_UNKNOWN_CHAR)
 
         general.add_argument("--save", dest="saveConfig",
-                           help="Save options to a configuration INI file")
+            help="Save options to a configuration INI file")
 
         general.add_argument("--scope", dest="scope",
-                           help="Regexp to filter targets from provided proxy log")
+            help="Regexp to filter targets from provided proxy log")
 
         general.add_argument("--test-filter", dest="testFilter",
-                           help="Select tests by payloads and/or titles (e.g. ROW)")
+            help="Select tests by payloads and/or titles (e.g. ROW)")
 
         general.add_argument("--test-skip", dest="testSkip",
-                           help="Skip tests by payloads and/or titles (e.g. BENCHMARK)")
+            help="Skip tests by payloads and/or titles (e.g. BENCHMARK)")
 
         general.add_argument("--update", dest="updateAll", action="store_true",
-                           help="Update sqlmap")
+            help="Update sqlmap")
 
         # Miscellaneous options
         miscellaneous = parser.add_argument_group("Miscellaneous")
 
         miscellaneous.add_argument("-z", dest="mnemonics",
-                                 help="Use short mnemonics (e.g. \"flu,bat,ban,tec=EU\")")
+            help="Use short mnemonics (e.g. \"flu,bat,ban,tec=EU\")")
 
         miscellaneous.add_argument("--alert", dest="alert",
-                                 help="Run host OS command(s) when SQL injection is found")
+            help="Run host OS command(s) when SQL injection is found")
 
         miscellaneous.add_argument("--answers", dest="answers",
-                                 help="Set predefined answers (e.g. \"quit=N,follow=N\")")
+            help="Set predefined answers (e.g. \"quit=N,follow=N\")")
 
         miscellaneous.add_argument("--beep", dest="beep", action="store_true",
-                                 help="Beep on question and/or when SQL injection is found")
+            help="Beep on question and/or when SQL injection is found")
 
         miscellaneous.add_argument("--cleanup", dest="cleanup", action="store_true",
-                                 help="Clean up the DBMS from sqlmap specific UDF and tables")
+            help="Clean up the DBMS from sqlmap specific UDF and tables")
 
         miscellaneous.add_argument("--dependencies", dest="dependencies", action="store_true",
-                                 help="Check for missing (optional) sqlmap dependencies")
+            help="Check for missing (optional) sqlmap dependencies")
 
         miscellaneous.add_argument("--disable-coloring", dest="disableColoring", action="store_true",
-                                 help="Disable console output coloring")
+            help="Disable console output coloring")
 
         miscellaneous.add_argument("--gpage", dest="googlePage", type=int,
-                                 help="Use Google dork results from specified page number")
+            help="Use Google dork results from specified page number")
 
         miscellaneous.add_argument("--list-tampers", dest="listTampers", action="store_true",
-                                 help="Display list of available tamper scripts")
+            help="Display list of available tamper scripts")
 
         miscellaneous.add_argument("--mobile", dest="mobile", action="store_true",
-                                 help="Imitate smartphone through HTTP User-Agent header")
+            help="Imitate smartphone through HTTP User-Agent header")
 
         miscellaneous.add_argument("--offline", dest="offline", action="store_true",
-                                 help="Work in offline mode (only use session data)")
+            help="Work in offline mode (only use session data)")
 
         miscellaneous.add_argument("--purge", dest="purge", action="store_true",
-                                 help="Safely remove all content from sqlmap data directory")
+            help="Safely remove all content from sqlmap data directory")
 
         miscellaneous.add_argument("--skip-waf", dest="skipWaf", action="store_true",
-                                 help="Skip heuristic detection of WAF/IPS protection")
+            help="Skip heuristic detection of WAF/IPS protection")
 
         miscellaneous.add_argument("--smart", dest="smart", action="store_true",
-                                 help="Conduct thorough tests only if positive heuristic(s)")
+            help="Conduct thorough tests only if positive heuristic(s)")
 
         miscellaneous.add_argument("--sqlmap-shell", dest="sqlmapShell", action="store_true",
-                                 help="Prompt for an interactive sqlmap shell")
+            help="Prompt for an interactive sqlmap shell")
 
         miscellaneous.add_argument("--tmp-dir", dest="tmpDir",
-                                 help="Local directory for storing temporary files")
+            help="Local directory for storing temporary files")
 
         miscellaneous.add_argument("--web-root", dest="webRoot",
-                                 help="Web server document root directory (e.g. \"/var/www\")")
+            help="Web server document root directory (e.g. \"/var/www\")")
 
         miscellaneous.add_argument("--wizard", dest="wizard", action="store_true",
-                                 help="Simple wizard interface for beginner users")
+            help="Simple wizard interface for beginner users")
 
         # Hidden and/or experimental options
         parser.add_argument("--base64", dest="base64Parameter",
-                          help=SUPPRESS)
-#                          help="Parameter(s) containing Base64 encoded values")
+            help=SUPPRESS)  # "Parameter(s) containing Base64 encoded values"
 
         parser.add_argument("--crack", dest="hashFile",
-                          help=SUPPRESS)
-#                          help="Load and crack hashes from a file (standalone)")
+            help=SUPPRESS)  # "Load and crack hashes from a file (standalone)"
 
         parser.add_argument("--dummy", dest="dummy", action="store_true",
-                          help=SUPPRESS)
+            help=SUPPRESS)
 
         parser.add_argument("--murphy-rate", dest="murphyRate", type=int,
-                          help=SUPPRESS)
+            help=SUPPRESS)
 
         parser.add_argument("--debug", dest="debug", action="store_true",
-                          help=SUPPRESS)
+            help=SUPPRESS)
 
         parser.add_argument("--disable-precon", dest="disablePrecon", action="store_true",
-                          help=SUPPRESS)
+            help=SUPPRESS)
 
         parser.add_argument("--disable-stats", dest="disableStats", action="store_true",
-                          help=SUPPRESS)
+            help=SUPPRESS)
 
         parser.add_argument("--profile", dest="profile", action="store_true",
-                          help=SUPPRESS)
+            help=SUPPRESS)
 
         parser.add_argument("--force-dbms", dest="forceDbms",
-                          help=SUPPRESS)
+            help=SUPPRESS)
 
         parser.add_argument("--force-dns", dest="forceDns", action="store_true",
-                          help=SUPPRESS)
+            help=SUPPRESS)
 
         parser.add_argument("--force-pivoting", dest="forcePivoting", action="store_true",
-                          help=SUPPRESS)
+            help=SUPPRESS)
 
         parser.add_argument("--smoke-test", dest="smokeTest", action="store_true",
-                          help=SUPPRESS)
+            help=SUPPRESS)
 
         parser.add_argument("--live-test", dest="liveTest", action="store_true",
-                          help=SUPPRESS)
+            help=SUPPRESS)
 
         parser.add_argument("--vuln-test", dest="vulnTest", action="store_true",
-                          help=SUPPRESS)
+            help=SUPPRESS)
 
         parser.add_argument("--stop-fail", dest="stopFail", action="store_true",
-                          help=SUPPRESS)
+            help=SUPPRESS)
 
-        parser.add_argument("--run-case", dest="runCase", help=SUPPRESS)
+        parser.add_argument("--run-case", dest="runCase",
+            help=SUPPRESS)
 
         # API options
         parser.add_argument("--api", dest="api", action="store_true",
-                          help=SUPPRESS)
+            help=SUPPRESS)
 
-        parser.add_argument("--taskid", dest="taskid", help=SUPPRESS)
+        parser.add_argument("--taskid", dest="taskid",
+            help=SUPPRESS)
 
-        parser.add_argument("--database", dest="database", help=SUPPRESS)
+        parser.add_argument("--database", dest="database",
+            help=SUPPRESS)
 
         # Dirty hack to display longer options without breaking into two lines
         if hasattr(parser, "formatter"):
@@ -805,7 +803,7 @@ def cmdLineParser(argv=None):
                     action.option_strings = ["-hh"]
                     break
 
-        ## Dirty hack for inherent help message of switch '-h'
+        # Dirty hack for inherent help message of switch '-h'
         if hasattr(parser, "get_option"):
             option = parser.get_option("-h")
             option.help = option.help.capitalize().replace("this help", "basic help")

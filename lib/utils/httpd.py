@@ -82,7 +82,7 @@ class ReqHandler(_BaseHTTPServer.BaseHTTPRequestHandler):
                 name = match.group(1)
                 _ = getattr(self, "_%s" % name.lower(), None)
                 if _:
-                    content = self._format(content, **{ name: _() })
+                    content = self._format(content, **{name: _()})
 
             if "gzip" in self.headers.get(HTTP_HEADER.ACCEPT_ENCODING):
                 self.send_header(HTTP_HEADER.CONTENT_ENCODING, "gzip")
