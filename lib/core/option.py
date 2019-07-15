@@ -526,22 +526,10 @@ def _setMetasploit():
             raise SqlmapMissingDependence(errMsg)
 
         if not conf.msfPath:
-            def _(key, value):
-                retVal = None
-
-                try:
-                    from six.moves.winreg import ConnectRegistry, OpenKey, QueryValueEx, HKEY_LOCAL_MACHINE
-                    _ = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
-                    _ = OpenKey(_, key)
-                    retVal = QueryValueEx(_, value)[0]
-                except:
-                    logger.debug("unable to identify Metasploit installation path via registry key")
-
-                return retVal
-
-            conf.msfPath = _(r"SOFTWARE\Rapid7\Metasploit", "Location")
-            if conf.msfPath:
-                conf.msfPath = os.path.join(conf.msfPath, "msf3")
+            for candidate in os.environ.get("PATH", "").split(';'):
+                if all(_ in candidate for _ in ("metasploit", "bin")):
+                    conf.msfPath = os.path.dirname(candidate.rstrip('\\'))
+                    break
 
     if conf.osSmb:
         isAdmin = runningAsAdmin()

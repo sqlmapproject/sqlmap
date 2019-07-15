@@ -68,29 +68,11 @@ class Metasploit(object):
         self.payloadConnStr = None
         self.localIP = getLocalIP()
         self.remoteIP = getRemoteIP() or conf.hostname
-        self._msfCli = normalizePath(os.path.join(conf.msfPath, "msfcli"))
-        self._msfConsole = normalizePath(os.path.join(conf.msfPath, "msfconsole"))
-        self._msfEncode = normalizePath(os.path.join(conf.msfPath, "msfencode"))
-        self._msfPayload = normalizePath(os.path.join(conf.msfPath, "msfpayload"))
-        self._msfVenom = normalizePath(os.path.join(conf.msfPath, "msfvenom"))
-
-        if IS_WIN:
-            _ = conf.msfPath
-            while _:
-                if os.path.exists(os.path.join(_, "scripts")):
-                    _ = os.path.join(_, "scripts", "setenv.bat")
-                    break
-                else:
-                    old = _
-                    _ = normalizePath(os.path.join(_, ".."))
-                    if _ == old:
-                        break
-
-            self._msfCli = "%s & ruby %s" % (_, self._msfCli)
-            self._msfConsole = "%s & ruby %s" % (_, self._msfConsole)
-            self._msfEncode = "ruby %s" % self._msfEncode
-            self._msfPayload = "%s & ruby %s" % (_, self._msfPayload)
-            self._msfVenom = "%s & ruby %s" % (_, self._msfVenom)
+        self._msfCli = normalizePath(os.path.join(conf.msfPath, "msfcli%s" % (".bat" if IS_WIN else "")))
+        self._msfConsole = normalizePath(os.path.join(conf.msfPath, "msfconsole%s" % (".bat" if IS_WIN else "")))
+        self._msfEncode = normalizePath(os.path.join(conf.msfPath, "msfencode%s" % (".bat" if IS_WIN else "")))
+        self._msfPayload = normalizePath(os.path.join(conf.msfPath, "msfpayload%s" % (".bat" if IS_WIN else "")))
+        self._msfVenom = normalizePath(os.path.join(conf.msfPath, "msfvenom%s" % (".bat" if IS_WIN else "")))
 
         self._msfPayloadsList = {
             "windows": {
