@@ -455,12 +455,14 @@ def _findPageForms():
     if conf.url and not checkConnection():
         return
 
+    found = False
     infoMsg = "searching for forms"
     logger.info(infoMsg)
 
     if not any((conf.bulkFile, conf.googleDork, conf.sitemapUrl)):
         page, _, _ = Request.queryPage(content=True)
-        findPageForms(page, conf.url, True, True)
+        if findPageForms(page, conf.url, True, True):
+            found = True
     else:
         if conf.bulkFile:
             targets = getFileItems(conf.bulkFile)
@@ -473,7 +475,8 @@ def _findPageForms():
             try:
                 target = targets[i]
                 page, _, _ = Request.getPage(url=target.strip(), cookie=conf.cookie, crawling=True, raise404=False)
-                findPageForms(page, target, False, True)
+                if findPageForms(page, target, False, True):
+                    found = True
 
                 if conf.verbose in (1, 2):
                     status = '%d/%d links visited (%d%%)' % (i + 1, len(targets), round(100.0 * (i + 1) / len(targets)))
@@ -483,6 +486,10 @@ def _findPageForms():
             except Exception as ex:
                 errMsg = "problem occurred while searching for forms at '%s' ('%s')" % (target, getSafeExString(ex))
                 logger.error(errMsg)
+
+    if not found:
+        warnMsg = "no forms found"
+        logger.warn(warnMsg)
 
 def _setDBMSAuthentication():
     """
