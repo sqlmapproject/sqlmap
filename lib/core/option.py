@@ -1441,6 +1441,9 @@ def _createHomeDirectories():
     Creates directories inside sqlmap's home directory
     """
 
+    if conf.purge:
+        return
+
     for context in "output", "history":
         directory = paths["SQLMAP_%s_PATH" % context.upper()]
         try:
