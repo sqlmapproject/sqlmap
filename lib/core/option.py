@@ -1448,7 +1448,7 @@ def _createHomeDirectories():
     Creates directories inside sqlmap's home directory
     """
 
-    if conf.purge:
+    if conf.get("purge"):
         return
 
     for context in "output", "history":
@@ -1461,7 +1461,7 @@ def _createHomeDirectories():
             open(_, "w+b").close()
             os.remove(_)
 
-            if conf.outputDir and context == "output":
+            if conf.get("outputDir") and context == "output":
                 warnMsg = "using '%s' as the %s directory" % (directory, context)
                 logger.warn(warnMsg)
         except (OSError, IOError) as ex:
