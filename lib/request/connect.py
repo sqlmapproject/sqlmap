@@ -646,7 +646,7 @@ class Connect(object):
             if not multipart:
                 logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
 
-            if ex.code != conf.ignoreCode:
+            if ex.code not in (conf.ignoreCode or []):
                 if ex.code == _http_client.UNAUTHORIZED:
                     errMsg = "not authorized, try to provide right HTTP "
                     errMsg += "authentication type and valid credentials (%d)" % code

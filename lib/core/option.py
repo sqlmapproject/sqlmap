@@ -1555,6 +1555,15 @@ def _cleanupOptions():
     else:
         conf.testParameter = []
 
+    if conf.ignoreCode:
+        try:
+            conf.ignoreCode = [int(_) for _ in re.split(PARAMETER_SPLITTING_REGEX, conf.ignoreCode)]
+        except ValueError:
+            errMsg = "options '--ignore-code' should contain a list of integer values"
+            raise SqlmapSyntaxException(errMsg)
+    else:
+        conf.ignoreCode = []
+
     if conf.paramFilter:
         conf.paramFilter = [_.strip() for _ in re.split(PARAMETER_SPLITTING_REGEX, conf.paramFilter.upper())]
     else:
