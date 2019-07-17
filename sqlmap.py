@@ -330,6 +330,12 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
+        elif "can't allocate read lock" in excMsg:
+            errMsg = "there has been a problem in regular socket operation "
+            errMsg += "('%s')" % excMsg.strip().split('\n')[-1]
+            logger.critical(errMsg)
+            raise SystemExit
+
         elif "'DictObject' object has no attribute '" in excMsg and all(_ in errMsg for _ in ("(fingerprinted)", "(identified)")):
             errMsg = "there has been a problem in enumeration. "
             errMsg += "Because of a considerable chance of false-positive case "
