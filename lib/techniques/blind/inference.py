@@ -178,7 +178,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             else:
                 numThreads = 1
 
-        if numThreads == 1 and not timeBasedCompare and not conf.predictOutput:
+        if conf.threads == 1 and not any((timeBasedCompare, conf.predictOutput)):
             warnMsg = "running in a single-thread mode. Please consider "
             warnMsg += "usage of option '--threads' for faster data retrieval"
             singleTimeWarnMessage(warnMsg)
