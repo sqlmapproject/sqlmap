@@ -201,7 +201,7 @@ def _unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYLO
             if content and phrase in content:
                 validPayload = payload
                 kb.unionDuplicates = len(re.findall(phrase, content, re.I)) > 1
-                vector = (position, count, comment, prefix, suffix, kb.uChar, where, kb.unionDuplicates, False)
+                vector = (position, count, comment, prefix, suffix, kb.uChar, where, kb.unionDuplicates, conf.forcePartial)
 
                 if where == PAYLOAD.WHERE.ORIGINAL:
                     # Prepare expression with delimiters
