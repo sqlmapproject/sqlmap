@@ -21,6 +21,7 @@ from lib.core.common import getManualDirectories
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import getSQLSnippet
 from lib.core.common import getTechnique
+from lib.core.common import getTechniqueData
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import isWindowsDriveLetterPath
 from lib.core.common import normalizePath
@@ -149,7 +150,7 @@ class Web(object):
         query = ""
 
         if isTechniqueAvailable(getTechnique()):
-            where = kb.injection.data[getTechnique()].where
+            where = getTechniqueData().where
 
             if where == PAYLOAD.WHERE.NEGATIVE:
                 randInt = randomInt()

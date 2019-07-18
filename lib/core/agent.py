@@ -13,6 +13,7 @@ from lib.core.common import extractRegexResult
 from lib.core.common import filterNone
 from lib.core.common import getSQLSnippet
 from lib.core.common import getTechnique
+from lib.core.common import getTechniqueData
 from lib.core.common import isDBMSVersionAtLeast
 from lib.core.common import isNumber
 from lib.core.common import isTechniqueAvailable
@@ -91,7 +92,7 @@ class Agent(object):
         if kb.forceWhere:
             where = kb.forceWhere
         elif where is None and isTechniqueAvailable(getTechnique()):
-            where = kb.injection.data[getTechnique()].where
+            where = getTechniqueData().where
 
         if kb.injection.place is not None:
             place = kb.injection.place
@@ -236,7 +237,7 @@ class Agent(object):
         query = None
 
         if where is None and getTechnique() is not None and getTechnique() in kb.injection.data:
-            where = kb.injection.data[getTechnique()].where
+            where = getTechniqueData().where
 
         # If we are replacing (<where>) the parameter original value with
         # our payload do not prepend with the prefix
@@ -284,8 +285,8 @@ class Agent(object):
         suffix = kb.injection.suffix if kb.injection and suffix is None else suffix
 
         if getTechnique() is not None and getTechnique() in kb.injection.data:
-            where = kb.injection.data[getTechnique()].where if where is None else where
-            comment = kb.injection.data[getTechnique()].comment if comment is None else comment
+            where = getTechniqueData().where if where is None else where
+            comment = getTechniqueData().comment if comment is None else comment
 
         if Backend.getIdentifiedDbms() == DBMS.ACCESS and any((comment or "").startswith(_) for _ in ("--", "[GENERIC_SQL_COMMENT]")):
             comment = queries[DBMS.ACCESS].comment.query

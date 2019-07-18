@@ -23,6 +23,7 @@ from lib.core.common import getCharset
 from lib.core.common import getCounter
 from lib.core.common import getPartRun
 from lib.core.common import getTechnique
+from lib.core.common import getTechniqueData
 from lib.core.common import goGoodSamaritan
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
@@ -229,10 +230,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             result = not Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
 
-            if result and timeBasedCompare and kb.injection.data[getTechnique()].trueCode:
-                result = threadData.lastCode == kb.injection.data[getTechnique()].trueCode
+            if result and timeBasedCompare and getTechniqueData().trueCode:
+                result = threadData.lastCode == getTechniqueData().trueCode
                 if not result:
-                    warnMsg = "detected HTTP code '%s' in validation phase is differing from expected '%s'" % (threadData.lastCode, kb.injection.data[getTechnique()].trueCode)
+                    warnMsg = "detected HTTP code '%s' in validation phase is differing from expected '%s'" % (threadData.lastCode, getTechniqueData().trueCode)
                     singleTimeWarnMessage(warnMsg)
 
             incrementCounter(getTechnique())
@@ -342,7 +343,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     incrementCounter(getTechnique())
 
                     if not timeBasedCompare:
-                        unexpectedCode |= threadData.lastCode not in (kb.injection.data[getTechnique()].falseCode, kb.injection.data[getTechnique()].trueCode)
+                        unexpectedCode |= threadData.lastCode not in (getTechniqueData().falseCode, getTechniqueData().trueCode)
                         if unexpectedCode:
                             warnMsg = "unexpected HTTP code '%s' detected. Will use (extra) validation step in similar cases" % threadData.lastCode
                             singleTimeWarnMessage(warnMsg)
@@ -570,7 +571,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                         # One-shot query containing equals commonValue
                         testValue = unescaper.escape("'%s'" % commonValue) if "'" not in commonValue else unescaper.escape("%s" % commonValue, quote=False)
 
-                        query = kb.injection.data[getTechnique()].vector
+                        query = getTechniqueData().vector
                         query = agent.prefixQuery(query.replace(INFERENCE_MARKER, "(%s)%s%s" % (expressionUnescaped, INFERENCE_EQUALS_CHAR, testValue)))
                         query = agent.suffixQuery(query)
 
@@ -594,7 +595,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                         subquery = queries[Backend.getIdentifiedDbms()].substring.query % (expressionUnescaped, 1, len(commonPattern))
                         testValue = unescaper.escape("'%s'" % commonPattern) if "'" not in commonPattern else unescaper.escape("%s" % commonPattern, quote=False)
 
-                        query = kb.injection.data[getTechnique()].vector
+                        query = getTechniqueData().vector
                         query = agent.prefixQuery(query.replace(INFERENCE_MARKER, "(%s)=%s" % (subquery, testValue)))
                         query = agent.suffixQuery(query)
 

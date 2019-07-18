@@ -22,6 +22,7 @@ from lib.core.common import firstNotNone
 from lib.core.common import getConsoleWidth
 from lib.core.common import getPartRun
 from lib.core.common import getTechnique
+from lib.core.common import getTechniqueData
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
 from lib.core.common import incrementCounter
@@ -124,7 +125,7 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
                         nulledCastedField = queries[Backend.getIdentifiedDbms()].substring.query % (nulledCastedField, offset, kb.errorChunkLength)
 
                 # Forge the error-based SQL injection request
-                vector = kb.injection.data[getTechnique()].vector
+                vector = getTechniqueData().vector
                 query = agent.prefixQuery(vector)
                 query = agent.suffixQuery(query)
                 injExpression = expression.replace(field, nulledCastedField, 1) if field else expression

@@ -164,7 +164,7 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
 
     initTechnique(getTechnique())
 
-    query = agent.prefixQuery(kb.injection.data[getTechnique()].vector)
+    query = agent.prefixQuery(getTechniqueData().vector)
     query = agent.suffixQuery(query)
     payload = agent.payload(newValue=query)
     count = None
@@ -312,7 +312,7 @@ def _goBooleanProxy(expression):
     initTechnique(getTechnique())
 
     if conf.dnsDomain:
-        query = agent.prefixQuery(kb.injection.data[getTechnique()].vector)
+        query = agent.prefixQuery(getTechniqueData().vector)
         query = agent.suffixQuery(query)
         payload = agent.payload(newValue=query)
         output = _goDns(payload, expression)
@@ -320,7 +320,7 @@ def _goBooleanProxy(expression):
         if output is not None:
             return output
 
-    vector = kb.injection.data[getTechnique()].vector
+    vector = getTechniqueData().vector
     vector = vector.replace(INFERENCE_MARKER, expression)
     query = agent.prefixQuery(vector)
     query = agent.suffixQuery(query)

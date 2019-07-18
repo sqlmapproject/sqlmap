@@ -3222,7 +3222,7 @@ def getTechniqueData(technique=None):
     Returns injection data for technique specified
     """
 
-    return kb.injection.data.get(technique)
+    return kb.injection.data.get(technique if technique is not None else getTechnique())
 
 def isTechniqueAvailable(technique):
     """
