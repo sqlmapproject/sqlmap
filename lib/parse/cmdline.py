@@ -745,6 +745,9 @@ def cmdLineParser(argv=None):
         parser.add_argument("--force-dns", dest="forceDns", action="store_true",
             help=SUPPRESS)
 
+        parser.add_argument("--force-partial", dest="forcePartial", action="store_true",
+            help=SUPPRESS)
+
         parser.add_argument("--force-pivoting", dest="forcePivoting", action="store_true",
             help=SUPPRESS)
 
