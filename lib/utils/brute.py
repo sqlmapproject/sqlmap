@@ -102,7 +102,7 @@ def tableExists(tableFile, regex=None):
     threadData = getCurrentThreadData()
     threadData.shared.count = 0
     threadData.shared.limit = len(tables)
-    threadData.shared.value = []
+    threadData.shared.files = []
     threadData.shared.unique = set()
 
     def tableExistsThread():
@@ -128,7 +128,7 @@ def tableExists(tableFile, regex=None):
             kb.locks.io.acquire()
 
             if result and table.lower() not in threadData.shared.unique:
-                threadData.shared.value.append(table)
+                threadData.shared.files.append(table)
                 threadData.shared.unique.add(table.lower())
 
                 if conf.verbose in (1, 2) and not conf.api:
@@ -152,17 +152,17 @@ def tableExists(tableFile, regex=None):
     clearConsoleLine(True)
     dataToStdout("\n")
 
-    if not threadData.shared.value:
+    if not threadData.shared.files:
         warnMsg = "no table(s) found"
         logger.warn(warnMsg)
     else:
-        for item in threadData.shared.value:
+        for item in threadData.shared.files:
             if conf.db not in kb.data.cachedTables:
                 kb.data.cachedTables[conf.db] = [item]
             else:
                 kb.data.cachedTables[conf.db].append(item)
 
-    for _ in ((conf.db, item) for item in threadData.shared.value):
+    for _ in ((conf.db, item) for item in threadData.shared.files):
         if _ not in kb.brute.tables:
             kb.brute.tables.append(_)
 
@@ -224,7 +224,7 @@ def columnExists(columnFile, regex=None):
     threadData = getCurrentThreadData()
     threadData.shared.count = 0
     threadData.shared.limit = len(columns)
-    threadData.shared.value = []
+    threadData.shared.files = []
 
     def columnExistsThread():
         threadData = getCurrentThreadData()
@@ -244,7 +244,7 @@ def columnExists(columnFile, regex=None):
             kb.locks.io.acquire()
 
             if result:
-                threadData.shared.value.append(column)
+                threadData.shared.files.append(column)
 
                 if conf.verbose in (1, 2) and not conf.api:
                     clearConsoleLine(True)
@@ -269,13 +269,13 @@ def columnExists(columnFile, regex=None):
     clearConsoleLine(True)
     dataToStdout("\n")
 
-    if not threadData.shared.value:
+    if not threadData.shared.files:
         warnMsg = "no column(s) found"
         logger.warn(warnMsg)
     else:
         columns = {}
 
-        for column in threadData.shared.value:
+        for column in threadData.shared.files:
             if Backend.getIdentifiedDbms() in (DBMS.MYSQL,):
                 result = not inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE %s REGEXP '[^0-9]')", (column, table, column)))
             else:
@@ -327,7 +327,7 @@ def fileExists(pathFile):
     threadData = getCurrentThreadData()
     threadData.shared.count = 0
     threadData.shared.limit = len(paths)
-    threadData.shared.value = []
+    threadData.shared.files = []
 
     def fileExistsThread():
         threadData = getCurrentThreadData()
@@ -350,9 +350,9 @@ def fileExists(pathFile):
             kb.locks.io.acquire()
 
             if not isNoneValue(result):
-                threadData.shared.value.append(result)
+                threadData.shared.files.append(result)
 
-                if conf.verbose in (1, 2) and not conf.api:
+                if not conf.api:
                     clearConsoleLine(True)
                     infoMsg = "[%s] [INFO] retrieved: '%s'\n" % (time.strftime("%X"), path)
                     dataToStdout(infoMsg, True)
@@ -379,10 +379,10 @@ def fileExists(pathFile):
     clearConsoleLine(True)
     dataToStdout("\n")
 
-    if not threadData.shared.value:
+    if not threadData.shared.files:
         warnMsg = "no file(s) found"
         logger.warn(warnMsg)
     else:
-        retVal = threadData.shared.value
+        retVal = threadData.shared.files
 
     return retVal

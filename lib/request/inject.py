@@ -39,6 +39,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
+from lib.core.decorators import lockedmethod
 from lib.core.decorators import stackedmethod
 from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.enums import CHARSET_TYPE
@@ -351,6 +352,7 @@ def _goUnion(expression, unpack=True, dump=False):
 
     return output
 
+@lockedmethod
 @stackedmethod
 def getValue(expression, blind=True, union=True, error=True, time=True, fromUser=False, expected=None, batch=False, unpack=True, resumeValue=True, charsetType=None, firstChar=None, lastChar=None, dump=False, suppressOutput=None, expectingNone=False, safeCharEncode=True):
     """

@@ -14,7 +14,8 @@ from lib.core.settings import MAX_CACHE_ITEMS
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.threads import getCurrentThreadData
 
-_lock = threading.Lock()
+_cache_lock = threading.Lock()
+_method_locks = {}
 
 def cachedmethod(f, cache=LRUDict(capacity=MAX_CACHE_ITEMS)):
     """
@@ -38,12 +39,12 @@ def cachedmethod(f, cache=LRUDict(capacity=MAX_CACHE_ITEMS)):
         key = int(hashlib.md5("|".join(str(_) for _ in (f, args, kwargs)).encode(UNICODE_ENCODING)).hexdigest(), 16) & 0x7fffffffffffffff
 
         try:
-            with _lock:
+            with _cache_lock:
                 result = cache[key]
         except KeyError:
             result = f(*args, **kwargs)
 
-            with _lock:
+            with _cache_lock:
                 cache[key] = result
 
         return result
@@ -72,6 +73,19 @@ def stackedmethod(f):
         finally:
             if len(threadData.valueStack) > originalLevel:
                 threadData.valueStack = threadData.valueStack[:originalLevel]
+
+        return result
+
+    return _
+
+def lockedmethod(f):
+    @functools.wraps(f)
+    def _(*args, **kwargs):
+        if f not in _method_locks:
+            _method_locks[f] = threading.Lock()
+
+        with _method_locks[f]:
+            result = f(*args, **kwargs)
 
         return result
 
