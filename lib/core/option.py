@@ -1583,8 +1583,17 @@ def _cleanupOptions():
         conf.user = conf.user.replace(" ", "")
 
     if conf.rParam:
-        conf.rParam = conf.rParam.replace(" ", "")
-        conf.rParam = re.split(PARAMETER_SPLITTING_REGEX, conf.rParam)
+        if all(_ in conf.rParam for _ in ('=', ',')):
+            original = conf.rParam
+            conf.rParam = []
+            for part in original.split(';'):
+                if '=' in part:
+                    left, right = part.split('=', 1)
+                    conf.rParam.append(left)
+                    kb.randomPool[left] = filterNone(_.strip() for _ in right.split(','))
+        else:
+            conf.rParam = conf.rParam.replace(" ", "")
+            conf.rParam = re.split(PARAMETER_SPLITTING_REGEX, conf.rParam)
     else:
         conf.rParam = []
 
@@ -1946,6 +1955,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.processUserMarks = None
     kb.proxyAuthHeader = None
     kb.queryCounter = 0
+    kb.randomPool = {}
     kb.redirectChoice = None
     kb.reflectiveMechanism = True
     kb.reflectiveCounters = {REFLECTIVE_COUNTER.MISS: 0, REFLECTIVE_COUNTER.HIT: 0}
