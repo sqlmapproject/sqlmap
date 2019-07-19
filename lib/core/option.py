@@ -1591,6 +1591,8 @@ def _cleanupOptions():
                     left, right = part.split('=', 1)
                     conf.rParam.append(left)
                     kb.randomPool[left] = filterNone(_.strip() for _ in right.split(','))
+                else:
+                    conf.rParam.append(part)
         else:
             conf.rParam = conf.rParam.replace(" ", "")
             conf.rParam = re.split(PARAMETER_SPLITTING_REGEX, conf.rParam)
