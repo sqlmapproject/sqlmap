@@ -346,7 +346,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
                     incrementCounter(getTechnique())
 
-                    if not timeBasedCompare:
+                    if not timeBasedCompare and getTechniqueData() is not None:
                         unexpectedCode |= threadData.lastCode not in (getTechniqueData().falseCode, getTechniqueData().trueCode)
                         if unexpectedCode:
                             warnMsg = "unexpected HTTP code '%s' detected. Will use (extra) validation step in similar cases" % threadData.lastCode
