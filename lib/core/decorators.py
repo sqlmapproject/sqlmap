@@ -14,10 +14,11 @@ from lib.core.settings import MAX_CACHE_ITEMS
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.threads import getCurrentThreadData
 
+_cache = {}
 _cache_lock = threading.Lock()
 _method_locks = {}
 
-def cachedmethod(f, cache=LRUDict(capacity=MAX_CACHE_ITEMS)):
+def cachedmethod(f):
     """
     Method with a cached content
 
@@ -34,22 +35,24 @@ def cachedmethod(f, cache=LRUDict(capacity=MAX_CACHE_ITEMS)):
     Reference: http://code.activestate.com/recipes/325205-cache-decorator-in-python-24/
     """
 
+    _cache[f] = LRUDict(capacity=MAX_CACHE_ITEMS)
+
     @functools.wraps(f)
-    def _(*args, **kwargs):
+    def _f(*args, **kwargs):
         key = int(hashlib.md5("|".join(str(_) for _ in (f, args, kwargs)).encode(UNICODE_ENCODING)).hexdigest(), 16) & 0x7fffffffffffffff
 
         try:
             with _cache_lock:
-                result = cache[key]
+                result = _cache[f][key]
         except KeyError:
             result = f(*args, **kwargs)
 
             with _cache_lock:
-                cache[key] = result
+                _cache[f][key] = result
 
         return result
 
-    return _
+    return _f
 
 def stackedmethod(f):
     """
