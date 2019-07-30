@@ -1137,7 +1137,7 @@ def getTechnique():
     Thread-safe getting of currently used technique
     """
 
-    return getCurrentThreadData().technique or kb.technique
+    return getCurrentThreadData().technique or kb.get("technique")
 
 def randomRange(start=0, stop=1000, seed=None):
     """
