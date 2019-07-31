@@ -293,6 +293,7 @@ def _setRequestFromFile():
     if conf.requestFile:
         for requestFile in re.split(PARAMETER_SPLITTING_REGEX, conf.requestFile):
             requestFile = safeExpandUser(requestFile)
+            url = None
             seen = set()
 
             if not checkFile(requestFile, False):
@@ -310,6 +311,11 @@ def _setRequestFromFile():
                     if len(kb.targets) > 1:
                         conf.multipleTargets = True
                     seen.add(url)
+
+            if url is None:
+                errMsg = "specified file '%s' " % requestFile
+                errMsg += "does not contain a valid HTTP request"
+                raise SqlmapDataException(errMsg)
 
     if conf.secondReq:
         conf.secondReq = safeExpandUser(conf.secondReq)
