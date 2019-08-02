@@ -42,6 +42,7 @@ from lib.core.common import getRequestHeader
 from lib.core.common import getSafeExString
 from lib.core.common import isMultiThreadMode
 from lib.core.common import logHTTPTraffic
+from lib.core.common import openFile
 from lib.core.common import popValue
 from lib.core.common import pushValue
 from lib.core.common import randomizeParameterValue
@@ -60,6 +61,7 @@ from lib.core.common import wasLastResponseDelayed
 from lib.core.compat import patchHeaders
 from lib.core.compat import xrange
 from lib.core.convert import getBytes
+from lib.core.convert import getText
 from lib.core.convert import getUnicode
 from lib.core.data import conf
 from lib.core.data import kb
@@ -425,6 +427,14 @@ class Connect(object):
 
             if auxHeaders:
                 headers = forgeHeaders(auxHeaders, headers)
+
+            if kb.headersFile:
+                content = openFile(kb.headersFile, "rb").read()
+                for line in content.split("\n"):
+                    line = getText(line.strip())
+                    if ':' in line:
+                        header, value = line.split(':', 1)
+                        headers[header] = value
 
             for key, value in list(headers.items()):
                 del headers[key]

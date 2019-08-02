@@ -1302,6 +1302,9 @@ def _setHTTPExtraHeaders():
 
                 if header and value:
                     conf.httpHeaders.append((header, value))
+            elif headerValue.startswith('@'):
+                checkFile(headerValue[1:])
+                kb.headersFile = headerValue[1:]
             else:
                 errMsg = "invalid header value: %s. Valid header format is 'name:value'" % repr(headerValue).lstrip('u')
                 raise SqlmapSyntaxException(errMsg)
@@ -1905,6 +1908,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.forceWhere = None
     kb.futileUnion = None
     kb.heavilyDynamic = False
+    kb.headersFile = None
     kb.headersFp = {}
     kb.heuristicDbms = None
     kb.heuristicExtendedDbms = None
