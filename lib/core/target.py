@@ -111,7 +111,7 @@ def _setRequestParams():
         def process(match, repl):
             retVal = match.group(0)
 
-            if not (conf.testParameter and match.group("name") not in [removePostHintPrefix(_) for _ in conf.testParameter]):
+            if not (conf.testParameter and match.group("name") not in [removePostHintPrefix(_) for _ in conf.testParameter]) and match.group("name") == match.group("name").strip('\\'):
                 retVal = repl
                 while True:
                     _ = re.search(r"\\g<([^>]+)>", retVal)
@@ -121,6 +121,7 @@ def _setRequestParams():
                         break
                 if kb.customInjectionMark in retVal:
                     hintNames.append((retVal.split(kb.customInjectionMark)[0], match.group("name")))
+
             return retVal
 
         if kb.processUserMarks is None and kb.customInjectionMark in conf.data:
