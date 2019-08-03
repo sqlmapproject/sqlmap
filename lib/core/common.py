@@ -4881,7 +4881,6 @@ def zeroDepthSearch(expression, value):
         elif expression[index] == ')':
             depth -= 1
         elif depth == 0:
-            found = False
             if value.startswith('[') and value.endswith(']'):
                 if re.search(value, expression[index:index + 1]):
                     retVal.append(index)
