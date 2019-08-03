@@ -676,28 +676,28 @@ class Dump(object):
             else:
                 colConsiderStr = " '%s' was" % unsafeSQLIdentificatorNaming(column)
 
-            msg = "column%s found in the " % colConsiderStr
-            msg += "following databases:"
-            self._write(msg)
-
-            _ = {}
-
+            found = {}
             for db, tblData in dbs.items():
                 for tbl, colData in tblData.items():
                     for col, dataType in colData.items():
                         if column.lower() in col.lower():
-                            if db in _:
-                                if tbl in _[db]:
-                                    _[db][tbl][col] = dataType
+                            if db in found:
+                                if tbl in found[db]:
+                                    found[db][tbl][col] = dataType
                                 else:
-                                    _[db][tbl] = {col: dataType}
+                                    found[db][tbl] = {col: dataType}
                             else:
-                                _[db] = {}
-                                _[db][tbl] = {col: dataType}
+                                found[db] = {}
+                                found[db][tbl] = {col: dataType}
 
                             continue
 
-            self.dbTableColumns(_)
+            if found:
+                msg = "column%s found in the " % colConsiderStr
+                msg += "following databases:"
+                self._write(msg)
+
+                self.dbTableColumns(found)
 
     def sqlQuery(self, query, queryRes):
         self.string(query, queryRes, content_type=CONTENT_TYPE.SQL_QUERY)
