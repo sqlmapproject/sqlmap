@@ -114,6 +114,7 @@ def setDaemon(thread):
 def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardException=True, threadChoice=False, startThreadMsg=True):
     threads = []
 
+    kb.multipleCtrlC = False
     kb.threadContinue = True
     kb.threadException = False
     kb.technique = ThreadData.technique
@@ -185,6 +186,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
                 pass
 
         except KeyboardInterrupt:
+            kb.multipleCtrlC = True
             raise SqlmapThreadException("user aborted (Ctrl+C was pressed multiple times)")
 
         if forwardException:
@@ -199,13 +201,15 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
             traceback.print_exc()
 
     except:
-        from lib.core.common import unhandledExceptionMessage
-
         print()
-        kb.threadException = True
-        errMsg = unhandledExceptionMessage()
-        logger.error("thread %s: %s" % (threading.currentThread().getName(), errMsg))
-        traceback.print_exc()
+
+        if not kb.multipleCtrlC:
+            from lib.core.common import unhandledExceptionMessage
+
+            kb.threadException = True
+            errMsg = unhandledExceptionMessage()
+            logger.error("thread %s: %s" % (threading.currentThread().getName(), errMsg))
+            traceback.print_exc()
 
     finally:
         kb.threadContinue = True
