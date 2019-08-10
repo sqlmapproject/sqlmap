@@ -85,7 +85,7 @@ def lockedmethod(f):
     @functools.wraps(f)
     def _(*args, **kwargs):
         if f not in _method_locks:
-            _method_locks[f] = threading.Lock()
+            _method_locks[f] = threading.RLock()
 
         with _method_locks[f]:
             result = f(*args, **kwargs)
