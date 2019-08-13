@@ -78,7 +78,7 @@ class ReqHandler(_BaseHTTPServer.BaseHTTPRequestHandler):
             self.send_header(HTTP_HEADER.CONNECTION, "close")
 
         if content is not None:
-            for match in re.finditer(b"<!(\w+)!>", content):
+            for match in re.finditer(b"<!(\\w+)!>", content):
                 name = match.group(1)
                 _ = getattr(self, "_%s" % name.lower(), None)
                 if _:
