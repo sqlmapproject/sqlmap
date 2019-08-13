@@ -152,6 +152,9 @@ def cmdLineParser(argv=None):
         request.add_argument("--user-agent", dest="agent",
             help="HTTP User-Agent header value")
 
+        request.add_argument("--mobile", dest="mobile", action="store_true",
+            help="Imitate smartphone through HTTP User-Agent header")
+
         request.add_argument("--random-agent", dest="randomAgent", action="store_true",
             help="Use randomly selected HTTP User-Agent header value")
 
@@ -343,6 +346,9 @@ def cmdLineParser(argv=None):
 
         detection.add_argument("--code", dest="code", type=int,
             help="HTTP code to match when query is evaluated to True")
+
+        detection.add_argument("--smart", dest="smart", action="store_true",
+            help="Perform thorough tests only if positive heuristic(s)")
 
         detection.add_argument("--text-only", dest="textOnly", action="store_true",
             help="Compare pages based only on the textual content")
@@ -585,6 +591,9 @@ def cmdLineParser(argv=None):
         general.add_argument("-t", dest="trafficFile",
             help="Log all HTTP traffic into a textual file")
 
+        general.add_argument("--answers", dest="answers",
+            help="Set predefined answers (e.g. \"quit=N,follow=N\")")
+
         general.add_argument("--batch", dest="batch", action="store_true",
             help="Never ask for user input, use the default behavior")
 
@@ -593,6 +602,9 @@ def cmdLineParser(argv=None):
 
         general.add_argument("--check-internet", dest="checkInternet", action="store_true",
             help="Check Internet connection before assessing the target")
+
+        general.add_argument("--cleanup", dest="cleanup", action="store_true",
+            help="Clean up the DBMS from sqlmap specific UDF and tables")
 
         general.add_argument("--crawl", dest="crawlDepth", type=int,
             help="Crawl the website starting from the target URL")
@@ -624,6 +636,9 @@ def cmdLineParser(argv=None):
         general.add_argument("--fresh-queries", dest="freshQueries", action="store_true",
             help="Ignore query results stored in session file")
 
+        general.add_argument("--gpage", dest="googlePage", type=int,
+            help="Use Google dork results from specified page number")
+
         general.add_argument("--har", dest="harFile",
             help="Log all HTTP traffic into a HAR file")
 
@@ -648,17 +663,20 @@ def cmdLineParser(argv=None):
         general.add_argument("--scope", dest="scope",
             help="Regexp to filter targets from provided proxy log")
 
+        general.add_argument("--skip-waf", dest="skipWaf", action="store_true",
+            help="Skip heuristic detection of WAF/IPS protection")
+
         general.add_argument("--test-filter", dest="testFilter",
             help="Select tests by payloads and/or titles (e.g. ROW)")
 
         general.add_argument("--test-skip", dest="testSkip",
             help="Skip tests by payloads and/or titles (e.g. BENCHMARK)")
 
-        general.add_argument("--update", dest="updateAll", action="store_true",
-            help="Update sqlmap")
+        general.add_argument("--web-root", dest="webRoot",
+            help="Web server document root directory (e.g. \"/var/www\")")
 
         # Miscellaneous options
-        miscellaneous = parser.add_argument_group("Miscellaneous")
+        miscellaneous = parser.add_argument_group("Miscellaneous", "These options do not fit into any other category")
 
         miscellaneous.add_argument("-z", dest="mnemonics",
             help="Use short mnemonics (e.g. \"flu,bat,ban,tec=EU\")")
@@ -666,14 +684,8 @@ def cmdLineParser(argv=None):
         miscellaneous.add_argument("--alert", dest="alert",
             help="Run host OS command(s) when SQL injection is found")
 
-        miscellaneous.add_argument("--answers", dest="answers",
-            help="Set predefined answers (e.g. \"quit=N,follow=N\")")
-
         miscellaneous.add_argument("--beep", dest="beep", action="store_true",
             help="Beep on question and/or when SQL injection is found")
-
-        miscellaneous.add_argument("--cleanup", dest="cleanup", action="store_true",
-            help="Clean up the DBMS from sqlmap specific UDF and tables")
 
         miscellaneous.add_argument("--dependencies", dest="dependencies", action="store_true",
             help="Check for missing (optional) sqlmap dependencies")
@@ -681,14 +693,8 @@ def cmdLineParser(argv=None):
         miscellaneous.add_argument("--disable-coloring", dest="disableColoring", action="store_true",
             help="Disable console output coloring")
 
-        miscellaneous.add_argument("--gpage", dest="googlePage", type=int,
-            help="Use Google dork results from specified page number")
-
         miscellaneous.add_argument("--list-tampers", dest="listTampers", action="store_true",
             help="Display list of available tamper scripts")
-
-        miscellaneous.add_argument("--mobile", dest="mobile", action="store_true",
-            help="Imitate smartphone through HTTP User-Agent header")
 
         miscellaneous.add_argument("--offline", dest="offline", action="store_true",
             help="Work in offline mode (only use session data)")
@@ -696,20 +702,14 @@ def cmdLineParser(argv=None):
         miscellaneous.add_argument("--purge", dest="purge", action="store_true",
             help="Safely remove all content from sqlmap data directory")
 
-        miscellaneous.add_argument("--skip-waf", dest="skipWaf", action="store_true",
-            help="Skip heuristic detection of WAF/IPS protection")
-
-        miscellaneous.add_argument("--smart", dest="smart", action="store_true",
-            help="Conduct thorough tests only if positive heuristic(s)")
-
         miscellaneous.add_argument("--sqlmap-shell", dest="sqlmapShell", action="store_true",
             help="Prompt for an interactive sqlmap shell")
 
         miscellaneous.add_argument("--tmp-dir", dest="tmpDir",
             help="Local directory for storing temporary files")
 
-        miscellaneous.add_argument("--web-root", dest="webRoot",
-            help="Web server document root directory (e.g. \"/var/www\")")
+        miscellaneous.add_argument("--update", dest="updateAll", action="store_true",
+            help="Update sqlmap")
 
         miscellaneous.add_argument("--wizard", dest="wizard", action="store_true",
             help="Simple wizard interface for beginner users")
