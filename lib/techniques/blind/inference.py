@@ -8,7 +8,6 @@ See the file 'LICENSE' for copying permission
 from __future__ import division
 
 import re
-import threading
 import time
 
 from extra.safe2bin.safe2bin import safecharencode
@@ -190,10 +189,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             else:
                 dataToStdout("\r[%s] [INFO] retrieved: " % time.strftime("%X"))
 
-        hintlock = threading.Lock()
-
         def tryHint(idx):
-            with hintlock:
+            with kb.locks.hint:
                 hintValue = kb.hintValue
 
             if payload is not None and len(hintValue or "") > 0 and len(hintValue) >= idx:
@@ -212,7 +209,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 if result:
                     return hintValue[idx - 1]
 
-            with hintlock:
+            with kb.locks.hint:
                 kb.hintValue = ""
 
             return None
