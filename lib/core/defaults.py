@@ -20,6 +20,7 @@ _defaults = {
     "level": 1,
     "risk": 1,
     "dumpFormat": "CSV",
+    "tablePrefix": "sqlmap",
     "technique": "BEUSTQ",
     "torType": "SOCKS5",
 }

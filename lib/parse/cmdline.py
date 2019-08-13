@@ -666,6 +666,9 @@ def cmdLineParser(argv=None):
         general.add_argument("--skip-waf", dest="skipWaf", action="store_true",
             help="Skip heuristic detection of WAF/IPS protection")
 
+        general.add_argument("--table-prefix", dest="tablePrefix",
+            help="Prefix used for temporary tables (default: \"%s\")" % defaults.tablePrefix)
+
         general.add_argument("--test-filter", dest="testFilter",
             help="Select tests by payloads and/or titles (e.g. ROW)")
 

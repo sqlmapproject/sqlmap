@@ -33,7 +33,6 @@ from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapUndefinedMethod
-from lib.core.settings import TAKEOVER_TABLE_PREFIX
 from lib.core.settings import UNICODE_ENCODING
 from lib.request import inject
 
@@ -43,7 +42,7 @@ class Filesystem(object):
     """
 
     def __init__(self):
-        self.fileTblName = "%sfile" % TAKEOVER_TABLE_PREFIX
+        self.fileTblName = "%sfile" % conf.tablePrefix
         self.tblField = "data"
 
     def _checkFileLength(self, localFile, remoteFile, fileRead=False):

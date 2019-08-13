@@ -25,7 +25,6 @@ from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import TIMEOUT_STATE
-from lib.core.settings import TAKEOVER_TABLE_PREFIX
 from lib.core.settings import UNICODE_ENCODING
 from lib.utils.timeout import timeout
 
@@ -54,7 +53,7 @@ def direct(query, content=True):
 
     if not select and "EXEC " not in query.upper():
         timeout(func=conf.dbmsConnector.execute, args=(query,), duration=conf.timeout, default=None)
-    elif not (output and ("%soutput" % TAKEOVER_TABLE_PREFIX) not in query and ("%sfile" % TAKEOVER_TABLE_PREFIX) not in query):
+    elif not (output and ("%soutput" % conf.tablePrefix) not in query and ("%sfile" % conf.tablePrefix) not in query):
         output, state = timeout(func=conf.dbmsConnector.select, args=(query,), duration=conf.timeout, default=None)
         if state == TIMEOUT_STATE.NORMAL:
             hashDBWrite(query, output, True)
