@@ -97,11 +97,11 @@ def exceptionHandledFunction(threadFunction, silent=False):
     except Exception as ex:
         from lib.core.common import getSafeExString
 
-        if not silent and kb.get("threadContinue"):
+        if not silent and kb.get("threadContinue") and not isinstance(ex, SqlmapUserQuitException):
             errMsg = getSafeExString(ex) if isinstance(ex, SqlmapBaseException) else "%s: %s" % (type(ex).__name__, getSafeExString(ex))
             logger.error("thread %s: '%s'" % (threading.currentThread().getName(), errMsg))
 
-            if conf.get("verbose") > 1 and not isinstance(ex, (SqlmapUserQuitException, SqlmapConnectionException)):
+            if conf.get("verbose") > 1 and not isinstance(ex, SqlmapConnectionException):
                 traceback.print_exc()
 
 def setDaemon(thread):
