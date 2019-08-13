@@ -60,6 +60,7 @@ def _addPageTextWords():
 
     return wordsList
 
+@stackedmethod
 def tableExists(tableFile, regex=None):
     if kb.tableExistsChoice is None and not any(_ for _ in kb.injection.data if _ not in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED)) and not conf.direct:
         warnMsg = "it's not recommended to use '%s' and/or '%s' " % (PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.TIME], PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.STACKED])
@@ -74,14 +75,16 @@ def tableExists(tableFile, regex=None):
 
     result = inject.checkBooleanExpression("%s" % safeStringFormat(BRUTE_TABLE_EXISTS_TEMPLATE, (randomInt(1), randomStr())))
 
-    if conf.db and Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
-        conf.db = conf.db.upper()
-
     if result:
         errMsg = "can't use table existence check because of detected invalid results "
         errMsg += "(most likely caused by inability of the used injection "
         errMsg += "to distinguish erroneous results)"
         raise SqlmapDataException(errMsg)
+
+    pushValue(conf.db)
+
+    if conf.db and Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+        conf.db = conf.db.upper()
 
     message = "which common tables (wordlist) file do you want to use?\n"
     message += "[1] default '%s' (press Enter)\n" % tableFile
@@ -92,80 +95,88 @@ def tableExists(tableFile, regex=None):
         message = "what's the custom common tables file location?\n"
         tableFile = readInput(message) or tableFile
 
-    infoMsg = "checking table existence using items from '%s'" % tableFile
+    infoMsg = "performing table existence using items from '%s'" % tableFile
     logger.info(infoMsg)
 
     tables = getFileItems(tableFile, lowercase=Backend.getIdentifiedDbms() in (DBMS.ACCESS,), unique=True)
     tables.extend(_addPageTextWords())
     tables = filterListValue(tables, regex)
 
-    threadData = getCurrentThreadData()
-    threadData.shared.count = 0
-    threadData.shared.limit = len(tables)
-    threadData.shared.files = []
-    threadData.shared.unique = set()
+    for conf.db in (conf.db.split(',') if conf.db else [conf.db]):
+        if conf.db:
+            infoMsg = "checking database '%s'" % conf.db
+            logger.info(infoMsg)
 
-    def tableExistsThread():
         threadData = getCurrentThreadData()
+        threadData.shared.count = 0
+        threadData.shared.limit = len(tables)
+        threadData.shared.files = []
+        threadData.shared.unique = set()
 
-        while kb.threadContinue:
-            kb.locks.count.acquire()
-            if threadData.shared.count < threadData.shared.limit:
-                table = safeSQLIdentificatorNaming(tables[threadData.shared.count], True)
-                threadData.shared.count += 1
-                kb.locks.count.release()
-            else:
-                kb.locks.count.release()
-                break
+        def tableExistsThread():
+            threadData = getCurrentThreadData()
 
-            if conf.db and METADB_SUFFIX not in conf.db and Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD):
-                fullTableName = "%s.%s" % (conf.db, table)
-            else:
-                fullTableName = table
+            while kb.threadContinue:
+                kb.locks.count.acquire()
+                if threadData.shared.count < threadData.shared.limit:
+                    table = safeSQLIdentificatorNaming(tables[threadData.shared.count], True)
+                    threadData.shared.count += 1
+                    kb.locks.count.release()
+                else:
+                    kb.locks.count.release()
+                    break
 
-            result = inject.checkBooleanExpression("%s" % safeStringFormat(BRUTE_TABLE_EXISTS_TEMPLATE, (randomInt(1), fullTableName)))
+                if conf.db and METADB_SUFFIX not in conf.db and Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD):
+                    fullTableName = "%s.%s" % (conf.db, table)
+                else:
+                    fullTableName = table
 
-            kb.locks.io.acquire()
+                result = inject.checkBooleanExpression("%s" % safeStringFormat(BRUTE_TABLE_EXISTS_TEMPLATE, (randomInt(1), fullTableName)))
 
-            if result and table.lower() not in threadData.shared.unique:
-                threadData.shared.files.append(table)
-                threadData.shared.unique.add(table.lower())
+                kb.locks.io.acquire()
 
-                if conf.verbose in (1, 2) and not conf.api:
-                    clearConsoleLine(True)
-                    infoMsg = "[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), unsafeSQLIdentificatorNaming(table))
-                    dataToStdout(infoMsg, True)
+                if result and table.lower() not in threadData.shared.unique:
+                    threadData.shared.files.append(table)
+                    threadData.shared.unique.add(table.lower())
 
-            if conf.verbose in (1, 2):
-                status = '%d/%d items (%d%%)' % (threadData.shared.count, threadData.shared.limit, round(100.0 * threadData.shared.count / threadData.shared.limit))
-                dataToStdout("\r[%s] [INFO] tried %s" % (time.strftime("%X"), status), True)
+                    if conf.verbose in (1, 2) and not conf.api:
+                        clearConsoleLine(True)
+                        infoMsg = "[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), unsafeSQLIdentificatorNaming(table))
+                        dataToStdout(infoMsg, True)
 
-            kb.locks.io.release()
+                if conf.verbose in (1, 2):
+                    status = '%d/%d items (%d%%)' % (threadData.shared.count, threadData.shared.limit, round(100.0 * threadData.shared.count / threadData.shared.limit))
+                    dataToStdout("\r[%s] [INFO] tried %s" % (time.strftime("%X"), status), True)
 
-    try:
-        runThreads(conf.threads, tableExistsThread, threadChoice=True)
-    except KeyboardInterrupt:
-        warnMsg = "user aborted during table existence "
-        warnMsg += "check. sqlmap will display partial output"
-        logger.warn(warnMsg)
+                kb.locks.io.release()
 
-    clearConsoleLine(True)
-    dataToStdout("\n")
+        try:
+            runThreads(conf.threads, tableExistsThread, threadChoice=True)
+        except KeyboardInterrupt:
+            warnMsg = "user aborted during table existence "
+            warnMsg += "check. sqlmap will display partial output"
+            logger.warn(warnMsg)
 
-    if not threadData.shared.files:
-        warnMsg = "no table(s) found"
-        logger.warn(warnMsg)
-    else:
-        for item in threadData.shared.files:
-            if conf.db not in kb.data.cachedTables:
-                kb.data.cachedTables[conf.db] = [item]
-            else:
-                kb.data.cachedTables[conf.db].append(item)
+        clearConsoleLine(True)
+        dataToStdout("\n")
 
-    for _ in ((conf.db, item) for item in threadData.shared.files):
-        if _ not in kb.brute.tables:
-            kb.brute.tables.append(_)
+        if not threadData.shared.files:
+            warnMsg = "no table(s) found"
+            if conf.db:
+                 warnMsg += "for database '%s'" % conf.db
+            logger.warn(warnMsg)
+        else:
+            for item in threadData.shared.files:
+                if conf.db not in kb.data.cachedTables:
+                    kb.data.cachedTables[conf.db] = [item]
+                else:
+                    kb.data.cachedTables[conf.db].append(item)
 
+        for _ in ((conf.db, item) for item in threadData.shared.files):
+            if _ not in kb.brute.tables:
+                kb.brute.tables.append(_)
+
+    conf.db = popValue()
     hashDBWrite(HASHDB_KEYS.KB_BRUTE_TABLES, kb.brute.tables, True)
 
     return kb.data.cachedTables
