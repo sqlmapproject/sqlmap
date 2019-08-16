@@ -634,7 +634,7 @@ class Metasploit(object):
             self.shellcodeexecLocal = os.path.join(self.shellcodeexecLocal, "windows", "shellcodeexec.x%s.exe_" % "32")
             content = decloak(self.shellcodeexecLocal)
             if SHELLCODEEXEC_RANDOM_STRING_MARKER in content:
-                content = content.replace(SHELLCODEEXEC_RANDOM_STRING_MARKER, randomStr(len(SHELLCODEEXEC_RANDOM_STRING_MARKER)))
+                content = content.replace(SHELLCODEEXEC_RANDOM_STRING_MARKER, getBytes(randomStr(len(SHELLCODEEXEC_RANDOM_STRING_MARKER))))
                 _ = cloak(data=content)
                 handle, self.shellcodeexecLocal = tempfile.mkstemp(suffix="%s.exe_" % "32")
                 os.close(handle)
