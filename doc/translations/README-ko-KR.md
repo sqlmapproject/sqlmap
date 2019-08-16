@@ -4,8 +4,6 @@
 
 sqlmap은 SQL 인젝션 결함 탐지 및 활용, 데이터베이스 서버 장악 프로세스를 자동화 하는 오픈소스 침투 테스팅 도구입니다. 최고의 침투 테스터, 데이터베이스 핑거프린팅 부터 데이터베이스 데이터 읽기, 대역 외 연결을 통한 기반 파일 시스템 접근 및 명령어 실행에 걸치는 광범위한 스위치들을 위한 강력한 탐지 엔진과 다수의 편리한 기능이 탑재되어 있습니다.
 
-**sqlmap 프로젝트는 [Netsparker Web Application Security Scanner](https://www.netsparker.com/scan-website-security-issues/?utm_source=sqlmap.org&utm_medium=banner&utm_campaign=github)의 후원을 받습니다.**
-
 스크린샷
 ----
 
