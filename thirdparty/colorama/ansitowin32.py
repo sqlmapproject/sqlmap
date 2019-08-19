@@ -184,6 +184,8 @@ class AnsiToWin32(object):
             if not (err.errno == 0 and retry > 0):
                 raise
             self._write(text, retry-1)
+        except UnicodeError:
+            self.wrapped.write('?')
 
     def convert_ansi(self, paramstring, command):
         if self.convert:
