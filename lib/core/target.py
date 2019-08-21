@@ -125,8 +125,8 @@ def _setRequestParams():
             return retVal
 
         if kb.processUserMarks is None and kb.customInjectionMark in conf.data:
-            message = "custom injection marker ('%s') found in option " % kb.customInjectionMark
-            message += "'--data'. Do you want to process it? [Y/n/q] "
+            message = "custom injection marker ('%s') found in POST " % kb.customInjectionMark
+            message += "body. Do you want to process it? [Y/n/q] "
             choice = readInput(message, default='Y').upper()
 
             if choice == 'Q':
