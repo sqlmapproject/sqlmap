@@ -759,8 +759,7 @@ class Connect(object):
 
                 if kb.connErrorCounter >= MAX_CONSECUTIVE_CONNECTION_ERRORS and kb.connErrorChoice is None:
                     message = "there seems to be a continuous problem with connection to the target. "
-                    message += "Are you sure that you want to continue "
-                    message += "with further target testing? [y/N] "
+                    message += "Are you sure that you want to continue? [y/N] "
 
                     kb.connErrorChoice = readInput(message, default='N', boolean=True)
 
