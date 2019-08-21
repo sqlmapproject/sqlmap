@@ -763,16 +763,13 @@ class Connect(object):
 
                     kb.connErrorChoice = readInput(message, default='N', boolean=True)
 
-                if kb.connErrorChoice is not None:
-                    if kb.connErrorChoice:
-                        raise SqlmapConnectionException(warnMsg)
-                    else:
-                        raise SqlmapUserQuitException
+                if kb.connErrorChoice is False:
+                    raise SqlmapUserQuitException
 
             if "forcibly closed" in tbMsg:
                 logger.critical(warnMsg)
                 return None, None, None
-            elif ignoreTimeout and any(_ in tbMsg for _ in ("timed out", "IncompleteRead")):
+            elif ignoreTimeout and any(_ in tbMsg for _ in ("timed out", "IncompleteRead", "Interrupted system call")):
                 return None if not conf.ignoreTimeouts else "", None, None
             elif threadData.retriesCount < conf.retries and not kb.threadException:
                 warnMsg += ". sqlmap is going to retry the request"
