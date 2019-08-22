@@ -422,6 +422,15 @@ def start():
             if not checkConnection(suppressOutput=conf.forms) or not checkString() or not checkRegexp():
                 continue
 
+            if conf.rParam and kb.originalPage:
+                kb.randomPool = dict([_ for _ in kb.randomPool.items() if isinstance(_[1], list)])
+
+                for match in re.finditer(r"(?si)<select[^>]+\bname\s*=\s*[\"']([^\"']+)(.+?)</select>", kb.originalPage):
+                    name, _ = match.groups()
+                    options = tuple(re.findall(r"<option[^>]+\bvalue\s*=\s*[\"']([^\"']+)", _))
+                    if options:
+                        kb.randomPool[name] = options
+
             checkWaf()
 
             if conf.nullConnection:
