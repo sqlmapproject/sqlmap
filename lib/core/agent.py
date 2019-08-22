@@ -51,6 +51,7 @@ from lib.core.settings import REPLACEMENT_MARKER
 from lib.core.settings import SINGLE_QUOTE_MARKER
 from lib.core.settings import SLEEP_TIME_MARKER
 from lib.core.unescaper import unescaper
+from thirdparty import six
 
 class Agent(object):
     """
@@ -308,7 +309,7 @@ class Agent(object):
         return re.sub(r";\W*;", ";", expression) if trimEmpty else expression
 
     def cleanupPayload(self, payload, origValue=None):
-        if payload is None:
+        if not isinstance(payload, six.string_types):
             return
 
         replacements = {
