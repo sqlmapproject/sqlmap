@@ -624,7 +624,7 @@ def paramToDict(place, parameters=None):
                     try:
                         oldValue = value
                         value = decodeBase64(value, binary=False)
-                        parameters = re.sub(r"\b%s\b" % re.escape(oldValue), value, parameters)
+                        parameters = re.sub(r"\b%s(\b|\Z)" % re.escape(oldValue), value, parameters)
                     except:
                         errMsg = "parameter '%s' does not contain " % parameter
                         errMsg += "valid Base64 encoded value ('%s')" % value
@@ -701,7 +701,7 @@ def paramToDict(place, parameters=None):
                             message += "has boundaries. Do you want to inject inside? ('%s') [y/N] " % getUnicode(_)
 
                             if readInput(message, default='N', boolean=True):
-                                testableParameters[parameter] = re.sub(r"\b(%s\s*=\s*)%s" % (re.escape(parameter), re.escape(testableParameters[parameter])), (r"\g<1>%s" % re.sub(regex, r"\g<1>%s\g<2>" % BOUNDED_INJECTION_MARKER, testableParameters[parameter])).replace("\\", r"\\"), parameters)
+                                testableParameters[parameter] = re.sub(r"\b(%s\s*=\s*)%s" % (re.escape(parameter), re.escape(testableParameters[parameter])), (r"\g<1>%s" % re.sub(regex, r"\g<1>%s\g<2>" % BOUNDED_INJECTION_MARKER, testableParameters[parameter].replace("\\", r"\\"))), parameters)
                             break
 
     if conf.testParameter:
