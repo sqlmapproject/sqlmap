@@ -155,7 +155,24 @@ def postgres_passwd(password, username, uppercase=False):
 
     return retVal.upper() if uppercase else retVal.lower()
 
-def mssql_passwd(password, salt, uppercase=False):
+def mssql_new_passwd(password, salt, uppercase=False):  # since version '2012'
+    """
+    Reference(s):
+        http://hashcat.net/forum/thread-1474.html
+        https://sqlity.net/en/2460/sql-password-hash/
+
+    >>> mssql_new_passwd(password='testpass', salt='4086ceb6', uppercase=False)
+    '0x02004086ceb6eb051cdbc5bdae68ffc66c918d4977e592f6bdfc2b444a7214f71fa31c35902c5b7ae773ed5f4c50676d329120ace32ee6bc81c24f70711eb0fc6400e85ebf25'
+    """
+
+    binsalt = decodeHex(salt)
+    unistr = b"".join((_.encode(UNICODE_ENCODING) + b"\0") if ord(_) < 256 else _.encode(UNICODE_ENCODING) for _ in password)
+
+    retVal = "0200%s%s" % (salt, sha512(unistr + binsalt).hexdigest())
+
+    return "0x%s" % (retVal.upper() if uppercase else retVal.lower())
+
+def mssql_passwd(password, salt, uppercase=False):  # versions '2005' and '2008'
     """
     Reference(s):
         http://www.leidecker.info/projects/phrasendrescher/mssql.c
@@ -172,7 +189,7 @@ def mssql_passwd(password, salt, uppercase=False):
 
     return "0x%s" % (retVal.upper() if uppercase else retVal.lower())
 
-def mssql_old_passwd(password, salt, uppercase=True):  # prior to version '2005'
+def mssql_old_passwd(password, salt, uppercase=True):  # version '2000' and before
     """
     Reference(s):
         www.exploit-db.com/download_pdf/15537/
@@ -187,22 +204,6 @@ def mssql_old_passwd(password, salt, uppercase=True):  # prior to version '2005'
     unistr = b"".join((_.encode(UNICODE_ENCODING) + b"\0") if ord(_) < 256 else _.encode(UNICODE_ENCODING) for _ in password)
 
     retVal = "0100%s%s%s" % (salt, sha1(unistr + binsalt).hexdigest(), sha1(unistr.upper() + binsalt).hexdigest())
-
-    return "0x%s" % (retVal.upper() if uppercase else retVal.lower())
-
-def mssql_new_passwd(password, salt, uppercase=False):
-    """
-    Reference(s):
-        http://hashcat.net/forum/thread-1474.html
-
-    >>> mssql_new_passwd(password='testpass', salt='4086ceb6', uppercase=False)
-    '0x02004086ceb6eb051cdbc5bdae68ffc66c918d4977e592f6bdfc2b444a7214f71fa31c35902c5b7ae773ed5f4c50676d329120ace32ee6bc81c24f70711eb0fc6400e85ebf25'
-    """
-
-    binsalt = decodeHex(salt)
-    unistr = b"".join((_.encode(UNICODE_ENCODING) + b"\0") if ord(_) < 256 else _.encode(UNICODE_ENCODING) for _ in password)
-
-    retVal = "0200%s%s" % (salt, sha512(unistr + binsalt).hexdigest())
 
     return "0x%s" % (retVal.upper() if uppercase else retVal.lower())
 
