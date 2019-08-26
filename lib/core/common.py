@@ -1285,36 +1285,43 @@ def banner():
     """
 
     if not any(_ in sys.argv for _ in ("--version", "--api")) and not conf.get("disableBanner"):
-        _ = BANNER
+        result = BANNER
 
         if not IS_TTY or "--disable-coloring" in sys.argv:
-            _ = clearColors(_)
+            result = clearColors(result)
         elif IS_WIN:
             coloramainit()
 
-        dataToStdout(_, forceOutput=True)
+        dataToStdout(result, forceOutput=True)
 
 def parsePasswordHash(password):
     """
     In case of Microsoft SQL Server password hash value is expanded to its components
+
+    >>> pushValue(kb.forcedDbms)
+    >>> kb.forcedDbms = DBMS.MSSQL
+    >>> "salt: 4086ceb6" in parsePasswordHash("0x01004086ceb60c90646a8ab9889fe3ed8e5c150b5460ece8425a")
+    True
+    >>> kb.forcedDbms = popValue()
     """
 
     blank = " " * 8
 
-    if not password or password == " ":
-        password = NULL
+    if isNoneValue(password) or password == " ":
+        retVal = NULL
+    else:
+        retVal = password
 
-    if Backend.isDbms(DBMS.MSSQL) and password != NULL and isHexEncodedString(password):
-        hexPassword = password
-        password = "%s\n" % hexPassword
-        password += "%sheader: %s\n" % (blank, hexPassword[:6])
-        password += "%ssalt: %s\n" % (blank, hexPassword[6:14])
-        password += "%smixedcase: %s\n" % (blank, hexPassword[14:54])
+    if Backend.isDbms(DBMS.MSSQL) and retVal != NULL and isHexEncodedString(password):
+        retVal = "%s\n" % password
+        retVal += "%sheader: %s\n" % (blank, password[:6])
+        retVal += "%ssalt: %s\n" % (blank, password[6:14])
+        retVal += "%smixedcase: %s\n" % (blank, password[14:54])
 
-        if not Backend.isVersionWithin(("2005", "2008")):
-            password += "%suppercase: %s" % (blank, hexPassword[54:])
+        if password[54:]:
+            retVal += "%suppercase: %s" % (blank, password[54:])
 
-    return password
+    return retVal
 
 def cleanQuery(query):
     """
