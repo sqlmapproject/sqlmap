@@ -13,6 +13,7 @@ import subprocess
 import time
 
 from lib.core.compat import buffer
+from lib.core.convert import getBytes
 from lib.core.settings import IS_WIN
 
 if IS_WIN:
@@ -191,6 +192,8 @@ def recv_some(p, t=.1, e=1, tr=5, stderr=0):
 def send_all(p, data):
     if not data:
         return
+
+    data = getBytes(data)
 
     while len(data):
         sent = p.send(data)
