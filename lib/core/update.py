@@ -105,6 +105,7 @@ def update():
 
         dataToStdout("\r[%s] [INFO] update in progress" % time.strftime("%X"))
 
+        output = ""
         try:
             process = subprocess.Popen("git checkout . && git pull %s HEAD" % GIT_REPOSITORY, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=paths.SQLMAP_ROOT_PATH)
             pollProcess(process, True)
