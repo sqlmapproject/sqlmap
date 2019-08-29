@@ -3582,7 +3582,7 @@ def decodeIntToUnicode(value):
                     # Note: https://github.com/sqlmapproject/sqlmap/issues/1531
                     retVal = getUnicode(raw, conf.encoding or UNICODE_ENCODING)
                 elif Backend.isDbms(DBMS.MSSQL):
-                    retVal = getUnicode(raw, "UTF-16-BE")
+                    retVal = getUnicode(raw, "UTF-16-BE")   # References: https://docs.microsoft.com/en-us/sql/relational-databases/collations/collation-and-unicode-support?view=sql-server-2017 and https://stackoverflow.com/a/14488478
                 elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE):
                     retVal = _unichr(value)
                 else:
@@ -3669,7 +3669,7 @@ def getLatestRevision():
     """
 
     retVal = None
-    req = _urllib.request.Request(url="https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/lib/core/settings.py")
+    req = _urllib.request.Request(url="https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/lib/core/settings.py", headers={HTTP_HEADER.USER_AGENT: fetchRandomAgent()})
 
     try:
         content = getUnicode(_urllib.request.urlopen(req).read())
@@ -3801,7 +3801,7 @@ def maskSensitiveData(msg):
             retVal = retVal.replace(value, '*' * len(value))
 
     # Just in case (for problematic parameters regarding user encoding)
-    for match in re.finditer(r"(?i)[ -]-(u|url|data|cookie|auth-\w+|proxy)( |=)(.*?)(?= -?-[a-z]|\Z)", retVal):
+    for match in re.finditer(r"(?i)[ -]-(u|url|data|cookie|auth-\w+|proxy|host|referer|headers?|H)( |=)(.*?)(?= -?-[a-z]|\Z)", retVal):
         retVal = retVal.replace(match.group(3), '*' * len(match.group(3)))
 
     # Fail-safe substitutions
