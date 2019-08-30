@@ -334,6 +334,7 @@ class Agent(object):
 
         if origValue is not None:
             origValue = getUnicode(origValue)
+
             if "[ORIGVALUE]" in payload:
                 payload = getUnicode(payload).replace("[ORIGVALUE]", origValue if origValue.isdigit() else unescaper.escape("'%s'" % origValue))
             if "[ORIGINAL]" in payload:
@@ -352,6 +353,7 @@ class Agent(object):
                     inferenceQuery = inference.query
 
                 payload = payload.replace(INFERENCE_MARKER, inferenceQuery)
+
             elif not kb.testMode:
                 errMsg = "invalid usage of inference payload without "
                 errMsg += "knowledge of underlying DBMS"
@@ -394,7 +396,7 @@ class Agent(object):
         if "hex" in rootQuery:
             hexField = rootQuery.hex.query % field
         else:
-            warnMsg = "switch '--hex' is currently not supported on DBMS %s" % Backend.getIdentifiedDbms()
+            warnMsg = "switch '--hex' is currently not supported on DBMS '%s'" % Backend.getIdentifiedDbms()
             singleTimeWarnMessage(warnMsg)
 
         return hexField
@@ -1008,7 +1010,7 @@ class Agent(object):
                         limitedQuery = "%s WHERE %s " % (limitedQuery, self.nullAndCastField(uniqueField or field))
 
                     limitedQuery += "NOT IN (%s" % (limitStr % num)
-                    limitedQuery += "%s %s ORDER BY %s) ORDER BY %s" % (self.nullAndCastField(uniqueField or field), fromFrom, uniqueField or "1", uniqueField or "1")
+                    limitedQuery += "%s %s ORDER BY %s) ORDER BY %s" % (self.nullAndCastField(uniqueField or field), fromFrom, uniqueField or '1', uniqueField or '1')
                 else:
                     match = re.search(r" ORDER BY (\w+)\Z", query)
                     field = match.group(1) if match else field
@@ -1082,7 +1084,7 @@ class Agent(object):
         Removes payload delimiters from inside the input string
         """
 
-        return value.replace(PAYLOAD_DELIMITER, '') if value else value
+        return value.replace(PAYLOAD_DELIMITER, "") if value else value
 
     def extractPayload(self, value):
         """

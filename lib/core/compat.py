@@ -13,6 +13,7 @@ import math
 import os
 import random
 import sys
+import time
 import uuid
 
 class WichmannHill(random.Random):
@@ -40,7 +41,6 @@ class WichmannHill(random.Random):
             try:
                 a = int(binascii.hexlify(os.urandom(16)), 16)
             except NotImplementedError:
-                import time
                 a = int(time.time() * 256)  # use fractional seconds
 
         if not isinstance(a, int):
@@ -132,7 +132,6 @@ class WichmannHill(random.Random):
             raise ValueError('seeds must be in range(0, 256)')
         if 0 == x == y == z:
             # Initialize from current time
-            import time
             t = int(time.time() * 256)
             t = int((t & 0xffffff) ^ (t >> 24))
             t, x = divmod(t, 256)
@@ -204,6 +203,7 @@ def round(x, d=0):
     else:
         return float(math.ceil((x * p) - 0.5)) / p
 
+# Reference: https://code.activestate.com/recipes/576653-convert-a-cmp-function-to-a-key-function/
 def cmp_to_key(mycmp):
     """Convert a cmp= function into a key= function"""
     class K(object):

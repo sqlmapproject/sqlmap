@@ -39,6 +39,7 @@ from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapUserQuitException
+from lib.core.settings import CURRENT_USER
 from lib.core.threads import getCurrentThreadData
 from lib.request import inject
 from lib.utils.hash import attackCachedUsersPasswords
@@ -153,7 +154,7 @@ class Users(object):
 
         rootQuery = queries[Backend.getIdentifiedDbms()].passwords
 
-        if conf.user == "CU":
+        if conf.user == CURRENT_USER:
             infoMsg += " for current user"
             conf.user = self.getCurrentUser()
 
@@ -362,7 +363,7 @@ class Users(object):
 
         rootQuery = queries[Backend.getIdentifiedDbms()].privileges
 
-        if conf.user == "CU":
+        if conf.user == CURRENT_USER:
             infoMsg += " for current user"
             conf.user = self.getCurrentUser()
 
@@ -410,7 +411,7 @@ class Users(object):
             values = inject.getValue(query, blind=False, time=False)
 
             if not values and Backend.isDbms(DBMS.ORACLE) and not query2:
-                infoMsg = "trying with table USER_SYS_PRIVS"
+                infoMsg = "trying with table 'USER_SYS_PRIVS'"
                 logger.info(infoMsg)
 
                 return self.getPrivileges(query2=True)
@@ -446,7 +447,7 @@ class Users(object):
                             # In MySQL < 5.0 we get Y if the privilege is
                             # True, N otherwise
                             elif Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
-                                if privilege.upper() == "Y":
+                                if privilege.upper() == 'Y':
                                     privileges.add(MYSQL_PRIVS[count])
 
                             # In Firebird we get one letter for each privilege
@@ -465,7 +466,7 @@ class Users(object):
                                     i = 1
 
                                     for priv in privs:
-                                        if priv.upper() in ("Y", "G"):
+                                        if priv.upper() in ('Y', 'G'):
                                             for position, db2Priv in DB2_PRIVS.items():
                                                 if position == i:
                                                     privilege += ", " + db2Priv
@@ -525,7 +526,7 @@ class Users(object):
 
                     if not isNumPosStrValue(count):
                         if not retrievedUsers and Backend.isDbms(DBMS.ORACLE) and not query2:
-                            infoMsg = "trying with table USER_SYS_PRIVS"
+                            infoMsg = "trying with table 'USER_SYS_PRIVS'"
                             logger.info(infoMsg)
 
                             return self.getPrivileges(query2=True)

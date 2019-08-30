@@ -21,6 +21,7 @@ from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapNoneDataException
+from lib.core.settings import CURRENT_USER
 from lib.request import inject
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
@@ -30,7 +31,7 @@ class Enumeration(GenericEnumeration):
 
         rootQuery = queries[DBMS.ORACLE].roles
 
-        if conf.user == "CU":
+        if conf.user == CURRENT_USER:
             infoMsg += " for current user"
             conf.user = self.getCurrentUser()
 
@@ -55,7 +56,7 @@ class Enumeration(GenericEnumeration):
             values = inject.getValue(query, blind=False, time=False)
 
             if not values and not query2:
-                infoMsg = "trying with table USER_ROLE_PRIVS"
+                infoMsg = "trying with table 'USER_ROLE_PRIVS'"
                 logger.info(infoMsg)
 
                 return self.getRoles(query2=True)
@@ -116,7 +117,7 @@ class Enumeration(GenericEnumeration):
 
                 if not isNumPosStrValue(count):
                     if count != 0 and not query2:
-                        infoMsg = "trying with table USER_SYS_PRIVS"
+                        infoMsg = "trying with table 'USER_SYS_PRIVS'"
                         logger.info(infoMsg)
 
                         return self.getPrivileges(query2=True)

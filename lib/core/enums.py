@@ -244,8 +244,8 @@ class HASHDB_KEYS(object):
     OS = "OS"
 
 class REDIRECTION(object):
-    YES = "Y"
-    NO = "N"
+    YES = 'Y'
+    NO = 'N'
 
 class PAYLOAD(object):
     SQLINJECTION = {

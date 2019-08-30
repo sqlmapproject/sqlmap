@@ -227,18 +227,15 @@ class Metasploit(object):
 
                     if not choice or choice == "2":
                         _payloadStr = "windows/meterpreter"
-
                         break
 
                     elif choice == "3":
                         _payloadStr = "windows/shell"
-
                         break
 
                     elif choice == "1":
                         if Backend.isDbms(DBMS.PGSQL):
                             logger.warn("beware that the VNC injection might not work")
-
                             break
 
                         elif Backend.isDbms(DBMS.MSSQL) and Backend.isVersionWithin(("2005", "2008")):
