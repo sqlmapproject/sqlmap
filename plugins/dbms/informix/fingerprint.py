@@ -96,7 +96,7 @@ class Fingerprint(GenericFingerprint):
             infoMsg = "actively fingerprinting %s" % DBMS.INFORMIX
             logger.info(infoMsg)
 
-            for version in ("12.1", "11.7", "11.5"):
+            for version in ("14.1", "12.1", "11.7", "11.5", "10.0"):
                 output = inject.checkBooleanExpression("EXISTS(SELECT 1 FROM SYSMASTER:SYSDUAL WHERE DBINFO('VERSION,'FULL') LIKE '%%%s%%')" % version)
 
                 if output:
