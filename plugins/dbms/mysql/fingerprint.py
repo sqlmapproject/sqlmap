@@ -53,7 +53,7 @@ class Fingerprint(GenericFingerprint):
             (50600, 50646),  # MySQL 5.6
             (50700, 50726),  # MySQL 5.7
             (60000, 60014),  # MySQL 6.0
-            (80000, 80015),  # MySQL 8.0
+            (80000, 80017),  # MySQL 8.0
         )
 
         index = -1

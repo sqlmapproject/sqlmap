@@ -94,7 +94,8 @@ class Fingerprint(GenericFingerprint):
                 ("2008", "SYSDATETIME()=SYSDATETIME()"),
                 ("2012", "CONCAT(NULL,NULL)=CONCAT(NULL,NULL)"),
                 ("2014", "CHARINDEX('12.0.2000',@@version)>0"),
-                ("2016", "ISJSON(NULL) IS NULL")
+                ("2016", "ISJSON(NULL) IS NULL"),
+                ("2017", "TRIM(NULL) IS NULL")
             ):
                 result = inject.checkBooleanExpression(check)
 
