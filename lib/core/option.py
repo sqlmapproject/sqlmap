@@ -1273,8 +1273,8 @@ def _setHTTPAuthentication():
                 from ntlm import HTTPNtlmAuthHandler
             except ImportError:
                 errMsg = "sqlmap requires Python NTLM third-party library "
-                errMsg += "in order to authenticate via NTLM, "
-                errMsg += "https://github.com/mullender/python-ntlm"
+                errMsg += "in order to authenticate via NTLM. Download from "
+                errMsg += "'https://github.com/mullender/python-ntlm'"
                 raise SqlmapMissingDependence(errMsg)
 
             authHandler = HTTPNtlmAuthHandler.HTTPNtlmAuthHandler(kb.passwordMgr)
