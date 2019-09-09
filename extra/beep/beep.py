@@ -15,11 +15,13 @@ BEEP_WAV_FILENAME = os.path.join(os.path.dirname(__file__), "beep.wav")
 
 def beep():
     try:
-        if sys.platform == "nt":
+        if sys.platform.startswith("win"):
             _win_wav_play(BEEP_WAV_FILENAME)
-        elif sys.platform == "darwin":
+        elif sys.platform.startswith("darwin"):
             _mac_beep()
-        elif sys.platform.startswith("linux"):
+        elif sys.platform.startswith("cygwin"):
+            _cygwin_beep(BEEP_WAV_FILENAME)
+        elif any(sys.platform.startswith(_) for _ in ("linux", "freebsd")):
             _linux_wav_play(BEEP_WAV_FILENAME)
         else:
             _speaker_beep()
@@ -33,6 +35,10 @@ def _speaker_beep():
         sys.stdout.flush()
     except IOError:
         pass
+
+# Reference: https://lists.gnu.org/archive/html/emacs-devel/2014-09/msg00815.html
+def _cygwin_beep(filename):
+    os.system("play-sound-file '%s' 2>/dev/null" % filename)
 
 def _mac_beep():
     import Carbon.Snd
@@ -57,7 +63,10 @@ def _linux_wav_play(filename):
     class struct_pa_sample_spec(ctypes.Structure):
         _fields_ = [("format", ctypes.c_int), ("rate", ctypes.c_uint32), ("channels", ctypes.c_uint8)]
 
-    pa = ctypes.cdll.LoadLibrary("libpulse-simple.so.0")
+    try:
+        pa = ctypes.cdll.LoadLibrary("libpulse-simple.so.0")
+    except OSError:
+        return
 
     wave_file = wave.open(filename, "rb")
 
