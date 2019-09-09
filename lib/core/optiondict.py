@@ -61,6 +61,7 @@ optDict = {
         "skipUrlEncode": "boolean",
         "csrfToken": "string",
         "csrfUrl": "string",
+        "csrfMethod": "string",
         "forceSSL": "boolean",
         "chunked": "boolean",
         "hpp": "boolean",

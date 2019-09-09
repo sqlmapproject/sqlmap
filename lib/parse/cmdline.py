@@ -245,6 +245,9 @@ def cmdLineParser(argv=None):
         request.add_argument("--csrf-url", dest="csrfUrl",
             help="URL address to visit for extraction of anti-CSRF token")
 
+        request.add_argument("--csrf-method", dest="csrfMethod",
+            help="HTTP method to use during anti-CSRF token page visit")
+
         request.add_argument("--force-ssl", dest="forceSSL", action="store_true",
             help="Force usage of SSL/HTTPS")
 

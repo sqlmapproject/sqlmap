@@ -2490,6 +2490,10 @@ def _basicOptionValidation():
         errMsg = "option '--csrf-url' requires usage of option '--csrf-token'"
         raise SqlmapSyntaxException(errMsg)
 
+    if conf.csrfMethod and not conf.csrfToken:
+        errMsg = "option '--csrf-method' requires usage of option '--csrf-token'"
+        raise SqlmapSyntaxException(errMsg)
+
     if conf.csrfToken and conf.threads > 1:
         errMsg = "option '--csrf-url' is incompatible with option '--threads'"
         raise SqlmapSyntaxException(errMsg)
