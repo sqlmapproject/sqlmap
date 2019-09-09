@@ -76,7 +76,8 @@ class SQLAlchemy(GenericConnector):
                         pass
                 elif "invalid literal for int() with base 10: '0b" in traceback.format_exc():
                     raise SqlmapConnectionException("SQLAlchemy connection issue ('https://bitbucket.org/zzzeek/sqlalchemy/issues/3975')")
-                raise
+                else:
+                    pass
             except SqlmapFilePathException:
                 raise
             except Exception as ex:
