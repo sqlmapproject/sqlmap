@@ -10,7 +10,6 @@ from __future__ import print_function
 import re
 import time
 
-from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
 from lib.core.bigarray import BigArray
 from lib.core.common import Backend
@@ -60,6 +59,7 @@ from lib.core.threads import runThreads
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.utils.progress import ProgressBar
+from lib.utils.safe2bin import safecharencode
 from thirdparty import six
 
 def _oneShotErrorUse(expression, field=None, chunkTest=False):

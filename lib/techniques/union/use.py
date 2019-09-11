@@ -10,7 +10,6 @@ import re
 import time
 import xml.etree.ElementTree
 
-from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
 from lib.core.bigarray import BigArray
 from lib.core.common import arrayizeValue
@@ -62,6 +61,7 @@ from lib.core.threads import runThreads
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.utils.progress import ProgressBar
+from lib.utils.safe2bin import safecharencode
 from thirdparty import six
 from thirdparty.odict import OrderedDict
 

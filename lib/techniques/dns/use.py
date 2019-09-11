@@ -8,7 +8,6 @@ See the file 'LICENSE' for copying permission
 import re
 import time
 
-from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import calculateDeltaSeconds
@@ -33,6 +32,7 @@ from lib.core.settings import MAX_DNS_LABEL
 from lib.core.settings import PARTIAL_VALUE_MARKER
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
+from lib.utils.safe2bin import safecharencode
 
 def dnsUse(payload, expression):
     """

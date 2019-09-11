@@ -7,13 +7,13 @@ See the file 'LICENSE' for copying permission
 
 import sqlite3
 
-from extra.safe2bin.safe2bin import safechardecode
 from lib.core.common import getSafeExString
 from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapGenericException
 from lib.core.exception import SqlmapValueException
 from lib.core.settings import UNICODE_ENCODING
+from lib.utils.safe2bin import safechardecode
 
 class Replication(object):
     """

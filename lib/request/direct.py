@@ -7,7 +7,6 @@ See the file 'LICENSE' for copying permission
 
 import time
 
-from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import calculateDeltaSeconds
@@ -26,6 +25,7 @@ from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
 from lib.core.enums import TIMEOUT_STATE
 from lib.core.settings import UNICODE_ENCODING
+from lib.utils.safe2bin import safecharencode
 from lib.utils.timeout import timeout
 
 def direct(query, content=True):

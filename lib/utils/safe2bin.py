@@ -1,22 +1,14 @@
 #!/usr/bin/env python
 
 """
-safe2bin.py - Simple safe(hex) to binary format converter
-
 Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
-from __future__ import print_function
-
 import binascii
 import re
 import string
-import os
 import sys
-
-from optparse import OptionError
-from optparse import OptionParser
 
 if sys.version_info >= (3, 0):
     xrange = range
@@ -49,10 +41,10 @@ def safecharencode(value):
     """
     Returns safe representation of a given basestring value
 
-    >>> safecharencode(u'test123')
-    u'test123'
-    >>> safecharencode(u'test\x01\x02\xff')
-    u'test\\01\\02\\03\\ff'
+    >>> safecharencode(u'test123') == u'test123'
+    True
+    >>> safecharencode(u'test\x01\x02\xaf') == u'test\\\\x01\\\\x02\\xaf'
+    True
     """
 
     retVal = value
@@ -107,37 +99,3 @@ def safechardecode(value, binary=False):
             retVal[i] = safechardecode(value[i])
 
     return retVal
-
-def main():
-    usage = '%s -i <input file> [-o <output file>]' % sys.argv[0]
-    parser = OptionParser(usage=usage, version='0.1')
-
-    try:
-        parser.add_option('-i', dest='inputFile', help='Input file')
-        parser.add_option('-o', dest='outputFile', help='Output file')
-
-        (args, _) = parser.parse_args()
-
-        if not args.inputFile:
-            parser.error('Missing the input file, -h for help')
-
-    except (OptionError, TypeError) as ex:
-        parser.error(ex)
-
-    if not os.path.isfile(args.inputFile):
-        print('ERROR: the provided input file \'%s\' is not a regular file' % args.inputFile)
-        sys.exit(1)
-
-    f = open(args.inputFile, 'r')
-    data = f.read()
-    f.close()
-
-    if not args.outputFile:
-        args.outputFile = args.inputFile + '.bin'
-
-    f = open(args.outputFile, 'wb')
-    f.write(safechardecode(data))
-    f.close()
-
-if __name__ == '__main__':
-    main()

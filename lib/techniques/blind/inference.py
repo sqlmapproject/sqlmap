@@ -10,7 +10,6 @@ from __future__ import division
 import re
 import time
 
-from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import calculateDeltaSeconds
@@ -58,6 +57,7 @@ from lib.core.threads import runThreads
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.utils.progress import ProgressBar
+from lib.utils.safe2bin import safecharencode
 from lib.utils.xrange import xrange
 
 def bisection(payload, expression, length=None, charsetType=None, firstChar=None, lastChar=None, dump=False):

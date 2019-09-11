@@ -13,7 +13,6 @@ import shutil
 import tempfile
 import threading
 
-from extra.safe2bin.safe2bin import safechardecode
 from lib.core.common import Backend
 from lib.core.common import checkFile
 from lib.core.common import dataToDumpFile
@@ -53,6 +52,7 @@ from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import UNSAFE_DUMP_FILEPATH_REPLACEMENT
 from lib.core.settings import VERSION_STRING
 from lib.core.settings import WINDOWS_RESERVED_NAMES
+from lib.utils.safe2bin import safechardecode
 from thirdparty import six
 from thirdparty.magic import magic
 

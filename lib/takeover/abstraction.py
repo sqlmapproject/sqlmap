@@ -9,7 +9,6 @@ from __future__ import print_function
 
 import sys
 
-from extra.safe2bin.safe2bin import safechardecode
 from lib.core.common import Backend
 from lib.core.common import dataToStdout
 from lib.core.common import getSQLSnippet
@@ -28,6 +27,7 @@ from lib.request import inject
 from lib.takeover.udf import UDF
 from lib.takeover.web import Web
 from lib.takeover.xp_cmdshell import XP_cmdshell
+from lib.utils.safe2bin import safechardecode
 from thirdparty.six.moves import input as _input
 
 class Abstraction(Web, UDF, XP_cmdshell):

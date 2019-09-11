@@ -22,7 +22,6 @@ except ImportError:
     class WebSocketException(Exception):
         pass
 
-from extra.safe2bin.safe2bin import safecharencode
 from lib.core.agent import agent
 from lib.core.common import asciifyUrl
 from lib.core.common import calculateDeltaSeconds
@@ -125,6 +124,7 @@ from lib.request.basic import processResponse
 from lib.request.comparison import comparison
 from lib.request.direct import direct
 from lib.request.methodrequest import MethodRequest
+from lib.utils.safe2bin import safecharencode
 from thirdparty import six
 from thirdparty.odict import OrderedDict
 from thirdparty.six import unichr as _unichr
