@@ -310,7 +310,7 @@ def _setRequestParams():
                                 conf.paramDict[place]["%s #%d%s" % (header, i + 1, kb.customInjectionMark)] = "%s,%s" % (header, "".join("%s%s" % (parts[j], kb.customInjectionMark if i == j else "") for j in xrange(len(parts))))
                             conf.httpHeaders[index] = (header, value.replace(kb.customInjectionMark, ""))
                 else:
-                    parts = value.split(kb.customInjectionMark)
+                    parts = [_ for _ in value.split(kb.customInjectionMark) if _]
 
                     for i in xrange(len(parts) - 1):
                         name = None
