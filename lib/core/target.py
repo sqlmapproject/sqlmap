@@ -151,13 +151,13 @@ def _setRequestParams():
                     conf.data = re.sub(r'("(?P<name>[^"]+)"\s*:\s*".+?)"(?<!\\")', functools.partial(process, repl=r'\g<1>%s"' % kb.customInjectionMark), conf.data)
                     conf.data = re.sub(r'("(?P<name>[^"]+)"\s*:\s*)(-?\d[\d\.]*)\b', functools.partial(process, repl=r'\g<1>\g<3>%s' % kb.customInjectionMark), conf.data)
                     conf.data = re.sub(r'("(?P<name>[^"]+)"\s*:\s*)((true|false|null))\b', functools.partial(process, repl=r'\g<1>\g<3>%s' % kb.customInjectionMark), conf.data)
-                    match = re.search(r'(?P<name>[^"]+)"\s*:\s*\[([^\]]+)\]', conf.data)
-                    if match and not (conf.testParameter and match.group("name") not in conf.testParameter):
-                        _ = match.group(2)
-                        if kb.customInjectionMark not in _:  # Note: only for unprocessed (simple) forms - i.e. non-associative arrays (e.g. [1,2,3])
-                            _ = re.sub(r'("[^"]+)"', r'\g<1>%s"' % kb.customInjectionMark, _)
-                            _ = re.sub(r'(\A|,|\s+)(-?\d[\d\.]*\b)', r'\g<0>%s' % kb.customInjectionMark, _)
-                            conf.data = conf.data.replace(match.group(0), match.group(0).replace(match.group(2), _))
+                    for match in re.finditer(r'(?P<name>[^"]+)"\s*:\s*\[([^\]]+)\]', conf.data):
+                        if not (conf.testParameter and match.group("name") not in conf.testParameter):
+                            _ = match.group(2)
+                            if kb.customInjectionMark not in _:  # Note: only for unprocessed (simple) forms - i.e. non-associative arrays (e.g. [1,2,3])
+                                _ = re.sub(r'("[^"]+)"', r'\g<1>%s"' % kb.customInjectionMark, _)
+                                _ = re.sub(r'(\A|,|\s+)(-?\d[\d\.]*\b)', r'\g<0>%s' % kb.customInjectionMark, _)
+                                conf.data = conf.data.replace(match.group(0), match.group(0).replace(match.group(2), _))
 
                 kb.postHint = POST_HINT.JSON
 
