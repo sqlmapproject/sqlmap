@@ -42,7 +42,7 @@ class Wordlist(six.Iterator):
     def adjust(self):
         self.closeFP()
         if self.index > len(self.filenames):
-            raise StopIteration
+            return  # Note: https://stackoverflow.com/a/30217723 (PEP 479)
         elif self.index == len(self.filenames):
             self.iter = iter(self.custom)
         else:
