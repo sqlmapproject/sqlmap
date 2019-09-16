@@ -27,6 +27,7 @@ from lib.core.common import unArrayizeValue
 from lib.core.common import urlencode
 from lib.core.common import zeroDepthSearch
 from lib.core.compat import xrange
+from lib.core.convert import encodeBase64
 from lib.core.convert import getUnicode
 from lib.core.data import conf
 from lib.core.data import kb
@@ -170,8 +171,8 @@ class Agent(object):
 
         if re.sub(r" \(.+", "", parameter) in conf.base64Parameter:
             # TODO: support for POST_HINT
-            newValue = base64.b64encode(newValue)
-            origValue = base64.b64encode(origValue)
+            newValue = encodeBase64(newValue, binary=False)
+            origValue = encodeBase64(origValue, binary=False)
 
         if place in (PLACE.URI, PLACE.CUSTOM_POST, PLACE.CUSTOM_HEADER):
             _ = "%s%s" % (origValue, kb.customInjectionMark)
