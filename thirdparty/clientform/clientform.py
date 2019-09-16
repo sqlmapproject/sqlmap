@@ -227,6 +227,9 @@ def unescape(data, entities, encoding=DEFAULT_ENCODING):
     if data is None or "&" not in data:
         return data
 
+    if isinstance(data, six.string_types):
+        encoding = None
+
     def replace_entities(match, entities=entities, encoding=encoding):
         ent = match.group()
         if ent[1] == "#":
@@ -278,7 +281,6 @@ def get_entitydefs():
         for name, codepoint in _html_entities.name2codepoint.items():
             entitydefs["&%s;" % name] = _unichr(codepoint)
     return entitydefs
-
 
 def issequence(x):
     try:
