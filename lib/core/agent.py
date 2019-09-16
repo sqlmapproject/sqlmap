@@ -5,7 +5,6 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
-import base64
 import re
 
 from lib.core.common import Backend
@@ -51,6 +50,7 @@ from lib.core.settings import PAYLOAD_DELIMITER
 from lib.core.settings import REPLACEMENT_MARKER
 from lib.core.settings import SINGLE_QUOTE_MARKER
 from lib.core.settings import SLEEP_TIME_MARKER
+from lib.core.settings import UNICODE_ENCODING
 from lib.core.unescaper import unescaper
 from thirdparty import six
 
@@ -171,8 +171,8 @@ class Agent(object):
 
         if re.sub(r" \(.+", "", parameter) in conf.base64Parameter:
             # TODO: support for POST_HINT
-            newValue = encodeBase64(newValue, binary=False)
-            origValue = encodeBase64(origValue, binary=False)
+            newValue = encodeBase64(newValue, binary=False, encoding=conf.encoding or UNICODE_ENCODING)
+            origValue = encodeBase64(origValue, binary=False, encoding=conf.encoding or UNICODE_ENCODING)
 
         if place in (PLACE.URI, PLACE.CUSTOM_POST, PLACE.CUSTOM_HEADER):
             _ = "%s%s" % (origValue, kb.customInjectionMark)

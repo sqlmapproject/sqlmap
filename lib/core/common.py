@@ -623,7 +623,7 @@ def paramToDict(place, parameters=None):
                 if parameter in (conf.base64Parameter or []):
                     try:
                         oldValue = value
-                        value = decodeBase64(value, binary=False)
+                        value = decodeBase64(value, binary=False, encoding=conf.encoding or UNICODE_ENCODING)
                         parameters = re.sub(r"\b%s(\b|\Z)" % re.escape(oldValue), value, parameters)
                     except:
                         errMsg = "parameter '%s' does not contain " % parameter

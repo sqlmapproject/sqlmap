@@ -184,7 +184,7 @@ def encodeHex(value, binary=True):
 
     return retVal
 
-def decodeBase64(value, binary=True):
+def decodeBase64(value, binary=True, encoding=None):
     """
     Returns a decoded representation of provided Base64 value
 
@@ -197,11 +197,11 @@ def decodeBase64(value, binary=True):
     retVal = base64.b64decode(value)
 
     if not binary:
-        retVal = getText(retVal)
+        retVal = getText(retVal, encoding)
 
     return retVal
 
-def encodeBase64(value, binary=True):
+def encodeBase64(value, binary=True, encoding=None):
     """
     Returns a decoded representation of provided Base64 value
 
@@ -212,12 +212,12 @@ def encodeBase64(value, binary=True):
     """
 
     if isinstance(value, six.text_type):
-        value = value.encode(UNICODE_ENCODING)
+        value = value.encode(encoding or UNICODE_ENCODING)
 
     retVal = base64.b64encode(value)
 
     if not binary:
-        retVal = getText(retVal)
+        retVal = getText(retVal, encoding)
 
     return retVal
 
@@ -305,7 +305,7 @@ def getUnicode(value, encoding=None, noneToNull=False):
         except UnicodeDecodeError:
             return six.text_type(str(value), errors="ignore")  # encoding ignored for non-basestring instances
 
-def getText(value):
+def getText(value, encoding=None):
     """
     Returns textual value of a given value (Note: not necessary Unicode on Python2)
 
@@ -318,7 +318,7 @@ def getText(value):
     retVal = value
 
     if isinstance(value, six.binary_type):
-        retVal = getUnicode(value)
+        retVal = getUnicode(value, encoding)
 
     if six.PY2:
         try:
