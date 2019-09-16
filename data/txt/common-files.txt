@@ -192,6 +192,17 @@
 /var/log/mysqld.log
 /var/www/index.php
 
+# Reference: https://github.com/sqlmapproject/sqlmap/blob/master/lib/core/settings.py#L809-L810
+
+/var/www/index.php
+/usr/local/apache/index.php
+/usr/local/apache2/index.php
+/usr/local/www/apache22/index.php
+/usr/local/www/apache24/index.php
+/usr/local/httpd/index.php
+/var/www/nginx-default/index.php
+/srv/www/index.php
+
 # Reference: https://www.gracefulsecurity.com/path-traversal-cheat-sheet-linux
 
 /etc/passwd
