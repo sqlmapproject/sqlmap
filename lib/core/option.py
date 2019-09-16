@@ -2447,6 +2447,13 @@ def _basicOptionValidation():
             errMsg = "invalid regular expression '%s' ('%s')" % (conf.regexp, getSafeExString(ex))
             raise SqlmapSyntaxException(errMsg)
 
+    if conf.paramExclude:
+        try:
+            re.compile(conf.paramExclude)
+        except Exception as ex:
+            errMsg = "invalid regular expression '%s' ('%s')" % (conf.paramExclude, getSafeExString(ex))
+            raise SqlmapSyntaxException(errMsg)
+
     if conf.crawlExclude:
         try:
             re.compile(conf.crawlExclude)
