@@ -341,7 +341,8 @@ def _setCrawler():
         if conf.bulkFile:
             targets = getFileItems(conf.bulkFile)
         else:
-            targets = parseSitemap(conf.sitemapUrl)
+            targets = list(parseSitemap(conf.sitemapUrl))
+
         for i in xrange(len(targets)):
             try:
                 target = targets[i]
@@ -473,10 +474,13 @@ def _findPageForms():
         if conf.bulkFile:
             targets = getFileItems(conf.bulkFile)
         elif conf.sitemapUrl:
-            targets = parseSitemap(conf.sitemapUrl)
+            targets = list(parseSitemap(conf.sitemapUrl))
         elif conf.googleDork:
             targets = [_[0] for _ in kb.targets]
             kb.targets.clear()
+        else:
+            targets = []
+
         for i in xrange(len(targets)):
             try:
                 target = targets[i]
