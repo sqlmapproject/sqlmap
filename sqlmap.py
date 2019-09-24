@@ -263,6 +263,11 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
+        elif all(_ in excMsg for _ in ("Access is denied", "subprocess", "metasploit")):
+            errMsg = "permission error occurred while running Metasploit"
+            logger.critical(errMsg)
+            raise SystemExit
+
         elif all(_ in excMsg for _ in ("No such file", "_'")):
             errMsg = "corrupted installation detected ('%s'). " % excMsg.strip().split('\n')[-1]
             errMsg += "You should retrieve the latest development version from official GitHub "
