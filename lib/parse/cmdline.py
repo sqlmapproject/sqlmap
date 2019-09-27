@@ -44,6 +44,26 @@ finally:
     def get_groups(parser):
         return getattr(parser, "option_groups", None) or getattr(parser, "_action_groups")
 
+    def get_all_options(parser):
+        retVal = set()
+
+        for option in get_actions(parser):
+            if hasattr(option, "option_strings"):
+                retVal.update(option.option_strings)
+            else:
+                retVal.update(option._long_opts)
+                retVal.update(option._short_opts)
+
+        for group in get_groups(parser):
+            for option in get_actions(group):
+                if hasattr(option, "option_strings"):
+                    retVal.update(option.option_strings)
+                else:
+                    retVal.update(option._long_opts)
+                    retVal.update(option._short_opts)
+
+        return retVal
+
 from lib.core.common import checkOldOptions
 from lib.core.common import checkSystemEncoding
 from lib.core.common import dataToStdout
@@ -844,18 +864,10 @@ def cmdLineParser(argv=None):
             parser.usage = ""
             cmdLineOptions.sqlmapShell = True
 
-            _ = ["x", "q", "exit", "quit", "clear"]
+            commands = set(("x", "q", "exit", "quit", "clear"))
+            commands.update(get_all_options(parser))
 
-            for option in get_actions(parser):
-                _.extend(option._long_opts)
-                _.extend(option._short_opts)
-
-            for group in get_groups(parser):
-                for option in get_actions(group):
-                    _.extend(option._long_opts)
-                    _.extend(option._short_opts)
-
-            autoCompletion(AUTOCOMPLETE_TYPE.SQLMAP, commands=_)
+            autoCompletion(AUTOCOMPLETE_TYPE.SQLMAP, commands=commands)
 
             while True:
                 command = None
