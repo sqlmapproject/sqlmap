@@ -15,6 +15,7 @@ import string
 from lib.core.common import getSafeExString
 from lib.core.common import openFile
 from lib.core.compat import xrange
+from lib.core.convert import getUnicode
 from lib.core.data import logger
 from thirdparty.six import unichr as _unichr
 
@@ -84,4 +85,4 @@ def purge(directory):
     try:
         shutil.rmtree(directory)
     except OSError as ex:
-        logger.error("problem occurred while removing directory '%s' ('%s')" % (directory, getSafeExString(ex)))
+        logger.error("problem occurred while removing directory '%s' ('%s')" % (getUnicode(directory), getSafeExString(ex)))
