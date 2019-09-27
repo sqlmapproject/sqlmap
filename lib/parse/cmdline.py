@@ -902,6 +902,7 @@ def cmdLineParser(argv=None):
                 raise SqlmapSyntaxException("something went wrong during command line parsing ('%s')" % getSafeExString(ex))
 
         for i in xrange(len(argv)):
+            longOptions = set(re.findall(r"\-\-([^= ]+?)=", parser.format_help()))
             if argv[i] == "-hh":
                 argv[i] = "-h"
             elif len(argv[i]) > 1 and all(ord(_) in xrange(0x2018, 0x2020) for _ in ((argv[i].split('=', 1)[-1].strip() or ' ')[0], argv[i][-1])):
@@ -949,6 +950,9 @@ def cmdLineParser(argv=None):
                             found = True
                     if not found:
                         get_groups(parser).remove(group)
+            elif '=' in argv[i] and not argv[i].startswith('-') and argv[i].split('=')[0] in longOptions and re.search(r"\A-\w\Z", argv[i - 1]) is None:
+                dataToStdout("[!] detected usage of long-option without a starting hyphen ('%s')\n" % argv[i])
+                raise SystemExit
 
         for verbosity in (_ for _ in argv if re.search(r"\A\-v+\Z", _)):
             try:
