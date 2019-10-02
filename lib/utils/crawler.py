@@ -15,6 +15,7 @@ import time
 from lib.core.common import checkSameHost
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
+from lib.core.common import extractRegexResult
 from lib.core.common import findPageForms
 from lib.core.common import getSafeExString
 from lib.core.common import openFile
@@ -92,7 +93,7 @@ def crawl(target):
                         soup = BeautifulSoup(content)
                         tags = soup('a')
 
-                        tags += re.finditer(r'(?i)<a[^>]+href=["\'](?P<href>[^>"\']+)', content)
+                        tags += re.finditer(r'(?i)\b(href|src)=["\'](?P<href>[^>"\']+)', content)
 
                         for tag in tags:
                             href = tag.get("href") if hasattr(tag, "get") else tag.group("href")
@@ -111,7 +112,7 @@ def crawl(target):
                                 elif not _:
                                     continue
 
-                                if url.split('.')[-1].lower() not in CRAWL_EXCLUDE_EXTENSIONS:
+                                if (extractRegexResult(r"\A[^?]+\.(?P<result>\w+)(\?|\Z)", url) or "").lower() not in CRAWL_EXCLUDE_EXTENSIONS:
                                     with kb.locks.value:
                                         threadData.shared.deeper.add(url)
                                         if re.search(r"(.*?)\?(.+)", url):
