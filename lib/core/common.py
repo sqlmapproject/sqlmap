@@ -4471,6 +4471,16 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
         else:
             logger.debug(errMsg)
 
+    for match in re.finditer(r"\.post\(['\"]([^'\"]*)['\"],\s*\{([^}]*)\}", content):
+        url = _urllib.parse.urljoin(url, htmlUnescape(match.group(1)))
+        data = ""
+
+        for name, value in re.findall(r"['\"]?(\w+)['\"]?\s*:\s*(['\"][^'\"]+)?", match.group(2)):
+            data += "%s=%s%s" % (name, value, DEFAULT_GET_POST_DELIMITER)
+
+        data = data.rstrip(DEFAULT_GET_POST_DELIMITER)
+        retVal.add((url, HTTPMETHOD.POST, data, conf.cookie, None))
+
     if addToTargets and retVal:
         for target in retVal:
             kb.targets.add(target)
