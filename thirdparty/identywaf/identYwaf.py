@@ -27,7 +27,9 @@ import sys
 import time
 import zlib
 
-if sys.version_info >= (3, 0):
+PY3 = sys.version_info >= (3, 0)
+
+if PY3:
     import http.cookiejar
     import http.client as httplib
     import urllib.request
@@ -58,7 +60,7 @@ else:
     HTTPCookieProcessor = urllib2.HTTPCookieProcessor
 
 NAME = "identYwaf"
-VERSION = "1.0.114"
+VERSION = "1.0.122"
 BANNER = r"""
                                    ` __ __ `
  ____  ___      ___  ____   ______ `|  T  T` __    __   ____  _____ 
@@ -356,7 +358,7 @@ def init():
     os.chdir(os.path.abspath(os.path.dirname(__file__)))
 
     # Reference: http://blog.mathieu-leplatre.info/python-utf-8-print-fails-when-redirecting-stdout.html
-    if IS_TTY:
+    if not PY3 and not IS_TTY:
         sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
 
     print(colorize("[o] initializing handlers..."))

@@ -692,9 +692,9 @@ class Metasploit(object):
         self._runMsfCliSmbrelay()
 
         if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
-            self.uncPath = "\\\\\\\\%s\\\\%s" % (self.lhostStr, self._randFile)
+            self.uncPath = r"\\\\%s\\%s" % (self.lhostStr, self._randFile)
         else:
-            self.uncPath = "\\\\%s\\%s" % (self.lhostStr, self._randFile)
+            self.uncPath = r"\\%s\%s" % (self.lhostStr, self._randFile)
 
         debugMsg = "Metasploit Framework console exited with return "
         debugMsg += "code %s" % self._controlMsfCmd(self._msfCliProc, self.uncPathRequest)

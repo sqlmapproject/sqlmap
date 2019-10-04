@@ -356,6 +356,16 @@
             "regex": "The (ISA Server|server) denied the specified Uniform Resource Locator \\(URL\\)",
             "signatures": []
         },
+        "ithemes": {
+            "company": "iThemes",
+            "name": "iThemes Security",
+            "regex": "",
+            "signatures": [
+                "c70f:RVZXum60OEhCWKpAYKYPkoJyWOpohM4IiUYMr2RWg1uQJLX3uhZOnthtOj+hXrAA16FcPhJOdLoXomtKaK59nui7c4RmkgI2FZjxtDtAeq+c36A4chW1XaTC",
+                "71ee:RVZXum60OEhCWKpAYKYPkoJyWOpohM4IiUYMr2RWg1qQJLX2uhZOnthtOj+hXrAA16FcPhJOdLoXomtKaK59nui7c4RmkgI2FZjxtDtAeq+c36A4chW1XaTC"
+            ],
+            "note": "Formerly Better WP Security"
+        },
         "janusec": {
             "company": "Janusec",
             "name": "Janusec Application Gateway",
