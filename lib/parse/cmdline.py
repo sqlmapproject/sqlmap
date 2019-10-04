@@ -905,7 +905,7 @@ def cmdLineParser(argv=None):
             longOptions = set(re.findall(r"\-\-([^= ]+?)=", parser.format_help()))
             if argv[i] == "-hh":
                 argv[i] = "-h"
-            elif i == 1 and argv[i].startswith("http"):
+            elif i == 1 and re.search(r"\A(http|www\.|\w[\w.-]+\.\w{2,})", argv[i]) is not None:
                 argv[i] = "--url=%s" % argv[i]
             elif len(argv[i]) > 1 and all(ord(_) in xrange(0x2018, 0x2020) for _ in ((argv[i].split('=', 1)[-1].strip() or ' ')[0], argv[i][-1])):
                 dataToStdout("[!] copy-pasting illegal (non-console) quote characters from Internet is, well, illegal (%s)\n" % argv[i])
