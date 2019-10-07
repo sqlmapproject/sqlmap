@@ -24,6 +24,7 @@ from lib.core.common import getTechniqueData
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
 from lib.core.common import initTechnique
+from lib.core.common import isDigit
 from lib.core.common import isNoneValue
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
@@ -235,7 +236,7 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
                             elif choice == 'Q':
                                 raise SqlmapUserQuitException
 
-                            elif choice.isdigit() and int(choice) > 0 and int(choice) <= count:
+                            elif isDigit(choice) and int(choice) > 0 and int(choice) <= count:
                                 stopLimit = int(choice)
 
                                 infoMsg = "sqlmap is now going to retrieve the "
@@ -246,7 +247,7 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
                                 message = "how many? "
                                 stopLimit = readInput(message, default="10")
 
-                                if not stopLimit.isdigit():
+                                if not isDigit(stopLimit):
                                     errMsg = "invalid choice"
                                     logger.error(errMsg)
 
@@ -261,7 +262,7 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
 
                                 return None
 
-                    elif count and not count.isdigit():
+                    elif count and not isDigit(count):
                         warnMsg = "it was not possible to count the number "
                         warnMsg += "of entries for the SQL query provided. "
                         warnMsg += "sqlmap will assume that it returns only "

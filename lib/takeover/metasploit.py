@@ -23,6 +23,7 @@ from lib.core.common import dataToStdout
 from lib.core.common import Backend
 from lib.core.common import getLocalIP
 from lib.core.common import getRemoteIP
+from lib.core.common import isDigit
 from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
 from lib.core.common import pollProcess
@@ -154,7 +155,7 @@ class Metasploit(object):
 
         choice = readInput(message, default="%d" % default)
 
-        if not choice or not choice.isdigit() or int(choice) > maxValue or int(choice) < 1:
+        if not choice or not isDigit(choice) or int(choice) > maxValue or int(choice) < 1:
             choice = default
 
         choice = int(choice)
@@ -241,7 +242,7 @@ class Metasploit(object):
                         elif Backend.isDbms(DBMS.MSSQL) and Backend.isVersionWithin(("2005", "2008")):
                             break
 
-                    elif not choice.isdigit():
+                    elif not isDigit(choice):
                         logger.warn("invalid value, only digits are allowed")
 
                     elif int(choice) < 1 or int(choice) > 2:

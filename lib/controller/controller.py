@@ -31,6 +31,7 @@ from lib.core.common import getSafeExString
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
 from lib.core.common import intersect
+from lib.core.common import isDigit
 from lib.core.common import isListLike
 from lib.core.common import parseTargetUrl
 from lib.core.common import popValue
@@ -129,7 +130,7 @@ def _selectInjection():
         message += "[q] Quit"
         choice = readInput(message, default='0').upper()
 
-        if choice.isdigit() and int(choice) < len(kb.injections) and int(choice) >= 0:
+        if isDigit(choice) and int(choice) < len(kb.injections) and int(choice) >= 0:
             index = int(choice)
         elif choice == 'Q':
             raise SqlmapUserQuitException

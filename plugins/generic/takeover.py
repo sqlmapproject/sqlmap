@@ -9,6 +9,7 @@ import os
 
 from lib.core.common import Backend
 from lib.core.common import getSafeExString
+from lib.core.common import isDigit
 from lib.core.common import isStackingAvailable
 from lib.core.common import openFile
 from lib.core.common import readInput
@@ -101,7 +102,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
             while True:
                 tunnel = readInput(msg, default='1')
 
-                if tunnel.isdigit() and int(tunnel) in (1, 2):
+                if isDigit(tunnel) and int(tunnel) in (1, 2):
                     tunnel = int(tunnel)
                     break
 
@@ -172,7 +173,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
                     while True:
                         choice = readInput(msg, default='1')
 
-                        if choice.isdigit() and int(choice) in (1, 2):
+                        if isDigit(choice) and int(choice) in (1, 2):
                             choice = int(choice)
                             break
 

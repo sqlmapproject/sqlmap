@@ -11,6 +11,7 @@ from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import checkFile
 from lib.core.common import dataToStdout
+from lib.core.common import isDigit
 from lib.core.common import isStackingAvailable
 from lib.core.common import readInput
 from lib.core.common import unArrayizeValue
@@ -339,10 +340,8 @@ class UDF(object):
 
                 if choice == 'Q':
                     break
-                elif hasattr(choice, "isdigit") and choice.isdigit() and int(choice) > 0 and int(choice) <= len(udfList):
+                elif isDigit(choice) and int(choice) > 0 and int(choice) <= len(udfList):
                     choice = int(choice)
-                    break
-                elif isinstance(choice, int) and choice > 0 and choice <= len(udfList):
                     break
                 else:
                     warnMsg = "invalid value, only digits >= 1 and "

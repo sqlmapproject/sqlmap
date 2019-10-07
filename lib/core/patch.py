@@ -20,6 +20,7 @@ import thirdparty.chardet.universaldetector
 
 from lib.core.common import filterNone
 from lib.core.common import getSafeExString
+from lib.core.common import isDigit
 from lib.core.common import isListLike
 from lib.core.common import readInput
 from lib.core.common import shellExec
@@ -62,6 +63,7 @@ def resolveCrossReferences():
     Place for cross-reference resolution
     """
 
+    lib.core.threads.isDigit = isDigit
     lib.core.threads.readInput = readInput
     lib.core.common.getPageTemplate = getPageTemplate
     lib.core.convert.filterNone = filterNone

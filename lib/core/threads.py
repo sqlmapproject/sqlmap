@@ -73,6 +73,10 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
     # It will be overwritten by original from lib.core.common
     pass
 
+def isDigit(value):
+    # It will be overwritten by original from lib.core.common
+    pass
+
 def getCurrentThreadData():
     """
     Returns current thread's local data
@@ -125,10 +129,12 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
             choice = readInput(message, default=str(numThreads))
             if choice:
                 skipThreadCheck = False
+
                 if choice.endswith('!'):
                     choice = choice[:-1]
                     skipThreadCheck = True
-                if choice.isdigit():
+
+                if isDigit(choice):
                     if int(choice) > MAX_NUMBER_OF_THREADS and not skipThreadCheck:
                         errMsg = "maximum number of used threads is %d avoiding potential connection issues" % MAX_NUMBER_OF_THREADS
                         logger.critical(errMsg)

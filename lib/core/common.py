@@ -1245,6 +1245,22 @@ def isZipFile(filename):
 
     return openFile(filename, "rb", encoding=None).read(len(ZIP_HEADER)) == ZIP_HEADER
 
+def isDigit(value):
+    """
+    Checks if provided (string) value consists of digits (Note: Python's isdigit() is problematic)
+
+    >>> u'\xb2'.isdigit()
+    True
+    >>> isDigit(u'\xb2')
+    False
+    >>> isDigit('123456')
+    True
+    >>> isDigit('3b3')
+    False
+    """
+
+    return re.search(r"\A[0-9]+\Z", value or "") is not None
+
 def checkFile(filename, raiseOnError=True):
     """
     Checks for file existence and readability

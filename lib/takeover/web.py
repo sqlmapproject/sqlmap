@@ -22,6 +22,7 @@ from lib.core.common import getPublicTypeMembers
 from lib.core.common import getSQLSnippet
 from lib.core.common import getTechnique
 from lib.core.common import getTechniqueData
+from lib.core.common import isDigit
 from lib.core.common import isTechniqueAvailable
 from lib.core.common import isWindowsDriveLetterPath
 from lib.core.common import normalizePath
@@ -200,7 +201,7 @@ class Web(object):
         while True:
             choice = readInput(message, default=str(default))
 
-            if not choice.isdigit():
+            if not isDigit(choice):
                 logger.warn("invalid value, only digits are allowed")
 
             elif int(choice) < 1 or int(choice) > len(choices):
