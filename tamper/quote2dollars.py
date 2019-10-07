@@ -14,12 +14,15 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Tested on PostgreSQL 12.0
+    Replaces single quote with dollar signs (e.g. ' -> $$)
     
-    Replace single and double quotes with dollar signs (e.g. ' -> $$)
+    Tested against:
+    * PostgreSQL 12.0
+    
+    Notes: useful for applications that use PostgreSQL database and encodes or sanitizes quote characters
     
     >>> tamper("1' or '1'='1")
     "1$$ or $$1$$=$$1"
     """
 
-    return payload.replace("'", "$$'").replace('"', '$$')
+    return payload.replace("'", "$$")
