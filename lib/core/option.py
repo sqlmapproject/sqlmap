@@ -462,12 +462,16 @@ def _findPageForms():
     if conf.url and not checkConnection():
         return
 
+    # workaround for second url to get the injection page rather than result page
+    secondUrl = conf.secondUrl
+    conf.secondUrl = None
+
     found = False
     infoMsg = "searching for forms"
     logger.info(infoMsg)
 
     if not any((conf.bulkFile, conf.googleDork, conf.sitemapUrl)):
-        page, _, _ = Request.queryPage(content=True)
+        page, _, _ = Request.getPage()
         if findPageForms(page, conf.url, True, True):
             found = True
     else:
@@ -496,6 +500,9 @@ def _findPageForms():
             except Exception as ex:
                 errMsg = "problem occurred while searching for forms at '%s' ('%s')" % (target, getSafeExString(ex))
                 logger.error(errMsg)
+
+    # restore workaround
+    conf.secondUrl = secondUrl
 
     if not found:
         warnMsg = "no forms found"
