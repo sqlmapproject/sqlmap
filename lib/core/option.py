@@ -314,7 +314,7 @@ def _setRequestFromFile():
 
             if url is None:
                 errMsg = "specified file '%s' " % requestFile
-                errMsg += "does not contain a valid HTTP request"
+                errMsg += "does not contain a usable HTTP request (with parameters)"
                 raise SqlmapDataException(errMsg)
 
     if conf.secondReq:
