@@ -370,6 +370,9 @@ def cmdLineParser(argv=None):
         detection.add_argument("--code", dest="code", type=int,
             help="HTTP code to match when query is evaluated to True")
 
+        detection.add_argument("--error-string", dest="errorString",
+            help="String to match when the database encountered an error")
+
         detection.add_argument("--smart", dest="smart", action="store_true",
             help="Perform thorough tests only if positive heuristic(s)")
 

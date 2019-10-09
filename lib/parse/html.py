@@ -14,6 +14,7 @@ from lib.core.common import parseXmlFile
 from lib.core.data import kb
 from lib.core.data import paths
 from lib.core.threads import getCurrentThreadData
+from lib.core.data import conf
 
 class HTMLHandler(ContentHandler):
     """
@@ -80,7 +81,11 @@ def htmlParser(page):
     kb.cache.parsedDbms[key] = handler.dbms
 
     # generic SQL warning/error messages
-    if re.search(r"SQL (warning|error|syntax)", page, re.I):
+    if conf.errorString:
+        error=conf.errorString
+    else:
+        error=r"SQL (warning|error|syntax)"
+    if re.search(error, page, re.I):
         handler._markAsErrorPage()
 
     return handler.dbms
