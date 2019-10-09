@@ -4700,18 +4700,19 @@ def decodeDbmsHexValue(value, raw=False):
             else:
                 retVal = decodeHex(value)
 
-            if not kb.binaryField and not raw:
-                if Backend.isDbms(DBMS.MSSQL) and value.startswith("0x"):
-                    try:
-                        retVal = retVal.decode("utf-16-le")
-                    except UnicodeDecodeError:
-                        pass
+            if not raw:
+                if not kb.binaryField:
+                    if Backend.isDbms(DBMS.MSSQL) and value.startswith("0x"):
+                        try:
+                            retVal = retVal.decode("utf-16-le")
+                        except UnicodeDecodeError:
+                            pass
 
-                elif Backend.getIdentifiedDbms() in (DBMS.HSQLDB, DBMS.H2):
-                    try:
-                        retVal = retVal.decode("utf-16-be")
-                    except UnicodeDecodeError:
-                        pass
+                    elif Backend.getIdentifiedDbms() in (DBMS.HSQLDB, DBMS.H2):
+                        try:
+                            retVal = retVal.decode("utf-16-be")
+                        except UnicodeDecodeError:
+                            pass
 
                 if not isinstance(retVal, six.text_type):
                     retVal = getUnicode(retVal, conf.encoding or UNICODE_ENCODING)
