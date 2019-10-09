@@ -312,10 +312,10 @@ def _setRequestFromFile():
                         conf.multipleTargets = True
                     seen.add(url)
 
-            if url is None:
-                errMsg = "specified file '%s' " % requestFile
-                errMsg += "does not contain a valid HTTP request"
-                raise SqlmapDataException(errMsg)
+                if url is None:
+                    errMsg = "specified file '%s' " % requestFile
+                    errMsg += "does not contain a valid HTTP request"
+                    raise SqlmapDataException(errMsg)
 
     if conf.secondReq:
         conf.secondReq = safeExpandUser(conf.secondReq)
