@@ -76,60 +76,63 @@ def main(src, dst):
     decoder = ImpactDecoder.IPDecoder()
 
     while True:
-        cmd = ''
+        try:
+            cmd = ''
 
-        # Wait for incoming replies
-        if sock in select.select([sock], [], [])[0]:
-            buff = sock.recv(4096)
+            # Wait for incoming replies
+            if sock in select.select([sock], [], [])[0]:
+                buff = sock.recv(4096)
 
-            if 0 == len(buff):
-                # Socket remotely closed
-                sock.close()
-                sys.exit(0)
+                if 0 == len(buff):
+                    # Socket remotely closed
+                    sock.close()
+                    sys.exit(0)
 
-            # Packet received; decode and display it
-            ippacket = decoder.decode(buff)
-            icmppacket = ippacket.child()
+                # Packet received; decode and display it
+                ippacket = decoder.decode(buff)
+                icmppacket = ippacket.child()
 
-            # If the packet matches, report it to the user
-            if ippacket.get_ip_dst() == src and ippacket.get_ip_src() == dst and 8 == icmppacket.get_icmp_type():
-                # Get identifier and sequence number
-                ident = icmppacket.get_icmp_id()
-                seq_id = icmppacket.get_icmp_seq()
-                data = icmppacket.get_data_as_string()
+                # If the packet matches, report it to the user
+                if ippacket.get_ip_dst() == src and ippacket.get_ip_src() == dst and 8 == icmppacket.get_icmp_type():
+                    # Get identifier and sequence number
+                    ident = icmppacket.get_icmp_id()
+                    seq_id = icmppacket.get_icmp_seq()
+                    data = icmppacket.get_data_as_string()
 
-                if len(data) > 0:
-                    sys.stdout.write(data)
+                    if len(data) > 0:
+                        sys.stdout.write(data)
 
-                # Parse command from standard input
-                try:
-                    cmd = sys.stdin.readline()
-                except:
-                    pass
+                    # Parse command from standard input
+                    try:
+                        cmd = sys.stdin.readline()
+                    except:
+                        pass
 
-                if cmd == 'exit\n':
-                    return
+                    if cmd == 'exit\n':
+                        return
 
-                # Set sequence number and identifier
-                icmp.set_icmp_id(ident)
-                icmp.set_icmp_seq(seq_id)
+                    # Set sequence number and identifier
+                    icmp.set_icmp_id(ident)
+                    icmp.set_icmp_seq(seq_id)
 
-                # Include the command as data inside the ICMP packet
-                icmp.contains(ImpactPacket.Data(cmd))
+                    # Include the command as data inside the ICMP packet
+                    icmp.contains(ImpactPacket.Data(cmd))
 
-                # Calculate its checksum
-                icmp.set_icmp_cksum(0)
-                icmp.auto_checksum = 1
+                    # Calculate its checksum
+                    icmp.set_icmp_cksum(0)
+                    icmp.auto_checksum = 1
 
-                # Have the IP packet contain the ICMP packet (along with its payload)
-                ip.contains(icmp)
+                    # Have the IP packet contain the ICMP packet (along with its payload)
+                    ip.contains(icmp)
 
-                try:
-                    # Send it to the target host
-                    sock.sendto(ip.get_packet(), (dst, 0))
-                except socket.error as ex:
-                    sys.stderr.write("'%s'\n" % ex)
-                    sys.stderr.flush()
+                    try:
+                        # Send it to the target host
+                        sock.sendto(ip.get_packet(), (dst, 0))
+                    except socket.error as ex:
+                        sys.stderr.write("'%s'\n" % ex)
+                        sys.stderr.flush()
+        except:
+            break
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:
