@@ -2085,7 +2085,7 @@ Option `--preprocess`
 Using this option it is possible to use a preprocessing script for (HTTP) response data prior being used by the sqlmap detection engine (e.g. to decode data or to remove junk). For example, preprocessing script that transforms all lowercase characters to uppercase could be:
 
 ```
-#!/usr/bin/env
+#!/usr/bin/env python
 
 def preprocess(page, headers=None, code=None):
     return page.upper() if page else page, headers, code
