@@ -600,7 +600,8 @@ class Users(object):
 
                     # In Firebird we get one letter for each privilege
                     elif Backend.isDbms(DBMS.FIREBIRD):
-                        privileges.add(FIREBIRD_PRIVS[privilege.strip()])
+                        if privilege.strip() in FIREBIRD_PRIVS:
+                            privileges.add(FIREBIRD_PRIVS[privilege.strip()])
 
                     # In Informix we get one letter for the highest privilege
                     elif Backend.isDbms(DBMS.INFORMIX):
