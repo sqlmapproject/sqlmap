@@ -237,7 +237,7 @@ def unescape(data, entities, encoding=DEFAULT_ENCODING):
 
         repl = entities.get(ent)
         if repl is not None:
-            if type(repl) != type(""):
+            if type(repl) != type("") and encoding is not None:
                 try:
                     repl = repl.encode(encoding)
                 except UnicodeError:
