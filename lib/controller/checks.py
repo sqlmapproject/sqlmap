@@ -73,6 +73,7 @@ from lib.core.settings import BOUNDED_INJECTION_MARKER
 from lib.core.settings import CANDIDATE_SENTENCE_MIN_LENGTH
 from lib.core.settings import CHECK_INTERNET_ADDRESS
 from lib.core.settings import CHECK_INTERNET_VALUE
+from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DUMMY_NON_SQLI_CHECK_APPENDIX
 from lib.core.settings import FI_ERROR_REGEX
@@ -1558,6 +1559,15 @@ def checkConnection(suppressOutput=False):
     finally:
         kb.originalPage = kb.pageTemplate = threadData.lastPage
         kb.originalCode = threadData.lastCode
+
+    if conf.cj and not conf.cookie and not conf.dropSetCookie:
+        candidate = DEFAULT_COOKIE_DELIMITER.join("%s=%s" % (_.name, _.value) for _ in conf.cj)
+
+        message = "you have not declared cookie(s), while "
+        message += "server wants to set its own ('%s'). " % re.sub(r"(=[^=;]{10}[^=;])[^=;]+([^=;]{10})", r"\g<1>...\g<2>", candidate)
+        message += "Do you want to use those [Y/n] "
+        if readInput(message, default='Y', boolean=True):
+            conf.httpHeaders.append((HTTP_HEADER.COOKIE, candidate))
 
     return True
 
