@@ -1000,7 +1000,7 @@ def dictionaryAttack(attack_dict):
                                 resumes.append((user, hash_, resumed))
                             keys.add(hash_)
 
-                    except (binascii.Error, IndexError):
+                    except (binascii.Error, TypeError, IndexError):
                         pass
 
         if not attack_info:

@@ -123,7 +123,7 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
 
                             try:
                                 decodeBase64(value)
-                            except binascii.Error:
+                            except (binascii.Error, TypeError):
                                 base64 = False
                                 break
 

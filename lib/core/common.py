@@ -5012,7 +5012,7 @@ def parseRequestFile(reqFile, checkParams=True):
                     port, request = match.groups()
                     try:
                         request = decodeBase64(request, binary=False)
-                    except binascii.Error:
+                    except (binascii.Error, TypeError):
                         continue
                     _ = re.search(r"%s:.+" % re.escape(HTTP_HEADER.HOST), request)
                     if _:
