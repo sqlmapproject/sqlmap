@@ -12,3 +12,4 @@ script:
     - python -c "import sqlmap; import sqlmapapi"
     - python sqlmap.py --smoke
     - python sqlmap.py --vuln
+    -python sqlmap.py --authbypass
