@@ -9,6 +9,7 @@ See the file 'LICENSE' for copying permission
 
 from __future__ import print_function
 
+import json
 import re
 import sqlite3
 import sys
@@ -99,10 +100,13 @@ class ReqHandler(BaseHTTPRequestHandler):
                 return
 
         if hasattr(self, "data"):
-            params.update(parse_qs(self.data))
+            if self.data.startswith('{') and self.data.endswith('}'):
+                params.update(json.loads(self.data))
+            else:
+                params.update(parse_qs(self.data))
 
         for key in params:
-            if params[key]:
+            if params[key] and isinstance(params[key], (tuple, list)):
                 params[key] = params[key][-1]
 
         self.url, self.params = path, params

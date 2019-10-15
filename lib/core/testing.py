@@ -75,6 +75,7 @@ def vulnTest():
 
     for options, checks in (
         ("--flush-session", ("CloudFlare",)),
+        ("--flush-session --data='{\"id\": 1}' --banner", ("Payload: {\"id\"", "banner: '3")),
         ("--flush-session --parse-errors --eval=\"id2=2\" --referer=\"localhost\" --cookie=\"PHPSESSID=d41d8cd98f00b204e9800998ecf8427e\"", (": syntax error", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "back-end DBMS: SQLite", "3 columns")),
         ("--banner --schema --dump -T users --binary-fields=surname --where \"id>3\"", ("banner: '3", "INTEGER", "TEXT", "id", "name", "surname", "2 entries", "6E616D6569736E756C6C")),
         ("--all --tamper=between,randomcase", ("5 entries", "luther", "blisset", "fluffy", "179ad45c6ce2cb97cf1029e212046e81", "NULL", "nameisnull", "testpass")),
