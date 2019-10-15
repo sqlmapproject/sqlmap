@@ -18,7 +18,7 @@ from lib.core.enums import OS
 from thirdparty.six import unichr as _unichr
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.3.10.16"
+VERSION = "1.3.10.17"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -412,6 +412,9 @@ CANDIDATE_SENTENCE_MIN_LENGTH = 10
 
 # Character used for marking injectable position inside provided data
 CUSTOM_INJECTION_MARK_CHAR = '*'
+
+# Wildcard value that can be used in option --ignore-code
+IGNORE_CODE_WILDCARD = '*'
 
 # Other way to declare injection position
 INJECT_HERE_REGEX = r"(?i)%INJECT[_ ]?HERE%"

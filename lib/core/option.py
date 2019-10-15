@@ -109,6 +109,7 @@ from lib.core.settings import DEFAULT_TOR_HTTP_PORTS
 from lib.core.settings import DEFAULT_TOR_SOCKS_PORTS
 from lib.core.settings import DEFAULT_USER_AGENT
 from lib.core.settings import DUMMY_URL
+from lib.core.settings import IGNORE_CODE_WILDCARD
 from lib.core.settings import IS_WIN
 from lib.core.settings import KB_CHARS_BOUNDARY_CHAR
 from lib.core.settings import KB_CHARS_LOW_FREQUENCY_ALPHABET
@@ -1569,11 +1570,14 @@ def _cleanupOptions():
         conf.testParameter = []
 
     if conf.ignoreCode:
-        try:
-            conf.ignoreCode = [int(_) for _ in re.split(PARAMETER_SPLITTING_REGEX, conf.ignoreCode)]
-        except ValueError:
-            errMsg = "options '--ignore-code' should contain a list of integer values"
-            raise SqlmapSyntaxException(errMsg)
+        if conf.ignoreCode == IGNORE_CODE_WILDCARD:
+            conf.ignoreCode = xrange(0, 1000)
+        else:
+            try:
+                conf.ignoreCode = [int(_) for _ in re.split(PARAMETER_SPLITTING_REGEX, conf.ignoreCode)]
+            except ValueError:
+                errMsg = "options '--ignore-code' should contain a list of integer values or a wildcard value '%s'" % IGNORE_CODE_WILDCARD
+                raise SqlmapSyntaxException(errMsg)
     else:
         conf.ignoreCode = []
 
