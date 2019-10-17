@@ -3,7 +3,7 @@
 <root>
     <!-- Stacked queries tests -->
     <test>
-        <title>MySQL &gt; 5.0.11 stacked queries (comment)</title>
+        <title>MySQL &gt;= 5.0.12 stacked queries (comment)</title>
         <stype>4</stype>
         <level>2</level>
         <risk>1</risk>
@@ -19,12 +19,12 @@
         </response>
         <details>
             <dbms>MySQL</dbms>
-            <dbms_version>&gt; 5.0.11</dbms_version>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
         </details>
     </test>
 
     <test>
-        <title>MySQL &gt; 5.0.11 stacked queries</title>
+        <title>MySQL &gt;= 5.0.12 stacked queries</title>
         <stype>4</stype>
         <level>3</level>
         <risk>1</risk>
@@ -39,12 +39,12 @@
         </response>
         <details>
             <dbms>MySQL</dbms>
-            <dbms_version>&gt; 5.0.11</dbms_version>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
         </details>
     </test>
 
      <test>
-        <title>MySQL &gt; 5.0.11 stacked queries (query SLEEP - comment)</title>
+        <title>MySQL &gt;= 5.0.12 stacked queries (query SLEEP - comment)</title>
         <stype>4</stype>
         <level>3</level>
         <risk>1</risk>
@@ -60,12 +60,12 @@
         </response>
         <details>
             <dbms>MySQL</dbms>
-            <dbms_version>&gt; 5.0.11</dbms_version>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
         </details>
     </test>
 
     <test>
-        <title>MySQL &gt; 5.0.11 stacked queries (query SLEEP)</title>
+        <title>MySQL &gt;= 5.0.12 stacked queries (query SLEEP)</title>
         <stype>4</stype>
         <level>4</level>
         <risk>1</risk>
@@ -80,7 +80,7 @@
         </response>
         <details>
             <dbms>MySQL</dbms>
-            <dbms_version>&gt; 5.0.11</dbms_version>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
         </details>
     </test>
 

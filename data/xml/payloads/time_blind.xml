@@ -169,7 +169,7 @@
     </test>
 
     <test>
-        <title>MySQL &lt;= 5.0.11 AND time-based blind (heavy query)</title>
+        <title>MySQL &lt; 5.0.12 AND time-based blind (heavy query)</title>
         <stype>5</stype>
         <level>2</level>
         <risk>2</risk>
@@ -184,12 +184,12 @@
         </response>
         <details>
             <dbms>MySQL</dbms>
-            <dbms_version>&lt;= 5.0.11</dbms_version>
+            <dbms_version>&lt; 5.0.12</dbms_version>
         </details>
     </test>
 
     <test>
-        <title>MySQL &lt;= 5.0.11 OR time-based blind (heavy query)</title>
+        <title>MySQL &lt; 5.0.12 OR time-based blind (heavy query)</title>
         <stype>5</stype>
         <level>2</level>
         <risk>3</risk>
@@ -204,12 +204,12 @@
         </response>
         <details>
             <dbms>MySQL</dbms>
-            <dbms_version>&lt;= 5.0.11</dbms_version>
+            <dbms_version>&lt; 5.0.12</dbms_version>
         </details>
     </test>
 
     <test>
-        <title>MySQL &lt;= 5.0.11 AND time-based blind (heavy query - comment)</title>
+        <title>MySQL &lt; 5.0.12 AND time-based blind (heavy query - comment)</title>
         <stype>5</stype>
         <level>5</level>
         <risk>2</risk>
@@ -225,12 +225,12 @@
         </response>
         <details>
             <dbms>MySQL</dbms>
-            <dbms_version>&lt;= 5.0.11</dbms_version>
+            <dbms_version>&lt; 5.0.12</dbms_version>
         </details>
     </test>
 
     <test>
-        <title>MySQL &lt;= 5.0.11 OR time-based blind (heavy query - comment)</title>
+        <title>MySQL &lt; 5.0.12 OR time-based blind (heavy query - comment)</title>
         <stype>5</stype>
         <level>5</level>
         <risk>3</risk>
@@ -246,7 +246,7 @@
         </response>
         <details>
             <dbms>MySQL</dbms>
-            <dbms_version>&lt;= 5.0.11</dbms_version>
+            <dbms_version>&lt; 5.0.12</dbms_version>
         </details>
     </test>
 
@@ -1506,7 +1506,7 @@
     </test>
 
     <test>
-        <title>MySQL &lt;= 5.0.11 time-based blind - Parameter replace (heavy queries)</title>
+        <title>MySQL &lt; 5.0.12 time-based blind - Parameter replace (heavy queries)</title>
         <stype>5</stype>
         <level>4</level>
         <risk>2</risk>
@@ -1521,7 +1521,7 @@
         </response>
         <details>
             <dbms>MySQL</dbms>
-            <dbms_version>&lt;= 5.0.11</dbms_version>
+            <dbms_version>&lt; 5.0.12</dbms_version>
         </details>
     </test>
 
@@ -1861,7 +1861,7 @@
     </test>
 
     <test>
-        <title>MySQL &lt;= 5.0.11 time-based blind - ORDER BY, GROUP BY clause (heavy query)</title>
+        <title>MySQL &lt; 5.0.12 time-based blind - ORDER BY, GROUP BY clause (heavy query)</title>
         <stype>5</stype>
         <level>4</level>
         <risk>2</risk>
@@ -1876,7 +1876,7 @@
         </response>
         <details>
             <dbms>MySQL</dbms>
-            <dbms_version>&lt;= 5.0.11</dbms_version>
+            <dbms_version>&lt; 5.0.12</dbms_version>
         </details>
     </test>
 
