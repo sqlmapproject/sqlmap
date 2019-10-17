@@ -203,6 +203,15 @@
 /var/www/nginx-default/index.php
 /srv/www/index.php
 
+# Reference: https://github.com/sqlmapproject/sqlmap/issues/3928
+
+/srv/www/htdocs/index.php
+/usr/local/apache2/htdocs/index.php
+/usr/local/www/data/index.php
+/var/apache2/htdocs/index.php
+/var/www/htdocs/index.php
+/var/www/html/index.php
+
 # Reference: https://www.gracefulsecurity.com/path-traversal-cheat-sheet-linux
 
 /etc/passwd
