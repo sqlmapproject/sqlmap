@@ -16,6 +16,7 @@ from lib.core.common import isStackingAvailable
 from lib.core.common import readInput
 from lib.core.convert import getUnicode
 from lib.core.data import conf
+from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import AUTOCOMPLETE_TYPE
 from lib.core.enums import DBMS
@@ -48,7 +49,7 @@ class Abstraction(Web, UDF, XP_cmdshell):
         if Backend.isDbms(DBMS.PGSQL) and self.checkCopyExec():
             self.copyExecCmd(cmd)
 
-        elif self.webBackdoorUrl and not isStackingAvailable():
+        elif self.webBackdoorUrl and (not isStackingAvailable() or kb.udfFail):
             self.webBackdoorRunCmd(cmd)
 
         elif Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
@@ -67,7 +68,7 @@ class Abstraction(Web, UDF, XP_cmdshell):
         if Backend.isDbms(DBMS.PGSQL) and self.checkCopyExec():
             retVal = self.copyExecCmd(cmd)
 
-        elif self.webBackdoorUrl and not isStackingAvailable():
+        elif self.webBackdoorUrl and (not isStackingAvailable() or kb.udfFail):
             retVal = self.webBackdoorRunCmd(cmd)
 
         elif Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
@@ -104,7 +105,7 @@ class Abstraction(Web, UDF, XP_cmdshell):
             self.execCmd(cmd)
 
     def shell(self):
-        if self.webBackdoorUrl and not isStackingAvailable():
+        if self.webBackdoorUrl and (not isStackingAvailable() or kb.udfFail):
             infoMsg = "calling OS shell. To quit type "
             infoMsg += "'x' or 'q' and press ENTER"
             logger.info(infoMsg)

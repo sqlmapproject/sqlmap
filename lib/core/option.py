@@ -2012,6 +2012,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.threadException = False
     kb.tableExistsChoice = None
     kb.uChar = NULL
+    kb.udfFail = False
     kb.unionDuplicates = False
     kb.wizardMode = False
     kb.xpCmdshellAvailable = False

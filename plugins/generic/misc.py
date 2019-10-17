@@ -137,7 +137,7 @@ class Miscellaneous(object):
             self.delRemoteFile(self.webStagerFilePath)
             self.delRemoteFile(self.webBackdoorFilePath)
 
-        if not isStackingAvailable() and not conf.direct:
+        if (not isStackingAvailable() or kb.udfFail) and not conf.direct:
             return
 
         if any((conf.osCmd, conf.osShell)) and Backend.isDbms(DBMS.PGSQL) and kb.copyExecTest:
