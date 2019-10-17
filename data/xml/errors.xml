@@ -7,13 +7,14 @@
         <error regexp="Warning.*?\Wmysqli?_"/>
         <error regexp="MySQLSyntaxErrorException"/>
         <error regexp="valid MySQL result"/>
-        <error regexp="check the manual that corresponds to your (MySQL|MariaDB) server version"/>
+        <error regexp="check the manual that (corresponds to|fits) your (MySQL|MariaDB) server version"/>
         <error regexp="Unknown column '[^ ]+' in 'field list'"/>
         <error regexp="MySqlClient\."/>
         <error regexp="com\.mysql\.jdbc"/>
         <error regexp="Zend_Db_(Adapter|Statement)_Mysqli_Exception"/>
         <error regexp="Pdo[./_\\]Mysql"/>
         <error regexp="MySqlException"/>
+        <error regexp="SQLSTATE\[\d+\]: Syntax error or access violation"/>
     </dbms>
 
     <!-- PostgreSQL -->
