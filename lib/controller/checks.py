@@ -1567,6 +1567,7 @@ def checkConnection(suppressOutput=False):
         message += "server wants to set its own ('%s'). " % re.sub(r"(=[^=;]{10}[^=;])[^=;]+([^=;]{10})", r"\g<1>...\g<2>", candidate)
         message += "Do you want to use those [Y/n] "
         if readInput(message, default='Y', boolean=True):
+            kb.mergeCookies = True
             conf.httpHeaders.append((HTTP_HEADER.COOKIE, candidate))
 
     return True
