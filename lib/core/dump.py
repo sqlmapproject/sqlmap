@@ -197,7 +197,7 @@ class Dump(object):
             self._areAdmins = userSettings[1]
             userSettings = userSettings[0]
 
-        users = list(userSettings.keys())
+        users = [_ for _ in userSettings.keys() if _ is not None]
         users.sort(key=lambda _: _.lower() if hasattr(_, "lower") else _)
 
         if conf.api:
