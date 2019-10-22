@@ -3194,7 +3194,10 @@ def isDBMSVersionAtLeast(minimum):
                 parts[1] = filterStringValue(parts[1], '[0-9]')
                 version = '.'.join(parts)
 
-            version = float(filterStringValue(version, '[0-9.]')) + correction
+            try:
+                version = float(filterStringValue(version, '[0-9.]')) + correction
+            except ValueError:
+                return None
 
             if isinstance(minimum, six.string_types):
                 if '.' in minimum:
