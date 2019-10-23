@@ -734,6 +734,9 @@ def cmdLineParser(argv=None):
         miscellaneous.add_argument("--tmp-dir", dest="tmpDir",
             help="Local directory for storing temporary files")
 
+        miscellaneous.add_argument("--unstable", dest="unstable", action="store_true",
+            help="Adjust options for unstable connections")
+
         miscellaneous.add_argument("--update", dest="updateAll", action="store_true",
             help="Update sqlmap")
 

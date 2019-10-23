@@ -2211,6 +2211,13 @@ def _mergeOptions(inputOptions, overrideOptions):
         if hasattr(conf, key) and conf[key] is None:
             conf[key] = value
 
+            if conf.unstable:
+                if key in ("timeSec", "retries", "timeout"):
+                    conf[key] *= 2
+
+    if conf.unstable:
+        conf.forcePartial = True
+
     lut = {}
     for group in optDict.keys():
         lut.update((_.upper(), _) for _ in optDict[group])

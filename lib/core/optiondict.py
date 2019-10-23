@@ -239,8 +239,9 @@ optDict = {
         "offline": "boolean",
         "purge": "boolean",
         "tmpDir": "string",
-        "wizard": "boolean",
+        "unstable": "boolean",
         "updateAll": "boolean",
+        "wizard": "boolean",
         "verbose": "integer",
     },
 
