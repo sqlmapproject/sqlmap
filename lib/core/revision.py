@@ -40,9 +40,14 @@ def getRevisionNumber():
             with openFile(filePath, "r") as f:
                 content = getText(f.read())
                 filePath = None
+
                 if content.startswith("ref: "):
-                    filePath = os.path.join(_, ".git", content.replace("ref: ", "")).strip()
-                else:
+                    try:
+                        filePath = os.path.join(_, ".git", content.replace("ref: ", "")).strip()
+                    except UnicodeError:
+                        pass
+
+                if filePath is None:
                     match = re.match(r"(?i)[0-9a-f]{32}", content)
                     retVal = match.group(0) if match else None
                     break
