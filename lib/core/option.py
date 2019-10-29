@@ -1228,7 +1228,7 @@ def _setHTTPAuthentication():
 
     elif not conf.authType and conf.authCred:
         errMsg = "you specified the HTTP authentication credentials, "
-        errMsg += "but did not provide the type"
+        errMsg += "but did not provide the type (e.g. --auth-type=\"basic\")"
         raise SqlmapSyntaxException(errMsg)
 
     elif (conf.authType or "").lower() not in (AUTH_TYPE.BASIC, AUTH_TYPE.DIGEST, AUTH_TYPE.NTLM, AUTH_TYPE.PKI):
