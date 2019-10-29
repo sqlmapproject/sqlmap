@@ -28,6 +28,7 @@ from lib.core.common import safeCSValue
 from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.compat import xrange
 from lib.core.convert import getBytes
+from lib.core.convert import getConsoleLength
 from lib.core.convert import getText
 from lib.core.convert import getUnicode
 from lib.core.data import conf
@@ -547,7 +548,7 @@ class Dump(object):
 
                 column = unsafeSQLIdentificatorNaming(column)
                 maxlength = int(info["length"])
-                blank = " " * (maxlength - len(column))
+                blank = " " * (maxlength - getConsoleLength(column))
 
                 self._write("| %s%s" % (column, blank), newline=False)
 
@@ -602,7 +603,7 @@ class Dump(object):
 
                     values.append(value)
                     maxlength = int(info["length"])
-                    blank = " " * (maxlength - len(value))
+                    blank = " " * (maxlength - getConsoleLength(value))
                     self._write("| %s%s" % (value, blank), newline=False, console=console)
 
                     if len(value) > MIN_BINARY_DISK_DUMP_SIZE and r'\x' in value:

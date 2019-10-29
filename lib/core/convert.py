@@ -263,7 +263,7 @@ def getOrds(value):
 
 def getUnicode(value, encoding=None, noneToNull=False):
     """
-    Return the unicode representation of the supplied value:
+    Returns the unicode representation of the supplied value
 
     >>> getUnicode('test') == u'test'
     True
@@ -373,5 +373,22 @@ def stdoutEncode(value):
 
     else:
         retVal = value
+
+    return retVal
+
+def getConsoleLength(value):
+    """
+    Returns console width of unicode values
+
+    >>> getConsoleLength("abc")
+    3
+    >>> getConsoleLength(u"\\u957f\\u6c5f")
+    4
+    """
+
+    if isinstance(value, six.text_type):
+        retVal = sum((2 if ord(_) >= 0x3000 else 1) for _ in value)
+    else:
+        retVal = len(value)
 
     return retVal
