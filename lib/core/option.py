@@ -1161,9 +1161,9 @@ def _setSafeVisit():
     else:
         if not re.search(r"\Ahttp[s]*://", conf.safeUrl):
             if ":443/" in conf.safeUrl:
-                conf.safeUrl = "https://" + conf.safeUrl
+                conf.safeUrl = "https://%s" % conf.safeUrl
             else:
-                conf.safeUrl = "http://" + conf.safeUrl
+                conf.safeUrl = "http://%s" % conf.safeUrl
 
     if (conf.safeFreq or 0) <= 0:
         errMsg = "please provide a valid value (>0) for safe frequency (--safe-freq) while using safe visit features"
