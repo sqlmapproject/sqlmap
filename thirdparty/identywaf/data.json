@@ -161,10 +161,11 @@
         "barracuda": {
             "company": "Barracuda Networks",
             "name": "Barracuda",
-            "regex": "\\bbarracuda_|barra_counter_session=|when this page occurred and the event ID found at the bottom of the page",
+            "regex": "\\bbarracuda_|barra_counter_session=|when this page occurred and the event ID found at the bottom of the page|<!--(0123456789){15}",
             "signatures": [
                 "2676:RVdXum61OElCWapAYKYPk4JzWOtohM4JiUcMr2RWg1qQJbX3uhdOn9htOj+hXrAB16FcPxJPdLsXo2tKaK99n+i6c4VmkwI3FZjxtDtAeq6c36A4chS1XaTC",
-                "db27:RVdXum61OElCWapAYKYPk4JzWOtohM4JiUcMr2RWg1qQJbX3uhdOn9htOj+hXrAB16FcPxJPdLsXo2tKaK99n+i6c4RmkgI2FZjxtDtAeq6c3qA4chS1XaTC"
+                "db27:RVdXum61OElCWapAYKYPk4JzWOtohM4JiUcMr2RWg1qQJbX3uhdOn9htOj+hXrAB16FcPxJPdLsXo2tKaK99n+i6c4RmkgI2FZjxtDtAeq6c3qA4chS1XaTC",
+                "7e6b:RVdXum61OElCWapBYKYPk4JzWOtohM4JiUcMr2RXg1uQJbX3uhdOn9htOj+hX7AB16FcPxJPdLsXo2tKaK99n+i7c4VmkwI3FZjxtDtAeq+c36A4chS1XaTC"
             ]
         },
         "bekchy": {
