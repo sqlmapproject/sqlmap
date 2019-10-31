@@ -507,7 +507,7 @@ class Entries(object):
                         logger.info(infoMsg)
 
     def dumpFoundColumn(self, dbs, foundCols, colConsider):
-        message = "do you want to dump entries? [Y/n] "
+        message = "do you want to dump found column(s) entries? [Y/n] "
 
         if not readInput(message, default='Y', boolean=True):
             return
@@ -574,7 +574,7 @@ class Entries(object):
                     conf.dumper.dbTableValues(data)
 
     def dumpFoundTables(self, tables):
-        message = "do you want to dump tables' entries? [Y/n] "
+        message = "do you want to dump found table(s) entries? [Y/n] "
 
         if not readInput(message, default='Y', boolean=True):
             return
