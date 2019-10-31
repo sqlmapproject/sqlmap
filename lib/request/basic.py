@@ -34,6 +34,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.decorators import cachedmethod
+from lib.core.decorators import lockedmethod
 from lib.core.dicts import HTML_ENTITIES
 from lib.core.enums import DBMS
 from lib.core.enums import HTTP_HEADER
@@ -57,6 +58,7 @@ from thirdparty.odict import OrderedDict
 from thirdparty.six import unichr as _unichr
 from thirdparty.six.moves import http_client as _http_client
 
+@lockedmethod
 def forgeHeaders(items=None, base=None):
     """
     Prepare HTTP Cookie, HTTP User-Agent and HTTP Referer headers to use when performing
