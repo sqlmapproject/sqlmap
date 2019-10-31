@@ -1953,6 +1953,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.mergeCookies = None
     kb.multipleCtrlC = False
     kb.negativeLogic = False
+    kb.normalizeCrawlingChoice = None
     kb.nullConnection = None
     kb.oldMsf = None
     kb.orderByColumns = None
