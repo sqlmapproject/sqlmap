@@ -348,7 +348,7 @@ def _setCrawler():
             try:
                 target = targets[i]
 
-                if not re.search(r"\Ahttp[s]*://", target):
+                if not re.search(r"(?i)\Ahttp[s]*://", target):
                     target = "http://%s" % target
 
                 crawl(target)
@@ -490,7 +490,7 @@ def _findPageForms():
             try:
                 target = targets[i].strip()
 
-                if not re.search(r"\Ahttp[s]*://", target):
+                if not re.search(r"(?i)\Ahttp[s]*://", target):
                     target = "http://%s" % target
 
                 page, _, _ = Request.getPage(url=target.strip(), cookie=conf.cookie, crawling=True, raise404=False)
@@ -1167,7 +1167,7 @@ def _setSafeVisit():
             errMsg = "invalid format of a safe request file"
             raise SqlmapSyntaxException(errMsg)
     else:
-        if not re.search(r"\Ahttp[s]*://", conf.safeUrl):
+        if not re.search(r"(?i)\Ahttp[s]*://", conf.safeUrl):
             if ":443/" in conf.safeUrl:
                 conf.safeUrl = "https://%s" % conf.safeUrl
             else:
