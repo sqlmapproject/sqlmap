@@ -728,6 +728,9 @@ def cmdLineParser(argv=None):
         miscellaneous.add_argument("--purge", dest="purge", action="store_true",
             help="Safely remove all content from sqlmap data directory")
 
+        miscellaneous.add_argument("--results-file", dest="resultsFile",
+            help="Location of CSV results file in multiple targets mode")
+
         miscellaneous.add_argument("--sqlmap-shell", dest="sqlmapShell", action="store_true",
             help="Prompt for an interactive sqlmap shell")
 

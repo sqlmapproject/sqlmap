@@ -1833,7 +1833,6 @@ def _setConfAttributes():
     conf.path = None
     conf.port = None
     conf.proxyList = None
-    conf.resultsFilename = None
     conf.resultsFP = None
     conf.scheme = None
     conf.tests = []

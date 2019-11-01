@@ -263,7 +263,7 @@ def _saveToResultsFile():
 
         conf.resultsFP.flush()
     except IOError as ex:
-        errMsg = "unable to write to the results file '%s' ('%s'). " % (conf.resultsFilename, getSafeExString(ex))
+        errMsg = "unable to write to the results file '%s' ('%s'). " % (conf.resultsFile, getSafeExString(ex))
         raise SqlmapSystemException(errMsg)
 
 @stackedmethod
@@ -738,9 +738,9 @@ def start():
         logger.info("fetched data logged to text files under '%s'" % conf.outputPath)
 
     if conf.multipleTargets:
-        if conf.resultsFilename:
+        if conf.resultsFile:
             infoMsg = "you can find results of scanning in multiple targets "
-            infoMsg += "mode inside the CSV file '%s'" % conf.resultsFilename
+            infoMsg += "mode inside the CSV file '%s'" % conf.resultsFile
             logger.info(infoMsg)
 
     return True

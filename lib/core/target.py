@@ -561,16 +561,18 @@ def _setResultsFile():
         return
 
     if not conf.resultsFP:
-        conf.resultsFilename = os.path.join(paths.SQLMAP_OUTPUT_PATH, time.strftime(RESULTS_FILE_FORMAT).lower())
+        conf.resultsFile = conf.resultsFile or os.path.join(paths.SQLMAP_OUTPUT_PATH, time.strftime(RESULTS_FILE_FORMAT).lower())
+        found = os.path.exists(conf.resultsFile)
+
         try:
-            conf.resultsFP = openFile(conf.resultsFilename, "a", UNICODE_ENCODING, buffering=0)
+            conf.resultsFP = openFile(conf.resultsFile, "a", UNICODE_ENCODING, buffering=0)
         except (OSError, IOError) as ex:
             try:
-                warnMsg = "unable to create results file '%s' ('%s'). " % (conf.resultsFilename, getUnicode(ex))
-                handle, conf.resultsFilename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.RESULTS, suffix=".csv")
+                warnMsg = "unable to create results file '%s' ('%s'). " % (conf.resultsFile, getUnicode(ex))
+                handle, conf.resultsFile = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.RESULTS, suffix=".csv")
                 os.close(handle)
-                conf.resultsFP = openFile(conf.resultsFilename, "w+", UNICODE_ENCODING, buffering=0)
-                warnMsg += "Using temporary file '%s' instead" % conf.resultsFilename
+                conf.resultsFP = openFile(conf.resultsFile, "w+", UNICODE_ENCODING, buffering=0)
+                warnMsg += "Using temporary file '%s' instead" % conf.resultsFile
                 logger.warn(warnMsg)
             except IOError as _:
                 errMsg = "unable to write to the temporary directory ('%s'). " % _
@@ -579,9 +581,10 @@ def _setResultsFile():
                 errMsg += "create temporary files and/or directories"
                 raise SqlmapSystemException(errMsg)
 
-        conf.resultsFP.writelines("Target URL,Place,Parameter,Technique(s),Note(s)%s" % os.linesep)
+        if not found:
+            conf.resultsFP.writelines("Target URL,Place,Parameter,Technique(s),Note(s)%s" % os.linesep)
 
-        logger.info("using '%s' as the CSV results file in multiple targets mode" % conf.resultsFilename)
+        logger.info("using '%s' as the CSV results file in multiple targets mode" % conf.resultsFile)
 
 def _createFilesDir():
     """

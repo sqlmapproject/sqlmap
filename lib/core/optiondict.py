@@ -238,6 +238,7 @@ optDict = {
         "listTampers": "boolean",
         "offline": "boolean",
         "purge": "boolean",
+        "resultsFile": "string",
         "tmpDir": "string",
         "unstable": "boolean",
         "updateAll": "boolean",
