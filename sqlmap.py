@@ -45,6 +45,7 @@ try:
     from lib.core.common import dataToStdout
     from lib.core.common import filterNone
     from lib.core.common import getDaysFromLastUpdate
+    from lib.core.common import getFileItems
     from lib.core.common import getSafeExString
     from lib.core.common import maskSensitiveData
     from lib.core.common import openFile
@@ -57,6 +58,7 @@ try:
     from lib.core.common import MKSTEMP_PREFIX
     from lib.core.common import setColor
     from lib.core.common import unhandledExceptionMessage
+    from lib.core.compat import xrange
     from lib.core.exception import SqlmapBaseException
     from lib.core.exception import SqlmapShellQuitException
     from lib.core.exception import SqlmapSilentQuitException
@@ -73,6 +75,7 @@ try:
     from lib.core.settings import UNICODE_ENCODING
     from lib.core.settings import VERSION
     from lib.parse.cmdline import cmdLineParser
+    from lib.utils.crawler import crawl
     from thirdparty import six
 except KeyboardInterrupt:
     errMsg = "user aborted"
@@ -177,7 +180,30 @@ def main():
                     profile()
                 else:
                     try:
-                        start()
+                        if conf.crawlDepth and conf.bulkFile:
+                            targets = getFileItems(conf.bulkFile)
+
+                            for i in xrange(len(targets)):
+                                try:
+                                    kb.targets.clear()
+                                    target = targets[i]
+
+                                    if not re.search(r"(?i)\Ahttp[s]*://", target):
+                                        target = "http://%s" % target
+
+                                    infoMsg = "starting crawler for target URL '%s' (%d/%d)" % (target, i + 1, len(targets))
+                                    logger.info(infoMsg)
+
+                                    crawl(target)
+                                except Exception as ex:
+                                    if not isinstance(ex, SqlmapUserQuitException):
+                                        errMsg = "problem occurred while crawling '%s' ('%s')" % (target, getSafeExString(ex))
+                                        logger.error(errMsg)
+                                else:
+                                    if kb.targets:
+                                        start()
+                        else:
+                            start()
                     except Exception as ex:
                         os._exitcode = 1
 

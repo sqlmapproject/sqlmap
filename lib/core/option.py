@@ -133,7 +133,6 @@ from lib.core.update import update
 from lib.parse.configfile import configFileParser
 from lib.parse.payloads import loadBoundaries
 from lib.parse.payloads import loadPayloads
-from lib.parse.sitemap import parseSitemap
 from lib.request.basic import checkCharEncoding
 from lib.request.basicauthhandler import SmartHTTPBasicAuthHandler
 from lib.request.chunkedhandler import ChunkedHandler
@@ -338,25 +337,6 @@ def _setCrawler():
 
     if not conf.bulkFile:
         crawl(conf.url)
-    else:
-        targets = getFileItems(conf.bulkFile)
-
-        for i in xrange(len(targets)):
-            try:
-                target = targets[i]
-
-                if not re.search(r"(?i)\Ahttp[s]*://", target):
-                    target = "http://%s" % target
-
-                crawl(target)
-
-                if conf.verbose in (1, 2):
-                    status = "%d/%d links visited (%d%%)" % (i + 1, len(targets), round(100.0 * (i + 1) / len(targets)))
-                    dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status), True)
-            except Exception as ex:
-                if not isinstance(ex, SqlmapUserQuitException):
-                    errMsg = "problem occurred while crawling at '%s' ('%s')" % (target, getSafeExString(ex))
-                    logger.error(errMsg)
 
 def _doSearch():
     """
@@ -1939,7 +1919,6 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.mergeCookies = None
     kb.multipleCtrlC = False
     kb.negativeLogic = False
-    kb.normalizeCrawlingChoice = None
     kb.nullConnection = None
     kb.oldMsf = None
     kb.orderByColumns = None
@@ -1993,7 +1972,6 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.reduceTests = None
     kb.tlsSNI = {}
     kb.stickyDBMS = False
-    kb.storeCrawlingChoice = None
     kb.storeHashesChoice = None
     kb.suppressResumeInfo = False
     kb.tableFrom = None
@@ -2013,11 +1991,14 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.xpCmdshellAvailable = False
 
     if flushAll:
+        kb.checkSitemap = None
         kb.headerPaths = {}
         kb.keywords = set(getFileItems(paths.SQL_KEYWORDS))
+        kb.normalizeCrawlingChoice = None
         kb.passwordMgr = None
         kb.preprocessFunctions = []
         kb.skipVulnHost = None
+        kb.storeCrawlingChoice = None
         kb.tamperFunctions = []
         kb.targets = OrderedSet()
         kb.testedParams = set()

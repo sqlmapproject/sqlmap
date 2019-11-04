@@ -133,10 +133,12 @@ def crawl(target):
         threadData.shared.deeper = set()
         threadData.shared.unprocessed = set([target])
 
-        message = "do you want to check for the existence of "
-        message += "site's sitemap(.xml) [y/N] "
+        if kb.checkSitemap is None:
+            message = "do you want to check for the existence of "
+            message += "site's sitemap(.xml) [y/N] "
+            kb.checkSitemap = readInput(message, default='N', boolean=True)
 
-        if readInput(message, default='N', boolean=True):
+        if kb.checkSitemap:
             found = True
             items = None
             url = _urllib.parse.urljoin(target, "/sitemap.xml")
@@ -158,10 +160,9 @@ def crawl(target):
                             threadData.shared.unprocessed.update(items)
                     logger.info("%s links found" % ("no" if not items else len(items)))
 
-        infoMsg = "starting crawler"
-        if conf.bulkFile:
-            infoMsg += " for target URL '%s'" % target
-        logger.info(infoMsg)
+        if not conf.bulkFile:
+            infoMsg = "starting crawler for target URL '%s'" % target
+            logger.info(infoMsg)
 
         for i in xrange(conf.crawlDepth):
             threadData.shared.count = 0
