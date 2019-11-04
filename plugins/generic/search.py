@@ -5,6 +5,8 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+import re
+
 from lib.core.agent import agent
 from lib.core.common import arrayizeValue
 from lib.core.common import Backend
@@ -376,7 +378,7 @@ class Search(object):
         colList = conf.col.split(',')
 
         if conf.exclude:
-            colList = [_ for _ in colList if _ not in conf.exclude.split(',')]
+            colList = [_ for _ in colList if re.search(conf.exclude, _, re.I) is None]
 
         origTbl = conf.tbl
         origDb = conf.db

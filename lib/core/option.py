@@ -1770,7 +1770,18 @@ def _cleanupOptions():
         conf.col = re.sub(r"\s*,\s*", ',', conf.col)
 
     if conf.exclude:
-        conf.exclude = re.sub(r"\s*,\s*", ',', conf.exclude)
+        regex = False
+        if any(_ in conf.exclude for _ in ('+', '*')):
+            try:
+                re.compile(conf.exclude)
+            except re.error:
+                pass
+            else:
+                regex = True
+
+        if not regex:
+            conf.exclude = re.sub(r"\s*,\s*", ',', conf.exclude)
+            conf.exclude = "\A%s\Z" % '|'.join(re.escape(_) for _ in conf.exclude.split(','))
 
     if conf.binaryFields:
         conf.binaryFields = re.sub(r"\s*,\s*", ',', conf.binaryFields)

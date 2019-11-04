@@ -5,6 +5,8 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+import re
+
 from lib.core.agent import agent
 from lib.core.common import arrayizeValue
 from lib.core.common import Backend
@@ -332,7 +334,7 @@ class Databases(object):
                     logger.info(infoMsg)
                     continue
 
-                if conf.exclude and db in conf.exclude.split(','):
+                if conf.exclude and re.search(conf.exclude, db, re.I) is not None:
                     infoMsg = "skipping database '%s'" % unsafeSQLIdentificatorNaming(db)
                     singleTimeLogMessage(infoMsg)
                     continue
@@ -466,7 +468,7 @@ class Databases(object):
             colList = []
 
         if conf.exclude:
-            colList = [_ for _ in colList if _ not in conf.exclude.split(',')]
+            colList = [_ for _ in colList if re.search(conf.exclude, _, re.I) is None]
 
         for col in colList:
             colList[colList.index(col)] = safeSQLIdentificatorNaming(col)

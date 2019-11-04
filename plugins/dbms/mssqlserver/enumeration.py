@@ -5,6 +5,8 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+import re
+
 from lib.core.agent import agent
 from lib.core.common import arrayizeValue
 from lib.core.common import getLimitRange
@@ -96,7 +98,7 @@ class Enumeration(GenericEnumeration):
                     singleTimeLogMessage(infoMsg)
                     continue
 
-                if conf.exclude and db in conf.exclude.split(','):
+                if conf.exclude and re.search(conf.exclude, db, re.I) is not None:
                     infoMsg = "skipping database '%s'" % db
                     singleTimeLogMessage(infoMsg)
                     continue
@@ -119,7 +121,7 @@ class Enumeration(GenericEnumeration):
                     singleTimeLogMessage(infoMsg)
                     continue
 
-                if conf.exclude and db in conf.exclude.split(','):
+                if conf.exclude and re.search(conf.exclude, db, re.I) is not None:
                     infoMsg = "skipping database '%s'" % db
                     singleTimeLogMessage(infoMsg)
                     continue
@@ -209,7 +211,7 @@ class Enumeration(GenericEnumeration):
                     singleTimeLogMessage(infoMsg)
                     continue
 
-                if conf.exclude and db in conf.exclude.split(','):
+                if conf.exclude and re.search(conf.exclude, db, re.I) is not None:
                     infoMsg = "skipping database '%s'" % db
                     singleTimeLogMessage(infoMsg)
                     continue
@@ -283,7 +285,7 @@ class Enumeration(GenericEnumeration):
         colList = conf.col.split(',')
 
         if conf.exclude:
-            colList = [_ for _ in colList if _ not in conf.exclude.split(',')]
+            colList = [_ for _ in colList if re.search(conf.exclude, _, re.I) is None]
 
         origTbl = conf.tbl
         origDb = conf.db
@@ -344,7 +346,7 @@ class Enumeration(GenericEnumeration):
                 if conf.excludeSysDbs and db in self.excludeDbsList:
                     continue
 
-                if conf.exclude and db in conf.exclude.split(','):
+                if conf.exclude and re.search(conf.exclude, db, re.I) is not None:
                     continue
 
                 if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:

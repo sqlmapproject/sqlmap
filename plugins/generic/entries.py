@@ -78,7 +78,7 @@ class Entries(object):
                 errMsg += "the tables' columns"
                 raise SqlmapMissingMandatoryOptionException(errMsg)
 
-            if conf.exclude and conf.db in conf.exclude.split(','):
+            if conf.exclude and re.search(conf.exclude, conf.db, re.I) is not None:
                 infoMsg = "skipping database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 singleTimeLogMessage(infoMsg)
                 return
@@ -112,7 +112,7 @@ class Entries(object):
             if kb.dumpKeyboardInterrupt:
                 break
 
-            if conf.exclude and tbl in conf.exclude.split(','):
+            if conf.exclude and re.search(conf.exclude, tbl, re.I) is not None:
                 infoMsg = "skipping table '%s'" % unsafeSQLIdentificatorNaming(tbl)
                 singleTimeLogMessage(infoMsg)
                 continue
@@ -145,7 +145,7 @@ class Entries(object):
                 colList = sorted(column for column in columns if column)
 
                 if conf.exclude:
-                    colList = [_ for _ in colList if _ not in conf.exclude.split(',')]
+                    colList = [_ for _ in colList if re.search(conf.exclude, _, re.I) is None]
 
                 if not colList:
                     warnMsg = "skipping table '%s'" % unsafeSQLIdentificatorNaming(tbl)
@@ -491,7 +491,7 @@ class Entries(object):
                 conf.db = db
 
                 for table in tables:
-                    if conf.exclude and table in conf.exclude.split(','):
+                    if conf.exclude and re.search(conf.exclude, table, re.I) is not None:
                         infoMsg = "skipping table '%s'" % unsafeSQLIdentificatorNaming(table)
                         logger.info(infoMsg)
                         continue
@@ -562,7 +562,7 @@ class Entries(object):
                 colList = [_ for _ in columns if _]
 
                 if conf.exclude:
-                    colList = [_ for _ in colList if _ not in conf.exclude.split(',')]
+                    colList = [_ for _ in colList if re.search(conf.exclude, _, re.I) is None]
 
                 conf.col = ','.join(colList)
                 kb.data.cachedColumns = {}
