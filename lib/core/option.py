@@ -336,13 +336,10 @@ def _setCrawler():
     if not conf.crawlDepth:
         return
 
-    if not any((conf.bulkFile, conf.sitemapUrl)):
+    if not conf.bulkFile:
         crawl(conf.url)
     else:
-        if conf.bulkFile:
-            targets = getFileItems(conf.bulkFile)
-        else:
-            targets = list(parseSitemap(conf.sitemapUrl))
+        targets = getFileItems(conf.bulkFile)
 
         for i in xrange(len(targets)):
             try:
@@ -443,23 +440,6 @@ def _setBulkMultipleTargets():
         warnMsg = "no usable links found (with GET parameters)"
         logger.warn(warnMsg)
 
-def _setSitemapTargets():
-    if not conf.sitemapUrl:
-        return
-
-    infoMsg = "parsing sitemap '%s'" % conf.sitemapUrl
-    logger.info(infoMsg)
-
-    found = False
-    for item in parseSitemap(conf.sitemapUrl):
-        if re.match(r"[^ ]+\?(.+)", item, re.I):
-            found = True
-            kb.targets.add((item.strip(), None, None, None, None))
-
-    if not found and not conf.forms and not conf.crawlDepth:
-        warnMsg = "no usable links found (with GET parameters)"
-        logger.warn(warnMsg)
-
 def _findPageForms():
     if not conf.forms or conf.crawlDepth:
         return
@@ -471,15 +451,13 @@ def _findPageForms():
     infoMsg = "searching for forms"
     logger.info(infoMsg)
 
-    if not any((conf.bulkFile, conf.googleDork, conf.sitemapUrl)):
+    if not any((conf.bulkFile, conf.googleDork)):
         page, _, _ = Request.queryPage(content=True, ignoreSecondOrder=True)
         if findPageForms(page, conf.url, True, True):
             found = True
     else:
         if conf.bulkFile:
             targets = getFileItems(conf.bulkFile)
-        elif conf.sitemapUrl:
-            targets = list(parseSitemap(conf.sitemapUrl))
         elif conf.googleDork:
             targets = [_[0] for _ in kb.targets]
             kb.targets.clear()
@@ -1653,16 +1631,13 @@ def _cleanupOptions():
     if conf.fileDest:
         conf.fileDest = ntToPosixSlashes(normalizePath(conf.fileDest))
 
-    if conf.sitemapUrl and not conf.sitemapUrl.lower().startswith("http"):
-        conf.sitemapUrl = "http%s://%s" % ('s' if conf.forceSSL else '', conf.sitemapUrl)
-
     if conf.msfPath:
         conf.msfPath = ntToPosixSlashes(normalizePath(conf.msfPath))
 
     if conf.tmpPath:
         conf.tmpPath = ntToPosixSlashes(normalizePath(conf.tmpPath))
 
-    if any((conf.googleDork, conf.logFile, conf.bulkFile, conf.sitemapUrl, conf.forms, conf.crawlDepth)):
+    if any((conf.googleDork, conf.logFile, conf.bulkFile, conf.forms, conf.crawlDepth)):
         conf.multipleTargets = True
 
     if conf.optimize:
@@ -2508,8 +2483,8 @@ def _basicOptionValidation():
         errMsg = "maximum number of used threads is %d avoiding potential connection issues" % MAX_NUMBER_OF_THREADS
         raise SqlmapSyntaxException(errMsg)
 
-    if conf.forms and not any((conf.url, conf.googleDork, conf.bulkFile, conf.sitemapUrl)):
-        errMsg = "switch '--forms' requires usage of option '-u' ('--url'), '-g', '-m' or '-x'"
+    if conf.forms and not any((conf.url, conf.googleDork, conf.bulkFile)):
+        errMsg = "switch '--forms' requires usage of option '-u' ('--url'), '-g' or '-m'"
         raise SqlmapSyntaxException(errMsg)
 
     if conf.crawlExclude and not conf.crawlDepth:
@@ -2610,7 +2585,7 @@ def _basicOptionValidation():
         errMsg = "value for option '--union-char' must be an alpha-numeric value (e.g. 1)"
         raise SqlmapSyntaxException(errMsg)
 
-    if conf.hashFile and any((conf.direct, conf.url, conf.logFile, conf.bulkFile, conf.googleDork, conf.configFile, conf.requestFile, conf.updateAll, conf.smokeTest, conf.liveTest, conf.wizard, conf.dependencies, conf.purge, conf.sitemapUrl, conf.listTampers)):
+    if conf.hashFile and any((conf.direct, conf.url, conf.logFile, conf.bulkFile, conf.googleDork, conf.configFile, conf.requestFile, conf.updateAll, conf.smokeTest, conf.liveTest, conf.wizard, conf.dependencies, conf.purge, conf.listTampers)):
         errMsg = "option '--crack' should be used as a standalone"
         raise SqlmapSyntaxException(errMsg)
 
@@ -2677,7 +2652,7 @@ def init():
 
     parseTargetDirect()
 
-    if any((conf.url, conf.logFile, conf.bulkFile, conf.sitemapUrl, conf.requestFile, conf.googleDork, conf.liveTest)):
+    if any((conf.url, conf.logFile, conf.bulkFile, conf.requestFile, conf.googleDork, conf.liveTest)):
         _setHostname()
         _setHTTPTimeout()
         _setHTTPExtraHeaders()
@@ -2692,7 +2667,6 @@ def init():
         _setSafeVisit()
         _doSearch()
         _setBulkMultipleTargets()
-        _setSitemapTargets()
         _checkTor()
         _setCrawler()
         _findPageForms()

@@ -133,31 +133,30 @@ def crawl(target):
         threadData.shared.deeper = set()
         threadData.shared.unprocessed = set([target])
 
-        if not conf.sitemapUrl:
-            message = "do you want to check for the existence of "
-            message += "site's sitemap(.xml) [y/N] "
+        message = "do you want to check for the existence of "
+        message += "site's sitemap(.xml) [y/N] "
 
-            if readInput(message, default='N', boolean=True):
-                found = True
-                items = None
-                url = _urllib.parse.urljoin(target, "/sitemap.xml")
-                try:
-                    items = parseSitemap(url)
-                except SqlmapConnectionException as ex:
-                    if "page not found" in getSafeExString(ex):
-                        found = False
-                        logger.warn("'sitemap.xml' not found")
-                except:
-                    pass
-                finally:
-                    if found:
-                        if items:
-                            for item in items:
-                                if re.search(r"(.*?)\?(.+)", item):
-                                    threadData.shared.value.add(item)
-                            if conf.crawlDepth > 1:
-                                threadData.shared.unprocessed.update(items)
-                        logger.info("%s links found" % ("no" if not items else len(items)))
+        if readInput(message, default='N', boolean=True):
+            found = True
+            items = None
+            url = _urllib.parse.urljoin(target, "/sitemap.xml")
+            try:
+                items = parseSitemap(url)
+            except SqlmapConnectionException as ex:
+                if "page not found" in getSafeExString(ex):
+                    found = False
+                    logger.warn("'sitemap.xml' not found")
+            except:
+                pass
+            finally:
+                if found:
+                    if items:
+                        for item in items:
+                            if re.search(r"(.*?)\?(.+)", item):
+                                threadData.shared.value.add(item)
+                        if conf.crawlDepth > 1:
+                            threadData.shared.unprocessed.update(items)
+                    logger.info("%s links found" % ("no" if not items else len(items)))
 
         infoMsg = "starting crawler"
         if conf.bulkFile:
