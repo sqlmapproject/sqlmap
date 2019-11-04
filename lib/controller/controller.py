@@ -301,7 +301,6 @@ def start():
 
     for targetUrl, targetMethod, targetData, targetCookie, targetHeaders in kb.targets:
         try:
-
             if conf.checkInternet:
                 infoMsg = "checking for Internet connection"
                 logger.info(infoMsg)

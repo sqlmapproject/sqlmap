@@ -354,8 +354,9 @@ def _setCrawler():
                     status = "%d/%d links visited (%d%%)" % (i + 1, len(targets), round(100.0 * (i + 1) / len(targets)))
                     dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status), True)
             except Exception as ex:
-                errMsg = "problem occurred while crawling at '%s' ('%s')" % (target, getSafeExString(ex))
-                logger.error(errMsg)
+                if not isinstance(ex, SqlmapUserQuitException):
+                    errMsg = "problem occurred while crawling at '%s' ('%s')" % (target, getSafeExString(ex))
+                    logger.error(errMsg)
 
 def _doSearch():
     """
