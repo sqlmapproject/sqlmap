@@ -107,6 +107,9 @@ class ReqHandler(BaseHTTPRequestHandler):
             else:
                 params.update(parse_qs(self.data))
 
+        for name in self.headers:
+            params[name.lower()] = self.headers[name]
+
         for key in params:
             if params[key] and isinstance(params[key], (tuple, list)):
                 params[key] = params[key][-1]
