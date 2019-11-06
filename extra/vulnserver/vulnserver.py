@@ -110,6 +110,13 @@ class ReqHandler(BaseHTTPRequestHandler):
         for name in self.headers:
             params[name.lower()] = self.headers[name]
 
+        if "cookie" in params:
+            for part in params["cookie"].split(';'):
+                part = part.strip()
+                if '=' in part:
+                    name, value = part.split('=', 1)
+                    params[name.strip()] = unquote_plus(value.strip())
+
         for key in params:
             if params[key] and isinstance(params[key], (tuple, list)):
                 params[key] = params[key][-1]
