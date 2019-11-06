@@ -195,27 +195,28 @@ def crawl(target):
             for url in threadData.shared.value:
                 kb.targets.add((urldecode(url, kb.pageEncoding), None, None, None, None))
 
-        if kb.normalizeCrawlingChoice is None:
-            message = "do you want to normalize "
-            message += "crawling results [Y/n] "
+        if kb.targets:
+            if kb.normalizeCrawlingChoice is None:
+                message = "do you want to normalize "
+                message += "crawling results [Y/n] "
 
-            kb.normalizeCrawlingChoice = readInput(message, default='Y', boolean=True)
+                kb.normalizeCrawlingChoice = readInput(message, default='Y', boolean=True)
 
-        if kb.normalizeCrawlingChoice:
-            seen = set()
-            results = OrderedSet()
+            if kb.normalizeCrawlingChoice:
+                seen = set()
+                results = OrderedSet()
 
-            for target in kb.targets:
-                match = re.search(r"/[^/?]*\?.*\Z", target[0])
-                if match:
-                    key = re.sub(r"=[^=&]*", "=", match.group(0))
-                    if key not in seen:
-                        results.add(target)
-                        seen.add(key)
+                for target in kb.targets:
+                    match = re.search(r"/[^/?]*\?.*\Z", target[0])
+                    if match:
+                        key = re.sub(r"=[^=&]*", "=", match.group(0))
+                        if key not in seen:
+                            results.add(target)
+                            seen.add(key)
 
-            kb.targets = results
+                kb.targets = results
 
-        storeResultsToFile(kb.targets)
+            storeResultsToFile(kb.targets)
 
 def storeResultsToFile(results):
     if not results:

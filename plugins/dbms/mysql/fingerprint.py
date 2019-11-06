@@ -41,6 +41,8 @@ class Fingerprint(GenericFingerprint):
             return None
 
         # Reference: https://downloads.mysql.com/archives/community/
+        # Reference: https://dev.mysql.com/doc/relnotes/mysql/<major>.<minor>/en/
+
         versions = (
             (32200, 32235),  # MySQL 3.22
             (32300, 32359),  # MySQL 3.23
@@ -50,10 +52,10 @@ class Fingerprint(GenericFingerprint):
             (50100, 50174),  # MySQL 5.1
             (50400, 50404),  # MySQL 5.4
             (50500, 50562),  # MySQL 5.5
-            (50600, 50646),  # MySQL 5.6
-            (50700, 50726),  # MySQL 5.7
+            (50600, 50648),  # MySQL 5.6
+            (50700, 50730),  # MySQL 5.7
             (60000, 60014),  # MySQL 6.0
-            (80000, 80017),  # MySQL 8.0
+            (80000, 80021),  # MySQL 8.0
         )
 
         index = -1
