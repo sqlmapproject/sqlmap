@@ -102,6 +102,8 @@ class ReqHandler(BaseHTTPRequestHandler):
         if hasattr(self, "data"):
             if self.data.startswith('{') and self.data.endswith('}'):
                 params.update(json.loads(self.data))
+            elif self.data.startswith('<') and self.data.endswith('>'):
+                params.update(dict(re.findall(r'name="([^"]+)" value="([^"]*)"', self.data)))
             else:
                 params.update(parse_qs(self.data))
 
