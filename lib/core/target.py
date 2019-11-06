@@ -257,6 +257,9 @@ def _setRequestParams():
             kb.processUserMarks = True
 
     for place, value in ((PLACE.URI, conf.url), (PLACE.CUSTOM_POST, conf.data), (PLACE.CUSTOM_HEADER, str(conf.httpHeaders))):
+        if place == PLACE.CUSTOM_HEADER and any((conf.forms, conf.crawlDepth)):
+            continue
+
         _ = re.sub(PROBLEMATIC_CUSTOM_INJECTION_PATTERNS, "", value or "") if place == PLACE.CUSTOM_HEADER else value or ""
         if kb.customInjectionMark in _:
             if kb.processUserMarks is None:
