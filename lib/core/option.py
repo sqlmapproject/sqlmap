@@ -374,7 +374,7 @@ def _doSearch():
         links = retrieve()
 
         if kb.targets:
-            infoMsg = "sqlmap got %d results for your " % len(links)
+            infoMsg = "found %d results for your " % len(links)
             infoMsg += "search dork expression, "
 
             if len(links) == len(kb.targets):
@@ -387,7 +387,7 @@ def _doSearch():
             break
 
         else:
-            message = "sqlmap got %d results " % len(links)
+            message = "found %d results " % len(links)
             message += "for your search dork expression, but none of them "
             message += "have GET parameters to test for SQL injection. "
             message += "Do you want to skip to the next result page? [Y/n]"

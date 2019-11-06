@@ -47,7 +47,7 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
     def _ask_redirect_choice(self, redcode, redurl, method):
         with kb.locks.redirect:
             if kb.redirectChoice is None:
-                msg = "sqlmap got a %d redirect to " % redcode
+                msg = "got a %d redirect to " % redcode
                 msg += "'%s'. Do you want to follow? [Y/n] " % redurl
 
                 kb.redirectChoice = REDIRECTION.YES if readInput(msg, default='Y', boolean=True) else REDIRECTION.NO

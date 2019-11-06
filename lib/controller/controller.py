@@ -293,7 +293,7 @@ def start():
         return False
 
     if kb.targets and len(kb.targets) > 1:
-        infoMsg = "sqlmap got a total of %d targets" % len(kb.targets)
+        infoMsg = "found a total of %d targets" % len(kb.targets)
         logger.info(infoMsg)
 
     hostCount = 0

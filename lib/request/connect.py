@@ -565,7 +565,7 @@ class Connect(object):
 
                 if refresh:
                     if kb.alwaysRefresh is None:
-                        msg = "sqlmap got a refresh request "
+                        msg = "got a refresh request "
                         msg += "(redirect like response common to login pages). "
                         msg += "Do you want to apply the refresh "
                         msg += "from now on (or stay on the original page)? [Y/n]"
