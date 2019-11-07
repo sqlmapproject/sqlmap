@@ -1231,7 +1231,7 @@ def checkPipedInput():
     # Reference: https://stackoverflow.com/a/33873570
     """
 
-    return not os.isatty(sys.stdin.fileno())
+    return not os.isatty(sys.stdin.fileno()) if hasattr(sys.stdin, "fileno") else False
 
 def isZipFile(filename):
     """
