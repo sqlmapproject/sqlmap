@@ -3806,6 +3806,8 @@ def maskSensitiveData(msg):
 
     >>> maskSensitiveData('python sqlmap.py -u "http://www.test.com/vuln.php?id=1" --banner') == 'python sqlmap.py -u *********************************** --banner'
     True
+    >>> maskSensitiveData('sqlmap.py -u test.com/index.go?id=index') == 'sqlmap.py -u **************************'
+    True
     """
 
     retVal = getUnicode(msg)
