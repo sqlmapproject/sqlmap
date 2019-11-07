@@ -28,6 +28,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.datatype import OrderedSet
+from lib.core.enums import HTTPMETHOD
 from lib.core.enums import MKSTEMP_PREFIX
 from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapSyntaxException
@@ -116,7 +117,7 @@ def crawl(target):
                                 if (extractRegexResult(r"\A[^?]+\.(?P<result>\w+)(\?|\Z)", url) or "").lower() not in CRAWL_EXCLUDE_EXTENSIONS:
                                     with kb.locks.value:
                                         threadData.shared.deeper.add(url)
-                                        if re.search(r"(.*?)\?(.+)", url):
+                                        if re.search(r"(.*?)\?(.+)", url) and not re.search(r"\?\d+\Z", url):
                                             threadData.shared.value.add(url)
                     except UnicodeEncodeError:  # for non-HTML files
                         pass
@@ -211,12 +212,15 @@ def crawl(target):
                 results = OrderedSet()
 
                 for target in kb.targets:
-                    match = re.search(r"/[^/?]*\?.*\Z", target[0])
-                    if match:
-                        key = re.sub(r"=[^=&]*", "=", match.group(0))
-                        if key not in seen:
-                            results.add(target)
-                            seen.add(key)
+                    if target[1] == HTTPMETHOD.GET:
+                        match = re.search(r"/[^/?]*\?.*\Z", target[0])
+                        if match:
+                            key = re.sub(r"=[^=&]*", "=", match.group(0))
+                            if key not in seen:
+                                results.add(target)
+                                seen.add(key)
+                    else:
+                        results.add(target)
 
                 kb.targets = results
 
