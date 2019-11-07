@@ -46,6 +46,7 @@ def crawl(target):
         visited = set()
         threadData = getCurrentThreadData()
         threadData.shared.value = OrderedSet()
+        threadData.shared.formsFound = False
 
         def crawlThread():
             threadData = getCurrentThreadData()
@@ -123,7 +124,7 @@ def crawl(target):
                         pass
                     finally:
                         if conf.forms:
-                            findPageForms(content, current, False, True)
+                            threadData.shared.formsFound |= len(findPageForms(content, current, False, True)) > 0
 
                 if conf.verbose in (1, 2):
                     threadData.shared.count += 1
@@ -189,8 +190,11 @@ def crawl(target):
         clearConsoleLine(True)
 
         if not threadData.shared.value:
-            warnMsg = "no usable links found (with GET parameters)"
-            logger.warn(warnMsg)
+            if not (conf.forms and threadData.shared.formsFound):
+                warnMsg = "no usable links found (with GET parameters)"
+                if conf.forms:
+                    warnMsg += " or forms"
+                logger.warn(warnMsg)
         else:
             for url in threadData.shared.value:
                 kb.targets.add((urldecode(url, kb.pageEncoding), None, None, None, None))
