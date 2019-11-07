@@ -257,10 +257,6 @@ def _saveToResultsFile():
             line = "%s,%s,%s,%s,%s%s" % (safeCSValue(kb.originalUrls.get(conf.url) or conf.url), place, parameter, "".join(techniques[_][0].upper() for _ in sorted(value)), notes, os.linesep)
             conf.resultsFP.write(line)
 
-        if not results:
-            line = "%s,,,,%s" % (conf.url, os.linesep)
-            conf.resultsFP.write(line)
-
         conf.resultsFP.flush()
     except IOError as ex:
         errMsg = "unable to write to the results file '%s' ('%s'). " % (conf.resultsFile, getSafeExString(ex))
