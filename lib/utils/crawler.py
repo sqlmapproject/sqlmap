@@ -212,7 +212,7 @@ def crawl(target):
                 results = OrderedSet()
 
                 for target in kb.targets:
-                    if target[1] == HTTPMETHOD.GET:
+                    if target[1] in (HTTPMETHOD.GET, None):
                         match = re.search(r"/[^/?]*\?.*\Z", target[0])
                         if match:
                             key = re.sub(r"=[^=&]*", "=", match.group(0))
