@@ -84,7 +84,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
         try:
             self.initEnv(web=web)
         except SqlmapFilePathException:
-            if not web:
+            if not web and not conf.direct:
                 infoMsg = "falling back to web backdoor method..."
                 logger.info(infoMsg)
 
