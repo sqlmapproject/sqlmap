@@ -27,6 +27,7 @@ except ImportError:
     pass
 
 _protocols = filterNone(getattr(ssl, _, None) for _ in ("PROTOCOL_TLSv1_2", "PROTOCOL_TLSv1_1", "PROTOCOL_TLSv1", "PROTOCOL_SSLv3", "PROTOCOL_SSLv23", "PROTOCOL_SSLv2"))
+_lut = dict((getattr(ssl, _), _) for _ in dir(ssl) if _.startswith("PROTOCOL_"))
 
 class HTTPSConnection(_http_client.HTTPSConnection):
     """
@@ -66,7 +67,7 @@ class HTTPSConnection(_http_client.HTTPSConnection):
                         sock.close()
                 except (ssl.SSLError, socket.error, _http_client.BadStatusLine) as ex:
                     self._tunnel_host = None
-                    logger.debug("SSL connection error occurred ('%s')" % getSafeExString(ex))
+                    logger.debug("SSL connection error occurred for '%s' ('%s')" % (_lut[protocol], getSafeExString(ex)))
 
             if kb.tlsSNI.get(self.host) is None:
                 kb.tlsSNI[self.host] = success
@@ -86,7 +87,7 @@ class HTTPSConnection(_http_client.HTTPSConnection):
                         sock.close()
                 except (ssl.SSLError, socket.error, _http_client.BadStatusLine) as ex:
                     self._tunnel_host = None
-                    logger.debug("SSL connection error occurred ('%s')" % getSafeExString(ex))
+                    logger.debug("SSL connection error occurred for '%s' ('%s')" % (_lut[protocol], getSafeExString(ex)))
 
         if not success:
             errMsg = "can't establish SSL connection"

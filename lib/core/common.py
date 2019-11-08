@@ -4504,7 +4504,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
         data = data.strip("['\"]")
         retVal.add((url, HTTPMETHOD.POST, data, conf.cookie, None))
 
-    if not retVal:
+    if not retVal and not conf.crawlDepth:
         errMsg = "there were no forms found at the given target URL"
         if raise_:
             raise SqlmapGenericException(errMsg)
