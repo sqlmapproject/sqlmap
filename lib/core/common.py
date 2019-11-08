@@ -4421,7 +4421,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
     try:
         forms = ParseResponse(response, backwards_compat=False)
     except ParseError:
-        if re.search(r"(?i)<!DOCTYPE html|<html", content or ""):
+        if re.search(r"(?i)<!DOCTYPE html|<html", content or "") and not re.search(r"(?i)\.js(\?|\Z)", url):
             dbgMsg = "badly formed HTML at the given URL ('%s'). Going to filter it" % url
             logger.debug(dbgMsg)
             filtered = _("".join(re.findall(FORM_SEARCH_REGEX, content)), url)

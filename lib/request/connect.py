@@ -567,8 +567,9 @@ class Connect(object):
                 if not refresh:
                     refresh = extractRegexResult(JAVASCRIPT_HREF_REGEX, page)
 
-                    debugMsg = "got Javascript redirect request"
-                    logger.debug(debugMsg)
+                    if refresh:
+                        debugMsg = "got Javascript redirect request"
+                        logger.debug(debugMsg)
 
                 if refresh:
                     if kb.alwaysRefresh is None:
