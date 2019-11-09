@@ -185,6 +185,12 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
         kb.threadContinue = False
         kb.threadException = True
 
+        if kb.lastCtrlCTime and (time.time() - kb.lastCtrlCTime < 1):
+            kb.multipleCtrlC = True
+            raise SqlmapUserQuitException("user aborted (Ctrl+C was pressed multiple times)")
+
+        kb.lastCtrlCTime = time.time()
+
         if numThreads > 1:
             logger.info("waiting for threads to finish%s" % (" (Ctrl+C was pressed)" if isinstance(ex, KeyboardInterrupt) else ""))
         try:

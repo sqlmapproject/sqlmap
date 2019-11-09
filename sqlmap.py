@@ -200,6 +200,8 @@ def main():
                                     if not isinstance(ex, SqlmapUserQuitException):
                                         errMsg = "problem occurred while crawling '%s' ('%s')" % (target, getSafeExString(ex))
                                         logger.error(errMsg)
+                                    else:
+                                        raise
                                 else:
                                     if kb.targets:
                                         start()

@@ -1909,6 +1909,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.injections = []
     kb.laggingChecked = False
     kb.lastParserStatus = None
+    kb.lastCtrlCTime = None
 
     kb.locks = AttribDict()
     for _ in ("cache", "connError", "count", "handlers", "hint", "index", "io", "limit", "log", "socket", "redirect", "request", "value"):
