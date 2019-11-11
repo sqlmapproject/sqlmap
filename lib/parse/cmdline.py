@@ -145,6 +145,12 @@ def cmdLineParser(argv=None):
         # Request options
         request = parser.add_argument_group("Request", "These options can be used to specify how to connect to the target URL")
 
+        request.add_argument("-A", "--user-agent", dest="agent",
+            help="HTTP User-Agent header value")
+
+        request.add_argument("-H", "--header", dest="header",
+            help="Extra header (e.g. \"X-Forwarded-For: 127.0.0.1\")")
+
         request.add_argument("--method", dest="method",
             help="Force usage of given HTTP method (e.g. PUT)")
 
@@ -166,9 +172,6 @@ def cmdLineParser(argv=None):
         request.add_argument("--drop-set-cookie", dest="dropSetCookie", action="store_true",
             help="Ignore Set-Cookie header from response")
 
-        request.add_argument("--user-agent", dest="agent",
-            help="HTTP User-Agent header value")
-
         request.add_argument("--mobile", dest="mobile", action="store_true",
             help="Imitate smartphone through HTTP User-Agent header")
 
@@ -180,9 +183,6 @@ def cmdLineParser(argv=None):
 
         request.add_argument("--referer", dest="referer",
             help="HTTP Referer header value")
-
-        request.add_argument("-H", "--header", dest="header",
-            help="Extra header (e.g. \"X-Forwarded-For: 127.0.0.1\")")
 
         request.add_argument("--headers", dest="headers",
             help="Extra headers (e.g. \"Accept-Language: fr\\nETag: 123\")")
