@@ -1737,7 +1737,7 @@ def _cleanupOptions():
 
         if not regex:
             conf.exclude = re.sub(r"\s*,\s*", ',', conf.exclude)
-            conf.exclude = "\A%s\Z" % '|'.join(re.escape(_) for _ in conf.exclude.split(','))
+            conf.exclude = r"\A%s\Z" % '|'.join(re.escape(_) for _ in conf.exclude.split(','))
 
     if conf.binaryFields:
         conf.binaryFields = re.sub(r"\s*,\s*", ',', conf.binaryFields)
