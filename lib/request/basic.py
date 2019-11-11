@@ -48,6 +48,7 @@ from lib.core.settings import MAX_CONNECTION_TOTAL_SIZE
 from lib.core.settings import META_CHARSET_REGEX
 from lib.core.settings import PARSE_HEADERS_LIMIT
 from lib.core.settings import SELECT_FROM_TABLE_REGEX
+from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import VIEWSTATE_REGEX
 from lib.parse.headers import headersParser
 from lib.parse.html import htmlParser
@@ -260,7 +261,7 @@ def getHeuristicCharEncoding(page):
     retVal = kb.cache.encoding.get(key) or detect(page)["encoding"]
     kb.cache.encoding[key] = retVal
 
-    if retVal:
+    if retVal and retVal.lower().replace('-', "") == UNICODE_ENCODING.lower().replace('-', ""):
         infoMsg = "heuristics detected web page charset '%s'" % retVal
         singleTimeLogMessage(infoMsg, logging.INFO, retVal)
 
