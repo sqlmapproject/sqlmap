@@ -87,6 +87,9 @@ def vulnTest():
     thread.start()
 
     for options, checks in TESTS:
+        status = '%d/%d (%d%%) ' % (count, len(TESTS), round(100.0 * count / len(TESTS)))
+        dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%X"), status))
+
         cmd = "%s %s -u http://%s:%d/?id=1 --batch %s" % (sys.executable, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py")), address, port, options)
         output = shellExec(cmd)
 
@@ -96,8 +99,6 @@ def vulnTest():
             retVal = False
 
         count += 1
-        status = '%d/%d (%d%%) ' % (count, len(TESTS), round(100.0 * count / len(TESTS)))
-        dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%X"), status))
 
     clearConsoleLine()
     if retVal:
