@@ -2560,6 +2560,10 @@ def _basicOptionValidation():
         errMsg = "option '--proxy' is incompatible with switch '--ignore-proxy'"
         raise SqlmapSyntaxException(errMsg)
 
+    if conf.alert and conf.alert.startswith('-'):
+        errMsg = "value for option '--alert' must be valid operating system command(s)"
+        raise SqlmapSyntaxException(errMsg)
+
     if conf.timeSec < 1:
         errMsg = "value for option '--time-sec' must be a positive integer"
         raise SqlmapSyntaxException(errMsg)
