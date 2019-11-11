@@ -215,7 +215,7 @@ def crawl(target):
                     if target[1] in (HTTPMETHOD.GET, None):
                         match = re.search(r"/[^/?]*\?.*\Z", target[0])
                         if match:
-                            key = re.sub(r"=[^=&]*", "=", match.group(0))
+                            key = re.sub(r"=[^=&]*", "=", match.group(0)).strip('&')
                             if key not in seen:
                                 results.add(target)
                                 seen.add(key)

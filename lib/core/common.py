@@ -4476,6 +4476,9 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
             # flag to know if we are dealing with the same target host
             _ = checkSameHost(response.geturl(), url)
 
+            if data:
+                data = data.lstrip("&=").rstrip('&')
+
             if conf.scope:
                 if not re.search(conf.scope, url, re.I):
                     continue
