@@ -4480,9 +4480,8 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
             if data:
                 data = data.lstrip("&=").rstrip('&')
 
-            if conf.scope:
-                if not re.search(conf.scope, url, re.I):
-                    continue
+            if conf.scope and not re.search(conf.scope, url, re.I):
+                continue
             elif not re.sub(r"(%s)=[^&]*&?" % '|'.join(IGNORE_PARAMETERS), "", data):
                 continue
             elif not _:
