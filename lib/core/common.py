@@ -130,6 +130,7 @@ from lib.core.settings import GOOGLE_ANALYTICS_COOKIE_PREFIX
 from lib.core.settings import HASHDB_MILESTONE_VALUE
 from lib.core.settings import HOST_ALIASES
 from lib.core.settings import HTTP_CHUNKED_SPLIT_KEYWORDS
+from lib.core.settings import IGNORE_PARAMETERS
 from lib.core.settings import IGNORE_SAVE_OPTIONS
 from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import IP_ADDRESS_REGEX
@@ -4482,6 +4483,8 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
             if conf.scope:
                 if not re.search(conf.scope, url, re.I):
                     continue
+            elif not re.sub(r"(%s)=[^&]*&?" % '|'.join(IGNORE_PARAMETERS), "", data):
+                continue
             elif not _:
                 continue
             else:
