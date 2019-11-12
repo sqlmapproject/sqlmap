@@ -96,6 +96,7 @@ def crawl(target):
                         tags = soup('a')
 
                         tags += re.finditer(r'(?i)\s(href|src)=["\'](?P<href>[^>"\']+)', content)
+                        tags += re.finditer(r'(?i)window\.open\(["\'](?P<href>[^)"\']+)["\']', content)
 
                         for tag in tags:
                             href = tag.get("href") if hasattr(tag, "get") else tag.group("href")
