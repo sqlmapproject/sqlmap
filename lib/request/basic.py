@@ -267,7 +267,7 @@ def getHeuristicCharEncoding(page):
 
     return retVal
 
-def decodePage(page, contentEncoding, contentType):
+def decodePage(page, contentEncoding, contentType, percentDecode=True):
     """
     Decode compressed/charset HTTP response
 
@@ -340,8 +340,9 @@ def decodePage(page, contentEncoding, contentType):
             page = re.sub(b"&#(\\d{1,3});", lambda _: six.int2byte(int(_.group(1))) if int(_.group(1)) < 256 else _.group(0), page)
 
         # e.g. %20%28%29
-        if b"%" in page:
-            page = re.sub(b"%([0-9a-fA-F]{2})", lambda _: decodeHex(_.group(1)), page)
+        if percentDecode:
+            if b"%" in page:
+                page = re.sub(b"%([0-9a-fA-F]{2})", lambda _: decodeHex(_.group(1)), page)
 
         # e.g. &amp;
         page = re.sub(b"&([^;]+);", lambda _: six.int2byte(HTML_ENTITIES[getText(_.group(1))]) if HTML_ENTITIES.get(getText(_.group(1)), 256) < 256 else _.group(0), page)
