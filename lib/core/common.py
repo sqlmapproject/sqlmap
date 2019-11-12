@@ -3484,6 +3484,23 @@ def flattenValue(value):
         else:
             yield i
 
+def joinValue(value, delimiter=','):
+    """
+    Returns a value consisting of joined parts of a given value
+
+    >>> joinValue(['1', '2'])
+    '1,2'
+    >>> joinValue('1')
+    '1'
+    """
+
+    if isListLike(value):
+        retVal = delimiter.join(value)
+    else:
+        retVal = value
+
+    return retVal
+
 def isListLike(value):
     """
     Returns True if the given value is a list-like instance
