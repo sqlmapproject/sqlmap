@@ -64,10 +64,10 @@ def vulnTest():
     TESTS = (
         ("--flush-session", ("CloudFlare",)),
         ("--flush-session --data='{\"id\": 1}' --banner", ("Payload: {\"id\"", "banner: '3")),
-        ("--flush-session --data='<root><param name=\"id\" value=\"1*\"/></root>' --banner", ("Payload: <root><param name=\"id\" value=\"1", "banner: '3")),
-        ("--flush-session --method=PUT --data='id=1' --banner", ("Parameter: id (PUT)", "banner: '3")),
+        ("--flush-session --data='<root><param name=\"id\" value=\"1*\"/></root>' --mobile --banner --smart", ("Payload: <root><param name=\"id\" value=\"1", "banner: '3")),
+        ("--flush-session --method=PUT --data='a=1&b=2&c=3&id=1' --skip-static --dump -T users --start=1 --stop=2", ("Parameter: id (PUT)", "2 entries")),
         ("--flush-session -H 'id: 1*' --tables", ("Parameter: id #1* ((custom) HEADER)", " users ")),
-        ("--flush-session --cookie=\"PHPSESSID=d41d8cd98f00b204e9800998ecf8427e; id=1*; id2=2\" --tables", ("Cookie #1* ((custom) HEADER)", " users ")),
+        ("--flush-session --cookie=\"PHPSESSID=d41d8cd98f00b204e9800998ecf8427e; id=1*; id2=2\" --tables --union-cols=3", ("Cookie #1* ((custom) HEADER)", " users ")),
         ("--flush-session --parse-errors --eval=\"id2=2\" --referer=\"localhost\"", (": syntax error", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "back-end DBMS: SQLite", "3 columns")),
         ("--banner --schema --dump -T users --binary-fields=surname --where \"id>3\"", ("banner: '3", "INTEGER", "TEXT", "id", "name", "surname", "2 entries", "6E616D6569736E756C6C")),
         ("--all --tamper=between,randomcase", ("5 entries", "luther", "blisset", "fluffy", "179ad45c6ce2cb97cf1029e212046e81", "NULL", "nameisnull", "testpass")),
