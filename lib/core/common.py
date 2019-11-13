@@ -4499,7 +4499,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
 
             if conf.scope and not re.search(conf.scope, url, re.I):
                 continue
-            elif not re.sub(r"(%s)=[^&]*&?" % '|'.join(IGNORE_PARAMETERS), "", data):
+            elif data and not re.sub(r"(%s)=[^&]*&?" % '|'.join(IGNORE_PARAMETERS), "", data):
                 continue
             elif not _:
                 continue
