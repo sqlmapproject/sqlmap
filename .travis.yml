@@ -1,16 +1,11 @@
 language: python
-jobs:
-    include:
-        - python: 2.6
-        dist: trusty
-        - python: 2.7
-        dist: trusty
-        - python: 3.3
-        dist: trusty
-        - python: 3.6
-        dist: trusty
-        - python: 3.8
-        dist: xenial
+python:
+  - "2.6"
+  - "2.7"
+  - "3.3"
+  - "3.6"
+  - "3.7"
+  - "3.8"
 sudo: false
 git:
     depth: 1
