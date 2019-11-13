@@ -161,6 +161,9 @@ class ReqHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.do_REQUEST()
 
+    def do_PUT(self):
+        self.do_REQUEST()
+
     def do_POST(self):
         length = int(self.headers.get("Content-length", 0))
         if length:

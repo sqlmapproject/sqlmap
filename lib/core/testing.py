@@ -65,6 +65,7 @@ def vulnTest():
         ("--flush-session", ("CloudFlare",)),
         ("--flush-session --data='{\"id\": 1}' --banner", ("Payload: {\"id\"", "banner: '3")),
         ("--flush-session --data='<root><param name=\"id\" value=\"1*\"/></root>' --banner", ("Payload: <root><param name=\"id\" value=\"1", "banner: '3")),
+        ("--flush-session --method=PUT --data='id=1' --banner", ("Parameter: id (PUT)", "banner: '3")),
         ("--flush-session -H 'id: 1*' --tables", ("Parameter: id #1* ((custom) HEADER)", " users ")),
         ("--flush-session --cookie=\"PHPSESSID=d41d8cd98f00b204e9800998ecf8427e; id=1*; id2=2\" --tables", ("Cookie #1* ((custom) HEADER)", " users ")),
         ("--flush-session --parse-errors --eval=\"id2=2\" --referer=\"localhost\"", (": syntax error", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "back-end DBMS: SQLite", "3 columns")),

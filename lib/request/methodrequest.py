@@ -14,6 +14,7 @@ class MethodRequest(_urllib.request.Request):
 
     def set_method(self, method):
         self.method = method.upper()
+        print("%s,%s" % (type(self.method), type(self.data)))
 
     def get_method(self):
         return getattr(self, 'method', _urllib.request.Request.get_method(self))
