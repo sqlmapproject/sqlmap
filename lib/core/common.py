@@ -4040,6 +4040,14 @@ def safeSQLIdentificatorNaming(name, isTable=False):
     Returns a safe representation of SQL identificator name (internal data format)
 
     # Reference: http://stackoverflow.com/questions/954884/what-special-characters-are-allowed-in-t-sql-column-retVal
+
+    >>> pushValue(kb.forcedDbms)
+    >>> kb.forcedDbms = DBMS.MSSQL
+    >>> getText(safeSQLIdentificatorNaming("begin"))
+    '[begin]'
+    >>> getText(safeSQLIdentificatorNaming("foobar"))
+    'foobar'
+    >>> kb.forceDbms = popValue()
     """
 
     retVal = name
@@ -4079,6 +4087,14 @@ def safeSQLIdentificatorNaming(name, isTable=False):
 def unsafeSQLIdentificatorNaming(name):
     """
     Extracts identificator's name from its safe SQL representation
+
+    >>> pushValue(kb.forcedDbms)
+    >>> kb.forcedDbms = DBMS.MSSQL
+    >>> getText(unsafeSQLIdentificatorNaming("[begin]"))
+    'begin'
+    >>> getText(unsafeSQLIdentificatorNaming("foobar"))
+    'foobar'
+    >>> kb.forceDbms = popValue()
     """
 
     retVal = name
