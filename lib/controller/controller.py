@@ -312,7 +312,7 @@ def start():
                     dataToStdout("\n")
 
             conf.url = targetUrl
-            conf.method = targetMethod.upper() if targetMethod else targetMethod
+            conf.method = targetMethod.upper().strip() if targetMethod else targetMethod
             conf.data = targetData
             conf.cookie = targetCookie
             conf.httpHeaders = list(initialHeaders)
