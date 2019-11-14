@@ -36,6 +36,7 @@ from lib.core.common import isListLike
 from lib.core.common import parseTargetUrl
 from lib.core.common import popValue
 from lib.core.common import pushValue
+from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import removePostHintPrefix
@@ -203,10 +204,11 @@ def _randomFillBlankFields(value):
             for match in re.finditer(EMPTY_FORM_FIELDS_REGEX, retVal):
                 item = match.group("result")
                 if not any(_ in item for _ in IGNORE_PARAMETERS) and not re.search(ASP_NET_CONTROL_REGEX, item):
+                    newValue = randomStr() if not re.search(r"^id|id$", item, re.I) else randomInt()
                     if item[-1] == DEFAULT_GET_POST_DELIMITER:
-                        retVal = retVal.replace(item, "%s%s%s" % (item[:-1], randomStr(), DEFAULT_GET_POST_DELIMITER))
+                        retVal = retVal.replace(item, "%s%s%s" % (item[:-1], newValue, DEFAULT_GET_POST_DELIMITER))
                     else:
-                        retVal = retVal.replace(item, "%s%s" % (item, randomStr()))
+                        retVal = retVal.replace(item, "%s%s" % (item, newValue))
 
     return retVal
 

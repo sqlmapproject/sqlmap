@@ -64,6 +64,7 @@ def vulnTest():
 
     TESTS = (
         ("--flush-session", ("CloudFlare",)),
+        ("--flush-session --forms --crawl=2 --banner", ("total of 2 targets", "might be injectable", "Type: UNION query", "banner: '3")),
         ("--flush-session --data='{\"id\": 1}' --banner", ("might be injectable", "Payload: {\"id\"", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "banner: '3")),
         ("--flush-session --data='<root><param name=\"id\" value=\"1*\"/></root>' --mobile --banner --smart", ("might be injectable", "Payload: <root><param name=\"id\" value=\"1", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "banner: '3")),
         ("--flush-session --method=PUT --data='a=1&b=2&c=3&id=1' --skip-static --dump -T users --start=1 --stop=2", ("might be injectable", "Parameter: id (PUT)", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "2 entries")),

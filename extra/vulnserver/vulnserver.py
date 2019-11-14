@@ -124,13 +124,14 @@ class ReqHandler(BaseHTTPRequestHandler):
         self.url, self.params = path, params
 
         if self.url == '/':
+            self.send_response(OK)
+
             if "id" not in params:
-                self.send_response(FOUND)
+                self.send_header("Content-type", "text/html")
                 self.send_header("Connection", "close")
-                self.send_header("Location", "/?id=1")
                 self.end_headers()
+                self.wfile.write(b"<html><p><h3>GET:</h3><a href='/?id=1'>link</a></p><hr><p><h3>POST:</h3><form method='post'>ID: <input type='text' name='id'><input type='submit' value='Submit'></form></p></html>")
             else:
-                self.send_response(OK)
                 self.send_header("Content-type", "text/html")
                 self.send_header("Connection", "close")
 

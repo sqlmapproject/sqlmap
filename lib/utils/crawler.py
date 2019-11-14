@@ -136,6 +136,14 @@ def crawl(target):
         threadData.shared.deeper = set()
         threadData.shared.unprocessed = set([target])
 
+        _ = re.sub(r"(?<!/)/(?!/).*", "", target)
+        if _:
+            if target.strip('/') != _.strip('/'):
+                threadData.shared.unprocessed.add(_)
+
+        if re.search(r"\?.*\b\w+=", target):
+            threadData.shared.value.add(target)
+
         if kb.checkSitemap is None:
             message = "do you want to check for the existence of "
             message += "site's sitemap(.xml) [y/N] "
