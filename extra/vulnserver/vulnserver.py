@@ -133,7 +133,9 @@ class ReqHandler(BaseHTTPRequestHandler):
                 self.send_response(OK)
                 self.send_header("Content-type", "text/html")
                 self.send_header("Connection", "close")
-                self.end_headers()
+
+                if not self.raw_requestline.startswith(b"HEAD"):
+                    self.end_headers()
 
                 try:
                     with _lock:
@@ -152,7 +154,11 @@ class ReqHandler(BaseHTTPRequestHandler):
                 except Exception as ex:
                     output = "%s: %s" % (re.search(r"'([^']+)'", str(type(ex))).group(1), ex)
 
-                self.wfile.write(output.encode("utf8"))
+                if self.raw_requestline.startswith(b"HEAD"):
+                    self.send_header("Content-Length", str(len(output)))
+                    self.end_headers()
+                else:
+                    self.wfile.write(output.encode("utf8"))
         else:
             self.send_response(NOT_FOUND)
             self.send_header("Connection", "close")
@@ -162,6 +168,9 @@ class ReqHandler(BaseHTTPRequestHandler):
         self.do_REQUEST()
 
     def do_PUT(self):
+        self.do_REQUEST()
+
+    def do_HEAD(self):
         self.do_REQUEST()
 
     def do_POST(self):
