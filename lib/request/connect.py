@@ -932,7 +932,7 @@ class Connect(object):
                 if kb.postHint in (POST_HINT.SOAP, POST_HINT.XML):
                     # payloads in SOAP/XML should have chars > and < replaced
                     # with their HTML encoded counterparts
-                    payload = payload.replace('>', "&gt;").replace('<', "&lt;")
+                    payload = payload.replace('&', "&amp;").replace('>', "&gt;").replace('<', "&lt;").replace('"', "&quot;").replace("'", "&apos;")  # Reference: https://stackoverflow.com/a/1091953
                 elif kb.postHint == POST_HINT.JSON:
                     payload = escapeJsonValue(payload)
                 elif kb.postHint == POST_HINT.JSON_LIKE:
