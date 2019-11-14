@@ -14,6 +14,7 @@ import os
 import random
 import re
 import shutil
+import socket
 import sys
 import tempfile
 import threading
@@ -86,6 +87,14 @@ def vulnTest():
     thread = threading.Thread(target=_thread)
     thread.daemon = True
     thread.start()
+
+    while True:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            s.connect((address, port))
+            break
+        except:
+            time.sleep(1)
 
     for options, checks in TESTS:
         status = '%d/%d (%d%%) ' % (count, len(TESTS), round(100.0 * count / len(TESTS)))
