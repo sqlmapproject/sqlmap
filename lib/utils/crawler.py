@@ -224,7 +224,7 @@ def crawl(target, post=None, cookie=None):
                 results = OrderedSet()
 
                 for target in kb.targets:
-                    value = "%s&%s" % (target[0], target[2] or "")
+                    value = "%s%s%s" % (target[0], '&' if '?' in target[0] else '?', target[2] or "")
                     match = re.search(r"/[^/?]*\?.*\Z", value)
                     if match:
                         key = re.sub(r"=[^=&]*", "=", match.group(0)).strip('&')
