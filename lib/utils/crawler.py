@@ -224,15 +224,14 @@ def crawl(target, post=None, cookie=None):
                 results = OrderedSet()
 
                 for target in kb.targets:
-                    if target[1] in (HTTPMETHOD.GET, None):
-                        match = re.search(r"/[^/?]*\?.*\Z", target[0])
-                        if match:
-                            key = re.sub(r"=[^=&]*", "=", match.group(0)).strip('&')
-                            if key not in seen:
-                                results.add(target)
-                                seen.add(key)
-                    else:
-                        results.add(target)
+                    value = "%s&%s" % (target[0], target[2] or "")
+                    match = re.search(r"/[^/?]*\?.*\Z", value)
+                    if match:
+                        key = re.sub(r"=[^=&]*", "=", match.group(0)).strip('&')
+                        if key not in seen:
+                            print(key)
+                            results.add(target)
+                            seen.add(key)
 
                 kb.targets = results
 
