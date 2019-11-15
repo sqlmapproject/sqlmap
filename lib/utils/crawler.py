@@ -228,7 +228,7 @@ def crawl(target, post=None, cookie=None):
                     match = re.search(r"/[^/?]*\?.+\Z", value)
                     if match:
                         key = re.sub(r"=[^=&]*", "=", match.group(0)).strip("&?")
-                        if key not in seen:
+                        if '=' in key and key not in seen:
                             results.add(target)
                             seen.add(key)
 
