@@ -429,11 +429,16 @@ def processResponse(page, responseHeaders, code=None, status=None):
         for match in re.finditer(r"(?si)<form.+?</form>", page):
             if re.search(r"(?i)captcha", match.group(0)):
                 kb.captchaDetected = True
-                warnMsg = "potential CAPTCHA protection mechanism detected"
-                if re.search(r"(?i)<title>[^<]*CloudFlare", page):
-                    warnMsg += " (CloudFlare)"
-                singleTimeWarnMessage(warnMsg)
                 break
+
+        if re.search(r"<meta[^>]+\brefresh\b[^>]+\bcaptcha\b", page):
+            kb.captchaDetected = True
+
+        if kb.captchaDetected:
+            warnMsg = "potential CAPTCHA protection mechanism detected"
+            if re.search(r"(?i)<title>[^<]*CloudFlare", page):
+                warnMsg += " (CloudFlare)"
+            singleTimeWarnMessage(warnMsg)
 
     if re.search(BLOCKED_IP_REGEX, page):
         warnMsg = "it appears that you have been blocked by the target server"
