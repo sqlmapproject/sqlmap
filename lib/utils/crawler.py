@@ -42,7 +42,7 @@ from thirdparty.beautifulsoup.beautifulsoup import BeautifulSoup
 from thirdparty.six.moves import http_client as _http_client
 from thirdparty.six.moves import urllib as _urllib
 
-def crawl(target):
+def crawl(target, post=None, cookie=None):
     if not target:
         return
 
@@ -73,7 +73,7 @@ def crawl(target):
                 content = None
                 try:
                     if current:
-                        content = Request.getPage(url=current, crawling=True, raise404=False)[0]
+                        content = Request.getPage(url=current, post=post, cookie=None, crawling=True, raise404=False)[0]
                 except SqlmapConnectionException as ex:
                     errMsg = "connection exception detected ('%s'). skipping " % getSafeExString(ex)
                     errMsg += "URL '%s'" % current

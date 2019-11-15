@@ -336,7 +336,11 @@ def _setCrawler():
         return
 
     if not conf.bulkFile:
-        crawl(conf.url)
+        if conf.url:
+            crawl(conf.url)
+        elif conf.requestFile and kb.targets:
+            target = list(kb.targets)[0]
+            crawl(target[0], target[2], target[3])
 
 def _doSearch():
     """
