@@ -229,7 +229,6 @@ def crawl(target, post=None, cookie=None):
                     if match:
                         key = re.sub(r"=[^=&]*", "=", match.group(0)).strip('&')
                         if key not in seen:
-                            print(key)
                             results.add(target)
                             seen.add(key)
 
