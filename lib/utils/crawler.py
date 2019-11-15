@@ -43,6 +43,9 @@ from thirdparty.six.moves import http_client as _http_client
 from thirdparty.six.moves import urllib as _urllib
 
 def crawl(target):
+    if not target:
+        return
+
     try:
         visited = set()
         threadData = getCurrentThreadData()
