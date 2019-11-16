@@ -5,6 +5,7 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+import re
 import time
 
 from lib.core.agent import agent
@@ -43,8 +44,14 @@ def direct(query, content=True):
                 select = False
                 break
 
-    if select and not query.upper().startswith("SELECT "):
-        query = "SELECT %s" % query
+    if select:
+        if not query.upper().startswith("SELECT "):
+            query = "SELECT %s" % query
+        if conf.binaryFields:
+            for field in conf.binaryFields.split(','):
+                field = field.strip()
+                if re.search(r"\b%s\b" % re.escape(field), query):
+                    query = re.sub(r"\b%s\b" % re.escape(field), agent.hexConvertField(field), query)
 
     logger.log(CUSTOM_LOGGING.PAYLOAD, query)
 
