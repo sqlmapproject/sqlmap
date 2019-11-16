@@ -15,6 +15,7 @@ import random
 import re
 import shutil
 import socket
+import sqlite3
 import sys
 import tempfile
 import threading
@@ -63,19 +64,20 @@ def vulnTest():
     """
 
     TESTS = (
-        ("--flush-session", ("CloudFlare",)),
-        ("--flush-session --forms --crawl=2 --banner", ("total of 2 targets", "might be injectable", "Type: UNION query", "banner: '3")),
-        ("--flush-session --data='{\"id\": 1}' --banner", ("might be injectable", "Payload: {\"id\"", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "banner: '3")),
-        ("--flush-session --data='<root><param name=\"id\" value=\"1*\"/></root>' --mobile --banner --smart", ("might be injectable", "Payload: <root><param name=\"id\" value=\"1", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "banner: '3")),
-        ("--flush-session --method=PUT --data='a=1&b=2&c=3&id=1' --skip-static --dump -T users --start=1 --stop=2", ("might be injectable", "Parameter: id (PUT)", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "2 entries")),
-        ("--flush-session -H 'id: 1*' --tables", ("might be injectable", "Parameter: id #1* ((custom) HEADER)", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", " users ")),
-        ("--flush-session --cookie=\"PHPSESSID=d41d8cd98f00b204e9800998ecf8427e; id=1*; id2=2\" --tables --union-cols=3", ("might be injectable", "Cookie #1* ((custom) HEADER)", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", " users ")),
-        ("--flush-session --null-connection --technique=B --banner", ("NULL connection is supported with HEAD method", "banner: '3")),
-        ("--flush-session --parse-errors --eval=\"id2=2\" --referer=\"localhost\"", ("might be injectable", ": syntax error", "back-end DBMS: SQLite", "3 columns")),
-        ("--banner --schema --dump -T users --binary-fields=surname --where \"id>3\"", ("banner: '3", "INTEGER", "TEXT", "id", "name", "surname", "2 entries", "6E616D6569736E756C6C")),
-        ("--all --tamper=between,randomcase", ("5 entries", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "luther", "blisset", "fluffy", "179ad45c6ce2cb97cf1029e212046e81", "NULL", "nameisnull", "testpass")),
-        ("-z \"tec=B\" --hex --fresh-queries --threads=4 --sql-query=\"SELECT 987654321\"", ("length of query output", ": '987654321'",)),
-        ("--technique=T --fresh-queries --sql-query=\"SELECT 1234\"", (": '1234'",)),
+        ("-u <url> --flush-session", ("CloudFlare",)),
+        ("-u <url> --flush-session --forms --crawl=2 --banner", ("total of 2 targets", "might be injectable", "Type: UNION query", "banner: '3")),
+        ("-u <url> --flush-session --data='{\"id\": 1}' --banner", ("might be injectable", "Payload: {\"id\"", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "banner: '3")),
+        ("-u <url> --flush-session --data='<root><param name=\"id\" value=\"1*\"/></root>' --mobile --banner --smart", ("might be injectable", "Payload: <root><param name=\"id\" value=\"1", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "banner: '3")),
+        ("-u <url> --flush-session --method=PUT --data='a=1&b=2&c=3&id=1' --skip-static --dump -T users --start=1 --stop=2", ("might be injectable", "Parameter: id (PUT)", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "2 entries")),
+        ("-u <url> --flush-session -H 'id: 1*' --tables", ("might be injectable", "Parameter: id #1* ((custom) HEADER)", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", " users ")),
+        ("-u <url> --flush-session --cookie=\"PHPSESSID=d41d8cd98f00b204e9800998ecf8427e; id=1*; id2=2\" --tables --union-cols=3", ("might be injectable", "Cookie #1* ((custom) HEADER)", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", " users ")),
+        ("-u <url> --flush-session --null-connection --technique=B --banner", ("NULL connection is supported with HEAD method", "banner: '3")),
+        ("-u <url> --flush-session --parse-errors --eval=\"id2=2\" --referer=\"localhost\"", ("might be injectable", ": syntax error", "back-end DBMS: SQLite", "3 columns")),
+        ("-u <url> --banner --schema --dump -T users --binary-fields=surname --where \"id>3\"", ("banner: '3", "INTEGER", "TEXT", "id", "name", "surname", "2 entries", "6E616D6569736E756C6C")),
+        ("-u <url> --all --tamper=between,randomcase", ("5 entries", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "luther", "blisset", "fluffy", "179ad45c6ce2cb97cf1029e212046e81", "NULL", "nameisnull", "testpass")),
+        ("-u <url> -z \"tec=B\" --hex --fresh-queries --threads=4 --sql-query=\"SELECT 987654321\"", ("length of query output", ": '987654321'",)),
+        ("-d <direct> --flush-session --dump -T users --binary-fields=surname --where \"id>3\"", ("2 entries", "6E616D6569736E756C6C")),
+        ("-d <direct> --flush-session --banner --schema --sql-query=\"SELECT 987654321\"", ("banner: '3", "INTEGER", "TEXT", "id", "name", "surname", "[*] 987654321",)),
     )
 
     retVal = True
@@ -98,11 +100,21 @@ def vulnTest():
         except:
             time.sleep(1)
 
+    handle, filename = tempfile.mkstemp(suffix=".sqlite")
+    os.close(handle)
+
+    with sqlite3.connect(filename) as conn:
+        c = conn.cursor()
+        c.executescript(vulnserver.SCHEMA)
+
+    url = "http://%s:%d/?id=1" % (address, port)
+    direct = "sqlite3://%s" % filename
+
     for options, checks in TESTS:
         status = '%d/%d (%d%%) ' % (count, len(TESTS), round(100.0 * count / len(TESTS)))
         dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%X"), status))
 
-        cmd = "%s %s -u http://%s:%d/?id=1 --batch %s" % (sys.executable, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py")), address, port, options)
+        cmd = "%s %s %s --batch" % (sys.executable, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py")), options.replace("<url>", url).replace("<direct>", direct))
         output = shellExec(cmd)
 
         if not all(check in output for check in checks):
