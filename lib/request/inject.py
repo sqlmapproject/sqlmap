@@ -110,7 +110,7 @@ def _goInference(payload, expression, charsetType=None, firstChar=None, lastChar
                 if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
                     expression += " AS %s" % randomStr(lowercase=True, seed=hash(expression))
 
-            if field and conf.hexConvert or conf.binaryFields and field in conf.binaryFields.split(','):
+            if field and conf.hexConvert or conf.binaryFields and field in conf.binaryFields:
                 nulledCastedField = agent.nullAndCastField(field)
                 injExpression = expression.replace(field, nulledCastedField, 1)
             else:

@@ -48,7 +48,7 @@ def direct(query, content=True):
         if not query.upper().startswith("SELECT "):
             query = "SELECT %s" % query
         if conf.binaryFields:
-            for field in conf.binaryFields.split(','):
+            for field in conf.binaryFields:
                 field = field.strip()
                 if re.search(r"\b%s\b" % re.escape(field), query):
                     query = re.sub(r"\b%s\b" % re.escape(field), agent.hexConvertField(field), query)

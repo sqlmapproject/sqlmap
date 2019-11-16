@@ -1744,7 +1744,8 @@ def _cleanupOptions():
             conf.exclude = r"\A%s\Z" % '|'.join(re.escape(_) for _ in conf.exclude.split(','))
 
     if conf.binaryFields:
-        conf.binaryFields = re.sub(r"\s*,\s*", ',', conf.binaryFields)
+        conf.binaryFields = conf.binaryFields.replace(" ", "")
+        conf.binaryFields = re.split(PARAMETER_SPLITTING_REGEX, conf.binaryFields)
 
     if any((conf.proxy, conf.proxyFile, conf.tor)):
         conf.disablePrecon = True

@@ -680,6 +680,9 @@ def attackDumpedTable():
                 if len(table[column]["values"]) <= i:
                     continue
 
+                if conf.binaryFields and column in conf.binaryFields:
+                    continue
+
                 value = table[column]["values"][i]
 
                 if column in binary_fields and re.search(HASH_BINARY_COLUMNS_REGEX, column) is not None:
