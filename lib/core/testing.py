@@ -74,7 +74,7 @@ def vulnTest():
         ("-u <url> --flush-session --null-connection --technique=B --banner", ("NULL connection is supported with HEAD method", "banner: '3")),
         ("-u <url> --flush-session --parse-errors --test-filter=\"subquery\" --eval=\"id2=2\" --referer=\"localhost\"", ("might be injectable", ": syntax error", "back-end DBMS: SQLite", "WHERE or HAVING clause (subquery")),
         ("-u <url> --banner --schema --dump -T users --binary-fields=surname --where \"id>3\"", ("banner: '3", "INTEGER", "TEXT", "id", "name", "surname", "2 entries", "6E616D6569736E756C6C")),
-        ("-u <url> --all --tamper=between,randomcase", ("5 entries", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "luther", "blisset", "fluffy", "179ad45c6ce2cb97cf1029e212046e81", "NULL", "nameisnull", "testpass")),
+        ("-u <url> --flush-session --all --tamper=between,randomcase", ("5 entries", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "luther", "blisset", "fluffy", "179ad45c6ce2cb97cf1029e212046e81", "NULL", "nameisnull", "testpass")),
         ("-u <url> -z \"tec=B\" --hex --fresh-queries --threads=4 --sql-query=\"SELECT * FROM users\"", ("SELECT * FROM users [5]", "nameisnull")),
         ("-d <direct> --flush-session --dump -T users --binary-fields=name --where \"id=3\"", ("7775", "179ad45c6ce2cb97cf1029e212046e81 (testpass)",)),
         ("-d <direct> --flush-session --banner --schema --sql-query=\"SELECT 987654321\"", ("banner: '3", "INTEGER", "TEXT", "id", "name", "surname", "[*] 987654321",)),
