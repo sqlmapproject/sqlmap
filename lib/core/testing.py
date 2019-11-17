@@ -110,7 +110,7 @@ def vulnTest():
     handle, request = tempfile.mkstemp(suffix=".req")
     os.close(handle)
 
-    open(request, "w+b").write("POST / HTTP/1.0\nHost: %s:%s\n\nid=1\n" % (address, port))
+    open(request, "w+").write("POST / HTTP/1.0\nHost: %s:%s\n\nid=1\n" % (address, port))
 
     url = "http://%s:%d/?id=1" % (address, port)
     direct = "sqlite3://%s" % database
