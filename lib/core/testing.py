@@ -64,7 +64,7 @@ def vulnTest():
     """
 
     TESTS = (
-        ("-u <url> --flush-session", ("CloudFlare",)),
+        ("-r <request> --flush-session", ("CloudFlare",)),
         ("-u <url> --flush-session --forms --crawl=2 --banner", ("total of 2 targets", "might be injectable", "Type: UNION query", "banner: '3")),
         ("-u <url> --flush-session --data='{\"id\": 1}' --banner", ("might be injectable", "Payload: {\"id\"", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "banner: '3")),
         ("-u <url> --flush-session --data='<root><param name=\"id\" value=\"1*\"/></root>' --mobile --banner --smart", ("might be injectable", "Payload: <root><param name=\"id\" value=\"1", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "banner: '3")),
@@ -100,21 +100,26 @@ def vulnTest():
         except:
             time.sleep(1)
 
-    handle, filename = tempfile.mkstemp(suffix=".sqlite")
+    handle, database = tempfile.mkstemp(suffix=".sqlite")
     os.close(handle)
 
-    with sqlite3.connect(filename) as conn:
+    with sqlite3.connect(database) as conn:
         c = conn.cursor()
         c.executescript(vulnserver.SCHEMA)
 
+    handle, request = tempfile.mkstemp(suffix=".req")
+    os.close(handle)
+
+    open(request, "w+b").write("POST / HTTP/1.0\nHost: %s:%s\n\nid=1\n" % (address, port))
+
     url = "http://%s:%d/?id=1" % (address, port)
-    direct = "sqlite3://%s" % filename
+    direct = "sqlite3://%s" % database
 
     for options, checks in TESTS:
         status = '%d/%d (%d%%) ' % (count, len(TESTS), round(100.0 * count / len(TESTS)))
         dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%X"), status))
 
-        cmd = "%s %s %s --batch" % (sys.executable, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py")), options.replace("<url>", url).replace("<direct>", direct))
+        cmd = "%s %s %s --batch" % (sys.executable, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py")), options.replace("<url>", url).replace("<direct>", direct).replace("<request>", request))
         output = shellExec(cmd)
 
         if not all(check in output for check in checks):
