@@ -1115,7 +1115,12 @@ class Agent(object):
 
     def whereQuery(self, query):
         if conf.dumpWhere and query:
-            prefix, suffix = query.split(" ORDER BY ") if " ORDER BY " in query else (query, "")
+            match = re.search(r" (LIMIT|ORDER).+", query, re.I)
+            if match:
+                suffix = match.group(0)
+                prefix = query[:-len(suffix)]
+            else:
+                prefix, suffix = query, ""
 
             if conf.tbl and "%s)" % conf.tbl.upper() in prefix.upper():
                 prefix = re.sub(r"(?i)%s\)" % re.escape(conf.tbl), "%s WHERE %s)" % (conf.tbl, conf.dumpWhere), prefix)
@@ -1124,7 +1129,9 @@ class Agent(object):
             else:
                 prefix += " WHERE %s" % conf.dumpWhere
 
-            query = "%s ORDER BY %s" % (prefix, suffix) if suffix else prefix
+            query = prefix
+            if suffix:
+                query += suffix
 
         return query
 
