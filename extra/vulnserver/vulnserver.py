@@ -139,17 +139,24 @@ class ReqHandler(BaseHTTPRequestHandler):
                     self.end_headers()
 
                 try:
+                    output = ""
+
+                    if self.params.get("echo", ""):
+                        output += "%s<br>" % self.params["echo"]
+
                     with _lock:
                         _cursor.execute("SELECT * FROM users WHERE id=%s LIMIT 0, 1" % self.params.get("id", ""))
                         results = _cursor.fetchall()
 
-                    output = "<b>SQL results:</b>\n"
+                    output += "<b>SQL results:</b>\n"
                     output += "<table border=\"1\">\n"
+
                     for row in results:
                         output += "<tr>"
                         for value in row:
                             output += "<td>%s</td>" % value
                         output += "</tr>\n"
+
                     output += "</table>\n"
                     output += "</body></html>"
                 except Exception as ex:

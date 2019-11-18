@@ -65,6 +65,7 @@ def vulnTest():
 
     TESTS = (
         ("-r <request> --flush-session", ("CloudFlare",)),
+        ("-u '<url>&echo=foobar*' --flush-session", ("might be vulnerable to cross-site scripting",)),
         ("-u <url> --flush-session --forms --crawl=2 --banner", ("total of 2 targets", "might be injectable", "Type: UNION query", "banner: '3")),
         ("-u <url> --flush-session --data='{\"id\": 1}' --banner", ("might be injectable", "3 columns", "Payload: {\"id\"", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "banner: '3")),
         ("-u <url> --flush-session --data='<root><param name=\"id\" value=\"1*\"/></root>' --union-char=1 --mobile --banner --smart", ("might be injectable", "Payload: <root><param name=\"id\" value=\"1", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "banner: '3")),
