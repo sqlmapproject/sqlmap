@@ -124,22 +124,17 @@ class ReqHandler(BaseHTTPRequestHandler):
         self.url, self.params = path, params
 
         if self.url == '/':
-            self.send_response(OK)
 
             if not any(_ in self.params for _ in ("id", "query")):
+                self.send_response(OK)
                 self.send_header("Content-type", "text/html")
                 self.send_header("Connection", "close")
                 self.end_headers()
                 self.wfile.write(b"<html><p><h3>GET:</h3><a href='/?id=1'>link</a></p><hr><p><h3>POST:</h3><form method='post'>ID: <input type='text' name='id'><input type='submit' value='Submit'></form></p></html>")
             else:
-                self.send_header("Content-type", "text/html")
-                self.send_header("Connection", "close")
-
-                if not self.raw_requestline.startswith(b"HEAD"):
-                    self.end_headers()
+                code, output = OK, ""
 
                 try:
-                    output = ""
 
                     if self.params.get("echo", ""):
                         output += "%s<br>" % self.params["echo"]
@@ -163,12 +158,19 @@ class ReqHandler(BaseHTTPRequestHandler):
                     output += "</table>\n"
                     output += "</body></html>"
                 except Exception as ex:
+                    code = INTERNAL_SERVER_ERROR
                     output = "%s: %s" % (re.search(r"'([^']+)'", str(type(ex))).group(1), ex)
+
+                self.send_response(code)
+
+                self.send_header("Content-type", "text/html")
+                self.send_header("Connection", "close")
 
                 if self.raw_requestline.startswith(b"HEAD"):
                     self.send_header("Content-Length", str(len(output)))
                     self.end_headers()
                 else:
+                    self.end_headers()
                     self.wfile.write(output.encode("utf8"))
         else:
             self.send_response(NOT_FOUND)
