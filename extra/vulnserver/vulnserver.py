@@ -126,7 +126,7 @@ class ReqHandler(BaseHTTPRequestHandler):
         if self.url == '/':
             self.send_response(OK)
 
-            if "id" not in params:
+            if not any(_ in self.params for _ in ("id", "query")):
                 self.send_header("Content-type", "text/html")
                 self.send_header("Connection", "close")
                 self.end_headers()
@@ -145,7 +145,10 @@ class ReqHandler(BaseHTTPRequestHandler):
                         output += "%s<br>" % self.params["echo"]
 
                     with _lock:
-                        _cursor.execute("SELECT * FROM users WHERE id=%s LIMIT 0, 1" % self.params.get("id", ""))
+                        if "query" in self.params:
+                            _cursor.execute(self.params["query"])
+                        elif "id" in self.params:
+                            _cursor.execute("SELECT * FROM users WHERE id=%s LIMIT 0, 1" % self.params["id"])
                         results = _cursor.fetchall()
 
                     output += "<b>SQL results:</b>\n"
