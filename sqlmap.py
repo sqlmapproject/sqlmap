@@ -37,6 +37,7 @@ try:
     warnings.filterwarnings(action="ignore", message=".*using a very old release", category=UserWarning)
     warnings.filterwarnings(action="ignore", message=".*default buffer size will be used", category=RuntimeWarning)
     warnings.filterwarnings(action="ignore", category=DeprecationWarning)
+    warnings.filterwarnings(action="ignore", category=UserWarning, module="psycopg2")
 
     from lib.core.data import logger
 
