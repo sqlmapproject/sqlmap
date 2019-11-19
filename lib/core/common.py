@@ -3584,6 +3584,10 @@ def openFile(filename, mode='r', encoding=UNICODE_ENCODING, errors="reversible",
     True
     """
 
+    # Reference: https://stackoverflow.com/a/37462452
+    if 'b' in mode:
+        buffering = 0
+
     if filename == STDIN_PIPE_DASH:
         if filename not in kb.cache.content:
             kb.cache.content[filename] = sys.stdin.read()
@@ -3591,7 +3595,7 @@ def openFile(filename, mode='r', encoding=UNICODE_ENCODING, errors="reversible",
         return contextlib.closing(io.StringIO(readCachedFileContent(filename)))
     else:
         try:
-            return codecs.open(filename, mode, encoding, errors, buffering and 'b' not in mode)
+            return codecs.open(filename, mode, encoding, errors, buffering)
         except IOError:
             errMsg = "there has been a file opening error for filename '%s'. " % filename
             errMsg += "Please check %s permissions on a file " % ("write" if mode and ('w' in mode or 'a' in mode or '+' in mode) else "read")
