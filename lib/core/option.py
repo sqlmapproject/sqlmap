@@ -98,6 +98,7 @@ from lib.core.exception import SqlmapSyntaxException
 from lib.core.exception import SqlmapSystemException
 from lib.core.exception import SqlmapUnsupportedDBMSException
 from lib.core.exception import SqlmapUserQuitException
+from lib.core.exception import SqlmapValueException
 from lib.core.log import FORMATTER
 from lib.core.optiondict import optDict
 from lib.core.settings import CODECS_LIST_PAGE
@@ -1418,7 +1419,10 @@ def _setHTTPTimeout():
     else:
         conf.timeout = 30.0
 
-    socket.setdefaulttimeout(conf.timeout)
+    try:
+        socket.setdefaulttimeout(conf.timeout)
+    except OverflowError as ex:
+        raise SqlmapValueException("invalid value used for option '--timeout' ('%s')" % getSafeExString(ex))
 
 def _checkDependencies():
     """
