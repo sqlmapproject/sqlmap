@@ -79,6 +79,7 @@ from lib.core.dicts import DEPRECATED_OPTIONS
 from lib.core.enums import AUTOCOMPLETE_TYPE
 from lib.core.exception import SqlmapShellQuitException
 from lib.core.exception import SqlmapSyntaxException
+from lib.core.gui import runGui
 from lib.core.option import _createHomeDirectories
 from lib.core.settings import BASIC_HELP_ITEMS
 from lib.core.settings import DUMMY_URL
@@ -780,6 +781,9 @@ def cmdLineParser(argv=None):
         parser.add_argument("--force-pivoting", dest="forcePivoting", action="store_true",
             help=SUPPRESS)
 
+        parser.add_argument("--gui", dest="gui", action="store_true",
+            help=SUPPRESS)
+
         parser.add_argument("--smoke-test", dest="smokeTest", action="store_true",
             help=SUPPRESS)
 
@@ -847,7 +851,6 @@ def cmdLineParser(argv=None):
                     break
 
         _ = []
-        prompt = False
         advancedHelp = True
         extraHeaders = []
         tamperIndex = None
@@ -859,9 +862,10 @@ def cmdLineParser(argv=None):
         argv = _
         checkOldOptions(argv)
 
-        prompt = "--sqlmap-shell" in argv
+        if "--gui" in argv:
+            runGui(parser)
 
-        if prompt:
+        elif "--sqlmap-shell" in argv:
             _createHomeDirectories()
 
             parser.usage = ""
