@@ -86,8 +86,13 @@ def runGui(parser):
         tk.Label(frame).grid(column=0, row=0, sticky=tk.W)
 
         row = 1
+        if group.get_description():
+            tk.Label(frame, text="%s:" % group.get_description()).grid(column=0, row=1, columnspan=3, sticky=tk.W)
+            tk.Label(frame).grid(column=0, row=2, sticky=tk.W)
+            row += 2
+
         for option in group.option_list:
-            tk.Label(frame, text=parser.formatter._format_option_strings(option)).grid(column=0, row=row, sticky=tk.W)
+            tk.Label(frame, text="%s " % parser.formatter._format_option_strings(option)).grid(column=0, row=row, sticky=tk.W)
 
             if option.type == "string":
                 widget = tk.Entry(frame)
@@ -107,8 +112,7 @@ def runGui(parser):
                 if hasattr(widget, "insert"):
                     widget.insert(0, default)
 
-            tk.Label(frame, text=" ").grid(column=3, row=row, sticky=tk.W)
-            tk.Label(frame, text=option.help).grid(column=4, row=row, sticky=tk.W)
+            tk.Label(frame, text=" %s" % option.help).grid(column=2, row=row, sticky=tk.W)
 
             row += 1
 

@@ -411,7 +411,7 @@ def cmdLineParser(argv=None):
             help="Perform an extensive DBMS version fingerprint")
 
         # Enumeration options
-        enumeration = parser.add_argument_group("Enumeration", "These options can be used to enumerate the back-end database management system information, structure and data contained in the tables. Moreover you can run your own SQL statements")
+        enumeration = parser.add_argument_group("Enumeration", "These options can be used to enumerate the back-end database management system information, structure and data contained in the tables")
 
         enumeration.add_argument("-a", "--all", dest="getAll", action="store_true",
             help="Retrieve everything")
