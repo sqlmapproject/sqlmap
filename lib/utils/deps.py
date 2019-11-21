@@ -82,7 +82,7 @@ def checkDependencies():
 
     try:
         __import__("websocket.ABNF")
-        debugMsg = "'python websocket-client' library is found"
+        debugMsg = "'websocket-client' library is found"
         logger.debug(debugMsg)
     except ImportError:
         warnMsg = "sqlmap requires 'websocket-client' third-party library "
@@ -90,6 +90,26 @@ def checkDependencies():
         warnMsg += "Download from 'https://pypi.python.org/pypi/websocket-client/'"
         logger.warn(warnMsg)
         missing_libraries.add('websocket-client')
+
+    try:
+        __import__("tkinter")
+        debugMsg = "'tkinter' library is found"
+        logger.debug(debugMsg)
+    except ImportError:
+        warnMsg = "sqlmap requires 'tkinter' library "
+        warnMsg += "if you plan to run a GUI"
+        logger.warn(warnMsg)
+        missing_libraries.add('tkinter')
+
+    try:
+        __import__("tkinter.ttk")
+        debugMsg = "'tkinter.ttk' library is found"
+        logger.debug(debugMsg)
+    except ImportError:
+        warnMsg = "sqlmap requires 'tkinter.ttk' library "
+        warnMsg += "if you plan to run a GUI"
+        logger.warn(warnMsg)
+        missing_libraries.add('tkinter.ttk')
 
     if IS_WIN:
         try:
