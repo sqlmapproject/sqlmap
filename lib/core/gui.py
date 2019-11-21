@@ -64,19 +64,42 @@ def runGui(parser):
     style.theme_create("custom", parent="alt", settings=settings)
     style.theme_use("custom")
 
-    def dummy():
-        pass
+    def run():
+        options = {}
+
+        for key in window._widgets:
+            dest, type = key
+            widget = window._widgets[key]
+
+            if hasattr(widget, "get") and not widget.get():
+                value = None
+            elif type == "string":
+                value = widget.get()
+            elif type == "float":
+                value = float(widget.get())
+            elif type == "int":
+                value = int(widget.get())
+            else:
+                value = bool(widget.getint())
+
+            options[dest] = value
+
+        for option in parser.option_list:
+            options[option.dest] = defaults.get(option.dest, None)
+
+        parser._args = options
+        window.destroy()
 
     menubar = tkinter.Menu(window)
 
     filemenu = tkinter.Menu(menubar, tearoff=0)
-    filemenu.add_command(label="Open", command=dummy, state=tkinter.DISABLED)
-    filemenu.add_command(label="Save", command=dummy, state=tkinter.DISABLED)
+    filemenu.add_command(label="Open", state=tkinter.DISABLED)
+    filemenu.add_command(label="Save", state=tkinter.DISABLED)
     filemenu.add_separator()
     filemenu.add_command(label="Exit", command=window.quit)
     menubar.add_cascade(label="File", menu=filemenu)
 
-    menubar.add_command(label="Run", command=window.quit)
+    menubar.add_command(label="Run", command=run)
 
     helpmenu = tkinter.Menu(menubar, tearoff=0)
     helpmenu.add_command(label="Official site", command=lambda: webbrowser.open(SITE))
@@ -88,11 +111,13 @@ def runGui(parser):
     menubar.add_cascade(label="Help", menu=helpmenu)
 
     window.config(menu=menubar)
+    window._widgets = {}
 
     notebook = AutoresizableNotebook(window)
 
     first = None
     frames = {}
+
     for group in parser.option_groups:
         frame = frames[group.title] = tkinter.Frame(notebook, width=200, height=200)
         notebook.add(frames[group.title], text=group.title)
@@ -121,6 +146,8 @@ def runGui(parser):
 
             first = first or widget
             widget.grid(column=1, row=row, sticky=tkinter.W)
+
+            window._widgets[(option.dest, option.type)] = widget
 
             default = defaults.get(option.dest)
             if default:

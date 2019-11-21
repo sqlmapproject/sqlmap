@@ -141,7 +141,8 @@ def main():
         banner()
 
         # Store original command line options for possible later restoration
-        cmdLineOptions.update(cmdLineParser().__dict__)
+        args = cmdLineParser()
+        cmdLineOptions.update(args.__dict__ if hasattr(args, "__dict__") else args)
         initOptions(cmdLineOptions)
 
         if checkPipedInput():

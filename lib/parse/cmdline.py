@@ -863,8 +863,10 @@ def cmdLineParser(argv=None):
 
         if "--gui" in argv:
             from lib.core.gui import runGui
-
             runGui(parser)
+
+            if hasattr(parser, "_args"):
+                return parser._args
 
         elif "--sqlmap-shell" in argv:
             _createHomeDirectories()
