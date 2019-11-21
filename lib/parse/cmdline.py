@@ -122,11 +122,11 @@ def cmdLineParser(argv=None):
         # Target options
         target = parser.add_argument_group("Target", "At least one of these options has to be provided to define the target(s)")
 
-        target.add_argument("-d", dest="direct",
-            help="Connection string for direct database connection")
-
         target.add_argument("-u", "--url", dest="url",
             help="Target URL (e.g. \"http://www.site.com/vuln.php?id=1\")")
+
+        target.add_argument("-d", dest="direct",
+            help="Connection string for direct database connection")
 
         target.add_argument("-l", dest="logFile",
             help="Parse target(s) from Burp or WebScarab proxy log file")

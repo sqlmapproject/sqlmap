@@ -5,6 +5,16 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+import webbrowser
+
+from lib.core.settings import DEV_EMAIL_ADDRESS
+from lib.core.settings import ISSUES_PAGE
+from lib.core.settings import GIT_PAGE
+from lib.core.settings import SITE
+from lib.core.settings import VERSION_STRING
+from lib.core.settings import WIKI_PAGE
+from thirdparty.six.moves import tkinter_messagebox as _tkinter_messagebox
+
 def runGui(parser):
     import re
     import tkinter as tk
@@ -42,7 +52,7 @@ def runGui(parser):
             event.widget.configure(height=tab.winfo_reqheight())
 
     window = tk.Tk()
-    window.title("sqlmap")
+    window.title(VERSION_STRING)
 
     # Reference: https://www.holadevs.com/pregunta/64750/change-selected-tab-color-in-ttknotebook
     style = ttk.Style()
@@ -56,28 +66,28 @@ def runGui(parser):
     menubar = tk.Menu(window)
 
     filemenu = tk.Menu(menubar, tearoff=0)
-    filemenu.add_command(label="Open", command=dummy)
-    filemenu.add_command(label="Save", command=dummy)
+    filemenu.add_command(label="Open", command=dummy, state=tk.DISABLED)
+    filemenu.add_command(label="Save", command=dummy, state=tk.DISABLED)
     filemenu.add_separator()
     filemenu.add_command(label="Exit", command=window.quit)
     menubar.add_cascade(label="File", menu=filemenu)
 
-    runmenu = tk.Menu(menubar, tearoff=0)
-    runmenu.add_command(label="Start", command=dummy)
-    runmenu.add_command(label="Stop", command=dummy)
-    menubar.add_cascade(label="Run", menu=runmenu)
+    menubar.add_command(label="Run", command=window.quit)
 
     helpmenu = tk.Menu(menubar, tearoff=0)
-    helpmenu.add_command(label="Wiki pages", command=dummy)
-    helpmenu.add_command(label="Official site", command=dummy)
+    helpmenu.add_command(label="Official site", command=lambda: webbrowser.open(SITE))
+    helpmenu.add_command(label="Github pages", command=lambda: webbrowser.open(GIT_PAGE))
+    helpmenu.add_command(label="Wiki pages", command=lambda: webbrowser.open(WIKI_PAGE))
+    helpmenu.add_command(label="Report issue", command=lambda: webbrowser.open(ISSUES_PAGE))
     helpmenu.add_separator()
-    helpmenu.add_command(label="About", command=dummy)
+    helpmenu.add_command(label="About", command=lambda: _tkinter_messagebox.showinfo("About", "Copyright (c) 2006-2019\n\n    (%s)" % DEV_EMAIL_ADDRESS))
     menubar.add_cascade(label="Help", menu=helpmenu)
 
     window.config(menu=menubar)
 
     notebook = AutoresizableNotebook(window)
 
+    first = None
     frames = {}
     for group in parser.option_groups:
         frame = frames[group.title] = tk.Frame(notebook, width=200, height=200)
@@ -105,6 +115,7 @@ def runGui(parser):
                 widget = tk.Checkbutton(frame, variable=var)
                 widget.var = var
 
+            first = first or widget
             widget.grid(column=1, row=row, sticky=tk.W)
 
             default = defaults.get(option.dest)
@@ -119,7 +130,8 @@ def runGui(parser):
         tk.Label(frame).grid(column=0, row=row, sticky=tk.W)
 
     notebook.pack(expand=1, fill="both")
-
     notebook.enable_traversal()
+
+    first.focus()
 
     window.mainloop()
