@@ -5,8 +5,11 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+import re
+import tkinter as tk
 import webbrowser
 
+from lib.core.defaults import defaults
 from lib.core.settings import DEV_EMAIL_ADDRESS
 from lib.core.settings import ISSUES_PAGE
 from lib.core.settings import GIT_PAGE
@@ -14,14 +17,9 @@ from lib.core.settings import SITE
 from lib.core.settings import VERSION_STRING
 from lib.core.settings import WIKI_PAGE
 from thirdparty.six.moves import tkinter_messagebox as _tkinter_messagebox
+from tkinter import ttk
 
 def runGui(parser):
-    import re
-    import tkinter as tk
-    from tkinter import ttk
-
-    from lib.core.defaults import defaults
-
     # Reference: https://www.reddit.com/r/learnpython/comments/985umy/limit_user_input_to_only_int_with_tkinter/e4dj9k9?utm_source=share&utm_medium=web2x
     class ConstrainedEntry(tk.Entry):
         def __init__(self, master=None, **kwargs):

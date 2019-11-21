@@ -79,7 +79,6 @@ from lib.core.dicts import DEPRECATED_OPTIONS
 from lib.core.enums import AUTOCOMPLETE_TYPE
 from lib.core.exception import SqlmapShellQuitException
 from lib.core.exception import SqlmapSyntaxException
-from lib.core.gui import runGui
 from lib.core.option import _createHomeDirectories
 from lib.core.settings import BASIC_HELP_ITEMS
 from lib.core.settings import DUMMY_URL
@@ -863,6 +862,8 @@ def cmdLineParser(argv=None):
         checkOldOptions(argv)
 
         if "--gui" in argv:
+            from lib.core.gui import runGui
+
             runGui(parser)
 
         elif "--sqlmap-shell" in argv:
