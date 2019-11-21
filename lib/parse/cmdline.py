@@ -910,6 +910,7 @@ def cmdLineParser(argv=None):
 
         for i in xrange(len(argv)):
             longOptions = set(re.findall(r"\-\-([^= ]+?)=", parser.format_help()))
+            longSwitches = set(re.findall(r"\-\-([^= ]+?)\s", parser.format_help()))
             if argv[i] == "-hh":
                 argv[i] = "-h"
             elif i == 1 and re.search(r"\A(http|www\.|\w[\w.-]+\.\w{2,})", argv[i]) is not None:
@@ -923,6 +924,9 @@ def cmdLineParser(argv=None):
             elif re.search(r"\A-\w=.+", argv[i]):
                 dataToStdout("[!] potentially miswritten (illegal '=') short option detected ('%s')\n" % argv[i])
                 raise SystemExit
+            elif re.search(r"\A-\w{3,}", argv[i]):
+                if argv[i].strip('-').split('=')[0] in (longOptions | longSwitches):
+                    argv[i] = "-%s" % argv[i]
             elif argv[i] in DEPRECATED_OPTIONS:
                 argv[i] = ""
             elif argv[i].startswith("--tamper"):
