@@ -203,6 +203,15 @@
 /var/www/nginx-default/index.php
 /srv/www/index.php
 
+/var/www/config.php
+/usr/local/apache/config.php
+/usr/local/apache2/config.php
+/usr/local/www/apache22/config.php
+/usr/local/www/apache24/config.php
+/usr/local/httpd/config.php
+/var/www/nginx-default/config.php
+/srv/www/config.php
+
 # Reference: https://github.com/sqlmapproject/sqlmap/issues/3928
 
 /srv/www/htdocs/index.php
@@ -211,6 +220,13 @@
 /var/apache2/htdocs/index.php
 /var/www/htdocs/index.php
 /var/www/html/index.php
+
+/srv/www/htdocs/config.php
+/usr/local/apache2/htdocs/config.php
+/usr/local/www/data/config.php
+/var/apache2/htdocs/config.php
+/var/www/htdocs/config.php
+/var/www/html/config.php
 
 # Reference: https://www.gracefulsecurity.com/path-traversal-cheat-sheet-linux
 
