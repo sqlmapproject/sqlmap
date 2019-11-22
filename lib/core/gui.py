@@ -6,6 +6,10 @@ See the file 'LICENSE' for copying permission
 """
 
 import re
+import socket
+import subprocess
+import sys
+import threading
 import webbrowser
 
 from lib.core.common import getSafeExString
@@ -18,10 +22,16 @@ from lib.core.settings import SITE
 from lib.core.settings import VERSION_STRING
 from lib.core.settings import WIKI_PAGE
 from thirdparty.six.moves import tkinter_messagebox as _tkinter_messagebox
+from thirdparty.six.moves import queue as _queue
+
+line = ""
+process = None
+queue = None
 
 def runGui(parser):
     try:
         import tkinter
+        import tkinter.scrolledtext
         import tkinter.ttk
     except ImportError as ex:
         raise SqlmapMissingDependence("missing dependence ('%s')" % getSafeExString(ex))
@@ -64,7 +74,83 @@ def runGui(parser):
     style.theme_create("custom", parent="alt", settings=settings)
     style.theme_use("custom")
 
+    # Reference: https://stackoverflow.com/a/10018670
+    def center(window):
+        window.update_idletasks()
+        width = window.winfo_width()
+        frm_width = window.winfo_rootx() - window.winfo_x()
+        win_width = width + 2 * frm_width
+        height = window.winfo_height()
+        titlebar_height = window.winfo_rooty() - window.winfo_y()
+        win_height = height + titlebar_height + frm_width
+        x = window.winfo_screenwidth() // 2 - win_width // 2
+        y = window.winfo_screenheight() // 2 - win_height // 2
+        window.geometry('{}x{}+{}+{}'.format(width, height, x, y))
+        window.deiconify()
+
+    def onKeyPress(event):
+        global line
+        global queue
+
+        if process:
+            if event.char == '\b':
+                line = line[:-1]
+            else:
+                line += event.char
+
+    def onReturnPress(event):
+        global line
+        global queue
+
+        if process:
+            try:
+                process.stdin.write(("%s\n" % line.strip()).encode())
+                process.stdin.flush()
+            except socket.error:
+                line = ""
+                event.widget.master.master.destroy()
+                return "break"
+
+            event.widget.insert(tkinter.END, "\n")
+
+            counter = 0
+            while True:
+                line = ""
+                try:
+                    #line = queue.get_nowait()
+                    line = queue.get(timeout=.1)
+                    event.widget.insert(tkinter.END, line)
+                    counter = 0
+                except _queue.Empty:
+                    event.widget.see(tkinter.END)
+                    event.widget.update_idletasks()
+                    if counter > 3:
+                        break
+                    else:
+                        counter += 1
+
+            return "break"
+
     def run():
+        global process
+        global queue
+
+        ON_POSIX = "posix" in sys.builtin_module_names
+
+        def enqueue(stream, queue):
+            for line in iter(stream.readline, b''):
+                queue.put(line)
+            stream.close()
+
+        process = subprocess.Popen("/bin/bash", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE, bufsize=1, close_fds=ON_POSIX)
+
+        # Reference: https://stackoverflow.com/a/4896288
+        queue = _queue.Queue()
+        thread = threading.Thread(target=enqueue, args=(process.stdout, queue))
+        thread.daemon = True
+        thread.start()
+
+
         options = {}
 
         for key in window._widgets:
@@ -80,7 +166,7 @@ def runGui(parser):
             elif type == "int":
                 value = int(widget.get())
             else:
-                value = bool(widget.getint())
+                value = bool(widget.var.get())
 
             options[dest] = value
 
@@ -88,7 +174,18 @@ def runGui(parser):
             options[option.dest] = defaults.get(option.dest, None)
 
         parser._args = options
-        window.destroy()
+
+        top = tkinter.Toplevel()
+        top.title("Console")
+
+        # Reference: https://stackoverflow.com/a/13833338
+        text = tkinter.scrolledtext.ScrolledText(top, undo=True)
+        text.bind("<Key>", onKeyPress)
+        text.bind("<Return>", onReturnPress)
+        text.pack()
+        text.focus()
+
+        center(top)
 
     menubar = tkinter.Menu(window)
 
