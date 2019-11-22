@@ -4360,11 +4360,16 @@ def asciifyUrl(url, forceQuote=False):
     if all(char in string.printable for char in url):
         return getText(url)
 
+    hostname = parts.hostname
+
+    if isinstance(hostname, six.binary_type):
+        hostname = getUnicode(hostname)
+
     # idna-encode domain
     try:
-        hostname = parts.hostname.encode("idna")
-    except LookupError:
-        hostname = parts.hostname.encode("punycode")
+        hostname = hostname.encode("idna")
+    except:
+        hostname = hostname.encode("punycode")
 
     # UTF8-quote the other parts. We check each part individually if
     # if needs to be quoted - that should catch some additional user

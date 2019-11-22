@@ -170,7 +170,7 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
         threadData.lastRedirectURL = (threadData.lastRequestUID, redurl)
 
         result.redcode = code
-        result.redurl = redurl
+        result.redurl = getUnicode(redurl)
         return result
 
     http_error_301 = http_error_303 = http_error_307 = http_error_302
