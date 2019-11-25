@@ -7,6 +7,7 @@ See the file 'LICENSE' for copying permission
 
 from __future__ import division
 
+import codecs
 import functools
 import glob
 import inspect
@@ -1527,7 +1528,7 @@ def _cleanupOptions():
     if conf.encoding:
         try:
             codecs.lookup(conf.encoding)
-        except Exception as ex:
+        except LookupError:
             errMsg = "unknown encoding '%s'" % conf.encoding
             raise SqlmapValueException(errMsg)
 
