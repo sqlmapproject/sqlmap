@@ -37,6 +37,7 @@ from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapThreadException
+from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.core.settings import CHAR_INFERENCE_MARK
 from lib.core.settings import INFERENCE_BLANK_BREAK
 from lib.core.settings import INFERENCE_EQUALS_CHAR
@@ -425,6 +426,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             else:
                                 return None
             else:
+                if "'%s'" % CHAR_INFERENCE_MARK in payload and conf.charset:
+                    errMsg = "option '--charset' is not supported on '%s'" % Backend.getIdentifiedDbms()
+                    raise SqlmapUnsupportedFeatureException(errMsg)
+
                 candidates = list(originalTbl)
                 bit = 0
                 while len(candidates) > 1:
