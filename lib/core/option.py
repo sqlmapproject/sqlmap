@@ -1524,6 +1524,13 @@ def _cleanupOptions():
     Cleanup configuration attributes.
     """
 
+    if conf.encoding:
+        try:
+            codecs.lookup(conf.encoding)
+        except Exception as ex:
+            errMsg = "unknown encoding '%s'" % conf.encoding
+            raise SqlmapValueException(errMsg)
+
     debugMsg = "cleaning up configuration parameters"
     logger.debug(debugMsg)
 
