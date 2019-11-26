@@ -17,7 +17,6 @@ import threading
 import traceback
 
 if sys.version_info >= (3, 0):
-    from http.client import FOUND
     from http.client import INTERNAL_SERVER_ERROR
     from http.client import NOT_FOUND
     from http.client import OK
@@ -29,7 +28,6 @@ if sys.version_info >= (3, 0):
 else:
     from BaseHTTPServer import BaseHTTPRequestHandler
     from BaseHTTPServer import HTTPServer
-    from httplib import FOUND
     from httplib import INTERNAL_SERVER_ERROR
     from httplib import NOT_FOUND
     from httplib import OK

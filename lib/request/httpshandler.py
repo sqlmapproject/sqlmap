@@ -11,7 +11,6 @@ import socket
 
 from lib.core.common import filterNone
 from lib.core.common import getSafeExString
-from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import SqlmapConnectionException

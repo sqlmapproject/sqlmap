@@ -10,7 +10,6 @@ import time
 import types
 
 from lib.core.common import getHostHeader
-from lib.core.common import getSafeExString
 from lib.core.common import logHTTPTraffic
 from lib.core.common import readInput
 from lib.core.convert import getUnicode
