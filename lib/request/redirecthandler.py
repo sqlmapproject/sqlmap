@@ -74,10 +74,8 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
 
         try:
             content = fp.read(MAX_CONNECTION_TOTAL_SIZE)
-        except Exception as ex:
-            dbgMsg = "there was a problem while retrieving "
-            dbgMsg += "redirect response content ('%s')" % getSafeExString(ex)
-            logger.debug(dbgMsg)
+        except:  # e.g. IncompleteRead
+            content = ""
         finally:
             if content:
                 try:  # try to write it back to the read buffer so we could reuse it in further steps
