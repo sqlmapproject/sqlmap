@@ -61,15 +61,12 @@ class Custom(object):
                 return None
             else:
                 if sqlType:
-                    debugMsg = "executing %s query: '%s'" % (sqlType if sqlType is not None else "SQL", query)
+                    infoMsg = "executing %s statement: '%s'" % (sqlType if sqlType is not None else "SQL", query)
                 else:
-                    debugMsg = "executing unknown SQL type query: '%s'" % query
-                logger.debug(debugMsg)
+                    infoMsg = "executing unknown SQL command: '%s'" % query
+                logger.info(infoMsg)
 
                 inject.goStacked(query)
-
-                debugMsg = "done"
-                logger.debug(debugMsg)
 
                 output = NULL
 

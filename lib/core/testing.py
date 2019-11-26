@@ -80,7 +80,7 @@ def vulnTest():
         ("-u '<url>&echo=foobar*' --flush-session", ("might be vulnerable to cross-site scripting",)),
         ("-u '<url>&query=*' --flush-session --technique=Q --banner", ("Title: SQLite inline queries", "banner: '3")),
         ("-d <direct> --flush-session --dump -T users --binary-fields=name --where \"id=3\"", ("7775", "179ad45c6ce2cb97cf1029e212046e81 (testpass)",)),
-        ("-d <direct> --flush-session --banner --schema --sql-query=\"SELECT 987654321\"", ("banner: '3", "INTEGER", "TEXT", "id", "name", "surname", "[*] 987654321",)),
+        ("-d <direct> --flush-session --banner --schema --sql-query=\"UPDATE users SET name='foobar' WHERE id=5; SELECT * FROM users; SELECT 987654321\"", ("banner: '3", "INTEGER", "TEXT", "id", "name", "surname", "5, foobar, nameisnull", "[*] 987654321",)),
     )
 
     retVal = True
