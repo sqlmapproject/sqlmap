@@ -33,6 +33,7 @@ from lib.core.common import readXmlFile
 from lib.core.common import shellExec
 from lib.core.compat import round
 from lib.core.compat import xrange
+from lib.core.convert import encodeBase64
 from lib.core.convert import getUnicode
 from lib.core.data import conf
 from lib.core.data import kb
@@ -64,10 +65,13 @@ def vulnTest():
     """
 
     TESTS = (
-        ("-r <request> --flush-session", ("CloudFlare",)),
-        ("-u <url> --flush-session --encoding=ascii --forms --crawl=2 --banner", ("total of 2 targets", "might be injectable", "Type: UNION query", "banner: '3")),
+        ("--list-tampers", ("between", "MySQL", "xforwardedfor")),
+        ("-r <request> --flush-session", ("CloudFlare", "possible DBMS: 'SQLite'")),
+        ("-l <log> --flush-session --skip-waf -v 3 --technique=U --union-from=users --banner --parse-errors", ("banner: '3", "ORDER BY term out of range", "~xp_cmdshell")),
+        ("-l <log> --offline --banner -v 5", ("banner: '3", "~[TRAFFIC OUT]")),
+        ("-u <url> --flush-session --encoding=ascii --forms --crawl=2 --threads=2 --banner", ("total of 2 targets", "might be injectable", "Type: UNION query", "banner: '3")),
         ("-u <url> --flush-session --data='{\"id\": 1}' --banner", ("might be injectable", "3 columns", "Payload: {\"id\"", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "banner: '3")),
-        ("-u <url> --flush-session --data='<root><param name=\"id\" value=\"1*\"/></root>' --union-char=1 --mobile --banner --smart", ("might be injectable", "Payload: <root><param name=\"id\" value=\"1", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "banner: '3")),
+        ("-u <url> --flush-session --data='<root><param name=\"id\" value=\"1*\"/></root>' --union-char=1 --mobile --answers='smartphone=3' --banner --smart -v 5", ("might be injectable", "Payload: <root><param name=\"id\" value=\"1", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "banner: '3", "Nexus")),
         ("-u <url> --flush-session --method=PUT --data='a=1&b=2&c=3&id=1' --skip-static --dump -T users --start=1 --stop=2", ("might be injectable", "Parameter: id (PUT)", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "2 entries")),
         ("-u <url> --flush-session -H 'id: 1*' --tables", ("might be injectable", "Parameter: id #1* ((custom) HEADER)", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", " users ")),
         ("-u <url> --flush-session --banner --invalid-logical --technique=B --test-filter='OR boolean' --tamper=space2dash", ("banner: '3", " LIKE ")),
@@ -113,7 +117,13 @@ def vulnTest():
     handle, request = tempfile.mkstemp(suffix=".req")
     os.close(handle)
 
-    open(request, "w+").write("POST / HTTP/1.0\nHost: %s:%s\n\nid=1\n" % (address, port))
+    handle, log = tempfile.mkstemp(suffix=".log")
+    os.close(handle)
+
+    content = "POST / HTTP/1.0\nHost: %s:%s\n\nid=1\n" % (address, port)
+
+    open(request, "w+").write(content)
+    open(log, "w+").write('<port>%d</port><request base64="true"><![CDATA[%s]]></request>' % (port, encodeBase64(content, binary=False)))
 
     url = "http://%s:%d/?id=1" % (address, port)
     direct = "sqlite3://%s" % database
@@ -122,10 +132,10 @@ def vulnTest():
         status = '%d/%d (%d%%) ' % (count, len(TESTS), round(100.0 * count / len(TESTS)))
         dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%X"), status))
 
-        cmd = "%s %s %s --batch" % (sys.executable, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py")), options.replace("<url>", url).replace("<direct>", direct).replace("<request>", request))
+        cmd = "%s %s %s --batch" % (sys.executable, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py")), options.replace("<url>", url).replace("<direct>", direct).replace("<request>", request).replace("<log>", log))
         output = shellExec(cmd)
 
-        if not all(check in output for check in checks):
+        if not all((check in output if not check.startswith('~') else check[1:] not in output) for check in checks):
             dataToStdout("---\n\n$ %s\n" % cmd)
             dataToStdout("%s---\n" % clearColors(output))
             retVal = False
