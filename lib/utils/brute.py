@@ -289,6 +289,8 @@ def columnExists(columnFile, regex=None):
         for column in threadData.shared.files:
             if Backend.getIdentifiedDbms() in (DBMS.MYSQL,):
                 result = not inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE %s REGEXP '[^0-9]')", (column, table, column)))
+            elif Backend.getIdentifiedDbms() in (DBMS.SQLITE,):
+                result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE %s NOT GLOB '*[^0-9]*')", (column, table, column)))
             else:
                 result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE ROUND(%s)=ROUND(%s))", (column, table, column, column)))
 
