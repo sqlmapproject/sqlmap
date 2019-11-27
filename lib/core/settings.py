@@ -18,7 +18,7 @@ from lib.core.enums import OS
 from thirdparty.six import unichr as _unichr
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.3.11.106"
+VERSION = "1.3.11.107"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -600,6 +600,9 @@ PARSE_HEADERS_LIMIT = 3
 
 # Step used in ORDER BY technique used for finding the right number of columns in UNION query injections
 ORDER_BY_STEP = 10
+
+# Maximum value used in ORDER BY technique used for finding the right number of columns in UNION query injections
+ORDER_BY_MAX = 1000
 
 # Maximum number of times for revalidation of a character in inference (as required)
 MAX_REVALIDATION_STEPS = 5

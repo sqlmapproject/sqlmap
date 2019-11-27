@@ -38,6 +38,7 @@ from lib.core.settings import MIN_RATIO
 from lib.core.settings import MIN_STATISTICAL_RANGE
 from lib.core.settings import MIN_UNION_RESPONSES
 from lib.core.settings import NULL
+from lib.core.settings import ORDER_BY_MAX
 from lib.core.settings import ORDER_BY_STEP
 from lib.core.settings import UNION_MIN_RESPONSE_CHARS
 from lib.core.settings import UNION_STDEV_COEFF
@@ -74,6 +75,9 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
                 if not conf.uCols and _orderByTest(highCols):
                     lowCols = highCols
                     highCols += ORDER_BY_STEP
+
+                    if highCols > ORDER_BY_MAX:
+                        break
                 else:
                     while not found:
                         mid = highCols - (highCols - lowCols) // 2
