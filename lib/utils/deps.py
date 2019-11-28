@@ -81,7 +81,7 @@ def checkDependencies():
         missing_libraries.add('python-ntlm')
 
     try:
-        __import__("websocket.ABNF")
+        __import__("websocket._abnf")
         debugMsg = "'websocket-client' library is found"
         logger.debug(debugMsg)
     except ImportError:
