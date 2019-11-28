@@ -119,6 +119,7 @@ from lib.core.settings import UNENCODED_ORIGINAL_VALUE
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import URI_HTTP_HEADER
 from lib.core.settings import WARN_TIME_STDEV
+from lib.core.settings import WEBSOCKET_INITIAL_TIMEOUT
 from lib.request.basic import decodePage
 from lib.request.basic import forgeHeaders
 from lib.request.basic import processResponse
@@ -451,10 +452,25 @@ class Connect(object):
 
             if webSocket:
                 ws = websocket.WebSocket()
-                ws.settimeout(timeout)
+                ws.settimeout(WEBSOCKET_INITIAL_TIMEOUT if kb.webSocketRecvCount is None else timeout)
                 ws.connect(url, header=("%s: %s" % _ for _ in headers.items() if _[0] not in ("Host",)), cookie=cookie)  # WebSocket will add Host field of headers automatically
                 ws.send(urldecode(post or ""))
-                page = ws.recv()
+
+                _page = []
+
+                if kb.webSocketRecvCount is None:
+                    while True:
+                        try:
+                            _page.append(ws.recv())
+                        except websocket.WebSocketTimeoutException:
+                            kb.webSocketRecvCount = len(_page)
+                            break
+                else:
+                    for i in xrange(max(1, kb.webSocketRecvCount)):
+                        _page.append(ws.recv())
+
+                page = "\n".join(_page)
+
                 ws.close()
                 code = ws.status
                 status = _http_client.responses[code]
