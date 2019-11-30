@@ -45,6 +45,7 @@ from lib.core.common import unArrayizeValue
 from lib.core.common import wasLastResponseDBMSError
 from lib.core.common import wasLastResponseHTTPError
 from lib.core.compat import xrange
+from lib.core.convert import getBytes
 from lib.core.convert import getUnicode
 from lib.core.data import conf
 from lib.core.data import kb
@@ -788,7 +789,7 @@ def checkSqlInjection(place, parameter, value):
                                 logger.info(infoMsg)
 
                                 try:
-                                    process = subprocess.Popen(conf.alert.encode(sys.getfilesystemencoding() or UNICODE_ENCODING), shell=True)
+                                    process = subprocess.Popen(getBytes(conf.alert, sys.getfilesystemencoding() or UNICODE_ENCODING), shell=True)
                                     process.wait()
                                 except Exception as ex:
                                     errMsg = "error occurred while executing '%s' ('%s')" % (conf.alert, getSafeExString(ex))

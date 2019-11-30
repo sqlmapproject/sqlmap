@@ -1970,7 +1970,7 @@ def safeFilepathEncode(filepath):
     retVal = filepath
 
     if filepath and six.PY2 and isinstance(filepath, six.text_type):
-        retVal = filepath.encode(sys.getfilesystemencoding() or UNICODE_ENCODING)
+        retVal = getBytes(filepath, sys.getfilesystemencoding() or UNICODE_ENCODING)
 
     return retVal
 

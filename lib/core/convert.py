@@ -231,6 +231,11 @@ def getBytes(value, encoding=UNICODE_ENCODING, errors="strict", unsafe=True):
 
     retVal = value
 
+    try:
+        codecs.lookup(encoding)
+    except LookupError:
+        encoding = UNICODE_ENCODING
+
     if isinstance(value, six.text_type):
         if INVALID_UNICODE_PRIVATE_AREA:
             if unsafe:
