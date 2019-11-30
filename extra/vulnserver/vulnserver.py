@@ -172,7 +172,7 @@ class ReqHandler(BaseHTTPRequestHandler):
                     self.end_headers()
                 else:
                     self.end_headers()
-                    self.wfile.write(quote(output if isinstance(output, bytes) else output.encode(UNICODE_ENCODING)))
+                    self.wfile.write(output if isinstance(output, bytes) else output.encode(UNICODE_ENCODING))
         else:
             self.send_response(NOT_FOUND)
             self.send_header("Connection", "close")
