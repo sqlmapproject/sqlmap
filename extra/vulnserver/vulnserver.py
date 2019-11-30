@@ -17,6 +17,7 @@ import threading
 import traceback
 
 PY3 = sys.version_info >= (3, 0)
+UNICODE_ENCODING = "utf-8"
 
 if PY3:
     from http.client import INTERNAL_SERVER_ERROR
@@ -96,7 +97,7 @@ class ReqHandler(BaseHTTPRequestHandler):
                 self.send_response(INTERNAL_SERVER_ERROR)
                 self.send_header("Connection", "close")
                 self.end_headers()
-                self.wfile.write("CLOUDFLARE_ERROR_500S_BOX".encode("utf8"))
+                self.wfile.write("CLOUDFLARE_ERROR_500S_BOX".encode(UNICODE_ENCODING))
                 return
 
         if hasattr(self, "data"):
@@ -127,7 +128,7 @@ class ReqHandler(BaseHTTPRequestHandler):
 
             if not any(_ in self.params for _ in ("id", "query")):
                 self.send_response(OK)
-                self.send_header("Content-type", "text/html")
+                self.send_header("Content-type", "text/html; charset=%s" % UNICODE_ENCODING)
                 self.send_header("Connection", "close")
                 self.end_headers()
                 self.wfile.write(b"<html><p><h3>GET:</h3><a href='/?id=1'>link</a></p><hr><p><h3>POST:</h3><form method='post'>ID: <input type='text' name='id'><input type='submit' value='Submit'></form></p></html>")
@@ -171,7 +172,7 @@ class ReqHandler(BaseHTTPRequestHandler):
                     self.end_headers()
                 else:
                     self.end_headers()
-                    self.wfile.write(output.encode("utf8") if PY3 else output)
+                    self.wfile.write(quote(output if isinstance(output, bytes) else output.encode(UNICODE_ENCODING)))
         else:
             self.send_response(NOT_FOUND)
             self.send_header("Connection", "close")
@@ -190,7 +191,7 @@ class ReqHandler(BaseHTTPRequestHandler):
         length = int(self.headers.get("Content-length", 0))
         if length:
             data = self.rfile.read(length)
-            data = unquote_plus(data.decode("utf8"))
+            data = unquote_plus(data.decode(UNICODE_ENCODING))
             self.data = data
         self.do_REQUEST()
 
