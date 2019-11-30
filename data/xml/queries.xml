@@ -3,7 +3,8 @@
 <root>
     <!-- MySQL -->
     <dbms value="MySQL">
-        <cast query="CAST(%s AS CHAR)"/>
+        <!-- http://dba.fyicenter.com/faq/mysql/Difference-between-CHAR-and-NCHAR.html -->
+        <cast query="CAST(%s AS NCHAR)"/>
         <length query="CHAR_LENGTH(%s)"/>
         <isnull query="IFNULL(%s,' ')"/>
         <delimiter query=","/>
@@ -242,6 +243,9 @@
         <concatenate query="%s||%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
         <hex query="RAWTOHEX(%s)"/>
+        <!--
+        NOTE: ASCIISTR (https://www.techonthenet.com/oracle/functions/asciistr.php)
+        -->
         <inference query="ASCII(SUBSTRC((%s),%d,1))>%d"/>
         <banner query="SELECT banner FROM v$version WHERE ROWNUM=1"/>
         <current_user query="SELECT USER FROM DUAL"/>

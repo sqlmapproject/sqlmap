@@ -16,7 +16,9 @@ import sys
 import threading
 import traceback
 
-if sys.version_info >= (3, 0):
+PY3 = sys.version_info >= (3, 0)
+
+if PY3:
     from http.client import INTERNAL_SERVER_ERROR
     from http.client import NOT_FOUND
     from http.client import OK
@@ -169,7 +171,7 @@ class ReqHandler(BaseHTTPRequestHandler):
                     self.end_headers()
                 else:
                     self.end_headers()
-                    self.wfile.write(output.encode("utf8"))
+                    self.wfile.write(output.encode("utf8") if PY3 else output)
         else:
             self.send_response(NOT_FOUND)
             self.send_header("Connection", "close")

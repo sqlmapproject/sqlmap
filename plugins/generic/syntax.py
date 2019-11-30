@@ -7,8 +7,10 @@ See the file 'LICENSE' for copying permission
 
 import re
 
+from lib.core.common import Backend
 from lib.core.convert import getBytes
 from lib.core.data import conf
+from lib.core.enums import DBMS
 from lib.core.exception import SqlmapUndefinedMethod
 
 class Syntax(object):
@@ -31,7 +33,7 @@ class Syntax(object):
 
                     if replacement != original:
                         retVal = retVal.replace(item, replacement)
-                    elif len(original) != len(getBytes(original)) and "n'%s'" % original not in retVal:
+                    elif len(original) != len(getBytes(original)) and "n'%s'" % original not in retVal and Backend.getDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.ORACLE, DBMS.MSSQL):
                         retVal = retVal.replace("'%s'" % original, "n'%s'" % original)
         else:
             retVal = escaper(expression)
