@@ -31,6 +31,11 @@ from lib.core.settings import UNICODE_ENCODING
 from thirdparty import six
 from thirdparty.six import unichr as _unichr
 
+try:
+    from html import escape as htmlEscape
+except ImportError:
+    from cgi import escape as htmlEscape
+
 def base64pickle(value):
     """
     Serializes (with pickle) and encodes to Base64 format supplied (binary) value

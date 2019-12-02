@@ -31,6 +31,7 @@ from lib.core.convert import getBytes
 from lib.core.convert import getConsoleLength
 from lib.core.convert import getText
 from lib.core.convert import getUnicode
+from lib.core.convert import htmlEscape
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -557,7 +558,7 @@ class Dump(object):
                         else:
                             dataToDumpFile(dumpFP, "%s%s" % (safeCSValue(column), conf.csvDel))
                     elif conf.dumpFormat == DUMP_FORMAT.HTML:
-                        dataToDumpFile(dumpFP, "<th>%s</th>" % getUnicode(cgi.escape(column).encode("ascii", "xmlcharrefreplace")))
+                        dataToDumpFile(dumpFP, "<th>%s</th>" % getUnicode(htmlEscape(column).encode("ascii", "xmlcharrefreplace")))
 
                 field += 1
 
@@ -629,7 +630,7 @@ class Dump(object):
                         else:
                             dataToDumpFile(dumpFP, "%s%s" % (safeCSValue(value), conf.csvDel))
                     elif conf.dumpFormat == DUMP_FORMAT.HTML:
-                        dataToDumpFile(dumpFP, "<td>%s</td>" % getUnicode(cgi.escape(value).encode("ascii", "xmlcharrefreplace")))
+                        dataToDumpFile(dumpFP, "<td>%s</td>" % getUnicode(htmlEscape(value).encode("ascii", "xmlcharrefreplace")))
 
                     field += 1
 
