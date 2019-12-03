@@ -5,17 +5,23 @@ Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+import os
 import re
 import socket
 import subprocess
 import sys
+import tempfile
 import threading
 import webbrowser
 
 from lib.core.common import getSafeExString
+from lib.core.common import saveConfig
+from lib.core.data import paths
 from lib.core.defaults import defaults
+from lib.core.enums import MKSTEMP_PREFIX
 from lib.core.exception import SqlmapMissingDependence
 from lib.core.settings import DEV_EMAIL_ADDRESS
+from lib.core.settings import IS_WIN
 from lib.core.settings import ISSUES_PAGE
 from lib.core.settings import GIT_PAGE
 from lib.core.settings import SITE
@@ -110,48 +116,19 @@ def runGui(parser):
                 line = ""
                 event.widget.master.master.destroy()
                 return "break"
+            except:
+                return
 
             event.widget.insert(tkinter.END, "\n")
-
-            counter = 0
-            while True:
-                line = ""
-                try:
-                    #line = queue.get_nowait()
-                    line = queue.get(timeout=.1)
-                    event.widget.insert(tkinter.END, line)
-                    counter = 0
-                except _queue.Empty:
-                    event.widget.see(tkinter.END)
-                    event.widget.update_idletasks()
-                    if counter > 3:
-                        break
-                    else:
-                        counter += 1
 
             return "break"
 
     def run():
+        global alive
         global process
         global queue
 
-        ON_POSIX = "posix" in sys.builtin_module_names
-
-        def enqueue(stream, queue):
-            for line in iter(stream.readline, b''):
-                queue.put(line)
-            stream.close()
-
-        process = subprocess.Popen("/bin/bash", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE, bufsize=1, close_fds=ON_POSIX)
-
-        # Reference: https://stackoverflow.com/a/4896288
-        queue = _queue.Queue()
-        thread = threading.Thread(target=enqueue, args=(process.stdout, queue))
-        thread.daemon = True
-        thread.start()
-
-
-        options = {}
+        config = {}
 
         for key in window._widgets:
             dest, type = key
@@ -168,12 +145,34 @@ def runGui(parser):
             else:
                 value = bool(widget.var.get())
 
-            options[dest] = value
+            config[dest] = value
 
         for option in parser.option_list:
-            options[option.dest] = defaults.get(option.dest, None)
+            config[option.dest] = defaults.get(option.dest, None)
 
-        parser._args = options
+        handle, configFile = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.CONFIG, text=True)
+        os.close(handle)
+
+        saveConfig(config, configFile)
+
+        def enqueue(stream, queue):
+            global alive
+
+            for line in iter(stream.readline, b''):
+                queue.put(line)
+
+            alive = False
+            stream.close()
+
+        alive = True
+
+        process = subprocess.Popen([sys.executable or "python", os.path.join(paths.SQLMAP_ROOT_PATH, "sqlmap.py"), "-c", configFile], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE, bufsize=1, close_fds=not IS_WIN)
+
+        # Reference: https://stackoverflow.com/a/4896288
+        queue = _queue.Queue()
+        thread = threading.Thread(target=enqueue, args=(process.stdout, queue))
+        thread.daemon = True
+        thread.start()
 
         top = tkinter.Toplevel()
         top.title("Console")
@@ -186,6 +185,16 @@ def runGui(parser):
         text.focus()
 
         center(top)
+
+        while alive:
+            line = ""
+            try:
+                #line = queue.get_nowait()
+                line = queue.get(timeout=.1)
+                text.insert(tkinter.END, line)
+            except _queue.Empty:
+                text.see(tkinter.END)
+                text.update_idletasks()
 
     menubar = tkinter.Menu(window)
 

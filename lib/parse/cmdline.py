@@ -78,6 +78,7 @@ from lib.core.defaults import defaults
 from lib.core.dicts import DEPRECATED_OPTIONS
 from lib.core.enums import AUTOCOMPLETE_TYPE
 from lib.core.exception import SqlmapShellQuitException
+from lib.core.exception import SqlmapSilentQuitException
 from lib.core.exception import SqlmapSyntaxException
 from lib.core.option import _createHomeDirectories
 from lib.core.settings import BASIC_HELP_ITEMS
@@ -863,10 +864,10 @@ def cmdLineParser(argv=None):
 
         if "--gui" in argv:
             from lib.core.gui import runGui
+
             runGui(parser)
 
-            if hasattr(parser, "_args"):
-                return parser._args
+            raise SqlmapSilentQuitException
 
         elif "--sqlmap-shell" in argv:
             _createHomeDirectories()
