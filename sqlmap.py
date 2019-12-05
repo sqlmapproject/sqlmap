@@ -385,6 +385,12 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
+        elif all(_ in excMsg for _ in ("window = tkinter.Tk()",)):
+            errMsg = "there has been a problem in initialization of GUI interface "
+            errMsg += "('%s')" % excMsg.strip().split('\n')[-1]
+            logger.critical(errMsg)
+            raise SystemExit
+
         elif "bad marshal data (unknown type code)" in excMsg:
             match = re.search(r"\s*(.+)\s+ValueError", excMsg)
             errMsg = "one of your .pyc files are corrupted%s" % (" ('%s')" % match.group(1) if match else "")
