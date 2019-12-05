@@ -27,7 +27,6 @@ from lib.core.settings import GIT_PAGE
 from lib.core.settings import SITE
 from lib.core.settings import VERSION_STRING
 from lib.core.settings import WIKI_PAGE
-from thirdparty.six.moves import tkinter_messagebox as _tkinter_messagebox
 from thirdparty.six.moves import queue as _queue
 
 line = ""
@@ -36,19 +35,20 @@ queue = None
 
 def runGui(parser):
     try:
-        import tkinter
-        import tkinter.scrolledtext
-        import tkinter.ttk
+        from thirdparty.six.moves import tkinter as _tkinter
+        from thirdparty.six.moves import tkinter_scrolledtext as _tkinter_scrolledtext
+        from thirdparty.six.moves import tkinter_ttk as _tkinter_ttk
+        from thirdparty.six.moves import tkinter_messagebox as _tkinter_messagebox
     except ImportError as ex:
         raise SqlmapMissingDependence("missing dependence ('%s')" % getSafeExString(ex))
 
     # Reference: https://www.reddit.com/r/learnpython/comments/985umy/limit_user_input_to_only_int_with_tkinter/e4dj9k9?utm_source=share&utm_medium=web2x
-    class ConstrainedEntry(tkinter.Entry):
+    class ConstrainedEntry(_tkinter.Entry):
         def __init__(self, master=None, **kwargs):
-            self.var = tkinter.StringVar()
+            self.var = _tkinter.StringVar()
             self.regex = kwargs["regex"]
             del kwargs["regex"]
-            tkinter.Entry.__init__(self, master, textvariable=self.var, **kwargs)
+            _tkinter.Entry.__init__(self, master, textvariable=self.var, **kwargs)
             self.old_value = ''
             self.var.trace('w', self.check)
             self.get, self.set = self.var.get, self.var.set
@@ -60,9 +60,9 @@ def runGui(parser):
                 self.set(self.old_value)
 
     # Reference: https://code.activestate.com/recipes/580726-tkinter-notebook-that-fits-to-the-height-of-every-/
-    class AutoresizableNotebook(tkinter.ttk.Notebook):
+    class AutoresizableNotebook(_tkinter_ttk.Notebook):
         def __init__(self, master=None, **kw):
-            tkinter.ttk.Notebook.__init__(self, master, **kw)
+            _tkinter_ttk.Notebook.__init__(self, master, **kw)
             self.bind("<<NotebookTabChanged>>", self._on_tab_changed)
 
         def _on_tab_changed(self,event):
@@ -71,11 +71,11 @@ def runGui(parser):
             tab = event.widget.nametowidget(event.widget.select())
             event.widget.configure(height=tab.winfo_reqheight())
 
-    window = tkinter.Tk()
+    window = _tkinter.Tk()
     window.title(VERSION_STRING)
 
     # Reference: https://www.holadevs.com/pregunta/64750/change-selected-tab-color-in-ttknotebook
-    style = tkinter.ttk.Style()
+    style = _tkinter_ttk.Style()
     settings = {"TNotebook.Tab": {"configure": {"padding": [5, 1], "background": "#fdd57e" }, "map": {"background": [("selected", "#C70039"), ("active", "#fc9292")], "foreground": [("selected", "#ffffff"), ("active", "#000000")]}}}
     style.theme_create("custom", parent="alt", settings=settings)
     style.theme_use("custom")
@@ -119,7 +119,7 @@ def runGui(parser):
             except:
                 return
 
-            event.widget.insert(tkinter.END, "\n")
+            event.widget.insert(_tkinter.END, "\n")
 
             return "break"
 
@@ -174,11 +174,11 @@ def runGui(parser):
         thread.daemon = True
         thread.start()
 
-        top = tkinter.Toplevel()
+        top = _tkinter.Toplevel()
         top.title("Console")
 
         # Reference: https://stackoverflow.com/a/13833338
-        text = tkinter.scrolledtext.ScrolledText(top, undo=True)
+        text = _tkinter_scrolledtext.ScrolledText(top, undo=True)
         text.bind("<Key>", onKeyPress)
         text.bind("<Return>", onReturnPress)
         text.pack()
@@ -191,23 +191,23 @@ def runGui(parser):
             try:
                 #line = queue.get_nowait()
                 line = queue.get(timeout=.1)
-                text.insert(tkinter.END, line)
+                text.insert(_tkinter.END, line)
             except _queue.Empty:
-                text.see(tkinter.END)
+                text.see(_tkinter.END)
                 text.update_idletasks()
 
-    menubar = tkinter.Menu(window)
+    menubar = _tkinter.Menu(window)
 
-    filemenu = tkinter.Menu(menubar, tearoff=0)
-    filemenu.add_command(label="Open", state=tkinter.DISABLED)
-    filemenu.add_command(label="Save", state=tkinter.DISABLED)
+    filemenu = _tkinter.Menu(menubar, tearoff=0)
+    filemenu.add_command(label="Open", state=_tkinter.DISABLED)
+    filemenu.add_command(label="Save", state=_tkinter.DISABLED)
     filemenu.add_separator()
     filemenu.add_command(label="Exit", command=window.quit)
     menubar.add_cascade(label="File", menu=filemenu)
 
     menubar.add_command(label="Run", command=run)
 
-    helpmenu = tkinter.Menu(menubar, tearoff=0)
+    helpmenu = _tkinter.Menu(menubar, tearoff=0)
     helpmenu.add_command(label="Official site", command=lambda: webbrowser.open(SITE))
     helpmenu.add_command(label="Github pages", command=lambda: webbrowser.open(GIT_PAGE))
     helpmenu.add_command(label="Wiki pages", command=lambda: webbrowser.open(WIKI_PAGE))
@@ -225,33 +225,33 @@ def runGui(parser):
     frames = {}
 
     for group in parser.option_groups:
-        frame = frames[group.title] = tkinter.Frame(notebook, width=200, height=200)
+        frame = frames[group.title] = _tkinter.Frame(notebook, width=200, height=200)
         notebook.add(frames[group.title], text=group.title)
 
-        tkinter.Label(frame).grid(column=0, row=0, sticky=tkinter.W)
+        _tkinter.Label(frame).grid(column=0, row=0, sticky=_tkinter.W)
 
         row = 1
         if group.get_description():
-            tkinter.Label(frame, text="%s:" % group.get_description()).grid(column=0, row=1, columnspan=3, sticky=tkinter.W)
-            tkinter.Label(frame).grid(column=0, row=2, sticky=tkinter.W)
+            _tkinter.Label(frame, text="%s:" % group.get_description()).grid(column=0, row=1, columnspan=3, sticky=_tkinter.W)
+            _tkinter.Label(frame).grid(column=0, row=2, sticky=_tkinter.W)
             row += 2
 
         for option in group.option_list:
-            tkinter.Label(frame, text="%s " % parser.formatter._format_option_strings(option)).grid(column=0, row=row, sticky=tkinter.W)
+            _tkinter.Label(frame, text="%s " % parser.formatter._format_option_strings(option)).grid(column=0, row=row, sticky=_tkinter.W)
 
             if option.type == "string":
-                widget = tkinter.Entry(frame)
+                widget = _tkinter.Entry(frame)
             elif option.type == "float":
                 widget = ConstrainedEntry(frame, regex=r"\A\d*\.?\d*\Z")
             elif option.type == "int":
                 widget = ConstrainedEntry(frame, regex=r"\A\d*\Z")
             else:
-                var = tkinter.IntVar()
-                widget = tkinter.Checkbutton(frame, variable=var)
+                var = _tkinter.IntVar()
+                widget = _tkinter.Checkbutton(frame, variable=var)
                 widget.var = var
 
             first = first or widget
-            widget.grid(column=1, row=row, sticky=tkinter.W)
+            widget.grid(column=1, row=row, sticky=_tkinter.W)
 
             window._widgets[(option.dest, option.type)] = widget
 
@@ -260,11 +260,11 @@ def runGui(parser):
                 if hasattr(widget, "insert"):
                     widget.insert(0, default)
 
-            tkinter.Label(frame, text=" %s" % option.help).grid(column=2, row=row, sticky=tkinter.W)
+            _tkinter.Label(frame, text=" %s" % option.help).grid(column=2, row=row, sticky=_tkinter.W)
 
             row += 1
 
-        tkinter.Label(frame).grid(column=0, row=row, sticky=tkinter.W)
+        _tkinter.Label(frame).grid(column=0, row=row, sticky=_tkinter.W)
 
     notebook.pack(expand=1, fill="both")
     notebook.enable_traversal()
