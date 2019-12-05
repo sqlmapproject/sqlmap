@@ -2466,6 +2466,10 @@ def _basicOptionValidation():
             errMsg = "invalid regular expression '%s' ('%s')" % (conf.paramExclude, getSafeExString(ex))
             raise SqlmapSyntaxException(errMsg)
 
+    if conf.cookieDel and len(conf.cookieDel):
+        errMsg = "option '--cookie-del' should contain a single character (e.g. ';')"
+        raise SqlmapSyntaxException(errMsg)
+
     if conf.crawlExclude:
         try:
             re.compile(conf.crawlExclude)
