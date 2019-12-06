@@ -16,7 +16,7 @@ import optparse
 import os
 import warnings
 
-warnings.filterwarnings(action="ignore", message=".*was already imported", category=UserWarning)
+warnings.filterwarnings(action="ignore", category=UserWarning)
 warnings.filterwarnings(action="ignore", category=DeprecationWarning)
 
 from lib.core.common import getUnicode
