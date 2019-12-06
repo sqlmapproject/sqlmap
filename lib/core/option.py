@@ -2477,6 +2477,13 @@ def _basicOptionValidation():
             errMsg = "invalid regular expression '%s' ('%s')" % (conf.crawlExclude, getSafeExString(ex))
             raise SqlmapSyntaxException(errMsg)
 
+    if conf.scope:
+        try:
+            re.compile(conf.scope)
+        except Exception as ex:
+            errMsg = "invalid regular expression '%s' ('%s')" % (conf.scope, getSafeExString(ex))
+            raise SqlmapSyntaxException(errMsg)
+
     if conf.dumpTable and conf.dumpAll:
         errMsg = "switch '--dump' is incompatible with switch '--dump-all'"
         raise SqlmapSyntaxException(errMsg)
