@@ -456,18 +456,18 @@ def start():
                 for place in parameters:
                     # Test User-Agent and Referer headers only if
                     # --level >= 3
-                    skip = (place == PLACE.USER_AGENT and conf.level < 3)
-                    skip |= (place == PLACE.REFERER and conf.level < 3)
+                    skip = (place == PLACE.USER_AGENT and (kb.testOnlyCustom or conf.level < 3))
+                    skip |= (place == PLACE.REFERER and (kb.testOnlyCustom or conf.level < 3))
 
                     # --param-filter
                     skip |= (len(conf.paramFilter) > 0 and place.upper() not in conf.paramFilter)
 
                     # Test Host header only if
                     # --level >= 5
-                    skip |= (place == PLACE.HOST and conf.level < 5)
+                    skip |= (place == PLACE.HOST and (kb.testOnlyCustom or conf.level < 5))
 
                     # Test Cookie header only if --level >= 2
-                    skip |= (place == PLACE.COOKIE and conf.level < 2)
+                    skip |= (place == PLACE.COOKIE and (kb.testOnlyCustom or conf.level < 2))
 
                     skip |= (place == PLACE.USER_AGENT and intersect(USER_AGENT_ALIASES, conf.skip, True) not in ([], None))
                     skip |= (place == PLACE.REFERER and intersect(REFERER_ALIASES, conf.skip, True) not in ([], None))
