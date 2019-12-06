@@ -70,13 +70,12 @@ class Dump(object):
         self._lock = threading.Lock()
 
     def _write(self, data, newline=True, console=True, content_type=None):
-        if conf.api:
-            dataToStdout(data, content_type=content_type, status=CONTENT_STATUS.COMPLETE)
-            return
-
         text = "%s%s" % (data, "\n" if newline else " ")
 
-        if console:
+        if conf.api:
+            dataToStdout(data, content_type=content_type, status=CONTENT_STATUS.COMPLETE)
+
+        elif console:
             dataToStdout(text)
 
         multiThreadMode = isMultiThreadMode()
@@ -118,7 +117,6 @@ class Dump(object):
     def string(self, header, data, content_type=None, sort=True):
         if conf.api:
             self._write(data, content_type=content_type)
-            return
 
         if isListLike(data):
             self.lister(header, data, content_type, sort)
@@ -150,7 +148,6 @@ class Dump(object):
 
         if conf.api:
             self._write(elements, content_type=content_type)
-            return
 
         if elements:
             self._write("%s [%d]:" % (header, len(elements)))
@@ -202,7 +199,6 @@ class Dump(object):
 
         if conf.api:
             self._write(userSettings, content_type=content_type)
-            return
 
         if userSettings:
             self._write("%s:" % header)
@@ -236,7 +232,6 @@ class Dump(object):
         if isinstance(dbTables, dict) and len(dbTables) > 0:
             if conf.api:
                 self._write(dbTables, content_type=CONTENT_TYPE.TABLES)
-                return
 
             maxlength = 0
 
@@ -279,7 +274,6 @@ class Dump(object):
         if isinstance(tableColumns, dict) and len(tableColumns) > 0:
             if conf.api:
                 self._write(tableColumns, content_type=content_type)
-                return
 
             for db, tables in tableColumns.items():
                 if not db:
@@ -353,7 +347,6 @@ class Dump(object):
         if isinstance(dbTables, dict) and len(dbTables) > 0:
             if conf.api:
                 self._write(dbTables, content_type=CONTENT_TYPE.COUNT)
-                return
 
             maxlength1 = len("Table")
             maxlength2 = len("Entries")
@@ -412,7 +405,6 @@ class Dump(object):
 
         if conf.api:
             self._write(tableValues, content_type=CONTENT_TYPE.DUMP_TABLE)
-            return
 
         dumpDbPath = os.path.join(conf.dumpPath, unsafeSQLIdentificatorNaming(db))
 
@@ -668,7 +660,6 @@ class Dump(object):
     def dbColumns(self, dbColumnsDict, colConsider, dbs):
         if conf.api:
             self._write(dbColumnsDict, content_type=CONTENT_TYPE.COLUMNS)
-            return
 
         for column in dbColumnsDict.keys():
             if colConsider == "1":
