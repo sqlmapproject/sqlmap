@@ -19,6 +19,7 @@ import re
 import sys
 
 from lib.core.bigarray import BigArray
+from lib.core.compat import xrange
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.settings import INVALID_UNICODE_PRIVATE_AREA
