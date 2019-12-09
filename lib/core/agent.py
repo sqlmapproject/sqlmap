@@ -247,7 +247,7 @@ class Agent(object):
 
         # If we are replacing (<where>) the parameter original value with
         # our payload do not prepend with the prefix
-        if where == PAYLOAD.WHERE.REPLACE:
+        if where == PAYLOAD.WHERE.REPLACE and not conf.prefix:  # Note: https://github.com/sqlmapproject/sqlmap/issues/4030
             query = ""
 
         # If the technique is stacked queries (<stype>) do not put a space
