@@ -63,9 +63,9 @@ def main():
     (args, _) = apiparser.parse_args()
 
     # Start the client or the server
-    if args.server is True:
+    if args.server:
         server(args.host, args.port, adapter=args.adapter, username=args.username, password=args.password)
-    elif args.client is True:
+    elif args.client:
         client(args.host, args.port, username=args.username, password=args.password)
     else:
         apiparser.print_help()
