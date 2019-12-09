@@ -163,7 +163,7 @@ def tableExists(tableFile, regex=None):
         if not threadData.shared.files:
             warnMsg = "no table(s) found"
             if conf.db:
-                 warnMsg += " for database '%s'" % conf.db
+                warnMsg += " for database '%s'" % conf.db
             logger.warn(warnMsg)
         else:
             for item in threadData.shared.files:

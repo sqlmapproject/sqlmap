@@ -65,7 +65,7 @@ def runGui(parser):
             _tkinter_ttk.Notebook.__init__(self, master, **kw)
             self.bind("<<NotebookTabChanged>>", self._on_tab_changed)
 
-        def _on_tab_changed(self,event):
+        def _on_tab_changed(self, event):
             event.widget.update_idletasks()
 
             tab = event.widget.nametowidget(event.widget.select())
@@ -76,7 +76,7 @@ def runGui(parser):
 
     # Reference: https://www.holadevs.com/pregunta/64750/change-selected-tab-color-in-ttknotebook
     style = _tkinter_ttk.Style()
-    settings = {"TNotebook.Tab": {"configure": {"padding": [5, 1], "background": "#fdd57e" }, "map": {"background": [("selected", "#C70039"), ("active", "#fc9292")], "foreground": [("selected", "#ffffff"), ("active", "#000000")]}}}
+    settings = {"TNotebook.Tab": {"configure": {"padding": [5, 1], "background": "#fdd57e"}, "map": {"background": [("selected", "#C70039"), ("active", "#fc9292")], "foreground": [("selected", "#ffffff"), ("active", "#000000")]}}}
     style.theme_create("custom", parent="alt", settings=settings)
     style.theme_use("custom")
 
@@ -189,7 +189,7 @@ def runGui(parser):
         while alive:
             line = ""
             try:
-                #line = queue.get_nowait()
+                # line = queue.get_nowait()
                 line = queue.get(timeout=.1)
                 text.insert(_tkinter.END, line)
             except _queue.Empty:

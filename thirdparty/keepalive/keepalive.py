@@ -107,9 +107,11 @@ from __future__ import print_function
 
 try:
     from thirdparty.six.moves import http_client as _http_client
+    from thirdparty.six.moves import range as _range
     from thirdparty.six.moves import urllib as _urllib
 except ImportError:
     from six.moves import http_client as _http_client
+    from six.moves import range as _range
     from six.moves import urllib as _urllib
 
 import socket
@@ -569,7 +571,7 @@ def fetch(N, url, delay=0):
     import time
     lens = []
     starttime = time.time()
-    for i in range(N):
+    for i in _range(N):
         if delay and i > 0: time.sleep(delay)
         fo = _urllib.request.urlopen(url)
         foo = fo.read()

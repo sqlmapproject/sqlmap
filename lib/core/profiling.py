@@ -27,7 +27,7 @@ def profile(profileOutputFile=None, dotOutputFile=None, imageOutputFile=None):
         import pydot
     except ImportError as ex:
         errMsg = "profiling requires third-party libraries ('%s') " % getSafeExString(ex)
-        errMsg += "(Hint: 'sudo apt-get install python-pydot python-pyparsing python-profiler graphviz')"
+        errMsg += "(Hint: 'sudo apt install python-pydot python-pyparsing python-profiler graphviz')"
         logger.error(errMsg)
 
         return
@@ -84,7 +84,7 @@ def profile(profileOutputFile=None, dotOutputFile=None, imageOutputFile=None):
         pydotGraph.write_png(imageOutputFile)
     except OSError:
         errMsg = "profiling requires graphviz installed "
-        errMsg += "(Hint: 'sudo apt-get install graphviz')"
+        errMsg += "(Hint: 'sudo apt install graphviz')"
         logger.error(errMsg)
     else:
         infoMsg = "displaying interactive graph with xdot library"
