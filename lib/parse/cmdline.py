@@ -942,6 +942,8 @@ def cmdLineParser(argv=None):
             elif argv[i] == "-H":
                 if i + 1 < len(argv):
                     extraHeaders.append(argv[i + 1])
+            elif argv[i] == "--deps":
+                argv[i] = "--dependencies"
             elif argv[i] == "-r":
                 for j in xrange(i + 2, len(argv)):
                     value = argv[j]
