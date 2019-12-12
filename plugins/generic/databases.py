@@ -901,7 +901,7 @@ class Databases(object):
             self.getTables()
 
             infoMsg = "fetched tables: "
-            infoMsg += ", ".join(["%s" % ", ".join("%s%s%s" % (unsafeSQLIdentificatorNaming(db), ".." if Backend.isDbms(DBMS.MSSQL) or Backend.isDbms(DBMS.SYBASE) else '.', unsafeSQLIdentificatorNaming(_)) for _ in tbl) for db, tbl in kb.data.cachedTables.items()])
+            infoMsg += ", ".join(["%s" % ", ".join("'%s%s%s'" % (unsafeSQLIdentificatorNaming(db), ".." if Backend.isDbms(DBMS.MSSQL) or Backend.isDbms(DBMS.SYBASE) else '.', unsafeSQLIdentificatorNaming(_)) for _ in tbl) for db, tbl in kb.data.cachedTables.items()])
             logger.info(infoMsg)
 
             for db, tables in kb.data.cachedTables.items():
