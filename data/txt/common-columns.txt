@@ -539,6 +539,19 @@ kljuc
 
 # turkish
 
+isim
+ad
+adi
+soyisim
+soyad
+soyadi
+kimlik
+kimlikno
+tckimlikno
+tckimlik
+yonetici
+sil
+silinmis
 numara
 sira
 lokasyon
@@ -554,7 +567,9 @@ ev_adres
 is_adresi
 ev_adresi
 isadresi
+isadres
 evadresi
+evadres
 il
 ilce
 eposta
