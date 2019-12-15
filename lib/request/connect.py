@@ -1054,11 +1054,11 @@ class Connect(object):
 
                 match = re.search(r"%s=[^&]*" % re.escape(parameter), paramString, re.I)
                 if match:
-                    retVal = re.sub("(?i)%s" % re.escape(match.group(0)), ("%s=%s" % (parameter, newValue)).replace('\\', r'\\'), paramString)
+                    retVal = re.sub(r"(?i)%s" % re.escape(match.group(0)), ("%s=%s" % (parameter, newValue)).replace('\\', r'\\'), paramString)
                 else:
                     match = re.search(r"(%s[\"']:[\"'])([^\"']+)" % re.escape(parameter), paramString, re.I)
                     if match:
-                        retVal = re.sub("(?i)%s" % re.escape(match.group(0)), "%s%s" % (match.group(1), newValue), paramString)
+                        retVal = re.sub(r"(?i)%s" % re.escape(match.group(0)), "%s%s" % (match.group(1), newValue), paramString)
 
                 return retVal
 

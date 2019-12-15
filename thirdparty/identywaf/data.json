@@ -431,6 +431,12 @@
                 "e34c:RVZXum60OEhCWapAYKYPkoJyWOpohM4IiUYMr2RWg1qQJLX2uhdOn9htOj+hX7AB16FcPxJPdLsXomtKaK59nui6c4RmkgI2FZjxtDtAeq+c3qA4chS1XKTC"
             ]
         },
+        "kuipernet": {
+            "company": "ASTSoft",
+            "name": "Kuipernet",
+            "regex": "(?s)Content-Length: 118214.+W5M0MpCehiHzreSzNTczkc9d",
+            "signatures": []
+        },
         "malcare": {
             "company": "Inactiv",
             "name": "MalCare",
