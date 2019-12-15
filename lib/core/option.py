@@ -995,7 +995,7 @@ def _setHTTPHandlers():
                 errMsg = "invalid proxy address '%s' ('%s')" % (conf.proxy, getSafeExString(ex))
                 raise SqlmapSyntaxException(errMsg)
 
-            hostnamePort = _.netloc.split(":")
+            hostnamePort = _.netloc.rsplit(":", 1)
 
             scheme = _.scheme.upper()
             hostname = hostnamePort[0]
