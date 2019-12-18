@@ -53,8 +53,8 @@ def main():
 
     # Parse command line options
     apiparser = optparse.OptionParser()
-    apiparser.add_option("-s", "--server", help="Run as a REST-JSON API server", default=RESTAPI_DEFAULT_PORT, action="store_true")
-    apiparser.add_option("-c", "--client", help="Run as a REST-JSON API client", default=RESTAPI_DEFAULT_PORT, action="store_true")
+    apiparser.add_option("-s", "--server", help="Run as a REST-JSON API server", action="store_true")
+    apiparser.add_option("-c", "--client", help="Run as a REST-JSON API client", action="store_true")
     apiparser.add_option("-H", "--host", help="Host of the REST-JSON API server (default \"%s\")" % RESTAPI_DEFAULT_ADDRESS, default=RESTAPI_DEFAULT_ADDRESS, action="store")
     apiparser.add_option("-p", "--port", help="Port of the the REST-JSON API server (default %d)" % RESTAPI_DEFAULT_PORT, default=RESTAPI_DEFAULT_PORT, type="int", action="store")
     apiparser.add_option("--adapter", help="Server (bottle) adapter to use (default \"%s\")" % RESTAPI_DEFAULT_ADAPTER, default=RESTAPI_DEFAULT_ADAPTER, action="store")
