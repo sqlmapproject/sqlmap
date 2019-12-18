@@ -2630,7 +2630,7 @@ def debug(mode=True):
     """ Change the debug level.
     There is only one debug level supported at the moment."""
     global DEBUG
-    if mode: warnings.simplefilter('default')
+    #if mode: warnings.simplefilter('default')  # neutralizing already set warning filters (e.g. DeprecationWarning inside sqlmapapi.py)
     DEBUG = bool(mode)
 
 
