@@ -10,6 +10,7 @@ import time
 import types
 
 from lib.core.common import getHostHeader
+from lib.core.common import getSafeExString
 from lib.core.common import logHTTPTraffic
 from lib.core.common import readInput
 from lib.core.convert import getUnicode
@@ -139,6 +140,14 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
             except _urllib.error.HTTPError as ex:
                 result = ex
 
+                # Dirty hack for https://github.com/sqlmapproject/sqlmap/issues/4046
+                try:
+                    hasattr(result, "read")
+                except KeyError:
+                    class _(object):
+                        pass
+                    result = _()
+
                 # Dirty hack for http://bugs.python.org/issue15701
                 try:
                     result.info()
@@ -149,7 +158,12 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
 
                 if not hasattr(result, "read"):
                     def _(self, length=None):
-                        return ex.msg
+                        try:
+                            retVal = getSafeExString(ex)
+                        except:
+                            retVal = ""
+                        finally:
+                            return retVal
                     result.read = types.MethodType(_, result)
 
                 if not getattr(result, "url", None):
