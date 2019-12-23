@@ -25,7 +25,7 @@ except ImportError:
 try:
     import MySQLdb  # used by SQLAlchemy in case of MySQL
     warnings.filterwarnings("error", category=MySQLdb.Warning)
-except ImportError:
+except (ImportError, AttributeError):
     pass
 
 from lib.core.data import conf
