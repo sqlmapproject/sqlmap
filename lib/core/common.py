@@ -1123,8 +1123,10 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
 
     if boolean:
         retVal = retVal.strip().upper() == 'Y'
+    else:
+        retVal = retVal or ""
 
-    return retVal or ""
+    return retVal
 
 def setTechnique(technique):
     """
