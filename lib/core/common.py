@@ -1104,7 +1104,10 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
                 dataToStdout("%s" % message, forceOutput=not kb.wizardMode, bold=True)
                 kb.prependFlag = False
 
-                retVal = _input().strip() or default
+                retVal = _input()
+                if not retVal:  # Note: Python doesn't print newline on empty input
+                    dataToStdout("\n")
+                retVal = retVal.strip() or default
                 retVal = getUnicode(retVal, encoding=sys.stdin.encoding) if retVal else retVal
             except:
                 try:
