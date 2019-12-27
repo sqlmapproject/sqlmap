@@ -275,6 +275,11 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
+        elif all(_ in excMsg for _ in ("Permission denied", "metasploit")):
+            errMsg = "permission error occurred while using Metasploit"
+            logger.critical(errMsg)
+            raise SystemExit
+
         elif "Read-only file system" in excMsg:
             errMsg = "output device is mounted as read-only"
             logger.critical(errMsg)
