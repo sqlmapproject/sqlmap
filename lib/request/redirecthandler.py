@@ -174,7 +174,7 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
             except:
                 redurl = None
                 result = fp
-                fp.read = io.BytesIO("").read
+                fp.read = io.BytesIO(b"").read
         else:
             result = fp
 
