@@ -1,5 +1,9 @@
 # History
 
+## 2020
+
+* **Jan 1**, stable version [1.4](https://github.com/sqlmapproject/sqlmap/releases/tag/1.4) released ([changeset](https://github.com/sqlmapproject/sqlmap/compare/1.3...1.4)).
+
 ## 2019
 
 * **Jan 5**, stable version [1.3](https://github.com/sqlmapproject/sqlmap/releases/tag/1.3) released ([changeset](https://github.com/sqlmapproject/sqlmap/compare/1.2...1.3)).
