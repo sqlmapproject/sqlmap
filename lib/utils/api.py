@@ -459,7 +459,7 @@ def option_get(taskid):
             logger.debug("(%s) Requested value for unknown option '%s'" % (taskid, option))
             return jsonize({"success": False, "message": "Unknown option '%s'" % option})
 
-    logger.debug("(%s) Retrieved values for option(s) '%s'" % (taskid, ",".join(options)))
+    logger.debug("(%s) Retrieved values for option(s) '%s'" % (taskid, ','.join(options)))
 
     return jsonize({"success": True, "options": results})
 
