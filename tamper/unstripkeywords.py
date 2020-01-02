@@ -21,6 +21,9 @@ def tamper(payload, **kwargs):
     """
     Transforms keywords ('SELECT') so they are valid when stripped once ('SELSELECTECT')
 
+    Keywords can be set with 'UNSTRIP_KEYWORDS' environment variable:
+        $ export UNSTRIP_KEYWORDS=select,union
+
     Tested against:
         * MySQL 5.7
 
