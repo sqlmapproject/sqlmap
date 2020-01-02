@@ -22,10 +22,7 @@ def tamper(payload, **kwargs):
     Transforms keywords ('SELECT') so they are valid when stripped once ('SELSELECTECT')
 
     Tested against:
-        * Microsoft SQL Server 2005
-        * MySQL 4, 5.0 and 5.5
-        * Oracle 10g
-        * PostgreSQL 8.3, 8.4, 9.0
+        * MySQL 5.7
 
     Notes:
         * Useful to bypass weak filters based on keywords stripping.
