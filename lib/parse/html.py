@@ -57,6 +57,12 @@ def htmlParser(page):
     """
     This function calls a class that parses the input HTML page to
     fingerprint the back-end database management system
+
+    >>> from lib.core.enums import DBMS
+    >>> htmlParser("Warning: mysql_fetch_array() expects parameter 1 to be resource") == DBMS.MYSQL
+    True
+    >>> threadData = getCurrentThreadData()
+    >>> threadData.lastErrorPage = None
     """
 
     xmlfile = paths.ERRORS_XML

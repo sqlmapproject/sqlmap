@@ -192,6 +192,15 @@ def smokeTest():
 
     dirtyPatchRandom()
 
+    content = open(paths.ERRORS_XML, "r").read()
+    for regex in re.findall(r'<error regexp="(.+?)"/>', content):
+        try:
+            re.compile(regex)
+        except re.error:
+            errMsg = "smoke test failed at compiling '%s'" % regex
+            logger.error(errMsg)
+            return False
+
     retVal = True
     count, length = 0, 0
 
