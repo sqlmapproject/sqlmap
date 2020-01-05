@@ -2602,7 +2602,7 @@ def _basicOptionValidation():
         errMsg = "value for option '--union-char' must be an alpha-numeric value (e.g. 1)"
         raise SqlmapSyntaxException(errMsg)
 
-    if conf.hashFile and any((conf.direct, conf.url, conf.logFile, conf.bulkFile, conf.googleDork, conf.configFile, conf.requestFile, conf.updateAll, conf.smokeTest, conf.liveTest, conf.wizard, conf.dependencies, conf.purge, conf.listTampers)):
+    if conf.hashFile and any((conf.direct, conf.url, conf.logFile, conf.bulkFile, conf.googleDork, conf.configFile, conf.requestFile, conf.updateAll, conf.smokeTest, conf.wizard, conf.dependencies, conf.purge, conf.listTampers)):
         errMsg = "option '--crack' should be used as a standalone"
         raise SqlmapSyntaxException(errMsg)
 
@@ -2669,7 +2669,7 @@ def init():
 
     parseTargetDirect()
 
-    if any((conf.url, conf.logFile, conf.bulkFile, conf.requestFile, conf.googleDork, conf.liveTest)):
+    if any((conf.url, conf.logFile, conf.bulkFile, conf.requestFile, conf.googleDork)):
         _setHostname()
         _setHTTPTimeout()
         _setHTTPExtraHeaders()

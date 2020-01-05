@@ -569,13 +569,6 @@ class Metasploit(object):
                         errMsg += "to open a remote session"
                         raise SqlmapGenericException(errMsg)
 
-                if conf.liveTest and timeout:
-                    if initialized:
-                        send_all(proc, "exit\n")
-                        time.sleep(2)
-                    else:
-                        proc.kill()
-
             except select.error as ex:
                 # Reference: https://github.com/andymccurdy/redis-py/pull/743/commits/2b59b25bb08ea09e98aede1b1f23a270fc085a9f
                 if ex.args[0] == errno.EINTR:
