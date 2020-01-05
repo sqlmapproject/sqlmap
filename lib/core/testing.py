@@ -22,14 +22,11 @@ import threading
 import time
 import traceback
 
-from extra.beep.beep import beep
 from extra.vulnserver import vulnserver
 from lib.controller.controller import start
 from lib.core.common import clearColors
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
-from lib.core.common import randomStr
-from lib.core.common import readXmlFile
 from lib.core.common import shellExec
 from lib.core.compat import round
 from lib.core.compat import xrange
@@ -42,11 +39,9 @@ from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.enums import MKSTEMP_PREFIX
 from lib.core.exception import SqlmapBaseException
-from lib.core.exception import SqlmapNotVulnerableException
 from lib.core.log import LOGGER_HANDLER
 from lib.core.option import init
 from lib.core.option import initOptions
-from lib.core.option import setVerbosity
 from lib.core.optiondict import optDict
 from lib.core.settings import UNICODE_ENCODING
 from lib.parse.cmdline import cmdLineParser
