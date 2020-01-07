@@ -1759,6 +1759,13 @@ def _cleanupOptions():
         conf.binaryFields = conf.binaryFields.replace(" ", "")
         conf.binaryFields = re.split(PARAMETER_SPLITTING_REGEX, conf.binaryFields)
 
+    envProxy = max(os.environ.get(_, "") for _ in ("all_proxy", "ALL_PROXY", "http_proxy", "HTTP_PROXY", "https_proxy", "HTTPS_PROXY"))
+    if re.search(r"\A(https?|socks[45])://.+:\d+\Z", envProxy) and conf.proxy is None:
+        debugMsg = "using environment proxy '%s'" % envProxy
+        logger.debug(debugMsg)
+
+        conf.proxy = envProxy
+
     if any((conf.proxy, conf.proxyFile, conf.tor)):
         conf.disablePrecon = True
 

@@ -18,7 +18,7 @@ from lib.core.enums import OS
 from thirdparty.six import unichr as _unichr
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.4.1.10"
+VERSION = "1.4.1.11"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -485,6 +485,9 @@ GOOGLE_ANALYTICS_COOKIE_PREFIX = "__UTM"
 
 # Prefix for configuration overriding environment variables
 SQLMAP_ENVIRONMENT_PREFIX = "SQLMAP_"
+
+# General OS environment variables that can be used for setting proxy address
+PROXY_ENVIRONMENT_VARIABLES = ("all_proxy", "ALL_PROXY", "http_proxy", "HTTP_PROXY", "https_proxy", "HTTPS_PROXY")
 
 # Turn off resume console info to avoid potential slowdowns
 TURN_OFF_RESUME_INFO_LIMIT = 20
