@@ -1139,7 +1139,7 @@ def _setSafeVisit():
                 conf.safeUrl = "http://%s" % conf.safeUrl
 
     if (conf.safeFreq or 0) <= 0:
-        errMsg = "please provide a valid value (>0) for safe frequency (--safe-freq) while using safe visit features"
+        errMsg = "please provide a valid value (>0) for safe frequency ('--safe-freq') while using safe visit features"
         raise SqlmapSyntaxException(errMsg)
 
 def _setPrefixSuffix():

@@ -60,8 +60,8 @@ def vulnTest():
     """
 
     TESTS = (
-        (u"-u <url> --flush-session --sql-query=\"SELECT '\u0161u\u0107uraj'\" --technique=U", (u": '\u0161u\u0107uraj'",)),
-        (u"-u <url> --flush-session --sql-query=\"SELECT '\u0161u\u0107uraj'\" --technique=B --no-escape", (u": '\u0161u\u0107uraj'",)),
+        (u"-c <config> --flush-session --sql-query=\"SELECT '\u0161u\u0107uraj'\" --technique=U", (u": '\u0161u\u0107uraj'",)),
+        (u"-u <url> --flush-session --sql-query=\"SELECT '\u0161u\u0107uraj'\" --technique=B --no-escape --string=luther", (u": '\u0161u\u0107uraj'",)),
         ("--list-tampers", ("between", "MySQL", "xforwardedfor")),
         ("-r <request> --flush-session -v 5", ("CloudFlare", "possible DBMS: 'SQLite'", "User-agent: foobar")),
         ("-l <log> --flush-session --keep-alive --skip-waf -v 5 --technique=U --union-from=users --banner --parse-errors", ("banner: '3.", "ORDER BY term out of range", "~xp_cmdshell", "Connection: keep-alive")),
@@ -76,7 +76,7 @@ def vulnTest():
         ("-u <url> --flush-session --null-connection --technique=B --tamper=between,randomcase --banner", ("NULL connection is supported with HEAD method", "banner: '3.")),
         ("-u <url> --flush-session --parse-errors --test-filter=\"subquery\" --eval=\"import hashlib; id2=2; id3=hashlib.md5(id.encode()).hexdigest()\" --referer=\"localhost\"", ("might be injectable", ": syntax error", "back-end DBMS: SQLite", "WHERE or HAVING clause (subquery")),
         ("-u <url> --banner --schema --dump -T users --binary-fields=surname --where \"id>3\"", ("banner: '3.", "INTEGER", "TEXT", "id", "name", "surname", "2 entries", "6E616D6569736E756C6C")),
-        ("-u <url> --technique=U --fresh-queries --force-partial --dump -T users --answer=\"crack=n\" -v 3", ("performed 6 queries", "nameisnull", "~using default dictionary")),
+        ("-u <url> --technique=U --fresh-queries --force-partial --dump -T users --answers=\"crack=n\" -v 3", ("performed 6 queries", "nameisnull", "~using default dictionary")),
         ("-u <url> --flush-session --all", ("5 entries", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "luther", "blisset", "fluffy", "179ad45c6ce2cb97cf1029e212046e81", "NULL", "nameisnull", "testpass")),
         ("-u <url> -z \"tec=B\" --hex --fresh-queries --threads=4 --sql-query=\"SELECT * FROM users\"", ("SELECT * FROM users [5]", "nameisnull")),
         ("-u '<url>&echo=foobar*' --flush-session", ("might be vulnerable to cross-site scripting",)),
@@ -105,6 +105,9 @@ def vulnTest():
         except:
             time.sleep(1)
 
+    handle, config = tempfile.mkstemp(suffix=".conf")
+    os.close(handle)
+
     handle, database = tempfile.mkstemp(suffix=".sqlite")
     os.close(handle)
 
@@ -126,11 +129,14 @@ def vulnTest():
     url = "http://%s:%d/?id=1" % (address, port)
     direct = "sqlite3://%s" % database
 
+    content = open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.conf"))).read().replace("url =", "url = %s" % url)
+    open(config, "w+").write(content)
+
     for options, checks in TESTS:
         status = '%d/%d (%d%%) ' % (count, len(TESTS), round(100.0 * count / len(TESTS)))
         dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%X"), status))
 
-        cmd = "%s %s %s --batch" % (sys.executable, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py")), options.replace("<url>", url).replace("<direct>", direct).replace("<request>", request).replace("<log>", log))
+        cmd = "%s %s %s --batch" % (sys.executable, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py")), options.replace("<url>", url).replace("<direct>", direct).replace("<request>", request).replace("<log>", log).replace("<config>", config))
         output = shellExec(cmd)
 
         if not all((check in output if not check.startswith('~') else check[1:] not in output) for check in checks):

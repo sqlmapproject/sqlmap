@@ -252,7 +252,7 @@ def cmdLineParser(argv=None):
             help="Load safe HTTP request from a file")
 
         request.add_argument("--safe-freq", dest="safeFreq", type=int,
-            help="Test requests between two visits to a given safe URL")
+            help="Regular requests between visits to a safe URL")
 
         request.add_argument("--skip-urlencode", dest="skipUrlEncode", action="store_true",
             help="Skip URL encoding of payload data")
