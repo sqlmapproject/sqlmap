@@ -173,6 +173,9 @@ def main():
             elif conf.vulnTest:
                 from lib.core.testing import vulnTest
                 os._exitcode = 1 - (vulnTest() or 0)
+            elif conf.fuzzTest:
+                from lib.core.testing import fuzzTest
+                fuzzTest()
             else:
                 from lib.controller.controller import start
                 if conf.profile and six.PY2:

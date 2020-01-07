@@ -7,51 +7,33 @@ See the file 'LICENSE' for copying permission
 
 from __future__ import division
 
-import codecs
 import doctest
 import logging
 import os
 import random
 import re
-import shutil
 import socket
 import sqlite3
 import sys
 import tempfile
 import threading
 import time
-import traceback
 
 from extra.vulnserver import vulnserver
-from lib.controller.controller import start
 from lib.core.common import clearColors
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
+from lib.core.common import randomInt
+from lib.core.common import randomStr
 from lib.core.common import shellExec
 from lib.core.compat import round
 from lib.core.compat import xrange
 from lib.core.convert import encodeBase64
-from lib.core.convert import getUnicode
-from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
-from lib.core.enums import MKSTEMP_PREFIX
-from lib.core.exception import SqlmapBaseException
-from lib.core.log import LOGGER_HANDLER
-from lib.core.option import init
-from lib.core.option import initOptions
-from lib.core.optiondict import optDict
-from lib.core.settings import UNICODE_ENCODING
-from lib.parse.cmdline import cmdLineParser
 
-class Failures(object):
-    failedItems = None
-    failedParseOn = None
-    failedTraceBack = None
-
-_failures = Failures()
 _rand = 0
 
 def vulnTest():
@@ -153,6 +135,63 @@ def vulnTest():
         logger.error("vuln test final result: FAILED")
 
     return retVal
+
+def fuzzTest():
+    count = 0
+    address, port = "127.0.0.10", random.randint(1025, 65535)
+
+    def _thread():
+        vulnserver.init(quiet=True)
+        vulnserver.run(address=address, port=port)
+
+    thread = threading.Thread(target=_thread)
+    thread.daemon = True
+    thread.start()
+
+    while True:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            s.connect((address, port))
+            break
+        except:
+            time.sleep(1)
+
+    handle, config = tempfile.mkstemp(suffix=".conf")
+    os.close(handle)
+
+    url = "http://%s:%d/?id=1" % (address, port)
+
+    content = open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.conf"))).read().replace("url =", "url = %s" % url)
+    open(config, "w+").write(content)
+
+    while True:
+        lines = content.split("\n")
+
+        for i in xrange(20):
+            j = random.randint(0, len(lines) - 1)
+            if lines[j].strip().endswith('='):
+                lines[j] += random.sample(("True", "False", randomStr(), str(randomInt())), 1)[0]
+
+            k = random.randint(0, len(lines) - 1)
+            if '=' in lines[k]:
+                lines[k] += chr(random.randint(0, 255))
+
+        open(config, "w+").write("\n".join(lines))
+
+        cmd = "%s %s -c %s --batch --flush-session --technique=%s --banner" % (sys.executable, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py")), config, random.sample("BEUQ", 1)[0])
+        output = shellExec(cmd)
+
+        if "Traceback" in output:
+            dataToStdout("---\n\n$ %s\n" % cmd)
+            dataToStdout("%s---\n" % clearColors(output))
+        else:
+            handle, config = tempfile.mkstemp(prefix="sqlmapcrash", suffix=".conf")
+            os.close(handle)
+            open(config, "w+").write("\n".join(lines))
+
+            dataToStdout("\r%d\r" % count)
+
+        count += 1
 
 def dirtyPatchRandom():
     """
@@ -272,111 +311,5 @@ def smokeTest():
         logger.info("smoke test final result: PASSED")
     else:
         logger.error("smoke test final result: FAILED")
-
-    return retVal
-
-def adjustValueType(tagName, value):
-    for family in optDict:
-        for name, type_ in optDict[family].items():
-            if type(type_) == tuple:
-                type_ = type_[0]
-            if tagName == name:
-                if type_ == "boolean":
-                    value = (value == "True")
-                elif type_ == "integer":
-                    value = int(value)
-                elif type_ == "float":
-                    value = float(value)
-                break
-    return value
-
-def initCase(switches, count):
-    _failures.failedItems = []
-    _failures.failedParseOn = None
-    _failures.failedTraceBack = None
-
-    paths.SQLMAP_OUTPUT_PATH = tempfile.mkdtemp(prefix="%s%d-" % (MKSTEMP_PREFIX.TESTING, count))
-    paths.SQLMAP_DUMP_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "dump")
-    paths.SQLMAP_FILES_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "files")
-
-    logger.debug("using output directory '%s' for this test case" % paths.SQLMAP_OUTPUT_PATH)
-
-    LOGGER_HANDLER.stream = sys.stdout = tempfile.SpooledTemporaryFile(max_size=0, mode="w+b", prefix="sqlmapstdout-")
-
-    cmdLineOptions = cmdLineParser()
-
-    if switches:
-        for key, value in switches.items():
-            if key in cmdLineOptions.__dict__:
-                cmdLineOptions.__dict__[key] = value
-
-    initOptions(cmdLineOptions, True)
-    init()
-
-def cleanCase():
-    shutil.rmtree(paths.SQLMAP_OUTPUT_PATH, True)
-
-def runCase(parse):
-    retVal = True
-    handled_exception = None
-    unhandled_exception = None
-    result = False
-    console = ""
-
-    try:
-        result = start()
-    except KeyboardInterrupt:
-        pass
-    except SqlmapBaseException as ex:
-        handled_exception = ex
-    except Exception as ex:
-        unhandled_exception = ex
-    finally:
-        sys.stdout.seek(0)
-        console = sys.stdout.read()
-        LOGGER_HANDLER.stream = sys.stdout = sys.__stdout__
-
-    if unhandled_exception:
-        _failures.failedTraceBack = "unhandled exception: %s" % str(traceback.format_exc())
-        retVal = None
-    elif handled_exception:
-        _failures.failedTraceBack = "handled exception: %s" % str(traceback.format_exc())
-        retVal = None
-    elif result is False:  # this means no SQL injection has been detected - if None, ignore
-        retVal = False
-
-    console = getUnicode(console, encoding=sys.stdin.encoding)
-
-    if parse and retVal:
-        with codecs.open(conf.dumper.getOutputFile(), "rb", UNICODE_ENCODING) as f:
-            content = f.read()
-
-        for item, parse_from_console_output in parse:
-            parse_on = console if parse_from_console_output else content
-
-            if item.startswith("r'") and item.endswith("'"):
-                if not re.search(item[2:-1], parse_on, re.DOTALL):
-                    retVal = None
-                    _failures.failedItems.append(item)
-
-            elif item not in parse_on:
-                retVal = None
-                _failures.failedItems.append(item)
-
-        if _failures.failedItems:
-            _failures.failedParseOn = console
-
-    elif retVal is False:
-        _failures.failedParseOn = console
-
-    return retVal
-
-def replaceVars(item, vars_):
-    retVal = item
-
-    if item and vars_:
-        for var in re.findall(r"\$\{([^}]+)\}", item):
-            if var in vars_:
-                retVal = retVal.replace("${%s}" % var, vars_[var])
 
     return retVal

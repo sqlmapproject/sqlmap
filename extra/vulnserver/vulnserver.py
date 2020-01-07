@@ -191,7 +191,7 @@ class ReqHandler(BaseHTTPRequestHandler):
         length = int(self.headers.get("Content-length", 0))
         if length:
             data = self.rfile.read(length)
-            data = unquote_plus(data.decode(UNICODE_ENCODING))
+            data = unquote_plus(data.decode(UNICODE_ENCODING, "ignore"))
             self.data = data
         self.do_REQUEST()
 
