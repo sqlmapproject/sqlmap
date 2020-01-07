@@ -300,7 +300,7 @@ def getUnicode(value, encoding=None, noneToNull=False):
         for candidate in candidates:
             try:
                 return six.text_type(value, candidate)
-            except UnicodeDecodeError:
+            except (UnicodeDecodeError, LookupError):
                 pass
 
         try:
