@@ -184,11 +184,11 @@ def fuzzTest():
         if "Traceback" in output:
             dataToStdout("---\n\n$ %s\n" % cmd)
             dataToStdout("%s---\n" % clearColors(output))
-        else:
+
             handle, config = tempfile.mkstemp(prefix="sqlmapcrash", suffix=".conf")
             os.close(handle)
             open(config, "w+").write("\n".join(lines))
-
+        else:
             dataToStdout("\r%d\r" % count)
 
         count += 1
