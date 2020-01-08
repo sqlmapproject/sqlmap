@@ -169,6 +169,10 @@ def fuzzTest():
 
         for i in xrange(20):
             j = random.randint(0, len(lines) - 1)
+
+            if any(_ in lines[j] for _ in ("googleDork",)):
+                continue
+
             if lines[j].strip().endswith('='):
                 lines[j] += random.sample(("True", "False", randomStr(), str(randomInt())), 1)[0]
 
@@ -178,7 +182,7 @@ def fuzzTest():
 
         open(config, "w+").write("\n".join(lines))
 
-        cmd = "%s %s -c %s --non-interactive --flush-session --technique=%s --banner" % (sys.executable, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py")), config, random.sample("BEUQ", 1)[0])
+        cmd = "%s %s -c %s --non-interactive --answers='Github=n' --flush-session --technique=%s --banner" % (sys.executable, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py")), config, random.sample("BEUQ", 1)[0])
         output = shellExec(cmd)
 
         if "Traceback" in output:
