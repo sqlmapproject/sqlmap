@@ -178,7 +178,7 @@ def fuzzTest():
 
         open(config, "w+").write("\n".join(lines))
 
-        cmd = "%s %s -c %s --batch --flush-session --technique=%s --banner" % (sys.executable, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py")), config, random.sample("BEUQ", 1)[0])
+        cmd = "%s %s -c %s --non-interactive --flush-session --technique=%s --banner" % (sys.executable, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py")), config, random.sample("BEUQ", 1)[0])
         output = shellExec(cmd)
 
         if "Traceback" in output:

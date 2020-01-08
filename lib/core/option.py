@@ -330,8 +330,13 @@ def _setRequestFromFile():
         infoMsg = "parsing second-order HTTP request from '%s'" % conf.secondReq
         logger.info(infoMsg)
 
-        target = next(parseRequestFile(conf.secondReq, False))
-        kb.secondReq = target
+        try:
+            target = next(parseRequestFile(conf.secondReq, False))
+            kb.secondReq = target
+        except StopIteration:
+            errMsg = "specified second-order HTTP request file '%s' " % conf.secondReq
+            errMsg += "does not contain a valid HTTP request"
+            raise SqlmapDataException(errMsg)
 
 def _setCrawler():
     if not conf.crawlDepth:
