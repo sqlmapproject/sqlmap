@@ -121,6 +121,7 @@ from lib.core.settings import MAX_NUMBER_OF_THREADS
 from lib.core.settings import NULL
 from lib.core.settings import PARAMETER_SPLITTING_REGEX
 from lib.core.settings import PRECONNECT_CANDIDATE_TIMEOUT
+from lib.core.settings import PROXY_ENVIRONMENT_VARIABLES
 from lib.core.settings import SOCKET_PRE_CONNECT_QUEUE_SIZE
 from lib.core.settings import SQLMAP_ENVIRONMENT_PREFIX
 from lib.core.settings import SUPPORTED_DBMS
@@ -1764,7 +1765,7 @@ def _cleanupOptions():
         conf.binaryFields = conf.binaryFields.replace(" ", "")
         conf.binaryFields = re.split(PARAMETER_SPLITTING_REGEX, conf.binaryFields)
 
-    envProxy = max(os.environ.get(_, "") for _ in ("all_proxy", "ALL_PROXY", "http_proxy", "HTTP_PROXY", "https_proxy", "HTTPS_PROXY"))
+    envProxy = max(os.environ.get(_, "") for _ in PROXY_ENVIRONMENT_VARIABLES)
     if re.search(r"\A(https?|socks[45])://.+:\d+\Z", envProxy) and conf.proxy is None:
         debugMsg = "using environment proxy '%s'" % envProxy
         logger.debug(debugMsg)
