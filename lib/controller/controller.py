@@ -58,6 +58,7 @@ from lib.core.enums import NOTE
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.exception import SqlmapBaseException
+from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapNotVulnerableException
 from lib.core.exception import SqlmapSilentQuitException
@@ -307,11 +308,20 @@ def start():
                     warnMsg = "[%s] [WARNING] no connection detected" % time.strftime("%X")
                     dataToStdout(warnMsg)
 
-                    while not checkInternet():
-                        dataToStdout('.')
-                        time.sleep(5)
+                    valid = False
+                    for _ in xrange(conf.retries):
+                        if checkInternet():
+                            valid = True
+                            break
+                        else:
+                            dataToStdout('.')
+                            time.sleep(5)
 
-                    dataToStdout("\n")
+                    if not valid:
+                        errMsg = "please check your Internet connection and rerun"
+                        raise SqlmapConnectionException(errMsg)
+                    else:
+                        dataToStdout("\n")
 
             conf.url = targetUrl
             conf.method = targetMethod.upper().strip() if targetMethod else targetMethod

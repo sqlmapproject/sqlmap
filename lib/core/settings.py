@@ -18,7 +18,7 @@ from lib.core.enums import OS
 from thirdparty.six import unichr as _unichr
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.4.1.17"
+VERSION = "1.4.1.18"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -565,10 +565,10 @@ LAST_UPDATE_NAGGING_DAYS = 60
 MIN_ERROR_PARSING_NON_WRITING_RATIO = 0.05
 
 # Generic address for checking the Internet connection while using switch --check-internet
-CHECK_INTERNET_ADDRESS = "https://ipinfo.io/"
+CHECK_INTERNET_ADDRESS = "https://ipinfo.io/json"
 
 # Value to look for in response to CHECK_INTERNET_ADDRESS
-CHECK_INTERNET_VALUE = "IP Address Details"
+CHECK_INTERNET_VALUE = '"ip":'
 
 # Payload used for checking of existence of WAF/IPS (dummier the better)
 IPS_WAF_CHECK_PAYLOAD = "AND 1=1 UNION ALL SELECT 1,NULL,'<script>alert(\"XSS\")</script>',table_name FROM information_schema.tables WHERE 2>1--/**/; EXEC xp_cmdshell('cat ../../../etc/passwd')#"
