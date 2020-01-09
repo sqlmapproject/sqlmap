@@ -227,7 +227,7 @@ def encodeBase64(value, binary=True, encoding=None):
 
     return retVal
 
-def getBytes(value, encoding=UNICODE_ENCODING, errors="strict", unsafe=True):
+def getBytes(value, encoding=None, errors="strict", unsafe=True):
     """
     Returns byte representation of provided Unicode value
 
@@ -237,9 +237,12 @@ def getBytes(value, encoding=UNICODE_ENCODING, errors="strict", unsafe=True):
 
     retVal = value
 
+    if encoding is None:
+        encoding = conf.encoding or UNICODE_ENCODING
+
     try:
         codecs.lookup(encoding)
-    except LookupError:
+    except (LookupError, TypeError):
         encoding = UNICODE_ENCODING
 
     if isinstance(value, six.text_type):

@@ -26,6 +26,6 @@ class Syntax(GenericSyntax):
             if all(_ < 128 for _ in getOrds(value)):
                 return "0x%s" % getUnicode(binascii.hexlify(getBytes(value)))
             else:
-                return "CONVERT(0x%s USING utf8)" % getUnicode(binascii.hexlify(getBytes(value)))
+                return "CONVERT(0x%s USING utf8)" % getUnicode(binascii.hexlify(getBytes(value, "utf8")))
 
         return Syntax._escape(expression, quote, escaper)
