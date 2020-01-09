@@ -29,6 +29,7 @@ from lib.core.settings import VERSION_STRING
 from lib.core.settings import WIKI_PAGE
 from thirdparty.six.moves import queue as _queue
 
+alive = None
 line = ""
 process = None
 queue = None
@@ -186,7 +187,7 @@ def runGui(parser):
 
         center(top)
 
-        while alive:
+        while True:
             line = ""
             try:
                 # line = queue.get_nowait()
@@ -195,6 +196,9 @@ def runGui(parser):
             except _queue.Empty:
                 text.see(_tkinter.END)
                 text.update_idletasks()
+
+                if not alive:
+                    break
 
     menubar = _tkinter.Menu(window)
 
