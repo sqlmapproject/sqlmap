@@ -18,7 +18,7 @@ from lib.core.enums import OS
 from thirdparty.six import unichr as _unichr
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.4.1.18"
+VERSION = "1.4.1.19"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -564,8 +564,8 @@ LAST_UPDATE_NAGGING_DAYS = 60
 # Minimum non-writing chars (e.g. ['"-:/]) ratio in case of parsed error messages
 MIN_ERROR_PARSING_NON_WRITING_RATIO = 0.05
 
-# Generic address for checking the Internet connection while using switch --check-internet
-CHECK_INTERNET_ADDRESS = "https://ipinfo.io/json"
+# Generic address for checking the Internet connection while using switch --check-internet (Note: https version does not work for Python < 2.7.9)
+CHECK_INTERNET_ADDRESS = "http://ipinfo.io/json"
 
 # Value to look for in response to CHECK_INTERNET_ADDRESS
 CHECK_INTERNET_VALUE = '"ip":'
