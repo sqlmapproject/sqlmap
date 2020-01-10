@@ -106,7 +106,7 @@ def _setRequestParams():
         conf.data = ""
 
     if conf.data is not None:
-        conf.method = HTTPMETHOD.POST if not conf.method or conf.method == HTTPMETHOD.GET else conf.method
+        conf.method = conf.method or HTTPMETHOD.POST
 
         def process(match, repl):
             retVal = match.group(0)
@@ -125,7 +125,7 @@ def _setRequestParams():
             return retVal
 
         if kb.processUserMarks is None and kb.customInjectionMark in conf.data:
-            message = "custom injection marker ('%s') found in POST " % kb.customInjectionMark
+            message = "custom injection marker ('%s') found in %s " % (kb.customInjectionMark, conf.method)
             message += "body. Do you want to process it? [Y/n/q] "
             choice = readInput(message, default='Y').upper()
 
@@ -138,7 +138,7 @@ def _setRequestParams():
                     kb.testOnlyCustom = True
 
         if re.search(JSON_RECOGNITION_REGEX, conf.data):
-            message = "JSON data found in %s data. " % conf.method
+            message = "JSON data found in %s body. " % conf.method
             message += "Do you want to process it? [Y/n/q] "
             choice = readInput(message, default='Y').upper()
 
@@ -162,7 +162,7 @@ def _setRequestParams():
                 kb.postHint = POST_HINT.JSON
 
         elif re.search(JSON_LIKE_RECOGNITION_REGEX, conf.data):
-            message = "JSON-like data found in %s data. " % conf.method
+            message = "JSON-like data found in %s body. " % conf.method
             message += "Do you want to process it? [Y/n/q] "
             choice = readInput(message, default='Y').upper()
 
@@ -178,7 +178,7 @@ def _setRequestParams():
                 kb.postHint = POST_HINT.JSON_LIKE
 
         elif re.search(ARRAY_LIKE_RECOGNITION_REGEX, conf.data):
-            message = "Array-like data found in %s data. " % conf.method
+            message = "Array-like data found in %s body. " % conf.method
             message += "Do you want to process it? [Y/n/q] "
             choice = readInput(message, default='Y').upper()
 
@@ -192,7 +192,7 @@ def _setRequestParams():
                 kb.postHint = POST_HINT.ARRAY_LIKE
 
         elif re.search(XML_RECOGNITION_REGEX, conf.data):
-            message = "SOAP/XML data found in %s data. " % conf.method
+            message = "SOAP/XML data found in %s body. " % conf.method
             message += "Do you want to process it? [Y/n/q] "
             choice = readInput(message, default='Y').upper()
 
@@ -207,7 +207,7 @@ def _setRequestParams():
                 kb.postHint = POST_HINT.SOAP if "soap" in conf.data.lower() else POST_HINT.XML
 
         elif re.search(MULTIPART_RECOGNITION_REGEX, conf.data):
-            message = "Multipart-like data found in %s data. " % conf.method
+            message = "Multipart-like data found in %s body. " % conf.method
             message += "Do you want to process it? [Y/n/q] "
             choice = readInput(message, default='Y').upper()
 
