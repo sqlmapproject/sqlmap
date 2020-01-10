@@ -31,7 +31,6 @@ class Enumeration(Custom, Databases, Entries, Search, Users):
         kb.data.banner = None
         kb.data.hostname = ""
         kb.data.processChar = None
-        kb.data.characterSet = None
 
         Custom.__init__(self)
         Databases.__init__(self)

@@ -519,8 +519,6 @@ def checkSqlInjection(place, parameter, value):
                                 except (MemoryError, OverflowError):
                                     pass
 
-                            kb.prevFalsePage = falsePage
-
                             # Perform the test's True request
                             trueResult = Request.queryPage(reqPayload, place, raise404=False)
                             truePage, trueHeaders, trueCode = threadData.lastComparisonPage or "", threadData.lastComparisonHeaders, threadData.lastComparisonCode

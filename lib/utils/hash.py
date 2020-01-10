@@ -248,18 +248,6 @@ def oracle_old_passwd(password, username, uppercase=True):  # prior to version '
 
     return retVal.upper() if uppercase else retVal.lower()
 
-def md4_generic_passwd(password, uppercase=False):
-    """
-    >>> md4_generic_passwd(password='testpass', uppercase=False)
-    '5b4d300688f19c8fd65b8d6ccf98e0ae'
-    """
-
-    password = getBytes(password)
-
-    retVal = hashlib.new("md4", password).hexdigest()
-
-    return retVal.upper() if uppercase else retVal.lower()
-
 def md5_generic_passwd(password, uppercase=False):
     """
     >>> md5_generic_passwd(password='testpass', uppercase=False)

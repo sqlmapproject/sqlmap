@@ -1377,7 +1377,6 @@ def setPaths(rootPath):
     paths.SQLMAP_EXTRAS_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "extra")
     paths.SQLMAP_SETTINGS_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "lib", "core", "settings.py")
     paths.SQLMAP_TAMPER_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "tamper")
-    paths.SQLMAP_WAF_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "waf")
 
     paths.SQLMAP_PROCS_PATH = os.path.join(paths.SQLMAP_DATA_PATH, "procs")
     paths.SQLMAP_SHELL_PATH = os.path.join(paths.SQLMAP_DATA_PATH, "shell")
@@ -2318,16 +2317,6 @@ def readCachedFileContent(filename, mode="rb"):
                     raise SqlmapSystemException(errMsg)
 
     return kb.cache.content[filename]
-
-def readXmlFile(xmlFile):
-    """
-    Reads XML file content and returns its DOM representation
-    """
-
-    checkFile(xmlFile)
-    retVal = minidom.parse(xmlFile).documentElement
-
-    return retVal
 
 def average(values):
     """

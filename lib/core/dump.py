@@ -107,9 +107,6 @@ class Dump(object):
             errMsg = "error occurred while opening log file ('%s')" % getSafeExString(ex)
             raise SqlmapGenericException(errMsg)
 
-    def getOutputFile(self):
-        return self._outputFile
-
     def singleString(self, data, content_type=None):
         self._write(data, content_type=content_type)
 
