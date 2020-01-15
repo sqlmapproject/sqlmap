@@ -238,7 +238,7 @@ def getBytes(value, encoding=None, errors="strict", unsafe=True):
     retVal = value
 
     if encoding is None:
-        encoding = conf.encoding or UNICODE_ENCODING
+        encoding = conf.get("encoding") or UNICODE_ENCODING
 
     try:
         codecs.lookup(encoding)

@@ -29,6 +29,8 @@ from lib.core.convert import decodeBase64
 from lib.core.convert import dejsonize
 from lib.core.convert import encodeBase64
 from lib.core.convert import encodeHex
+from lib.core.convert import getBytes
+from lib.core.convert import getText
 from lib.core.convert import jsonize
 from lib.core.data import conf
 from lib.core.data import kb
@@ -711,17 +713,19 @@ def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=REST
 def _client(url, options=None):
     logger.debug("Calling '%s'" % url)
     try:
-        data = None
-        if options is not None:
-            data = jsonize(options).encode("utf-8")
         headers = {"Content-Type": "application/json"}
+
+        if options is not None:
+            data = getBytes(jsonize(options))
+        else:
+            data = None
 
         if DataStore.username or DataStore.password:
             headers["Authorization"] = "Basic %s" % encodeBase64("%s:%s" % (DataStore.username or "", DataStore.password or ""), binary=False)
 
         req = _urllib.request.Request(url, data, headers)
         response = _urllib.request.urlopen(req)
-        text = response.read().decode("utf-8")
+        text = getText(response.read())
     except:
         if options:
             logger.error("Failed to load and parse %s" % url)
