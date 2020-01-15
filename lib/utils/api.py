@@ -713,7 +713,7 @@ def _client(url, options=None):
     try:
         data = None
         if options is not None:
-            data = jsonize(options)
+            data = jsonize(options).encode("utf-8")
         headers = {"Content-Type": "application/json"}
 
         if DataStore.username or DataStore.password:
@@ -721,7 +721,7 @@ def _client(url, options=None):
 
         req = _urllib.request.Request(url, data, headers)
         response = _urllib.request.urlopen(req)
-        text = response.read()
+        text = response.read().decode("utf-8")
     except:
         if options:
             logger.error("Failed to load and parse %s" % url)
