@@ -169,4 +169,10 @@
     <dbms value="H2">
         <error regexp="org\.h2\.jdbc"/>
     </dbms>
+
+    <!-- MonetDB -->
+    <dbms value="MonetDB">
+        <error regexp="![0-9]{5}![^\n]+(failed|unexpected|error|syntax|expected|violation|exception)"/>
+        <error regexp="\[MonetDB\]\[ODBC Driver"/>
+    </dbms>
 </root>

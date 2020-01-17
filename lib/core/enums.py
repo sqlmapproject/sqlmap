@@ -45,6 +45,7 @@ class DBMS(object):
     HSQLDB = "HSQLDB"
     H2 = "H2"
     INFORMIX = "Informix"
+    MONETDB = "MonetDB"
 
 class DBMS_DIRECTORY_NAME(object):
     ACCESS = "access"
@@ -60,6 +61,7 @@ class DBMS_DIRECTORY_NAME(object):
     HSQLDB = "hsqldb"
     H2 = "h2"
     INFORMIX = "informix"
+    MONETDB = "monetdb"
 
 class CUSTOM_LOGGING(object):
     PAYLOAD = 9

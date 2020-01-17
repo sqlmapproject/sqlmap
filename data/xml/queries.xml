@@ -531,7 +531,7 @@
         </roles>
         <statements/>
         <dump_table>
-            <inband query="SELECT %s FROM %%s"/>
+            <inband query="SELECT %s FROM %s"/>
             <blind query="SELECT MIN(%s) FROM %s WHERE CHR(%s)>'%s'" query2="SELECT MAX(%s) FROM %s WHERE CHR(%s) LIKE '%s'" count="SELECT COUNT(*) FROM %s" count2="SELECT COUNT(*) FROM (SELECT DISTINCT %s FROM %s) AS qq"/>
         </dump_table>
    </dbms>
@@ -875,5 +875,71 @@
         <search_db/>
         <search_table/>
         <search_column/>
+    </dbms>
+
+    <!-- MonetDB -->
+    <dbms value="MonetDB">
+        <cast query="CAST(%s AS VARCHAR(4000))"/>
+        <length query="LENGTH(%s)"/>
+        <isnull query="COALESCE(%s,' ')"/>
+        <delimiter query="||"/>
+        <limit query="LIMIT %d OFFSET %d"/>
+        <limitregexp query="\s+LIMIT\s+([\d]+)\s*OFFSET\s*([\d]+)" query2="\s+LIMIT\s+([\d]+)"/>
+        <limitgroupstart query="1"/>
+        <limitgroupstop query="2"/>
+        <limitstring query=" LIMIT "/>
+        <order query="ORDER BY %s ASC"/>
+        <count query="COUNT(%s)"/>
+        <comment query="--" query2="#"/>
+        <substring query="SUBSTRING((%s),%d,%d)"/>
+        <concatenate query="CONCAT(%s,%s)"/>
+        <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
+        <hex/>
+        <inference query="ASCII(SUBSTRING((%s),%d,1))>%d"/>
+        <banner query="SELECT value FROM environment WHERE name='monet_version'"/>
+        <current_user query="CURRENT_USER"/>
+        <current_db query="SELECT CURRENT_SCHEMA" query2="SELECT value FROM environment WHERE name='gdk_dbname'"/>
+        <hostname/>
+        <table_comment/>
+        <column_comment/>
+        <is_dba query="(SELECT grantor FROM auths WHERE name=CURRENT_USER)=0"/>
+        <check_udf/>
+        <users>
+            <inband query="SELECT name FROM sys.users"/>
+            <!-- NOTE: LIMIT %d OFFSET %d not supported inside subqueries -->
+            <blind query="SELECT name FROM (SELECT name,row_number() over() AS y FROM sys.users)x WHERE x.y-1=%d" count="SELECT COUNT(name) FROM sys.users"/>
+        </users>
+        <passwords/>
+        <privileges/>
+        <roles/>
+        <statements/>
+        <dbs>
+            <inband query="SELECT name FROM schemas"/>
+            <blind query="SELECT name FROM (SELECT name,row_number() over() AS y FROM sys.schemas)x WHERE x.y-1=%d" count="SELECT COUNT(DISTINCT(name)) FROM schemas"/>
+        </dbs>
+        <tables>
+            <inband query="SELECT schemas.name,tables.name FROM tables JOIN schemas ON schema_id=schemas.id WHERE tables.system=false"/>
+            <blind query="SELECT name FROM (SELECT tables.name,row_number() over() AS y FROM tables JOIN schemas ON schema_id=schemas.id WHERE tables.system=false AND schemas.name='%s')x WHERE x.y-1=%d" count="SELECT COUNT(DISTINCT(tables.name)) FROM tables JOIN schemas ON schema_id=schemas.id WHERE tables.system=false AND schemas.name='%s'"/>
+        </tables>
+        <columns>
+            <inband query="SELECT name,type FROM columns WHERE table_id=(SELECT tables.id FROM tables JOIN schemas ON schema_id=schemas.id WHERE tables.name='%s' AND schemas.name='%s' AND tables.id=table_id)" condition="name"/>
+            <blind query="SELECT name FROM (SELECT name,row_number() over() AS y FROM columns WHERE table_id=(SELECT tables.id FROM tables JOIN schemas ON schema_id=schemas.id WHERE tables.name='%s' AND schemas.name='%s'))x WHERE x.y-1=%d" query2="SELECT type FROM columns WHERE name='%s' AND table_id=(SELECT tables.id FROM tables JOIN schemas ON schema_id=schemas.id WHERE tables.name='%s' AND schemas.name='%s')" count="SELECT COUNT(name) FROM columns WHERE table_id=(SELECT tables.id FROM tables JOIN schemas ON schema_id=schemas.id WHERE tables.name='%s' AND schemas.name='%s')" condition="name"/>
+        </columns>
+        <dump_table>
+            <inband query="SELECT %s FROM %s.%s"/>
+            <blind query="SELECT z FROM (SELECT %s AS z,row_number() over() AS y FROM %s.%s)x WHERE x.y-1=%d" count="SELECT COUNT(*) FROM %s.%s"/>
+        </dump_table>
+        <search_db>
+            <inband query="SELECT schemas.name FROM schemas WHERE %s" condition="schemas.name"/>
+            <blind query="SELECT DISTINCT(schemas.name) FROM schemas WHERE %s" count="SELECT COUNT(DISTINCT(schemas.name)) FROM schemas WHERE %s" condition="schemas.name"/>
+        </search_db>
+        <search_table>
+            <inband query="SELECT schemas.name,tables.name FROM tables JOIN schemas ON schema_id=schemas.id WHERE tables.system=false AND %s" condition="tables.name" condition2="schemas.name"/>
+            <blind query="SELECT DISTINCT(schemas.name) FROM tables JOIN schemas ON schema_id=schemas.id WHERE tables.system=false AND %s" query2="SELECT DISTINCT(tables.name) FROM tables JOIN schemas ON schema_id=schemas.id WHERE tables.system=false AND schemas.name='%s'" count="SELECT COUNT(DISTINCT(tables.name)) FROM tables JOIN schemas ON schema_id=schemas.id WHERE tables.system=false AND schemas.name='%s'" count2="SELECT COUNT(DISTINCT(tables.name)) FROM tables JOIN schemas ON schema_id=schemas.id WHERE tables.system=false AND schemas.name='%s'" condition="tables.name" condition2="schemas.name"/>
+        </search_table>
+        <search_column>
+            <inband query="SELECT schemas.name,tables.name FROM tables JOIN schemas ON tables.schema_id=schemas.id JOIN columns ON tables.id=columns.table_id WHERE %s" condition="columns.name" condition2="schemas.name" condition3="tables.name"/>
+            <blind query="SELECT DISTINCT(schemas.name) FROM tables JOIN schemas ON tables.schema_id=schemas.id JOIN columns ON tables.id=columns.table_id WHERE %s" query2="SELECT DISTINCT(tables.name) FROM tables JOIN schemas ON tables.schema_id=schemas.id JOIN columns ON tables.id=columns.table_id WHERE schemas.name='%s'" count="SELECT COUNT(DISTINCT(schemas.name)) FROM tables JOIN schemas ON tables.schema_id=schemas.id JOIN columns ON tables.id=columns.table_id WHERE %s" count2="SELECT COUNT(DISTINCT(tables.name)) FROM tables JOIN schemas ON tables.schema_id=schemas.id JOIN columns ON tables.id=columns.table_id WHERE schemas.name='%s'" condition="columns.name" condition2="schemas.name" condition3="tables.name"/>
+        </search_column>
     </dbms>
 </root>

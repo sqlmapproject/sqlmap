@@ -10,7 +10,7 @@ from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
 class Enumeration(GenericEnumeration):
     def getPasswordHashes(self):
-        warnMsg = "on DB2 it is not possible to list password hashes"
+        warnMsg = "on DB2 it is not possible to enumerate password hashes"
         logger.warn(warnMsg)
 
         return {}

@@ -46,6 +46,8 @@ def checkDependencies():
                 __import__("jpype")
             elif dbmsName == DBMS.INFORMIX:
                 __import__("ibm_db_dbi")
+            elif dbmsName == DBMS.MONETDB:
+                __import__("pymonetdb")
         except:
             warnMsg = "sqlmap requires '%s' third-party library " % data[1]
             warnMsg += "in order to directly connect to the DBMS "

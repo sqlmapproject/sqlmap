@@ -105,10 +105,12 @@ def _goInference(payload, expression, charsetType=None, firstChar=None, lastChar
         if (conf.eta or conf.threads > 1) and Backend.getIdentifiedDbms() and not re.search(r"(COUNT|LTRIM)\(", expression, re.I) and not (timeBasedCompare and not kb.forceThreads):
 
             if field and re.search(r"\ASELECT\s+DISTINCT\((.+?)\)\s+FROM", expression, re.I):
-                expression = "SELECT %s FROM (%s)" % (field, expression)
-
-                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
-                    expression += " AS %s" % randomStr(lowercase=True, seed=hash(expression))
+                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.MONETDB):
+                    alias = randomStr(lowercase=True, seed=hash(expression))
+                    expression = "SELECT %s FROM (%s)" % (field if '.' not in field else re.sub(r".+\.", "%s." % alias, field), expression)  # Note: MonetDB as a prime example
+                    expression += " AS %s" % alias
+                else:
+                    expression = "SELECT %s FROM (%s)" % (field, expression)
 
             if field and conf.hexConvert or conf.binaryFields and field in conf.binaryFields:
                 nulledCastedField = agent.nullAndCastField(field)

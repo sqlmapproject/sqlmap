@@ -415,6 +415,8 @@ class Entries(object):
                                         query = rootQuery.blind.query % (index, agent.preprocessField(tbl, column), tbl)
                                     elif Backend.isDbms(DBMS.INFORMIX):
                                         query = rootQuery.blind.query % (index, agent.preprocessField(tbl, column), conf.db, tbl, sorted(colList, key=len)[0])
+                                    elif Backend.isDbms(DBMS.MONETDB):
+                                        query = rootQuery.blind.query % (agent.preprocessField(tbl, column), conf.db, tbl, index)
 
                                     query = agent.whereQuery(query)
 

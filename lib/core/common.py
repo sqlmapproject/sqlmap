@@ -147,6 +147,7 @@ from lib.core.settings import NETSCAPE_FORMAT_HEADER_COOKIES
 from lib.core.settings import NULL
 from lib.core.settings import PARAMETER_AMP_MARKER
 from lib.core.settings import PARAMETER_SEMICOLON_MARKER
+from lib.core.settings import PARAMETER_PERCENTAGE_MARKER
 from lib.core.settings import PARTIAL_HEX_VALUE_MARKER
 from lib.core.settings import PARTIAL_VALUE_MARKER
 from lib.core.settings import PAYLOAD_DELIMITER
@@ -2021,6 +2022,8 @@ def safeStringFormat(format_, params):
         if retVal.count("%s", start, end) == len(params):
             for param in params:
                 index = retVal.find("%s", start)
+                if isinstance(param, six.string_types):
+                    param = param.replace('%', PARAMETER_PERCENTAGE_MARKER)
                 retVal = retVal[:index] + getUnicode(param) + retVal[index + 2:]
         else:
             if any('%s' in _ for _ in conf.parameters.values()):
@@ -2046,7 +2049,7 @@ def safeStringFormat(format_, params):
                 else:
                     break
 
-    retVal = getText(retVal)
+    retVal = getText(retVal).replace(PARAMETER_PERCENTAGE_MARKER, '%')
 
     return retVal
 
@@ -4067,7 +4070,7 @@ def safeSQLIdentificatorNaming(name, isTable=False):
 
             if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS, DBMS.SQLITE):  # Note: in SQLite double-quotes are treated as string if column/identifier is non-existent (e.g. SELECT "foobar" FROM users)
                 retVal = "`%s`" % retVal
-            elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2, DBMS.HSQLDB, DBMS.H2, DBMS.INFORMIX):
+            elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2, DBMS.HSQLDB, DBMS.H2, DBMS.INFORMIX, DBMS.MONETDB):
                 retVal = "\"%s\"" % retVal
             elif Backend.getIdentifiedDbms() in (DBMS.ORACLE,):
                 retVal = "\"%s\"" % retVal.upper()
@@ -4105,7 +4108,7 @@ def unsafeSQLIdentificatorNaming(name):
     if isinstance(name, six.string_types):
         if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS, DBMS.SQLITE):
             retVal = name.replace("`", "")
-        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2, DBMS.INFORMIX, DBMS.HSQLDB):
+        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2, DBMS.INFORMIX, DBMS.HSQLDB, DBMS.MONETDB):
             retVal = name.replace("\"", "")
         elif Backend.getIdentifiedDbms() in (DBMS.ORACLE,):
             retVal = name.replace("\"", "").upper()

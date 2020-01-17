@@ -26,6 +26,7 @@ from lib.core.common import pushValue
 from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import safeSQLIdentificatorNaming
+from lib.core.common import safeStringFormat
 from lib.core.common import singleTimeLogMessage
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import unArrayizeValue
@@ -580,7 +581,7 @@ class Databases(object):
                     condQueryStr = "%%s%s" % colCondParam
                     condQuery = " AND (%s)" % " OR ".join(condQueryStr % (condition, unsafeSQLIdentificatorNaming(col)) for col in sorted(colList))
 
-                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2):
+                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2, DBMS.MONETDB):
                     query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
                     query += condQuery
 
@@ -722,7 +723,7 @@ class Databases(object):
                     condQueryStr = "%%s%s" % colCondParam
                     condQuery = " AND (%s)" % " OR ".join(condQueryStr % (condition, unsafeSQLIdentificatorNaming(col)) for col in sorted(colList))
 
-                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2):
+                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2, DBMS.MONETDB):
                     query = rootQuery.blind.count % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
                     query += condQuery
 
@@ -797,6 +798,9 @@ class Databases(object):
                         query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
                         query = query.replace(" ORDER BY ", "%s ORDER BY " % condQuery)
                         field = None
+                    elif Backend.isDbms(DBMS.MONETDB):
+                        query = safeStringFormat(rootQuery.blind.query, (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db), index))
+                        field = None
                     elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
                         query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(tbl.upper()), unsafeSQLIdentificatorNaming(conf.db.upper()))
                         query += condQuery
@@ -846,6 +850,8 @@ class Databases(object):
                                 query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(tbl), column)
                             elif Backend.isDbms(DBMS.INFORMIX):
                                 query = rootQuery.blind.query2 % (conf.db, conf.db, conf.db, conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl), column)
+                            elif Backend.isDbms(DBMS.MONETDB):
+                                query = rootQuery.blind.query2 % (column, unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
 
                             colType = unArrayizeValue(inject.getValue(query, union=False, error=False))
                             key = int(colType) if hasattr(colType, "isdigit") and colType.isdigit() else colType

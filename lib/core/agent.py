@@ -648,7 +648,7 @@ class Agent(object):
             elif fieldsNoSelect:
                 concatenatedQuery = "CONCAT('%s',%s,'%s')" % (kb.chars.start, concatenatedQuery, kb.chars.stop)
 
-        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE, DBMS.DB2, DBMS.FIREBIRD, DBMS.HSQLDB, DBMS.H2):
+        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE, DBMS.DB2, DBMS.FIREBIRD, DBMS.HSQLDB, DBMS.H2, DBMS.MONETDB):
             if fieldsExists:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.chars.start, 1)
                 concatenatedQuery += "||'%s'" % kb.chars.stop
@@ -940,6 +940,16 @@ class Agent(object):
         if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE, DBMS.H2):
             limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (num, 1)
             limitedQuery += " %s" % limitStr
+
+        elif Backend.getIdentifiedDbms() in (DBMS.MONETDB,):
+            if query.startswith("SELECT ") and field is not None and field in query:
+                original = query.split("SELECT ", 1)[1].split(" FROM", 1)[0]
+                for part in original.split(','):
+                    if re.search(r"\b%s\b" % re.escape(field), part):
+                        _ = re.sub(r"SELECT.+?FROM", "SELECT %s AS z,row_number() over() AS y FROM" % part, query, 1)
+                        replacement = "SELECT x.z FROM (%s)x WHERE x.y-1=%d" % (_, num)
+                        limitedQuery = replacement
+                        break
 
         elif Backend.isDbms(DBMS.HSQLDB):
             match = re.search(r"ORDER BY [^ ]+", limitedQuery)

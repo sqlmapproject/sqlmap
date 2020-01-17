@@ -17,6 +17,7 @@ from lib.core.settings import H2_ALIASES
 from lib.core.settings import HSQLDB_ALIASES
 from lib.core.settings import INFORMIX_ALIASES
 from lib.core.settings import MAXDB_ALIASES
+from lib.core.settings import MONETDB_ALIASES
 from lib.core.settings import MSSQL_ALIASES
 from lib.core.settings import MYSQL_ALIASES
 from lib.core.settings import NULL
@@ -198,6 +199,7 @@ DBMS_DICT = {
     DBMS.HSQLDB: (HSQLDB_ALIASES, "python jaydebeapi & python-jpype", "https://pypi.python.org/pypi/JayDeBeApi/ & http://jpype.sourceforge.net/", None),
     DBMS.H2: (H2_ALIASES, None, None, None),
     DBMS.INFORMIX: (INFORMIX_ALIASES, "python ibm-db", "https://github.com/ibmdb/python-ibmdb", "ibm_db_sa"),
+    DBMS.MONETDB: (MONETDB_ALIASES, "pymonetdb", "https://github.com/gijzelaerr/pymonetdb", "monetdb"),
 }
 
 FROM_DUMMY_TABLE = {
