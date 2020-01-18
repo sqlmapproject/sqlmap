@@ -174,5 +174,6 @@
     <dbms value="MonetDB">
         <error regexp="![0-9]{5}![^\n]+(failed|unexpected|error|syntax|expected|violation|exception)"/>
         <error regexp="\[MonetDB\]\[ODBC Driver"/>
+        <error regexp="nl\.cwi\.monetdb\.jdbc"/>
     </dbms>
 </root>
