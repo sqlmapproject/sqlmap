@@ -40,7 +40,6 @@ import unicodedata
 from difflib import SequenceMatcher
 from math import sqrt
 from optparse import OptionValueError
-from xml.dom import minidom
 from xml.sax import parse
 from xml.sax import SAXParseException
 

@@ -12,6 +12,7 @@ from lib.core.enums import POST_HINT
 from lib.core.settings import ACCESS_ALIASES
 from lib.core.settings import BLANK
 from lib.core.settings import DB2_ALIASES
+from lib.core.settings import DERBY_ALIASES
 from lib.core.settings import FIREBIRD_ALIASES
 from lib.core.settings import H2_ALIASES
 from lib.core.settings import HSQLDB_ALIASES
@@ -200,6 +201,7 @@ DBMS_DICT = {
     DBMS.H2: (H2_ALIASES, None, None, None),
     DBMS.INFORMIX: (INFORMIX_ALIASES, "python ibm-db", "https://github.com/ibmdb/python-ibmdb", "ibm_db_sa"),
     DBMS.MONETDB: (MONETDB_ALIASES, "pymonetdb", "https://github.com/gijzelaerr/pymonetdb", "monetdb"),
+    DBMS.DERBY: (DERBY_ALIASES, "pydrda", "https://github.com/nakagami/pydrda/", None),
 }
 
 FROM_DUMMY_TABLE = {
@@ -209,7 +211,8 @@ FROM_DUMMY_TABLE = {
     DBMS.MAXDB: " FROM VERSIONS",
     DBMS.DB2: " FROM SYSIBM.SYSDUMMY1",
     DBMS.HSQLDB: " FROM INFORMATION_SCHEMA.SYSTEM_USERS",
-    DBMS.INFORMIX: " FROM SYSMASTER:SYSDUAL"
+    DBMS.INFORMIX: " FROM SYSMASTER:SYSDUAL",
+    DBMS.DERBY: " FROM SYSIBM.SYSDUMMY1"
 }
 
 SQL_STATEMENTS = {

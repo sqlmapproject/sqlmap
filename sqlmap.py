@@ -351,6 +351,11 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
+        elif all(_ in excMsg for _ in ("drda", "to_bytes")):
+            errMsg = "wrong initialization of drda detected (using Python3 syntax)"
+            logger.critical(errMsg)
+            raise SystemExit
+
         elif all(_ in excMsg for _ in ("window = tkinter.Tk()",)):
             errMsg = "there has been a problem in initialization of GUI interface "
             errMsg += "('%s')" % excMsg.strip().split('\n')[-1]

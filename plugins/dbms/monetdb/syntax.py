@@ -5,10 +5,6 @@ Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
-import re
-
-from lib.core.common import isDBMSVersionAtLeast
-from lib.core.common import randomStr
 from lib.core.convert import getOrds
 from plugins.generic.syntax import Syntax as GenericSyntax
 

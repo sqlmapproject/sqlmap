@@ -33,7 +33,6 @@ else:
 import base64
 import binascii
 import gc
-import hashlib
 import os
 import re
 import tempfile

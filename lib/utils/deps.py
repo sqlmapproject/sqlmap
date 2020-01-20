@@ -48,6 +48,8 @@ def checkDependencies():
                 __import__("ibm_db_dbi")
             elif dbmsName == DBMS.MONETDB:
                 __import__("pymonetdb")
+            elif dbmsName == DBMS.DERBY:
+                __import__("drda")
         except:
             warnMsg = "sqlmap requires '%s' third-party library " % data[1]
             warnMsg += "in order to directly connect to the DBMS "

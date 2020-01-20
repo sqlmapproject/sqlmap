@@ -63,7 +63,7 @@ class Search(object):
             values = []
             db = safeSQLIdentificatorNaming(db)
 
-            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB, DBMS.H2):
+            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB, DBMS.H2, DBMS.DERBY):
                 db = db.upper()
 
             infoMsg = "searching database"
@@ -170,7 +170,7 @@ class Search(object):
             values = []
             tbl = safeSQLIdentificatorNaming(tbl, True)
 
-            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.FIREBIRD, DBMS.HSQLDB, DBMS.H2):
+            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.FIREBIRD, DBMS.HSQLDB, DBMS.H2, DBMS.DERBY):
                 tbl = tbl.upper()
                 conf.db = conf.db.upper() if conf.db else conf.db
 
@@ -393,7 +393,7 @@ class Search(object):
             conf.db = origDb
             conf.tbl = origTbl
 
-            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB, DBMS.H2):
+            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB, DBMS.H2, DBMS.DERBY):
                 column = column.upper()
                 conf.db = conf.db.upper() if conf.db else conf.db
                 conf.tbl = conf.tbl.upper() if conf.tbl else conf.tbl

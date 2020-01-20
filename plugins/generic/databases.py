@@ -97,7 +97,7 @@ class Databases(object):
             warnMsg += "names will be fetched from 'mysql' database"
             logger.warn(warnMsg)
 
-        elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.PGSQL):
+        elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.PGSQL, DBMS.DERBY):
             warnMsg = "schema names are going to be used on %s " % Backend.getIdentifiedDbms()
             warnMsg += "for enumeration as the counterpart to database "
             warnMsg += "names on other DBMSes"
@@ -221,7 +221,7 @@ class Databases(object):
         if conf.db == CURRENT_DB:
             conf.db = self.getCurrentDb()
 
-        if conf.db and Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB):
+        if conf.db and Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB, DBMS.DERBY):
             conf.db = conf.db.upper()
 
         if conf.db:
@@ -308,7 +308,7 @@ class Databases(object):
                         if conf.getComments:
                             _ = queries[Backend.getIdentifiedDbms()].table_comment
                             if hasattr(_, "query"):
-                                if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+                                if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY):
                                     query = _.query % (unsafeSQLIdentificatorNaming(db.upper()), unsafeSQLIdentificatorNaming(table.upper()))
                                 else:
                                     query = _.query % (unsafeSQLIdentificatorNaming(db), unsafeSQLIdentificatorNaming(table))
@@ -390,7 +390,7 @@ class Databases(object):
                         if conf.getComments:
                             _ = queries[Backend.getIdentifiedDbms()].table_comment
                             if hasattr(_, "query"):
-                                if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+                                if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY):
                                     query = _.query % (unsafeSQLIdentificatorNaming(db.upper()), unsafeSQLIdentificatorNaming(table.upper()))
                                 else:
                                     query = _.query % (unsafeSQLIdentificatorNaming(db), unsafeSQLIdentificatorNaming(table))
@@ -450,7 +450,7 @@ class Databases(object):
                 raise SqlmapNoneDataException(errMsg)
 
         elif conf.db is not None:
-            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB, DBMS.H2):
+            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB, DBMS.H2, DBMS.DERBY):
                 conf.db = conf.db.upper()
 
             if ',' in conf.db:
@@ -461,7 +461,7 @@ class Databases(object):
         conf.db = safeSQLIdentificatorNaming(conf.db)
 
         if conf.col:
-            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY):
                 conf.col = conf.col.upper()
 
             colList = conf.col.split(',')
@@ -477,7 +477,7 @@ class Databases(object):
         colList = [_ for _ in colList if _]
 
         if conf.tbl:
-            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB, DBMS.H2):
+            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB, DBMS.H2, DBMS.DERBY):
                 conf.tbl = conf.tbl.upper()
 
             tblList = conf.tbl.split(',')
@@ -585,7 +585,7 @@ class Databases(object):
                     query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
                     query += condQuery
 
-                elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+                elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY):
                     query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(tbl.upper()), unsafeSQLIdentificatorNaming(conf.db.upper()))
                     query += condQuery
 
@@ -661,7 +661,7 @@ class Databases(object):
                                 if conf.getComments:
                                     _ = queries[Backend.getIdentifiedDbms()].column_comment
                                     if hasattr(_, "query"):
-                                        if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+                                        if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY):
                                             query = _.query % (unsafeSQLIdentificatorNaming(conf.db.upper()), unsafeSQLIdentificatorNaming(tbl.upper()), unsafeSQLIdentificatorNaming(name.upper()))
                                         else:
                                             query = _.query % (unsafeSQLIdentificatorNaming(conf.db), unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(name))
@@ -727,7 +727,7 @@ class Databases(object):
                     query = rootQuery.blind.count % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
                     query += condQuery
 
-                elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+                elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY):
                     query = rootQuery.blind.count % (unsafeSQLIdentificatorNaming(tbl.upper()), unsafeSQLIdentificatorNaming(conf.db.upper()))
                     query += condQuery
 
@@ -801,7 +801,7 @@ class Databases(object):
                     elif Backend.isDbms(DBMS.MONETDB):
                         query = safeStringFormat(rootQuery.blind.query, (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db), index))
                         field = None
-                    elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+                    elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY):
                         query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(tbl.upper()), unsafeSQLIdentificatorNaming(conf.db.upper()))
                         query += condQuery
                         field = None
@@ -825,7 +825,7 @@ class Databases(object):
                         if conf.getComments:
                             _ = queries[Backend.getIdentifiedDbms()].column_comment
                             if hasattr(_, "query"):
-                                if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+                                if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY):
                                     query = _.query % (unsafeSQLIdentificatorNaming(conf.db.upper()), unsafeSQLIdentificatorNaming(tbl.upper()), unsafeSQLIdentificatorNaming(column.upper()))
                                 else:
                                     query = _.query % (unsafeSQLIdentificatorNaming(conf.db), unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(column))
@@ -842,7 +842,7 @@ class Databases(object):
                         if not onlyColNames:
                             if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2):
                                 query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(tbl), column, unsafeSQLIdentificatorNaming(conf.db))
-                            elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+                            elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY):
                                 query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(tbl.upper()), column, unsafeSQLIdentificatorNaming(conf.db.upper()))
                             elif Backend.isDbms(DBMS.MSSQL):
                                 query = rootQuery.blind.query2 % (conf.db, conf.db, conf.db, conf.db, column, conf.db, conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl).split(".")[-1])

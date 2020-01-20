@@ -10,13 +10,13 @@ from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
 class Enumeration(GenericEnumeration):
     def getPasswordHashes(self):
-        warnMsg = "on DB2 it is not possible to enumerate password hashes"
+        warnMsg = "on IBM DB2 it is not possible to enumerate password hashes"
         logger.warn(warnMsg)
 
         return {}
 
     def getStatements(self):
-        warnMsg = "on DB2 it is not possible to enumerate the SQL statements"
+        warnMsg = "on IBM DB2 it is not possible to enumerate the SQL statements"
         logger.warn(warnMsg)
 
         return []

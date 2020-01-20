@@ -942,4 +942,73 @@
             <blind query="SELECT DISTINCT(schemas.name) FROM tables JOIN schemas ON tables.schema_id=schemas.id JOIN columns ON tables.id=columns.table_id WHERE %s" query2="SELECT DISTINCT(tables.name) FROM tables JOIN schemas ON tables.schema_id=schemas.id JOIN columns ON tables.id=columns.table_id WHERE schemas.name='%s'" count="SELECT COUNT(DISTINCT(schemas.name)) FROM tables JOIN schemas ON tables.schema_id=schemas.id JOIN columns ON tables.id=columns.table_id WHERE %s" count2="SELECT COUNT(DISTINCT(tables.name)) FROM tables JOIN schemas ON tables.schema_id=schemas.id JOIN columns ON tables.id=columns.table_id WHERE schemas.name='%s'" condition="columns.name" condition2="schemas.name" condition3="tables.name"/>
         </search_column>
     </dbms>
+
+    <!-- Apache Derby -->
+    <dbms value="Apache Derby">
+        <!-- NOTE: CHAR(%s) causes 'A truncation error was encountered trying to shrink CHAR' -->
+        <cast query="RTRIM(CAST(%s AS CHAR(254)))"/>
+        <length query="LENGTH(RTRIM(CAST(%s AS CHAR(254))))"/>
+        <isnull query="COALESCE(%s,' ')"/>
+        <delimiter query="||"/>
+        <limit query="{LIMIT %d OFFSET %d}"/>
+        <limitregexp query="{LIMIT\s+([\d]+)\s+OFFSET\s+([\d]+)}"/>
+        <limitgroupstart query="2"/>
+        <limitgroupstop query="1"/>
+        <limitstring/>
+        <order query="ORDER BY %s ASC"/>
+        <count query="COUNT(%s)"/>
+        <!-- NOTE: comment without alphanumeric char in continuation is invalid -->
+        <comment query="--x"/>
+        <substring query="SUBSTR((%s),%d,%d)"/>
+        <concatenate query="%s||%s"/>
+        <!-- NOTE: Apache Derby does not support implicit conversion from int to string -->
+        <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END) FROM SYSIBM.SYSDUMMY1"/>
+        <inference query="SUBSTR((%s),%d,1)>'%c'"/>
+        <banner/>
+        <current_user query="SELECT USER FROM SYSIBM.SYSDUMMY1"/>
+        <current_db query="SELECT CURRENT SCHEMA FROM SYSIBM.SYSDUMMY1"/>
+        <hostname/>
+        <table_comment/>
+        <column_comment/>
+        <!-- NOTE: ERROR 4251D: Only the database owner can perform this operation. -->
+        <is_dba query="(SELECT COUNT(*) FROM SYS.SYSUSERS)>=0"/>
+        <dbs>
+            <inband query="SELECT SCHEMANAME FROM SYS.SYSSCHEMAS"/>
+            <blind query="SELECT SCHEMANAME FROM SYS.SYSSCHEMAS {LIMIT 1 OFFSET %d}" count="SELECT COUNT(SCHEMANAME) FROM SYS.SYSSCHEMAS"/>
+        </dbs>
+        <tables>
+            <inband query="SELECT SCHEMANAME,TABLENAME FROM SYS.SYSTABLES JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID" condition="SCHEMANAME"/>
+            <blind query="SELECT TABLENAME FROM SYS.SYSTABLES JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID WHERE SCHEMANAME='%s' {LIMIT 1 OFFSET %d}" count="SELECT COUNT(TABLENAME) FROM SYS.SYSTABLES JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID WHERE SCHEMANAME='%s'"/>
+        </tables>
+        <columns>
+            <!-- NOTE: COLUMNDATATYPE without CAST() causes problems during enumeration -->
+            <inband query="SELECT COLUMNNAME,RTRIM(CAST(COLUMNDATATYPE AS CHAR(254))) FROM SYS.SYSCOLUMNS JOIN SYS.SYSTABLES ON SYS.SYSCOLUMNS.REFERENCEID=SYS.SYSTABLES.TABLEID JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID WHERE TABLENAME='%s' AND SCHEMANAME='%s'" condition="COLUMNNAME"/>
+            <blind query="SELECT COLUMNNAME FROM SYS.SYSCOLUMNS JOIN SYS.SYSTABLES ON SYS.SYSCOLUMNS.REFERENCEID=SYS.SYSTABLES.TABLEID JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID WHERE TABLENAME='%s' AND SCHEMANAME='%s'" query2="SELECT COLUMNDATATYPE FROM SYS.SYSCOLUMNS JOIN SYS.SYSTABLES ON SYS.SYSCOLUMNS.REFERENCEID=SYS.SYSTABLES.TABLEID JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID WHERE TABLENAME='%s' AND COLUMNNAME='%s' AND SCHEMANAME='%s'" count="SELECT COUNT(COLUMNNAME) FROM SYS.SYSCOLUMNS JOIN SYS.SYSTABLES ON SYS.SYSCOLUMNS.REFERENCEID=SYS.SYSTABLES.TABLEID JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID WHERE TABLENAME='%s' AND SCHEMANAME='%s'" condition="COLUMNNAME"/>
+        </columns>
+        <dump_table>
+            <inband query="SELECT %s FROM %s"/>
+            <blind query="SELECT %s FROM %s {LIMIT 1 OFFSET %d}" count="SELECT COUNT(*) FROM %s"/>
+        </dump_table>
+        <users>
+            <inband query="SELECT USERNAME FROM SYS.SYSUSERS"/>
+            <blind query="SELECT USERNAME FROM SYS.SYSUSERS {LIMIT 1 OFFSET %d}" count="SELECT COUNT(USERNAME) FROM SYS.SYSUSERS"/>
+        </users>
+        <!-- NOTE: No one can view the 'SYSUSERS'.'PASSWORD' column -->
+        <passwords/>
+        <privileges/>
+        <roles/>
+        <statements/>
+        <search_db>
+            <inband query="SELECT SCHEMANAME FROM SYS.SYSSCHEMAS WHERE %s" condition="SCHEMANAME"/>
+            <blind query="SELECT DISTINCT(SCHEMANAME) FROM SYS.SYSSCHEMAS WHERE %s" count="SELECT COUNT(DISTINCT(SCHEMANAME)) FROM SYS.SYSSCHEMAS WHERE %s" condition="SCHEMANAME"/>
+        </search_db>
+        <search_table>
+            <inband query="SELECT SCHEMANAME,TABLENAME FROM SYS.SYSTABLES JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID WHERE %s" condition="TABLENAME" condition2="SCHEMANAME"/>
+            <blind query="SELECT DISTINCT(SCHEMANAME) FROM SYS.SYSTABLES JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID WHERE %s" query2="SELECT DISTINCT(TABLENAME) FROM SYS.SYSTABLES JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID WHERE SCHEMANAME='%s'" count="SELECT COUNT(DISTINCT(SCHEMANAME)) FROM SYS.SYSTABLES JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID WHERE %s" count2="SELECT COUNT(DISTINCT(TABLENAME)) FROM SYS.SYSTABLES JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID WHERE SCHEMANAME='%s'" condition="TABLENAME" condition2="SCHEMANAME"/>
+        </search_table>
+        <search_column>
+            <inband query="SELECT SCHEMANAME,TABLENAME FROM SYS.SYSCOLUMNS JOIN SYS.SYSTABLES ON SYS.SYSCOLUMNS.REFERENCEID=SYS.SYSTABLES.TABLEID JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID WHERE %s" condition="COLUMNNAME" condition2="SCHEMANAME" condition3="TABLENAME"/>
+            <blind query="SELECT DISTINCT(SCHEMANAME) FROM SYS.SYSCOLUMNS JOIN SYS.SYSTABLES ON SYS.SYSCOLUMNS.REFERENCEID=SYS.SYSTABLES.TABLEID JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID WHERE %s" count="SELECT COUNT(DISTINCT(SCHEMANAME)) FROM SYS.SYSCOLUMNS JOIN SYS.SYSTABLES ON SYS.SYSCOLUMNS.REFERENCEID=SYS.SYSTABLES.TABLEID JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID WHERE %s" query2="SELECT DISTINCT(TABLENAME) FROM SYS.SYSCOLUMNS JOIN SYS.SYSTABLES ON SYS.SYSCOLUMNS.REFERENCEID=SYS.SYSTABLES.TABLEID JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID WHERE %s" count2="SELECT COUNT(DISTINCT(TABLENAME)) FROM SYS.SYSCOLUMNS JOIN SYS.SYSTABLES ON SYS.SYSCOLUMNS.REFERENCEID=SYS.SYSTABLES.TABLEID JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID WHERE SCHEMANAME='%s'" condition="COLUMNNAME" condition2="SCHEMANAME" condition3="TABLENAME"/>
+        </search_column>
+   </dbms>
 </root>

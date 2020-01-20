@@ -46,6 +46,7 @@ class DBMS(object):
     H2 = "H2"
     INFORMIX = "Informix"
     MONETDB = "MonetDB"
+    DERBY = "Apache Derby"
 
 class DBMS_DIRECTORY_NAME(object):
     ACCESS = "access"
@@ -62,6 +63,7 @@ class DBMS_DIRECTORY_NAME(object):
     H2 = "h2"
     INFORMIX = "informix"
     MONETDB = "monetdb"
+    DERBY = "derby"
 
 class CUSTOM_LOGGING(object):
     PAYLOAD = 9

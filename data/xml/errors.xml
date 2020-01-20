@@ -176,4 +176,11 @@
         <error regexp="\[MonetDB\]\[ODBC Driver"/>
         <error regexp="nl\.cwi\.monetdb\.jdbc"/>
     </dbms>
+
+    <!-- Apache Derby -->
+    <dbms value="Apache Derby">
+        <error regexp="Syntax error: Encountered"/>
+        <error regexp="org\.apache\.derby"/>
+        <error regexp="ERROR 42X01"/>
+    </dbms>
 </root>

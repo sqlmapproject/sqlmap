@@ -70,7 +70,7 @@ class Entries(object):
             conf.db = self.getCurrentDb()
 
         elif conf.db is not None:
-            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB, DBMS.H2):
+            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB, DBMS.H2, DBMS.DERBY):
                 conf.db = conf.db.upper()
 
             if ',' in conf.db:
@@ -86,7 +86,7 @@ class Entries(object):
         conf.db = safeSQLIdentificatorNaming(conf.db)
 
         if conf.tbl:
-            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB, DBMS.H2):
+            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB, DBMS.H2, DBMS.DERBY):
                 conf.tbl = conf.tbl.upper()
 
             tblList = conf.tbl.split(',')
@@ -176,7 +176,7 @@ class Entries(object):
                     entries = []
                     query = None
 
-                    if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+                    if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY):
                         query = rootQuery.inband.query % (colString, tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())))
                     elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD, DBMS.MAXDB):
                         query = rootQuery.inband.query % (colString, tbl)
@@ -285,7 +285,7 @@ class Entries(object):
                     infoMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                     logger.info(infoMsg)
 
-                    if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+                    if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY):
                         query = rootQuery.blind.count % (tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())))
                     elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD):
                         query = rootQuery.blind.count % tbl
@@ -407,7 +407,7 @@ class Entries(object):
 
                                     if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2):
                                         query = rootQuery.blind.query % (agent.preprocessField(tbl, column), conf.db, conf.tbl, sorted(colList, key=len)[0], index)
-                                    elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+                                    elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY):
                                         query = rootQuery.blind.query % (agent.preprocessField(tbl, column), tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())), index)
                                     elif Backend.isDbms(DBMS.SQLITE):
                                         query = rootQuery.blind.query % (agent.preprocessField(tbl, column), tbl, index)
