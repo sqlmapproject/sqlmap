@@ -17,6 +17,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
+from lib.core.enums import FORK
 from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import OS
 from lib.core.session import setDbms
@@ -176,13 +177,20 @@ class Fingerprint(GenericFingerprint):
             result = inject.checkBooleanExpression("SESSION_USER() LIKE USER()")
 
             if not result:
+                # Note: MemSQL doesn't support SESSION_USER()
+                result = inject.checkBooleanExpression("GEOGRAPHY_AREA(NULL) IS NULL")
+
+                if result:
+                    hashDBWrite(HASHDB_KEYS.DBMS_FORK, FORK.MEMSQL)
+
+            if not result:
                 warnMsg = "the back-end DBMS is not %s" % DBMS.MYSQL
                 logger.warn(warnMsg)
 
                 return False
 
             if hashDBRetrieve(HASHDB_KEYS.DBMS_FORK) is None:
-                hashDBWrite(HASHDB_KEYS.DBMS_FORK, inject.checkBooleanExpression("VERSION() LIKE '%MariaDB%'") and "MariaDB" or "")
+                hashDBWrite(HASHDB_KEYS.DBMS_FORK, inject.checkBooleanExpression("VERSION() LIKE '%MariaDB%'") and FORK.MARIADB or "")
 
             # reading information_schema on some platforms is causing annoying timeout exits
             # Reference: http://bugs.mysql.com/bug.php?id=15855

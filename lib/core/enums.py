@@ -65,6 +65,10 @@ class DBMS_DIRECTORY_NAME(object):
     MONETDB = "monetdb"
     DERBY = "derby"
 
+class FORK(object):
+    MARIADB = "MariaDB"
+    MEMSQL = "MemSQL"
+
 class CUSTOM_LOGGING(object):
     PAYLOAD = 9
     TRAFFIC_OUT = 8

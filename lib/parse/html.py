@@ -52,6 +52,7 @@ class HTMLHandler(ContentHandler):
             if kb.cache.regex[regexp] in self._lower_page and re.search(regexp, self._urldecoded_page, re.I):
                 self.dbms = self._dbms
                 self._markAsErrorPage()
+                kb.forkNote = kb.forkNote or attrs.get("fork")
 
 def htmlParser(page):
     """

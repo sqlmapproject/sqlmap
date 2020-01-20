@@ -7,7 +7,7 @@
         <error regexp="Warning.*?\Wmysqli?_"/>
         <error regexp="MySQLSyntaxErrorException"/>
         <error regexp="valid MySQL result"/>
-        <error regexp="check the manual that (corresponds to|fits) your (MySQL|MariaDB) server version"/>
+        <error regexp="check the manual that (corresponds to|fits) your MySQL server version"/>
         <error regexp="Unknown column '[^ ]+' in 'field list'"/>
         <error regexp="MySqlClient\."/>
         <error regexp="com\.mysql\.jdbc"/>
@@ -15,6 +15,10 @@
         <error regexp="Pdo[./_\\]Mysql"/>
         <error regexp="MySqlException"/>
         <error regexp="SQLSTATE\[\d+\]: Syntax error or access violation"/>
+        <error regexp="check the manual that (corresponds to|fits) your MariaDB server version" fork="MariaDB"/>
+        <error regexp="MemSQL does not support this type of query" fork="MemSQL"/>
+        <error regexp="is not supported by MemSQL" fork="MemSQL"/>
+        <error regexp="unsupported nested scalar subselect" fork="MemSQL"/>
     </dbms>
 
     <!-- PostgreSQL -->

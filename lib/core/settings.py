@@ -18,7 +18,7 @@ from lib.core.enums import OS
 from thirdparty.six import unichr as _unichr
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.4.1.30"
+VERSION = "1.4.1.31"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -262,7 +262,7 @@ MONETDB_SYSTEM_DBS = ("tmp", "json", "profiler")
 DERBY_SYSTEM_DBS = ("NULLID", "SQLJ", "SYS", "SYSCAT", "SYSCS_DIAG", "SYSCS_UTIL", "SYSFUN", "SYSIBM", "SYSPROC", "SYSSTAT")
 
 MSSQL_ALIASES = ("microsoft sql server", "mssqlserver", "mssql", "ms")
-MYSQL_ALIASES = ("mysql", "my", "mariadb", "maria")
+MYSQL_ALIASES = ("mysql", "my") + ("mariadb", "maria", "memsql")
 PGSQL_ALIASES = ("postgresql", "postgres", "pgsql", "psql", "pg")
 ORACLE_ALIASES = ("oracle", "orcl", "ora", "or")
 SQLITE_ALIASES = ("sqlite", "sqlite3")

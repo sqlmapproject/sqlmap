@@ -13,6 +13,7 @@ from lib.core.common import filterNone
 from lib.core.common import getSQLSnippet
 from lib.core.common import getTechnique
 from lib.core.common import getTechniqueData
+from lib.core.common import hashDBRetrieve
 from lib.core.common import isDBMSVersionAtLeast
 from lib.core.common import isNumber
 from lib.core.common import isTechniqueAvailable
@@ -34,6 +35,8 @@ from lib.core.data import queries
 from lib.core.dicts import DUMP_DATA_PREPROCESS
 from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.enums import DBMS
+from lib.core.enums import FORK
+from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import HTTP_HEADER
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
@@ -380,6 +383,11 @@ class Agent(object):
 
             for _ in set(re.findall(r"\[RANDSTR(?:\d+)?\]", payload, re.I)):
                 payload = payload.replace(_, randomStr())
+
+            if hashDBRetrieve(HASHDB_KEYS.DBMS_FORK) == FORK.MEMSQL:
+                payload = re.sub(r"(?i)\bORD\(", "ASCII(", payload)
+                payload = re.sub(r"(?i)\bMID\(", "SUBSTR(", payload)
+                payload = re.sub(r"(?i)\bNCHAR\b", "CHAR", payload)
 
         return payload
 

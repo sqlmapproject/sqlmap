@@ -1919,6 +1919,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.forcePartialUnion = False
     kb.forceThreads = None
     kb.forceWhere = None
+    kb.forkNote = None
     kb.futileUnion = None
     kb.heavilyDynamic = False
     kb.headersFile = None
