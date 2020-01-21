@@ -1011,4 +1011,81 @@
             <blind query="SELECT DISTINCT(SCHEMANAME) FROM SYS.SYSCOLUMNS JOIN SYS.SYSTABLES ON SYS.SYSCOLUMNS.REFERENCEID=SYS.SYSTABLES.TABLEID JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID WHERE %s" count="SELECT COUNT(DISTINCT(SCHEMANAME)) FROM SYS.SYSCOLUMNS JOIN SYS.SYSTABLES ON SYS.SYSCOLUMNS.REFERENCEID=SYS.SYSTABLES.TABLEID JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID WHERE %s" query2="SELECT DISTINCT(TABLENAME) FROM SYS.SYSCOLUMNS JOIN SYS.SYSTABLES ON SYS.SYSCOLUMNS.REFERENCEID=SYS.SYSTABLES.TABLEID JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID WHERE %s" count2="SELECT COUNT(DISTINCT(TABLENAME)) FROM SYS.SYSCOLUMNS JOIN SYS.SYSTABLES ON SYS.SYSCOLUMNS.REFERENCEID=SYS.SYSTABLES.TABLEID JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID WHERE SCHEMANAME='%s'" condition="COLUMNNAME" condition2="SCHEMANAME" condition3="TABLENAME"/>
         </search_column>
    </dbms>
+
+    <!-- Vertica -->
+    <dbms value="Vertica">
+        <cast query="CAST(%s AS CHARACTER(10000))"/>
+        <length query="LENGTH(%s)"/>
+        <isnull query="COALESCE(%s,' ')"/>
+        <delimiter query="||"/>
+        <limit query="OFFSET %d LIMIT %d"/>
+        <limitregexp query="\s+OFFSET\s+([\d]+)\s+LIMIT\s+([\d]+)" query2="\s+LIMIT\s+([\d]+)"/>
+        <limitgroupstart query="1"/>
+        <limitgroupstop query="2"/>
+        <limitstring query=" OFFSET "/>
+        <order query="ORDER BY %s ASC"/>
+        <count query="COUNT(%s)"/>
+        <comment query="--"/>
+        <substring query="SUBSTRING((%s) FROM %d FOR %d)"/>
+        <concatenate query="%s||%s"/>
+        <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
+        <!-- NOTE: requires >=9.1.1 because of 'cannot cast type varchar to varbinary' -->
+        <hex query="TO_HEX((%s)::varbinary)"/>
+        <inference query="ASCII(SUBSTRING((%s)::varchar FROM %d FOR 1))>%d"/>
+        <banner query="VERSION()"/>
+        <current_user query="CURRENT_USER"/>
+        <current_db query="CURRENT_SCHEMA()"/>
+        <hostname query="SELECT MIN(node_name) FROM v_catalog.nodes"/>
+        <table_comment query="SELECT comment FROM v_catalog.comments WHERE object_type='TABLE' AND object_schema='%s' AND object_name='%s'"/>
+        <!-- NOTE: Vertica uses "projection columns" in case of column comments (e.g. testusers_super.surname) -->
+        <column_comment query="SELECT comment FROM v_catalog.comments WHERE object_type='COLUMN' AND object_schema='%s' AND object_name LIKE '%.%s'"/>
+        <is_dba query="(SELECT is_super_user FROM v_catalog.users WHERE user_name=CURRENT_USER OFFSET 0 LIMIT 1)"/>
+        <check_udf query="(SELECT procedure_name='%s' FROM v_catalog.user_procedures WHERE procedure_name='%s' OFFSET 0 LIMIT 1)"/>
+        <users>
+            <inband query="SELECT user_name FROM v_catalog.users"/>
+            <blind query="SELECT user_name FROM v_catalog.users OFFSET %d LIMIT 1" count="SELECT COUNT(user_name) FROM v_catalog.users"/>
+        </users>
+        <passwords>
+            <inband query="SELECT user_name,password FROM v_catalog.passwords" condition="user_name"/>
+            <blind query="SELECT password FROM v_catalog.passwords WHERE user_name='%s' OFFSET %d LIMIT 1" count="SELECT COUNT(password) FROM v_catalog.passwords WHERE user_name='%s'"/>
+        </passwords>
+        <privileges>
+            <inband query="SELECT grantee,privileges_description FROM v_catalog.grants WHERE object_type!='PROCEDURE'" condition="grantee"/>
+            <!-- NOTE: Vertica does not cache DISTINCT queries (must use ORDER BY to have consistent results) -->
+            <blind query="SELECT DISTINCT(privileges_description) FROM v_catalog.grants WHERE grantee='%s' ORDER BY 1 LIMIT 1 OFFSET %d" count="SELECT COUNT(DISTINCT(privileges_description)) FROM grants WHERE grantee='%s'"/>
+        </privileges>
+        <roles/>
+        <statements>
+            <inband query="SELECT current_statement FROM v_monitor.sessions"/>
+            <blind query="SELECT DISTINCT(current_statement) FROM v_monitor.sessions ORDER BY 1 OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(current_statement)) FROM v_monitor.sessions"/>
+        </statements>
+        <dbs>
+            <inband query="SELECT schema_name FROM v_catalog.schemata"/>
+            <blind query="SELECT DISTINCT(schema_name) FROM v_catalog.schemata ORDER BY 1 OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(schema_name)) FROM v_catalog.schemata"/>
+        </dbs>
+        <tables>
+            <inband query="SELECT schema_name,table_name FROM v_catalog.all_tables" condition="schema_name"/>
+            <blind query="SELECT table_name FROM v_catalog.all_tables WHERE schema_name='%s' OFFSET %d LIMIT 1" count="SELECT COUNT(table_name) FROM v_catalog.all_tables WHERE schema_name='%s'"/>
+        </tables>
+        <columns>
+            <inband query="SELECT column_name,data_type FROM v_catalog.columns WHERE table_name='%s' AND table_schema='%s'" condition="column_name"/>
+            <blind query="SELECT column_name FROM v_catalog.columns WHERE table_name='%s' AND table_schema='%s'" query2="SELECT data_type FROM v_catalog.columns WHERE table_name='%s' AND column_name='%s' AND table_schema='%s'" count="SELECT COUNT(column_name) FROM v_catalog.columns WHERE table_name='%s' AND table_schema='%s'" condition="column_name"/>
+        </columns>
+        <dump_table>
+            <inband query="SELECT %s FROM %s.%s ORDER BY %s"/>
+            <blind query="SELECT %s FROM %s.%s ORDER BY %s OFFSET %d LIMIT 1" count="SELECT COUNT(*) FROM %s.%s"/>
+        </dump_table>
+        <search_db>
+            <inband query="SELECT schema_name FROM v_catalog.schemata WHERE %s" condition="schema_name"/>
+            <blind query="SELECT DISTINCT(schema_name) FROM v_catalog.schemata WHERE %s ORDER BY 1" count="SELECT COUNT(DISTINCT(schema_name)) FROM v_catalog.schemata WHERE %s" condition="schema_name"/>
+        </search_db>
+        <search_table>
+            <inband query="SELECT schema_name,table_name FROM v_catalog.all_tables WHERE %s" condition="table_name" condition2="schema_name"/>
+            <blind query="SELECT DISTINCT(schema_name) FROM v_catalog.all_tables WHERE %s ORDER BY 1" query2="SELECT table_name FROM v_catalog.all_tables WHERE schema_name='%s'" count="SELECT COUNT(DISTINCT(schema_name)) FROM v_catalog.all_tables WHERE %s" count2="SELECT COUNT(table_name) FROM v_catalog.all_tables WHERE schema_name='%s'" condition="table_name" condition2="schema_name"/>
+        </search_table>
+        <search_column>
+            <inband query="SELECT table_schema,table_name FROM v_catalog.columns WHERE %s" condition="column_name" condition2="table_schema" condition3="table_name"/>
+            <blind query="SELECT DISTINCT(table_schema) FROM v_catalog.columns WHERE %s ORDER BY 1" query2="SELECT DISTINCT(table_name) FROM v_catalog.columns WHERE table_schema='%s'" count="SELECT COUNT(DISTINCT(table_schema)) FROM v_catalog.columns WHERE %s" count2="SELECT COUNT(DISTINCT(table_name)) FROM v_catalog.columns WHERE table_schema='%s'" condition="column_name" condition2="table_schema" condition3="table_name"/>
+        </search_column>
+    </dbms>
 </root>

@@ -26,6 +26,7 @@ from lib.core.settings import ORACLE_ALIASES
 from lib.core.settings import PGSQL_ALIASES
 from lib.core.settings import SQLITE_ALIASES
 from lib.core.settings import SYBASE_ALIASES
+from lib.core.settings import VERTICA_ALIASES
 
 FIREBIRD_TYPES = {
     261: "BLOB",
@@ -202,6 +203,7 @@ DBMS_DICT = {
     DBMS.INFORMIX: (INFORMIX_ALIASES, "python ibm-db", "https://github.com/ibmdb/python-ibmdb", "ibm_db_sa"),
     DBMS.MONETDB: (MONETDB_ALIASES, "pymonetdb", "https://github.com/gijzelaerr/pymonetdb", "monetdb"),
     DBMS.DERBY: (DERBY_ALIASES, "pydrda", "https://github.com/nakagami/pydrda/", None),
+    DBMS.VERTICA: (VERTICA_ALIASES, "vertica-python", "https://github.com/vertica/vertica-python", "vertica+vertica_python"),
 }
 
 FROM_DUMMY_TABLE = {

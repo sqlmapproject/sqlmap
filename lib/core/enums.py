@@ -47,6 +47,7 @@ class DBMS(object):
     INFORMIX = "Informix"
     MONETDB = "MonetDB"
     DERBY = "Apache Derby"
+    VERTICA = "Vertica"
 
 class DBMS_DIRECTORY_NAME(object):
     ACCESS = "access"
@@ -64,6 +65,7 @@ class DBMS_DIRECTORY_NAME(object):
     INFORMIX = "informix"
     MONETDB = "monetdb"
     DERBY = "derby"
+    VERTICA = "vertica"
 
 class FORK(object):
     MARIADB = "MariaDB"

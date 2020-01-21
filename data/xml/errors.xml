@@ -187,4 +187,13 @@
         <error regexp="org\.apache\.derby"/>
         <error regexp="ERROR 42X01"/>
     </dbms>
+
+    <!-- Vertica -->
+    <dbms value="Vertica">
+        <error regexp=", Sqlstate: (3F|42).{3}, (Routine|Hint|Position):"/>
+        <error regexp="/vertica/Parser/scan"/>
+        <error regexp="com\.vertica\.jdbc"/>
+        <error regexp="org\.jkiss\.dbeaver\.ext\.vertica"/>
+        <error regexp="com\.vertica\.dsi\.dataengine"/>
+    </dbms>
 </root>

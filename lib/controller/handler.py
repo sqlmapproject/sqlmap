@@ -26,6 +26,7 @@ from lib.core.settings import H2_ALIASES
 from lib.core.settings import INFORMIX_ALIASES
 from lib.core.settings import MONETDB_ALIASES
 from lib.core.settings import DERBY_ALIASES
+from lib.core.settings import VERTICA_ALIASES
 from lib.utils.sqlalchemy import SQLAlchemy
 
 from plugins.dbms.mssqlserver import MSSQLServerMap
@@ -58,6 +59,8 @@ from plugins.dbms.monetdb import MonetDBMap
 from plugins.dbms.monetdb.connector import Connector as MonetDBConn
 from plugins.dbms.derby import DerbyMap
 from plugins.dbms.derby.connector import Connector as DerbyConn
+from plugins.dbms.vertica import VerticaMap
+from plugins.dbms.vertica.connector import Connector as VerticaConn
 
 def setHandler():
     """
@@ -81,6 +84,7 @@ def setHandler():
         (DBMS.INFORMIX, INFORMIX_ALIASES, InformixMap, InformixConn),
         (DBMS.MONETDB, MONETDB_ALIASES, MonetDBMap, MonetDBConn),
         (DBMS.DERBY, DERBY_ALIASES, DerbyMap, DerbyConn),
+        (DBMS.VERTICA, VERTICA_ALIASES, VerticaMap, VerticaConn),
     ]
 
     _ = max(_ if (conf.get("dbms") or Backend.getIdentifiedDbms() or kb.heuristicExtendedDbms or "").lower() in _[1] else () for _ in items)

