@@ -96,6 +96,12 @@ class Fingerprint(GenericFingerprint):
         return None
 
     def getFingerprint(self):
+        fork = hashDBRetrieve(HASHDB_KEYS.DBMS_FORK)
+
+        if fork is None:
+            fork = inject.checkBooleanExpression("VERSION() LIKE '%MariaDB%'") and FORK.MARIADB or ""
+            hashDBWrite(HASHDB_KEYS.DBMS_FORK, fork)
+
         value = ""
         wsOsFp = Format.getOs("web server", kb.headersFp)
 
@@ -111,12 +117,10 @@ class Fingerprint(GenericFingerprint):
         value += "back-end DBMS: "
         actVer = Format.getDbms()
 
-        _ = hashDBRetrieve(HASHDB_KEYS.DBMS_FORK)
-        if _:
-            actVer += " (%s fork)" % _
-
         if not conf.extensiveFp:
             value += actVer
+            if fork:
+                value += " (%s fork)" % fork
             return value
 
         comVer = self._commentCheck()
@@ -141,6 +145,9 @@ class Fingerprint(GenericFingerprint):
 
         if htmlErrorFp:
             value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
+
+        if fork:
+            value += "\n%sfork fingerprint: %s" % (blank, fork)
 
         return value
 
@@ -188,9 +195,6 @@ class Fingerprint(GenericFingerprint):
                 logger.warn(warnMsg)
 
                 return False
-
-            if hashDBRetrieve(HASHDB_KEYS.DBMS_FORK) is None:
-                hashDBWrite(HASHDB_KEYS.DBMS_FORK, inject.checkBooleanExpression("VERSION() LIKE '%MariaDB%'") and FORK.MARIADB or "")
 
             # reading information_schema on some platforms is causing annoying timeout exits
             # Reference: http://bugs.mysql.com/bug.php?id=15855

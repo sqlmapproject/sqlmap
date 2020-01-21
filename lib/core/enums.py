@@ -70,6 +70,7 @@ class DBMS_DIRECTORY_NAME(object):
 class FORK(object):
     MARIADB = "MariaDB"
     MEMSQL = "MemSQL"
+    COCKROACHDB = "CockroachDB"
 
 class CUSTOM_LOGGING(object):
     PAYLOAD = 9

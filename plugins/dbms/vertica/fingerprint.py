@@ -11,7 +11,6 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
-from lib.core.enums import OS
 from lib.core.session import setDbms
 from lib.core.settings import VERTICA_ALIASES
 from lib.request import inject
