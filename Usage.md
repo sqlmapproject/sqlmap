@@ -851,6 +851,9 @@ By default sqlmap automatically detects the web application's back-end database 
 * Sybase
 * SAP MaxDB
 * Informix
+* MariaDB
+* MemSQL
+* CockroachDB
 * HSQLDB
 * H2
 * MonetDB
