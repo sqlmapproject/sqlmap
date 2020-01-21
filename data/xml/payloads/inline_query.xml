@@ -74,7 +74,8 @@
         <where>3</where>
         <vector>(SELECT ('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]') FROM DUAL)</vector>
         <request>
-            <payload>(SELECT '[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL)||'[DELIMITER_STOP]' FROM DUAL)</payload>
+            <!-- NOTE: Vertica works too without the TO_NUMBER() -->
+            <payload>(SELECT '[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN TO_NUMBER(1) ELSE TO_NUMBER(0) END) FROM DUAL)||'[DELIMITER_STOP]' FROM DUAL)</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>

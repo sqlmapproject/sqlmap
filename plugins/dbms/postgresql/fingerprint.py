@@ -75,7 +75,8 @@ class Fingerprint(GenericFingerprint):
         infoMsg = "testing %s" % DBMS.PGSQL
         logger.info(infoMsg)
 
-        result = inject.checkBooleanExpression("QUOTE_IDENT(NULL) IS NULL")
+        # NOTE: Vertica works too without the CONVERT_TO()
+        result = inject.checkBooleanExpression("CONVERT_TO('[RANDSTR]', QUOTE_IDENT(NULL)) IS NULL")
 
         if result:
             infoMsg = "confirming %s" % DBMS.PGSQL
