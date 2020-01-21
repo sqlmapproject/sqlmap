@@ -83,10 +83,6 @@ Hence, if you are keen on keeping a closer look at the development you can:
  * Alternatively, you can subscribe to the [RSS feed](http://rss.gmane.org/messages/complete/gmane.comp.security.sqlmap).
  * You can also browse the [posts' archive](http://news.gmane.org/gmane.comp.security.sqlmap) online.
 
-## Will you support other database management systems?
-
-We already support the major and some minor databases. We do have plans to extend support for some of them and support also new ones: Informix and Ingres at some point in time.
-
 ## Can you hack a site for me?
 
 **No**.
