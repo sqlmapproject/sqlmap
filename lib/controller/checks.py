@@ -879,11 +879,11 @@ def heuristicCheckDbms(injection):
     kb.injection = injection
 
     for dbms in getPublicTypeMembers(DBMS, True):
-        randStr1, randStr2 = randomStr(), randomStr()
-        Backend.forceDbms(dbms)
-
         if conf.noEscape and dbms not in FROM_DUMMY_TABLE:
             continue
+
+        randStr1, randStr2 = randomStr(), randomStr()
+        Backend.forceDbms(dbms)
 
         if checkBooleanExpression("(SELECT '%s'%s)=%s%s%s" % (randStr1, FROM_DUMMY_TABLE.get(dbms, ""), SINGLE_QUOTE_MARKER, randStr1, SINGLE_QUOTE_MARKER)):
             if not checkBooleanExpression("(SELECT '%s'%s)=%s%s%s" % (randStr1, FROM_DUMMY_TABLE.get(dbms, ""), SINGLE_QUOTE_MARKER, randStr2, SINGLE_QUOTE_MARKER)):

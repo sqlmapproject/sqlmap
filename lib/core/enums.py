@@ -48,6 +48,7 @@ class DBMS(object):
     MONETDB = "MonetDB"
     DERBY = "Apache Derby"
     VERTICA = "Vertica"
+    MCKOI = "Mckoi"
 
 class DBMS_DIRECTORY_NAME(object):
     ACCESS = "access"
@@ -66,6 +67,7 @@ class DBMS_DIRECTORY_NAME(object):
     MONETDB = "monetdb"
     DERBY = "derby"
     VERTICA = "vertica"
+    MCKOI = "mckoi"
 
 class FORK(object):
     MARIADB = "MariaDB"

@@ -47,6 +47,7 @@ from lib.core.settings import BOUNDED_INJECTION_MARKER
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import GENERIC_SQL_COMMENT
+from lib.core.settings import GENERIC_SQL_COMMENT_MARKER
 from lib.core.settings import INFERENCE_MARKER
 from lib.core.settings import NULL
 from lib.core.settings import PAYLOAD_DELIMITER
@@ -297,8 +298,8 @@ class Agent(object):
             where = getTechniqueData().where if where is None else where
             comment = getTechniqueData().comment if comment is None else comment
 
-        if Backend.getIdentifiedDbms() == DBMS.ACCESS and any((comment or "").startswith(_) for _ in ("--", "[GENERIC_SQL_COMMENT]")):
-            comment = queries[DBMS.ACCESS].comment.query
+        if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI) and any((comment or "").startswith(_) for _ in ("--", GENERIC_SQL_COMMENT_MARKER)):
+            comment = queries[Backend.getIdentifiedDbms()].comment.query
 
         if comment is not None:
             expression += comment
@@ -454,7 +455,7 @@ class Agent(object):
             else:
                 if not (Backend.isDbms(DBMS.SQLITE) and not isDBMSVersionAtLeast('3')):
                     nulledCastedField = rootQuery.cast.query % field
-                if Backend.getIdentifiedDbms() in (DBMS.ACCESS,):
+                if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI):
                     nulledCastedField = rootQuery.isnull.query % (nulledCastedField, nulledCastedField)
                 else:
                     nulledCastedField = rootQuery.isnull.query % nulledCastedField
@@ -656,7 +657,7 @@ class Agent(object):
             elif fieldsNoSelect:
                 concatenatedQuery = "CONCAT('%s',%s,'%s')" % (kb.chars.start, concatenatedQuery, kb.chars.stop)
 
-        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE, DBMS.DB2, DBMS.FIREBIRD, DBMS.HSQLDB, DBMS.H2, DBMS.MONETDB, DBMS.DERBY, DBMS.VERTICA):
+        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE, DBMS.DB2, DBMS.FIREBIRD, DBMS.HSQLDB, DBMS.H2, DBMS.MONETDB, DBMS.DERBY, DBMS.VERTICA, DBMS.MCKOI):
             if fieldsExists:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.chars.start, 1)
                 concatenatedQuery += "||'%s'" % kb.chars.stop
@@ -1058,12 +1059,15 @@ class Agent(object):
     def forgeQueryOutputLength(self, expression):
         lengthQuery = queries[Backend.getIdentifiedDbms()].length.query
         select = re.search(r"\ASELECT\s+", expression, re.I)
+        selectFrom = re.search(r"\ASELECT\s+(.+)\s+FROM\s+(.+)", expression, re.I)
         selectTopExpr = re.search(r"\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", expression, re.I)
         selectMinMaxExpr = re.search(r"\ASELECT\s+(MIN|MAX)\(.+?\)\s+FROM", expression, re.I)
 
         _, _, _, _, _, _, fieldsStr, _ = self.getFields(expression)
 
-        if selectTopExpr or selectMinMaxExpr:
+        if Backend.getIdentifiedDbms() in (DBMS.MCKOI,) and selectFrom:
+            lengthExpr = "SELECT %s FROM %s" % (lengthQuery % selectFrom.group(1), selectFrom.group(2))
+        elif selectTopExpr or selectMinMaxExpr:
             lengthExpr = lengthQuery % ("(%s)" % expression)
         elif select:
             lengthExpr = expression.replace(fieldsStr, lengthQuery % fieldsStr, 1)

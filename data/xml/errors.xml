@@ -196,4 +196,10 @@
         <error regexp="org\.jkiss\.dbeaver\.ext\.vertica"/>
         <error regexp="com\.vertica\.dsi\.dataengine"/>
     </dbms>
+
+    <!-- Mckoi -->
+    <dbms value="Mckoi">
+        <error regexp="com\.mckoi\.JDBCDriver"/>
+        <error regexp="com\.mckoi\.database\.jdbc"/>
+    </dbms>
 </root>

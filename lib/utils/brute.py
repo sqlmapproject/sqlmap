@@ -41,6 +41,7 @@ from lib.core.exception import SqlmapNoneDataException
 from lib.core.settings import BRUTE_COLUMN_EXISTS_TEMPLATE
 from lib.core.settings import BRUTE_TABLE_EXISTS_TEMPLATE
 from lib.core.settings import METADB_SUFFIX
+from lib.core.settings import UPPER_CASE_IDENTIFIERS
 from lib.core.threads import getCurrentThreadData
 from lib.core.threads import runThreads
 from lib.request import inject
@@ -83,7 +84,7 @@ def tableExists(tableFile, regex=None):
 
     pushValue(conf.db)
 
-    if conf.db and Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+    if conf.db and Backend.getIdentifiedDbms() in UPPER_CASE_IDENTIFIERS:
         conf.db = conf.db.upper()
 
     message = "which common tables (wordlist) file do you want to use?\n"
@@ -131,7 +132,11 @@ def tableExists(tableFile, regex=None):
                 else:
                     fullTableName = table
 
-                result = inject.checkBooleanExpression("%s" % safeStringFormat(BRUTE_TABLE_EXISTS_TEMPLATE, (randomInt(1), fullTableName)))
+                if Backend.isDbms(DBMS.MCKOI):
+                    _ = randomInt(1)
+                    result = inject.checkBooleanExpression("%s" % safeStringFormat("%d=(SELECT %d FROM %s)", (_, _, fullTableName)))
+                else:
+                    result = inject.checkBooleanExpression("%s" % safeStringFormat(BRUTE_TABLE_EXISTS_TEMPLATE, (randomInt(1), fullTableName)))
 
                 kb.locks.io.acquire()
 
@@ -197,7 +202,7 @@ def columnExists(columnFile, regex=None):
         errMsg = "missing table parameter"
         raise SqlmapMissingMandatoryOptionException(errMsg)
 
-    if conf.db and Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+    if conf.db and Backend.getIdentifiedDbms() in UPPER_CASE_IDENTIFIERS:
         conf.db = conf.db.upper()
 
     result = inject.checkBooleanExpression(safeStringFormat(BRUTE_COLUMN_EXISTS_TEMPLATE, (randomStr(), randomStr())))
@@ -250,7 +255,10 @@ def columnExists(columnFile, regex=None):
                 kb.locks.count.release()
                 break
 
-            result = inject.checkBooleanExpression(safeStringFormat(BRUTE_COLUMN_EXISTS_TEMPLATE, (column, table)))
+            if Backend.isDbms(DBMS.MCKOI):
+                result = inject.checkBooleanExpression(safeStringFormat("0<(SELECT COUNT(%s) FROM %s)", (column, table)))
+            else:
+                result = inject.checkBooleanExpression(safeStringFormat(BRUTE_COLUMN_EXISTS_TEMPLATE, (column, table)))
 
             kb.locks.io.acquire()
 
@@ -291,6 +299,8 @@ def columnExists(columnFile, regex=None):
                 result = not inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE %s REGEXP '[^0-9]')", (column, table, column)))
             elif Backend.getIdentifiedDbms() in (DBMS.SQLITE,):
                 result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE %s NOT GLOB '*[^0-9]*')", (column, table, column)))
+            elif Backend.getIdentifiedDbms() in (DBMS.MCKOI,):
+                result = inject.checkBooleanExpression("%s" % safeStringFormat("0=(SELECT MAX(%s)-MAX(%s) FROM %s)", (column, column, table)))
             else:
                 result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE ROUND(%s)=ROUND(%s))", (column, table, column, column)))
 

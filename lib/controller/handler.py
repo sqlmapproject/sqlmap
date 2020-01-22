@@ -11,6 +11,7 @@ from lib.core.data import kb
 from lib.core.dicts import DBMS_DICT
 from lib.core.enums import DBMS
 from lib.core.exception import SqlmapConnectionException
+from lib.core.settings import MCKOI_ALIASES
 from lib.core.settings import MSSQL_ALIASES
 from lib.core.settings import MYSQL_ALIASES
 from lib.core.settings import ORACLE_ALIASES
@@ -29,6 +30,8 @@ from lib.core.settings import DERBY_ALIASES
 from lib.core.settings import VERTICA_ALIASES
 from lib.utils.sqlalchemy import SQLAlchemy
 
+from plugins.dbms.mckoi import MckoiMap
+from plugins.dbms.mckoi.connector import Connector as MckoiConn
 from plugins.dbms.mssqlserver import MSSQLServerMap
 from plugins.dbms.mssqlserver.connector import Connector as MSSQLServerConn
 from plugins.dbms.mysql import MySQLMap
@@ -85,6 +88,7 @@ def setHandler():
         (DBMS.MONETDB, MONETDB_ALIASES, MonetDBMap, MonetDBConn),
         (DBMS.DERBY, DERBY_ALIASES, DerbyMap, DerbyConn),
         (DBMS.VERTICA, VERTICA_ALIASES, VerticaMap, VerticaConn),
+        (DBMS.MCKOI, MCKOI_ALIASES, MckoiMap, MckoiConn),
     ]
 
     _ = max(_ if (conf.get("dbms") or Backend.getIdentifiedDbms() or kb.heuristicExtendedDbms or "").lower() in _[1] else () for _ in items)

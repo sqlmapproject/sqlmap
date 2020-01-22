@@ -18,6 +18,7 @@ from lib.core.settings import H2_ALIASES
 from lib.core.settings import HSQLDB_ALIASES
 from lib.core.settings import INFORMIX_ALIASES
 from lib.core.settings import MAXDB_ALIASES
+from lib.core.settings import MCKOI_ALIASES
 from lib.core.settings import MONETDB_ALIASES
 from lib.core.settings import MSSQL_ALIASES
 from lib.core.settings import MYSQL_ALIASES
@@ -204,6 +205,7 @@ DBMS_DICT = {
     DBMS.MONETDB: (MONETDB_ALIASES, "pymonetdb", "https://github.com/gijzelaerr/pymonetdb", "monetdb"),
     DBMS.DERBY: (DERBY_ALIASES, "pydrda", "https://github.com/nakagami/pydrda/", None),
     DBMS.VERTICA: (VERTICA_ALIASES, "vertica-python", "https://github.com/vertica/vertica-python", "vertica+vertica_python"),
+    DBMS.MCKOI: (MCKOI_ALIASES, None, None, None),
 }
 
 FROM_DUMMY_TABLE = {

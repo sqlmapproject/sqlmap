@@ -1088,4 +1088,46 @@
             <blind query="SELECT DISTINCT(table_schema) FROM v_catalog.columns WHERE %s ORDER BY 1" query2="SELECT DISTINCT(table_name) FROM v_catalog.columns WHERE table_schema='%s'" count="SELECT COUNT(DISTINCT(table_schema)) FROM v_catalog.columns WHERE %s" count2="SELECT COUNT(DISTINCT(table_name)) FROM v_catalog.columns WHERE table_schema='%s'" condition="column_name" condition2="table_schema" condition3="table_name"/>
         </search_column>
     </dbms>
+
+    <!-- Mckoi -->
+    <!-- NOTE: DBMS with minimalistic set of (restricted) features -->
+    <dbms value="Mckoi">
+        <cast query="CONCAT('',%s)"/>
+        <length query="LENGTH(%s)"/>
+        <isnull query="IF(%s IS NULL,' ', %s)"/>
+        <delimiter query="||"/>
+        <limit/>
+        <limitregexp/>
+        <limitgroupstart/>
+        <limitgroupstop/>
+        <limitstring/>
+        <order query="ORDER BY %s ASC"/>
+        <count query="COUNT(%s)"/>
+        <comment query=";"/>
+        <substring query="SUBSTRING((%s),%d,%d)"/>
+        <concatenate query="%s||%s"/>
+        <case query="SELECT (IF(%s,1,0))"/>
+        <!-- NOTE: other way around does not work -->
+        <inference query="'%c'&lt;SUBSTRING((%s),%d,1)"/>
+        <banner/>
+        <current_user/>
+        <current_db/>
+        <hostname/>
+        <table_comment/>
+        <column_comment/>
+        <is_dba/>
+        <dbs/>
+        <tables/>
+        <dump_table>
+            <inband query="SELECT %s FROM %s"/>
+            <blind query="SELECT MIN(%s) FROM %s WHERE CONCAT('',%s)>'%s'" query2="SELECT MAX(%s) FROM %s WHERE CONCAT('',%s) LIKE '%s'" count="SELECT COUNT(*) FROM %s" count2="SELECT COUNT(DISTINCT(%s)) FROM %s"/>
+        </dump_table>
+        <users/>
+        <privileges/>
+        <roles/>
+        <statements/>
+        <search_db/>
+        <search_table/>
+        <search_column/>
+   </dbms>
 </root>

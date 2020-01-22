@@ -5,11 +5,24 @@ Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+from lib.core.exception import SqlmapUnsupportedFeatureException
 from plugins.generic.takeover import Takeover as GenericTakeover
 
 class Takeover(GenericTakeover):
-    def __init__(self):
-        self.__basedir = None
-        self.__datadir = None
+    def osCmd(self):
+        errMsg = "on MonetDB it is not possible to execute commands"
+        raise SqlmapUnsupportedFeatureException(errMsg)
 
-        GenericTakeover.__init__(self)
+    def osShell(self):
+        errMsg = "on MonetDB it is not possible to execute commands"
+        raise SqlmapUnsupportedFeatureException(errMsg)
+
+    def osPwn(self):
+        errMsg = "on MonetDB it is not possible to establish an "
+        errMsg += "out-of-band connection"
+        raise SqlmapUnsupportedFeatureException(errMsg)
+
+    def osSmb(self):
+        errMsg = "on MonetDB it is not possible to establish an "
+        errMsg += "out-of-band connection"
+        raise SqlmapUnsupportedFeatureException(errMsg)

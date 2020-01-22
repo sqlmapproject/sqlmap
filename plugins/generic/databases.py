@@ -48,6 +48,7 @@ from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import CURRENT_DB
 from lib.core.settings import REFLECTED_VALUE_MARKER
+from lib.core.settings import UPPER_CASE_IDENTIFIERS
 from lib.core.settings import VERTICA_DEFAULT_SCHEMA
 from lib.request import inject
 from lib.techniques.union.use import unionUse
@@ -208,7 +209,10 @@ class Databases(object):
                 logger.error(errMsg)
                 bruteForce = True
 
-            elif Backend.isDbms(DBMS.ACCESS):
+            elif Backend.getIdentifiedDbms() in (DBMS.MCKOI,):
+                bruteForce = True
+
+            elif Backend.getIdentifiedDbms() in (DBMS.ACCESS,):
                 try:
                     tables = self.getTables(False)
                 except SqlmapNoneDataException:
@@ -216,7 +220,7 @@ class Databases(object):
 
                 if not tables:
                     errMsg = "cannot retrieve table names, "
-                    errMsg += "back-end DBMS is Access"
+                    errMsg += "back-end DBMS is %s" % Backend.getIdentifiedDbms()
                     logger.error(errMsg)
                     bruteForce = True
                 else:
@@ -225,7 +229,7 @@ class Databases(object):
         if conf.db == CURRENT_DB:
             conf.db = self.getCurrentDb()
 
-        if conf.db and Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB, DBMS.DERBY):
+        if conf.db and Backend.getIdentifiedDbms() in UPPER_CASE_IDENTIFIERS:
             conf.db = conf.db.upper()
 
         if conf.db:
@@ -256,7 +260,7 @@ class Databases(object):
 
                 return kb.data.cachedTables
 
-            message = "do you want to use common table existence check? %s " % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS,) else "[y/N/q]")
+            message = "do you want to use common table existence check? %s " % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI) else "[y/N/q]")
             choice = readInput(message, default='Y' if 'Y' in message else 'N').upper()
 
             if choice == 'N':
@@ -348,7 +352,7 @@ class Databases(object):
                 infoMsg += "database '%s'" % unsafeSQLIdentificatorNaming(db)
                 logger.info(infoMsg)
 
-                if Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD, DBMS.MAXDB, DBMS.ACCESS):
+                if Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD, DBMS.MAXDB, DBMS.ACCESS, DBMS.MCKOI):
                     query = rootQuery.blind.count
                 else:
                     query = rootQuery.blind.count % unsafeSQLIdentificatorNaming(db)
@@ -375,7 +379,7 @@ class Databases(object):
                 for index in indexRange:
                     if Backend.isDbms(DBMS.SYBASE):
                         query = rootQuery.blind.query % (db, (kb.data.cachedTables[-1] if kb.data.cachedTables else " "))
-                    elif Backend.getIdentifiedDbms() in (DBMS.MAXDB, DBMS.ACCESS):
+                    elif Backend.getIdentifiedDbms() in (DBMS.MAXDB, DBMS.ACCESS, DBMS.MCKOI):
                         query = rootQuery.blind.query % (kb.data.cachedTables[-1] if kb.data.cachedTables else " ")
                     elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD):
                         query = rootQuery.blind.query % index
@@ -454,7 +458,7 @@ class Databases(object):
                 raise SqlmapNoneDataException(errMsg)
 
         elif conf.db is not None:
-            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB, DBMS.H2, DBMS.DERBY):
+            if Backend.getIdentifiedDbms() in UPPER_CASE_IDENTIFIERS:
                 conf.db = conf.db.upper()
 
             if ',' in conf.db:
@@ -514,9 +518,9 @@ class Databases(object):
                 logger.error(errMsg)
                 bruteForce = True
 
-            elif Backend.isDbms(DBMS.ACCESS):
+            elif Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI):
                 errMsg = "cannot retrieve column names, "
-                errMsg += "back-end DBMS is %s" % DBMS.ACCESS
+                errMsg += "back-end DBMS is %s" % Backend.getIdentifiedDbms()
                 logger.error(errMsg)
                 bruteForce = True
 
@@ -547,7 +551,7 @@ class Databases(object):
 
                 return kb.data.cachedColumns
 
-            message = "do you want to use common column existence check? %s" % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS,) else "[y/N/q]")
+            message = "do you want to use common column existence check? %s" % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI) else "[y/N/q]")
             choice = readInput(message, default='Y' if 'Y' in message else 'N').upper()
 
             if choice == 'N':
@@ -665,7 +669,7 @@ class Databases(object):
                                 if conf.getComments:
                                     _ = queries[Backend.getIdentifiedDbms()].column_comment
                                     if hasattr(_, "query"):
-                                        if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY):
+                                        if Backend.getIdentifiedDbms() in UPPER_CASE_IDENTIFIERS:
                                             query = _.query % (unsafeSQLIdentificatorNaming(conf.db.upper()), unsafeSQLIdentificatorNaming(tbl.upper()), unsafeSQLIdentificatorNaming(name.upper()))
                                         else:
                                             query = _.query % (unsafeSQLIdentificatorNaming(conf.db), unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(name))
@@ -829,7 +833,7 @@ class Databases(object):
                         if conf.getComments:
                             _ = queries[Backend.getIdentifiedDbms()].column_comment
                             if hasattr(_, "query"):
-                                if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY):
+                                if Backend.getIdentifiedDbms() in UPPER_CASE_IDENTIFIERS:
                                     query = _.query % (unsafeSQLIdentificatorNaming(conf.db.upper()), unsafeSQLIdentificatorNaming(tbl.upper()), unsafeSQLIdentificatorNaming(column.upper()))
                                 else:
                                     query = _.query % (unsafeSQLIdentificatorNaming(conf.db), unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(column))
@@ -935,7 +939,7 @@ class Databases(object):
             db = db.upper()
             table = table.upper()
 
-        if Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD):
+        if Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD, DBMS.MCKOI):
             query = "SELECT %s FROM %s" % (queries[Backend.getIdentifiedDbms()].count.query % '*', safeSQLIdentificatorNaming(table, True))
         else:
             query = "SELECT %s FROM %s.%s" % (queries[Backend.getIdentifiedDbms()].count.query % '*', safeSQLIdentificatorNaming(db), safeSQLIdentificatorNaming(table, True))
@@ -963,7 +967,7 @@ class Databases(object):
             if not conf.db:
                 conf.db, conf.tbl = conf.tbl.split('.', 1)
 
-        if conf.tbl is not None and conf.db is None and Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD):
+        if conf.tbl is not None and conf.db is None and Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD, DBMS.MCKOI):
             warnMsg = "missing database parameter. sqlmap is going to "
             warnMsg += "use the current database to retrieve the "
             warnMsg += "number of entries for table '%s'" % unsafeSQLIdentificatorNaming(conf.tbl)
