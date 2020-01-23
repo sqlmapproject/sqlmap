@@ -19,22 +19,27 @@ class DNSQuery(object):
     """
     >>> DNSQuery(b'|K\\x01 \\x00\\x01\\x00\\x00\\x00\\x00\\x00\\x01\\x03www\\x06google\\x03com\\x00\\x00\\x01\\x00\\x01\\x00\\x00)\\x10\\x00\\x00\\x00\\x00\\x00\\x00\\x0c\\x00\\n\\x00\\x08O4|Np!\\x1d\\xb3')._query == b"www.google.com."
     True
+    >>> DNSQuery(b'\\x00')._query == b""
+    True
     """
 
     def __init__(self, raw):
         self._raw = raw
         self._query = b""
 
-        type_ = (ord(raw[2:3]) >> 3) & 15                   # Opcode bits
+        try:
+            type_ = (ord(raw[2:3]) >> 3) & 15                   # Opcode bits
 
-        if type_ == 0:                                      # Standard query
-            i = 12
-            j = ord(raw[i:i + 1])
-
-            while j != 0:
-                self._query += raw[i + 1:i + j + 1] + b'.'
-                i = i + j + 1
+            if type_ == 0:                                      # Standard query
+                i = 12
                 j = ord(raw[i:i + 1])
+
+                while j != 0:
+                    self._query += raw[i + 1:i + j + 1] + b'.'
+                    i = i + j + 1
+                    j = ord(raw[i:i + 1])
+        except TypeError:
+            pass
 
     def response(self, resolution):
         """
