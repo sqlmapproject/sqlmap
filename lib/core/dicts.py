@@ -208,6 +208,7 @@ DBMS_DICT = {
     DBMS.MCKOI: (MCKOI_ALIASES, None, None, None),
 }
 
+# Reference: https://blog.jooq.org/tag/sysibm-sysdummy1/
 FROM_DUMMY_TABLE = {
     DBMS.ORACLE: " FROM DUAL",
     DBMS.ACCESS: " FROM MSysAccessObjects",
