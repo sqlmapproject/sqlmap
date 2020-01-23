@@ -853,6 +853,7 @@ By default sqlmap automatically detects the web application's back-end database 
 * Informix
 * MariaDB
 * MemSQL
+* TiDB
 * CockroachDB
 * HSQLDB
 * H2
