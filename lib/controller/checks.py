@@ -884,7 +884,7 @@ def heuristicCheckDbms(injection):
 
         Backend.forceDbms(dbms)
 
-        if (randStr1 in unescaper.escape("'%s'" % randStr1)) and FROM_DUMMY_TABLE.values().count(FROM_DUMMY_TABLE.get(dbms, "")) != 1:
+        if (randStr1 in unescaper.escape("'%s'" % randStr1)) and list(FROM_DUMMY_TABLE.values()).count(FROM_DUMMY_TABLE.get(dbms, "")) != 1:
             continue
 
         if checkBooleanExpression("(SELECT '%s'%s)=%s%s%s" % (randStr1, FROM_DUMMY_TABLE.get(dbms, ""), SINGLE_QUOTE_MARKER, randStr1, SINGLE_QUOTE_MARKER)):
