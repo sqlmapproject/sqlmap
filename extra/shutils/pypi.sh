@@ -132,13 +132,13 @@ To get a list of basic options and switches use:
 
 ::
 
-    python sqlmap.py -h
+    sqlmap -h
 
 To get a list of all options and switches use:
 
 ::
 
-    python sqlmap.py -hh
+    sqlmap -hh
 
 You can find a sample run `here <https://asciinema.org/a/46601>`__. To
 get an overview of sqlmap capabilities, list of supported features and
