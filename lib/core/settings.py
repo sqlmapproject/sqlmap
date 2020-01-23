@@ -18,7 +18,7 @@ from lib.core.enums import OS
 from thirdparty.six import unichr as _unichr
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.4.1.36"
+VERSION = "1.4.1.37"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -282,7 +282,7 @@ DERBY_ALIASES = ("derby", "apache derby",)
 VERTICA_ALIASES = ("vertica",)
 MCKOI_ALIASES = ("mckoi",)
 
-UPPER_CASE_IDENTIFIERS = {DBMS.ORACLE, DBMS.DB2, DBMS.FIREBIRD, DBMS.HSQLDB, DBMS.MAXDB, DBMS.H2, DBMS.DERBY}
+UPPER_CASE_IDENTIFIERS = set((DBMS.ORACLE, DBMS.DB2, DBMS.FIREBIRD, DBMS.HSQLDB, DBMS.MAXDB, DBMS.H2, DBMS.DERBY))
 
 DBMS_DIRECTORY_DICT = dict((getattr(DBMS, _), getattr(DBMS_DIRECTORY_NAME, _)) for _ in dir(DBMS) if not _.startswith("_"))
 
