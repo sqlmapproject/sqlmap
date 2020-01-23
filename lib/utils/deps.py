@@ -52,6 +52,8 @@ def checkDependencies():
                 __import__("drda")
             elif dbmsName == DBMS.VERTICA:
                 __import__("vertica_python")
+            elif dbmsName == DBMS.PRESTO:
+                __import__("prestodb")
         except:
             warnMsg = "sqlmap requires '%s' third-party library " % data[1]
             warnMsg += "in order to directly connect to the DBMS "

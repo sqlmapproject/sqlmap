@@ -11,59 +11,62 @@ from lib.core.data import kb
 from lib.core.dicts import DBMS_DICT
 from lib.core.enums import DBMS
 from lib.core.exception import SqlmapConnectionException
+from lib.core.settings import ACCESS_ALIASES
+from lib.core.settings import DB2_ALIASES
+from lib.core.settings import DERBY_ALIASES
+from lib.core.settings import FIREBIRD_ALIASES
+from lib.core.settings import H2_ALIASES
+from lib.core.settings import HSQLDB_ALIASES
+from lib.core.settings import INFORMIX_ALIASES
+from lib.core.settings import MAXDB_ALIASES
 from lib.core.settings import MCKOI_ALIASES
+from lib.core.settings import MONETDB_ALIASES
 from lib.core.settings import MSSQL_ALIASES
 from lib.core.settings import MYSQL_ALIASES
 from lib.core.settings import ORACLE_ALIASES
 from lib.core.settings import PGSQL_ALIASES
+from lib.core.settings import PRESTO_ALIASES
 from lib.core.settings import SQLITE_ALIASES
-from lib.core.settings import ACCESS_ALIASES
-from lib.core.settings import FIREBIRD_ALIASES
-from lib.core.settings import MAXDB_ALIASES
 from lib.core.settings import SYBASE_ALIASES
-from lib.core.settings import DB2_ALIASES
-from lib.core.settings import HSQLDB_ALIASES
-from lib.core.settings import H2_ALIASES
-from lib.core.settings import INFORMIX_ALIASES
-from lib.core.settings import MONETDB_ALIASES
-from lib.core.settings import DERBY_ALIASES
 from lib.core.settings import VERTICA_ALIASES
 from lib.utils.sqlalchemy import SQLAlchemy
 
-from plugins.dbms.mckoi import MckoiMap
-from plugins.dbms.mckoi.connector import Connector as MckoiConn
-from plugins.dbms.mssqlserver import MSSQLServerMap
-from plugins.dbms.mssqlserver.connector import Connector as MSSQLServerConn
-from plugins.dbms.mysql import MySQLMap
-from plugins.dbms.mysql.connector import Connector as MySQLConn
-from plugins.dbms.oracle import OracleMap
-from plugins.dbms.oracle.connector import Connector as OracleConn
-from plugins.dbms.postgresql import PostgreSQLMap
-from plugins.dbms.postgresql.connector import Connector as PostgreSQLConn
-from plugins.dbms.sqlite import SQLiteMap
-from plugins.dbms.sqlite.connector import Connector as SQLiteConn
-from plugins.dbms.access import AccessMap
 from plugins.dbms.access.connector import Connector as AccessConn
-from plugins.dbms.firebird import FirebirdMap
-from plugins.dbms.firebird.connector import Connector as FirebirdConn
-from plugins.dbms.maxdb import MaxDBMap
-from plugins.dbms.maxdb.connector import Connector as MaxDBConn
-from plugins.dbms.sybase import SybaseMap
-from plugins.dbms.sybase.connector import Connector as SybaseConn
-from plugins.dbms.db2 import DB2Map
+from plugins.dbms.access import AccessMap
 from plugins.dbms.db2.connector import Connector as DB2Conn
-from plugins.dbms.hsqldb import HSQLDBMap
-from plugins.dbms.hsqldb.connector import Connector as HSQLDBConn
-from plugins.dbms.h2 import H2Map
-from plugins.dbms.h2.connector import Connector as H2Conn
-from plugins.dbms.informix import InformixMap
-from plugins.dbms.informix.connector import Connector as InformixConn
-from plugins.dbms.monetdb import MonetDBMap
-from plugins.dbms.monetdb.connector import Connector as MonetDBConn
-from plugins.dbms.derby import DerbyMap
+from plugins.dbms.db2 import DB2Map
 from plugins.dbms.derby.connector import Connector as DerbyConn
-from plugins.dbms.vertica import VerticaMap
+from plugins.dbms.derby import DerbyMap
+from plugins.dbms.firebird.connector import Connector as FirebirdConn
+from plugins.dbms.firebird import FirebirdMap
+from plugins.dbms.h2.connector import Connector as H2Conn
+from plugins.dbms.h2 import H2Map
+from plugins.dbms.hsqldb.connector import Connector as HSQLDBConn
+from plugins.dbms.hsqldb import HSQLDBMap
+from plugins.dbms.informix.connector import Connector as InformixConn
+from plugins.dbms.informix import InformixMap
+from plugins.dbms.maxdb.connector import Connector as MaxDBConn
+from plugins.dbms.maxdb import MaxDBMap
+from plugins.dbms.mckoi.connector import Connector as MckoiConn
+from plugins.dbms.mckoi import MckoiMap
+from plugins.dbms.monetdb.connector import Connector as MonetDBConn
+from plugins.dbms.monetdb import MonetDBMap
+from plugins.dbms.mssqlserver.connector import Connector as MSSQLServerConn
+from plugins.dbms.mssqlserver import MSSQLServerMap
+from plugins.dbms.mysql.connector import Connector as MySQLConn
+from plugins.dbms.mysql import MySQLMap
+from plugins.dbms.oracle.connector import Connector as OracleConn
+from plugins.dbms.oracle import OracleMap
+from plugins.dbms.postgresql.connector import Connector as PostgreSQLConn
+from plugins.dbms.postgresql import PostgreSQLMap
+from plugins.dbms.presto.connector import Connector as PrestoConn
+from plugins.dbms.presto import PrestoMap
+from plugins.dbms.sqlite.connector import Connector as SQLiteConn
+from plugins.dbms.sqlite import SQLiteMap
+from plugins.dbms.sybase.connector import Connector as SybaseConn
+from plugins.dbms.sybase import SybaseMap
 from plugins.dbms.vertica.connector import Connector as VerticaConn
+from plugins.dbms.vertica import VerticaMap
 
 def setHandler():
     """
@@ -89,6 +92,7 @@ def setHandler():
         (DBMS.DERBY, DERBY_ALIASES, DerbyMap, DerbyConn),
         (DBMS.VERTICA, VERTICA_ALIASES, VerticaMap, VerticaConn),
         (DBMS.MCKOI, MCKOI_ALIASES, MckoiMap, MckoiConn),
+        (DBMS.PRESTO, PRESTO_ALIASES, PrestoMap, PrestoConn),
     ]
 
     _ = max(_ if (conf.get("dbms") or Backend.getIdentifiedDbms() or kb.heuristicExtendedDbms or "").lower() in _[1] else () for _ in items)

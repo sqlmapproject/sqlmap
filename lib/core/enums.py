@@ -49,6 +49,7 @@ class DBMS(object):
     DERBY = "Apache Derby"
     VERTICA = "Vertica"
     MCKOI = "Mckoi"
+    PRESTO = "Presto"
 
 class DBMS_DIRECTORY_NAME(object):
     ACCESS = "access"
@@ -68,6 +69,7 @@ class DBMS_DIRECTORY_NAME(object):
     DERBY = "derby"
     VERTICA = "vertica"
     MCKOI = "mckoi"
+    PRESTO = "presto"
 
 class FORK(object):
     MARIADB = "MariaDB"

@@ -202,4 +202,12 @@
         <error regexp="com\.mckoi\.JDBCDriver"/>
         <error regexp="com\.mckoi\.database\.jdbc"/>
     </dbms>
+
+    <!-- Presto -->
+    <dbms value="Presto">
+        <error regexp="com\.facebook\.presto\.jdbc"/>
+        <error regexp="io\.prestosql\.jdbc"/>
+        <error regexp="com\.simba\.presto\.jdbc"/>
+        <error regexp="UNION query has different number of fields: \d+, \d+"/>
+    </dbms>
 </root>

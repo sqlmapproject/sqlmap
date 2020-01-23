@@ -25,6 +25,7 @@ from lib.core.settings import MYSQL_ALIASES
 from lib.core.settings import NULL
 from lib.core.settings import ORACLE_ALIASES
 from lib.core.settings import PGSQL_ALIASES
+from lib.core.settings import PRESTO_ALIASES
 from lib.core.settings import SQLITE_ALIASES
 from lib.core.settings import SYBASE_ALIASES
 from lib.core.settings import VERTICA_ALIASES
@@ -206,6 +207,7 @@ DBMS_DICT = {
     DBMS.DERBY: (DERBY_ALIASES, "pydrda", "https://github.com/nakagami/pydrda/", None),
     DBMS.VERTICA: (VERTICA_ALIASES, "vertica-python", "https://github.com/vertica/vertica-python", "vertica+vertica_python"),
     DBMS.MCKOI: (MCKOI_ALIASES, None, None, None),
+    DBMS.PRESTO: (PRESTO_ALIASES, "presto-python-client", "https://github.com/prestodb/presto-python-client", None),
 }
 
 # Reference: https://blog.jooq.org/tag/sysibm-sysdummy1/
