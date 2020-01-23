@@ -385,7 +385,7 @@ class Agent(object):
             for _ in set(re.findall(r"\[RANDSTR(?:\d+)?\]", payload, re.I)):
                 payload = payload.replace(_, randomStr())
 
-            if hashDBRetrieve(HASHDB_KEYS.DBMS_FORK) == FORK.MEMSQL:
+            if hashDBRetrieve(HASHDB_KEYS.DBMS_FORK) in (FORK.MEMSQL, FORK.TIDB):
                 payload = re.sub(r"(?i)\bORD\(", "ASCII(", payload)
                 payload = re.sub(r"(?i)\bMID\(", "SUBSTR(", payload)
                 payload = re.sub(r"(?i)\bNCHAR\b", "CHAR", payload)

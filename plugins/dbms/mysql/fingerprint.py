@@ -99,7 +99,13 @@ class Fingerprint(GenericFingerprint):
         fork = hashDBRetrieve(HASHDB_KEYS.DBMS_FORK)
 
         if fork is None:
-            fork = inject.checkBooleanExpression("VERSION() LIKE '%MariaDB%'") and FORK.MARIADB or ""
+            if inject.checkBooleanExpression("VERSION() LIKE '%MariaDB%'"):
+                fork = FORK.MARIADB
+            elif inject.checkBooleanExpression("VERSION() LIKE '%TiDB%'"):
+                fork = FORK.TIDB
+            else:
+                fork = ""
+
             hashDBWrite(HASHDB_KEYS.DBMS_FORK, fork)
 
         value = ""

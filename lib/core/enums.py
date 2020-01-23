@@ -75,6 +75,7 @@ class FORK(object):
     MARIADB = "MariaDB"
     MEMSQL = "MemSQL"
     COCKROACHDB = "CockroachDB"
+    TIDB = "TiDB"
 
 class CUSTOM_LOGGING(object):
     PAYLOAD = 9
