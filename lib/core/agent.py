@@ -188,8 +188,10 @@ class Agent(object):
             else:
                 newValue = self.addPayloadDelimiters(newValue)
 
-            newValue = newValue.replace(kb.customInjectionMark, REPLACEMENT_MARKER)
-            retVal = paramString.replace(_, newValue)
+            if newValue:
+                newValue = newValue.replace(kb.customInjectionMark, REPLACEMENT_MARKER)
+                retVal = paramString.replace(_, newValue)
+
             retVal = retVal.replace(kb.customInjectionMark, "").replace(REPLACEMENT_MARKER, kb.customInjectionMark)
         elif BOUNDED_INJECTION_MARKER in paramDict[parameter]:
             retVal = paramString.replace("%s%s" % (origValue, BOUNDED_INJECTION_MARKER), self.addPayloadDelimiters(newValue))
