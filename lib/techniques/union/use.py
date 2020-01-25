@@ -261,9 +261,9 @@ def unionUse(expression, unpack=True, dump=False):
                 else:
                     stopLimit = int(count)
 
-                    infoMsg = "used SQL query returns "
-                    infoMsg += "%d %s" % (stopLimit, "entries" if stopLimit > 1 else "entry")
-                    logger.info(infoMsg)
+                    debugMsg = "used SQL query returns "
+                    debugMsg += "%d %s" % (stopLimit, "entries" if stopLimit > 1 else "entry")
+                    logger.debug(debugMsg)
 
             elif count and (not isinstance(count, six.string_types) or not count.isdigit()):
                 warnMsg = "it was not possible to count the number "
