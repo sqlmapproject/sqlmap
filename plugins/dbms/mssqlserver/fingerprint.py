@@ -89,19 +89,21 @@ class Fingerprint(GenericFingerprint):
             logger.info(infoMsg)
 
             for version, check in (
-                ("2000", "HOST_NAME()=HOST_NAME()"),
-                ("2005", "XACT_STATE()=XACT_STATE()"),
-                ("2008", "SYSDATETIME()=SYSDATETIME()"),
-                ("2012", "CONCAT(NULL,NULL)=CONCAT(NULL,NULL)"),
-                ("2014", "CHARINDEX('12.0.2000',@@version)>0"),
-                ("2016", "ISJSON(NULL) IS NULL"),
-                ("2017", "TRIM(NULL) IS NULL"),
+                ("2019", "CHARINDEX('15.0.',@@VERSION)>0"),
                 ("Azure", "@@VERSION LIKE '%Azure%'"),
+                ("2017", "TRIM(NULL) IS NULL"),
+                ("2016", "ISJSON(NULL) IS NULL"),
+                ("2014", "CHARINDEX('12.0.',@@VERSION)>0"),
+                ("2012", "CONCAT(NULL,NULL)=CONCAT(NULL,NULL)"),
+                ("2008", "SYSDATETIME()=SYSDATETIME()"),
+                ("2005", "XACT_STATE()=XACT_STATE()"),
+                ("2000", "HOST_NAME()=HOST_NAME()"),
             ):
                 result = inject.checkBooleanExpression(check)
 
                 if result:
                     Backend.setVersion(version)
+                    break
 
             if Backend.getVersion():
                 setDbms("%s %s" % (DBMS.MSSQL, Backend.getVersion()))
