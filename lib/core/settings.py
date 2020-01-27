@@ -18,7 +18,7 @@ from lib.core.enums import OS
 from thirdparty.six import unichr as _unichr
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.4.1.58"
+VERSION = "1.4.1.59"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -266,9 +266,10 @@ MCKOI_SYSTEM_DBS = ("",)
 PRESTO_SYSTEM_DBS = ("information_schema",)
 ALTIBASE_SYSTEM_DBS = ("SYSTEM_",)
 
+# Note: (<regular>) + (<forks>)
 MSSQL_ALIASES = ("microsoft sql server", "mssqlserver", "mssql", "ms")
-MYSQL_ALIASES = ("mysql", "my") + ("mariadb", "maria", "memsql", "tidb")
-PGSQL_ALIASES = ("postgresql", "postgres", "pgsql", "psql", "pg")
+MYSQL_ALIASES = ("mysql", "my") + ("mariadb", "maria", "memsql", "tidb", "percona")
+PGSQL_ALIASES = ("postgresql", "postgres", "pgsql", "psql", "pg") + ("cockroach", "cockroachdb")
 ORACLE_ALIASES = ("oracle", "orcl", "ora", "or")
 SQLITE_ALIASES = ("sqlite", "sqlite3")
 ACCESS_ALIASES = ("msaccess", "access", "jet", "microsoft access")
