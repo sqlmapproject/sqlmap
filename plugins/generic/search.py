@@ -34,6 +34,7 @@ from lib.core.exception import SqlmapMissingMandatoryOptionException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import CURRENT_DB
 from lib.core.settings import METADB_SUFFIX
+from lib.core.settings import UPPER_CASE_DBMSES
 from lib.request import inject
 from lib.utils.brute import columnExists
 from lib.utils.brute import tableExists
@@ -63,7 +64,7 @@ class Search(object):
             values = []
             db = safeSQLIdentificatorNaming(db)
 
-            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB, DBMS.H2, DBMS.DERBY):
+            if Backend.getIdentifiedDbms() in UPPER_CASE_DBMSES:
                 db = db.upper()
 
             infoMsg = "searching database"
@@ -170,7 +171,7 @@ class Search(object):
             values = []
             tbl = safeSQLIdentificatorNaming(tbl, True)
 
-            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.FIREBIRD, DBMS.HSQLDB, DBMS.H2, DBMS.DERBY):
+            if Backend.getIdentifiedDbms() in UPPER_CASE_DBMSES:
                 tbl = tbl.upper()
                 conf.db = conf.db.upper() if conf.db else conf.db
 
@@ -393,7 +394,7 @@ class Search(object):
             conf.db = origDb
             conf.tbl = origTbl
 
-            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB, DBMS.H2, DBMS.DERBY):
+            if Backend.getIdentifiedDbms() in UPPER_CASE_DBMSES:
                 column = column.upper()
                 conf.db = conf.db.upper() if conf.db else conf.db
                 conf.tbl = conf.tbl.upper() if conf.tbl else conf.tbl
@@ -602,7 +603,7 @@ class Search(object):
             logger.warn(warnMsg)
 
     def search(self):
-        if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+        if Backend.getIdentifiedDbms() in UPPER_CASE_DBMSES:
             for item in ('db', 'tbl', 'col'):
                 if getattr(conf, item, None):
                     setattr(conf, item, getattr(conf, item).upper())

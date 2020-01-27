@@ -210,4 +210,9 @@
         <error regexp="com\.simba\.presto\.jdbc"/>
         <error regexp="UNION query has different number of fields: \d+, \d+"/>
     </dbms>
+
+    <!-- Altibase -->
+    <dbms value="Altibase">
+        <error regexp="Altibase\.jdbc\.driver"/>
+    </dbms>
 </root>

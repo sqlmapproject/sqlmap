@@ -48,7 +48,7 @@ from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import CURRENT_DB
 from lib.core.settings import REFLECTED_VALUE_MARKER
-from lib.core.settings import UPPER_CASE_IDENTIFIERS
+from lib.core.settings import UPPER_CASE_DBMSES
 from lib.core.settings import VERTICA_DEFAULT_SCHEMA
 from lib.request import inject
 from lib.techniques.union.use import unionUse
@@ -87,6 +87,11 @@ class Databases(object):
             warnMsg += "schema names for enumeration as the counterpart to database "
             warnMsg += "names on other DBMSes"
             singleTimeWarnMessage(warnMsg)
+        elif Backend.getIdentifiedDbms() in (DBMS.ALTIBASE,):
+            warnMsg = "on %s you'll need to use " % Backend.getIdentifiedDbms()
+            warnMsg += "user names for enumeration as the counterpart to database "
+            warnMsg += "names on other DBMSes"
+            singleTimeWarnMessage(warnMsg)
 
         return kb.data.currentDb
 
@@ -109,6 +114,14 @@ class Databases(object):
             logger.warn(warnMsg)
 
             infoMsg = "fetching database (schema) names"
+
+        elif Backend.getIdentifiedDbms() in (DBMS.ALTIBASE,):
+            warnMsg = "user names are going to be used on %s " % Backend.getIdentifiedDbms()
+            warnMsg += "for enumeration as the counterpart to database "
+            warnMsg += "names on other DBMSes"
+            logger.warn(warnMsg)
+
+            infoMsg = "fetching database (user) names"
 
         else:
             infoMsg = "fetching database names"
@@ -142,7 +155,7 @@ class Databases(object):
                 errMsg = "unable to retrieve the number of databases"
                 logger.error(errMsg)
             else:
-                plusOne = Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2)
+                plusOne = Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.ALTIBASE)
                 indexRange = getLimitRange(count, plusOne=plusOne)
 
                 for index in indexRange:
@@ -229,7 +242,7 @@ class Databases(object):
         if conf.db == CURRENT_DB:
             conf.db = self.getCurrentDb()
 
-        if conf.db and Backend.getIdentifiedDbms() in UPPER_CASE_IDENTIFIERS:
+        if conf.db and Backend.getIdentifiedDbms() in UPPER_CASE_DBMSES:
             conf.db = conf.db.upper()
 
         if conf.db:
@@ -316,7 +329,7 @@ class Databases(object):
                         if conf.getComments:
                             _ = queries[Backend.getIdentifiedDbms()].table_comment
                             if hasattr(_, "query"):
-                                if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY):
+                                if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE):
                                     query = _.query % (unsafeSQLIdentificatorNaming(db.upper()), unsafeSQLIdentificatorNaming(table.upper()))
                                 else:
                                     query = _.query % (unsafeSQLIdentificatorNaming(db), unsafeSQLIdentificatorNaming(table))
@@ -373,7 +386,7 @@ class Databases(object):
 
                 tables = []
 
-                plusOne = Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2)
+                plusOne = Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.ALTIBASE)
                 indexRange = getLimitRange(count, plusOne=plusOne)
 
                 for index in indexRange:
@@ -398,7 +411,7 @@ class Databases(object):
                         if conf.getComments:
                             _ = queries[Backend.getIdentifiedDbms()].table_comment
                             if hasattr(_, "query"):
-                                if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY):
+                                if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE):
                                     query = _.query % (unsafeSQLIdentificatorNaming(db.upper()), unsafeSQLIdentificatorNaming(table.upper()))
                                 else:
                                     query = _.query % (unsafeSQLIdentificatorNaming(db), unsafeSQLIdentificatorNaming(table))
@@ -458,7 +471,7 @@ class Databases(object):
                 raise SqlmapNoneDataException(errMsg)
 
         elif conf.db is not None:
-            if Backend.getIdentifiedDbms() in UPPER_CASE_IDENTIFIERS:
+            if Backend.getIdentifiedDbms() in UPPER_CASE_DBMSES:
                 conf.db = conf.db.upper()
 
             if ',' in conf.db:
@@ -469,7 +482,7 @@ class Databases(object):
         conf.db = safeSQLIdentificatorNaming(conf.db)
 
         if conf.col:
-            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY):
+            if Backend.getIdentifiedDbms() in UPPER_CASE_DBMSES:
                 conf.col = conf.col.upper()
 
             colList = conf.col.split(',')
@@ -485,7 +498,7 @@ class Databases(object):
         colList = [_ for _ in colList if _]
 
         if conf.tbl:
-            if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.HSQLDB, DBMS.H2, DBMS.DERBY):
+            if Backend.getIdentifiedDbms() in UPPER_CASE_DBMSES:
                 conf.tbl = conf.tbl.upper()
 
             tblList = conf.tbl.split(',')
@@ -593,7 +606,7 @@ class Databases(object):
                     query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
                     query += condQuery
 
-                elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY):
+                elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE):
                     query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(tbl.upper()), unsafeSQLIdentificatorNaming(conf.db.upper()))
                     query += condQuery
 
@@ -669,7 +682,7 @@ class Databases(object):
                                 if conf.getComments:
                                     _ = queries[Backend.getIdentifiedDbms()].column_comment
                                     if hasattr(_, "query"):
-                                        if Backend.getIdentifiedDbms() in UPPER_CASE_IDENTIFIERS:
+                                        if Backend.getIdentifiedDbms() in UPPER_CASE_DBMSES:
                                             query = _.query % (unsafeSQLIdentificatorNaming(conf.db.upper()), unsafeSQLIdentificatorNaming(tbl.upper()), unsafeSQLIdentificatorNaming(name.upper()))
                                         else:
                                             query = _.query % (unsafeSQLIdentificatorNaming(conf.db), unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(name))
@@ -735,7 +748,7 @@ class Databases(object):
                     query = rootQuery.blind.count % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
                     query += condQuery
 
-                elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY):
+                elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE):
                     query = rootQuery.blind.count % (unsafeSQLIdentificatorNaming(tbl.upper()), unsafeSQLIdentificatorNaming(conf.db.upper()))
                     query += condQuery
 
@@ -809,7 +822,7 @@ class Databases(object):
                     elif Backend.isDbms(DBMS.MONETDB):
                         query = safeStringFormat(rootQuery.blind.query, (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db), index))
                         field = None
-                    elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY):
+                    elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE):
                         query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(tbl.upper()), unsafeSQLIdentificatorNaming(conf.db.upper()))
                         query += condQuery
                         field = None
@@ -833,7 +846,7 @@ class Databases(object):
                         if conf.getComments:
                             _ = queries[Backend.getIdentifiedDbms()].column_comment
                             if hasattr(_, "query"):
-                                if Backend.getIdentifiedDbms() in UPPER_CASE_IDENTIFIERS:
+                                if Backend.getIdentifiedDbms() in UPPER_CASE_DBMSES:
                                     query = _.query % (unsafeSQLIdentificatorNaming(conf.db.upper()), unsafeSQLIdentificatorNaming(tbl.upper()), unsafeSQLIdentificatorNaming(column.upper()))
                                 else:
                                     query = _.query % (unsafeSQLIdentificatorNaming(conf.db), unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(column))
@@ -850,7 +863,7 @@ class Databases(object):
                         if not onlyColNames:
                             if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2, DBMS.VERTICA, DBMS.PRESTO):
                                 query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(tbl), column, unsafeSQLIdentificatorNaming(conf.db))
-                            elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY):
+                            elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE):
                                 query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(tbl.upper()), column, unsafeSQLIdentificatorNaming(conf.db.upper()))
                             elif Backend.isDbms(DBMS.MSSQL):
                                 query = rootQuery.blind.query2 % (conf.db, conf.db, conf.db, conf.db, column, conf.db, conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl).split(".")[-1])
@@ -935,7 +948,7 @@ class Databases(object):
         if not db or not table:
             return None
 
-        if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2):
+        if Backend.getIdentifiedDbms() in UPPER_CASE_DBMSES:
             db = db.upper()
             table = table.upper()
 
@@ -1027,7 +1040,7 @@ class Databases(object):
                 errMsg = "unable to retrieve the number of statements"
                 raise SqlmapNoneDataException(errMsg)
 
-            plusOne = Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2)
+            plusOne = Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.ALTIBASE)
             indexRange = getLimitRange(count, plusOne=plusOne)
 
             for index in indexRange:

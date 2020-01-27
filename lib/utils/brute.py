@@ -41,7 +41,7 @@ from lib.core.exception import SqlmapNoneDataException
 from lib.core.settings import BRUTE_COLUMN_EXISTS_TEMPLATE
 from lib.core.settings import BRUTE_TABLE_EXISTS_TEMPLATE
 from lib.core.settings import METADB_SUFFIX
-from lib.core.settings import UPPER_CASE_IDENTIFIERS
+from lib.core.settings import UPPER_CASE_DBMSES
 from lib.core.threads import getCurrentThreadData
 from lib.core.threads import runThreads
 from lib.request import inject
@@ -84,7 +84,7 @@ def tableExists(tableFile, regex=None):
 
     pushValue(conf.db)
 
-    if conf.db and Backend.getIdentifiedDbms() in UPPER_CASE_IDENTIFIERS:
+    if conf.db and Backend.getIdentifiedDbms() in UPPER_CASE_DBMSES:
         conf.db = conf.db.upper()
 
     message = "which common tables (wordlist) file do you want to use?\n"
@@ -202,7 +202,7 @@ def columnExists(columnFile, regex=None):
         errMsg = "missing table parameter"
         raise SqlmapMissingMandatoryOptionException(errMsg)
 
-    if conf.db and Backend.getIdentifiedDbms() in UPPER_CASE_IDENTIFIERS:
+    if conf.db and Backend.getIdentifiedDbms() in UPPER_CASE_DBMSES:
         conf.db = conf.db.upper()
 
     result = inject.checkBooleanExpression(safeStringFormat(BRUTE_COLUMN_EXISTS_TEMPLATE, (randomStr(), randomStr())))

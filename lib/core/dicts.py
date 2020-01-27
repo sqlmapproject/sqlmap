@@ -10,6 +10,7 @@ from lib.core.enums import DBMS
 from lib.core.enums import OS
 from lib.core.enums import POST_HINT
 from lib.core.settings import ACCESS_ALIASES
+from lib.core.settings import ALTIBASE_ALIASES
 from lib.core.settings import BLANK
 from lib.core.settings import DB2_ALIASES
 from lib.core.settings import DERBY_ALIASES
@@ -208,6 +209,7 @@ DBMS_DICT = {
     DBMS.VERTICA: (VERTICA_ALIASES, "vertica-python", "https://github.com/vertica/vertica-python", "vertica+vertica_python"),
     DBMS.MCKOI: (MCKOI_ALIASES, None, None, None),
     DBMS.PRESTO: (PRESTO_ALIASES, "presto-python-client", "https://github.com/prestodb/presto-python-client", None),
+    DBMS.ALTIBASE: (ALTIBASE_ALIASES, None, None, None),
 }
 
 # Reference: https://blog.jooq.org/tag/sysibm-sysdummy1/
@@ -219,7 +221,23 @@ FROM_DUMMY_TABLE = {
     DBMS.DB2: " FROM SYSIBM.SYSDUMMY1",
     DBMS.HSQLDB: " FROM INFORMATION_SCHEMA.SYSTEM_USERS",
     DBMS.INFORMIX: " FROM SYSMASTER:SYSDUAL",
-    DBMS.DERBY: " FROM SYSIBM.SYSDUMMY1"
+    DBMS.DERBY: " FROM SYSIBM.SYSDUMMY1",
+}
+
+HEURISTIC_NULL_EVAL = {
+    DBMS.ACCESS: "CVAR(NULL)",
+    DBMS.MAXDB: "ALPHA(NULL)",
+    DBMS.MSSQL: "DIFFERENCE(NULL,NULL)",
+    DBMS.MYSQL: "QUARTER(NULL)",
+    DBMS.ORACLE: "INSTR2(NULL,NULL)",
+    DBMS.PGSQL: "QUOTE_IDENT(NULL)",
+    DBMS.SQLITE: "UNLIKELY(NULL)",
+    DBMS.MONETDB: "CODE(NULL)",
+    DBMS.DERBY: "NULLIF(USER,SESSION_USER)",
+    DBMS.VERTICA: "BITSTRING_TO_BINARY(NULL)",
+    DBMS.MCKOI: "TONUMBER(NULL)",
+    DBMS.PRESTO: "FROM_HEX(NULL)",
+    DBMS.ALTIBASE: "TDESENCRYPT(NULL,NULL)",
 }
 
 SQL_STATEMENTS = {

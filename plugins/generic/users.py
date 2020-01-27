@@ -128,7 +128,7 @@ class Users(object):
                 errMsg = "unable to retrieve the number of database users"
                 raise SqlmapNoneDataException(errMsg)
 
-            plusOne = Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2)
+            plusOne = Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.ALTIBASE)
             indexRange = getLimitRange(count, plusOne=plusOne)
 
             for index in indexRange:
@@ -293,7 +293,7 @@ class Users(object):
 
                     passwords = []
 
-                    plusOne = Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2)
+                    plusOne = Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.ALTIBASE)
                     indexRange = getLimitRange(count, plusOne=plusOne)
 
                     for index in indexRange:
@@ -541,7 +541,7 @@ class Users(object):
 
                 privileges = set()
 
-                plusOne = Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2)
+                plusOne = Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.ALTIBASE)
                 indexRange = getLimitRange(count, plusOne=plusOne)
 
                 for index in indexRange:
