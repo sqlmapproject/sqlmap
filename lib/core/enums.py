@@ -76,6 +76,7 @@ class DBMS_DIRECTORY_NAME(object):
 class FORK(object):
     MARIADB = "MariaDB"
     MEMSQL = "MemSQL"
+    PERCONA = "Percona"
     COCKROACHDB = "CockroachDB"
     TIDB = "TiDB"
 

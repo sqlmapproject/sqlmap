@@ -92,6 +92,8 @@ class Fingerprint(GenericFingerprint):
                 fork = FORK.MARIADB
             elif inject.checkBooleanExpression("VERSION() LIKE '%TiDB%'"):
                 fork = FORK.TIDB
+            elif inject.checkBooleanExpression("@@VERSION_COMMENT LIKE '%Percona%'"):
+                fork = FORK.PERCONA
             else:
                 fork = ""
 
