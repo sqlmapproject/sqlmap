@@ -26,10 +26,12 @@ from lib.core.common import readInput
 from lib.core.common import shellExec
 from lib.core.common import singleTimeWarnMessage
 from lib.core.convert import stdoutEncode
+from lib.core.data import conf
 from lib.core.option import _setHTTPHandlers
 from lib.core.option import setVerbosity
 from lib.core.settings import IS_WIN
 from lib.request.templates import getPageTemplate
+from thirdparty import six
 from thirdparty.six.moves import http_client as _http_client
 
 def dirtyPatches():
@@ -39,6 +41,17 @@ def dirtyPatches():
 
     # accept overly long result lines (e.g. SQLi results in HTTP header responses)
     _http_client._MAXLINE = 1 * 1024 * 1024
+
+    # prevent double chunked encoding in case of sqlmap chunking (Note: Python3 does it automatically if 'Content-length' is missing)
+    if six.PY3:
+        if not hasattr(_http_client.HTTPConnection, "__send_output"):
+            _http_client.HTTPConnection.__send_output = _http_client.HTTPConnection._send_output
+        def _send_output(self, *args, **kwargs):
+            if conf.chunked and "encode_chunked" in kwargs:
+                kwargs["encode_chunked"] = False
+            self.__send_output(*args, **kwargs)
+
+        _http_client.HTTPConnection._send_output = _send_output
 
     # add support for inet_pton() on Windows OS
     if IS_WIN:

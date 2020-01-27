@@ -193,6 +193,25 @@ class ReqHandler(BaseHTTPRequestHandler):
             data = self.rfile.read(length)
             data = unquote_plus(data.decode(UNICODE_ENCODING, "ignore"))
             self.data = data
+        elif self.headers.get("Transfer-encoding") == "chunked":
+            data, line = b"", b""
+            count = 0
+
+            while True:
+                line += self.rfile.read(1)
+                if line.endswith(b'\n'):
+                    if count % 2 == 1:
+                        current = line.rstrip(b"\r\n")
+                        if not current:
+                            break
+                        else:
+                            data += current
+
+                    count += 1
+                    line = b""
+
+            self.data = data.decode(UNICODE_ENCODING, "ignore")
+
         self.do_REQUEST()
 
     def log_message(self, format, *args):
