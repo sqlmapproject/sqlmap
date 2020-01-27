@@ -16,7 +16,6 @@ Options:
     -d DIRECT           Connection string for direct database connection
     -u URL, --url=URL   Target URL (e.g. "http://www.site.com/vuln.php?id=1")
     -l LOGFILE          Parse target(s) from Burp or WebScarab proxy log file
-    -x SITEMAPURL       Parse target(s) from remote sitemap(.xml) file
     -m BULKFILE         Scan multiple targets given in a textual file
     -r REQUESTFILE      Load HTTP request from a file
     -g GOOGLEDORK       Process Google dork results as target URLs
@@ -320,12 +319,6 @@ Option: `-l`
 
 Rather than providing a single target URL, it is possible to test and inject against HTTP requests proxied through [Burp proxy](http://portswigger.net/suite/) or 
 [WebScarab proxy](http://www.owasp.org/index.php/Category:OWASP_WebScarab_Project). This option requires an argument which is the proxy's HTTP requests log file.
-
-### Parse targets from remote sitemap(.xml) file
-
-Option: `-x`
-
-A sitemap is a file where web admins can list the web page locations of their site to tell search engines about the site content's organization. You can provide a sitemap's location to sqlmap by using option `-x` (e.g. `-x http://www.target.com/sitemap.xml`) so it could find usable target URLs for scanning purposes.
 
 ### Scan multiple targets enlisted in a given textual file
 
