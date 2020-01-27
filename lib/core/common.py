@@ -138,6 +138,7 @@ from lib.core.settings import IS_TTY
 from lib.core.settings import IS_WIN
 from lib.core.settings import LARGE_OUTPUT_THRESHOLD
 from lib.core.settings import LOCALHOST
+from lib.core.settings import MAX_INT
 from lib.core.settings import MIN_ENCODED_LEN_CHECK
 from lib.core.settings import MIN_ERROR_PARSING_NON_WRITING_RATIO
 from lib.core.settings import MIN_TIME_RESPONSES
@@ -2998,9 +2999,11 @@ def isNumPosStrValue(value):
     False
     >>> isNumPosStrValue('-2')
     False
+    >>> isNumPosStrValue('100000000000000000000')
+    False
     """
 
-    return (hasattr(value, "isdigit") and value.isdigit() and int(value) > 0) or (isinstance(value, int) and value > 0)
+    return ((hasattr(value, "isdigit") and value.isdigit() and int(value) > 0) or (isinstance(value, int) and value > 0)) and int(value) < MAX_INT
 
 @cachedmethod
 def aliasToDbmsEnum(dbms):
