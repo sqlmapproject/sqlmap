@@ -347,7 +347,7 @@ def _setCrawler():
         if conf.url:
             crawl(conf.url)
         elif conf.requestFile and kb.targets:
-            target = list(kb.targets)[0]
+            target = next(iter(kb.targets))
             crawl(target[0], target[2], target[3])
 
 def _doSearch():
@@ -1735,8 +1735,7 @@ def _cleanupOptions():
             conf.__setitem__(_, True)
 
     if conf.noCast:
-        for _ in list(DUMP_REPLACEMENTS.keys()):
-            del DUMP_REPLACEMENTS[_]
+        DUMP_REPLACEMENTS.clear()
 
     if conf.dumpFormat:
         conf.dumpFormat = conf.dumpFormat.upper()

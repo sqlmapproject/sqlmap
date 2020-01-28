@@ -28,7 +28,7 @@ def cachedmethod(f):
     >>> __ = cachedmethod(lambda *args, **kwargs: args[0])
     >>> __(2)
     2
-    >>> __ = cachedmethod(lambda *args, **kwargs: list(kwargs.values())[0])
+    >>> __ = cachedmethod(lambda *args, **kwargs: next(iter(kwargs.values())))
     >>> __(foobar=3)
     3
 
