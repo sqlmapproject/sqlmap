@@ -2248,7 +2248,7 @@ Switch: `--hpp`
 
 HTTP parameter pollution (HPP) is a method for bypassing WAF/IPS protection mechanisms (explained [here](https://www.imperva.com/resources/glossary/http-parameter-pollution)) that is particularly effective against ASP/IIS and ASP.NET/IIS platforms. If you suspect that the target is behind such protection, you can try to bypass it by using this switch.
 
-### Make a through testing for a WAF/IPS protection
+### Make a thorough testing for a WAF/IPS protection
 
 Switch: `--identify-waf`
 
@@ -2361,7 +2361,7 @@ $ python sqlmap.py --purge -v 3
 [...]
 ```
 
-### Conduct through tests only if positive heuristic(s)
+### Conduct thorough tests only if positive heuristic(s)
 
 Switch `--smart`
 
