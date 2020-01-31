@@ -54,6 +54,8 @@ def checkDependencies():
                 __import__("vertica_python")
             elif dbmsName == DBMS.PRESTO:
                 __import__("prestodb")
+            elif dbmsName == DBMS.MIMERSQL:
+                __import__("mimerpy")
         except:
             warnMsg = "sqlmap requires '%s' third-party library " % data[1]
             warnMsg += "in order to directly connect to the DBMS "

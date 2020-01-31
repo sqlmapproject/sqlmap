@@ -18,7 +18,7 @@ from lib.core.enums import OS
 from thirdparty.six import unichr as _unichr
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.4.1.61"
+VERSION = "1.4.1.62"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -265,6 +265,7 @@ VERTICA_SYSTEM_DBS = ("v_catalog", "v_internal", "v_monitor",)
 MCKOI_SYSTEM_DBS = ("",)
 PRESTO_SYSTEM_DBS = ("information_schema",)
 ALTIBASE_SYSTEM_DBS = ("SYSTEM_",)
+MIMERSQL_SYSTEM_DBS = ("information_schema", "SYSTEM",)
 
 # Note: (<regular>) + (<forks>)
 MSSQL_ALIASES = ("microsoft sql server", "mssqlserver", "mssql", "ms")
@@ -286,6 +287,7 @@ VERTICA_ALIASES = ("vertica",)
 MCKOI_ALIASES = ("mckoi",)
 PRESTO_ALIASES = ("presto",)
 ALTIBASE_ALIASES = ("altibase",)
+MIMERSQL_ALIASES = ("mimersql", "mimer")
 
 DBMS_DIRECTORY_DICT = dict((getattr(DBMS, _), getattr(DBMS_DIRECTORY_NAME, _)) for _ in dir(DBMS) if not _.startswith("_"))
 

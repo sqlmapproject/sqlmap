@@ -215,4 +215,10 @@
     <dbms value="Altibase">
         <error regexp="Altibase\.jdbc\.driver"/>
     </dbms>
+
+    <!-- MimerSQL -->
+    <dbms value="MimerSQL">
+        <error regexp="com\.mimer\.jdbc"/>
+        <error regexp="Syntax error,[^\n]+assumed to mean"/>
+    </dbms>
 </root>

@@ -20,6 +20,7 @@ from lib.core.settings import HSQLDB_ALIASES
 from lib.core.settings import INFORMIX_ALIASES
 from lib.core.settings import MAXDB_ALIASES
 from lib.core.settings import MCKOI_ALIASES
+from lib.core.settings import MIMERSQL_ALIASES
 from lib.core.settings import MONETDB_ALIASES
 from lib.core.settings import MSSQL_ALIASES
 from lib.core.settings import MYSQL_ALIASES
@@ -210,6 +211,7 @@ DBMS_DICT = {
     DBMS.MCKOI: (MCKOI_ALIASES, None, None, None),
     DBMS.PRESTO: (PRESTO_ALIASES, "presto-python-client", "https://github.com/prestodb/presto-python-client", None),
     DBMS.ALTIBASE: (ALTIBASE_ALIASES, None, None, None),
+    DBMS.MIMERSQL: (MIMERSQL_ALIASES, "mimerpy", "https://github.com/mimersql/MimerPy", None),
 }
 
 # Reference: https://blog.jooq.org/tag/sysibm-sysdummy1/
@@ -222,6 +224,7 @@ FROM_DUMMY_TABLE = {
     DBMS.HSQLDB: " FROM INFORMATION_SCHEMA.SYSTEM_USERS",
     DBMS.INFORMIX: " FROM SYSMASTER:SYSDUAL",
     DBMS.DERBY: " FROM SYSIBM.SYSDUMMY1",
+    DBMS.MIMERSQL: " FROM SYSTEM.ONEROW",
 }
 
 HEURISTIC_NULL_EVAL = {
@@ -238,6 +241,7 @@ HEURISTIC_NULL_EVAL = {
     DBMS.MCKOI: "TONUMBER(NULL)",
     DBMS.PRESTO: "FROM_HEX(NULL)",
     DBMS.ALTIBASE: "TDESENCRYPT(NULL,NULL)",
+    DBMS.MIMERSQL: "ASCII_CHAR(256) IS NULL",
 }
 
 SQL_STATEMENTS = {

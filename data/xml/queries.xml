@@ -1264,4 +1264,74 @@
             <blind query="SELECT DISTINCT(USER_NAME) FROM SYSTEM_.SYS_COLUMNS_ JOIN SYSTEM_.SYS_TABLES_ ON SYSTEM_.SYS_COLUMNS_.TABLE_ID=SYSTEM_.SYS_TABLES_.TABLE_ID JOIN SYSTEM_.SYS_USERS_ ON SYSTEM_.SYS_USERS_.USER_ID=SYSTEM_.SYS_TABLES_.USER_ID WHERE %s" query2="SELECT DISTINCT(TABLE_NAME) FROM SYSTEM_.SYS_COLUMNS_ JOIN SYSTEM_.SYS_TABLES_ ON SYSTEM_.SYS_COLUMNS_.TABLE_ID=SYSTEM_.SYS_TABLES_.TABLE_ID JOIN SYSTEM_.SYS_USERS_ ON SYSTEM_.SYS_USERS_.USER_ID=SYSTEM_.SYS_TABLES_.USER_ID WHERE USER_NAME='%s'" count="SELECT COUNT(DISTINCT(USER_NAME)) FROM SYSTEM_.SYS_COLUMNS_ JOIN SYSTEM_.SYS_TABLES_ ON SYSTEM_.SYS_COLUMNS_.TABLE_ID=SYSTEM_.SYS_TABLES_.TABLE_ID JOIN SYSTEM_.SYS_USERS_ ON SYSTEM_.SYS_USERS_.USER_ID=SYSTEM_.SYS_TABLES_.USER_ID WHERE %s" count2="SELECT COUNT(DISTINCT(TABLE_NAME)) FROM SYSTEM_.SYS_COLUMNS_ JOIN SYSTEM_.SYS_TABLES_ ON SYSTEM_.SYS_COLUMNS_.TABLE_ID=SYSTEM_.SYS_TABLES_.TABLE_ID JOIN SYSTEM_.SYS_USERS_ ON SYSTEM_.SYS_USERS_.USER_ID=SYSTEM_.SYS_TABLES_.USER_ID WHERE USER_NAME='%s'" condition="COLUMN_NAME" condition2="USER_NAME" condition3="TABLE_NAME"/>
         </search_column>
     </dbms>
+
+    <!-- MimerSQL -->
+    <!-- NOTE: DBMS with stohastic output of rows (ORDER BY required) -->
+    <dbms value="MimerSQL">
+        <!-- NOTE: NVARCHAR(4000) causes problems in boolean (e.g. 'Required temporary table row length is 32006, only 32000 is possible') -->
+        <cast query="CAST(%s AS NVARCHAR(1000))"/>
+        <length query="CHAR_LENGTH(%s)"/>
+        <isnull query="COALESCE(%s,' ')"/>
+        <delimiter query="||"/>
+        <limit query="OFFSET %d FETCH %d"/>
+        <limitregexp query="\s+OFFSET\s+([\d]+)\s+FETCH\s+([\d]+)" query2="\s+FETCH\s+([\d]+)"/>
+        <limitgroupstart query="1"/>
+        <limitgroupstop query="2"/>
+        <limitstring query=" OFFSET "/>
+        <order query="ORDER BY %s ASC"/>
+        <count query="COUNT(%s)"/>
+        <comment query="--"/>
+        <substring query="SUBSTRING((%s),%d,%d)"/>
+        <concatenate query="%s||%s"/>
+        <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
+        <inference query="UNICODE_CODE(SUBSTRING((%s),%d,1))>%d"/>
+        <banner query="SELECT attribute_value FROM SYSTEM.SERVER_INFO WHERE server_attribute='CATALOG_VERSION_CURRENT'"/>
+        <current_user query="USER()"/>
+        <current_db query="USER()"/>
+        <hostname/>
+        <table_comment/>
+        <column_comment/>
+        <is_dba query="(SELECT COUNT(schema_name) FROM INFORMATION_SCHEMA.SCHEMATA WHERE schema_owner=USER())>0"/>
+        <check_udf/>
+        <!-- Reference: https://download.mimer.com/pub/developer/docs/html_110/Mimer_SQL_Engine_DocSet/App_D_Dic_tables2.html -->
+        <users>
+            <inband query="SELECT user_name FROM SYSTEM.USERS"/>
+            <blind query="SELECT user_name FROM SYSTEM.USERS ORDER BY 1 OFFSET %d FETCH 1" count="SELECT COUNT(user_name) FROM SYSTEM.USERS"/>
+        </users>
+        <passwords/>
+        <privileges>
+            <inband query="SELECT DISTINCT user_name,privilege_type FROM SYSTEM.TABLE_PRIVILEGES JOIN SYSTEM.USERS ON SYSTEM.TABLE_PRIVILEGES.GRANTEE_SYSID=SYSTEM.USERS.USER_SYSID" condition="user_name"/>
+            <blind query="SELECT DISTINCT(privilege_type) FROM SYSTEM.TABLE_PRIVILEGES JOIN SYSTEM.USERS ON SYSTEM.TABLE_PRIVILEGES.GRANTEE_SYSID=SYSTEM.USERS.USER_SYSID WHERE user_name='%s' ORDER BY 1 OFFSET %d FETCH 1" count="SELECT COUNT(DISTINCT(privilege_type)) FROM SYSTEM.TABLE_PRIVILEGES JOIN SYSTEM.USERS ON SYSTEM.TABLE_PRIVILEGES.GRANTEE_SYSID=SYSTEM.USERS.USER_SYSID WHERE user_name='%s'"/>
+        </privileges>
+        <roles/>
+        <statements/>
+        <dbs>
+            <inband query="SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA"/>
+            <blind query="SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA ORDER BY 1 OFFSET %d FETCH 1" count="SELECT COUNT(schema_name) FROM INFORMATION_SCHEMA.SCHEMATA"/>
+        </dbs>
+        <tables>
+            <inband query="SELECT table_schema,table_name FROM INFORMATION_SCHEMA.TABLES" condition="table_schema"/>
+            <blind query="SELECT table_name FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='%s' ORDER BY 1 OFFSET %d FETCH 1" count="SELECT COUNT(table_name) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='%s'"/>
+        </tables>
+        <columns>
+            <inband query="SELECT column_name,data_type FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='%s' AND table_schema='%s'" condition="column_name"/>
+            <blind query="SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='%s' AND table_schema='%s' ORDER BY 1" query2="SELECT data_type FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='%s' AND column_name='%s' AND table_schema='%s'" count="SELECT COUNT(column_name) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='%s' AND table_schema='%s'" condition="column_name"/>
+        </columns>
+        <dump_table>
+            <inband query="SELECT %s FROM %s"/>
+            <blind query="SELECT %s FROM %s ORDER BY %s OFFSET %d FETCH 1" count="SELECT COUNT(*) FROM %s"/>
+        </dump_table>
+        <search_db>
+            <inband query="SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA WHERE %s" condition="schema_name"/>
+            <blind query="SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA WHERE %s ORDER BY 1" count="SELECT COUNT(schema_name) FROM INFORMATION_SCHEMA.SCHEMATA WHERE %s" condition="schema_name"/>
+        </search_db>
+        <search_table>
+            <inband query="SELECT table_schema,table_name FROM INFORMATION_SCHEMA.TABLES WHERE %s" condition="table_name" condition2="table_schema"/>
+            <blind query="SELECT DISTINCT(table_schema) FROM INFORMATION_SCHEMA.TABLES WHERE %s ORDER BY 1" query2="SELECT DISTINCT(table_name) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='%s' ORDER BY 1" count="SELECT COUNT(DISTINCT(table_schema)) FROM INFORMATION_SCHEMA.TABLES WHERE %s" count2="SELECT COUNT(DISTINCT(table_name)) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='%s'" condition="table_name" condition2="table_schema"/>
+        </search_table>
+        <search_column>
+            <inband query="SELECT table_schema,table_name FROM INFORMATION_SCHEMA.COLUMNS WHERE %s" condition="column_name" condition2="table_schema" condition3="table_name"/>
+            <blind query="SELECT DISTINCT(table_schema) FROM INFORMATION_SCHEMA.COLUMNS WHERE %s ORDER BY 1" query2="SELECT DISTINCT(table_name) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema='%s' ORDER BY 1" count="SELECT COUNT(DISTINCT(table_schema)) FROM INFORMATION_SCHEMA.COLUMNS WHERE %s" count2="SELECT COUNT(DISTINCT(table_name)) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema='%s'" condition="column_name" condition2="table_schema" condition3="table_name"/>
+        </search_column>
+    </dbms>
 </root>

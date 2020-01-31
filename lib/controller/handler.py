@@ -21,6 +21,7 @@ from lib.core.settings import HSQLDB_ALIASES
 from lib.core.settings import INFORMIX_ALIASES
 from lib.core.settings import MAXDB_ALIASES
 from lib.core.settings import MCKOI_ALIASES
+from lib.core.settings import MIMERSQL_ALIASES
 from lib.core.settings import MONETDB_ALIASES
 from lib.core.settings import MSSQL_ALIASES
 from lib.core.settings import MYSQL_ALIASES
@@ -52,6 +53,8 @@ from plugins.dbms.maxdb.connector import Connector as MaxDBConn
 from plugins.dbms.maxdb import MaxDBMap
 from plugins.dbms.mckoi.connector import Connector as MckoiConn
 from plugins.dbms.mckoi import MckoiMap
+from plugins.dbms.mimersql.connector import Connector as MimerSQLConn
+from plugins.dbms.mimersql import MimerSQLMap
 from plugins.dbms.monetdb.connector import Connector as MonetDBConn
 from plugins.dbms.monetdb import MonetDBMap
 from plugins.dbms.mssqlserver.connector import Connector as MSSQLServerConn
@@ -97,6 +100,7 @@ def setHandler():
         (DBMS.MCKOI, MCKOI_ALIASES, MckoiMap, MckoiConn),
         (DBMS.PRESTO, PRESTO_ALIASES, PrestoMap, PrestoConn),
         (DBMS.ALTIBASE, ALTIBASE_ALIASES, AltibaseMap, AltibaseConn),
+        (DBMS.MIMERSQL, MIMERSQL_ALIASES, MimerSQLMap, MimerSQLConn),
     ]
 
     _ = max(_ if (conf.get("dbms") or Backend.getIdentifiedDbms() or kb.heuristicExtendedDbms or "").lower() in _[1] else () for _ in items)

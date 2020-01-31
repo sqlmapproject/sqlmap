@@ -4074,7 +4074,7 @@ def safeSQLIdentificatorNaming(name, isTable=False):
                 retVal = "`%s`" % retVal
             elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2, DBMS.HSQLDB, DBMS.H2, DBMS.INFORMIX, DBMS.MONETDB, DBMS.VERTICA, DBMS.MCKOI, DBMS.PRESTO):
                 retVal = "\"%s\"" % retVal
-            elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.ALTIBASE):
+            elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.ALTIBASE, DBMS.MIMERSQL):
                 retVal = "\"%s\"" % retVal.upper()
             elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
                 if isTable:
@@ -4112,7 +4112,7 @@ def unsafeSQLIdentificatorNaming(name):
             retVal = name.replace("`", "")
         elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2, DBMS.HSQLDB, DBMS.H2, DBMS.INFORMIX, DBMS.MONETDB, DBMS.VERTICA, DBMS.MCKOI, DBMS.PRESTO):
             retVal = name.replace("\"", "")
-        elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.ALTIBASE):
+        elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.ALTIBASE, DBMS.MIMERSQL):
             retVal = name.replace("\"", "").upper()
         elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
             retVal = name.replace("[", "").replace("]", "")
