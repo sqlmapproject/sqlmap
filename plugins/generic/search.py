@@ -561,6 +561,8 @@ class Search(object):
 
                             if query.endswith("'%s')"):
                                 query = query[:-1] + " AND %s)" % (colQuery + whereTblsQuery)
+                            elif " ORDER BY " in query:
+                                query = query.replace(" ORDER BY ", " AND %s ORDER BY " % (colQuery + whereTblsQuery))
                             else:
                                 query += " AND %s" % (colQuery + whereTblsQuery)
 
