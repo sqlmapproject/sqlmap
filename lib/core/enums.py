@@ -81,6 +81,7 @@ class FORK(object):
     PERCONA = "Percona"
     COCKROACHDB = "CockroachDB"
     TIDB = "TiDB"
+    REDSHIFT = "Amazon Redshift"
 
 class CUSTOM_LOGGING(object):
     PAYLOAD = 9
