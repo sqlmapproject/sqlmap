@@ -26,7 +26,10 @@ class HTMLHandler(ContentHandler):
 
         self._dbms = None
         self._page = (page or "")
-        self._lower_page = self._page.lower()
+        try:
+            self._lower_page = self._page.lower()
+        except SystemError:  # https://bugs.python.org/issue18183
+            self._lower_page = None
         self._urldecoded_page = urldecode(self._page)
 
         self.dbms = None
@@ -49,7 +52,7 @@ class HTMLHandler(ContentHandler):
                 keywords = sorted(keywords, key=len)
                 kb.cache.regex[regexp] = keywords[-1].lower()
 
-            if kb.cache.regex[regexp] in self._lower_page and re.search(regexp, self._urldecoded_page, re.I):
+            if kb.cache.regex[regexp] in (self._lower_page or kb.cache.regex[regexp]) and re.search(regexp, self._urldecoded_page, re.I):
                 self.dbms = self._dbms
                 self._markAsErrorPage()
                 kb.forkNote = kb.forkNote or attrs.get("fork")
