@@ -33,6 +33,8 @@ class Fingerprint(GenericFingerprint):
                 fork = FORK.COCKROACHDB
             elif inject.checkBooleanExpression("VERSION() LIKE '%Redshift%'"):  # Reference: https://dataedo.com/kb/query/amazon-redshift/check-server-version
                 fork = FORK.REDSHIFT
+            elif inject.checkBooleanExpression("VERSION() LIKE '%Greenplum%'"):  # Reference: http://www.sqldbpros.com/wordpress/wp-content/uploads/2014/08/what-version-of-greenplum.png
+                fork = FORK.GREENPLUM
             else:
                 fork = ""
 
