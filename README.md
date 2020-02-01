@@ -70,3 +70,6 @@ Translations
 * [Spanish](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-es-MX.md)
 * [Turkish](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-tr-TR.md)
 * [Ukrainian](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-uk-UA.md)
+* [Persian](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-fa-FA.md)
+
+
