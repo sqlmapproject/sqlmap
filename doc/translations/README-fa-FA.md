@@ -42,6 +42,7 @@
 
 
 
+<div dir=ltr>
 
 
 ```
@@ -49,11 +50,14 @@
 ```
 
     
-    <div dir=rtl>
+    
+    
+<div dir=rtl>
     
     
 برای گرفتن لیست تمامی ارگومان‌های می‌توانید از دستور زیر استفاده کنید:
 
+<div dir=ltr>
 
     
 ```
@@ -61,7 +65,7 @@
 ```
     
     
-    <div dir=rtl>
+ <div dir=rtl>
     
 
 برای اطلاعات بیشتر برای اجرا از [اینجا](https://asciinema.org/a/46601) می‌توانید استفاده کنید. برای گرفتن اطلاعات بیشتر توسعه می‌شود به [راهنمای](https://github.com/sqlmapproject/sqlmap/wiki/Usage) `sqlmap` سر بزنید.
