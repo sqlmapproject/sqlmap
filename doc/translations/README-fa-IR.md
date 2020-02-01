@@ -10,10 +10,6 @@
 برنامه `sqlmap`، برنامه‌ی منبع باز هست که برای تست نفوذ پذیزی دربرابر حمله‌های احتمالی `sql injection` (جلوگیری از لو رفتن پایگاه داده) جلو گیری می‌کند. این برنامه مجهز به مکانیزیم تشخیص قدرتمندی می‌باشد. همچنین داری طیف گسترده‌ای از اسکریپت ها می‌باشد که برای متخصص تست نفوذ کار کردن با بانک اطلاعاتی را راحتر می‌کند. از جمع اوری اطلاعات درباره بانک داده تا دسترسی به داده های سیستم و اجرا دستورات از طریق `via out-of-band` درسیستم عامل را امکان پذیر می‌کند.
 
 
-**پروژه sqlmap درحال خاضر به دنبال اسپانسرها است.** 
-
-
-
 عکس
 ----
 
@@ -67,7 +63,7 @@
 ```
     
     
- <div dir=rtl>
+<div dir=rtl>
     
 
 برای اطلاعات بیشتر برای اجرا از [اینجا](https://asciinema.org/a/46601) می‌توانید استفاده کنید. برای گرفتن اطلاعات بیشتر توسعه می‌شود به [راهنمای](https://github.com/sqlmapproject/sqlmap/wiki/Usage) `sqlmap` سر بزنید.
@@ -86,30 +82,3 @@
 * تویتر: [@sqlmap](https://twitter.com/sqlmap)
 * رسانه: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
 * عکس‌ها: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
-
-
-
-ترجمه‌ها 
-----
-
-
-
-* [بلغاری](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-bg-BG.md)
-* [چینی](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-zh-CN.md)
-* [کرواتی](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-hr-HR.md)
-* [فرانسه](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-fr-FR.md)
-* [المانی](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-de-GER.md)
-* [یونانی](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-gr-GR.md)
-* [اندونزی](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-id-ID.md)
-* [ایتالیایی](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-it-IT.md)
-* [ژاپنی](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-ja-JP.md)
-* [کره](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-ko-KR.md)
-* [لهستانی](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-pl-PL.md)
-* [پرتغالی](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-pt-BR.md)
-* [روسی](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-ru-RUS.md)
-* [اسپانیایی](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-es-MX.md)
-* [ترکی](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-tr-TR.md)
-* [اوکراینی](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-uk-UA.md)
-* [اوکراینی](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-uk-UA.md)
-* [فارسی](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-fa-FA.md)
-
