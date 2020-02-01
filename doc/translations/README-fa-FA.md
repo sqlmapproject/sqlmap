@@ -31,7 +31,7 @@
 نصب
 ----
 
-برای دانلود اخرین نسخه tarball، با کلیک در اینجا یا دانلود اخرین نسخه zipball با کلیک در اینجا میتوانید این کار را انجام دهید.
+برای دانلود اخرین نسخه tarball، با کلیک در [اینجا](https://github.com/sqlmapproject/sqlmap/tarball/master) یا دانلود اخرین نسخه zipball با کلیک در [اینجا](https://github.com/sqlmapproject/sqlmap/zipball/master) میتوانید این کار را انجام دهید.
 
 
 طرز استفاده
@@ -84,4 +84,30 @@
 * تویتر: [@sqlmap](https://twitter.com/sqlmap)
 * رسانه: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
 * عکس‌ها: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
+
+
+
+ترجمه‌ها 
+----
+
+
+
+* [بلغاری](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-bg-BG.md)
+* [چینی](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-zh-CN.md)
+* [کرواتی](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-hr-HR.md)
+* [فرانسه](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-fr-FR.md)
+* [المانی](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-de-GER.md)
+* [یونانی](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-gr-GR.md)
+* [اندونزی](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-id-ID.md)
+* [ایتالیایی](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-it-IT.md)
+* [ژاپنی](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-ja-JP.md)
+* [کره](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-ko-KR.md)
+* [لهستانی](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-pl-PL.md)
+* [پرتغالی](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-pt-BR.md)
+* [روسی](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-ru-RUS.md)
+* [اسپانیایی](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-es-MX.md)
+* [ترکی](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-tr-TR.md)
+* [اوکراینی](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-uk-UA.md)
+* [اوکراینی](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-uk-UA.md)
+* [فارسی](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-fa-FA.md)
 
