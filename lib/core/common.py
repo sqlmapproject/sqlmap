@@ -1649,13 +1649,13 @@ def parseTargetUrl():
         else:
             conf.parameters[PLACE.GET] = urldecode(urlSplit.query, spaceplus=not conf.base64Parameter) if urlSplit.query and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in urlSplit.query else urlSplit.query
 
-    if not conf.referer and (intersect(REFERER_ALIASES, conf.testParameter, True) or conf.level >= 3):
+    if (intersect(REFERER_ALIASES, conf.testParameter, True) or conf.level >= 3) and not any(_[0] == HTTP_HEADER.REFERER for _ in conf.httpHeaders):
         debugMsg = "setting the HTTP Referer header to the target URL"
         logger.debug(debugMsg)
         conf.httpHeaders = [_ for _ in conf.httpHeaders if _[0] != HTTP_HEADER.REFERER]
         conf.httpHeaders.append((HTTP_HEADER.REFERER, conf.url.replace(kb.customInjectionMark, "")))
 
-    if not conf.host and (intersect(HOST_ALIASES, conf.testParameter, True) or conf.level >= 5):
+    if (intersect(HOST_ALIASES, conf.testParameter, True) or conf.level >= 5) and not any(_[0] == HTTP_HEADER.HOST for _ in conf.httpHeaders):
         debugMsg = "setting the HTTP Host header to the target URL"
         logger.debug(debugMsg)
         conf.httpHeaders = [_ for _ in conf.httpHeaders if _[0] != HTTP_HEADER.HOST]
