@@ -43,8 +43,10 @@
 <div dir=ltr>
 
 
-
+```
     python sqlmap.py -h
+```
+
     
     <div dir=rtl>
     
@@ -52,9 +54,10 @@
 برای گرفتن لیست تمامی ارگومان‌های می‌توانید از دستور زیر استفاده کنید:
 
 <div dir=ltr>
-
-
+    
+```
     python sqlmap.py -hh
+```
     
     
     <div dir=rtl>
