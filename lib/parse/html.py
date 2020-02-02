@@ -73,6 +73,10 @@ def htmlParser(page):
     handler = HTMLHandler(page)
     key = hash(page)
 
+    # generic SQL warning/error messages
+    if re.search(r"SQL (warning|error|syntax)", page, re.I):
+        handler._markAsErrorPage()
+
     if key in kb.cache.parsedDbms:
         retVal = kb.cache.parsedDbms[key]
         if retVal:
@@ -88,9 +92,5 @@ def htmlParser(page):
         kb.lastParserStatus = None
 
     kb.cache.parsedDbms[key] = handler.dbms
-
-    # generic SQL warning/error messages
-    if re.search(r"SQL (warning|error|syntax)", page, re.I):
-        handler._markAsErrorPage()
 
     return handler.dbms

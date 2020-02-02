@@ -2703,6 +2703,12 @@ def extractErrorMessage(page):
                     retVal = candidate
                     break
 
+        if not retVal and wasLastResponseDBMSError():
+            match = re.search(r"[^\n]*SQL[^\n:]*:[^\n]*", page, re.IGNORECASE)
+
+            if match:
+                retVal = match.group(0)
+
     return retVal
 
 def findLocalPort(ports):
