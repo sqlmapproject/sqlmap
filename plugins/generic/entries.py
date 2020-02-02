@@ -233,7 +233,7 @@ class Entries(object):
                                     entries = BigArray(_zip(*[entries[colName] for colName in colList]))
                         else:
                             query = rootQuery.inband.query % (colString, conf.db, tbl)
-                    elif Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2, DBMS.VERTICA, DBMS.PRESTO):
+                    elif Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2, DBMS.VERTICA, DBMS.PRESTO, DBMS.CRATEDB):
                         query = rootQuery.inband.query % (colString, conf.db, tbl, prioritySortColumns(colList)[0])
                     else:
                         query = rootQuery.inband.query % (colString, conf.db, tbl)
@@ -329,9 +329,7 @@ class Entries(object):
                     elif Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.SYBASE, DBMS.MAXDB, DBMS.MSSQL, DBMS.INFORMIX, DBMS.MCKOI):
                         if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI):
                             table = tbl
-                        elif Backend.getIdentifiedDbms() in (DBMS.SYBASE, DBMS.MSSQL):
-                            table = "%s.%s" % (conf.db, tbl)
-                        elif Backend.isDbms(DBMS.MAXDB):
+                        elif Backend.getIdentifiedDbms() in (DBMS.SYBASE, DBMS.MSSQL, DBMS.MAXDB):
                             table = "%s.%s" % (conf.db, tbl)
                         elif Backend.isDbms(DBMS.INFORMIX):
                             table = "%s:%s" % (conf.db, tbl)
@@ -406,7 +404,7 @@ class Entries(object):
                                     if column not in entries:
                                         entries[column] = BigArray()
 
-                                    if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2, DBMS.VERTICA, DBMS.PRESTO):
+                                    if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2, DBMS.VERTICA, DBMS.PRESTO, DBMS.CRATEDB):
                                         query = rootQuery.blind.query % (agent.preprocessField(tbl, column), conf.db, conf.tbl, sorted(colList, key=len)[0], index)
                                     elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE,):
                                         query = rootQuery.blind.query % (agent.preprocessField(tbl, column), tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())), index)
@@ -418,7 +416,7 @@ class Entries(object):
                                         query = rootQuery.blind.query % (index, agent.preprocessField(tbl, column), tbl)
                                     elif Backend.isDbms(DBMS.INFORMIX):
                                         query = rootQuery.blind.query % (index, agent.preprocessField(tbl, column), conf.db, tbl, sorted(colList, key=len)[0])
-                                    elif Backend.isDbms(DBMS.MONETDB):
+                                    else:
                                         query = rootQuery.blind.query % (agent.preprocessField(tbl, column), conf.db, tbl, index)
 
                                     query = agent.whereQuery(query)

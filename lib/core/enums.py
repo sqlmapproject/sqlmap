@@ -52,6 +52,7 @@ class DBMS(object):
     PRESTO = "Presto"
     ALTIBASE = "Altibase"
     MIMERSQL = "MimerSQL"
+    CRATEDB = "CrateDB"
 
 class DBMS_DIRECTORY_NAME(object):
     ACCESS = "access"
@@ -74,6 +75,7 @@ class DBMS_DIRECTORY_NAME(object):
     PRESTO = "presto"
     ALTIBASE = "altibase"
     MIMERSQL = "mimersql"
+    CRATEDB = "cratedb"
 
 class FORK(object):
     MARIADB = "MariaDB"

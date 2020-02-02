@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <root>
-    <!-- MySQL -->
     <dbms value="MySQL">
         <!-- http://dba.fyicenter.com/faq/mysql/Difference-between-CHAR-and-NCHAR.html -->
         <cast query="CAST(%s AS NCHAR)"/>
@@ -78,7 +77,6 @@
         </search_column>
     </dbms>
 
-    <!-- PostgreSQL -->
     <dbms value="PostgreSQL">
         <cast query="CAST(%s AS CHARACTER(10000))"/>
         <length query="LENGTH(%s)"/>
@@ -153,7 +151,6 @@
         </search_column>
     </dbms>
 
-    <!-- Microsoft SQL Server -->
     <dbms value="Microsoft SQL Server">
         <cast query="CAST(%s AS NVARCHAR(4000))"/>
         <length query="LTRIM(STR(LEN(%s)))"/>
@@ -225,7 +222,6 @@
         </search_column>
     </dbms>
 
-    <!-- Oracle -->
     <dbms value="Oracle">
         <cast query="CAST(%s AS VARCHAR(4000))"/>
         <length query="LENGTH(%s)"/>
@@ -322,7 +318,6 @@
         </search_column>
     </dbms>
 
-    <!-- SQLite -->
     <dbms value="SQLite">
         <cast query="CAST(%s AS TEXT)" dbms_version="&gt;=3.0"/>
         <!-- NOTE: On SQLite version 2 everything is stored as a string (Reference: http://www.mono-project.com/SQLite) -->
@@ -376,7 +371,6 @@
         <search_column/>
     </dbms>
 
-    <!-- Microsoft Access -->
     <dbms value="Microsoft Access">
         <cast query="RTRIM(CVAR(%s))"/>
         <length query="LEN(RTRIM(CVAR(%s)))"/>
@@ -421,7 +415,6 @@
         <search_column/>
    </dbms>
 
-   <!-- Firebird -->
    <dbms value="Firebird">
         <cast query="TRIM(CAST(%s AS VARCHAR(10000)))"/>
         <length query="CHAR_LENGTH(TRIM(%s))"/>
@@ -478,12 +471,6 @@
         <search_column/>
    </dbms>
 
-   <!-- SAP MaxDB -->
-   <!-- http://dev.mysql.com/tech-resources/articles/maxdb-php-ready-for-web.html -->
-   <!-- http://dev.mysql.com/doc/refman/5.0/es/maxdb-reserved-words.html -->
-   <!-- http://maxdb.sap.com/doc/7_6/default.htm -->
-   <!-- http://www.sapdb.org/7.4/htmhelp/35/f8823cb7e5d42be10000000a114027/content.htm -->
-   <!-- http://www.ximido.de/research/PenTestingMaxDB.pdf -->
    <dbms value="SAP MaxDB">
         <length query="LENGTH(%s)"/>
         <isnull query="VALUE(%s,' ')" query2="IFNULL(%s,' ')"/>
@@ -536,7 +523,6 @@
         </dump_table>
    </dbms>
 
-    <!-- Sybase -->
     <dbms value="Sybase">
         <cast query="CONVERT(VARCHAR(4000),%s)"/>
         <length query="LTRIM(STR(LEN(%s)))"/>
@@ -606,7 +592,6 @@
         </search_column>
     </dbms>
 
-    <!-- IBM DB2 -->
     <dbms value="IBM DB2">
         <!-- Casting to varchar does not work with version < v9, so we had to use char(254) instead -->
         <cast query="RTRIM(CAST(%s AS CHAR(254)))"/>
@@ -679,7 +664,6 @@
         </search_column>
     </dbms>
 
-    <!-- Hyper SQL Database -->
     <dbms value="HSQLDB">
         <cast query="CAST(%s AS LONGVARCHAR)"/>
         <length query="CHAR_LENGTH(%s)"/>
@@ -813,9 +797,6 @@
         </search_column>
     </dbms>
 
-    <!-- Informix -->
-    <!-- https://www.ibm.com/support/knowledgecenter/SSGU8G_11.70.0/com.ibm.sqlr.doc/ids_sqr_072.htm -->
-    <!-- https://www.ibm.com/support/knowledgecenter/SSGU8G_12.1.0/com.ibm.sec.doc/ids_am_041.htm -->
     <dbms value="Informix">
         <cast query="RTRIM(TO_CHAR(%s))"/>
         <length query="CHAR_LENGTH(RTRIM(%s))"/>
@@ -877,7 +858,6 @@
         <search_column/>
     </dbms>
 
-    <!-- MonetDB -->
     <dbms value="MonetDB">
         <cast query="CAST(%s AS VARCHAR(4000))"/>
         <length query="LENGTH(%s)"/>
@@ -942,7 +922,6 @@
         </search_column>
     </dbms>
 
-    <!-- Apache Derby -->
     <dbms value="Apache Derby">
         <!-- NOTE: CHAR(%s) causes 'A truncation error was encountered trying to shrink CHAR' -->
         <cast query="RTRIM(CAST(%s AS CHAR(254)))"/>
@@ -1011,7 +990,6 @@
         </search_column>
    </dbms>
 
-    <!-- Vertica -->
     <dbms value="Vertica">
         <cast query="CAST(%s AS CHARACTER(10000))"/>
         <length query="LENGTH(%s)"/>
@@ -1088,9 +1066,8 @@
         </search_column>
     </dbms>
 
-    <!-- Mckoi -->
-    <!-- NOTE: DBMS with minimalistic set of (restricted) features -->
     <dbms value="Mckoi">
+        <!-- NOTE: DBMS with minimalistic set of (restricted) features -->
         <cast query="CONCAT('',%s)"/>
         <length query="LENGTH(%s)"/>
         <isnull query="IF(%s IS NULL,' ', %s)"/>
@@ -1130,7 +1107,6 @@
         <search_column/>
    </dbms>
 
-    <!-- Presto -->
     <dbms value="Presto">
         <cast query="CAST(%s AS VARCHAR(4000))"/>
         <length query="LENGTH(%s)"/>
@@ -1192,7 +1168,6 @@
         </search_column>
     </dbms>
 
-    <!-- Altibase -->
     <dbms value="Altibase">
         <cast query="CAST(%s AS VARCHAR(4000))"/>
         <length query="LENGTH(%s)"/>
@@ -1265,9 +1240,8 @@
         </search_column>
     </dbms>
 
-    <!-- MimerSQL -->
-    <!-- NOTE: DBMS with stohastic output of rows (ORDER BY required) -->
     <dbms value="MimerSQL">
+        <!-- NOTE: DBMS with stohastic output of rows (ORDER BY required) -->
         <!-- NOTE: NVARCHAR(4000) causes problems in boolean (e.g. 'Required temporary table row length is 32006, only 32000 is possible') -->
         <cast query="CAST(%s AS NVARCHAR(1000))"/>
         <length query="CHAR_LENGTH(%s)"/>
@@ -1332,6 +1306,79 @@
         <search_column>
             <inband query="SELECT table_schema,table_name FROM INFORMATION_SCHEMA.COLUMNS WHERE %s" condition="column_name" condition2="table_schema" condition3="table_name"/>
             <blind query="SELECT DISTINCT(table_schema) FROM INFORMATION_SCHEMA.COLUMNS WHERE %s ORDER BY table_schema" query2="SELECT DISTINCT(table_name) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema='%s' ORDER BY table_name" count="SELECT COUNT(DISTINCT(table_schema)) FROM INFORMATION_SCHEMA.COLUMNS WHERE %s" count2="SELECT COUNT(DISTINCT(table_name)) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema='%s'" condition="column_name" condition2="table_schema" condition3="table_name"/>
+        </search_column>
+    </dbms>
+
+    <dbms value="CrateDB">
+        <cast query="CAST(%s AS TEXT)"/>
+        <length query="CHAR_LENGTH((%s)::text)"/>
+        <isnull query="COALESCE(%s,' ')"/>
+        <delimiter query="||"/>
+        <limit query="LIMIT %d OFFSET %d"/>
+        <limitregexp query="\s+LIMIT\s+([\d]+)\s+OFFSET\s+([\d]+)" query2="\s+LIMIT\s+([\d]+)"/>
+        <limitgroupstart query="2"/>
+        <limitgroupstop query="1"/>
+        <limitstring query=" LIMIT "/>
+        <order query="ORDER BY %s ASC"/>
+        <count query="COUNT(%s)"/>
+        <!-- NOTE: non-; version(s) doesn't work properly -->
+        <comment query=";--" query2=";/*"/>
+        <substring query="SUBSTR((%s)::text,%d,%d)"/>
+        <concatenate query="%s||%s"/>
+        <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
+        <hex/>
+        <!-- NOTE: ASCII() only available in >= 4.1 -->
+        <inference query="SUBSTR((%s)::text,%d,1)>'%c'" query2="ASCII(SUBSTR((%s)::text,%d,1))>%d"/>
+        <banner query="SELECT version['number'] FROM sys.nodes" query2="VERSION()"/>
+        <current_user query="CURRENT_USER"/>
+        <current_db query="CURRENT_SCHEMA()"/>
+        <hostname query="SELECT hostname FROM sys.nodes"/>
+        <!--<table_comment query="SELECT pg_catalog.obj_description(c.oid) FROM pg_catalog.pg_class c WHERE c.relname='%s'"/>-->
+        <table_comment query="SELECT description FROM pg_description JOIN pg_class ON pg_description.objoid=pg_class.oid JOIN pg_namespace ON pg_class.relnamespace=pg_namespace.oid WHERE nspname='%s' AND relname='%s'"/>
+        <column_comment/>
+        <is_dba query="(SELECT superuser=true FROM sys.users WHERE name=CURRENT_USER)"/>
+        <check_udf/>
+        <users>
+            <inband query="SELECT name FROM sys.users"/>
+            <blind query="SELECT name FROM sys.users LIMIT 1 OFFSET %d" count="SELECT COUNT(name) FROM sys.users"/>
+        </users>
+        <passwords/>
+        <privileges>
+            <inband query="SELECT grantee,type FROM sys.privileges" condition="grantee"/>
+            <blind query="SELECT DISTINCT(type) FROM sys.privileges WHERE grantee %s '%s' LIMIT 1 OFFSET %d" count="SELECT COUNT(DISTINCT(type)) FROM sys.privileges WHERE grantee %s '%s'"/>
+        </privileges>
+        <roles/>
+        <statements>
+            <inband query="SELECT stmt FROM sys.jobs"/>
+            <blind query="SELECT stmt FROM sys.jobs LIMIT 1 OFFSET %d" count="SELECT COUNT(stmt) FROM sys.jobs"/>
+        </statements>
+        <dbs>
+            <inband query="SELECT schema_name FROM information_schema.schemata"/>
+            <blind query="SELECT schema_name FROM information_schema.schemata ORDER BY schema_name LIMIT 1 OFFSET %d" count="SELECT COUNT(schema_name) FROM information_schema.schemata"/>
+        </dbs>
+        <tables>
+            <inband query="SELECT table_schema,table_name FROM information_schema.tables" condition="table_schema"/>
+            <blind query="SELECT table_name FROM information_schema.tables WHERE table_schema='%s' LIMIT 1 OFFSET %d" count="SELECT COUNT(table_name) FROM information_schema.tables WHERE table_schema='%s'"/>
+        </tables>
+        <columns>
+            <inband query="SELECT attname,typname FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND a.relname='%s' AND nspname='%s'" condition="attname"/>
+            <blind query="SELECT attname FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND a.relname='%s' AND nspname='%s'" query2="SELECT typname FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relname='%s' AND a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND attname='%s' AND nspname='%s'" count="SELECT COUNT(attname) FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND a.relname='%s' AND nspname='%s'" condition="attname"/>
+        </columns>
+        <dump_table>
+            <inband query="SELECT %s FROM %s.%s ORDER BY %s"/>
+            <blind query="SELECT %s FROM %s.%s ORDER BY %s LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM %s.%s"/>
+        </dump_table>
+        <search_db>
+            <inband query="SELECT schema_name FROM information_schema.schemata WHERE %s" condition="schema_name"/>
+            <blind query="SELECT schema_name FROM information_schema.schemata WHERE %s" count="SELECT COUNT(DISTINCT(schema_name)) FROM information_schema.schemata WHERE %s" condition="schema_name"/>
+        </search_db>
+        <search_table>
+            <inband query="SELECT table_schema,table_name FROM information_schema.tables WHERE %s" condition="table_name" condition2="table_schema"/>
+            <blind query="SELECT DISTINCT(table_schema) FROM information_schema.tables WHERE %s" query2="SELECT table_name FROM information_schema.tables WHERE table_schema='%s'" count="SELECT COUNT(DISTINCT(table_schema)) FROM information_schema.tables WHERE %s" count2="SELECT COUNT(table_name) FROM information_schema.tables WHERE table_schema='%s'" condition="table_name" condition2="table_schema"/>
+        </search_table>
+        <search_column>
+            <inband query="SELECT nspname,relname FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND %s" condition="attname" condition2="nspname" condition3="relname"/>
+            <blind query="SELECT DISTINCT(nspname) FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND %s" query2="SELECT DISTINCT(relname) FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND nspname='%s'" count="SELECT COUNT(DISTINCT(nspname)) FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND %s" count2="SELECT COUNT(DISTINCT(relname)) FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND nspname='%s'" condition="attname" condition2="nspname" condition3="relname"/>
         </search_column>
     </dbms>
 </root>

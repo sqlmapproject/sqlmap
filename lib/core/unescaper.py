@@ -21,10 +21,15 @@ class Unescaper(AttribDict):
         identifiedDbms = Backend.getIdentifiedDbms()
 
         if dbms is not None:
-            return self[dbms](expression, quote=quote)
+            retVal = self[dbms](expression, quote=quote)
         elif identifiedDbms is not None:
-            return self[identifiedDbms](expression, quote=quote)
+            retVal = self[identifiedDbms](expression, quote=quote)
         else:
-            return expression
+            retVal = expression
+
+        # e.g. inference comparison for '
+        retVal = retVal.replace("'''", "''''")
+
+        return retVal
 
 unescaper = Unescaper()

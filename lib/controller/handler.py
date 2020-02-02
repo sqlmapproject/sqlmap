@@ -13,6 +13,7 @@ from lib.core.enums import DBMS
 from lib.core.exception import SqlmapConnectionException
 from lib.core.settings import ACCESS_ALIASES
 from lib.core.settings import ALTIBASE_ALIASES
+from lib.core.settings import CRATEDB_ALIASES
 from lib.core.settings import DB2_ALIASES
 from lib.core.settings import DERBY_ALIASES
 from lib.core.settings import FIREBIRD_ALIASES
@@ -37,6 +38,8 @@ from plugins.dbms.access.connector import Connector as AccessConn
 from plugins.dbms.access import AccessMap
 from plugins.dbms.altibase.connector import Connector as AltibaseConn
 from plugins.dbms.altibase import AltibaseMap
+from plugins.dbms.cratedb.connector import Connector as CrateDBConn
+from plugins.dbms.cratedb import CrateDBMap
 from plugins.dbms.db2.connector import Connector as DB2Conn
 from plugins.dbms.db2 import DB2Map
 from plugins.dbms.derby.connector import Connector as DerbyConn
@@ -101,6 +104,7 @@ def setHandler():
         (DBMS.PRESTO, PRESTO_ALIASES, PrestoMap, PrestoConn),
         (DBMS.ALTIBASE, ALTIBASE_ALIASES, AltibaseMap, AltibaseConn),
         (DBMS.MIMERSQL, MIMERSQL_ALIASES, MimerSQLMap, MimerSQLConn),
+        (DBMS.CRATEDB, CRATEDB_ALIASES, CrateDBMap, CrateDBConn),
     ]
 
     _ = max(_ if (conf.get("dbms") or Backend.getIdentifiedDbms() or kb.heuristicExtendedDbms or "").lower() in _[1] else () for _ in items)

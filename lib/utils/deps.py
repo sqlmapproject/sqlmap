@@ -29,7 +29,7 @@ def checkDependencies():
                     logger.warn(warnMsg)
             elif dbmsName == DBMS.MYSQL:
                 __import__("pymysql")
-            elif dbmsName == DBMS.PGSQL:
+            elif dbmsName in (DBMS.PGSQL, DBMS.CRATEDB):
                 __import__("psycopg2")
             elif dbmsName == DBMS.ORACLE:
                 __import__("cx_Oracle")

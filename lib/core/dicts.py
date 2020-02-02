@@ -12,6 +12,7 @@ from lib.core.enums import POST_HINT
 from lib.core.settings import ACCESS_ALIASES
 from lib.core.settings import ALTIBASE_ALIASES
 from lib.core.settings import BLANK
+from lib.core.settings import CRATEDB_ALIASES
 from lib.core.settings import DB2_ALIASES
 from lib.core.settings import DERBY_ALIASES
 from lib.core.settings import FIREBIRD_ALIASES
@@ -212,6 +213,7 @@ DBMS_DICT = {
     DBMS.PRESTO: (PRESTO_ALIASES, "presto-python-client", "https://github.com/prestodb/presto-python-client", None),
     DBMS.ALTIBASE: (ALTIBASE_ALIASES, None, None, None),
     DBMS.MIMERSQL: (MIMERSQL_ALIASES, "mimerpy", "https://github.com/mimersql/MimerPy", None),
+    DBMS.CRATEDB: (CRATEDB_ALIASES, "python-psycopg2", "http://initd.org/psycopg/", "postgresql"),
 }
 
 # Reference: https://blog.jooq.org/tag/sysibm-sysdummy1/
@@ -241,7 +243,8 @@ HEURISTIC_NULL_EVAL = {
     DBMS.MCKOI: "TONUMBER(NULL)",
     DBMS.PRESTO: "FROM_HEX(NULL)",
     DBMS.ALTIBASE: "TDESENCRYPT(NULL,NULL)",
-    DBMS.MIMERSQL: "ASCII_CHAR(256) IS NULL",
+    DBMS.MIMERSQL: "ASCII_CHAR(256)",
+    DBMS.CRATEDB: "(NULL~NULL)",
 }
 
 SQL_STATEMENTS = {
