@@ -300,8 +300,9 @@ class Agent(object):
             where = getTechniqueData().where if where is None else where
             comment = getTechniqueData().comment if comment is None else comment
 
-        if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI) and any((comment or "").startswith(_) for _ in ("--", GENERIC_SQL_COMMENT_MARKER)):
-            comment = queries[Backend.getIdentifiedDbms()].comment.query
+        if any((comment or "").startswith(_) for _ in ("--", GENERIC_SQL_COMMENT_MARKER)):
+            if not GENERIC_SQL_COMMENT.startswith(queries[Backend.getIdentifiedDbms()].comment.query):
+                comment = queries[Backend.getIdentifiedDbms()].comment.query
 
         if comment is not None:
             expression += comment
