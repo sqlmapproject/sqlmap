@@ -13,6 +13,7 @@ from lib.core.settings import ACCESS_ALIASES
 from lib.core.settings import ALTIBASE_ALIASES
 from lib.core.settings import BLANK
 from lib.core.settings import CRATEDB_ALIASES
+from lib.core.settings import CUBRID_ALIASES
 from lib.core.settings import DB2_ALIASES
 from lib.core.settings import DERBY_ALIASES
 from lib.core.settings import FIREBIRD_ALIASES
@@ -214,6 +215,7 @@ DBMS_DICT = {
     DBMS.ALTIBASE: (ALTIBASE_ALIASES, None, None, None),
     DBMS.MIMERSQL: (MIMERSQL_ALIASES, "mimerpy", "https://github.com/mimersql/MimerPy", None),
     DBMS.CRATEDB: (CRATEDB_ALIASES, "python-psycopg2", "http://initd.org/psycopg/", "postgresql"),
+    DBMS.CUBRID: (CUBRID_ALIASES, "CUBRID-Python", "https://github.com/CUBRID/cubrid-python", None),
 }
 
 # Reference: https://blog.jooq.org/tag/sysibm-sysdummy1/
@@ -245,6 +247,7 @@ HEURISTIC_NULL_EVAL = {
     DBMS.ALTIBASE: "TDESENCRYPT(NULL,NULL)",
     DBMS.MIMERSQL: "ASCII_CHAR(256)",
     DBMS.CRATEDB: "(NULL~NULL)",
+    DBMS.CUBRID: "(NULL SETEQ NULL)",
 }
 
 SQL_STATEMENTS = {

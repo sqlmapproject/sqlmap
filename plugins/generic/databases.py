@@ -87,7 +87,7 @@ class Databases(object):
             warnMsg += "schema names for enumeration as the counterpart to database "
             warnMsg += "names on other DBMSes"
             singleTimeWarnMessage(warnMsg)
-        elif Backend.getIdentifiedDbms() in (DBMS.ALTIBASE,):
+        elif Backend.getIdentifiedDbms() in (DBMS.ALTIBASE, DBMS.CUBRID):
             warnMsg = "on %s you'll need to use " % Backend.getIdentifiedDbms()
             warnMsg += "user names for enumeration as the counterpart to database "
             warnMsg += "names on other DBMSes"
@@ -115,7 +115,7 @@ class Databases(object):
 
             infoMsg = "fetching database (schema) names"
 
-        elif Backend.getIdentifiedDbms() in (DBMS.ALTIBASE,):
+        elif Backend.getIdentifiedDbms() in (DBMS.ALTIBASE, DBMS.CUBRID):
             warnMsg = "user names are going to be used on %s " % Backend.getIdentifiedDbms()
             warnMsg += "for enumeration as the counterpart to database "
             warnMsg += "names on other DBMSes"

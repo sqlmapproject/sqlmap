@@ -1381,4 +1381,71 @@
             <blind query="SELECT DISTINCT(nspname) FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND %s" query2="SELECT DISTINCT(relname) FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND nspname='%s'" count="SELECT COUNT(DISTINCT(nspname)) FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND %s" count2="SELECT COUNT(DISTINCT(relname)) FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND nspname='%s'" condition="attname" condition2="nspname" condition3="relname"/>
         </search_column>
     </dbms>
+
+    <dbms value="Cubrid">
+        <cast query="CAST(%s AS VARCHAR(4000))"/>
+        <length query="CHAR_LENGTH(%s)"/>
+        <isnull query="IFNULL(%s,' ')"/>
+        <delimiter query="||"/>
+        <limit query="LIMIT %d,%d"/>
+        <limitregexp query="\s+LIMIT\s+([\d]+)\s*\,\s*([\d]+)" query2="\s+LIMIT\s+([\d]+)"/>
+        <limitgroupstart query="1"/>
+        <limitgroupstop query="2"/>
+        <limitstring query=" LIMIT "/>
+        <order query="ORDER BY %s ASC"/>
+        <count query="COUNT(%s)"/>
+        <comment query="--" query2="/*" query3="//"/>
+        <substring query="MID((%s),%d,%d)"/>
+        <concatenate query="%s||%s"/>
+        <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
+        <hex query="HEX(%s)"/>
+        <inference query="ASCII(MID((%s),%d,1))>%d"/>
+        <banner query="VERSION()"/>
+        <current_user query="CURRENT_USER"/>
+        <current_db query="CURRENT_USER"/>
+        <hostname/>
+        <table_comment query="SELECT comment FROM db_class WHERE owner_name='%s' AND class_name='%s'"/>
+        <column_comment query="SELECT db_attribute.comment FROM db_attribute JOIN db_class ON db_attribute.class_name=db_class.class_name WHERE owner_name='%s' AND db_class.class_name='%s' AND attr_name='%s'"/>
+        <is_dba query="CURRENT_USER='DBA'"/>
+        <check_udf query="(SELECT meth_name FROM db_method WHERE meth_name='%s' LIMIT 0,1)='%s'"/>
+        <users>
+            <inband query="SELECT name FROM db_user"/>
+            <blind query="SELECT name FROM db_user LIMIT %d,1" count="SELECT COUNT(name) FROM db_user"/>
+        </users>
+        <passwords/>
+        <privileges>
+            <inband query="SELECT grantee,auth_type FROM DB_AUTH" condition="grantee"/>
+            <blind query="SELECT DISTINCT(auth_type) FROM DB_AUTH WHERE grantee %s '%s' LIMIT %d,1" count="SELECT COUNT(DISTINCT(auth_type)) FROM DB_AUTH WHERE grantee %s '%s'"/>
+        </privileges>
+        <roles/>
+        <statements/>
+        <dbs>
+            <inband query="SELECT owner_name FROM db_class"/>
+            <blind query="SELECT DISTINCT(owner_name) FROM db_class LIMIT %d,1" count="SELECT COUNT(DISTINCT(owner_name)) FROM db_class"/>
+        </dbs>
+        <tables>
+            <inband query="SELECT owner_name,class_name FROM db_class" condition="owner_name"/>
+            <blind query="SELECT class_name FROM db_class WHERE owner_name='%s' LIMIT %d,1" count="SELECT COUNT(class_name) FROM db_class WHERE owner_name='%s'"/>
+        </tables>
+        <columns>
+            <inband query="SELECT attr_name,data_type FROM db_attribute WHERE class_name='%s'" condition="attr_name"/>
+            <blind query="SELECT attr_name FROM db_attribute WHERE class_name='%s'" query2="SELECT data_type FROM db_attribute WHERE class_name='%s' AND attr_name='%s'" count="SELECT COUNT(attr_name) FROM db_attribute WHERE class_name='%s'" condition="attr_name"/>
+        </columns>
+        <dump_table>
+            <inband query="SELECT %s FROM %s.%s"/>
+            <blind query="SELECT %s FROM %s.%s LIMIT %d,1" count="SELECT COUNT(*) FROM %s.%s"/>
+        </dump_table>
+        <search_db>
+            <inband query="SELECT name FROM db_user WHERE %s" condition="name"/>
+            <blind query="SELECT name FROM db_user WHERE %s" count="SELECT COUNT(name) FROM db_user WHERE %s" condition="name"/>
+        </search_db>
+        <search_table>
+            <inband query="SELECT owner_name,class_name FROM db_class WHERE %s" condition="class_name" condition2="owner_name"/>
+            <blind query="SELECT DISTINCT(owner_name) FROM db_class WHERE %s" query2="SELECT DISTINCT(class_name) FROM db_class WHERE owner_name='%s'" count="SELECT COUNT(DISTINCT(owner_name)) FROM db_class WHERE %s" count2="SELECT COUNT(DISTINCT(class_name)) FROM db_class WHERE owner_name='%s'" condition="class_name" condition2="owner_name"/>
+        </search_table>
+        <search_column>
+            <inband query="SELECT owner_name,db_class.class_name FROM db_attribute JOIN db_class ON db_attribute.class_name=db_class.class_name WHERE %s" condition="attr_name" condition2="owner_name" condition3="db_class.class_name"/>
+            <blind query="SELECT DISTINCT(owner_name) FROM db_attribute JOIN db_class ON db_attribute.class_name=db_class.class_name WHERE %s" query2="SELECT DISTINCT(db_class.class_name) FROM db_attribute JOIN db_class ON db_attribute.class_name=db_class.class_name WHERE owner_name='%s'" count="SELECT COUNT(DISTINCT(owner_name)) FROM db_attribute JOIN db_class ON db_attribute.class_name=db_class.class_name WHERE %s" count2="SELECT COUNT(DISTINCT(db_class.class_name)) FROM db_attribute JOIN db_class ON db_attribute.class_name=db_class.class_name WHERE owner_name='%s'" condition="attr_name" condition2="owner_name" condition3="db_class.class_name"/>
+        </search_column>
+    </dbms>
 </root>

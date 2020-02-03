@@ -56,6 +56,8 @@ def checkDependencies():
                 __import__("prestodb")
             elif dbmsName == DBMS.MIMERSQL:
                 __import__("mimerpy")
+            elif dbmsName == DBMS.CUBRID:
+                __import__("CUBRIDdb")
         except:
             warnMsg = "sqlmap requires '%s' third-party library " % data[1]
             warnMsg += "in order to directly connect to the DBMS "
