@@ -96,6 +96,8 @@ class Fingerprint(GenericFingerprint):
                 fork = FORK.DRIZZLE
             elif inject.checkBooleanExpression("@@VERSION_COMMENT LIKE '%Percona%'"):
                 fork = FORK.PERCONA
+            elif inject.checkBooleanExpression("AURORA_VERSION() LIKE '%'"):            # Reference: https://aws.amazon.com/premiumsupport/knowledge-center/aurora-version-number/
+                fork = FORK.AURORA
             else:
                 fork = ""
 

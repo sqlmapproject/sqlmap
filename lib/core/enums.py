@@ -89,6 +89,7 @@ class FORK(object):
     GREENPLUM = "Greenplum"
     DRIZZLE = "Drizzle"
     IGNITE = "Apache Ignite"
+    AURORA = "Aurora"
 
 class CUSTOM_LOGGING(object):
     PAYLOAD = 9
