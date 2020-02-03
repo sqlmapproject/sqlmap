@@ -83,6 +83,7 @@ from lib.core.exception import SqlmapSyntaxException
 from lib.core.option import _createHomeDirectories
 from lib.core.settings import BASIC_HELP_ITEMS
 from lib.core.settings import DUMMY_URL
+from lib.core.settings import IGNORED_OPTIONS
 from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import IS_WIN
 from lib.core.settings import MAX_HELP_OPTION_LENGTH
@@ -928,6 +929,8 @@ def cmdLineParser(argv=None):
             elif re.search(r"\A-\w{3,}", argv[i]):
                 if argv[i].strip('-').split('=')[0] in (longOptions | longSwitches):
                     argv[i] = "-%s" % argv[i]
+            elif argv[i] in IGNORED_OPTIONS:
+                argv[i] = ""
             elif argv[i] in DEPRECATED_OPTIONS:
                 argv[i] = ""
             elif argv[i].startswith("--tamper"):
