@@ -88,6 +88,7 @@ class FORK(object):
     REDSHIFT = "Amazon Redshift"
     GREENPLUM = "Greenplum"
     DRIZZLE = "Drizzle"
+    IGNITE = "Apache Ignite"
 
 class CUSTOM_LOGGING(object):
     PAYLOAD = 9
