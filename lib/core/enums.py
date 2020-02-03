@@ -87,6 +87,7 @@ class FORK(object):
     TIDB = "TiDB"
     REDSHIFT = "Amazon Redshift"
     GREENPLUM = "Greenplum"
+    DRIZZLE = "Drizzle"
 
 class CUSTOM_LOGGING(object):
     PAYLOAD = 9
