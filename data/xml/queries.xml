@@ -1414,8 +1414,8 @@
         </users>
         <passwords/>
         <privileges>
-            <inband query="SELECT grantee,auth_type FROM DB_AUTH" condition="grantee"/>
-            <blind query="SELECT DISTINCT(auth_type) FROM DB_AUTH WHERE grantee %s '%s' LIMIT %d,1" count="SELECT COUNT(DISTINCT(auth_type)) FROM DB_AUTH WHERE grantee %s '%s'"/>
+            <inband query="SELECT grantee_name,auth_type FROM db_auth" condition="grantee_name"/>
+            <blind query="SELECT DISTINCT(auth_type) FROM db_auth WHERE grantee_name='%s' LIMIT %d,1" count="SELECT COUNT(DISTINCT(auth_type)) FROM db_auth WHERE grantee_name='%s'"/>
         </privileges>
         <roles/>
         <statements/>
@@ -1428,8 +1428,8 @@
             <blind query="SELECT class_name FROM db_class WHERE owner_name='%s' LIMIT %d,1" count="SELECT COUNT(class_name) FROM db_class WHERE owner_name='%s'"/>
         </tables>
         <columns>
-            <inband query="SELECT attr_name,data_type FROM db_attribute WHERE class_name='%s'" condition="attr_name"/>
-            <blind query="SELECT attr_name FROM db_attribute WHERE class_name='%s'" query2="SELECT data_type FROM db_attribute WHERE class_name='%s' AND attr_name='%s'" count="SELECT COUNT(attr_name) FROM db_attribute WHERE class_name='%s'" condition="attr_name"/>
+            <inband query="SELECT attr_name,data_type FROM db_attribute JOIN db_class ON db_attribute.class_name=db_class.class_name WHERE db_class.class_name='%s' AND owner_name='%s'" condition="attr_name"/>
+            <blind query="SELECT attr_name FROM db_attribute JOIN db_class ON db_attribute.class_name=db_class.class_name WHERE db_class.class_name='%s' AND owner_name='%s'" query2="SELECT data_type FROM db_attribute JOIN db_class ON db_attribute.class_name=db_class.class_name WHERE db_class.class_name='%s' AND owner_name='%s'" count="SELECT COUNT(attr_name) FROM db_attribute JOIN db_class ON db_attribute.class_name=db_class.class_name WHERE db_class.class_name='%s' AND owner_name='%s'" condition="attr_name"/>
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s.%s"/>
