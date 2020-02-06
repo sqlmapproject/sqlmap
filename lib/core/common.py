@@ -944,6 +944,10 @@ def setColor(message, color=None, bold=False, level=None, istty=None):
             except:
                 level = None
             retVal = LOGGER_HANDLER.colorize(message, level)
+        else:
+            match = re.search(r"\(([^)]*)\s*fork\)", message)
+            if match:
+                retVal = retVal.replace(match.group(1), colored(match.group(1), color="lightgrey"))
 
     return retVal
 
