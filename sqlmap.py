@@ -351,6 +351,11 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
+        elif all(_ in excMsg for _ in ("ntlm", "socket.error, err", "SyntaxError")):
+            errMsg = "wrong initialization of python-ntlm detected (using Python2 syntax)"
+            logger.critical(errMsg)
+            raise SystemExit
+
         elif all(_ in excMsg for _ in ("drda", "to_bytes")):
             errMsg = "wrong initialization of drda detected (using Python3 syntax)"
             logger.critical(errMsg)
