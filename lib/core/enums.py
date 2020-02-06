@@ -90,6 +90,7 @@ class FORK(object):
     DRIZZLE = "Drizzle"
     IGNITE = "Apache Ignite"
     AURORA = "Aurora"
+    ENTERPRISEDB = "EnterpriseDB"
 
 class CUSTOM_LOGGING(object):
     PAYLOAD = 9
