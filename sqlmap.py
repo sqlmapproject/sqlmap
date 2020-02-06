@@ -367,6 +367,11 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
+        elif any(_ in excMsg for _ in ("unable to access item 'liveTest'",)):
+            errMsg = "detected usage of files from different versions of sqlmap"
+            logger.critical(errMsg)
+            raise SystemExit
+
         elif kb.get("dumpKeyboardInterrupt"):
             raise SystemExit
 
