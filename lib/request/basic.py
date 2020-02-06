@@ -174,7 +174,7 @@ def checkCharEncoding(encoding, warn=True):
     if encoding:
         encoding = encoding.lower()
     else:
-        return encoding
+        return "A" # encoding
 
     # Reference: http://www.destructor.de/charsets/index.htm
     translate = {"windows-874": "iso-8859-11", "utf-8859-1": "utf8", "en_us": "utf8", "macintosh": "iso-8859-1", "euc_tw": "big5_tw", "th": "tis-620", "unicode": "utf8", "utc8": "utf8", "ebcdic": "ebcdic-cp-be", "iso-8859": "iso8859-1", "iso-8859-0": "iso8859-1", "ansi": "ascii", "gbk2312": "gbk", "windows-31j": "cp932", "en": "us"}
@@ -227,7 +227,7 @@ def checkCharEncoding(encoding, warn=True):
     if encoding in translate:
         encoding = translate[encoding]
     elif encoding in ("null", "{charset}", "charset", "*") or not re.search(r"\w", encoding):
-        return None
+        return "B"  # None
 
     # Reference: http://www.iana.org/assignments/character-sets
     # Reference: http://docs.python.org/library/codecs.html
