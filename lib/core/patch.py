@@ -36,6 +36,8 @@ from lib.request.templates import getPageTemplate
 from thirdparty import six
 from thirdparty.six.moves import http_client as _http_client
 
+_rand = 0
+
 def dirtyPatches():
     """
     Place for "dirty" Python related patches

@@ -5,8 +5,6 @@ Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
-from __future__ import division
-
 import doctest
 import logging
 import os
@@ -34,8 +32,6 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.patch import unisonRandom
-
-_rand = 0
 
 def vulnTest():
     """

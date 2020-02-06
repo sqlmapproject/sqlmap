@@ -4,7 +4,6 @@
 Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
-from __future__ import print_function
 
 import codecs
 import gzip
@@ -239,12 +238,8 @@ def checkCharEncoding(encoding, warn=True):
 
     if encoding:
         try:
-            _ = getBytes(randomStr())
-            print(repr(_))
-            print(encoding)
-            six.text_type(_, encoding)
-        except Exception as ex:
-            print(getSafeExString(ex))
+            six.text_type(getBytes(randomStr()), encoding)
+        except:
             if warn:
                 warnMsg = "invalid web page charset '%s'" % encoding
                 singleTimeLogMessage(warnMsg, logging.WARN, encoding)
