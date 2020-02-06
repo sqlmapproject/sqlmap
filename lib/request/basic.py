@@ -4,6 +4,7 @@
 Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
+from __future__ import print_function
 
 import codecs
 import gzip
@@ -174,7 +175,7 @@ def checkCharEncoding(encoding, warn=True):
     if encoding:
         encoding = encoding.lower()
     else:
-        return "A" # encoding
+        return encoding
 
     # Reference: http://www.destructor.de/charsets/index.htm
     translate = {"windows-874": "iso-8859-11", "utf-8859-1": "utf8", "en_us": "utf8", "macintosh": "iso-8859-1", "euc_tw": "big5_tw", "th": "tis-620", "unicode": "utf8", "utc8": "utf8", "ebcdic": "ebcdic-cp-be", "iso-8859": "iso8859-1", "iso-8859-0": "iso8859-1", "ansi": "ascii", "gbk2312": "gbk", "windows-31j": "cp932", "en": "us"}
@@ -227,7 +228,7 @@ def checkCharEncoding(encoding, warn=True):
     if encoding in translate:
         encoding = translate[encoding]
     elif encoding in ("null", "{charset}", "charset", "*") or not re.search(r"\w", encoding):
-        return "B"  # None
+        return None
 
     # Reference: http://www.iana.org/assignments/character-sets
     # Reference: http://docs.python.org/library/codecs.html
@@ -238,8 +239,12 @@ def checkCharEncoding(encoding, warn=True):
 
     if encoding:
         try:
-            six.text_type(getBytes(randomStr()), encoding)
-        except:
+            _ = getBytes(randomStr())
+            print(repr(_))
+            print(encoding)
+            six.text_type(_, encoding)
+        except Exception as ex:
+            print(getSafeExString(ex))
             if warn:
                 warnMsg = "invalid web page charset '%s'" % encoding
                 singleTimeLogMessage(warnMsg, logging.WARN, encoding)
