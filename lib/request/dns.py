@@ -49,16 +49,16 @@ class DNSQuery(object):
         retVal = b""
 
         if self._query:
-            retVal += self._raw[:2]                                                     # Transaction ID
-            retVal += b"\x85\x80"                                                       # Flags (Standard query response, No error)
-            retVal += self._raw[4:6] + self._raw[4:6] + b"\x00\x00\x00\x00"             # Questions and Answers Counts
-            retVal += self._raw[12:(12 + self._raw[12:].find(b"\x00") + 5)]             # Original Domain Name Query
-            retVal += b"\xc0\x0c"                                                       # Pointer to domain name
-            retVal += b"\x00\x01"                                                       # Type A
-            retVal += b"\x00\x01"                                                       # Class IN
-            retVal += b"\x00\x00\x00\x20"                                               # TTL (32 seconds)
-            retVal += b"\x00\x04"                                                       # Data length
-            retVal += b"".join(struct.pack('B', int(_)) for _ in resolution.split('.')) # 4 bytes of IP
+            retVal += self._raw[:2]                                                         # Transaction ID
+            retVal += b"\x85\x80"                                                           # Flags (Standard query response, No error)
+            retVal += self._raw[4:6] + self._raw[4:6] + b"\x00\x00\x00\x00"                 # Questions and Answers Counts
+            retVal += self._raw[12:(12 + self._raw[12:].find(b"\x00") + 5)]                 # Original Domain Name Query
+            retVal += b"\xc0\x0c"                                                           # Pointer to domain name
+            retVal += b"\x00\x01"                                                           # Type A
+            retVal += b"\x00\x01"                                                           # Class IN
+            retVal += b"\x00\x00\x00\x20"                                                   # TTL (32 seconds)
+            retVal += b"\x00\x04"                                                           # Data length
+            retVal += b"".join(struct.pack('B', int(_)) for _ in resolution.split('.'))     # 4 bytes of IP
 
         return retVal
 
@@ -114,7 +114,7 @@ class DNSServer(object):
 
         with self._lock:
             for _ in self._requests:
-                if prefix is None and suffix is None or re.search(b"%s\..+\.%s" % (prefix, suffix), _, re.I):
+                if prefix is None and suffix is None or re.search(b"%s\\..+\\.%s" % (prefix, suffix), _, re.I):
                     retVal = _
                     self._requests.remove(_)
                     break

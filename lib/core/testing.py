@@ -33,6 +33,7 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
+from lib.core.patch import unisonRandom
 
 _rand = 0
 
@@ -201,44 +202,12 @@ def fuzzTest():
 
         count += 1
 
-def dirtyPatchRandom():
-    """
-    Unifying random generated data across different Python versions
-    """
-
-    def _lcg():
-        global _rand
-        a = 1140671485
-        c = 128201163
-        m = 2 ** 24
-        _rand = (a * _rand + c) % m
-        return _rand
-
-    def _randint(a, b):
-        _ = a + (_lcg() % (b - a + 1))
-        return _
-
-    def _choice(seq):
-        return seq[_randint(0, len(seq) - 1)]
-
-    def _sample(population, k):
-        return [_choice(population) for _ in xrange(k)]
-
-    def _seed(seed):
-        global _rand
-        _rand = seed
-
-    random.choice = _choice
-    random.randint = _randint
-    random.sample = _sample
-    random.seed = _seed
-
 def smokeTest():
     """
     Runs the basic smoke testing of a program
     """
 
-    dirtyPatchRandom()
+    unisonRandom()
 
     content = open(paths.ERRORS_XML, "r").read()
     for regex in re.findall(r'<error regexp="(.+?)"/>', content):

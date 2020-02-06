@@ -6,6 +6,7 @@ See the file 'LICENSE' for copying permission
 """
 
 import codecs
+import random
 
 import lib.controller.checks
 import lib.core.common
@@ -25,6 +26,7 @@ from lib.core.common import isListLike
 from lib.core.common import readInput
 from lib.core.common import shellExec
 from lib.core.common import singleTimeWarnMessage
+from lib.core.compat import xrange
 from lib.core.convert import stdoutEncode
 from lib.core.data import conf
 from lib.core.option import _setHTTPHandlers
@@ -46,6 +48,7 @@ def dirtyPatches():
     if six.PY3:
         if not hasattr(_http_client.HTTPConnection, "__send_output"):
             _http_client.HTTPConnection.__send_output = _http_client.HTTPConnection._send_output
+
         def _send_output(self, *args, **kwargs):
             if conf.chunked and "encode_chunked" in kwargs:
                 kwargs["encode_chunked"] = False
@@ -100,3 +103,35 @@ def pympTempLeakPatch(tempDir):
         multiprocessing.util.get_temp_dir = lambda: tempDir
     except:
         pass
+
+def unisonRandom():
+    """
+    Unifying random generated data across different Python versions
+    """
+
+    def _lcg():
+        global _rand
+        a = 1140671485
+        c = 128201163
+        m = 2 ** 24
+        _rand = (a * _rand + c) % m
+        return _rand
+
+    def _randint(a, b):
+        _ = a + (_lcg() % (b - a + 1))
+        return _
+
+    def _choice(seq):
+        return seq[_randint(0, len(seq) - 1)]
+
+    def _sample(population, k):
+        return [_choice(population) for _ in xrange(k)]
+
+    def _seed(seed):
+        global _rand
+        _rand = seed
+
+    random.choice = _choice
+    random.randint = _randint
+    random.sample = _sample
+    random.seed = _seed
