@@ -117,6 +117,30 @@ SYBASE_TYPES = {
     20: "image",
 }
 
+ALTIBASE_TYPES = {
+    1: "CHAR",
+    12: "VARCHAR",
+    -8: "NCHAR",
+    -9: "NVARCHAR",
+    2: "NUMERIC",
+    2: "DECIMAL",
+    6: "FLOAT",
+    6: "NUMBER",
+    8: "DOUBLE",
+    7: "REAL",
+    -5: "BIGINT",
+    4: "INTEGER",
+    5: "SMALLINT",
+    9: "DATE",
+    30: "BLOB",
+    40: "CLOB",
+    20001: "BYTE",
+    20002: "NIBBLE",
+    -7: "BIT",
+    -100: "VARBIT",
+    10003: "GEOMETRY",
+}
+
 MYSQL_PRIVS = {
     1: "select_priv",
     2: "insert_priv",

@@ -37,6 +37,7 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.decorators import stackedmethod
+from lib.core.dicts import ALTIBASE_TYPES
 from lib.core.dicts import FIREBIRD_TYPES
 from lib.core.dicts import INFORMIX_TYPES
 from lib.core.enums import CHARSET_TYPE
@@ -702,6 +703,8 @@ class Databases(object):
                                     key = int(columnData[1]) if isinstance(columnData[1], six.string_types) and columnData[1].isdigit() else columnData[1]
                                     if Backend.isDbms(DBMS.FIREBIRD):
                                         columnData[1] = FIREBIRD_TYPES.get(key, columnData[1])
+                                    elif Backend.isDbms(DBMS.ALTIBASE):
+                                        columnData[1] = ALTIBASE_TYPES.get(key, columnData[1])
                                     elif Backend.isDbms(DBMS.INFORMIX):
                                         notNull = False
                                         if isinstance(key, int) and key > 255:

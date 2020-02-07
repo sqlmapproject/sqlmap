@@ -412,6 +412,12 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
                     kb.forcePartialUnion = kb.injection.data[PAYLOAD.TECHNIQUE.UNION].vector[8]
                     fallback = not expected and kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.ORIGINAL and not kb.forcePartialUnion
 
+                    if expected == EXPECTED.BOOL:
+                        # Note: some DBMSes (e.g. Altibase) don't support implicit conversion of boolean check result during concatenation with prefix and suffix (e.g. 'qjjvq'||(1=1)||'qbbbq')
+
+                        if not any(_ in forgeCaseExpression for _ in ("SELECT", "CASE")):
+                            forgeCaseExpression = "(CASE WHEN (%s) THEN '1' ELSE '0' END)" % forgeCaseExpression
+
                     try:
                         value = _goUnion(forgeCaseExpression if expected == EXPECTED.BOOL else query, unpack, dump)
                     except SqlmapConnectionException:

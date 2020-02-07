@@ -173,6 +173,9 @@ def main():
             elif conf.vulnTest:
                 from lib.core.testing import vulnTest
                 os._exitcode = 1 - (vulnTest() or 0)
+            elif conf.bedTest:
+                from lib.core.testing import bedTest
+                os._exitcode = 1 - (bedTest() or 0)
             elif conf.fuzzTest:
                 from lib.core.testing import fuzzTest
                 fuzzTest()

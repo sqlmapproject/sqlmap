@@ -106,7 +106,7 @@
         <check_udf query="(SELECT proname='%s' FROM pg_proc WHERE proname='%s' OFFSET 0 LIMIT 1)"/>
         <users>
             <inband query="SELECT usename FROM pg_user"/>
-            <blind query="SELECT DISTINCT(usename) FROM pg_user OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(usename)) FROM pg_user"/>
+            <blind query="SELECT DISTINCT(usename) FROM pg_user ORDER BY usename OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(usename)) FROM pg_user"/>
         </users>
         <passwords>
             <inband query="SELECT usename,passwd FROM pg_shadow" condition="usename"/>
@@ -123,23 +123,23 @@
         </statements>
         <dbs>
             <inband query="SELECT DISTINCT(schemaname) FROM pg_tables"/>
-            <blind query="SELECT DISTINCT(schemaname) FROM pg_tables OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(schemaname)) FROM pg_tables"/>
+            <blind query="SELECT DISTINCT(schemaname) FROM pg_tables ORDER BY schemaname OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(schemaname)) FROM pg_tables"/>
         </dbs>
         <tables>
             <inband query="SELECT schemaname,tablename FROM pg_tables" condition="schemaname"/>
-            <blind query="SELECT tablename FROM pg_tables WHERE schemaname='%s' OFFSET %d LIMIT 1" count="SELECT COUNT(tablename) FROM pg_tables WHERE schemaname='%s'"/>
+            <blind query="SELECT tablename FROM pg_tables WHERE schemaname='%s' ORDER BY tablename OFFSET %d LIMIT 1" count="SELECT COUNT(tablename) FROM pg_tables WHERE schemaname='%s'"/>
         </tables>
         <columns>
             <inband query="SELECT attname,typname FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND a.relname='%s' AND nspname='%s'" condition="attname"/>
-            <blind query="SELECT attname FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND a.relname='%s' AND nspname='%s'" query2="SELECT typname FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relname='%s' AND a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND attname='%s' AND nspname='%s'" count="SELECT COUNT(attname) FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND a.relname='%s' AND nspname='%s'" condition="attname"/>
+            <blind query="SELECT attname FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND a.relname='%s' AND nspname='%s' ORDER BY attname" query2="SELECT typname FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relname='%s' AND a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND attname='%s' AND nspname='%s' ORDER BY attname" count="SELECT COUNT(attname) FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND a.relname='%s' AND nspname='%s'" condition="attname"/>
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s.%s ORDER BY %s"/>
             <blind query="SELECT %s FROM %s.%s ORDER BY %s OFFSET %d LIMIT 1" count="SELECT COUNT(*) FROM %s.%s"/>
         </dump_table>
         <search_db>
-            <inband query="SELECT datname FROM pg_database WHERE %s" condition="datname"/>
-            <blind query="SELECT DISTINCT(datname) FROM pg_database WHERE %s" count="SELECT COUNT(DISTINCT(datname)) FROM pg_database WHERE %s" condition="datname"/>
+            <inband query="SELECT schemaname FROM pg_tables WHERE %s" condition="schemaname"/>
+            <blind query="SELECT DISTINCT(schemaname) FROM pg_tables WHERE %s" count="SELECT COUNT(DISTINCT(schemaname)) FROM pg_tables WHERE %s" condition="schemaname"/>
         </search_db>
         <search_table>
             <inband query="SELECT schemaname,tablename FROM pg_tables WHERE %s" condition="tablename" condition2="schemaname"/>

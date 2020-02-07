@@ -137,6 +137,51 @@ def vulnTest():
 
     return retVal
 
+def bedTest():
+    """
+    Runs the testing against 'testbed'
+    """
+
+    TESTS = (
+        ("-u 'http://testbed/postgresql/get_int.php?id=1' --flush-session --technique=B --is-dba --threads=4 -v 3 --dump -D CD --banner --sql-query=\"SELECT 'foobar'\"", ("x86_64-pc-linux-gnu", "Database: public", "Table: testusers", "5 entries", "id", "name", "surname", "luther", "blisset", "NULL", "Vector: AND [INFERENCE]", "it looks like the back-end DBMS is 'PostgreSQL'", "the back-end DBMS is PostgreSQL", "current user is DBA: False", ": 'foobar'")),
+        ("-u 'http://testbed/postgresql/get_int.php?id=1' --flush-session --technique=U --is-dba -v 3 --dump -D CD --banner --sql-query=\"SELECT 'foobar'\"", ("x86_64-pc-linux-gnu", "Database: public", "Table: testusers", "5 entries", "id", "name", "surname", "luther", "blisset", "NULL", "Title: Generic UNION query (NULL) - 3 columns", "the back-end DBMS is PostgreSQL", "appears to have 3 columns", "current user is DBA: False", ": 'foobar'")),
+        ("-u 'http://testbed/postgresql/get_int.php?id=1' --flush-session --technique=U --hex --banner --current-user --current-db --search -C surname --answers='dump=n'", ("x86_64-pc-linux-gnu", "current schema (equivalent to database on PostgreSQL): 'public'", "current user: 'testuser'", "[1 column]", "| surname | varchar |")),
+        ("-u 'http://testbed/altibase/get_int.php?id=1' --flush-session --technique=B --is-dba --threads=4 -v 3 --dump -D CD --banner --sql-query=\"SELECT 'foobar'\"", ("x86_64-unknown-linux-gnu", "Database: SYS", "Table: TESTUSERS", "5 entries", "ID", "NAME", "SURNAME", "luther", "blisset", "NULL", "Vector: AND [INFERENCE]", "back-end DBMS could be 'Altibase'", "the back-end DBMS is Altibase", "current user is DBA: True", ": 'foobar'")),
+        ("-u 'http://testbed/altibase/get_int.php?id=1' --flush-session --technique=U --is-dba -v 3 --dump -D CD --banner --sql-query=\"SELECT 'foobar'\"", ("x86_64-unknown-linux-gnu", "Database: SYS", "Table: TESTUSERS", "5 entries", "ID", "NAME", "SURNAME", "luther", "blisset", "NULL", "Title: Generic UNION query (NULL) - 3 columns", "the back-end DBMS is Altibase", "appears to have 3 columns", "current user is DBA: True", ": 'foobar'")),
+        ("-u 'http://testbed/altibase/get_int.php?id=1' --flush-session --technique=U --hex --banner --current-user --current-db --search -C surname --answers='dump=n'", ("x86_64-unknown-linux-gnu", "current user (equivalent to database on Altibase): 'SYS'", "current user: 'SYS'", "[1 column]", "| SURNAME | VARCHAR |")),
+        ("-u 'http://testbed/cockroachdb/get_int.php?id=1' --flush-session --technique=B --is-dba --threads=4 -v 3 --dump -D CD --banner --sql-query=\"SELECT 'foobar'\"", ("x86_64-unknown-linux-gnu", "CockroachDB fork", "Database: public", "Table: testusers", "5 entries", "id", "name", "surname", "luther", "blisset", "NULL", "Vector: AND [INFERENCE]", "back-end DBMS could be 'PostgreSQL'", "the back-end DBMS is PostgreSQL", "current user is DBA: True", ": 'foobar'")),
+        ("-u 'http://testbed/cockroachdb/get_int.php?id=1' --flush-session --technique=U --is-dba -v 3 --dump -D CD --banner --sql-query=\"SELECT 'foobar'\"", ("x86_64-unknown-linux-gnu", "CockroachDB fork", "Database: public", "Table: testusers", "5 entries", "id", "name", "surname", "luther", "blisset", "NULL", "Title: Generic UNION query (NULL) - 3 columns", "the back-end DBMS is PostgreSQL", "appears to have 3 columns", "current user is DBA: True", ": 'foobar'")),
+        ("-u 'http://testbed/cockroachdb/get_int.php?id=1' --flush-session --technique=U --hex --banner --current-user --current-db --search -C surname --answers='dump=n'", ("x86_64-unknown-linux-gnu", "current schema (equivalent to database on PostgreSQL): 'public'", "current user: 'root'", "[1 column]", "| surname | varchar |")),
+    )
+
+    retVal = True
+    count = 0
+
+    for options, checks in TESTS:
+        status = '%d/%d (%d%%) ' % (count, len(TESTS), round(100.0 * count / len(TESTS)))
+        dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%X"), status))
+
+        cmd = "%s %s %s --batch" % (sys.executable, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py")), options)
+        output = shellExec(cmd)
+
+        if not all((check in output if not check.startswith('~') else check[1:] not in output) for check in checks):
+            for check in checks:
+                if check not in output:
+                    print(cmd, check)
+            dataToStdout("---\n\n$ %s\n" % cmd)
+            dataToStdout("%s---\n" % clearColors(output))
+            retVal = False
+
+        count += 1
+
+    clearConsoleLine()
+    if retVal:
+        logger.info("bed test final result: PASSED")
+    else:
+        logger.error("best test final result: FAILED")
+
+    return retVal
+
 def fuzzTest():
     count = 0
     address, port = "127.0.0.10", random.randint(1025, 65535)

@@ -450,7 +450,7 @@ class Agent(object):
 
         nulledCastedField = field
 
-        if field:
+        if field and Backend.getIdentifiedDbms():
             rootQuery = queries[Backend.getIdentifiedDbms()]
 
             if field.startswith("(CASE") or field.startswith("(IIF") or conf.noCast:
