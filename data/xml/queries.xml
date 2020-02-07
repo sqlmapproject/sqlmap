@@ -78,9 +78,10 @@
     </dbms>
 
     <dbms value="PostgreSQL">
-        <cast query="CAST(%s AS CHARACTER(10000))"/>
+        <cast query="CAST(%s AS VARCHAR(10000))"/>
         <length query="LENGTH(%s)"/>
-        <isnull query="COALESCE(%s,' ')"/>
+        <!-- NOTE: PostgreSQL does not like COALESCE with different data-types (e.g. COALESCE(id,' ')) -->
+        <isnull query="COALESCE(%s::text,' ')"/>
         <delimiter query="||"/>
         <limit query="OFFSET %d LIMIT %d"/>
         <limitregexp query="\s+OFFSET\s+([\d]+)\s+LIMIT\s+([\d]+)" query2="\s+LIMIT\s+([\d]+)"/>
@@ -1326,7 +1327,6 @@
         <substring query="SUBSTR((%s)::text,%d,%d)"/>
         <concatenate query="%s||%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
-        <hex/>
         <!-- NOTE: ASCII() only available in >= 4.1 -->
         <inference query="SUBSTR((%s)::text,%d,1)>'%c'" query2="ASCII(SUBSTR((%s)::text,%d,1))>%d"/>
         <banner query="SELECT version['number'] FROM sys.nodes" query2="VERSION()"/>
