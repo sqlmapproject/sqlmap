@@ -584,15 +584,14 @@ class Connect(object):
                     refresh = extractRegexResult(JAVASCRIPT_HREF_REGEX, page)
 
                     if refresh:
-                        debugMsg = "got Javascript redirect request"
+                        debugMsg = "got Javascript redirect logic"
                         logger.debug(debugMsg)
 
                 if refresh:
                     if kb.alwaysRefresh is None:
-                        msg = "got a refresh request "
+                        msg = "got a refresh intent "
                         msg += "(redirect like response common to login pages) to '%s'. " % refresh
-                        msg += "Do you want to apply the refresh "
-                        msg += "from now on (or stay on the original page)? [Y/n]"
+                        msg += "Do you want to apply it from now on? [Y/n]"
 
                         kb.alwaysRefresh = readInput(msg, default='Y', boolean=True)
 
