@@ -818,7 +818,8 @@
         <substring query="SUBSTR((%s),%d,%d)"/>
         <concatenate query="%s||%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END) FROM SYSMASTER:SYSDUAL"/>
-        <hex query="HEX(%s)"/>
+        <!-- NOTE: HEX() only accepts integer values -->
+        <!-- <hex query="HEX(%s)"/> -->
         <!-- http://www.dbforums.com/showthread.php?1660588-select-first-and-union&p=6478613#post6478613 -->
         <inference query="ASCII(SUBSTR((SELECT * FROM (%s)),%d,1))>%d"/>
         <banner query="SELECT DBINFO('VERSION','FULL') FROM SYSMASTER:SYSDUAL"/>

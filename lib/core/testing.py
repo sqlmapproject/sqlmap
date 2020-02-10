@@ -143,6 +143,10 @@ def bedTest():
     """
 
     TESTS = (
+        # Informix
+        ("-u 'http://testbed/informix/get_int.php?id=1' --flush-session --technique=B --is-dba --threads=4 --dump -D CD --banner --sql-query=\"SELECT 'foobar'\"", ("IBM Informix Dynamic Server Version 14.10.FC2DE", "Database: testdb", "Table: users", "5 entries", "id", "name", "surname", "luther", "blisset", "NULL", "Payload: id=1 AND ", "back-end DBMS could be 'Informix'", "the back-end DBMS is Informix", "current user is DBA: True", ": 'foobar'")),
+        ("-u 'http://testbed/informix/get_int.php?id=1' --flush-session --hex --banner --current-user --current-db --search -C surname --answers='dump=n'", ("IBM Informix Dynamic Server Version 14.10.FC2DE", "current database: 'testdb'", "current user: 'testuser'", "[1 column]", "| surname | varchar |")),
+
         # Altibase
         ("-u 'http://testbed/altibase/get_int.php?id=1' --flush-session --technique=B --is-dba --threads=4 --dump -D CD --banner --sql-query=\"SELECT 'foobar'\"", ("x86_64-unknown-linux-gnu", "Database: SYS", "Table: TESTUSERS", "5 entries", "ID", "NAME", "SURNAME", "luther", "blisset", "NULL", "Payload: id=1 AND ", "back-end DBMS could be 'Altibase'", "the back-end DBMS is Altibase", "current user is DBA: True", ": 'foobar'")),
         ("-u 'http://testbed/altibase/get_int.php?id=1' --flush-session --technique=U --is-dba --dump -D CD --banner --sql-query=\"SELECT 'foobar'\"", ("x86_64-unknown-linux-gnu", "Database: SYS", "Table: TESTUSERS", "5 entries", "ID", "NAME", "SURNAME", "luther", "blisset", "NULL", "Title: Generic UNION query (NULL) - 3 columns", "the back-end DBMS is Altibase", "appears to have 3 columns", "current user is DBA: True", ": 'foobar'")),
@@ -192,7 +196,7 @@ def bedTest():
         # MySQL
         ("-u 'http://testbed/mysql/get_int.php?id=1' --flush-session --technique=B --is-dba --threads=4 --dump -D CD --banner --sql-query=\"SELECT 'foobar'\"", ("8.0.19", "Database: testdb", "Table: testusers", "5 entries", "id", "name", "surname", "luther", "blisset", "NULL", "Payload: id=1 AND ", "it looks like the back-end DBMS is 'MySQL'", "the back-end DBMS is MySQL", "current user is DBA: True", ": 'foobar'")),
         ("-u 'http://testbed/mysql/get_int.php?id=1' --flush-session --technique=U --is-dba --dump -D CD --banner --sql-query=\"SELECT 'foobar'\"", ("8.0.19", "Database: testdb", "Table: testusers", "5 entries", "id", "name", "surname", "luther", "blisset", "NULL", "Title: Generic UNION query (NULL) - 3 columns", "the back-end DBMS is MySQL", "appears to have 3 columns", "current user is DBA: True", ": 'foobar'")),
-        ("-u 'http://testbed/mysql/get_int.php?id=1' --flush-session --technique=E --is-dba --dump -D CD --banner --sql-query=\"SELECT 'foobar'\"", ("8.0.19", "Database: testdb", "Table: testusers", "5 entries", "id", "name", "surname", "luther", "blisset", "NULL", "Title: MySQL >= 5.0 AND error-based", "the back-end DBMS is MySQL", "appears to have 3 columns", "current user is DBA: True", ": 'foobar'")),
+        ("-u 'http://testbed/mysql/get_int.php?id=1' --flush-session --technique=E --is-dba --dump -D CD --banner --sql-query=\"SELECT 'foobar'\"", ("8.0.19", "Database: testdb", "Table: testusers", "5 entries", "id", "name", "surname", "luther", "blisset", "NULL", "Title: MySQL >= 5.0 AND error-based", "the back-end DBMS is MySQL", "current user is DBA: True", ": 'foobar'")),
         ("-u 'http://testbed/mysql/get_int.php?id=1' --flush-session --hex --banner --current-user --current-db --search -C surname --answers='dump=n'", ("Title: AND boolean-based blind", "Title: MySQL >= 5.1 AND error-based", "Title: MySQL >= 5.0.12 AND time-based blind", "Title: Generic UNION query (NULL) - 3 columns", "8.0.19", "current database: 'testdb'", "current user: 'root@%'", "[1 column]", "| surname | varchar(1000) |")),
 
         # PostgreSQL
