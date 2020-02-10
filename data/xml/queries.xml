@@ -29,8 +29,8 @@
         <is_dba query="(SELECT super_priv FROM mysql.user WHERE user='%s' LIMIT 0,1)='Y'"/>
         <check_udf query="(SELECT name FROM mysql.func WHERE name='%s' LIMIT 0,1)='%s'"/>
         <users>
-            <inband query="SELECT grantee FROM INFORMATION_SCHEMA.USER_PRIVILEGES" query2="SELECT user FROM mysql.user"/>
-            <blind query="SELECT DISTINCT(grantee) FROM INFORMATION_SCHEMA.USER_PRIVILEGES LIMIT %d,1" query2="SELECT DISTINCT(user) FROM mysql.user LIMIT %d,1" count="SELECT COUNT(DISTINCT(grantee)) FROM INFORMATION_SCHEMA.USER_PRIVILEGES" count2="SELECT COUNT(DISTINCT(user)) FROM mysql.user"/>
+            <inband query="SELECT grantee FROM INFORMATION_SCHEMA.USER_PRIVILEGES" query2="SELECT user FROM mysql.user" query3="SELECT username FROM DATA_DICTIONARY.CUMULATIVE_USER_STATS"/>
+            <blind query="SELECT DISTINCT(grantee) FROM INFORMATION_SCHEMA.USER_PRIVILEGES LIMIT %d,1" query2="SELECT DISTINCT(user) FROM mysql.user LIMIT %d,1" query3="SELECT DISTINCT(username) FROM DATA_DICTIONARY.CUMULATIVE_USER_STATS LIMIT %d,1" count="SELECT COUNT(DISTINCT(grantee)) FROM INFORMATION_SCHEMA.USER_PRIVILEGES" count2="SELECT COUNT(DISTINCT(user)) FROM mysql.user" count3="SELECT COUNT(DISTINCT(username)) FROM DATA_DICTIONARY.CUMULATIVE_USER_STATS"/>
         </users>
         <!-- https://github.com/dev-sec/mysql-baseline/issues/35 -->
         <!-- https://stackoverflow.com/a/31122246 -->
@@ -44,7 +44,7 @@
         </privileges>
         <roles/>
         <statements>
-            <inband query="SELECT INFO FROM INFORMATION_SCHEMA.PROCESSLIST"/>
+            <inband query="SELECT INFO FROM INFORMATION_SCHEMA.PROCESSLIST" query2="SELECT INFO FROM DATA_DICTIONARY.PROCESSLIST"/>
             <blind query="SELECT INFO FROM INFORMATION_SCHEMA.PROCESSLIST ORDER BY ID LIMIT %d,1" query2="SELECT INFO FROM INFORMATION_SCHEMA.PROCESSLIST WHERE ID=%d" query3="SELECT ID FROM INFORMATION_SCHEMA.PROCESSLIST LIMIT %d,1" count="SELECT COUNT(DISTINCT(INFO)) FROM INFORMATION_SCHEMA.PROCESSLIST"/>
         </statements>
         <dbs>
@@ -131,7 +131,7 @@
             <blind query="SELECT tablename FROM pg_tables WHERE schemaname='%s' ORDER BY tablename OFFSET %d LIMIT 1" count="SELECT COUNT(tablename) FROM pg_tables WHERE schemaname='%s'"/>
         </tables>
         <columns>
-            <inband query="SELECT attname,typname FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND a.relname='%s' AND nspname='%s'" condition="attname"/>
+            <inband query="SELECT attname,typname FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND a.relname='%s' AND nspname='%s' ORDER BY attname" condition="attname"/>
             <blind query="SELECT attname FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND a.relname='%s' AND nspname='%s' ORDER BY attname" query2="SELECT typname FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relname='%s' AND a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND attname='%s' AND nspname='%s' ORDER BY attname" count="SELECT COUNT(attname) FROM pg_namespace,pg_type,pg_attribute b JOIN pg_class a ON a.oid=b.attrelid WHERE a.relnamespace=pg_namespace.oid AND pg_type.oid=b.atttypid AND attnum>0 AND a.relname='%s' AND nspname='%s'" condition="attname"/>
         </columns>
         <dump_table>
@@ -198,8 +198,8 @@
             <blind query="SELECT TOP 1 name FROM master..sysdatabases WHERE name NOT IN (SELECT TOP %d name FROM master..sysdatabases ORDER BY name) ORDER BY name" count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases"/>
         </dbs>
         <tables>
-            <inband query="SELECT %s..sysusers.name+'.'+%s..sysobjects.name FROM %s..sysobjects INNER JOIN %s..sysusers ON %s..sysobjects.uid = %s..sysusers.uid WHERE %s..sysobjects.xtype IN ('u','v')" query2="SELECT table_schema+'.'+table_name FROM information_schema.tables WHERE table_catalog='%s'" query3="SELECT name FROM %s..sysobjects WHERE xtype = 'U'"/>
-            <blind query="SELECT TOP 1 %s..sysusers.name+'.'+%s..sysobjects.name FROM %s..sysobjects INNER JOIN %s..sysusers ON %s..sysobjects.uid = %s..sysusers.uid WHERE %s..sysobjects.xtype IN ('u','v') AND %s..sysusers.name+'.'+%s..sysobjects.name NOT IN (SELECT TOP %d %s..sysusers.name+'.'+%s..sysobjects.name FROM %s..sysobjects INNER JOIN %s..sysusers ON %s..sysobjects.uid = %s..sysusers.uid WHERE %s..sysobjects.xtype IN ('u','v') ORDER BY %s..sysusers.name+'.'+%s..sysobjects.name) ORDER BY %s..sysusers.name+'.'+%s..sysobjects.name" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE %s..sysobjects.xtype IN ('u','v')" query2="SELECT TOP 1 table_schema+'.'+table_name FROM information_schema.tables WHERE table_catalog='%s' AND table_schema+'.'+table_name NOT IN (SELECT TOP %d table_schema+'.'+table_name FROM information_schema.tables WHERE table_catalog='%s' ORDER BY table_schema+'.'+table_name) ORDER BY table_schema+'.'+table_name" count2="SELECT LTRIM(STR(COUNT(table_name))) FROM information_schema.tables WHERE table_catalog='%s'" query3="SELECT TOP 1 name FROM %s..sysobjects WHERE xtype = 'U' AND name NOT IN (SELECT TOP %d name FROM %s..sysobjects WHERE xtype = 'U' ORDER BY name) ORDER BY name" count3="SELECT COUNT(name) FROM %s..sysobjects WHERE xtype = 'U'"/>
+            <inband query="SELECT %s..sysusers.name+'.'+%s..sysobjects.name FROM %s..sysobjects INNER JOIN %s..sysusers ON %s..sysobjects.uid=%s..sysusers.uid WHERE %s..sysobjects.xtype IN ('u','v')" query2="SELECT table_schema+'.'+table_name FROM information_schema.tables WHERE table_catalog='%s'" query3="SELECT name FROM %s..sysobjects WHERE xtype='U'"/>
+            <blind query="SELECT TOP 1 %s..sysusers.name+'.'+%s..sysobjects.name FROM %s..sysobjects INNER JOIN %s..sysusers ON %s..sysobjects.uid=%s..sysusers.uid WHERE %s..sysobjects.xtype IN ('u','v') AND %s..sysusers.name+'.'+%s..sysobjects.name NOT IN (SELECT TOP %d %s..sysusers.name+'.'+%s..sysobjects.name FROM %s..sysobjects INNER JOIN %s..sysusers ON %s..sysobjects.uid=%s..sysusers.uid WHERE %s..sysobjects.xtype IN ('u','v') ORDER BY %s..sysusers.name+'.'+%s..sysobjects.name) ORDER BY %s..sysusers.name+'.'+%s..sysobjects.name" count="SELECT LTRIM(STR(COUNT(name))) FROM %s..sysobjects WHERE %s..sysobjects.xtype IN ('u','v')" query2="SELECT TOP 1 table_schema+'.'+table_name FROM information_schema.tables WHERE table_catalog='%s' AND table_schema+'.'+table_name NOT IN (SELECT TOP %d table_schema+'.'+table_name FROM information_schema.tables WHERE table_catalog='%s' ORDER BY table_schema+'.'+table_name) ORDER BY table_schema+'.'+table_name" count2="SELECT LTRIM(STR(COUNT(table_name))) FROM information_schema.tables WHERE table_catalog='%s'" query3="SELECT TOP 1 name FROM %s..sysobjects WHERE xtype='U' AND name NOT IN (SELECT TOP %d name FROM %s..sysobjects WHERE xtype='U' ORDER BY name) ORDER BY name" count3="SELECT COUNT(name) FROM %s..sysobjects WHERE xtype='U'"/>
         </tables>
         <columns>
             <inband query="SELECT %s..syscolumns.name,TYPE_NAME(%s..syscolumns.xtype) FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" query2="SELECT COL_NAME(OBJECT_ID('%s.%s'),%d)" condition="[DB]..syscolumns.name"/>
@@ -445,8 +445,8 @@
             <blind query="SELECT FIRST 1 SKIP %d DISTINCT(RDB$USER) FROM RDB$USER_PRIVILEGES" count="SELECT COUNT(DISTINCT(RDB$USER)) FROM RDB$USER_PRIVILEGES"/>
         </users>
         <tables>
-            <inband query="SELECT RDB$RELATION_NAME FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG = 0)"/>
-            <blind query="SELECT FIRST 1 SKIP %d RDB$RELATION_NAME FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG = 0)" count="SELECT COUNT(RDB$RELATION_NAME) FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG = 0)"/>
+            <inband query="SELECT RDB$RELATION_NAME FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG=0)"/>
+            <blind query="SELECT FIRST 1 SKIP %d RDB$RELATION_NAME FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG=0)" count="SELECT COUNT(RDB$RELATION_NAME) FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG=0)"/>
         </tables>
         <privileges>
             <inband query="SELECT RDB$USER,RDB$PRIVILEGE FROM RDB$USER_PRIVILEGES" condition="RDB$USER"/>
@@ -456,9 +456,9 @@
         <statements/>
         <dbs/>
         <columns>
-            <!--<inband query="SELECT r.RDB$FIELD_NAME,CASE f.RDB$FIELD_TYPE WHEN 261 THEN 'BLOB' WHEN 14 THEN 'CHAR' WHEN 40 THEN 'CSTRING' WHEN 11 THEN 'D_FLOAT' WHEN 27 THEN 'DOUBLE' WHEN 10 THEN 'FLOAT' WHEN 16 THEN 'INT64' WHEN 8 THEN 'INTEGER' WHEN 9 THEN 'QUAD' WHEN 7 THEN 'SMALLINT' WHEN 12 THEN 'DATE' WHEN 13 THEN 'TIME' WHEN 35 THEN 'TIMESTAMP' WHEN 37 THEN 'VARCHAR' ELSE 'UNKNOWN' END AS field_type FROM RDB$RELATION_FIELDS r LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME WHERE r.RDB$RELATION_NAME='%s'"/>-->
-            <inband query="SELECT r.RDB$FIELD_NAME,f.RDB$FIELD_TYPE FROM RDB$RELATION_FIELDS r LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME WHERE r.RDB$RELATION_NAME='%s'"/>
-            <blind query="SELECT r.RDB$FIELD_NAME FROM RDB$RELATION_FIELDS r LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME WHERE r.RDB$RELATION_NAME='%s'" query2="SELECT f.RDB$FIELD_TYPE FROM RDB$RELATION_FIELDS r LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME WHERE r.RDB$RELATION_NAME='%s' AND r.RDB$FIELD_NAME='%s'" count="SELECT COUNT(r.RDB$FIELD_NAME) FROM RDB$RELATION_FIELDS r LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME WHERE r.RDB$RELATION_NAME='%s'"/>
+            <!--<inband query="SELECT r.RDB$FIELD_NAME,CASE f.RDB$FIELD_TYPE WHEN 261 THEN 'BLOB' WHEN 14 THEN 'CHAR' WHEN 40 THEN 'CSTRING' WHEN 11 THEN 'D_FLOAT' WHEN 27 THEN 'DOUBLE' WHEN 10 THEN 'FLOAT' WHEN 16 THEN 'INT64' WHEN 8 THEN 'INTEGER' WHEN 9 THEN 'QUAD' WHEN 7 THEN 'SMALLINT' WHEN 12 THEN 'DATE' WHEN 13 THEN 'TIME' WHEN 35 THEN 'TIMESTAMP' WHEN 37 THEN 'VARCHAR' ELSE 'UNKNOWN' END AS field_type FROM RDB$RELATION_FIELDS r LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE=f.RDB$FIELD_NAME WHERE r.RDB$RELATION_NAME='%s'"/>-->
+            <inband query="SELECT r.RDB$FIELD_NAME,f.RDB$FIELD_TYPE FROM RDB$RELATION_FIELDS r LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE=f.RDB$FIELD_NAME WHERE r.RDB$RELATION_NAME='%s'" condition="r.RDB$FIELD_NAME"/>
+            <blind query="SELECT r.RDB$FIELD_NAME FROM RDB$RELATION_FIELDS r LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE=f.RDB$FIELD_NAME WHERE r.RDB$RELATION_NAME='%s'" query2="SELECT f.RDB$FIELD_TYPE FROM RDB$RELATION_FIELDS r LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE=f.RDB$FIELD_NAME WHERE r.RDB$RELATION_NAME='%s' AND r.RDB$FIELD_NAME='%s'" count="SELECT COUNT(r.RDB$FIELD_NAME) FROM RDB$RELATION_FIELDS r LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE=f.RDB$FIELD_NAME WHERE r.RDB$RELATION_NAME='%s'" condition="r.RDB$FIELD_NAME"/>
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s"/>
@@ -466,10 +466,13 @@
         </dump_table>
         <search_db/>
         <search_table>
-            <inband query="SELECT RDB$RELATION_NAME FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG = 0) AND %s" condition="RDB$RELATION_NAME" condition2=""/>
-            <blind query="" query2="SELECT FIRST 1 SKIP %d RDB$RELATION_NAME FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG = 0)" count="" count2="SELECT COUNT(RDB$RELATION_NAME) FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG = 0)" condition="RDB$RELATION_NAME" condition2=""/>
+            <inband query="SELECT RDB$RELATION_NAME FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG=0) AND %s" condition="RDB$RELATION_NAME" condition2=""/>
+            <blind query="" query2="SELECT FIRST 1 SKIP %d RDB$RELATION_NAME FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG=0)" count="" count2="SELECT COUNT(RDB$RELATION_NAME) FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG=0)" condition="RDB$RELATION_NAME" condition2=""/>
         </search_table>
-        <search_column/>
+        <search_column>
+            <inband query="SELECT r.RDB$RELATION_NAME FROM RDB$RELATION_FIELDS r LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE=f.RDB$FIELD_NAME WHERE %s" condition="r.RDB$FIELD_NAME" condition2="" condition3="r.RDB$RELATION_NAME"/>
+            <blind query="" query2="SELECT DISTINCT(r.RDB$RELATION_NAME) FROM RDB$RELATION_FIELDS r LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE=f.RDB$FIELD_NAME WHERE %s" count="" count2="SELECT COUNT(DISTINCT(r.RDB$RELATION_NAME)) FROM RDB$RELATION_FIELDS r LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE=f.RDB$FIELD_NAME WHERE %s" condition="r.RDB$FIELD_NAME" condition2="" condition3="r.RDB$RELATION_NAME"/>
+        </search_column>
    </dbms>
 
    <dbms value="SAP MaxDB">

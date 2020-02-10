@@ -36,6 +36,7 @@ from lib.core.dicts import PGSQL_PRIVS
 from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
+from lib.core.enums import FORK
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapUserQuitException
@@ -75,16 +76,22 @@ class Users(object):
         infoMsg = "testing if current user is DBA"
         logger.info(infoMsg)
 
+        query = None
+
         if Backend.isDbms(DBMS.MYSQL):
             self.getCurrentUser()
-            query = queries[Backend.getIdentifiedDbms()].is_dba.query % (kb.data.currentUser.split("@")[0] if kb.data.currentUser else None)
+            if Backend.isFork(FORK.DRIZZLE):
+                kb.data.isDba = "root" in (kb.data.currentUser or "")
+            elif kb.data.currentUser:
+                query = queries[Backend.getIdentifiedDbms()].is_dba.query % kb.data.currentUser.split("@")[0]
         elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) and user is not None:
             query = queries[Backend.getIdentifiedDbms()].is_dba.query2 % user
         else:
             query = queries[Backend.getIdentifiedDbms()].is_dba.query
 
-        query = agent.forgeCaseStatement(query)
-        kb.data.isDba = inject.checkBooleanExpression(query) or False
+        if query:
+            query = agent.forgeCaseStatement(query)
+            kb.data.isDba = inject.checkBooleanExpression(query) or False
 
         return kb.data.isDba
 
@@ -98,10 +105,13 @@ class Users(object):
         condition |= (Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema)
 
         if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
-            if condition:
+            if Backend.isFork(FORK.DRIZZLE):
+                query = rootQuery.inband.query3
+            elif condition:
                 query = rootQuery.inband.query2
             else:
                 query = rootQuery.inband.query
+
             values = inject.getValue(query, blind=False, time=False)
 
             if not isNoneValue(values):
@@ -115,7 +125,9 @@ class Users(object):
             infoMsg = "fetching number of database users"
             logger.info(infoMsg)
 
-            if condition:
+            if Backend.isFork(FORK.DRIZZLE):
+                query = rootQuery.blind.count3
+            elif condition:
                 query = rootQuery.blind.count2
             else:
                 query = rootQuery.blind.count
@@ -134,10 +146,13 @@ class Users(object):
             for index in indexRange:
                 if Backend.getIdentifiedDbms() in (DBMS.SYBASE, DBMS.MAXDB):
                     query = rootQuery.blind.query % (kb.data.cachedUsers[-1] if kb.data.cachedUsers else " ")
+                elif Backend.isFork(FORK.DRIZZLE):
+                    query = rootQuery.blind.query3 % index
                 elif condition:
                     query = rootQuery.blind.query2 % index
                 else:
                     query = rootQuery.blind.query % index
+
                 user = unArrayizeValue(inject.getValue(query, union=False, error=False))
 
                 if user:

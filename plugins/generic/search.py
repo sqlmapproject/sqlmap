@@ -345,6 +345,8 @@ class Search(object):
     def searchColumn(self):
         bruteForce = False
 
+        self.forceDbmsEnum()
+
         if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
             errMsg = "information_schema not available, "
             errMsg += "back-end DBMS is MySQL < 5.0"
@@ -406,24 +408,26 @@ class Search(object):
 
             foundCols[column] = {}
 
-            if conf.tbl:
-                _ = conf.tbl.split(',')
-                whereTblsQuery = " AND (" + " OR ".join("%s = '%s'" % (tblCond, unsafeSQLIdentificatorNaming(tbl)) for tbl in _) + ")"
-                infoMsgTbl = " for table%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(tbl) for tbl in _))
+            if tblCond:
+                if conf.tbl:
+                    _ = conf.tbl.split(',')
+                    whereTblsQuery = " AND (" + " OR ".join("%s = '%s'" % (tblCond, unsafeSQLIdentificatorNaming(tbl)) for tbl in _) + ")"
+                    infoMsgTbl = " for table%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(tbl) for tbl in _))
 
             if conf.db == CURRENT_DB:
                 conf.db = self.getCurrentDb()
 
-            if conf.db:
-                _ = conf.db.split(',')
-                whereDbsQuery = " AND (" + " OR ".join("%s = '%s'" % (dbCond, unsafeSQLIdentificatorNaming(db)) for db in _) + ")"
-                infoMsgDb = " in database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(db) for db in _))
-            elif conf.excludeSysDbs:
-                whereDbsQuery = "".join(" AND %s != '%s'" % (dbCond, unsafeSQLIdentificatorNaming(db)) for db in self.excludeDbsList)
-                msg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(db) for db in self.excludeDbsList))
-                logger.info(msg)
-            else:
-                infoMsgDb = " across all databases"
+            if dbCond:
+                if conf.db:
+                    _ = conf.db.split(',')
+                    whereDbsQuery = " AND (" + " OR ".join("%s = '%s'" % (dbCond, unsafeSQLIdentificatorNaming(db)) for db in _) + ")"
+                    infoMsgDb = " in database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(db) for db in _))
+                elif conf.excludeSysDbs:
+                    whereDbsQuery = "".join(" AND %s != '%s'" % (dbCond, unsafeSQLIdentificatorNaming(db)) for db in self.excludeDbsList)
+                    msg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(db) for db in self.excludeDbsList))
+                    logger.info(msg)
+                else:
+                    infoMsgDb = " across all databases"
 
             logger.info("%s%s%s" % (infoMsg, infoMsgTbl, infoMsgDb))
 
@@ -445,6 +449,9 @@ class Search(object):
                     for db in conf.db.split(','):
                         for tbl in conf.tbl.split(','):
                             values.append([safeSQLIdentificatorNaming(db), safeSQLIdentificatorNaming(tbl, True)])
+
+                if Backend.getIdentifiedDbms() in (DBMS.FIREBIRD,):
+                    values = [(conf.db, value) for value in arrayizeValue(values)]
 
                 for db, tbl in filterPairValues(values):
                     db = safeSQLIdentificatorNaming(db)
@@ -538,8 +545,12 @@ class Search(object):
                         logger.info(infoMsg)
 
                         query = rootQuery.blind.count2
-                        query = query % unsafeSQLIdentificatorNaming(db)
-                        query += " AND %s" % colQuery
+                        if not re.search(r"(?i)%s\Z" % METADB_SUFFIX, db or ""):
+                            query = query % unsafeSQLIdentificatorNaming(db)
+                            query += " AND %s" % colQuery
+                        else:
+                            query = query % colQuery
+
                         query += whereTblsQuery
 
                         count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
@@ -559,7 +570,9 @@ class Search(object):
                         for index in indexRange:
                             query = rootQuery.blind.query2
 
-                            if query.endswith("'%s')"):
+                            if re.search(r"(?i)%s\Z" % METADB_SUFFIX, db or ""):
+                                query = query % (colQuery + whereTblsQuery)
+                            elif query.endswith("'%s')"):
                                 query = query[:-1] + " AND %s)" % (colQuery + whereTblsQuery)
                             elif " ORDER BY " in query:
                                 query = query.replace(" ORDER BY ", " AND %s ORDER BY " % (colQuery + whereTblsQuery))

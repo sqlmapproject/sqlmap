@@ -75,6 +75,7 @@ from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import CONTENT_STATUS
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
+from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import HEURISTIC_TEST
 from lib.core.enums import HTTP_HEADER
 from lib.core.enums import HTTPMETHOD
@@ -557,6 +558,10 @@ class Backend(object):
         if not kb.get("testMode") and all((Backend.getDbms(), Backend.getIdentifiedDbms())) and Backend.getDbms() != Backend.getIdentifiedDbms():
             singleTimeWarnMessage("identified ('%s') and fingerprinted ('%s') DBMSes differ. If you experience problems in enumeration phase please rerun with '--flush-session'" % (Backend.getIdentifiedDbms(), Backend.getDbms()))
         return Backend.getIdentifiedDbms() == aliasToDbmsEnum(dbms)
+
+    @staticmethod
+    def isFork(fork):
+        return hashDBRetrieve(HASHDB_KEYS.DBMS_FORK) == fork
 
     @staticmethod
     def isDbmsWithin(aliases):

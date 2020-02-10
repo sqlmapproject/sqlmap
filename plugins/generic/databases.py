@@ -43,6 +43,7 @@ from lib.core.dicts import INFORMIX_TYPES
 from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
+from lib.core.enums import FORK
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapMissingMandatoryOptionException
 from lib.core.exception import SqlmapNoneDataException
@@ -607,6 +608,9 @@ class Databases(object):
                     query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
                     query += condQuery
 
+                    if Backend.isFork(FORK.DRIZZLE):
+                        query = query.replace("column_type", "data_type")
+
                 elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE, DBMS.MIMERSQL):
                     query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(tbl.upper()), unsafeSQLIdentificatorNaming(conf.db.upper()))
                     query += condQuery
@@ -1016,7 +1020,10 @@ class Databases(object):
         rootQuery = queries[Backend.getIdentifiedDbms()].statements
 
         if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
-            query = rootQuery.inband.query
+            if Backend.isFork(FORK.DRIZZLE):
+                query = rootQuery.inband.query2
+            else:
+                query = rootQuery.inband.query
 
             while True:
                 values = inject.getValue(query, blind=False, time=False)
@@ -1039,6 +1046,10 @@ class Databases(object):
             logger.info(infoMsg)
 
             query = rootQuery.blind.count
+
+            if Backend.isFork(FORK.DRIZZLE):
+                query = query.replace("INFORMATION_SCHEMA", "DATA_DICTIONARY")
+
             count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
             if count == 0:
@@ -1063,6 +1074,10 @@ class Databases(object):
 
                 if isNoneValue(value):
                     query = rootQuery.blind.query % index
+
+                    if Backend.isFork(FORK.DRIZZLE):
+                        query = query.replace("INFORMATION_SCHEMA", "DATA_DICTIONARY")
+
                     value = unArrayizeValue(inject.getValue(query, union=False, error=False))
 
                 if not isNoneValue(value):

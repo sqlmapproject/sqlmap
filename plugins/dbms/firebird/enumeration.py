@@ -27,12 +27,6 @@ class Enumeration(GenericEnumeration):
 
         return []
 
-    def searchColumn(self):
-        warnMsg = "on Firebird it is not possible to search columns"
-        logger.warn(warnMsg)
-
-        return []
-
     def getHostname(self):
         warnMsg = "on Firebird it is not possible to enumerate the hostname"
         logger.warn(warnMsg)
