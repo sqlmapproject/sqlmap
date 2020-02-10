@@ -684,7 +684,8 @@
         <substring query="SUBSTR((%s),%d,%d)"/>
         <concatenate query="CONCAT(%s,%s)"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
-        <hex query="RAWTOHEX(%s)"/>
+        <!-- NOTE: RAWTOHEX() doesn't accept non-binary values -->
+        <!-- <hex query="RAWTOHEX(%s)"/> -->
         <inference query="ASCII(SUBSTR((%s),%d,1))>%d"/>
         <banner query="DATABASE_VERSION()"/>
         <current_user query="CURRENT_USER"/>
@@ -692,7 +693,7 @@
         <hostname/>
         <table_comment/>
         <column_comment/>
-        <is_dba query="SELECT ADMIN FROM INFORMATION_SCHEMA.USERS WHERE NAME=CURRENT_USER"/>
+        <is_dba query="SELECT ADMIN FROM INFORMATION_SCHEMA.SYSTEM_USERS WHERE USER_NAME=CURRENT_USER"/>
         <check_udf/>
         <users>
             <!-- LIMIT is needed at start for v1.7 this gets mangled unless no-cast is used -->
