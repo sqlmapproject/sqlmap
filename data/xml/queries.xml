@@ -617,7 +617,7 @@
         <banner query="SELECT service_level FROM TABLE(sysproc.env_get_inst_info())" query2="SELECT versionnumber FROM (SELECT ROW_NUMBER() OVER (ORDER BY versionnumber DESC) AS LIMIT,versionnumber FROM sysibm.sysversions) AS qq WHERE LIMIT=1"/>
         <current_user query="SELECT user FROM SYSIBM.SYSDUMMY1"/>
         <!-- NOTE: On DB2 we use the current user as default schema (database) -->
-        <current_db query="SELECT current server FROM SYSIBM.SYSDUMMY1"/>
+        <current_db query="SELECT user FROM SYSIBM.SYSDUMMY1"/>
         <hostname query="SELECT host_name FROM TABLE(sysproc.env_get_sys_info())"/>
         <table_comment/>
         <column_comment/>

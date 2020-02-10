@@ -143,6 +143,11 @@ def bedTest():
     """
 
     TESTS = (
+        # DB2
+        ("-u 'http://testbed/db2/get_int.php?id=1' --flush-session --technique=B --is-dba --threads=4 --dump -D CD --banner --sql-query=\"SELECT 'foobar'\"", ("banner: 'DB2 v", "Database: DB2INST1", "Table: USERS", "5 entries", "ID", "NAME", "SURNAME", "luther", "blisset", "NULL", "Payload: id=1 AND ", "it looks like the back-end DBMS is 'IBM DB2'", "the back-end DBMS is IBM DB2", "current user is DBA: True", ": 'foobar'")),
+        ("-u 'http://testbed/db2/get_int.php?id=1' --flush-session --technique=U --is-dba --dump -D CD --banner --sql-query=\"SELECT 'foobar'\"", ("banner: 'DB2 v", "Database: DB2INST1", "Table: USERS", "5 entries", "ID", "NAME", "SURNAME", "luther", "blisset", "NULL", "Title: Generic UNION query (NULL) - 3 columns", "the back-end DBMS is IBM DB2", "appears to have 3 columns", "current user is DBA: True", ": 'foobar'")),
+        ("-u 'http://testbed/db2/get_int.php?id=1' --flush-session --technique=U --hex --banner --current-user --current-db --search -C surname --answers='dump=n'", ("banner: 'DB2 v", "current user (equivalent to database on IBM DB2): 'DB2INST1'", "current user: 'DB2INST1'", "[1 column]", "| SURNAME | VARCHAR(1000) |")),
+
         # Altibase
         ("-u 'http://testbed/altibase/get_int.php?id=1' --flush-session --technique=B --is-dba --threads=4 --dump -D CD --banner --sql-query=\"SELECT 'foobar'\"", ("x86_64-unknown-linux-gnu", "Database: SYS", "Table: TESTUSERS", "5 entries", "ID", "NAME", "SURNAME", "luther", "blisset", "NULL", "Payload: id=1 AND ", "back-end DBMS could be 'Altibase'", "the back-end DBMS is Altibase", "current user is DBA: True", ": 'foobar'")),
         ("-u 'http://testbed/altibase/get_int.php?id=1' --flush-session --technique=U --is-dba --dump -D CD --banner --sql-query=\"SELECT 'foobar'\"", ("x86_64-unknown-linux-gnu", "Database: SYS", "Table: TESTUSERS", "5 entries", "ID", "NAME", "SURNAME", "luther", "blisset", "NULL", "Title: Generic UNION query (NULL) - 3 columns", "the back-end DBMS is Altibase", "appears to have 3 columns", "current user is DBA: True", ": 'foobar'")),
