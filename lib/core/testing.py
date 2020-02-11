@@ -143,6 +143,11 @@ def bedTest():
     """
 
     TESTS = (
+        # MaxDB
+        ("-u 'http://testbed/maxdb/get_int.php?id=1' --flush-session --technique=B --is-dba --threads=4 --dump -D CD --banner --sql-query=\"SELECT 'foobar'\"", ("Kernel____7.9.10___Build_003-123-265-343", "Database: TESTB", "Table: TESTUSERS", "5 entries", "ID", "NAME", "SURNAME", "luther", "blisset", "NULL", "Payload: id=1 AND ", "back-end DBMS could be 'SAP MaxDB'", "the back-end DBMS is SAP MaxDB", "current user is DBA: True", ": 'foobar'")),
+        ("-u 'http://testbed/maxdb/get_int.php?id=1' --flush-session --technique=U --is-dba --dump -D CD --banner --sql-query=\"SELECT 'foobar'\"", ("Kernel____7.9.10___Build_003-123-265-343", "Database: TESTDB", "Table: TESTUSERS", "5 entries", "ID", "NAME", "SURNAME", "luther", "blisset", "NULL", "Title: Generic UNION query (NULL) - 3 columns", "the back-end DBMS is SAP MaxDB", "appears to have 3 columns", "current user is DBA: True", ": 'foobar'")),
+        ("-u 'http://testbed/maxdb/get_int.php?id=1' --flush-session --technique=U --hex --banner --current-user --current-db --search -C surname --answers='dump=n'", ("Kernel____7.9.10___Build_003-123-265-343", "current user (equivalent to database on Altibase): 'SYS'", "current user: 'DBADMIN'", "[1 column]", "| SURNAME | VARCHAR |")),
+
         # Informix
         ("-u 'http://testbed/informix/get_int.php?id=1' --flush-session --technique=B --is-dba --threads=4 --dump -D CD --banner --sql-query=\"SELECT 'foobar'\"", ("IBM Informix Dynamic Server Version 14.10.FC2DE", "Database: testdb", "Table: users", "5 entries", "id", "name", "surname", "luther", "blisset", "NULL", "Payload: id=1 AND ", "back-end DBMS could be 'Informix'", "the back-end DBMS is Informix", "current user is DBA: True", ": 'foobar'")),
         ("-u 'http://testbed/informix/get_int.php?id=1' --flush-session --hex --banner --current-user --current-db --search -C surname --answers='dump=n'", ("IBM Informix Dynamic Server Version 14.10.FC2DE", "current database: 'testdb'", "current user: 'testuser'", "[1 column]", "| surname | varchar |")),

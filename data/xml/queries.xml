@@ -490,12 +490,12 @@
         <comment query="--" query2="#"/>
         <substring query="SUBSTR((%s),%d,%d)"/>
         <concatenate query="CONCAT(%s,%s)"/>
-        <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
+        <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END) FROM VERSIONS"/>
         <hex query="HEX(%s)"/>
         <inference query="SUBSTR((%s),%d,1)>'%c'"/>
         <banner query="SELECT ID FROM SYSINFO.VERSION"/>
-        <current_user query="SELECT USER() FROM DUAL"/>
-        <current_db query="SELECT DATABASE() FROM DUAL"/>
+        <current_user query="SELECT USER() FROM VERSIONS"/>
+        <current_db query="SELECT USER() FROM VERSIONS"/>
         <hostname/>
         <table_comment/>
         <column_comment/>

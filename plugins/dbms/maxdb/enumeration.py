@@ -8,6 +8,7 @@ See the file 'LICENSE' for copying permission
 import re
 
 from lib.core.common import isListLike
+from lib.core.common import isTechniqueAvailable
 from lib.core.common import readInput
 from lib.core.common import safeSQLIdentificatorNaming
 from lib.core.common import unsafeSQLIdentificatorNaming
@@ -17,6 +18,7 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.enums import DBMS
+from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapMissingMandatoryOptionException
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapUserQuitException
@@ -83,7 +85,8 @@ class Enumeration(GenericEnumeration):
 
         for db in dbs:
             query = rootQuery.inband.query % (("'%s'" % db) if db != "USER" else 'USER')
-            retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.tablename' % kb.aliasName], blind=True)
+            blind = not isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION)
+            retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.tablename' % kb.aliasName], blind=blind)
 
             if retVal:
                 for table in list(retVal[0].values())[0]:
@@ -204,8 +207,10 @@ class Enumeration(GenericEnumeration):
             infoMsg += "on database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
             logger.info(infoMsg)
 
+            blind = not isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION)
+
             query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(tbl), ("'%s'" % unsafeSQLIdentificatorNaming(conf.db)) if unsafeSQLIdentificatorNaming(conf.db) != "USER" else 'USER')
-            retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.columnname' % kb.aliasName, '%s.datatype' % kb.aliasName, '%s.len' % kb.aliasName], blind=True)
+            retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.columnname' % kb.aliasName, '%s.datatype' % kb.aliasName, '%s.len' % kb.aliasName], blind=blind)
 
             if retVal:
                 table = {}

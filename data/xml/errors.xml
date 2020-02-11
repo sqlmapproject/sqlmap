@@ -127,6 +127,7 @@
         <error regexp="SQL error.*?POS([0-9]+)"/>
         <error regexp="Warning.*?\Wmaxdb_"/>
         <error regexp="DriverSapDB"/>
+        <error regexp="-3014.*?Invalid end of SQL statement"/>
         <error regexp="com\.sap\.dbtech\.jdbc"/>
     </dbms>
 

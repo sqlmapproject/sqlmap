@@ -720,20 +720,42 @@ class Agent(object):
             warnMsg = "applying generic concatenation (CONCAT)"
             singleTimeWarnMessage(warnMsg)
 
+            if FROM_DUMMY_TABLE.get(Backend.getIdentifiedDbms()):
+                _ = re.sub(r"(?i)%s\Z" % re.escape(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]), "", concatenatedQuery)
+                if _ != concatenatedQuery:
+                    concatenatedQuery = _
+                    fieldsSelectFrom = None
+
             if fieldsExists:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "CONCAT(CONCAT('%s'," % kb.chars.start, 1)
                 concatenatedQuery += "),'%s')" % kb.chars.stop
             elif fieldsSelectCase:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "CONCAT(CONCAT('%s'," % kb.chars.start, 1)
                 concatenatedQuery += "),'%s')" % kb.chars.stop
-            elif fieldsSelectFrom:
+            elif fieldsSelectFrom or fieldsSelect:
+                fromTable = ""
+
                 _ = unArrayizeValue(zeroDepthSearch(concatenatedQuery, " FROM "))
-                concatenatedQuery = "%s),'%s')%s" % (concatenatedQuery[:_].replace("SELECT ", "CONCAT(CONCAT('%s'," % kb.chars.start, 1), kb.chars.stop, concatenatedQuery[_:])
+                if _:
+                    concatenatedQuery, fromTable = concatenatedQuery[:_], concatenatedQuery[_:]
+
+                concatenatedQuery = re.sub(r"(?i)\ASELECT ", "", concatenatedQuery)
+                replacement = "'%s',%s,'%s'" % (kb.chars.start, concatenatedQuery, kb.chars.stop)
+                chars = [_ for _ in replacement]
+
+                count = 0
+                for index in zeroDepthSearch(replacement, ',')[1:]:
+                    chars[index] = "),"
+                    count += 1
+
+                replacement = "CONCAT(%s%s)" % ("CONCAT(" * count, "".join(chars))
+                concatenatedQuery = "%s%s" % (replacement, fromTable)
             elif fieldsSelect:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "CONCAT(CONCAT('%s'," % kb.chars.start, 1)
                 concatenatedQuery += "),'%s')" % kb.chars.stop
             elif fieldsNoSelect:
                 concatenatedQuery = "CONCAT(CONCAT('%s',%s),'%s')" % (kb.chars.start, concatenatedQuery, kb.chars.stop)
+
 
         return concatenatedQuery
 
