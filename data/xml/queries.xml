@@ -525,6 +525,10 @@
             <inband query="SELECT %s FROM %s"/>
             <blind query="SELECT MIN(%s) FROM %s WHERE CHR(%s)>'%s'" query2="SELECT MAX(%s) FROM %s WHERE CHR(%s) LIKE '%s'" count="SELECT COUNT(*) FROM %s" count2="SELECT COUNT(*) FROM (SELECT DISTINCT %s FROM %s) AS qq"/>
         </dump_table>
+        <search_db>
+            <inband query="SELECT schemaname FROM domain.tables WHERE %s" condition="schemaname"/>
+            <blind query="SELECT DISTINCT(schemaname) FROM domain.tables WHERE %s" count="SELECT COUNT(DISTINCT(schemaname)) FROM domain.tables WHERE %s" condition="schemaname"/>
+        </search_db>
    </dbms>
 
     <dbms value="Sybase">

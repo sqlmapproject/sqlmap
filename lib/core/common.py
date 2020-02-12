@@ -2844,6 +2844,7 @@ def urlencode(value, safe="%&=-_", convall=False, limit=False, spaceplus=False):
         # except in cases when tampering scripts are used
         if all('%' in _ for _ in (safe, value)) and not kb.tamperFunctions:
             value = re.sub(r"%(?![0-9a-fA-F]{2})", "%25", value)
+            value = re.sub(r"(?<= ')%", "%25", value)   # e.g. LIKE '%DBA%'
 
         while True:
             result = _urllib.parse.quote(getBytes(value), safe)
