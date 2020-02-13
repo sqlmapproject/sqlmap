@@ -83,6 +83,10 @@
         <info type="Linux"/>
     </regexp>
 
+    <regexp value="\bArch\b">
+        <info type="Linux" distrib="Arch"/>
+    </regexp>
+
     <regexp value="CentOS">
         <info type="Linux" distrib="CentOS"/>
     </regexp>
@@ -115,8 +119,20 @@
         <info type="Linux" distrib="Mandrake"/>
     </regexp>
 
+    <regexp value="Manjaro">
+        <info type="Linux" distrib="Manjaro"/>
+    </regexp>
+
     <regexp value="Mandriva">
         <info type="Linux" distrib="Mandriva"/>
+    </regexp>
+
+    <regexp value="\bMint\b">
+        <info type="Linux" distrib="Mint"/>
+    </regexp>
+
+    <regexp value="\bPuppy\b">
+        <info type="Linux" distrib="Puppy"/>
     </regexp>
 
     <regexp value="Red[\-\_\ ]?Hat">

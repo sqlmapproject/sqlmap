@@ -81,6 +81,9 @@ COLORS = dict(
 
 COLORS.update(dict(("light%s" % color, COLORS[color] + 60) for color in COLORS))
 
+# Reference: https://misc.flogisoft.com/bash/tip_colors_and_formatting
+COLORS["lightgrey"] = 37
+COLORS["darkgrey"] = 90
 
 RESET = '\033[0m'
 

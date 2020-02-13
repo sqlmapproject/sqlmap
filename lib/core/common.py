@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -40,7 +40,6 @@ import unicodedata
 from difflib import SequenceMatcher
 from math import sqrt
 from optparse import OptionValueError
-from xml.dom import minidom
 from xml.sax import parse
 from xml.sax import SAXParseException
 
@@ -76,6 +75,7 @@ from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import CONTENT_STATUS
 from lib.core.enums import DBMS
 from lib.core.enums import EXPECTED
+from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import HEURISTIC_TEST
 from lib.core.enums import HTTP_HEADER
 from lib.core.enums import HTTPMETHOD
@@ -139,6 +139,7 @@ from lib.core.settings import IS_TTY
 from lib.core.settings import IS_WIN
 from lib.core.settings import LARGE_OUTPUT_THRESHOLD
 from lib.core.settings import LOCALHOST
+from lib.core.settings import MAX_INT
 from lib.core.settings import MIN_ENCODED_LEN_CHECK
 from lib.core.settings import MIN_ERROR_PARSING_NON_WRITING_RATIO
 from lib.core.settings import MIN_TIME_RESPONSES
@@ -147,6 +148,7 @@ from lib.core.settings import NETSCAPE_FORMAT_HEADER_COOKIES
 from lib.core.settings import NULL
 from lib.core.settings import PARAMETER_AMP_MARKER
 from lib.core.settings import PARAMETER_SEMICOLON_MARKER
+from lib.core.settings import PARAMETER_PERCENTAGE_MARKER
 from lib.core.settings import PARTIAL_HEX_VALUE_MARKER
 from lib.core.settings import PARTIAL_VALUE_MARKER
 from lib.core.settings import PAYLOAD_DELIMITER
@@ -558,6 +560,10 @@ class Backend(object):
         return Backend.getIdentifiedDbms() == aliasToDbmsEnum(dbms)
 
     @staticmethod
+    def isFork(fork):
+        return hashDBRetrieve(HASHDB_KEYS.DBMS_FORK) == fork
+
+    @staticmethod
     def isDbmsWithin(aliases):
         return Backend.getDbms() is not None and Backend.getDbms().lower() in aliases
 
@@ -943,6 +949,13 @@ def setColor(message, color=None, bold=False, level=None, istty=None):
             except:
                 level = None
             retVal = LOGGER_HANDLER.colorize(message, level)
+        else:
+            match = re.search(r"\(([^)]*)\s*fork\)", message)
+            if match:
+                retVal = retVal.replace(match.group(1), colored(match.group(1), color="lightgrey"))
+
+            for match in re.finditer(r"[^\w]'([^\n']+)'", message):  # single-quoted (Note: watch-out for the banner)
+                retVal = retVal.replace(match.group(1), colored(match.group(1), color="lightgrey"))
 
     return retVal
 
@@ -1080,7 +1093,7 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
         logger.debug(debugMsg)
 
     if retVal is None:
-        if checkBatch and conf.get("batch") or conf.get("api"):
+        if checkBatch and conf.get("batch") or any(conf.get(_) for _ in ("api", "nonInteractive")):
             if isListLike(default):
                 options = ','.join(getUnicode(opt, UNICODE_ENCODING) for opt in default)
             elif default:
@@ -1104,7 +1117,10 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
                 dataToStdout("%s" % message, forceOutput=not kb.wizardMode, bold=True)
                 kb.prependFlag = False
 
-                retVal = _input().strip() or default
+                retVal = _input()
+                if not retVal:  # Note: Python doesn't print newline on empty input
+                    dataToStdout("\n")
+                retVal = retVal.strip() or default
                 retVal = getUnicode(retVal, encoding=sys.stdin.encoding) if retVal else retVal
             except:
                 try:
@@ -1123,8 +1139,10 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
 
     if boolean:
         retVal = retVal.strip().upper() == 'Y'
+    else:
+        retVal = retVal or ""
 
-    return retVal or ""
+    return retVal
 
 def setTechnique(technique):
     """
@@ -1372,7 +1390,6 @@ def setPaths(rootPath):
     paths.SQLMAP_EXTRAS_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "extra")
     paths.SQLMAP_SETTINGS_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "lib", "core", "settings.py")
     paths.SQLMAP_TAMPER_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "tamper")
-    paths.SQLMAP_WAF_PATH = os.path.join(paths.SQLMAP_ROOT_PATH, "waf")
 
     paths.SQLMAP_PROCS_PATH = os.path.join(paths.SQLMAP_DATA_PATH, "procs")
     paths.SQLMAP_SHELL_PATH = os.path.join(paths.SQLMAP_DATA_PATH, "shell")
@@ -1393,7 +1410,6 @@ def setPaths(rootPath):
     paths.WORDLIST = os.path.join(paths.SQLMAP_TXT_PATH, "wordlist.tx_")
     paths.ERRORS_XML = os.path.join(paths.SQLMAP_XML_PATH, "errors.xml")
     paths.BOUNDARIES_XML = os.path.join(paths.SQLMAP_XML_PATH, "boundaries.xml")
-    paths.LIVE_TESTS_XML = os.path.join(paths.SQLMAP_XML_PATH, "livetests.xml")
     paths.QUERIES_XML = os.path.join(paths.SQLMAP_XML_PATH, "queries.xml")
     paths.GENERIC_XML = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "generic.xml")
     paths.MSSQL_XML = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "mssql.xml")
@@ -1458,7 +1474,7 @@ def parseTargetDirect():
     remote = False
 
     for dbms in SUPPORTED_DBMS:
-        details = re.search(r"^(?P<dbms>%s)://(?P<credentials>(?P<user>.+?)\:(?P<pass>.*)\@)?(?P<remote>(?P<hostname>[\w.-]+?)\:(?P<port>[\d]+)\/)?(?P<db>[\w\d\ \:\.\_\-\/\\]+?)$" % dbms, conf.direct, re.I)
+        details = re.search(r"^(?P<dbms>%s)://(?P<credentials>(?P<user>.*?)\:(?P<pass>.*)\@)?(?P<remote>(?P<hostname>[\w.-]+?)\:(?P<port>[\d]+)\/)?(?P<db>[\w\d\ \:\.\_\-\/\\]+?)$" % dbms, conf.direct, re.I)
 
         if details:
             conf.dbms = details.group("dbms")
@@ -1643,15 +1659,15 @@ def parseTargetUrl():
         if '=' not in urlSplit.query:
             conf.url = "%s?%s" % (conf.url, getUnicode(urlSplit.query))
         else:
-            conf.parameters[PLACE.GET] = urldecode(urlSplit.query) if urlSplit.query and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in urlSplit.query else urlSplit.query
+            conf.parameters[PLACE.GET] = urldecode(urlSplit.query, spaceplus=not conf.base64Parameter) if urlSplit.query and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in urlSplit.query else urlSplit.query
 
-    if not conf.referer and (intersect(REFERER_ALIASES, conf.testParameter, True) or conf.level >= 3):
+    if (intersect(REFERER_ALIASES, conf.testParameter, True) or conf.level >= 3) and not any(_[0] == HTTP_HEADER.REFERER for _ in conf.httpHeaders):
         debugMsg = "setting the HTTP Referer header to the target URL"
         logger.debug(debugMsg)
         conf.httpHeaders = [_ for _ in conf.httpHeaders if _[0] != HTTP_HEADER.REFERER]
         conf.httpHeaders.append((HTTP_HEADER.REFERER, conf.url.replace(kb.customInjectionMark, "")))
 
-    if not conf.host and (intersect(HOST_ALIASES, conf.testParameter, True) or conf.level >= 5):
+    if (intersect(HOST_ALIASES, conf.testParameter, True) or conf.level >= 5) and not any(_[0] == HTTP_HEADER.HOST for _ in conf.httpHeaders):
         debugMsg = "setting the HTTP Host header to the target URL"
         logger.debug(debugMsg)
         conf.httpHeaders = [_ for _ in conf.httpHeaders if _[0] != HTTP_HEADER.HOST]
@@ -1970,7 +1986,7 @@ def safeFilepathEncode(filepath):
     retVal = filepath
 
     if filepath and six.PY2 and isinstance(filepath, six.text_type):
-        retVal = filepath.encode(sys.getfilesystemencoding() or UNICODE_ENCODING)
+        retVal = getBytes(filepath, sys.getfilesystemencoding() or UNICODE_ENCODING)
 
     return retVal
 
@@ -2018,6 +2034,8 @@ def safeStringFormat(format_, params):
         if retVal.count("%s", start, end) == len(params):
             for param in params:
                 index = retVal.find("%s", start)
+                if isinstance(param, six.string_types):
+                    param = param.replace('%', PARAMETER_PERCENTAGE_MARKER)
                 retVal = retVal[:index] + getUnicode(param) + retVal[index + 2:]
         else:
             if any('%s' in _ for _ in conf.parameters.values()):
@@ -2043,7 +2061,7 @@ def safeStringFormat(format_, params):
                 else:
                     break
 
-    retVal = getText(retVal)
+    retVal = getText(retVal).replace(PARAMETER_PERCENTAGE_MARKER, '%')
 
     return retVal
 
@@ -2314,16 +2332,6 @@ def readCachedFileContent(filename, mode="rb"):
                     raise SqlmapSystemException(errMsg)
 
     return kb.cache.content[filename]
-
-def readXmlFile(xmlFile):
-    """
-    Reads XML file content and returns its DOM representation
-    """
-
-    checkFile(xmlFile)
-    retVal = minidom.parse(xmlFile).documentElement
-
-    return retVal
 
 def average(values):
     """
@@ -2707,6 +2715,12 @@ def extractErrorMessage(page):
                     retVal = candidate
                     break
 
+        if not retVal and wasLastResponseDBMSError():
+            match = re.search(r"[^\n]*SQL[^\n:]*:[^\n]*", page, re.IGNORECASE)
+
+            if match:
+                retVal = match.group(0)
+
     return retVal
 
 def findLocalPort(ports):
@@ -2830,6 +2844,7 @@ def urlencode(value, safe="%&=-_", convall=False, limit=False, spaceplus=False):
         # except in cases when tampering scripts are used
         if all('%' in _ for _ in (safe, value)) and not kb.tamperFunctions:
             value = re.sub(r"%(?![0-9a-fA-F]{2})", "%25", value)
+            value = re.sub(r"(?<= ')%", "%25", value)   # e.g. LIKE '%DBA%'
 
         while True:
             result = _urllib.parse.quote(getBytes(value), safe)
@@ -3003,9 +3018,11 @@ def isNumPosStrValue(value):
     False
     >>> isNumPosStrValue('-2')
     False
+    >>> isNumPosStrValue('100000000000000000000')
+    False
     """
 
-    return (hasattr(value, "isdigit") and value.isdigit() and int(value) > 0) or (isinstance(value, int) and value > 0)
+    return ((hasattr(value, "isdigit") and value.isdigit() and int(value) > 0) or (isinstance(value, int) and value > 0)) and int(value) < MAX_INT
 
 @cachedmethod
 def aliasToDbmsEnum(dbms):
@@ -3617,16 +3634,20 @@ def decodeIntToUnicode(value):
         try:
             if value > 255:
                 _ = "%x" % value
+
                 if len(_) % 2 == 1:
                     _ = "0%s" % _
+
                 raw = decodeHex(_)
 
                 if Backend.isDbms(DBMS.MYSQL):
+                    # Reference: https://dev.mysql.com/doc/refman/8.0/en/string-functions.html#function_ord
                     # Note: https://github.com/sqlmapproject/sqlmap/issues/1531
                     retVal = getUnicode(raw, conf.encoding or UNICODE_ENCODING)
                 elif Backend.isDbms(DBMS.MSSQL):
-                    retVal = getUnicode(raw, "UTF-16-BE")   # References: https://docs.microsoft.com/en-us/sql/relational-databases/collations/collation-and-unicode-support?view=sql-server-2017 and https://stackoverflow.com/a/14488478
-                elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE):
+                    # Reference: https://docs.microsoft.com/en-us/sql/relational-databases/collations/collation-and-unicode-support?view=sql-server-2017 and https://stackoverflow.com/a/14488478
+                    retVal = getUnicode(raw, "UTF-16-BE")
+                elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE):     # Note: cases with Unicode code points (e.g. http://www.postgresqltutorial.com/postgresql-ascii/)
                     retVal = _unichr(value)
                 else:
                     retVal = getUnicode(raw, conf.encoding)
@@ -4068,11 +4089,11 @@ def safeSQLIdentificatorNaming(name, isTable=False):
         if retVal.upper() in kb.keywords or (retVal or " ")[0].isdigit() or not re.match(r"\A[A-Za-z0-9_@%s\$]+\Z" % ('.' if _ else ""), retVal):  # MsSQL is the only DBMS where we automatically prepend schema to table name (dot is normal)
             retVal = unsafeSQLIdentificatorNaming(retVal)
 
-            if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS):
+            if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS, DBMS.CUBRID, DBMS.SQLITE):  # Note: in SQLite double-quotes are treated as string if column/identifier is non-existent (e.g. SELECT "foobar" FROM users)
                 retVal = "`%s`" % retVal
-            elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2, DBMS.SQLITE, DBMS.HSQLDB, DBMS.H2, DBMS.INFORMIX):
+            elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2, DBMS.HSQLDB, DBMS.H2, DBMS.INFORMIX, DBMS.MONETDB, DBMS.VERTICA, DBMS.MCKOI, DBMS.PRESTO, DBMS.CRATEDB):
                 retVal = "\"%s\"" % retVal
-            elif Backend.getIdentifiedDbms() in (DBMS.ORACLE,):
+            elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.ALTIBASE, DBMS.MIMERSQL):
                 retVal = "\"%s\"" % retVal.upper()
             elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
                 if isTable:
@@ -4106,11 +4127,11 @@ def unsafeSQLIdentificatorNaming(name):
     retVal = name
 
     if isinstance(name, six.string_types):
-        if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS):
+        if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS, DBMS.CUBRID, DBMS.SQLITE):
             retVal = name.replace("`", "")
-        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2, DBMS.SQLITE, DBMS.INFORMIX, DBMS.HSQLDB):
+        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2, DBMS.HSQLDB, DBMS.H2, DBMS.INFORMIX, DBMS.MONETDB, DBMS.VERTICA, DBMS.MCKOI, DBMS.PRESTO, DBMS.CRATEDB):
             retVal = name.replace("\"", "")
-        elif Backend.getIdentifiedDbms() in (DBMS.ORACLE,):
+        elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.ALTIBASE, DBMS.MIMERSQL):
             retVal = name.replace("\"", "").upper()
         elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
             retVal = name.replace("[", "").replace("]", "")

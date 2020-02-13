@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -58,6 +58,7 @@ from lib.core.enums import NOTE
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.exception import SqlmapBaseException
+from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapNotVulnerableException
 from lib.core.exception import SqlmapSilentQuitException
@@ -307,11 +308,20 @@ def start():
                     warnMsg = "[%s] [WARNING] no connection detected" % time.strftime("%X")
                     dataToStdout(warnMsg)
 
-                    while not checkInternet():
-                        dataToStdout('.')
-                        time.sleep(5)
+                    valid = False
+                    for _ in xrange(conf.retries):
+                        if checkInternet():
+                            valid = True
+                            break
+                        else:
+                            dataToStdout('.')
+                            time.sleep(5)
 
-                    dataToStdout("\n")
+                    if not valid:
+                        errMsg = "please check your Internet connection and rerun"
+                        raise SqlmapConnectionException(errMsg)
+                    else:
+                        dataToStdout("\n")
 
             conf.url = targetUrl
             conf.method = targetMethod.upper().strip() if targetMethod else targetMethod
@@ -456,18 +466,18 @@ def start():
                 for place in parameters:
                     # Test User-Agent and Referer headers only if
                     # --level >= 3
-                    skip = (place == PLACE.USER_AGENT and conf.level < 3)
-                    skip |= (place == PLACE.REFERER and conf.level < 3)
+                    skip = (place == PLACE.USER_AGENT and (kb.testOnlyCustom or conf.level < 3))
+                    skip |= (place == PLACE.REFERER and (kb.testOnlyCustom or conf.level < 3))
 
                     # --param-filter
                     skip |= (len(conf.paramFilter) > 0 and place.upper() not in conf.paramFilter)
 
                     # Test Host header only if
                     # --level >= 5
-                    skip |= (place == PLACE.HOST and conf.level < 5)
+                    skip |= (place == PLACE.HOST and (kb.testOnlyCustom or conf.level < 5))
 
                     # Test Cookie header only if --level >= 2
-                    skip |= (place == PLACE.COOKIE and conf.level < 2)
+                    skip |= (place == PLACE.COOKIE and (kb.testOnlyCustom or conf.level < 2))
 
                     skip |= (place == PLACE.USER_AGENT and intersect(USER_AGENT_ALIASES, conf.skip, True) not in ([], None))
                     skip |= (place == PLACE.REFERER and intersect(REFERER_ALIASES, conf.skip, True) not in ([], None))

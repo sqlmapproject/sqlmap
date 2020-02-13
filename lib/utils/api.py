@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -29,6 +29,8 @@ from lib.core.convert import decodeBase64
 from lib.core.convert import dejsonize
 from lib.core.convert import encodeBase64
 from lib.core.convert import encodeHex
+from lib.core.convert import getBytes
+from lib.core.convert import getText
 from lib.core.convert import jsonize
 from lib.core.data import conf
 from lib.core.data import kb
@@ -459,7 +461,7 @@ def option_get(taskid):
             logger.debug("(%s) Requested value for unknown option '%s'" % (taskid, option))
             return jsonize({"success": False, "message": "Unknown option '%s'" % option})
 
-    logger.debug("(%s) Retrieved values for option(s) '%s'" % (taskid, ",".join(options)))
+    logger.debug("(%s) Retrieved values for option(s) '%s'" % (taskid, ','.join(options)))
 
     return jsonize({"success": True, "options": results})
 
@@ -705,23 +707,25 @@ def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=REST
             errMsg += "List of supported adapters: %s" % ', '.join(sorted(list(server_names.keys())))
         else:
             errMsg = "Server support for adapter '%s' is not installed on this system " % adapter
-            errMsg += "(Note: you can try to install it with 'sudo apt-get install python-%s' or 'sudo pip install %s')" % (adapter, adapter)
+            errMsg += "(Note: you can try to install it with 'sudo apt install python-%s' or 'sudo pip install %s')" % (adapter, adapter)
         logger.critical(errMsg)
 
 def _client(url, options=None):
     logger.debug("Calling '%s'" % url)
     try:
-        data = None
-        if options is not None:
-            data = jsonize(options)
         headers = {"Content-Type": "application/json"}
+
+        if options is not None:
+            data = getBytes(jsonize(options))
+        else:
+            data = None
 
         if DataStore.username or DataStore.password:
             headers["Authorization"] = "Basic %s" % encodeBase64("%s:%s" % (DataStore.username or "", DataStore.password or ""), binary=False)
 
         req = _urllib.request.Request(url, data, headers)
         response = _urllib.request.urlopen(req)
-        text = response.read()
+        text = getText(response.read())
     except:
         if options:
             logger.error("Failed to load and parse %s" % url)

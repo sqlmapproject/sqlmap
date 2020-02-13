@@ -1,16 +1,20 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
 from lib.core.common import Backend
 from lib.core.common import Format
+from lib.core.common import hashDBRetrieve
+from lib.core.common import hashDBWrite
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
+from lib.core.enums import FORK
+from lib.core.enums import HASHDB_KEYS
 from lib.core.session import setDbms
 from lib.core.settings import H2_ALIASES
 from lib.request import inject
@@ -21,6 +25,16 @@ class Fingerprint(GenericFingerprint):
         GenericFingerprint.__init__(self, DBMS.H2)
 
     def getFingerprint(self):
+        fork = hashDBRetrieve(HASHDB_KEYS.DBMS_FORK)
+
+        if fork is None:
+            if inject.checkBooleanExpression("EXISTS(SELECT * FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='IGNITE')"):
+                fork = FORK.IGNITE
+            else:
+                fork = ""
+
+            hashDBWrite(HASHDB_KEYS.DBMS_FORK, fork)
+
         value = ""
         wsOsFp = Format.getOs("web server", kb.headersFp)
 
@@ -37,6 +51,8 @@ class Fingerprint(GenericFingerprint):
 
         if not conf.extensiveFp:
             value += DBMS.H2
+            if fork:
+                value += " (%s fork)" % fork
             return value
 
         actVer = Format.getDbms()

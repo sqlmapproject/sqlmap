@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -37,6 +37,7 @@ from lib.core.enums import CHARSET_TYPE
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapThreadException
+from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.core.settings import CHAR_INFERENCE_MARK
 from lib.core.settings import INFERENCE_BLANK_BREAK
 from lib.core.settings import INFERENCE_EQUALS_CHAR
@@ -107,6 +108,14 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             return 0, retVal
 
+    if Backend.isDbms(DBMS.MCKOI):
+        match = re.search(r"\ASELECT\b(.+)\bFROM\b(.+)\Z", expression, re.I)
+        if match:
+            original = queries[Backend.getIdentifiedDbms()].inference.query
+            right = original.split('<')[1]
+            payload = payload.replace(right, "(SELECT %s FROM %s)" % (right, match.group(2).strip()))
+            expression = match.group(1).strip()
+
     try:
         # Set kb.partRun in case "common prediction" feature (a.k.a. "good samaritan") is used or the engine is called from the API
         if conf.predictOutput:
@@ -118,7 +127,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
         if partialValue:
             firstChar = len(partialValue)
-        elif re.search(r"(?i)\b(LENGTH|LEN)\(", expression):
+        elif re.search(r"(?i)(\b|CHAR_)(LENGTH|LEN)\(", expression):
             firstChar = 0
         elif (kb.fileReadMode or dump) and conf.firstChar is not None and (isinstance(conf.firstChar, int) or (hasattr(conf.firstChar, "isdigit") and conf.firstChar.isdigit())):
             firstChar = int(conf.firstChar) - 1
@@ -129,7 +138,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         else:
             firstChar = 0
 
-        if re.search(r"(?i)\b(LENGTH|LEN)\(", expression):
+        if re.search(r"(?i)(\b|CHAR_)(LENGTH|LEN)\(", expression):
             lastChar = 0
         elif dump and conf.lastChar is not None and (isinstance(conf.lastChar, int) or (hasattr(conf.lastChar, "isdigit") and conf.lastChar.isdigit())):
             lastChar = int(conf.lastChar)
@@ -425,6 +434,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             else:
                                 return None
             else:
+                if "'%s'" % CHAR_INFERENCE_MARK in payload and conf.charset:
+                    errMsg = "option '--charset' is not supported on '%s'" % Backend.getIdentifiedDbms()
+                    raise SqlmapUnsupportedFeatureException(errMsg)
+
                 candidates = list(originalTbl)
                 bit = 0
                 while len(candidates) > 1:
@@ -637,7 +650,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     dataToStdout(filterControlChars(val))
 
                 # some DBMSes (e.g. Firebird, DB2, etc.) have issues with trailing spaces
-                if Backend.getIdentifiedDbms() in (DBMS.FIREBIRD, DBMS.DB2, DBMS.MAXDB) and len(partialValue) > INFERENCE_BLANK_BREAK and partialValue[-INFERENCE_BLANK_BREAK:].isspace():
+                if Backend.getIdentifiedDbms() in (DBMS.FIREBIRD, DBMS.DB2, DBMS.MAXDB, DBMS.DERBY) and len(partialValue) > INFERENCE_BLANK_BREAK and partialValue[-INFERENCE_BLANK_BREAK:].isspace():
                     finalValue = partialValue[:-INFERENCE_BLANK_BREAK]
                     break
                 elif charsetType and partialValue[-1:].isspace():

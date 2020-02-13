@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -26,7 +26,10 @@ class HTMLHandler(ContentHandler):
 
         self._dbms = None
         self._page = (page or "")
-        self._lower_page = self._page.lower()
+        try:
+            self._lower_page = self._page.lower()
+        except SystemError:  # https://bugs.python.org/issue18183
+            self._lower_page = None
         self._urldecoded_page = urldecode(self._page)
 
         self.dbms = None
@@ -49,19 +52,30 @@ class HTMLHandler(ContentHandler):
                 keywords = sorted(keywords, key=len)
                 kb.cache.regex[regexp] = keywords[-1].lower()
 
-            if kb.cache.regex[regexp] in self._lower_page and re.search(regexp, self._urldecoded_page, re.I):
+            if kb.cache.regex[regexp] in (self._lower_page or kb.cache.regex[regexp]) and re.search(regexp, self._urldecoded_page, re.I):
                 self.dbms = self._dbms
                 self._markAsErrorPage()
+                kb.forkNote = kb.forkNote or attrs.get("fork")
 
 def htmlParser(page):
     """
     This function calls a class that parses the input HTML page to
     fingerprint the back-end database management system
+
+    >>> from lib.core.enums import DBMS
+    >>> htmlParser("Warning: mysql_fetch_array() expects parameter 1 to be resource") == DBMS.MYSQL
+    True
+    >>> threadData = getCurrentThreadData()
+    >>> threadData.lastErrorPage = None
     """
 
     xmlfile = paths.ERRORS_XML
     handler = HTMLHandler(page)
     key = hash(page)
+
+    # generic SQL warning/error messages
+    if re.search(r"SQL (warning|error|syntax)", page, re.I):
+        handler._markAsErrorPage()
 
     if key in kb.cache.parsedDbms:
         retVal = kb.cache.parsedDbms[key]
@@ -78,9 +92,5 @@ def htmlParser(page):
         kb.lastParserStatus = None
 
     kb.cache.parsedDbms[key] = handler.dbms
-
-    # generic SQL warning/error messages
-    if re.search(r"SQL (warning|error|syntax)", page, re.I):
-        handler._markAsErrorPage()
 
     return handler.dbms

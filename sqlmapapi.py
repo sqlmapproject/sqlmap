@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -16,7 +16,7 @@ import optparse
 import os
 import warnings
 
-warnings.filterwarnings(action="ignore", message=".*was already imported", category=UserWarning)
+warnings.filterwarnings(action="ignore", category=UserWarning)
 warnings.filterwarnings(action="ignore", category=DeprecationWarning)
 
 from lib.core.common import getUnicode
@@ -53,8 +53,8 @@ def main():
 
     # Parse command line options
     apiparser = optparse.OptionParser()
-    apiparser.add_option("-s", "--server", help="Run as a REST-JSON API server", default=RESTAPI_DEFAULT_PORT, action="store_true")
-    apiparser.add_option("-c", "--client", help="Run as a REST-JSON API client", default=RESTAPI_DEFAULT_PORT, action="store_true")
+    apiparser.add_option("-s", "--server", help="Run as a REST-JSON API server", action="store_true")
+    apiparser.add_option("-c", "--client", help="Run as a REST-JSON API client", action="store_true")
     apiparser.add_option("-H", "--host", help="Host of the REST-JSON API server (default \"%s\")" % RESTAPI_DEFAULT_ADDRESS, default=RESTAPI_DEFAULT_ADDRESS, action="store")
     apiparser.add_option("-p", "--port", help="Port of the the REST-JSON API server (default %d)" % RESTAPI_DEFAULT_PORT, default=RESTAPI_DEFAULT_PORT, type="int", action="store")
     apiparser.add_option("--adapter", help="Server (bottle) adapter to use (default \"%s\")" % RESTAPI_DEFAULT_ADAPTER, default=RESTAPI_DEFAULT_ADAPTER, action="store")
@@ -63,9 +63,9 @@ def main():
     (args, _) = apiparser.parse_args()
 
     # Start the client or the server
-    if args.server is True:
+    if args.server:
         server(args.host, args.port, adapter=args.adapter, username=args.username, password=args.password)
-    elif args.client is True:
+    elif args.client:
         client(args.host, args.port, username=args.username, password=args.password)
     else:
         apiparser.print_help()

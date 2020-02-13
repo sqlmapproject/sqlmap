@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -25,7 +25,7 @@ except ImportError:
 try:
     import MySQLdb  # used by SQLAlchemy in case of MySQL
     warnings.filterwarnings("error", category=MySQLdb.Warning)
-except ImportError:
+except (ImportError, AttributeError):
     pass
 
 from lib.core.data import conf

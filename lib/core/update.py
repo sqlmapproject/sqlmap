@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -136,6 +136,6 @@ def update():
             infoMsg += "https://github.com/sqlmapproject/sqlmap/downloads"
         else:
             infoMsg = "for Linux platform it's recommended "
-            infoMsg += "to install a standard 'git' package (e.g.: 'sudo apt-get install git')"
+            infoMsg += "to install a standard 'git' package (e.g.: 'sudo apt install git')"
 
         logger.info(infoMsg)

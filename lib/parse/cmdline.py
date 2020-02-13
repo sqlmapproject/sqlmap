@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -78,10 +78,12 @@ from lib.core.defaults import defaults
 from lib.core.dicts import DEPRECATED_OPTIONS
 from lib.core.enums import AUTOCOMPLETE_TYPE
 from lib.core.exception import SqlmapShellQuitException
+from lib.core.exception import SqlmapSilentQuitException
 from lib.core.exception import SqlmapSyntaxException
 from lib.core.option import _createHomeDirectories
 from lib.core.settings import BASIC_HELP_ITEMS
 from lib.core.settings import DUMMY_URL
+from lib.core.settings import IGNORED_OPTIONS
 from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import IS_WIN
 from lib.core.settings import MAX_HELP_OPTION_LENGTH
@@ -251,7 +253,7 @@ def cmdLineParser(argv=None):
             help="Load safe HTTP request from a file")
 
         request.add_argument("--safe-freq", dest="safeFreq", type=int,
-            help="Test requests between two visits to a given safe URL")
+            help="Regular requests between visits to a safe URL")
 
         request.add_argument("--skip-urlencode", dest="skipUrlEncode", action="store_true",
             help="Skip URL encoding of payload data")
@@ -780,22 +782,22 @@ def cmdLineParser(argv=None):
         parser.add_argument("--force-pivoting", dest="forcePivoting", action="store_true",
             help=SUPPRESS)
 
+        parser.add_argument("--non-interactive", dest="nonInteractive", action="store_true",
+            help=SUPPRESS)
+
         parser.add_argument("--gui", dest="gui", action="store_true",
             help=SUPPRESS)
 
         parser.add_argument("--smoke-test", dest="smokeTest", action="store_true",
             help=SUPPRESS)
 
-        parser.add_argument("--live-test", dest="liveTest", action="store_true",
-            help=SUPPRESS)
-
         parser.add_argument("--vuln-test", dest="vulnTest", action="store_true",
             help=SUPPRESS)
 
-        parser.add_argument("--stop-fail", dest="stopFail", action="store_true",
+        parser.add_argument("--bed-test", dest="bedTest", action="store_true",
             help=SUPPRESS)
 
-        parser.add_argument("--run-case", dest="runCase",
+        parser.add_argument("--fuzz-test", dest="fuzzTest", action="store_true",
             help=SUPPRESS)
 
         # API options
@@ -863,10 +865,10 @@ def cmdLineParser(argv=None):
 
         if "--gui" in argv:
             from lib.core.gui import runGui
+
             runGui(parser)
 
-            if hasattr(parser, "_args"):
-                return parser._args
+            raise SqlmapSilentQuitException
 
         elif "--sqlmap-shell" in argv:
             _createHomeDirectories()
@@ -930,6 +932,8 @@ def cmdLineParser(argv=None):
             elif re.search(r"\A-\w{3,}", argv[i]):
                 if argv[i].strip('-').split('=')[0] in (longOptions | longSwitches):
                     argv[i] = "-%s" % argv[i]
+            elif argv[i] in IGNORED_OPTIONS:
+                argv[i] = ""
             elif argv[i] in DEPRECATED_OPTIONS:
                 argv[i] = ""
             elif argv[i].startswith("--tamper"):
@@ -941,6 +945,8 @@ def cmdLineParser(argv=None):
             elif argv[i] == "-H":
                 if i + 1 < len(argv):
                     extraHeaders.append(argv[i + 1])
+            elif argv[i] == "--deps":
+                argv[i] = "--dependencies"
             elif argv[i] == "-r":
                 for j in xrange(i + 2, len(argv)):
                     value = argv[j]
@@ -1002,7 +1008,7 @@ def cmdLineParser(argv=None):
         if args.dummy:
             args.url = args.url or DUMMY_URL
 
-        if not any((args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, args.requestFile, args.updateAll, args.smokeTest, args.vulnTest, args.liveTest, args.wizard, args.dependencies, args.purge, args.listTampers, args.hashFile)):
+        if not any((args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, args.requestFile, args.updateAll, args.smokeTest, args.vulnTest, args.bedTest, args.fuzzTest, args.wizard, args.dependencies, args.purge, args.listTampers, args.hashFile)):
             errMsg = "missing a mandatory option (-d, -u, -l, -m, -r, -g, -c, --list-tampers, --wizard, --update, --purge or --dependencies). "
             errMsg += "Use -h for basic and -hh for advanced help\n"
             parser.error(errMsg)

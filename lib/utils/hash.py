@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -33,7 +33,6 @@ else:
 import base64
 import binascii
 import gc
-import hashlib
 import os
 import re
 import tempfile
@@ -245,18 +244,6 @@ def oracle_old_passwd(password, username, uppercase=True):  # prior to version '
     encrypted = cipher.encrypt(unistr)
 
     retVal = encodeHex(encrypted[-8:], binary=False)
-
-    return retVal.upper() if uppercase else retVal.lower()
-
-def md4_generic_passwd(password, uppercase=False):
-    """
-    >>> md4_generic_passwd(password='testpass', uppercase=False)
-    '5b4d300688f19c8fd65b8d6ccf98e0ae'
-    """
-
-    password = getBytes(password)
-
-    retVal = hashlib.new("md4", password).hexdigest()
 
     return retVal.upper() if uppercase else retVal.lower()
 
@@ -740,21 +727,31 @@ def attackDumpedTable():
                             table[column]['length'] = max(table[column]['length'], len(table[column]['values'][i]))
 
 def hashRecognition(value):
+    """
+    >>> hashRecognition("179ad45c6ce2cb97cf1029e212046e81") == HASH.MD5_GENERIC
+    True
+    >>> hashRecognition("S:2BFCFDF5895014EE9BB2B9BA067B01E0389BB5711B7B5F82B7235E9E182C") == HASH.ORACLE
+    True
+    >>> hashRecognition("foobar") == None
+    True
+    """
+
     retVal = None
 
-    isOracle, isMySQL = Backend.isDbms(DBMS.ORACLE), Backend.isDbms(DBMS.MYSQL)
+    if value and len(value) >= 8 and ' ' not in value:   # Note: pre-filter condition (for optimization purposes)
+        isOracle, isMySQL = Backend.isDbms(DBMS.ORACLE), Backend.isDbms(DBMS.MYSQL)
 
-    if isinstance(value, six.string_types):
-        for name, regex in getPublicTypeMembers(HASH):
-            # Hashes for Oracle and old MySQL look the same hence these checks
-            if isOracle and regex == HASH.MYSQL_OLD or isMySQL and regex == HASH.ORACLE_OLD:
-                continue
-            elif regex == HASH.CRYPT_GENERIC:
-                if any((value.lower() == value, value.upper() == value)):
+        if isinstance(value, six.string_types):
+            for name, regex in getPublicTypeMembers(HASH):
+                # Hashes for Oracle and old MySQL look the same hence these checks
+                if isOracle and regex == HASH.MYSQL_OLD or isMySQL and regex == HASH.ORACLE_OLD:
                     continue
-            elif re.match(regex, value):
-                retVal = regex
-                break
+                elif regex == HASH.CRYPT_GENERIC:
+                    if any((value.lower() == value, value.upper() == value)):
+                        continue
+                elif re.match(regex, value):
+                    retVal = regex
+                    break
 
     return retVal
 

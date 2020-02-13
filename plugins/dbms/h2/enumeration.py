@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -43,7 +43,7 @@ class Enumeration(GenericEnumeration):
         return H2_DEFAULT_SCHEMA
 
     def getPasswordHashes(self):
-        warnMsg = "on H2 it is not possible to list password hashes"
+        warnMsg = "on H2 it is not possible to enumerate password hashes"
         logger.warn(warnMsg)
 
         return {}

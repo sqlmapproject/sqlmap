@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -74,10 +74,8 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
 
         try:
             content = fp.read(MAX_CONNECTION_TOTAL_SIZE)
-        except Exception as ex:
-            dbgMsg = "there was a problem while retrieving "
-            dbgMsg += "redirect response content ('%s')" % getSafeExString(ex)
-            logger.debug(dbgMsg)
+        except:  # e.g. IncompleteRead
+            content = ""
         finally:
             if content:
                 try:  # try to write it back to the read buffer so we could reuse it in further steps
@@ -142,6 +140,14 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
             except _urllib.error.HTTPError as ex:
                 result = ex
 
+                # Dirty hack for https://github.com/sqlmapproject/sqlmap/issues/4046
+                try:
+                    hasattr(result, "read")
+                except KeyError:
+                    class _(object):
+                        pass
+                    result = _()
+
                 # Dirty hack for http://bugs.python.org/issue15701
                 try:
                     result.info()
@@ -152,7 +158,12 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
 
                 if not hasattr(result, "read"):
                     def _(self, length=None):
-                        return ex.msg
+                        try:
+                            retVal = getSafeExString(ex)
+                        except:
+                            retVal = ""
+                        finally:
+                            return retVal
                     result.read = types.MethodType(_, result)
 
                 if not getattr(result, "url", None):
@@ -163,7 +174,7 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
             except:
                 redurl = None
                 result = fp
-                fp.read = io.BytesIO("").read
+                fp.read = io.BytesIO(b"").read
         else:
             result = fp
 

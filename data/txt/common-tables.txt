@@ -1,4 +1,4 @@
-# Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
+# Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 # See the file 'LICENSE' for copying permission
 
 users
@@ -1618,6 +1618,7 @@ Contributor
 flag
 
 # Various Joomla tables
+
 jos_vm_product_download
 jos_vm_coupons
 jos_vm_product_reviews
@@ -1711,6 +1712,7 @@ publicusers
 cmsusers
 
 # List provided by Anastasios Monachos (anastasiosm@gmail.com)
+
 blacklist
 cost
 moves
@@ -1762,6 +1764,7 @@ TBLCORPUSERS
 TBLCORPORATEUSERS
 
 # List from schemafuzz.py (http://www.beenuarora.com/code/schemafuzz.py)
+
 tbladmins
 sort
 _wfspro_admin
@@ -2048,6 +2051,7 @@ Login
 Logins
 
 # List from http://nibblesec.org/files/MSAccessSQLi/MSAccessSQLi.html
+
 account
 accnts
 accnt
@@ -2117,6 +2121,7 @@ user_pwd
 user_passwd
 
 # List from hyrax (http://sla.ckers.org/forum/read.php?16,36047)
+
 wsop
 Admin
 Config
@@ -2437,9 +2442,11 @@ Affichage1name
 sb_host_adminAffichage1name
 
 # site:jp
+
 TypesTab
 
 # site:it
+
 utenti
 categorie
 attivita
@@ -2581,6 +2588,7 @@ oil_stats_agents
 SGA_XPLAN_TPL_DBA_INDEXES
 
 # site:fr
+
 Avion
 departement
 Compagnie
@@ -2751,6 +2759,7 @@ spip_ortho_dico
 spip_caches
 
 # site:ru
+
 guestbook
 binn_forum_settings
 binn_forms_templ
@@ -2848,6 +2857,7 @@ binn_path_temps
 order_item
 
 # site:de
+
 tt_content
 kunde
 medien
@@ -3010,6 +3020,7 @@ wp_categories
 chessmessages
 
 # site:br
+
 endereco
 pessoa
 usuarios
@@ -3172,6 +3183,7 @@ LT_CUSTOM2
 LT_CUSTOM3
 
 # site:es
+
 jos_respuestas
 DEPARTAMENTO
 EMPLEADO
@@ -3210,6 +3222,7 @@ grupo
 facturas
 
 # site:cn
+
 url
 cdb_adminactions
 BlockInfo
@@ -3355,6 +3368,7 @@ mymps_mail_sendlist
 mymps_navurl
 
 # site:tr
+
 kullanici
 kullanicilar
 yonetici
@@ -3401,6 +3415,7 @@ kontak
 kontaklar
 
 # List provided by Pedrito Perez (0ark1ang3l@gmail.com)
+
 adminstbl
 admintbl
 affiliateUsers
@@ -3415,4 +3430,69 @@ userstbl
 usertbl
 
 # WebGoat
+
 user_data
+
+# https://laurent22.github.io/so-injections/
+
+accounts
+admin
+baza_site
+benutzer
+category
+comments
+company
+credentials
+Customer
+customers
+data
+details
+dhruv_users
+dt_tb
+employees
+events
+forsale
+friends
+giorni
+images
+info
+items
+kontabankowe
+login
+logs
+markers
+members
+messages
+orders
+order_table
+photos
+player
+players
+points
+register
+reports
+rooms
+shells
+signup
+songs
+student
+students
+table
+table2
+tbl_images
+tblproduct
+testv2
+tickets
+topicinfo
+trabajo
+user
+user_auth
+userinfo
+user_info
+userregister
+users
+usuarios
+utenti
+wm_products
+wp_payout_history
+zamowienia

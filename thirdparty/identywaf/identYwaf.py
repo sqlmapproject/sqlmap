@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2019 Miroslav Stampar (@stamparm), MIT
+Copyright (c) 2019-2020 Miroslav Stampar (@stamparm), MIT
 See the file 'LICENSE' for copying permission
 
 The above copyright notice and this permission notice shall be included in
@@ -60,7 +60,7 @@ else:
     HTTPCookieProcessor = urllib2.HTTPCookieProcessor
 
 NAME = "identYwaf"
-VERSION = "1.0.122"
+VERSION = "1.0.124"
 BANNER = r"""
                                    ` __ __ `
  ____  ___      ___  ____   ______ `|  T  T` __    __   ____  _____ 

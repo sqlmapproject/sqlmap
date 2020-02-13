@@ -16,7 +16,7 @@ cat > $TMP_DIR/setup.py << EOF
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -67,7 +67,7 @@ cat > sqlmap/__init__.py << EOF
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -132,13 +132,13 @@ To get a list of basic options and switches use:
 
 ::
 
-    python sqlmap.py -h
+    sqlmap -h
 
 To get a list of all options and switches use:
 
 ::
 
-    python sqlmap.py -hh
+    sqlmap -hh
 
 You can find a sample run `here <https://asciinema.org/a/46601>`__. To
 get an overview of sqlmap capabilities, list of supported features and

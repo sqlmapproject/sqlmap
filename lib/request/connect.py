@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -119,6 +119,7 @@ from lib.core.settings import UNENCODED_ORIGINAL_VALUE
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import URI_HTTP_HEADER
 from lib.core.settings import WARN_TIME_STDEV
+from lib.core.settings import WEBSOCKET_INITIAL_TIMEOUT
 from lib.request.basic import decodePage
 from lib.request.basic import forgeHeaders
 from lib.request.basic import processResponse
@@ -451,10 +452,25 @@ class Connect(object):
 
             if webSocket:
                 ws = websocket.WebSocket()
-                ws.settimeout(timeout)
+                ws.settimeout(WEBSOCKET_INITIAL_TIMEOUT if kb.webSocketRecvCount is None else timeout)
                 ws.connect(url, header=("%s: %s" % _ for _ in headers.items() if _[0] not in ("Host",)), cookie=cookie)  # WebSocket will add Host field of headers automatically
                 ws.send(urldecode(post or ""))
-                page = ws.recv()
+
+                _page = []
+
+                if kb.webSocketRecvCount is None:
+                    while True:
+                        try:
+                            _page.append(ws.recv())
+                        except websocket.WebSocketTimeoutException:
+                            kb.webSocketRecvCount = len(_page)
+                            break
+                else:
+                    for i in xrange(max(1, kb.webSocketRecvCount)):
+                        _page.append(ws.recv())
+
+                page = "\n".join(_page)
+
                 ws.close()
                 code = ws.status
                 status = _http_client.responses[code]
@@ -568,15 +584,14 @@ class Connect(object):
                     refresh = extractRegexResult(JAVASCRIPT_HREF_REGEX, page)
 
                     if refresh:
-                        debugMsg = "got Javascript redirect request"
+                        debugMsg = "got Javascript redirect logic"
                         logger.debug(debugMsg)
 
                 if refresh:
                     if kb.alwaysRefresh is None:
-                        msg = "got a refresh request "
+                        msg = "got a refresh intent "
                         msg += "(redirect like response common to login pages) to '%s'. " % refresh
-                        msg += "Do you want to apply the refresh "
-                        msg += "from now on (or stay on the original page)? [Y/n]"
+                        msg += "Do you want to apply it from now on? [Y/n]"
 
                         kb.alwaysRefresh = readInput(msg, default='Y', boolean=True)
 
@@ -1038,11 +1053,11 @@ class Connect(object):
 
                 match = re.search(r"%s=[^&]*" % re.escape(parameter), paramString, re.I)
                 if match:
-                    retVal = re.sub("(?i)%s" % re.escape(match.group(0)), ("%s=%s" % (parameter, newValue)).replace('\\', r'\\'), paramString)
+                    retVal = re.sub(r"(?i)%s" % re.escape(match.group(0)), ("%s=%s" % (parameter, newValue)).replace('\\', r'\\'), paramString)
                 else:
                     match = re.search(r"(%s[\"']:[\"'])([^\"']+)" % re.escape(parameter), paramString, re.I)
                     if match:
-                        retVal = re.sub("(?i)%s" % re.escape(match.group(0)), "%s%s" % (match.group(1), newValue), paramString)
+                        retVal = re.sub(r"(?i)%s" % re.escape(match.group(0)), "%s%s" % (match.group(1), newValue), paramString)
 
                 return retVal
 

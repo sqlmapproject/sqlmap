@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -13,6 +13,7 @@ from lib.core.common import popValue
 from lib.core.common import pushValue
 from lib.core.common import readInput
 from lib.core.common import urlencode
+from lib.core.convert import getBytes
 from lib.core.convert import getUnicode
 from lib.core.data import conf
 from lib.core.data import kb
@@ -132,7 +133,7 @@ def _search(dork):
             regex = DUCKDUCKGO_REGEX
 
         try:
-            req = _urllib.request.Request(url, data=data, headers=requestHeaders)
+            req = _urllib.request.Request(url, data=getBytes(data), headers=requestHeaders)
             conn = _urllib.request.urlopen(req)
 
             requestMsg = "HTTP request:\nGET %s" % url

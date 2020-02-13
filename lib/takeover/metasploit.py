@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -568,13 +568,6 @@ class Metasploit(object):
                         errMsg = "timeout occurred while attempting "
                         errMsg += "to open a remote session"
                         raise SqlmapGenericException(errMsg)
-
-                if conf.liveTest and timeout:
-                    if initialized:
-                        send_all(proc, "exit\n")
-                        time.sleep(2)
-                    else:
-                        proc.kill()
 
             except select.error as ex:
                 # Reference: https://github.com/andymccurdy/redis-py/pull/743/commits/2b59b25bb08ea09e98aede1b1f23a270fc085a9f

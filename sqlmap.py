@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -173,9 +173,12 @@ def main():
             elif conf.vulnTest:
                 from lib.core.testing import vulnTest
                 os._exitcode = 1 - (vulnTest() or 0)
-            elif conf.liveTest:
-                from lib.core.testing import liveTest
-                os._exitcode = 1 - (liveTest() or 0)
+            elif conf.bedTest:
+                from lib.core.testing import bedTest
+                os._exitcode = 1 - (bedTest() or 0)
+            elif conf.fuzzTest:
+                from lib.core.testing import fuzzTest
+                fuzzTest()
             else:
                 from lib.controller.controller import start
                 if conf.profile and six.PY2:
@@ -255,32 +258,7 @@ def main():
         excMsg = traceback.format_exc()
         valid = checkIntegrity()
 
-        if valid is False:
-            errMsg = "code integrity check failed (turning off automatic issue creation). "
-            errMsg += "You should retrieve the latest development version from official GitHub "
-            errMsg += "repository at '%s'" % GIT_PAGE
-            logger.critical(errMsg)
-            print()
-            dataToStdout(excMsg)
-            raise SystemExit
-
-        elif any(_ in excMsg for _ in ("tamper/", "waf/")):
-            logger.critical(errMsg)
-            print()
-            dataToStdout(excMsg)
-            raise SystemExit
-
-        elif any(_ in excMsg for _ in ("ImportError", "ModuleNotFoundError", "Can't find file for module")):
-            errMsg = "invalid runtime environment ('%s')" % excMsg.split("Error: ")[-1].strip()
-            logger.critical(errMsg)
-            raise SystemExit
-
-        elif all(_ in excMsg for _ in ("SyntaxError: Non-ASCII character", ".py on line", "but no encoding declared")) or any(_ in excMsg for _ in ("source code string cannot contain null bytes", "No module named")):
-            errMsg = "invalid runtime environment ('%s')" % excMsg.split("Error: ")[-1].strip()
-            logger.critical(errMsg)
-            raise SystemExit
-
-        elif any(_ in excMsg for _ in ("MemoryError", "Cannot allocate memory")):
+        if any(_ in excMsg for _ in ("MemoryError", "Cannot allocate memory")):
             errMsg = "memory exhaustion detected"
             logger.critical(errMsg)
             raise SystemExit
@@ -300,10 +278,8 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
-        elif all(_ in excMsg for _ in ("No such file", "_'")):
-            errMsg = "corrupted installation detected ('%s'). " % excMsg.strip().split('\n')[-1]
-            errMsg += "You should retrieve the latest development version from official GitHub "
-            errMsg += "repository at '%s'" % GIT_PAGE
+        elif all(_ in excMsg for _ in ("Permission denied", "metasploit")):
+            errMsg = "permission error occurred while using Metasploit"
             logger.critical(errMsg)
             raise SystemExit
 
@@ -373,15 +349,74 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
+        elif all(_ in excMsg for _ in ("pymysql", "configparser")):
+            errMsg = "wrong initialization of pymsql detected (using Python3 dependencies)"
+            logger.critical(errMsg)
+            raise SystemExit
+
+        elif all(_ in excMsg for _ in ("ntlm", "socket.error, err", "SyntaxError")):
+            errMsg = "wrong initialization of python-ntlm detected (using Python2 syntax)"
+            logger.critical(errMsg)
+            raise SystemExit
+
+        elif all(_ in excMsg for _ in ("drda", "to_bytes")):
+            errMsg = "wrong initialization of drda detected (using Python3 syntax)"
+            logger.critical(errMsg)
+            raise SystemExit
+
+        elif all(_ in excMsg for _ in ("window = tkinter.Tk()",)):
+            errMsg = "there has been a problem in initialization of GUI interface "
+            errMsg += "('%s')" % excMsg.strip().split('\n')[-1]
+            logger.critical(errMsg)
+            raise SystemExit
+
+        elif any(_ in excMsg for _ in ("unable to access item 'liveTest'",)):
+            errMsg = "detected usage of files from different versions of sqlmap"
+            logger.critical(errMsg)
+            raise SystemExit
+
+        elif kb.get("dumpKeyboardInterrupt"):
+            raise SystemExit
+
+        elif any(_ in excMsg for _ in ("Broken pipe",)):
+            raise SystemExit
+
+        elif valid is False:
+            errMsg = "code integrity check failed (turning off automatic issue creation). "
+            errMsg += "You should retrieve the latest development version from official GitHub "
+            errMsg += "repository at '%s'" % GIT_PAGE
+            logger.critical(errMsg)
+            print()
+            dataToStdout(excMsg)
+            raise SystemExit
+
+        elif any(_ in excMsg for _ in ("tamper/", "waf/")):
+            logger.critical(errMsg)
+            print()
+            dataToStdout(excMsg)
+            raise SystemExit
+
+        elif any(_ in excMsg for _ in ("ImportError", "ModuleNotFoundError", "Can't find file for module")):
+            errMsg = "invalid runtime environment ('%s')" % excMsg.split("Error: ")[-1].strip()
+            logger.critical(errMsg)
+            raise SystemExit
+
+        elif all(_ in excMsg for _ in ("SyntaxError: Non-ASCII character", ".py on line", "but no encoding declared")) or any(_ in excMsg for _ in ("source code string cannot contain null bytes", "No module named")):
+            errMsg = "invalid runtime environment ('%s')" % excMsg.split("Error: ")[-1].strip()
+            logger.critical(errMsg)
+            raise SystemExit
+
+        elif all(_ in excMsg for _ in ("No such file", "_'")):
+            errMsg = "corrupted installation detected ('%s'). " % excMsg.strip().split('\n')[-1]
+            errMsg += "You should retrieve the latest development version from official GitHub "
+            errMsg += "repository at '%s'" % GIT_PAGE
+            logger.critical(errMsg)
+            raise SystemExit
+
         elif "'DictObject' object has no attribute '" in excMsg and all(_ in errMsg for _ in ("(fingerprinted)", "(identified)")):
             errMsg = "there has been a problem in enumeration. "
             errMsg += "Because of a considerable chance of false-positive case "
             errMsg += "you are advised to rerun with switch '--flush-session'"
-            logger.critical(errMsg)
-            raise SystemExit
-
-        elif all(_ in excMsg for _ in ("pymysql", "configparser")):
-            errMsg = "wrong initialization of pymsql detected (using Python3 dependencies)"
             logger.critical(errMsg)
             raise SystemExit
 
@@ -390,12 +425,6 @@ def main():
             errMsg = "one of your .pyc files are corrupted%s" % (" ('%s')" % match.group(1) if match else "")
             errMsg += ". Please delete .pyc files on your system to fix the problem"
             logger.critical(errMsg)
-            raise SystemExit
-
-        elif kb.get("dumpKeyboardInterrupt"):
-            raise SystemExit
-
-        elif any(_ in excMsg for _ in ("Broken pipe",)):
             raise SystemExit
 
         for match in re.finditer(r'File "(.+?)", line', excMsg):

@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
-import cgi
 import hashlib
 import os
 import re
@@ -31,6 +30,7 @@ from lib.core.convert import getBytes
 from lib.core.convert import getConsoleLength
 from lib.core.convert import getText
 from lib.core.convert import getUnicode
+from lib.core.convert import htmlEscape
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -69,13 +69,12 @@ class Dump(object):
         self._lock = threading.Lock()
 
     def _write(self, data, newline=True, console=True, content_type=None):
-        if conf.api:
-            dataToStdout(data, content_type=content_type, status=CONTENT_STATUS.COMPLETE)
-            return
-
         text = "%s%s" % (data, "\n" if newline else " ")
 
-        if console:
+        if conf.api:
+            dataToStdout(data, content_type=content_type, status=CONTENT_STATUS.COMPLETE)
+
+        elif console:
             dataToStdout(text)
 
         multiThreadMode = isMultiThreadMode()
@@ -108,16 +107,12 @@ class Dump(object):
             errMsg = "error occurred while opening log file ('%s')" % getSafeExString(ex)
             raise SqlmapGenericException(errMsg)
 
-    def getOutputFile(self):
-        return self._outputFile
-
     def singleString(self, data, content_type=None):
         self._write(data, content_type=content_type)
 
     def string(self, header, data, content_type=None, sort=True):
         if conf.api:
             self._write(data, content_type=content_type)
-            return
 
         if isListLike(data):
             self.lister(header, data, content_type, sort)
@@ -137,8 +132,6 @@ class Dump(object):
                 self._write("%s:\n---\n%s\n---" % (header, _))
             else:
                 self._write("%s: %s" % (header, ("'%s'" % _) if isinstance(data, six.string_types) else _))
-        else:
-            self._write("%s:\tNone" % header)
 
     def lister(self, header, elements, content_type=None, sort=True):
         if elements and sort:
@@ -151,7 +144,6 @@ class Dump(object):
 
         if conf.api:
             self._write(elements, content_type=content_type)
-            return
 
         if elements:
             self._write("%s [%d]:" % (header, len(elements)))
@@ -172,10 +164,10 @@ class Dump(object):
         self.string("current user", data, content_type=CONTENT_TYPE.CURRENT_USER)
 
     def currentDb(self, data):
-        if Backend.isDbms(DBMS.MAXDB):
-            self.string("current database (no practical usage on %s)" % Backend.getIdentifiedDbms(), data, content_type=CONTENT_TYPE.CURRENT_DB)
-        elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2):
-            self.string("current schema (equivalent to database on %s)" % Backend.getIdentifiedDbms(), data, content_type=CONTENT_TYPE.CURRENT_DB)
+        if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2, DBMS.MONETDB, DBMS.VERTICA, DBMS.CRATEDB):
+            self.string("current database (equivalent to schema on %s)" % Backend.getIdentifiedDbms(), data, content_type=CONTENT_TYPE.CURRENT_DB)
+        elif Backend.getIdentifiedDbms() in (DBMS.ALTIBASE, DBMS.DB2, DBMS.MIMERSQL, DBMS.MAXDB):
+            self.string("current database (equivalent to owner on %s)" % Backend.getIdentifiedDbms(), data, content_type=CONTENT_TYPE.CURRENT_DB)
         else:
             self.string("current database", data, content_type=CONTENT_TYPE.CURRENT_DB)
 
@@ -203,7 +195,6 @@ class Dump(object):
 
         if conf.api:
             self._write(userSettings, content_type=content_type)
-            return
 
         if userSettings:
             self._write("%s:" % header)
@@ -237,7 +228,6 @@ class Dump(object):
         if isinstance(dbTables, dict) and len(dbTables) > 0:
             if conf.api:
                 self._write(dbTables, content_type=CONTENT_TYPE.TABLES)
-                return
 
             maxlength = 0
 
@@ -280,7 +270,6 @@ class Dump(object):
         if isinstance(tableColumns, dict) and len(tableColumns) > 0:
             if conf.api:
                 self._write(tableColumns, content_type=content_type)
-                return
 
             for db, tables in tableColumns.items():
                 if not db:
@@ -354,7 +343,6 @@ class Dump(object):
         if isinstance(dbTables, dict) and len(dbTables) > 0:
             if conf.api:
                 self._write(dbTables, content_type=CONTENT_TYPE.COUNT)
-                return
 
             maxlength1 = len("Table")
             maxlength2 = len("Entries")
@@ -413,7 +401,6 @@ class Dump(object):
 
         if conf.api:
             self._write(tableValues, content_type=CONTENT_TYPE.DUMP_TABLE)
-            return
 
         dumpDbPath = os.path.join(conf.dumpPath, unsafeSQLIdentificatorNaming(db))
 
@@ -559,7 +546,7 @@ class Dump(object):
                         else:
                             dataToDumpFile(dumpFP, "%s%s" % (safeCSValue(column), conf.csvDel))
                     elif conf.dumpFormat == DUMP_FORMAT.HTML:
-                        dataToDumpFile(dumpFP, "<th>%s</th>" % getUnicode(cgi.escape(column).encode("ascii", "xmlcharrefreplace")))
+                        dataToDumpFile(dumpFP, "<th>%s</th>" % getUnicode(htmlEscape(column).encode("ascii", "xmlcharrefreplace")))
 
                 field += 1
 
@@ -631,7 +618,7 @@ class Dump(object):
                         else:
                             dataToDumpFile(dumpFP, "%s%s" % (safeCSValue(value), conf.csvDel))
                     elif conf.dumpFormat == DUMP_FORMAT.HTML:
-                        dataToDumpFile(dumpFP, "<td>%s</td>" % getUnicode(cgi.escape(value).encode("ascii", "xmlcharrefreplace")))
+                        dataToDumpFile(dumpFP, "<td>%s</td>" % getUnicode(htmlEscape(value).encode("ascii", "xmlcharrefreplace")))
 
                     field += 1
 
@@ -651,7 +638,7 @@ class Dump(object):
 
         if conf.dumpFormat == DUMP_FORMAT.SQLITE:
             rtable.endTransaction()
-            logger.info("table '%s.%s' dumped to sqlite3 database '%s'" % (db, table, replication.dbpath))
+            logger.info("table '%s.%s' dumped to SQLITE database '%s'" % (db, table, replication.dbpath))
 
         elif conf.dumpFormat in (DUMP_FORMAT.CSV, DUMP_FORMAT.HTML):
             if conf.dumpFormat == DUMP_FORMAT.HTML:
@@ -669,7 +656,6 @@ class Dump(object):
     def dbColumns(self, dbColumnsDict, colConsider, dbs):
         if conf.api:
             self._write(dbColumnsDict, content_type=CONTENT_TYPE.COLUMNS)
-            return
 
         for column in dbColumnsDict.keys():
             if colConsider == "1":

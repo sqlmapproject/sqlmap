@@ -1,5 +1,5 @@
 {
-    "__copyright__": "Copyright (c) 2019 Miroslav Stampar (@stamparm), MIT. See the file 'LICENSE' for copying permission",
+    "__copyright__": "Copyright (c) 2019-2020 Miroslav Stampar (@stamparm), MIT. See the file 'LICENSE' for copying permission",
     "__notice__": "The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software",
 
     "payloads": [
@@ -430,6 +430,12 @@
                 "8976:RVZXum60OEhCWKpAYKYPkoJzWOtohM4JiUcMr2RXg1uQJLX3uhdOnthtOj+hX7AB16FcPxJPdLsXo2tKaK99n+i7c4RmkgI2FZjxtDtAeq+c36A4chW1XaTC",
                 "e34c:RVZXum60OEhCWapAYKYPkoJyWOpohM4IiUYMr2RWg1qQJLX2uhdOn9htOj+hX7AB16FcPxJPdLsXomtKaK59nui6c4RmkgI2FZjxtDtAeq+c3qA4chS1XKTC"
             ]
+        },
+        "kuipernet": {
+            "company": "ASTSoft",
+            "name": "Kuipernet",
+            "regex": "(?s)Content-Length: 118214.+W5M0MpCehiHzreSzNTczkc9d",
+            "signatures": []
         },
         "malcare": {
             "company": "Inactiv",

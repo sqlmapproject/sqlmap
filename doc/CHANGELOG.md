@@ -1,3 +1,8 @@
+# Version 1.4 (2020-01-01)
+
+* [View changes](https://github.com/sqlmapproject/sqlmap/compare/1.3...1.4)
+* [View issues](https://github.com/sqlmapproject/sqlmap/milestone/5?closed=1)
+
 # Version 1.3 (2019-01-05)
 
 * [View changes](https://github.com/sqlmapproject/sqlmap/compare/1.2...1.3)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -118,19 +118,24 @@ def autoCompletion(completion=None, os=None, commands=None):
         if os == OS.WINDOWS:
             # Reference: http://en.wikipedia.org/wiki/List_of_DOS_commands
             completer = CompleterNG({
-                "copy": None, "del": None, "dir": None,
-                "echo": None, "md": None, "mem": None,
+                "attrib": None, "copy": None, "del": None,
+                "dir": None, "echo": None, "fc": None,
+                "label": None, "md": None, "mem": None,
                 "move": None, "net": None, "netstat -na": None,
-                "ver": None, "xcopy": None, "whoami": None,
+                "tree": None, "truename": None, "type": None,
+                "ver": None, "vol": None, "xcopy": None,
             })
 
         else:
             # Reference: http://en.wikipedia.org/wiki/List_of_Unix_commands
             completer = CompleterNG({
-                "cp": None, "rm": None, "ls": None,
-                "echo": None, "mkdir": None, "free": None,
-                "mv": None, "ifconfig": None, "netstat -natu": None,
-                "pwd": None, "uname": None, "id": None,
+                "cat": None, "chmod": None, "chown": None,
+                "cp": None, "cut": None, "date": None, "df": None,
+                "diff": None, "du": None, "echo": None, "env": None,
+                "file": None, "find": None, "free": None, "grep": None,
+                "id": None, "ifconfig": None, "ls": None, "mkdir": None,
+                "mv": None, "netstat": None, "pwd": None, "rm": None,
+                "uname": None, "whoami": None,
             })
 
         readline.set_completer(completer.complete)

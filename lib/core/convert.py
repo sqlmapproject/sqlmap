@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -19,6 +19,7 @@ import re
 import sys
 
 from lib.core.bigarray import BigArray
+from lib.core.compat import xrange
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.settings import INVALID_UNICODE_PRIVATE_AREA
@@ -30,6 +31,11 @@ from lib.core.settings import SAFE_HEX_MARKER
 from lib.core.settings import UNICODE_ENCODING
 from thirdparty import six
 from thirdparty.six import unichr as _unichr
+
+try:
+    from html import escape as htmlEscape
+except ImportError:
+    from cgi import escape as htmlEscape
 
 def base64pickle(value):
     """
@@ -221,7 +227,7 @@ def encodeBase64(value, binary=True, encoding=None):
 
     return retVal
 
-def getBytes(value, encoding=UNICODE_ENCODING, errors="strict", unsafe=True):
+def getBytes(value, encoding=None, errors="strict", unsafe=True):
     """
     Returns byte representation of provided Unicode value
 
@@ -230,6 +236,14 @@ def getBytes(value, encoding=UNICODE_ENCODING, errors="strict", unsafe=True):
     """
 
     retVal = value
+
+    if encoding is None:
+        encoding = conf.get("encoding") or UNICODE_ENCODING
+
+    try:
+        codecs.lookup(encoding)
+    except (LookupError, TypeError):
+        encoding = UNICODE_ENCODING
 
     if isinstance(value, six.text_type):
         if INVALID_UNICODE_PRIVATE_AREA:
@@ -289,7 +303,7 @@ def getUnicode(value, encoding=None, noneToNull=False):
         for candidate in candidates:
             try:
                 return six.text_type(value, candidate)
-            except UnicodeDecodeError:
+            except (UnicodeDecodeError, LookupError):
                 pass
 
         try:

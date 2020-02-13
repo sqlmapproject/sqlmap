@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -13,6 +13,7 @@ from lib.core.common import filterNone
 from lib.core.common import getSQLSnippet
 from lib.core.common import getTechnique
 from lib.core.common import getTechniqueData
+from lib.core.common import hashDBRetrieve
 from lib.core.common import isDBMSVersionAtLeast
 from lib.core.common import isNumber
 from lib.core.common import isTechniqueAvailable
@@ -34,6 +35,8 @@ from lib.core.data import queries
 from lib.core.dicts import DUMP_DATA_PREPROCESS
 from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.enums import DBMS
+from lib.core.enums import FORK
+from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import HTTP_HEADER
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
@@ -44,6 +47,7 @@ from lib.core.settings import BOUNDED_INJECTION_MARKER
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import GENERIC_SQL_COMMENT
+from lib.core.settings import GENERIC_SQL_COMMENT_MARKER
 from lib.core.settings import INFERENCE_MARKER
 from lib.core.settings import NULL
 from lib.core.settings import PAYLOAD_DELIMITER
@@ -184,8 +188,10 @@ class Agent(object):
             else:
                 newValue = self.addPayloadDelimiters(newValue)
 
-            newValue = newValue.replace(kb.customInjectionMark, REPLACEMENT_MARKER)
-            retVal = paramString.replace(_, newValue)
+            if newValue:
+                newValue = newValue.replace(kb.customInjectionMark, REPLACEMENT_MARKER)
+                retVal = paramString.replace(_, newValue)
+
             retVal = retVal.replace(kb.customInjectionMark, "").replace(REPLACEMENT_MARKER, kb.customInjectionMark)
         elif BOUNDED_INJECTION_MARKER in paramDict[parameter]:
             retVal = paramString.replace("%s%s" % (origValue, BOUNDED_INJECTION_MARKER), self.addPayloadDelimiters(newValue))
@@ -247,7 +253,7 @@ class Agent(object):
 
         # If we are replacing (<where>) the parameter original value with
         # our payload do not prepend with the prefix
-        if where == PAYLOAD.WHERE.REPLACE:
+        if where == PAYLOAD.WHERE.REPLACE and not conf.prefix:  # Note: https://github.com/sqlmapproject/sqlmap/issues/4030
             query = ""
 
         # If the technique is stacked queries (<stype>) do not put a space
@@ -294,8 +300,9 @@ class Agent(object):
             where = getTechniqueData().where if where is None else where
             comment = getTechniqueData().comment if comment is None else comment
 
-        if Backend.getIdentifiedDbms() == DBMS.ACCESS and any((comment or "").startswith(_) for _ in ("--", "[GENERIC_SQL_COMMENT]")):
-            comment = queries[DBMS.ACCESS].comment.query
+        if any((comment or "").startswith(_) for _ in ("--", GENERIC_SQL_COMMENT_MARKER)):
+            if Backend.getIdentifiedDbms() and not GENERIC_SQL_COMMENT.startswith(queries[Backend.getIdentifiedDbms()].comment.query):
+                comment = queries[Backend.getIdentifiedDbms()].comment.query
 
         if comment is not None:
             expression += comment
@@ -381,6 +388,11 @@ class Agent(object):
             for _ in set(re.findall(r"\[RANDSTR(?:\d+)?\]", payload, re.I)):
                 payload = payload.replace(_, randomStr())
 
+            if hashDBRetrieve(HASHDB_KEYS.DBMS_FORK) in (FORK.MEMSQL, FORK.TIDB, FORK.DRIZZLE):
+                payload = re.sub(r"(?i)\bORD\(", "ASCII(", payload)
+                payload = re.sub(r"(?i)\bMID\(", "SUBSTR(", payload)
+                payload = re.sub(r"(?i)\bNCHAR\b", "CHAR", payload)
+
         return payload
 
     def getComment(self, request):
@@ -438,7 +450,7 @@ class Agent(object):
 
         nulledCastedField = field
 
-        if field:
+        if field and Backend.getIdentifiedDbms():
             rootQuery = queries[Backend.getIdentifiedDbms()]
 
             if field.startswith("(CASE") or field.startswith("(IIF") or conf.noCast:
@@ -446,7 +458,7 @@ class Agent(object):
             else:
                 if not (Backend.isDbms(DBMS.SQLITE) and not isDBMSVersionAtLeast('3')):
                     nulledCastedField = rootQuery.cast.query % field
-                if Backend.getIdentifiedDbms() in (DBMS.ACCESS,):
+                if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI):
                     nulledCastedField = rootQuery.isnull.query % (nulledCastedField, nulledCastedField)
                 else:
                     nulledCastedField = rootQuery.isnull.query % nulledCastedField
@@ -648,7 +660,7 @@ class Agent(object):
             elif fieldsNoSelect:
                 concatenatedQuery = "CONCAT('%s',%s,'%s')" % (kb.chars.start, concatenatedQuery, kb.chars.stop)
 
-        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE, DBMS.DB2, DBMS.FIREBIRD, DBMS.HSQLDB, DBMS.H2):
+        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE, DBMS.DB2, DBMS.FIREBIRD, DBMS.HSQLDB, DBMS.H2, DBMS.MONETDB, DBMS.DERBY, DBMS.VERTICA, DBMS.MCKOI, DBMS.PRESTO, DBMS.ALTIBASE, DBMS.MIMERSQL, DBMS.CRATEDB, DBMS.CUBRID):
             if fieldsExists:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.chars.start, 1)
                 concatenatedQuery += "||'%s'" % kb.chars.stop
@@ -708,20 +720,42 @@ class Agent(object):
             warnMsg = "applying generic concatenation (CONCAT)"
             singleTimeWarnMessage(warnMsg)
 
+            if FROM_DUMMY_TABLE.get(Backend.getIdentifiedDbms()):
+                _ = re.sub(r"(?i)%s\Z" % re.escape(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]), "", concatenatedQuery)
+                if _ != concatenatedQuery:
+                    concatenatedQuery = _
+                    fieldsSelectFrom = None
+
             if fieldsExists:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "CONCAT(CONCAT('%s'," % kb.chars.start, 1)
                 concatenatedQuery += "),'%s')" % kb.chars.stop
             elif fieldsSelectCase:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "CONCAT(CONCAT('%s'," % kb.chars.start, 1)
                 concatenatedQuery += "),'%s')" % kb.chars.stop
-            elif fieldsSelectFrom:
+            elif fieldsSelectFrom or fieldsSelect:
+                fromTable = ""
+
                 _ = unArrayizeValue(zeroDepthSearch(concatenatedQuery, " FROM "))
-                concatenatedQuery = "%s),'%s')%s" % (concatenatedQuery[:_].replace("SELECT ", "CONCAT(CONCAT('%s'," % kb.chars.start, 1), kb.chars.stop, concatenatedQuery[_:])
+                if _:
+                    concatenatedQuery, fromTable = concatenatedQuery[:_], concatenatedQuery[_:]
+
+                concatenatedQuery = re.sub(r"(?i)\ASELECT ", "", concatenatedQuery)
+                replacement = "'%s',%s,'%s'" % (kb.chars.start, concatenatedQuery, kb.chars.stop)
+                chars = [_ for _ in replacement]
+
+                count = 0
+                for index in zeroDepthSearch(replacement, ',')[1:]:
+                    chars[index] = "),"
+                    count += 1
+
+                replacement = "CONCAT(%s%s)" % ("CONCAT(" * count, "".join(chars))
+                concatenatedQuery = "%s%s" % (replacement, fromTable)
             elif fieldsSelect:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "CONCAT(CONCAT('%s'," % kb.chars.start, 1)
                 concatenatedQuery += "),'%s')" % kb.chars.stop
             elif fieldsNoSelect:
                 concatenatedQuery = "CONCAT(CONCAT('%s',%s),'%s')" % (kb.chars.start, concatenatedQuery, kb.chars.stop)
+
 
         return concatenatedQuery
 
@@ -937,9 +971,27 @@ class Agent(object):
         fromFrom = limitedQuery[fromIndex + 1:]
         orderBy = None
 
-        if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE, DBMS.H2):
+        if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE, DBMS.H2, DBMS.VERTICA, DBMS.PRESTO, DBMS.MIMERSQL, DBMS.CUBRID):
             limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (num, 1)
             limitedQuery += " %s" % limitStr
+
+        elif Backend.getIdentifiedDbms() in (DBMS.ALTIBASE,):
+            limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (num + 1, 1)
+            limitedQuery += " %s" % limitStr
+
+        elif Backend.getIdentifiedDbms() in (DBMS.DERBY, DBMS.CRATEDB):
+            limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (1, num)
+            limitedQuery += " %s" % limitStr
+
+        elif Backend.getIdentifiedDbms() in (DBMS.MONETDB,):
+            if query.startswith("SELECT ") and field is not None and field in query:
+                original = query.split("SELECT ", 1)[1].split(" FROM", 1)[0]
+                for part in original.split(','):
+                    if re.search(r"\b%s\b" % re.escape(field), part):
+                        _ = re.sub(r"SELECT.+?FROM", "SELECT %s AS z,row_number() over() AS y FROM" % part, query, 1)
+                        replacement = "SELECT x.z FROM (%s)x WHERE x.y-1=%d" % (_, num)
+                        limitedQuery = replacement
+                        break
 
         elif Backend.isDbms(DBMS.HSQLDB):
             match = re.search(r"ORDER BY [^ ]+", limitedQuery)
@@ -1036,12 +1088,15 @@ class Agent(object):
     def forgeQueryOutputLength(self, expression):
         lengthQuery = queries[Backend.getIdentifiedDbms()].length.query
         select = re.search(r"\ASELECT\s+", expression, re.I)
+        selectFrom = re.search(r"\ASELECT\s+(.+)\s+FROM\s+(.+)", expression, re.I)
         selectTopExpr = re.search(r"\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", expression, re.I)
         selectMinMaxExpr = re.search(r"\ASELECT\s+(MIN|MAX)\(.+?\)\s+FROM", expression, re.I)
 
         _, _, _, _, _, _, fieldsStr, _ = self.getFields(expression)
 
-        if selectTopExpr or selectMinMaxExpr:
+        if Backend.getIdentifiedDbms() in (DBMS.MCKOI,) and selectFrom:
+            lengthExpr = "SELECT %s FROM %s" % (lengthQuery % selectFrom.group(1), selectFrom.group(2))
+        elif selectTopExpr or selectMinMaxExpr:
             lengthExpr = lengthQuery % ("(%s)" % expression)
         elif select:
             lengthExpr = expression.replace(fieldsStr, lengthQuery % fieldsStr, 1)

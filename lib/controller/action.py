@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -181,7 +181,10 @@ def action():
             raise
 
     if conf.sqlQuery:
-        conf.dumper.sqlQuery(conf.sqlQuery, conf.dbmsHandler.sqlQuery(conf.sqlQuery))
+        for query in conf.sqlQuery.strip(';').split(';'):
+            query = query.strip()
+            if query:
+                conf.dumper.sqlQuery(query, conf.dbmsHandler.sqlQuery(query))
 
     if conf.sqlShell:
         conf.dbmsHandler.sqlShell()

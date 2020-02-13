@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -17,6 +17,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import DBMS
+from lib.core.enums import FORK
 from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import OS
 from lib.core.session import setDbms
@@ -44,57 +45,64 @@ class Fingerprint(GenericFingerprint):
         # Reference: https://dev.mysql.com/doc/relnotes/mysql/<major>.<minor>/en/
 
         versions = (
-            (32200, 32235),  # MySQL 3.22
-            (32300, 32359),  # MySQL 3.23
-            (40000, 40032),  # MySQL 4.0
-            (40100, 40131),  # MySQL 4.1
-            (50000, 50097),  # MySQL 5.0
-            (50100, 50174),  # MySQL 5.1
-            (50400, 50404),  # MySQL 5.4
-            (50500, 50562),  # MySQL 5.5
-            (50600, 50648),  # MySQL 5.6
-            (50700, 50730),  # MySQL 5.7
-            (60000, 60014),  # MySQL 6.0
             (80000, 80021),  # MySQL 8.0
+            (60000, 60014),  # MySQL 6.0
+            (50700, 50731),  # MySQL 5.7
+            (50600, 50649),  # MySQL 5.6
+            (50500, 50563),  # MySQL 5.5
+            (50400, 50404),  # MySQL 5.4
+            (50100, 50174),  # MySQL 5.1
+            (50000, 50097),  # MySQL 5.0
+            (40100, 40131),  # MySQL 4.1
+            (40000, 40032),  # MySQL 4.0
+            (32300, 32359),  # MySQL 3.23
+            (32200, 32235),  # MySQL 3.22
         )
 
-        index = -1
-        for i in xrange(len(versions)):
-            element = versions[i]
-            version = element[0]
-            version = getUnicode(version)
-            result = inject.checkBooleanExpression("[RANDNUM]=[RANDNUM]/*!%s AND [RANDNUM1]=[RANDNUM2]*/" % version)
+        found = False
+        for candidate in versions:
+            result = inject.checkBooleanExpression("[RANDNUM]=[RANDNUM]/*!%d AND [RANDNUM1]=[RANDNUM2]*/" % candidate[0])
 
-            if result:
+            if not result:
+                found = True
                 break
-            else:
-                index += 1
 
-        if index >= 0:
-            prevVer = None
-
-            for version in xrange(versions[index][0], versions[index][1] + 1):
+        if found:
+            for version in xrange(candidate[1], candidate[0] - 1, -1):
                 version = getUnicode(version)
                 result = inject.checkBooleanExpression("[RANDNUM]=[RANDNUM]/*!%s AND [RANDNUM1]=[RANDNUM2]*/" % version)
 
-                if result:
-                    if not prevVer:
-                        prevVer = version
-
+                if not result:
                     if version[0] == "3":
-                        midVer = prevVer[1:3]
+                        midVer = version[1:3]
                     else:
-                        midVer = prevVer[2]
+                        midVer = version[2]
 
-                    trueVer = "%s.%s.%s" % (prevVer[0], midVer, prevVer[3:])
+                    trueVer = "%s.%s.%s" % (version[0], midVer, version[3:])
 
                     return trueVer
-
-                prevVer = version
 
         return None
 
     def getFingerprint(self):
+        fork = hashDBRetrieve(HASHDB_KEYS.DBMS_FORK)
+
+        if fork is None:
+            if inject.checkBooleanExpression("VERSION() LIKE '%MariaDB%'"):
+                fork = FORK.MARIADB
+            elif inject.checkBooleanExpression("VERSION() LIKE '%TiDB%'"):
+                fork = FORK.TIDB
+            elif inject.checkBooleanExpression("@@VERSION_COMMENT LIKE '%drizzle%'"):
+                fork = FORK.DRIZZLE
+            elif inject.checkBooleanExpression("@@VERSION_COMMENT LIKE '%Percona%'"):
+                fork = FORK.PERCONA
+            elif inject.checkBooleanExpression("AURORA_VERSION() LIKE '%'"):            # Reference: https://aws.amazon.com/premiumsupport/knowledge-center/aurora-version-number/
+                fork = FORK.AURORA
+            else:
+                fork = ""
+
+            hashDBWrite(HASHDB_KEYS.DBMS_FORK, fork)
+
         value = ""
         wsOsFp = Format.getOs("web server", kb.headersFp)
 
@@ -110,12 +118,10 @@ class Fingerprint(GenericFingerprint):
         value += "back-end DBMS: "
         actVer = Format.getDbms()
 
-        _ = hashDBRetrieve(HASHDB_KEYS.DBMS_FORK)
-        if _:
-            actVer += " (%s fork)" % _
-
         if not conf.extensiveFp:
             value += actVer
+            if fork:
+                value += " (%s fork)" % fork
             return value
 
         comVer = self._commentCheck()
@@ -140,6 +146,9 @@ class Fingerprint(GenericFingerprint):
 
         if htmlErrorFp:
             value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
+
+        if fork:
+            value += "\n%sfork fingerprint: %s" % (blank, fork)
 
         return value
 
@@ -176,13 +185,17 @@ class Fingerprint(GenericFingerprint):
             result = inject.checkBooleanExpression("SESSION_USER() LIKE USER()")
 
             if not result:
+                # Note: MemSQL doesn't support SESSION_USER()
+                result = inject.checkBooleanExpression("GEOGRAPHY_AREA(NULL) IS NULL")
+
+                if result:
+                    hashDBWrite(HASHDB_KEYS.DBMS_FORK, FORK.MEMSQL)
+
+            if not result:
                 warnMsg = "the back-end DBMS is not %s" % DBMS.MYSQL
                 logger.warn(warnMsg)
 
                 return False
-
-            if hashDBRetrieve(HASHDB_KEYS.DBMS_FORK) is None:
-                hashDBWrite(HASHDB_KEYS.DBMS_FORK, inject.checkBooleanExpression("VERSION() LIKE '%MariaDB%'") and "MariaDB" or "")
 
             # reading information_schema on some platforms is causing annoying timeout exits
             # Reference: http://bugs.mysql.com/bug.php?id=15855

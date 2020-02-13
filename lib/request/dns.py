@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2019 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -11,10 +11,58 @@ import binascii
 import os
 import re
 import socket
+import struct
 import threading
 import time
 
 class DNSQuery(object):
+    """
+    >>> DNSQuery(b'|K\\x01 \\x00\\x01\\x00\\x00\\x00\\x00\\x00\\x01\\x03www\\x06google\\x03com\\x00\\x00\\x01\\x00\\x01\\x00\\x00)\\x10\\x00\\x00\\x00\\x00\\x00\\x00\\x0c\\x00\\n\\x00\\x08O4|Np!\\x1d\\xb3')._query == b"www.google.com."
+    True
+    >>> DNSQuery(b'\\x00')._query == b""
+    True
+    """
+
+    def __init__(self, raw):
+        self._raw = raw
+        self._query = b""
+
+        try:
+            type_ = (ord(raw[2:3]) >> 3) & 15                   # Opcode bits
+
+            if type_ == 0:                                      # Standard query
+                i = 12
+                j = ord(raw[i:i + 1])
+
+                while j != 0:
+                    self._query += raw[i + 1:i + j + 1] + b'.'
+                    i = i + j + 1
+                    j = ord(raw[i:i + 1])
+        except TypeError:
+            pass
+
+    def response(self, resolution):
+        """
+        Crafts raw DNS resolution response packet
+        """
+
+        retVal = b""
+
+        if self._query:
+            retVal += self._raw[:2]                                                         # Transaction ID
+            retVal += b"\x85\x80"                                                           # Flags (Standard query response, No error)
+            retVal += self._raw[4:6] + self._raw[4:6] + b"\x00\x00\x00\x00"                 # Questions and Answers Counts
+            retVal += self._raw[12:(12 + self._raw[12:].find(b"\x00") + 5)]                 # Original Domain Name Query
+            retVal += b"\xc0\x0c"                                                           # Pointer to domain name
+            retVal += b"\x00\x01"                                                           # Type A
+            retVal += b"\x00\x01"                                                           # Class IN
+            retVal += b"\x00\x00\x00\x20"                                                   # TTL (32 seconds)
+            retVal += b"\x00\x04"                                                           # Data length
+            retVal += b"".join(struct.pack('B', int(_)) for _ in resolution.split('.'))     # 4 bytes of IP
+
+        return retVal
+
+class DNSServer(object):
     """
     Used for making fake DNS resolution responses based on received
     raw request
@@ -24,43 +72,6 @@ class DNSQuery(object):
         https://code.google.com/p/marlon-tools/source/browse/tools/dnsproxy/dnsproxy.py
     """
 
-    def __init__(self, raw):
-        self._raw = raw
-        self._query = ""
-
-        type_ = (ord(raw[2]) >> 3) & 15                 # Opcode bits
-
-        if type_ == 0:                                  # Standard query
-            i = 12
-            j = ord(raw[i])
-
-            while j != 0:
-                self._query += raw[i + 1:i + j + 1] + '.'
-                i = i + j + 1
-                j = ord(raw[i])
-
-    def response(self, resolution):
-        """
-        Crafts raw DNS resolution response packet
-        """
-
-        retVal = ""
-
-        if self._query:
-            retVal += self._raw[:2]                                             # Transaction ID
-            retVal += "\x85\x80"                                                # Flags (Standard query response, No error)
-            retVal += self._raw[4:6] + self._raw[4:6] + "\x00\x00\x00\x00"      # Questions and Answers Counts
-            retVal += self._raw[12:(12 + self._raw[12:].find("\x00") + 5)]      # Original Domain Name Query
-            retVal += "\xc0\x0c"                                                # Pointer to domain name
-            retVal += "\x00\x01"                                                # Type A
-            retVal += "\x00\x01"                                                # Class IN
-            retVal += "\x00\x00\x00\x20"                                        # TTL (32 seconds)
-            retVal += "\x00\x04"                                                # Data length
-            retVal += "".join(chr(int(_)) for _ in resolution.split('.'))       # 4 bytes of IP
-
-        return retVal
-
-class DNSServer(object):
     def __init__(self):
         self._check_localhost()
         self._requests = []
@@ -95,9 +106,15 @@ class DNSServer(object):
 
         retVal = None
 
+        if prefix and hasattr(prefix, "encode"):
+            prefix = prefix.encode()
+
+        if suffix and hasattr(suffix, "encode"):
+            suffix = suffix.encode()
+
         with self._lock:
             for _ in self._requests:
-                if prefix is None and suffix is None or re.search(r"%s\..+\.%s" % (prefix, suffix), _, re.I):
+                if prefix is None and suffix is None or re.search(b"%s\\..+\\.%s" % (prefix, suffix), _, re.I):
                     retVal = _
                     self._requests.remove(_)
                     break
@@ -148,7 +165,7 @@ if __name__ == "__main__":
                 if _ is None:
                     break
                 else:
-                    print("[i] %s" % _)
+                    print("[i] %s" % _.decode())
 
             time.sleep(1)
 
