@@ -88,6 +88,7 @@
         <error regexp="Zend_Db_(Adapter|Statement)_Db2_Exception"/>
         <error regexp="Pdo[./_\\]Ibm"/>
         <error regexp="DB2Exception"/>
+        <error regexp="ibm_db_dbi\.ProgrammingError"/>
     </dbms>
 
     <dbms value="Informix">
@@ -129,6 +130,7 @@
         <error regexp="DriverSapDB"/>
         <error regexp="-3014.*?Invalid end of SQL statement"/>
         <error regexp="com\.sap\.dbtech\.jdbc"/>
+        <error regexp="\[-3008\].*?: Invalid keyword or missing delimiter"/>
     </dbms>
 
     <dbms value="Sybase">
@@ -150,6 +152,7 @@
     <dbms value="Frontbase">
         <error regexp="Exception (condition )?\d+\. Transaction rollback"/>
         <error regexp="com\.frontbase\.jdbc"/>
+        <error regexp="Syntax error 108\. Expected"/>
     </dbms>
 
     <dbms value="HSQLDB">
@@ -160,6 +163,7 @@
 
     <dbms value="H2">
         <error regexp="org\.h2\.jdbc"/>
+        <error regexp="\[42000-192\]"/>
     </dbms>
 
     <dbms value="MonetDB">
@@ -185,6 +189,7 @@
     <dbms value="Mckoi">
         <error regexp="com\.mckoi\.JDBCDriver"/>
         <error regexp="com\.mckoi\.database\.jdbc"/>
+        <error regexp="&lt;REGEX_LITERAL&gt;"/>
     </dbms>
 
     <dbms value="Presto">
@@ -205,5 +210,10 @@
 
     <dbms value="CrateDB">
         <error regexp="io\.crate\.client\.jdbc"/>
+    </dbms>
+
+    <dbms value="Cache">
+        <error regexp="encountered after end of query"/>
+        <error regexp="A comparison operator is required here"/>
     </dbms>
 </root>
