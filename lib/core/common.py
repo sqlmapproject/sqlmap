@@ -1661,13 +1661,13 @@ def parseTargetUrl():
         else:
             conf.parameters[PLACE.GET] = urldecode(urlSplit.query, spaceplus=not conf.base64Parameter) if urlSplit.query and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in urlSplit.query else urlSplit.query
 
-    if (intersect(REFERER_ALIASES, conf.testParameter, True) or conf.level >= 3) and not any(_[0] == HTTP_HEADER.REFERER for _ in conf.httpHeaders):
+    if (intersect(REFERER_ALIASES, conf.testParameter, True) or conf.level >= 3) and not any(_[0].upper() == HTTP_HEADER.REFERER.upper() for _ in conf.httpHeaders):
         debugMsg = "setting the HTTP Referer header to the target URL"
         logger.debug(debugMsg)
         conf.httpHeaders = [_ for _ in conf.httpHeaders if _[0] != HTTP_HEADER.REFERER]
         conf.httpHeaders.append((HTTP_HEADER.REFERER, conf.url.replace(kb.customInjectionMark, "")))
 
-    if (intersect(HOST_ALIASES, conf.testParameter, True) or conf.level >= 5) and not any(_[0] == HTTP_HEADER.HOST for _ in conf.httpHeaders):
+    if (intersect(HOST_ALIASES, conf.testParameter, True) or conf.level >= 5) and not any(_[0].upper() == HTTP_HEADER.HOST.upper() for _ in conf.httpHeaders):
         debugMsg = "setting the HTTP Host header to the target URL"
         logger.debug(debugMsg)
         conf.httpHeaders = [_ for _ in conf.httpHeaders if _[0] != HTTP_HEADER.HOST]
@@ -5168,6 +5168,11 @@ def parseRequestFile(reqFile, checkParams=True):
                 elif re.search(r"\A\S+:", line):
                     key, value = line.split(":", 1)
                     value = value.strip().replace("\r", "").replace("\n", "")
+
+                    # Note: overriding values with --headers '...'
+                    match = re.search(r"(?i)\b(%s): ([^\n]*)" % re.escape(key), conf.headers or "")
+                    if match:
+                        key, value = match.groups()
 
                     # Cookie and Host headers
                     if key.upper() == HTTP_HEADER.COOKIE.upper():
