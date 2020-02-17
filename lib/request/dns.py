@@ -115,8 +115,8 @@ class DNSServer(object):
         with self._lock:
             for _ in self._requests:
                 if prefix is None and suffix is None or re.search(b"%s\\..+\\.%s" % (prefix, suffix), _, re.I):
-                    retVal = _
                     self._requests.remove(_)
+                    retVal = _.decode()
                     break
 
         return retVal
@@ -165,7 +165,7 @@ if __name__ == "__main__":
                 if _ is None:
                     break
                 else:
-                    print("[i] %s" % _.decode())
+                    print("[i] %s" % _)
 
             time.sleep(1)
 
