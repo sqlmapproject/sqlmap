@@ -4809,6 +4809,8 @@ def extractExpectedValue(value, expected):
     True
     >>> extractExpectedValue('1', EXPECTED.INT)
     1
+    >>> extractExpectedValue('7\\xb9645', EXPECTED.INT) is None
+    True
     """
 
     if expected:
@@ -4832,8 +4834,10 @@ def extractExpectedValue(value, expected):
                 else:
                     value = None
         elif expected == EXPECTED.INT:
-            if isinstance(value, six.string_types):
-                value = int(value) if value.isdigit() else None
+            try:
+                value = int(value)
+            except:
+                value = None
 
     return value
 
