@@ -13,6 +13,7 @@ from lib.core.enums import DBMS
 from lib.core.exception import SqlmapConnectionException
 from lib.core.settings import ACCESS_ALIASES
 from lib.core.settings import ALTIBASE_ALIASES
+from lib.core.settings import CACHE_ALIASES
 from lib.core.settings import CRATEDB_ALIASES
 from lib.core.settings import CUBRID_ALIASES
 from lib.core.settings import DB2_ALIASES
@@ -39,6 +40,8 @@ from plugins.dbms.access.connector import Connector as AccessConn
 from plugins.dbms.access import AccessMap
 from plugins.dbms.altibase.connector import Connector as AltibaseConn
 from plugins.dbms.altibase import AltibaseMap
+from plugins.dbms.cache.connector import Connector as CacheConn
+from plugins.dbms.cache import CacheMap
 from plugins.dbms.cratedb.connector import Connector as CrateDBConn
 from plugins.dbms.cratedb import CrateDBMap
 from plugins.dbms.cubrid.connector import Connector as CubridConn
@@ -109,6 +112,7 @@ def setHandler():
         (DBMS.MIMERSQL, MIMERSQL_ALIASES, MimerSQLMap, MimerSQLConn),
         (DBMS.CRATEDB, CRATEDB_ALIASES, CrateDBMap, CrateDBConn),
         (DBMS.CUBRID, CUBRID_ALIASES, CubridMap, CubridConn),
+        (DBMS.CACHE, CACHE_ALIASES, CacheMap, CacheConn),
     ]
 
     _ = max(_ if (conf.get("dbms") or Backend.getIdentifiedDbms() or kb.heuristicExtendedDbms or "").lower() in _[1] else () for _ in items)

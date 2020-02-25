@@ -660,7 +660,7 @@ class Agent(object):
             elif fieldsNoSelect:
                 concatenatedQuery = "CONCAT('%s',%s,'%s')" % (kb.chars.start, concatenatedQuery, kb.chars.stop)
 
-        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE, DBMS.DB2, DBMS.FIREBIRD, DBMS.HSQLDB, DBMS.H2, DBMS.MONETDB, DBMS.DERBY, DBMS.VERTICA, DBMS.MCKOI, DBMS.PRESTO, DBMS.ALTIBASE, DBMS.MIMERSQL, DBMS.CRATEDB, DBMS.CUBRID):
+        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE, DBMS.DB2, DBMS.FIREBIRD, DBMS.HSQLDB, DBMS.H2, DBMS.MONETDB, DBMS.DERBY, DBMS.VERTICA, DBMS.MCKOI, DBMS.PRESTO, DBMS.ALTIBASE, DBMS.MIMERSQL, DBMS.CRATEDB, DBMS.CUBRID, DBMS.CACHE):
             if fieldsExists:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.chars.start, 1)
                 concatenatedQuery += "||'%s'" % kb.chars.stop
@@ -1010,6 +1010,15 @@ class Agent(object):
                 match = re.search(r"%s\s+(\w+)" % re.escape(limitStr), limitedQuery)
                 if match:
                     orderBy = " ORDER BY %s" % match.group(1)
+
+        elif Backend.isDbms(DBMS.CACHE):
+            match = re.search(r"ORDER BY ([^ ]+)\Z", limitedQuery)
+            if match:
+                limitedQuery = re.sub(r"\s*%s\s*" % re.escape(match.group(0)), " ", limitedQuery).strip()
+                orderBy = " %s" % match.group(0)
+                field = match.group(1)
+
+            limitedQuery = queries[Backend.getIdentifiedDbms()].limit.query % (1, field, limitedQuery, num)
 
         elif Backend.isDbms(DBMS.FIREBIRD):
             limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (num + 1, num + 1)

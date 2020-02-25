@@ -43,6 +43,7 @@ from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.core.settings import CHECK_ZERO_COLUMNS_THRESHOLD
 from lib.core.settings import CURRENT_DB
 from lib.core.settings import NULL
+from lib.core.settings import PLUS_ONE_DBMSES
 from lib.core.settings import UPPER_CASE_DBMSES
 from lib.request import inject
 from lib.utils.hash import attackDumpedTable
@@ -233,7 +234,7 @@ class Entries(object):
                                     entries = BigArray(_zip(*[entries[colName] for colName in colList]))
                         else:
                             query = rootQuery.inband.query % (colString, conf.db, tbl)
-                    elif Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2, DBMS.VERTICA, DBMS.PRESTO, DBMS.CRATEDB):
+                    elif Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2, DBMS.VERTICA, DBMS.PRESTO, DBMS.CRATEDB, DBMS.CACHE):
                         query = rootQuery.inband.query % (colString, conf.db, tbl, prioritySortColumns(colList)[0])
                     else:
                         query = rootQuery.inband.query % (colString, conf.db, tbl)
@@ -379,7 +380,7 @@ class Entries(object):
 
                     else:
                         emptyColumns = []
-                        plusOne = Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.ALTIBASE)
+                        plusOne = Backend.getIdentifiedDbms() in PLUS_ONE_DBMSES
                         indexRange = getLimitRange(count, plusOne=plusOne)
 
                         if len(colList) < len(indexRange) > CHECK_ZERO_COLUMNS_THRESHOLD:
@@ -404,7 +405,7 @@ class Entries(object):
                                     if column not in entries:
                                         entries[column] = BigArray()
 
-                                    if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2, DBMS.VERTICA, DBMS.PRESTO, DBMS.CRATEDB):
+                                    if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2, DBMS.VERTICA, DBMS.PRESTO, DBMS.CRATEDB, DBMS.CACHE):
                                         query = rootQuery.blind.query % (agent.preprocessField(tbl, column), conf.db, conf.tbl, sorted(colList, key=len)[0], index)
                                     elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE,):
                                         query = rootQuery.blind.query % (agent.preprocessField(tbl, column), tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())), index)

@@ -41,7 +41,7 @@ def checkDependencies():
                 __import__("kinterbasdb")
             elif dbmsName == DBMS.DB2:
                 __import__("ibm_db_dbi")
-            elif dbmsName == DBMS.HSQLDB:
+            elif dbmsName in (DBMS.HSQLDB, DBMS.CACHE):
                 __import__("jaydebeapi")
                 __import__("jpype")
             elif dbmsName == DBMS.INFORMIX:

@@ -33,7 +33,7 @@ class Connector(GenericConnector):
     def connect(self):
         self.initConnection()
         try:
-            msg = "please enter the location of 'hsqldb.jar'? "
+            msg = "please enter the location of 'cachejdbc.jar'? "
             jar = readInput(msg)
             checkFile(jar)
             args = "-Djava.class.path=%s" % jar
@@ -43,8 +43,8 @@ class Connector(GenericConnector):
             raise SqlmapConnectionException(getSafeExString(ex))
 
         try:
-            driver = 'org.hsqldb.jdbc.JDBCDriver'
-            connection_string = 'jdbc:hsqldb:mem:.'  # 'jdbc:hsqldb:hsql://%s/%s' % (self.hostname, self.db)
+            driver = 'com.intersys.jdbc.CacheDriver'
+            connection_string = 'jdbc:Cache://%s:%d/%s' % (self.hostname, self.port, self.db)
             self.connector = jaydebeapi.connect(driver, connection_string, str(self.user), str(self.password))
         except Exception as ex:
             raise SqlmapConnectionException(getSafeExString(ex))
@@ -73,17 +73,5 @@ class Connector(GenericConnector):
         return retVal
 
     def select(self, query):
-        retVal = None
-
-        upper_query = query.upper()
-
-        if query and not (upper_query.startswith("SELECT ") or upper_query.startswith("VALUES ")):
-            query = "VALUES %s" % query
-
-        if query and upper_query.startswith("SELECT ") and " FROM " not in upper_query:
-            query = "%s FROM (VALUES(0))" % query
-
-        self.cursor.execute(query)
-        retVal = self.cursor.fetchall()
-
-        return retVal
+        self.execute(query)
+        return self.fetchall()

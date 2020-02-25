@@ -12,6 +12,7 @@ from lib.core.enums import POST_HINT
 from lib.core.settings import ACCESS_ALIASES
 from lib.core.settings import ALTIBASE_ALIASES
 from lib.core.settings import BLANK
+from lib.core.settings import CACHE_ALIASES
 from lib.core.settings import CRATEDB_ALIASES
 from lib.core.settings import CUBRID_ALIASES
 from lib.core.settings import DB2_ALIASES
@@ -123,9 +124,7 @@ ALTIBASE_TYPES = {
     -8: "NCHAR",
     -9: "NVARCHAR",
     2: "NUMERIC",
-    2: "DECIMAL",
     6: "FLOAT",
-    6: "NUMBER",
     8: "DOUBLE",
     7: "REAL",
     -5: "BIGINT",
@@ -240,6 +239,7 @@ DBMS_DICT = {
     DBMS.MIMERSQL: (MIMERSQL_ALIASES, "mimerpy", "https://github.com/mimersql/MimerPy", None),
     DBMS.CRATEDB: (CRATEDB_ALIASES, "python-psycopg2", "http://initd.org/psycopg/", "postgresql"),
     DBMS.CUBRID: (CUBRID_ALIASES, "CUBRID-Python", "https://github.com/CUBRID/cubrid-python", None),
+    DBMS.CACHE: (CACHE_ALIASES, "python jaydebeapi & python-jpype", "https://pypi.python.org/pypi/JayDeBeApi/ & http://jpype.sourceforge.net/", None),
 }
 
 # Reference: https://blog.jooq.org/tag/sysibm-sysdummy1/
@@ -273,6 +273,7 @@ HEURISTIC_NULL_EVAL = {
     DBMS.MIMERSQL: "ASCII_CHAR(256)",
     DBMS.CRATEDB: "MD5(NULL~NULL)",  # Note: NULL~NULL also being evaluated on H2 and Ignite
     DBMS.CUBRID: "(NULL SETEQ NULL)",
+    DBMS.CACHE: "%SQLUPPER NULL",
 }
 
 SQL_STATEMENTS = {

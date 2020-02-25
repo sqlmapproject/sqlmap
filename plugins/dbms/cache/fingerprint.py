@@ -16,20 +16,20 @@ from lib.core.enums import DBMS
 from lib.core.enums import FORK
 from lib.core.enums import HASHDB_KEYS
 from lib.core.session import setDbms
-from lib.core.settings import H2_ALIASES
+from lib.core.settings import CACHE_ALIASES
 from lib.request import inject
 from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 
 class Fingerprint(GenericFingerprint):
     def __init__(self):
-        GenericFingerprint.__init__(self, DBMS.H2)
+        GenericFingerprint.__init__(self, DBMS.CACHE)
 
     def getFingerprint(self):
         fork = hashDBRetrieve(HASHDB_KEYS.DBMS_FORK)
 
         if fork is None:
-            if inject.checkBooleanExpression("EXISTS(SELECT * FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='IGNITE')"):
-                fork = FORK.IGNITE
+            if inject.checkBooleanExpression("$ZVERSION LIKE '%IRIS%'"):
+                fork = FORK.IRIS
             else:
                 fork = ""
 
@@ -50,7 +50,7 @@ class Fingerprint(GenericFingerprint):
         value += "back-end DBMS: "
 
         if not conf.extensiveFp:
-            value += DBMS.H2
+            value += DBMS.CACHE
             if fork:
                 value += " (%s fork)" % fork
             return value
@@ -77,41 +77,37 @@ class Fingerprint(GenericFingerprint):
         return value
 
     def checkDbms(self):
-        if not conf.extensiveFp and Backend.isDbmsWithin(H2_ALIASES):
-            setDbms("%s %s" % (DBMS.H2, Backend.getVersion()))
+        if not conf.extensiveFp and Backend.isDbmsWithin(CACHE_ALIASES):
+            setDbms(DBMS.CACHE)
 
             self.getBanner()
 
             return True
 
-        infoMsg = "testing %s" % DBMS.H2
+        infoMsg = "testing %s" % DBMS.CACHE
         logger.info(infoMsg)
 
-        result = inject.checkBooleanExpression("ZERO() IS 0")
+        result = inject.checkBooleanExpression("$LISTLENGTH(NULL) IS NULL")
 
         if result:
-            infoMsg = "confirming %s" % DBMS.H2
+            infoMsg = "confirming %s" % DBMS.CACHE
             logger.info(infoMsg)
 
-            result = inject.checkBooleanExpression("ROUNDMAGIC(PI())>=3")
+            result = inject.checkBooleanExpression("%EXTERNAL %INTERNAL NULL IS NULL")
 
             if not result:
-                warnMsg = "the back-end DBMS is not %s" % DBMS.H2
+                warnMsg = "the back-end DBMS is not %s" % DBMS.CACHE
                 logger.warn(warnMsg)
 
                 return False
-            else:
-                setDbms(DBMS.H2)
 
-                self.getBanner()
+            setDbms(DBMS.CACHE)
 
-                return True
+            self.getBanner()
+
+            return True
         else:
-            warnMsg = "the back-end DBMS is not %s" % DBMS.H2
+            warnMsg = "the back-end DBMS is not %s" % DBMS.CACHE
             logger.warn(warnMsg)
 
             return False
-
-    def getHostname(self):
-        warnMsg = "on H2 it is not possible to enumerate the hostname"
-        logger.warn(warnMsg)

@@ -54,6 +54,7 @@ class DBMS(object):
     MIMERSQL = "MimerSQL"
     CRATEDB = "CrateDB"
     CUBRID = "Cubrid"
+    CACHE = "InterSystems Cache"
 
 class DBMS_DIRECTORY_NAME(object):
     ACCESS = "access"
@@ -78,6 +79,7 @@ class DBMS_DIRECTORY_NAME(object):
     MIMERSQL = "mimersql"
     CRATEDB = "cratedb"
     CUBRID = "cubrid"
+    CACHE = "cache"
 
 class FORK(object):
     MARIADB = "MariaDB"
@@ -91,6 +93,8 @@ class FORK(object):
     IGNITE = "Apache Ignite"
     AURORA = "Aurora"
     ENTERPRISEDB = "EnterpriseDB"
+    YELLOWBRICK = "Yellowbrick"
+    IRIS = "Iris"
 
 class CUSTOM_LOGGING(object):
     PAYLOAD = 9

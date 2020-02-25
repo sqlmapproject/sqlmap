@@ -41,6 +41,7 @@ from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import CURRENT_USER
+from lib.core.settings import PLUS_ONE_DBMSES
 from lib.core.threads import getCurrentThreadData
 from lib.request import inject
 from lib.utils.hash import attackCachedUsersPasswords
@@ -140,7 +141,7 @@ class Users(object):
                 errMsg = "unable to retrieve the number of database users"
                 raise SqlmapNoneDataException(errMsg)
 
-            plusOne = Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.ALTIBASE)
+            plusOne = Backend.getIdentifiedDbms() in PLUS_ONE_DBMSES
             indexRange = getLimitRange(count, plusOne=plusOne)
 
             for index in indexRange:
@@ -308,7 +309,7 @@ class Users(object):
 
                     passwords = []
 
-                    plusOne = Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.ALTIBASE)
+                    plusOne = Backend.getIdentifiedDbms() in PLUS_ONE_DBMSES
                     indexRange = getLimitRange(count, plusOne=plusOne)
 
                     for index in indexRange:
@@ -556,7 +557,7 @@ class Users(object):
 
                 privileges = set()
 
-                plusOne = Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.ALTIBASE)
+                plusOne = Backend.getIdentifiedDbms() in PLUS_ONE_DBMSES
                 indexRange = getLimitRange(count, plusOne=plusOne)
 
                 for index in indexRange:
