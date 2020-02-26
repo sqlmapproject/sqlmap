@@ -149,7 +149,7 @@ class Search(object):
             bruteForce = True
 
         if bruteForce:
-            message = "do you want to use common table existence check? %s" % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI) else "[y/N/q]")
+            message = "do you want to use common table existence check? %s" % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB) else "[y/N/q]")
             choice = readInput(message, default='Y' if 'Y' in message else 'N').upper()
 
             if choice == 'N':
@@ -353,7 +353,7 @@ class Search(object):
             bruteForce = True
 
         if bruteForce:
-            message = "do you want to use common column existence check? %s" % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI) else "[y/N/q]")
+            message = "do you want to use common column existence check? %s" % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB) else "[y/N/q]")
             choice = readInput(message, default='Y' if 'Y' in message else 'N').upper()
 
             if choice == 'N':

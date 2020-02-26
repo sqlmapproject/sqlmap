@@ -180,7 +180,7 @@ class Entries(object):
 
                     if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE, DBMS.MIMERSQL):
                         query = rootQuery.inband.query % (colString, tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())))
-                    elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD, DBMS.MAXDB, DBMS.MCKOI):
+                    elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD, DBMS.MAXDB, DBMS.MCKOI, DBMS.EXTREMEDB):
                         query = rootQuery.inband.query % (colString, tbl)
                     elif Backend.getIdentifiedDbms() in (DBMS.SYBASE, DBMS.MSSQL):
                         # Partial inband and error
@@ -289,7 +289,7 @@ class Entries(object):
 
                     if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE, DBMS.MIMERSQL):
                         query = rootQuery.blind.count % (tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())))
-                    elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD, DBMS.MCKOI):
+                    elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD, DBMS.MCKOI, DBMS.EXTREMEDB):
                         query = rootQuery.blind.count % tbl
                     elif Backend.getIdentifiedDbms() in (DBMS.SYBASE, DBMS.MSSQL):
                         query = rootQuery.blind.count % ("%s.%s" % (conf.db, tbl))
@@ -328,7 +328,7 @@ class Entries(object):
                         continue
 
                     elif Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.SYBASE, DBMS.MAXDB, DBMS.MSSQL, DBMS.INFORMIX, DBMS.MCKOI):
-                        if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI):
+                        if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB):
                             table = tbl
                         elif Backend.getIdentifiedDbms() in (DBMS.SYBASE, DBMS.MSSQL, DBMS.MAXDB):
                             table = "%s.%s" % (conf.db, tbl)
@@ -411,7 +411,7 @@ class Entries(object):
                                         query = rootQuery.blind.query % (agent.preprocessField(tbl, column), tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())), index)
                                     elif Backend.getIdentifiedDbms() in (DBMS.MIMERSQL,):
                                         query = rootQuery.blind.query % (agent.preprocessField(tbl, column), tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())), sorted(colList, key=len)[0], index)
-                                    elif Backend.isDbms(DBMS.SQLITE):
+                                    elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.EXTREMEDB):
                                         query = rootQuery.blind.query % (agent.preprocessField(tbl, column), tbl, index)
                                     elif Backend.isDbms(DBMS.FIREBIRD):
                                         query = rootQuery.blind.query % (index, agent.preprocessField(tbl, column), tbl)

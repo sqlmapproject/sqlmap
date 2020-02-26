@@ -18,6 +18,7 @@ from lib.core.settings import CRATEDB_ALIASES
 from lib.core.settings import CUBRID_ALIASES
 from lib.core.settings import DB2_ALIASES
 from lib.core.settings import DERBY_ALIASES
+from lib.core.settings import EXTREMEDB_ALIASES
 from lib.core.settings import FIREBIRD_ALIASES
 from lib.core.settings import H2_ALIASES
 from lib.core.settings import HSQLDB_ALIASES
@@ -50,6 +51,8 @@ from plugins.dbms.db2.connector import Connector as DB2Conn
 from plugins.dbms.db2 import DB2Map
 from plugins.dbms.derby.connector import Connector as DerbyConn
 from plugins.dbms.derby import DerbyMap
+from plugins.dbms.extremedb.connector import Connector as ExtremeDBConn
+from plugins.dbms.extremedb import ExtremeDBMap
 from plugins.dbms.firebird.connector import Connector as FirebirdConn
 from plugins.dbms.firebird import FirebirdMap
 from plugins.dbms.h2.connector import Connector as H2Conn
@@ -113,6 +116,7 @@ def setHandler():
         (DBMS.CRATEDB, CRATEDB_ALIASES, CrateDBMap, CrateDBConn),
         (DBMS.CUBRID, CUBRID_ALIASES, CubridMap, CubridConn),
         (DBMS.CACHE, CACHE_ALIASES, CacheMap, CacheConn),
+        (DBMS.EXTREMEDB, EXTREMEDB_ALIASES, ExtremeDBMap, ExtremeDBConn),
     ]
 
     _ = max(_ if (conf.get("dbms") or Backend.getIdentifiedDbms() or kb.heuristicExtendedDbms or "").lower() in _[1] else () for _ in items)

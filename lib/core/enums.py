@@ -55,6 +55,7 @@ class DBMS(object):
     CRATEDB = "CrateDB"
     CUBRID = "Cubrid"
     CACHE = "InterSystems Cache"
+    EXTREMEDB = "eXtremeDB"
 
 class DBMS_DIRECTORY_NAME(object):
     ACCESS = "access"
@@ -80,6 +81,7 @@ class DBMS_DIRECTORY_NAME(object):
     CRATEDB = "cratedb"
     CUBRID = "cubrid"
     CACHE = "cache"
+    EXTREMEDB = "extremedb"
 
 class FORK(object):
     MARIADB = "MariaDB"

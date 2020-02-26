@@ -756,7 +756,7 @@
         <count query="COUNT(%s)"/>
         <comment query="--" query2="//"/>
         <substring query="SUBSTR((%s),%d,%d)"/>
-        <concatenate query="CONCAT(%s,%s)"/>
+        <concatenate query="%s||%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
         <hex query="RAWTOHEX(%s)"/>
         <inference query="ASCII(SUBSTR((%s),%d,1))>%d"/>
@@ -882,7 +882,7 @@
         <count query="COUNT(%s)"/>
         <comment query="--" query2="#"/>
         <substring query="SUBSTRING((%s),%d,%d)"/>
-        <concatenate query="CONCAT(%s,%s)"/>
+        <concatenate query="%s||%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
         <inference query="ASCII(SUBSTRING((%s),%d,1))>%d"/>
         <banner query="SELECT value FROM environment WHERE name='monet_version'"/>
@@ -1505,8 +1505,8 @@
             <blind query="SELECT TOP 1 %s FROM (SELECT TOP ALL * FROM %s.%s ORDER BY %s) WHERE %%VID=%d" count="SELECT COUNT(*) FROM %s.%s"/>
         </dump_table>
         <search_db>
-            <inband query="SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA WHERE %s" query2="SELECT db FROM mysql.db WHERE %s" condition="schema_name" condition2="db"/>
-            <blind query="SELECT DISTINCT(schema_name) FROM INFORMATION_SCHEMA.SCHEMATA WHERE %s" query2="SELECT DISTINCT(db) FROM mysql.db WHERE %s" count="SELECT COUNT(DISTINCT(schema_name)) FROM INFORMATION_SCHEMA.SCHEMATA WHERE %s" count2="SELECT COUNT(DISTINCT(db)) FROM mysql.db WHERE %s" condition="schema_name" condition2="db"/>
+            <inband query="SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA WHERE %s" condition="schema_name"/>
+            <blind query="SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA WHERE %s" count="SELECT COUNT(schema_name) FROM INFORMATION_SCHEMA.SCHEMATA WHERE %s" condition="schema_name"/>
         </search_db>
         <search_table>
             <inband query="SELECT table_schema,table_name FROM INFORMATION_SCHEMA.TABLES WHERE %s" condition="table_name" condition2="table_schema"/>
@@ -1516,5 +1516,48 @@
             <inband query="SELECT table_schema,table_name FROM INFORMATION_SCHEMA.COLUMNS WHERE %s" condition="column_name" condition2="table_schema" condition3="table_name"/>
             <blind query="SELECT DISTINCT(table_schema) FROM INFORMATION_SCHEMA.COLUMNS WHERE %s" query2="SELECT DISTINCT(table_name) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema='%s'" count="SELECT COUNT(DISTINCT(table_schema)) FROM INFORMATION_SCHEMA.COLUMNS WHERE %s" count2="SELECT COUNT(DISTINCT(table_name)) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema='%s'" condition="column_name" condition2="table_schema" condition3="table_name"/>
         </search_column>
+    </dbms>
+
+    <dbms value="eXtremeDB">
+        <cast query="CAST(%s AS VARCHAR(4000))"/>
+        <length query="LENGTH(%s)"/>
+        <isnull query="IFNULL(%s,' ')"/>
+        <delimiter query="||"/>
+        <limit query="LIMIT %d,%d"/>
+        <limitregexp query="\s+LIMIT\s+([\d]+)\s*\,\s*([\d]+)" query2="\s+LIMIT\s+([\d]+)"/>
+        <limitgroupstart query="1"/>
+        <limitgroupstop query="2"/>
+        <limitstring query=" LIMIT "/>
+        <order query="ORDER BY %s ASC"/>
+        <count query="COUNT(%s)"/>
+        <comment query="--"/>
+        <substring query="SUBSTR((%s),%d,%d)"/>
+        <concatenate query="%s||%s"/>
+        <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
+        <hex/>
+        <inference query="SUBSTR((%s),%d,1)>'%c'"/>
+        <banner/>
+        <current_user/>
+        <current_db/>
+        <hostname/>
+        <table_comment/>
+        <column_comment/>
+        <is_dba/>
+        <check_udf/>
+        <users/>
+        <passwords/>
+        <privileges/>
+        <roles/>
+        <statements/>
+        <dbs/>
+        <tables/>
+        <columns/>
+        <dump_table>
+            <inband query="SELECT %s FROM %s"/>
+            <blind query="SELECT %s FROM %s LIMIT %d,1" count="SELECT COUNT(*) FROM %s"/>
+        </dump_table>
+        <search_db/>
+        <search_table/>
+        <search_column/>
     </dbms>
 </root>

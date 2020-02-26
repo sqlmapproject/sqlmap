@@ -86,12 +86,12 @@ class Databases(object):
             kb.data.currentDb = VERTICA_DEFAULT_SCHEMA
 
         if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.PGSQL, DBMS.MONETDB, DBMS.DERBY, DBMS.VERTICA, DBMS.PRESTO, DBMS.MIMERSQL, DBMS.CRATEDB, DBMS.CACHE):
-            warnMsg = "on '%s' you'll need to use " % Backend.getIdentifiedDbms()
+            warnMsg = "on %s you'll need to use " % Backend.getIdentifiedDbms()
             warnMsg += "schema names for enumeration as the counterpart to database "
             warnMsg += "names on other DBMSes"
             singleTimeWarnMessage(warnMsg)
         elif Backend.getIdentifiedDbms() in (DBMS.ALTIBASE, DBMS.CUBRID):
-            warnMsg = "on '%s' you'll need to use " % Backend.getIdentifiedDbms()
+            warnMsg = "on %s you'll need to use " % Backend.getIdentifiedDbms()
             warnMsg += "user names for enumeration as the counterpart to database "
             warnMsg += "names on other DBMSes"
             singleTimeWarnMessage(warnMsg)
@@ -111,7 +111,7 @@ class Databases(object):
             logger.warn(warnMsg)
 
         elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.PGSQL, DBMS.MONETDB, DBMS.DERBY, DBMS.VERTICA, DBMS.PRESTO, DBMS.MIMERSQL, DBMS.CRATEDB, DBMS.CACHE):
-            warnMsg = "schema names are going to be used on '%s' " % Backend.getIdentifiedDbms()
+            warnMsg = "schema names are going to be used on %s " % Backend.getIdentifiedDbms()
             warnMsg += "for enumeration as the counterpart to database "
             warnMsg += "names on other DBMSes"
             logger.warn(warnMsg)
@@ -119,7 +119,7 @@ class Databases(object):
             infoMsg = "fetching database (schema) names"
 
         elif Backend.getIdentifiedDbms() in (DBMS.ALTIBASE, DBMS.CUBRID):
-            warnMsg = "user names are going to be used on '%s' " % Backend.getIdentifiedDbms()
+            warnMsg = "user names are going to be used on %s " % Backend.getIdentifiedDbms()
             warnMsg += "for enumeration as the counterpart to database "
             warnMsg += "names on other DBMSes"
             logger.warn(warnMsg)
@@ -225,7 +225,7 @@ class Databases(object):
                 logger.error(errMsg)
                 bruteForce = True
 
-            elif Backend.getIdentifiedDbms() in (DBMS.MCKOI,):
+            elif Backend.getIdentifiedDbms() in (DBMS.MCKOI, DBMS.EXTREMEDB):
                 bruteForce = True
 
             elif Backend.getIdentifiedDbms() in (DBMS.ACCESS,):
@@ -276,7 +276,7 @@ class Databases(object):
 
                 return kb.data.cachedTables
 
-            message = "do you want to use common table existence check? %s " % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI) else "[y/N/q]")
+            message = "do you want to use common table existence check? %s " % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB) else "[y/N/q]")
             choice = readInput(message, default='Y' if 'Y' in message else 'N').upper()
 
             if choice == 'N':
@@ -343,7 +343,7 @@ class Databases(object):
                                     infoMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(db)
                                     logger.info(infoMsg)
                             else:
-                                warnMsg = "on '%s' it is not " % Backend.getIdentifiedDbms()
+                                warnMsg = "on %s it is not " % Backend.getIdentifiedDbms()
                                 warnMsg += "possible to get table comments"
                                 singleTimeWarnMessage(warnMsg)
 
@@ -368,7 +368,7 @@ class Databases(object):
                 infoMsg += "database '%s'" % unsafeSQLIdentificatorNaming(db)
                 logger.info(infoMsg)
 
-                if Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD, DBMS.MAXDB, DBMS.ACCESS, DBMS.MCKOI):
+                if Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD, DBMS.MAXDB, DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB):
                     query = rootQuery.blind.count
                 else:
                     query = rootQuery.blind.count % unsafeSQLIdentificatorNaming(db)
@@ -395,7 +395,7 @@ class Databases(object):
                 for index in indexRange:
                     if Backend.isDbms(DBMS.SYBASE):
                         query = rootQuery.blind.query % (db, (kb.data.cachedTables[-1] if kb.data.cachedTables else " "))
-                    elif Backend.getIdentifiedDbms() in (DBMS.MAXDB, DBMS.ACCESS, DBMS.MCKOI):
+                    elif Backend.getIdentifiedDbms() in (DBMS.MAXDB, DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB):
                         query = rootQuery.blind.query % (kb.data.cachedTables[-1] if kb.data.cachedTables else " ")
                     elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD):
                         query = rootQuery.blind.query % index
@@ -425,7 +425,7 @@ class Databases(object):
                                     infoMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(db)
                                     logger.info(infoMsg)
                             else:
-                                warnMsg = "on '%s' it is not " % Backend.getIdentifiedDbms()
+                                warnMsg = "on %s it is not " % Backend.getIdentifiedDbms()
                                 warnMsg += "possible to get table comments"
                                 singleTimeWarnMessage(warnMsg)
 
@@ -534,7 +534,7 @@ class Databases(object):
                 logger.error(errMsg)
                 bruteForce = True
 
-            elif Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI):
+            elif Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB):
                 errMsg = "cannot retrieve column names, "
                 errMsg += "back-end DBMS is %s" % Backend.getIdentifiedDbms()
                 logger.error(errMsg)
@@ -567,7 +567,7 @@ class Databases(object):
 
                 return kb.data.cachedColumns
 
-            message = "do you want to use common column existence check? %s" % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI) else "[y/N/q]")
+            message = "do you want to use common column existence check? %s" % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB) else "[y/N/q]")
             choice = readInput(message, default='Y' if 'Y' in message else 'N').upper()
 
             if choice == 'N':
@@ -698,7 +698,7 @@ class Databases(object):
                                             infoMsg = "retrieved comment '%s' for column '%s'" % (comment, name)
                                             logger.info(infoMsg)
                                     else:
-                                        warnMsg = "on '%s' it is not " % Backend.getIdentifiedDbms()
+                                        warnMsg = "on %s it is not " % Backend.getIdentifiedDbms()
                                         warnMsg += "possible to get column comments"
                                         singleTimeWarnMessage(warnMsg)
 
@@ -868,7 +868,7 @@ class Databases(object):
                                     infoMsg = "retrieved comment '%s' for column '%s'" % (comment, column)
                                     logger.info(infoMsg)
                             else:
-                                warnMsg = "on '%s' it is not " % Backend.getIdentifiedDbms()
+                                warnMsg = "on %s it is not " % Backend.getIdentifiedDbms()
                                 warnMsg += "possible to get column comments"
                                 singleTimeWarnMessage(warnMsg)
 
@@ -964,7 +964,7 @@ class Databases(object):
             db = db.upper()
             table = table.upper()
 
-        if Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD, DBMS.MCKOI):
+        if Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD, DBMS.MCKOI, DBMS.EXTREMEDB):
             query = "SELECT %s FROM %s" % (queries[Backend.getIdentifiedDbms()].count.query % '*', safeSQLIdentificatorNaming(table, True))
         else:
             query = "SELECT %s FROM %s.%s" % (queries[Backend.getIdentifiedDbms()].count.query % '*', safeSQLIdentificatorNaming(db), safeSQLIdentificatorNaming(table, True))
@@ -992,7 +992,7 @@ class Databases(object):
             if not conf.db:
                 conf.db, conf.tbl = conf.tbl.split('.', 1)
 
-        if conf.tbl is not None and conf.db is None and Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD, DBMS.MCKOI):
+        if conf.tbl is not None and conf.db is None and Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD, DBMS.MCKOI, DBMS.EXTREMEDB):
             warnMsg = "missing database parameter. sqlmap is going to "
             warnMsg += "use the current database to retrieve the "
             warnMsg += "number of entries for table '%s'" % unsafeSQLIdentificatorNaming(conf.tbl)
