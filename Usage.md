@@ -866,6 +866,7 @@ By default sqlmap automatically detects the web application's back-end database 
 * Cubrid
 * InterSystems Cache
 * IRIS
+* eXtremeDB
 
 If for any reason sqlmap fails to detect the back-end DBMS once a SQL injection has been identified or if you want to avoid an active fingeprint, you can provide the name of the back-end DBMS yourself (e.g. `postgresql`). For MySQL and Microsoft SQL Server provide them respectively in the form `MySQL  <version>` and `Microsoft SQL Server  <version> `, where ` <version>` is a valid version for the DBMS; for instance `5.0` for MySQL and `2005` for Microsoft SQL Server.
 
