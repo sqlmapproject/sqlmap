@@ -220,9 +220,9 @@ class Databases(object):
 
         if bruteForce is None:
             if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
-                errMsg = "information_schema not available, "
-                errMsg += "back-end DBMS is MySQL < 5.0"
-                logger.error(errMsg)
+                warnMsg = "information_schema not available, "
+                warnMsg += "back-end DBMS is MySQL < 5.0"
+                logger.warn(warnMsg)
                 bruteForce = True
 
             elif Backend.getIdentifiedDbms() in (DBMS.MCKOI, DBMS.EXTREMEDB):
@@ -235,9 +235,9 @@ class Databases(object):
                     tables = None
 
                 if not tables:
-                    errMsg = "cannot retrieve table names, "
-                    errMsg += "back-end DBMS is %s" % Backend.getIdentifiedDbms()
-                    logger.error(errMsg)
+                    warnMsg = "cannot retrieve table names, "
+                    warnMsg += "back-end DBMS is %s" % Backend.getIdentifiedDbms()
+                    logger.warn(warnMsg)
                     bruteForce = True
                 else:
                     return tables
@@ -529,15 +529,15 @@ class Databases(object):
 
         if bruteForce is None:
             if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
-                errMsg = "information_schema not available, "
-                errMsg += "back-end DBMS is MySQL < 5.0"
-                logger.error(errMsg)
+                warnMsg = "information_schema not available, "
+                warnMsg += "back-end DBMS is MySQL < 5.0"
+                logger.warn(warnMsg)
                 bruteForce = True
 
             elif Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB):
-                errMsg = "cannot retrieve column names, "
-                errMsg += "back-end DBMS is %s" % Backend.getIdentifiedDbms()
-                logger.error(errMsg)
+                warnMsg = "cannot retrieve column names, "
+                warnMsg += "back-end DBMS is %s" % Backend.getIdentifiedDbms()
+                logger.warn(warnMsg)
                 bruteForce = True
 
         if bruteForce:
