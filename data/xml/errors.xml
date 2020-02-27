@@ -149,10 +149,11 @@
         <error regexp="com\.ingres\.gcf\.jdbc"/>
     </dbms>
 
-    <dbms value="Frontbase">
+    <dbms value="FrontBase">
         <error regexp="Exception (condition )?\d+\. Transaction rollback"/>
         <error regexp="com\.frontbase\.jdbc"/>
-        <error regexp="Syntax error 108\. Expected"/>
+        <error regexp="Syntax error 1. Missing"/>
+        <error regexp="(Semantic|Syntax) error [1-4]\d{2}\."/>
     </dbms>
 
     <dbms value="HSQLDB">

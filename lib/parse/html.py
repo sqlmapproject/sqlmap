@@ -52,7 +52,7 @@ class HTMLHandler(ContentHandler):
                 keywords = sorted(keywords, key=len)
                 kb.cache.regex[regexp] = keywords[-1].lower()
 
-            if kb.cache.regex[regexp] in (self._lower_page or kb.cache.regex[regexp]) and re.search(regexp, self._urldecoded_page, re.I):
+            if ('|' in regexp or kb.cache.regex[regexp] in (self._lower_page or kb.cache.regex[regexp])) and re.search(regexp, self._urldecoded_page, re.I):
                 self.dbms = self._dbms
                 self._markAsErrorPage()
                 kb.forkNote = kb.forkNote or attrs.get("fork")
