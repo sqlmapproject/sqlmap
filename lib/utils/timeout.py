@@ -31,7 +31,7 @@ def timeout(func, args=None, kwargs=None, duration=1, default=None):
     thread.start()
     thread.join(duration)
 
-    if thread.isAlive():
+    if thread.is_alive():
         return default, TIMEOUT_STATE.TIMEOUT
     else:
         return thread.result, thread.timeout_state

@@ -175,7 +175,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
         while alive:
             alive = False
             for thread in threads:
-                if thread.isAlive():
+                if thread.is_alive():
                     alive = True
                     time.sleep(0.1)
 

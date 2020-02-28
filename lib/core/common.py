@@ -4007,7 +4007,7 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
                     thread.start()
                     thread.join(REFLECTED_REPLACEMENT_TIMEOUT)
 
-                    if thread.isAlive():
+                    if thread.is_alive():
                         kb.reflectiveMechanism = False
                         retVal = content
                         if not suppressWarning:
