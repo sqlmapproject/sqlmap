@@ -41,7 +41,7 @@ def cleanupVals(text, tag):
     return text
 
 def parseXmlNode(node):
-    for element in node.getiterator("boundary"):
+    for element in node.findall("boundary"):
         boundary = AttribDict()
 
         for child in element.getchildren():
@@ -53,7 +53,7 @@ def parseXmlNode(node):
 
         conf.boundaries.append(boundary)
 
-    for element in node.getiterator("test"):
+    for element in node.findall("test"):
         test = AttribDict()
 
         for child in element.getchildren():
