@@ -535,7 +535,7 @@ class Agent(object):
         """
 
         prefixRegex = r"(?:\s+(?:FIRST|SKIP|LIMIT(?: \d+)?)\s+\d+)*"
-        fieldsSelectTop = re.search(r"\ASELECT\s+TOP\s+[\d]+\s+(.+?)\s+FROM", query, re.I)
+        fieldsSelectTop = re.search(r"\ASELECT\s+TOP\s+([\d]|\([^)]+\))+\s+(.+?)\s+FROM", query, re.I)
         fieldsSelectRownum = re.search(r"\ASELECT\s+([^()]+?),\s*ROWNUM AS LIMIT FROM", query, re.I)
         fieldsSelectDistinct = re.search(r"\ASELECT%s\s+DISTINCT\((.+?)\)\s+FROM" % prefixRegex, query, re.I)
         fieldsSelectCase = re.search(r"\ASELECT%s\s+(\(CASE WHEN\s+.+\s+END\))" % prefixRegex, query, re.I)
@@ -560,7 +560,7 @@ class Agent(object):
             if fieldsSelect:
                 fieldsToCastStr = fieldsSelect.group(1)
         elif fieldsSelectTop:
-            fieldsToCastStr = fieldsSelectTop.group(1)
+            fieldsToCastStr = fieldsSelectTop.group(2)
         elif fieldsSelectRownum:
             fieldsToCastStr = fieldsSelectRownum.group(1)
         elif fieldsSelectDistinct:
@@ -660,7 +660,7 @@ class Agent(object):
             elif fieldsNoSelect:
                 concatenatedQuery = "CONCAT('%s',%s,'%s')" % (kb.chars.start, concatenatedQuery, kb.chars.stop)
 
-        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE, DBMS.DB2, DBMS.FIREBIRD, DBMS.HSQLDB, DBMS.H2, DBMS.MONETDB, DBMS.DERBY, DBMS.VERTICA, DBMS.MCKOI, DBMS.PRESTO, DBMS.ALTIBASE, DBMS.MIMERSQL, DBMS.CRATEDB, DBMS.CUBRID, DBMS.CACHE, DBMS.EXTREMEDB):
+        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE, DBMS.DB2, DBMS.FIREBIRD, DBMS.HSQLDB, DBMS.H2, DBMS.MONETDB, DBMS.DERBY, DBMS.VERTICA, DBMS.MCKOI, DBMS.PRESTO, DBMS.ALTIBASE, DBMS.MIMERSQL, DBMS.CRATEDB, DBMS.CUBRID, DBMS.CACHE, DBMS.EXTREMEDB, DBMS.FRONTBASE):
             if fieldsExists:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.chars.start, 1)
                 concatenatedQuery += "||'%s'" % kb.chars.stop
@@ -982,6 +982,11 @@ class Agent(object):
         elif Backend.getIdentifiedDbms() in (DBMS.DERBY, DBMS.CRATEDB):
             limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (1, num)
             limitedQuery += " %s" % limitStr
+
+        elif Backend.getIdentifiedDbms() in (DBMS.FRONTBASE,):
+            limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (num, 1)
+            if query.startswith("SELECT "):
+                limitedQuery = query.replace("SELECT ", "SELECT %s " % limitStr, 1)
 
         elif Backend.getIdentifiedDbms() in (DBMS.MONETDB,):
             if query.startswith("SELECT ") and field is not None and field in query:

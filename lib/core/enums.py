@@ -56,6 +56,7 @@ class DBMS(object):
     CUBRID = "Cubrid"
     CACHE = "InterSystems Cache"
     EXTREMEDB = "eXtremeDB"
+    FRONTBASE = "FrontBase"
 
 class DBMS_DIRECTORY_NAME(object):
     ACCESS = "access"
@@ -82,6 +83,7 @@ class DBMS_DIRECTORY_NAME(object):
     CUBRID = "cubrid"
     CACHE = "cache"
     EXTREMEDB = "extremedb"
+    FRONTBASE = "frontbase"
 
 class FORK(object):
     MARIADB = "MariaDB"
@@ -426,3 +428,8 @@ class TIMEOUT_STATE(object):
 class HINT(object):
     PREPEND = 0
     APPEND = 1
+
+class FUZZ_UNION_COLUMN:
+    STRING = "<string>"
+    INTEGER = "<integer>"
+    NULL = "NULL"

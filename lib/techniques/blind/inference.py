@@ -116,6 +116,16 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             payload = payload.replace(right, "(SELECT %s FROM %s)" % (right, match.group(2).strip()))
             expression = match.group(1).strip()
 
+    elif Backend.isDbms(DBMS.FRONTBASE):
+        match = re.search(r"\ASELECT\b(\s+TOP\s*\([^)]+\)\s+)?(.+)\bFROM\b(.+)\Z", expression, re.I)
+        if match:
+            payload = payload.replace(INFERENCE_GREATER_CHAR, " FROM %s)%s" % (match.group(3).strip(), INFERENCE_GREATER_CHAR))
+            payload = payload.replace("SUBSTRING", "(SELECT%sSUBSTRING" % (match.group(1) if match.group(1) else " "), 1)
+            expression = match.group(2).strip()
+
+
+#<inference query="(SELECT SUBSTRING((%s) FROM %d FOR 1) FROM %s)>'%c'"/>
+
     try:
         # Set kb.partRun in case "common prediction" feature (a.k.a. "good samaritan") is used or the engine is called from the API
         if conf.predictOutput:
@@ -203,7 +213,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 hintValue = kb.hintValue
 
             if payload is not None and len(hintValue or "") > 0 and len(hintValue) >= idx:
-                if Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.MAXDB, DBMS.DB2):
+                if "'%s'" % CHAR_INFERENCE_MARK in payload:
                     posValue = hintValue[idx - 1]
                 else:
                     posValue = ord(hintValue[idx - 1])
@@ -649,8 +659,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 elif (conf.verbose in (1, 2) and not kb.bruteMode) or conf.api:
                     dataToStdout(filterControlChars(val))
 
-                # some DBMSes (e.g. Firebird, DB2, etc.) have issues with trailing spaces
-                if Backend.getIdentifiedDbms() in (DBMS.FIREBIRD, DBMS.DB2, DBMS.MAXDB, DBMS.DERBY) and len(partialValue) > INFERENCE_BLANK_BREAK and partialValue[-INFERENCE_BLANK_BREAK:].isspace():
+                # Note: some DBMSes (e.g. Firebird, DB2, etc.) have issues with trailing spaces
+                if Backend.getIdentifiedDbms() in (DBMS.FIREBIRD, DBMS.DB2, DBMS.MAXDB, DBMS.DERBY, DBMS.FRONTBASE) and len(partialValue) > INFERENCE_BLANK_BREAK and partialValue[-INFERENCE_BLANK_BREAK:].isspace():
                     finalValue = partialValue[:-INFERENCE_BLANK_BREAK]
                     break
                 elif charsetType and partialValue[-1:].isspace():

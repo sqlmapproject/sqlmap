@@ -22,7 +22,7 @@ class Unescaper(AttribDict):
 
         if dbms is not None:
             retVal = self[dbms](expression, quote=quote)
-        elif identifiedDbms is not None:
+        elif identifiedDbms is not None and identifiedDbms in self:
             retVal = self[identifiedDbms](expression, quote=quote)
         else:
             retVal = expression

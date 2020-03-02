@@ -78,6 +78,14 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
             injExpression = unescaper.escape(agent.concatQuery(expression, unpack))
             kb.unionDuplicates = vector[7]
             kb.forcePartialUnion = vector[8]
+
+            # Note: introduced columns in 1.4.2.42#dev
+            try:
+                kb.tableFrom = vector[9]
+                kb.unionTemplate = vector[10]
+            except IndexError:
+                pass
+
             query = agent.forgeUnionQuery(injExpression, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], vector[6], None, limited)
             where = PAYLOAD.WHERE.NEGATIVE if conf.limitStart or conf.limitStop else vector[6]
         else:

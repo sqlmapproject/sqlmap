@@ -1560,4 +1560,72 @@
         <search_table/>
         <search_column/>
     </dbms>
+
+    <dbms value="FrontBase">
+        <cast query="CAST(%s AS NCHAR VARYING(4000))"/>
+        <length query="CHAR_LENGTH(%s)"/>
+        <isnull query="COALESCE(%s,' ')"/>
+        <delimiter query="||"/>
+        <limit query="TOP (%d,%d)"/>
+        <limitregexp query="\s+TOP\s*\(([\d]+)\s*\,\s*([\d]+)\)" query2="\s+TOP\s+([\d]+)"/>
+        <limitgroupstart query="1"/>
+        <limitgroupstop query="2"/>
+        <limitstring query=" TOP "/>
+        <order query="ORDER BY %s ASC"/>
+        <count query="COUNT(%s)"/>
+        <comment query=";--"/>
+        <substring query="SUBSTRING((%s) FROM %d FOR %d)"/>
+        <concatenate query="%s||%s"/>
+        <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
+        <hex/>
+        <inference query="SUBSTRING((%s) FROM %d FOR 1)>'%c'"/>
+        <banner/>
+        <current_user query="CURRENT_USER"/>
+        <current_db query="CURRENT_SCHEMA"/>
+        <hostname/>
+        <table_comment/>
+        <column_comment/>
+        <is_dba query="(SELECT UPPER(CURRENT_USER) FROM INFORMATION_SCHEMA.IO_STATISTICS)='_SYSTEM'"/>
+        <check_udf/>
+        <users>
+            <inband query="SELECT user_name FROM INFORMATION_SCHEMA.USERS"/>
+            <blind query="SELECT TOP (%d,1) user_name FROM INFORMATION_SCHEMA.USERS" count="SELECT COUNT(user_name) FROM INFORMATION_SCHEMA.USERS"/>
+        </users>
+        <passwords>
+            <inband query="SELECT user_name,password FROM INFORMATION_SCHEMA.USERS" condition="user_name"/>
+            <blind query="SELECT TOP (%d,1) password FROM INFORMATION_SCHEMA.USERS WHERE user_name='%s'" count="SELECT COUNT(password) FROM INFORMATION_SCHEMA.USERS WHERE user_name='%s'"/>
+        </passwords>
+        <privileges/>
+        <roles/>
+        <statements/>
+        <dbs>
+            <inband query="SELECT &quot;schema_name&quot; FROM INFORMATION_SCHEMA.SCHEMATA"/>
+            <blind query="SELECT TOP (%d,1) &quot;schema_name&quot; FROM INFORMATION_SCHEMA.SCHEMATA" count="SELECT COUNT(&quot;schema_name&quot;) FROM INFORMATION_SCHEMA.SCHEMATA"/>
+        </dbs>
+        <tables>
+            <inband query="SELECT &quot;schema_name&quot;,&quot;table_name&quot; FROM INFORMATION_SCHEMA.TABLES AS a JOIN INFORMATION_SCHEMA.SCHEMATA AS b ON a.schema_pk=b.schema_pk" condition="&quot;schema_name&quot;"/>
+            <blind query="SELECT TOP (%d,1) &quot;table_name&quot; FROM INFORMATION_SCHEMA.TABLES AS a JOIN INFORMATION_SCHEMA.SCHEMATA AS b ON a.schema_pk=b.schema_pk WHERE &quot;schema_name&quot;='%s'" count="SELECT COUNT(&quot;table_name&quot;) FROM INFORMATION_SCHEMA.TABLES AS a JOIN INFORMATION_SCHEMA.SCHEMATA AS b ON a.schema_pk=b.schema_pk WHERE &quot;schema_name&quot;='%s'"/>
+        </tables>
+        <columns>
+            <inband query="SELECT &quot;column_name&quot;,data_type FROM INFORMATION_SCHEMA.COLUMNS,INFORMATION_SCHEMA.DATA_TYPE_DESCRIPTOR,INFORMATION_SCHEMA.TABLES,INFORMATION_SCHEMA.SCHEMATA WHERE INFORMATION_SCHEMA.COLUMNS.table_pk=INFORMATION_SCHEMA.TABLES.table_pk AND INFORMATION_SCHEMA.DATA_TYPE_DESCRIPTOR.column_name_pk=INFORMATION_SCHEMA.COLUMNS.column_pk AND INFORMATION_SCHEMA.TABLES.schema_pk=INFORMATION_SCHEMA.SCHEMATA.schema_pk AND &quot;table_name&quot;='%s' AND &quot;schema_name&quot;='%s'" condition="&quot;column_name&quot;"/>
+            <blind query="SELECT &quot;column_name&quot; FROM INFORMATION_SCHEMA.COLUMNS,INFORMATION_SCHEMA.TABLES,INFORMATION_SCHEMA.SCHEMATA WHERE INFORMATION_SCHEMA.COLUMNS.table_pk=INFORMATION_SCHEMA.TABLES.table_pk AND INFORMATION_SCHEMA.TABLES.schema_pk=INFORMATION_SCHEMA.SCHEMATA.schema_pk AND &quot;table_name&quot;='%s' AND &quot;schema_name&quot;='%s'" query2="SELECT data_type FROM INFORMATION_SCHEMA.COLUMNS,INFORMATION_SCHEMA.DATA_TYPE_DESCRIPTOR,INFORMATION_SCHEMA.TABLES,INFORMATION_SCHEMA.SCHEMATA WHERE INFORMATION_SCHEMA.COLUMNS.table_pk=INFORMATION_SCHEMA.TABLES.table_pk AND INFORMATION_SCHEMA.DATA_TYPE_DESCRIPTOR.column_name_pk=INFORMATION_SCHEMA.COLUMNS.column_pk AND INFORMATION_SCHEMA.TABLES.schema_pk=INFORMATION_SCHEMA.SCHEMATA.schema_pk AND &quot;table_name&quot;='%s' AND &quot;column_name&quot;='%s' AND &quot;schema_name&quot;='%s'" count="SELECT COUNT(&quot;column_name&quot;) FROM INFORMATION_SCHEMA.COLUMNS,INFORMATION_SCHEMA.TABLES,INFORMATION_SCHEMA.SCHEMATA WHERE INFORMATION_SCHEMA.COLUMNS.table_pk=INFORMATION_SCHEMA.TABLES.table_pk AND INFORMATION_SCHEMA.TABLES.schema_pk=INFORMATION_SCHEMA.SCHEMATA.schema_pk AND &quot;table_name&quot;='%s' AND &quot;schema_name&quot;='%s'" condition="&quot;column_name&quot;"/>
+        </columns>
+        <dump_table>
+            <inband query="SELECT %s FROM %s.%s"/>
+            <blind query="SELECT TOP (%d,1) %s FROM %s.%s" count="SELECT COUNT(*) FROM %s.%s"/>
+        </dump_table>
+        <search_db>
+            <inband query="SELECT &quot;schema_name&quot; FROM INFORMATION_SCHEMA.SCHEMATA WHERE %s" condition="&quot;schema_name&quot;"/>
+            <blind query="SELECT &quot;schema_name&quot; FROM INFORMATION_SCHEMA.SCHEMATA WHERE %s" count="SELECT COUNT(&quot;schema_name&quot;) FROM INFORMATION_SCHEMA.SCHEMATA WHERE %s" condition="&quot;schema_name&quot;"/>
+        </search_db>
+        <search_table>
+            <inband query="SELECT &quot;schema_name&quot;,&quot;table_name&quot; FROM INFORMATION_SCHEMA.TABLES AS a JOIN INFORMATION_SCHEMA.SCHEMATA AS b ON a.schema_pk=b.schema_pk WHERE %s" condition="&quot;table_name&quot;" condition2="&quot;schema_name&quot;"/>
+            <blind query="SELECT &quot;schema_name&quot; FROM INFORMATION_SCHEMA.TABLES AS a JOIN INFORMATION_SCHEMA.SCHEMATA AS b ON a.schema_pk=b.schema_pk WHERE %s" query2="SELECT &quot;table_name&quot; FROM INFORMATION_SCHEMA.TABLES AS a JOIN INFORMATION_SCHEMA.SCHEMATA AS b ON a.schema_pk=b.schema_pk WHERE &quot;schema_name&quot;='%s'" count="SELECT COUNT(&quot;schema_name&quot;) FROM INFORMATION_SCHEMA.TABLES AS a JOIN INFORMATION_SCHEMA.SCHEMATA AS b ON a.schema_pk=b.schema_pk WHERE %s" count2="SELECT COUNT(&quot;table_name&quot;) FROM INFORMATION_SCHEMA.TABLES AS a JOIN INFORMATION_SCHEMA.SCHEMATA AS b ON a.schema_pk=b.schema_pk WHERE &quot;schema_name&quot;='%s'" condition="&quot;table_name&quot;" condition2="&quot;schema_name&quot;"/>
+        </search_table>
+        <!-- NOTE: Not working properly with DISTINCT(...) in subquery -->
+        <search_column>
+            <inband query="SELECT &quot;schema_name&quot;,&quot;table_name&quot; FROM INFORMATION_SCHEMA.COLUMNS,INFORMATION_SCHEMA.TABLES,INFORMATION_SCHEMA.SCHEMATA WHERE INFORMATION_SCHEMA.COLUMNS.table_pk=INFORMATION_SCHEMA.TABLES.table_pk AND INFORMATION_SCHEMA.TABLES.schema_pk=INFORMATION_SCHEMA.SCHEMATA.schema_pk AND %s" condition="&quot;column_name&quot;" condition2="&quot;schema_name&quot;" condition3="&quot;table_name&quot;"/>
+            <blind query="SELECT &quot;schema_name&quot; FROM INFORMATION_SCHEMA.COLUMNS,INFORMATION_SCHEMA.TABLES,INFORMATION_SCHEMA.SCHEMATA WHERE INFORMATION_SCHEMA.COLUMNS.table_pk=INFORMATION_SCHEMA.TABLES.table_pk AND INFORMATION_SCHEMA.TABLES.schema_pk=INFORMATION_SCHEMA.SCHEMATA.schema_pk AND %s" query2="SELECT &quot;table_name&quot; FROM INFORMATION_SCHEMA.COLUMNS,INFORMATION_SCHEMA.TABLES,INFORMATION_SCHEMA.SCHEMATA WHERE INFORMATION_SCHEMA.COLUMNS.table_pk=INFORMATION_SCHEMA.TABLES.table_pk AND INFORMATION_SCHEMA.TABLES.schema_pk=INFORMATION_SCHEMA.SCHEMATA.schema_pk AND &quot;schema_name&quot;='%s'" count="SELECT COUNT(&quot;schema_name&quot;) FROM INFORMATION_SCHEMA.COLUMNS,INFORMATION_SCHEMA.TABLES,INFORMATION_SCHEMA.SCHEMATA WHERE INFORMATION_SCHEMA.COLUMNS.table_pk=INFORMATION_SCHEMA.TABLES.table_pk AND INFORMATION_SCHEMA.TABLES.schema_pk=INFORMATION_SCHEMA.SCHEMATA.schema_pk AND %s" count2="SELECT COUNT(&quot;table_name&quot;) FROM INFORMATION_SCHEMA.COLUMNS,INFORMATION_SCHEMA.TABLES,INFORMATION_SCHEMA.SCHEMATA WHERE INFORMATION_SCHEMA.COLUMNS.table_pk=INFORMATION_SCHEMA.TABLES.table_pk AND INFORMATION_SCHEMA.TABLES.schema_pk=INFORMATION_SCHEMA.SCHEMATA.schema_pk AND &quot;schema_name&quot;='%s'" condition="&quot;column_name&quot;" condition2="&quot;schema_name&quot;" condition3="&quot;table_name&quot;"/>
+        </search_column>
+    </dbms>
 </root>

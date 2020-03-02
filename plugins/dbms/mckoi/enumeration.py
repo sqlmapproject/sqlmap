@@ -10,7 +10,7 @@ from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
 class Enumeration(GenericEnumeration):
     def getBanner(self):
-        warnMsg = "on Mckoi it is not possible to get a banner"
+        warnMsg = "on Mckoi it is not possible to get the banner"
         logger.warn(warnMsg)
 
         return None
