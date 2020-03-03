@@ -301,7 +301,7 @@ ALTIBASE_ALIASES = ("altibase",)
 MIMERSQL_ALIASES = ("mimersql", "mimer")
 CRATEDB_ALIASES = ("cratedb", "crate")
 CUBRID_ALIASES = ("cubrid",)
-CACHE_ALIASES = ("cachedb", "cache")
+CACHE_ALIASES = ("intersystems cache", "cachedb", "cache")
 EXTREMEDB_ALIASES = ("extremedb", "extreme")
 FRONTBASE_ALIASES = ("frontbase",)
 
