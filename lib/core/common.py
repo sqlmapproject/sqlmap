@@ -1121,7 +1121,7 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
                 if not retVal:  # Note: Python doesn't print newline on empty input
                     dataToStdout("\n")
                 retVal = retVal.strip() or default
-                retVal = getUnicode(retVal, encoding=sys.stdin.encoding) if retVal else retVal
+                retVal = getUnicode(retVal, encoding=getattr(sys.stdin, "encoding", None)) if retVal else retVal
             except:
                 try:
                     time.sleep(0.05)  # Reference: http://www.gossamer-threads.com/lists/python/python/781893
@@ -3716,7 +3716,7 @@ def unhandledExceptionMessage():
     errMsg += "Running version: %s\n" % VERSION_STRING[VERSION_STRING.find('/') + 1:]
     errMsg += "Python version: %s\n" % PYVERSION
     errMsg += "Operating system: %s\n" % platform.platform()
-    errMsg += "Command line: %s\n" % re.sub(r".+?\bsqlmap\.py\b", "sqlmap.py", getUnicode(" ".join(sys.argv), encoding=sys.stdin.encoding))
+    errMsg += "Command line: %s\n" % re.sub(r".+?\bsqlmap\.py\b", "sqlmap.py", getUnicode(" ".join(sys.argv), encoding=getattr(sys.stdin, "encoding", None)))
     errMsg += "Technique: %s\n" % (enumValueToNameLookup(PAYLOAD.TECHNIQUE, getTechnique()) if getTechnique() is not None else ("DIRECT" if conf.get("direct") else None))
     errMsg += "Back-end DBMS:"
 
