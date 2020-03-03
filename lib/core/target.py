@@ -491,7 +491,7 @@ def _resumeDBMS():
 
     dbms = value.lower()
     dbmsVersion = [UNKNOWN_DBMS_VERSION]
-    _ = "(%s)" % ("|".join([alias for alias in SUPPORTED_DBMS]))
+    _ = "(%s)" % ('|'.join(SUPPORTED_DBMS))
     _ = re.search(r"\A%s (.*)" % _, dbms, re.I)
 
     if _:
