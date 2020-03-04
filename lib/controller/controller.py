@@ -413,14 +413,17 @@ def start():
                         parseTargetUrl()
 
                 else:
-                    message += "\ndo you want to test this URL? [Y/n/q]"
-                    choice = readInput(message, default='Y').upper()
+                    if not conf.scope:
+                        message += "\ndo you want to test this URL? [Y/n/q]"
+                        choice = readInput(message, default='Y').upper()
 
-                    if choice == 'N':
-                        dataToStdout(os.linesep)
-                        continue
-                    elif choice == 'Q':
-                        break
+                        if choice == 'N':
+                            dataToStdout(os.linesep)
+                            continue
+                        elif choice == 'Q':
+                            break
+                    else:
+                        pass
 
                     infoMsg = "testing URL '%s'" % targetUrl
                     logger.info(infoMsg)

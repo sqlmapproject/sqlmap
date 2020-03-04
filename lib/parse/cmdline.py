@@ -683,7 +683,7 @@ def cmdLineParser(argv=None):
             help="Save options to a configuration INI file")
 
         general.add_argument("--scope", dest="scope",
-            help="Regexp to filter targets from provided proxy log")
+            help="Regexp for filtering targets")
 
         general.add_argument("--skip-waf", dest="skipWaf", action="store_true",
             help="Skip heuristic detection of WAF/IPS protection")
