@@ -954,8 +954,8 @@ def setColor(message, color=None, bold=False, level=None, istty=None):
             if match:
                 retVal = retVal.replace(match.group(1), colored(match.group(1), color="lightgrey"))
 
-            for match in re.finditer(r"[^\w]'([^\n']+)'", message):  # single-quoted (Note: watch-out for the banner)
-                retVal = retVal.replace(match.group(1), colored(match.group(1), color="lightgrey"))
+            for match in re.finditer(r"([^\w])'([^\n']+)'", message):  # single-quoted (Note: watch-out for the banner)
+                retVal = retVal.replace(match.group(0), "%s'%s'" % (match.group(1), colored(match.group(2), color="lightgrey")))
 
     return retVal
 
