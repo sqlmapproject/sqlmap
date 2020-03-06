@@ -938,9 +938,10 @@ def setColor(message, color=None, bold=False, level=None, istty=None):
     """
 
     retVal = message
-    level = level or extractRegexResult(r"\[(?P<result>%s)\]" % '|'.join(_[0] for _ in getPublicTypeMembers(LOGGING_LEVELS)), message)
 
     if message and (IS_TTY or istty) and not conf.get("disableColoring"):  # colorizing handler
+        level = level or extractRegexResult(r"\[(?P<result>%s)\]" % '|'.join(_[0] for _ in getPublicTypeMembers(LOGGING_LEVELS)), message)
+
         if bold or color:
             retVal = colored(message, color=color, on_color=None, attrs=("bold",) if bold else None)
         elif level:
@@ -974,7 +975,7 @@ def clearColors(message):
 
     return retVal
 
-def dataToStdout(data, forceOutput=False, bold=False, content_type=None, status=CONTENT_STATUS.IN_PROGRESS):
+def dataToStdout(data, forceOutput=False, bold=False, contentType=None, status=CONTENT_STATUS.IN_PROGRESS, coloring=True):
     """
     Writes text to the stdout (console) stream
     """
@@ -987,9 +988,9 @@ def dataToStdout(data, forceOutput=False, bold=False, content_type=None, status=
 
             try:
                 if conf.get("api"):
-                    sys.stdout.write(stdoutEncode(clearColors(data)), status, content_type)
+                    sys.stdout.write(stdoutEncode(clearColors(data)), status, contentType)
                 else:
-                    sys.stdout.write(stdoutEncode(setColor(data, bold=bold)))
+                    sys.stdout.write(stdoutEncode(setColor(data, bold=bold) if coloring else clearColors(data)))
 
                 sys.stdout.flush()
             except IOError:

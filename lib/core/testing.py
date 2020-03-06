@@ -18,7 +18,6 @@ import threading
 import time
 
 from extra.vulnserver import vulnserver
-from lib.core.common import clearColors
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
 from lib.core.common import randomInt
@@ -132,7 +131,7 @@ def vulnTest():
 
         if not all((check in output if not check.startswith('~') else check[1:] not in output) for check in checks) or "unhandled exception" in output:
             dataToStdout("---\n\n$ %s\n" % cmd)
-            dataToStdout("%s---\n" % clearColors(output))
+            dataToStdout("%s---\n" % output, coloring=False)
             retVal = False
 
         count += 1
@@ -233,7 +232,7 @@ def bedTest():
                 if check not in output:
                     print(cmd, check)
             dataToStdout("---\n\n$ %s\n" % cmd)
-            dataToStdout("%s---\n" % clearColors(output))
+            dataToStdout("%s---\n" % output, coloring=False)
             retVal = False
 
         count += 1
@@ -297,7 +296,7 @@ def fuzzTest():
 
         if "Traceback" in output:
             dataToStdout("---\n\n$ %s\n" % cmd)
-            dataToStdout("%s---\n" % clearColors(output))
+            dataToStdout("%s---\n" % output, coloring=False)
 
             handle, config = tempfile.mkstemp(prefix="sqlmapcrash", suffix=".conf")
             os.close(handle)

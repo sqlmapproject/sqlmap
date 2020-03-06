@@ -72,7 +72,7 @@ class Dump(object):
         text = "%s%s" % (data, "\n" if newline else " ")
 
         if conf.api:
-            dataToStdout(data, content_type=content_type, status=CONTENT_STATUS.COMPLETE)
+            dataToStdout(data, contentType=content_type, status=CONTENT_STATUS.COMPLETE)
 
         elif console:
             dataToStdout(text)
