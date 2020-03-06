@@ -935,12 +935,20 @@ def setColor(message, color=None, bold=False, level=None, istty=None):
 
     >>> setColor("Hello World", color="red", istty=True)
     '\\x1b[31mHello World\\x1b[0m'
+    >>> setColor("[INFO] Hello World", istty=True)
+    '[\\x1b[32mINFO\\x1b[0m] Hello World'
+    >>> setColor("[INFO] Hello [CRITICAL] World", istty=True)
+    '[INFO] Hello [CRITICAL] World'
     """
 
     retVal = message
 
     if message and (IS_TTY or istty) and not conf.get("disableColoring"):  # colorizing handler
-        level = level or extractRegexResult(r"\[(?P<result>%s)\]" % '|'.join(_[0] for _ in getPublicTypeMembers(LOGGING_LEVELS)), message)
+        if level is None:
+            levels = re.findall(r"\[(?P<result>%s)\]" % '|'.join(_[0] for _ in getPublicTypeMembers(LOGGING_LEVELS)), message)
+
+            if len(levels) == 1:
+                level = levels[0]
 
         if bold or color:
             retVal = colored(message, color=color, on_color=None, attrs=("bold",) if bold else None)
