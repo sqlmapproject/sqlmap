@@ -450,7 +450,7 @@ class Users(object):
                             # In PostgreSQL we get 1 if the privilege is
                             # True, 0 otherwise
                             if Backend.isDbms(DBMS.PGSQL) and getUnicode(privilege).isdigit():
-                                if int(privilege) == 1:
+                                if int(privilege) == 1 and count in PGSQL_PRIVS:
                                     privileges.add(PGSQL_PRIVS[count])
 
                             # In MySQL >= 5.0 and Oracle we get the list
@@ -585,10 +585,8 @@ class Users(object):
                         i = 1
 
                         for priv in privs:
-                            if priv.isdigit() and int(priv) == 1:
-                                for position, pgsqlPriv in PGSQL_PRIVS.items():
-                                    if position == i:
-                                        privileges.add(pgsqlPriv)
+                            if priv.isdigit() and int(priv) == 1 and i in PGSQL_PRIVS:
+                                privileges.add(PGSQL_PRIVS[i])
 
                             i += 1
 
