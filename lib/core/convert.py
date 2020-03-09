@@ -95,7 +95,7 @@ def htmlUnescape(value):
 
         try:
             retVal = re.sub(r"&#x([^ ;]+);", lambda match: _unichr(int(match.group(1), 16)), retVal)
-        except ValueError:
+        except (ValueError, OverflowError):
             pass
 
     return retVal
