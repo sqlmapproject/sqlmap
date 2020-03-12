@@ -335,6 +335,12 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
+        elif all(_ in excMsg for _ in ("Resource temporarily unavailable", "os.fork()", "dictionaryAttack")):
+            errMsg = "there has been a problem while running the multiprocessing hash cracking. "
+            errMsg += "Please rerun with option '--threads=1'"
+            logger.critical(errMsg)
+            raise SystemExit
+
         elif "can't start new thread" in excMsg:
             errMsg = "there has been a problem while creating new thread instance. "
             errMsg += "Please make sure that you are not running too many processes"

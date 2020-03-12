@@ -913,6 +913,8 @@ def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found
                 proc_count.value -= 1
 
 def dictionaryAttack(attack_dict):
+    global _multiprocessing
+
     suffix_list = [""]
     custom_wordlist = [""]
     hash_regexes = []
@@ -921,6 +923,9 @@ def dictionaryAttack(attack_dict):
     user_hash = []
     processException = False
     foundHash = False
+
+    if conf.disableMulti:
+        _multiprocessing = None
 
     for (_, hashes) in attack_dict.items():
         for hash_ in hashes:
@@ -1108,7 +1113,7 @@ def dictionaryAttack(attack_dict):
 
                     else:
                         warnMsg = "multiprocessing hash cracking is currently "
-                        warnMsg += "not supported on this platform"
+                        warnMsg += "%s on this platform" % ("not supported" if not conf.disableMulti else "disabled")
                         singleTimeWarnMessage(warnMsg)
 
                         retVal = _queue.Queue()
@@ -1196,7 +1201,7 @@ def dictionaryAttack(attack_dict):
 
                         else:
                             warnMsg = "multiprocessing hash cracking is currently "
-                            warnMsg += "not supported on this platform"
+                            warnMsg += "%s on this platform" % ("not supported" if not conf.disableMulti else "disabled")
                             singleTimeWarnMessage(warnMsg)
 
                             class Value(object):
