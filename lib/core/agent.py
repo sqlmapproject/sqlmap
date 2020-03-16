@@ -110,6 +110,7 @@ class Agent(object):
         paramDict = conf.paramDict[place]
         origValue = getUnicode(paramDict[parameter])
         newValue = getUnicode(newValue) if newValue else newValue
+        base64Encoding = re.sub(r" \(.+", "", parameter) in conf.base64Parameter
 
         if place == PLACE.URI or BOUNDED_INJECTION_MARKER in origValue:
             paramString = origValue
@@ -173,7 +174,10 @@ class Agent(object):
 
         newValue = self.cleanupPayload(newValue, origValue)
 
-        if re.sub(r" \(.+", "", parameter) in conf.base64Parameter:
+        if base64Encoding:
+            _newValue = newValue
+            _origValue = origValue
+
             # TODO: support for POST_HINT
             newValue = encodeBase64(newValue, binary=False, encoding=conf.encoding or UNICODE_ENCODING)
             origValue = encodeBase64(origValue, binary=False, encoding=conf.encoding or UNICODE_ENCODING)
@@ -194,7 +198,13 @@ class Agent(object):
 
             retVal = retVal.replace(kb.customInjectionMark, "").replace(REPLACEMENT_MARKER, kb.customInjectionMark)
         elif BOUNDED_INJECTION_MARKER in paramDict[parameter]:
-            retVal = paramString.replace("%s%s" % (origValue, BOUNDED_INJECTION_MARKER), self.addPayloadDelimiters(newValue))
+            if base64Encoding:
+                retVal = paramString.replace("%s%s" % (_origValue, BOUNDED_INJECTION_MARKER), _newValue)
+                match = re.search(r"(%s)=([^&]*)" % re.sub(r" \(.+", "", parameter), retVal)
+                if match:
+                    retVal = retVal.replace(match.group(0), "%s=%s" % (match.group(1), encodeBase64(match.group(2), binary=False, encoding=conf.encoding or UNICODE_ENCODING)))
+            else:
+                retVal = paramString.replace("%s%s" % (origValue, BOUNDED_INJECTION_MARKER), self.addPayloadDelimiters(newValue))
         elif place in (PLACE.USER_AGENT, PLACE.REFERER, PLACE.HOST):
             retVal = paramString.replace(origValue, self.addPayloadDelimiters(newValue))
         else:
