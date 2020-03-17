@@ -52,7 +52,7 @@ def dirtyPatches():
             _http_client.HTTPConnection.__send_output = _http_client.HTTPConnection._send_output
 
         def _send_output(self, *args, **kwargs):
-            if conf.chunked and "encode_chunked" in kwargs:
+            if conf.get("chunked") and "encode_chunked" in kwargs:
                 kwargs["encode_chunked"] = False
             self.__send_output(*args, **kwargs)
 
