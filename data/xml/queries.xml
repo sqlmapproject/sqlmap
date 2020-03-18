@@ -1534,7 +1534,6 @@
         <substring query="SUBSTR((%s),%d,%d)"/>
         <concatenate query="%s||%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
-        <hex/>
         <inference query="SUBSTR((%s),%d,1)>'%c'"/>
         <banner/>
         <current_user/>
@@ -1577,7 +1576,6 @@
         <substring query="SUBSTRING((%s) FROM %d FOR %d)"/>
         <concatenate query="%s||%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
-        <hex/>
         <inference query="SUBSTRING((%s) FROM %d FOR 1)>'%c'"/>
         <banner/>
         <current_user query="CURRENT_USER"/>
