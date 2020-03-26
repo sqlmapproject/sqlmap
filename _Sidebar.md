@@ -1,4 +1,4 @@
-### sqlmap wiki pages
+### Contents
 ----
 #### User's manual
 * [[Introduction]] - Introductory to sqlmap
