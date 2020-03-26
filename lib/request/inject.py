@@ -499,7 +499,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
 
     kb.safeCharEncode = False
 
-    if not any((kb.testMode, conf.dummy, conf.offline)) and value is None and Backend.getDbms() and conf.dbmsHandler and not conf.noCast and not conf.hexConvert:
+    if not any((kb.testMode, conf.dummy, conf.offline, conf.noCast, conf.hexConvert)) and value is None and Backend.getDbms() and conf.dbmsHandler and kb.fingerprinted:
         warnMsg = "in case of continuous data retrieval problems you are advised to try "
         warnMsg += "a switch '--no-cast' "
         warnMsg += "or switch '--hex'" if hasattr(queries[Backend.getIdentifiedDbms()], "hex") else ""

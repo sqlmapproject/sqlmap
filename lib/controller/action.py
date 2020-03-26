@@ -54,6 +54,8 @@ def action():
 
     conf.dumper.singleString(conf.dbmsHandler.getFingerprint())
 
+    kb.fingerprinted = True
+
     # Enumeration options
     if conf.getBanner:
         conf.dumper.banner(conf.dbmsHandler.getBanner())

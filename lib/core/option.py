@@ -1916,6 +1916,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.errorIsNone = True
     kb.falsePositives = []
     kb.fileReadMode = False
+    kb.fingerprinted = False
     kb.followSitemapRecursion = None
     kb.forcedDbms = None
     kb.forcePartialUnion = False
