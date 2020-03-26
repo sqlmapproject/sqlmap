@@ -1,1 +1,1 @@
-You can find detailed information about sqlmap at wiki pages enlisted at the right side panel.
+You can find wiki contents at the right side panel.
