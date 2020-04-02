@@ -1213,9 +1213,9 @@ def randomStr(length=4, lowercase=False, alphabet=None, seed=None):
     """
 
     if seed is not None:
-        _ = getCurrentThreadData().random
-        _.seed(seed)
-        choice = _.choice
+        _random = getCurrentThreadData().random
+        _random.seed(seed)
+        choice = _random.choice
     else:
         choice = random.choice
 
@@ -1247,10 +1247,12 @@ def getHeader(headers, key):
     """
 
     retVal = None
-    for _ in (headers or {}):
-        if _.upper() == key.upper():
-            retVal = headers[_]
+
+    for header in (headers or {}):
+        if header.upper() == key.upper():
+            retVal = headers[header]
             break
+
     return retVal
 
 def checkPipedInput():
@@ -1431,6 +1433,7 @@ def setPaths(rootPath):
             checkFile(path)
 
     if IS_WIN:
+        # Reference: https://pureinfotech.com/list-environment-variables-windows-10/
         if os.getenv("LOCALAPPDATA"):
             paths.SQLMAP_HOME_PATH = os.path.expandvars("%LOCALAPPDATA%\\sqlmap")
         elif os.getenv("USERPROFILE"):
@@ -1444,7 +1447,7 @@ def setPaths(rootPath):
     paths.SQLMAP_DUMP_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "dump")
     paths.SQLMAP_FILES_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "files")
 
-    # history files
+    # History files
     paths.SQLMAP_HISTORY_PATH = getUnicode(os.path.join(paths.SQLMAP_HOME_PATH, "history"), encoding=sys.getfilesystemencoding() or UNICODE_ENCODING)
     paths.API_SHELL_HISTORY = os.path.join(paths.SQLMAP_HISTORY_PATH, "api.hst")
     paths.OS_SHELL_HISTORY = os.path.join(paths.SQLMAP_HISTORY_PATH, "os.hst")
@@ -1601,7 +1604,7 @@ def parseTargetUrl():
     originalUrl = conf.url
 
     if re.search(r"\[.+\]", conf.url) and not socket.has_ipv6:
-        errMsg = "IPv6 addressing is not supported "
+        errMsg = "IPv6 communication is not supported "
         errMsg += "on this platform"
         raise SqlmapGenericException(errMsg)
 
@@ -1658,7 +1661,7 @@ def parseTargetUrl():
         conf.port = 80
 
     if conf.port < 1 or conf.port > 65535:
-        errMsg = "invalid target URL's port (%d)" % conf.port
+        errMsg = "invalid target URL port (%d)" % conf.port
         raise SqlmapSyntaxException(errMsg)
 
     conf.url = getUnicode("%s://%s:%d%s" % (conf.scheme, ("[%s]" % conf.hostname) if conf.ipv6 else conf.hostname, conf.port, conf.path))
