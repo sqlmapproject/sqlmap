@@ -27,6 +27,7 @@ except ImportError:
 
 _protocols = filterNone(getattr(ssl, _, None) for _ in ("PROTOCOL_TLSv1_2", "PROTOCOL_TLSv1_1", "PROTOCOL_TLSv1", "PROTOCOL_SSLv3", "PROTOCOL_SSLv23", "PROTOCOL_SSLv2"))
 _lut = dict((getattr(ssl, _), _) for _ in dir(ssl) if _.startswith("PROTOCOL_"))
+_contexts = {}
 
 class HTTPSConnection(_http_client.HTTPSConnection):
     """
@@ -36,6 +37,12 @@ class HTTPSConnection(_http_client.HTTPSConnection):
     """
 
     def __init__(self, *args, **kwargs):
+        # NOTE: Dirty patch for https://bugs.python.org/issue38251 / https://github.com/sqlmapproject/sqlmap/issues/4158
+        if hasattr(ssl, "_create_default_https_context"):
+            if None not in _contexts:
+                _contexts[None] = ssl._create_default_https_context()
+            kwargs["context"] = _contexts[None]
+
         _http_client.HTTPSConnection.__init__(self, *args, **kwargs)
 
     def connect(self):
@@ -54,11 +61,12 @@ class HTTPSConnection(_http_client.HTTPSConnection):
             for protocol in [_ for _ in _protocols if _ >= ssl.PROTOCOL_TLSv1]:
                 try:
                     sock = create_sock()
-                    context = ssl.SSLContext(protocol)
-                    _ = context.wrap_socket(sock, do_handshake_on_connect=True, server_hostname=self.host)
-                    if _:
+                    if protocol not in _contexts:
+                        _contexts[protocol] = ssl.SSLContext(protocol)
+                    result = _contexts[protocol].wrap_socket(sock, do_handshake_on_connect=True, server_hostname=self.host)
+                    if result:
                         success = True
-                        self.sock = _
+                        self.sock = result
                         _protocols.remove(protocol)
                         _protocols.insert(0, protocol)
                         break
