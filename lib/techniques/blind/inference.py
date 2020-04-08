@@ -137,7 +137,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
         if partialValue:
             firstChar = len(partialValue)
-        elif re.search(r"(?i)(\b|CHAR_)(LENGTH|LEN)\(", expression):
+        elif re.search(r"(?i)(\b|CHAR_)(LENGTH|LEN|COUNT)\(", expression):
             firstChar = 0
         elif conf.firstChar is not None and (isinstance(conf.firstChar, int) or (hasattr(conf.firstChar, "isdigit") and conf.firstChar.isdigit())):
             firstChar = int(conf.firstChar) - 1
@@ -148,7 +148,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         else:
             firstChar = 0
 
-        if re.search(r"(?i)(\b|CHAR_)(LENGTH|LEN)\(", expression):
+        if re.search(r"(?i)(\b|CHAR_)(LENGTH|LEN|COUNT)\(", expression):
             lastChar = 0
         elif conf.lastChar is not None and (isinstance(conf.lastChar, int) or (hasattr(conf.lastChar, "isdigit") and conf.lastChar.isdigit())):
             lastChar = int(conf.lastChar)
