@@ -214,6 +214,8 @@ Options:
 
     -s SESSIONFILE      Load session from a stored (.sqlite) file
     -t TRAFFICFILE      Log all HTTP traffic into a textual file
+    --answers=ANSWERS   Set predefined answers (e.g. "quit=N,follow=N")
+    --base64=BASE64P..  Parameter(s) containing Base64 encoded data
     --batch             Never ask for user input, use the default behavior
     --binary-fields=..  Result fields having binary values (e.g. "digest")
     --check-internet    Check Internet connection before assessing the target
@@ -242,7 +244,6 @@ Options:
   Miscellaneous:
     -z MNEMONICS        Use short mnemonics (e.g. "flu,bat,ban,tec=EU")
     --alert=ALERT       Run host OS command(s) when SQL injection is found
-    --answers=ANSWERS   Set predefined answers (e.g. "quit=N,follow=N")
     --beep              Beep on question and/or when SQL injection is found
     --cleanup           Clean up the DBMS from sqlmap specific UDF and tables
     --dependencies      Check for missing (optional) sqlmap dependencies
@@ -1899,6 +1900,54 @@ This option requires an argument that specified the textual file to write all HT
 
 This is useful primarily for debug purposes - when you provide the developers with a potential bug report, send this file too.
 
+### Set answers for questions
+
+Option: `--answers`
+
+In case that user wants to automatically set up answers for questions, even if `--batch` is used, using this option he can do it by providing any part of question together with answer after an equal sign. Also, answers for different question can be split with delimiter character `,`.
+
+Example against a MySQL target:
+
+```
+$ python sqlmap.py -u "http://192.168.22.128/sqlmap/mysql/get_int.php?id=1"--te\
+chnique=E --answers="extending=N" --batch
+[...]
+[xx:xx:56] [INFO] testing for SQL injection on GET parameter 'id'
+heuristic (parsing) test showed that the back-end DBMS could be 'MySQL'. Do you 
+want to skip test payloads specific for other DBMSes? [Y/n] Y
+[xx:xx:56] [INFO] do you want to include all tests for 'MySQL' extending provide
+d level (1) and risk (1)? [Y/n] N
+[...]
+```
+
+### Declare parameters containing Base64 encoded data
+
+Option: `--base64`
+
+In case that the target web application is using Base64 encoding to store data inside specific parameters (e.g. Base64 encoded JSON dictionary), user can declare it with option `--base64` and thus instruct sqlmap to properly test the underlying values.
+
+Example usage (Note: `Base64('{"id": 1}') == 'eyJpZCI6IDF9'`):
+
+```
+$ python sqlmap.py -u http://192.168.22.128/sqlmap/mysql/get_base64?value=eyJpZC\
+I6IDF9 -v 5 --base64=value
+[...]
+[23:43:35] [INFO] testing 'Boolean-based blind - Parameter replace (original valu
+e)'
+[23:43:35] [PAYLOAD] KFNFTEVDVCAoQ0FTRSBXSEVOICgzODY1PTUzMTQpIFRIRU4gJ3siaWQiOiAx
+fScgRUxTRSAoU0VMRUNUIDUzMTQgVU5JT04gU0VMRUNUIDE5MzIpIEVORCkp
+[23:43:35] [TRAFFIC OUT] HTTP request [#11]:
+GET /?value=KFNFTEVDVCAoQ0FTRSBXSEVOICgzODY1PTUzMTQpIFRIRU4gJ3siaWQiOiAxfScgRUxTR
+SAoU0VMRUNUIDUzMTQgVU5JT04gU0VMRUNUIDE5MzIpIEVORCkp HTTP/1.1
+Host: localhost
+Cache-control: no-cache
+Accept-encoding: gzip,deflate
+Accept: */*
+User-agent: sqlmap/1.4.4.3#dev (http://sqlmap.org)
+Connection: close
+[...]
+```
+
 ### Act in non-interactive mode
 
 Switch: `--batch`
@@ -2164,26 +2213,6 @@ com/vuln.php?id=1"
 ### Alerting on successful SQL injection detection
 
 Option: `--alert`
-
-### Set answers for questions
-
-Option: `--answers`
-
-In case that user wants to automatically set up answers for questions, even if `--batch` is used, using this option he can do it by providing any part of question together with answer after an equal sign. Also, answers for different question can be split with delimiter character `,`.
-
-Example against a MySQL target:
-
-```
-$ python sqlmap.py -u "http://192.168.22.128/sqlmap/mysql/get_int.php?id=1"--te\
-chnique=E --answers="extending=N" --batch
-[...]
-[xx:xx:56] [INFO] testing for SQL injection on GET parameter 'id'
-heuristic (parsing) test showed that the back-end DBMS could be 'MySQL'. Do you 
-want to skip test payloads specific for other DBMSes? [Y/n] Y
-[xx:xx:56] [INFO] do you want to include all tests for 'MySQL' extending provide
-d level (1) and risk (1)? [Y/n] N
-[...]
-```
 
 ### Make a beep sound when SQL injection is found
 
