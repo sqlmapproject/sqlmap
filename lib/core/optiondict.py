@@ -201,6 +201,7 @@ optDict = {
         "trafficFile": "string",
         "answers": "string",
         "batch": "boolean",
+        "base64Parameter": "string",
         "binaryFields": "string",
         "charset": "string",
         "checkInternet": "boolean",
