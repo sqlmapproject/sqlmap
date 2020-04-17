@@ -943,28 +943,31 @@ def setColor(message, color=None, bold=False, level=None, istty=None):
 
     retVal = message
 
-    if message and (IS_TTY or istty) and not conf.get("disableColoring"):  # colorizing handler
-        if level is None:
-            levels = re.findall(r"\[(?P<result>%s)\]" % '|'.join(_[0] for _ in getPublicTypeMembers(LOGGING_LEVELS)), message)
+    if message:
+        if (IS_TTY or istty) and not conf.get("disableColoring"):  # colorizing handler
+            if level is None:
+                levels = re.findall(r"\[(?P<result>%s)\]" % '|'.join(_[0] for _ in getPublicTypeMembers(LOGGING_LEVELS)), message)
 
-            if len(levels) == 1:
-                level = levels[0]
+                if len(levels) == 1:
+                    level = levels[0]
 
-        if bold or color:
-            retVal = colored(message, color=color, on_color=None, attrs=("bold",) if bold else None)
-        elif level:
-            try:
-                level = getattr(logging, level, None)
-            except:
-                level = None
-            retVal = LOGGER_HANDLER.colorize(message, level)
-        else:
-            match = re.search(r"\(([^)]*)\s*fork\)", message)
-            if match:
-                retVal = retVal.replace(match.group(1), colored(match.group(1), color="lightgrey"))
+            if bold or color:
+                retVal = colored(message, color=color, on_color=None, attrs=("bold",) if bold else None)
+            elif level:
+                try:
+                    level = getattr(logging, level, None)
+                except:
+                    level = None
+                retVal = LOGGER_HANDLER.colorize(message, level)
+            else:
+                match = re.search(r"\(([^)]*)\s*fork\)", message)
+                if match:
+                    retVal = retVal.replace(match.group(1), colored(match.group(1), color="lightgrey"))
 
-            for match in re.finditer(r"([^\w])'([^\n']+)'", message):  # single-quoted (Note: watch-out for the banner)
-                retVal = retVal.replace(match.group(0), "%s'%s'" % (match.group(1), colored(match.group(2), color="lightgrey")))
+                for match in re.finditer(r"([^\w])'([^\n']+)'", message):  # single-quoted (Note: watch-out for the banner)
+                    retVal = retVal.replace(match.group(0), "%s'%s'" % (match.group(1), colored(match.group(2), color="lightgrey")))
+
+        message = message.strip()
 
     return retVal
 
@@ -987,6 +990,12 @@ def dataToStdout(data, forceOutput=False, bold=False, contentType=None, status=C
     """
     Writes text to the stdout (console) stream
     """
+
+    if not IS_TTY and isinstance(data, six.string_types) and data.startswith("\r"):
+        if re.search(r"\(\d+%\)", data):
+            data = ""
+        else:
+            data = "\n%s" % data.strip("\r")
 
     if not kb.get("threadException"):
         if forceOutput or not (getCurrentThreadData().disableStdOut or kb.get("wizardMode")):
