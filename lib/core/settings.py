@@ -18,7 +18,7 @@ from lib.core.enums import OS
 from thirdparty.six import unichr as _unichr
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.4.4.4"
+VERSION = "1.4.4.5"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -914,10 +914,21 @@ th{
 
 # Leaving (dirty) possibility to change values from here (e.g. `export SQLMAP__MAX_NUMBER_OF_THREADS=20`)
 for key, value in os.environ.items():
-    if key.upper().startswith("%s_" % SQLMAP_ENVIRONMENT_PREFIX):
-        _ = key[len(SQLMAP_ENVIRONMENT_PREFIX) + 1:].upper()
+    if key.upper().startswith("%s" % SQLMAP_ENVIRONMENT_PREFIX):
+        _ = key[len(SQLMAP_ENVIRONMENT_PREFIX):].upper()
         if _ in globals():
-            globals()[_] = value
+            original = globals()[_]
+            if isinstance(original, int):
+                try:
+                    globals()[_] = int(value)
+                except ValueError:
+                    pass
+            elif isinstance(original, bool):
+                globals()[_] = value.lower() in ('1', 'true')
+            elif isinstance(original, (list, tuple)):
+                globals()[_] = [__.strip() for __ in _.split(',')]
+            else:
+                globals()[_] = value
 
 # Installing "reversible" unicode (decoding) error handler
 def _reversible(ex):
