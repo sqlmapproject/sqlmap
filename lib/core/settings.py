@@ -18,7 +18,7 @@ from lib.core.enums import OS
 from thirdparty.six import unichr as _unichr
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.4.4.5"
+VERSION = "1.4.4.6"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -914,8 +914,8 @@ th{
 
 # Leaving (dirty) possibility to change values from here (e.g. `export SQLMAP__MAX_NUMBER_OF_THREADS=20`)
 for key, value in os.environ.items():
-    if key.upper().startswith("%s" % SQLMAP_ENVIRONMENT_PREFIX):
-        _ = key[len(SQLMAP_ENVIRONMENT_PREFIX):].upper()
+    if key.upper().startswith("%s_" % SQLMAP_ENVIRONMENT_PREFIX):
+        _ = key[len(SQLMAP_ENVIRONMENT_PREFIX) + 1:].upper()
         if _ in globals():
             original = globals()[_]
             if isinstance(original, int):
