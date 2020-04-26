@@ -80,7 +80,6 @@ def purge(directory):
             pass
 
     logger.debug("deleting the whole directory tree")
-    os.chdir(os.path.join(directory, ".."))
 
     try:
         shutil.rmtree(directory)
