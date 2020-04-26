@@ -80,7 +80,6 @@ def purge(directory):
             pass
 
     logger.debug("deleting the whole directory tree")
-
     try:
         shutil.rmtree(directory)
     except OSError as ex:
