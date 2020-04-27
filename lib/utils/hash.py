@@ -741,7 +741,9 @@ def hashRecognition(value):
     if value and len(value) >= 8 and ' ' not in value:   # Note: pre-filter condition (for optimization purposes)
         isOracle, isMySQL = Backend.isDbms(DBMS.ORACLE), Backend.isDbms(DBMS.MYSQL)
 
-        if isinstance(value, six.string_types):
+        if kb.cache.hashRegex is None:
+            parts = []
+
             for name, regex in getPublicTypeMembers(HASH):
                 # Hashes for Oracle and old MySQL look the same hence these checks
                 if isOracle and regex == HASH.MYSQL_OLD or isMySQL and regex == HASH.ORACLE_OLD:
@@ -749,9 +751,16 @@ def hashRecognition(value):
                 elif regex == HASH.CRYPT_GENERIC:
                     if any((value.lower() == value, value.upper() == value)):
                         continue
-                elif re.match(regex, value):
-                    retVal = regex
-                    break
+                else:
+                    parts.append("(?P<%s>%s)" % (name, regex))
+
+            kb.cache.hashRegex = ('|'.join(parts)).replace("(?i)", "")
+
+        if isinstance(value, six.string_types):
+            match = re.search(kb.cache.hashRegex, value, re.I)
+            if match:
+                algorithm, _ = [_ for _ in match.groupdict().items() if _[1] is not None][0]
+                retVal = getattr(HASH, algorithm)
 
     return retVal
 

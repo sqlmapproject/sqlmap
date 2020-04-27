@@ -1867,6 +1867,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.cache.content = {}
     kb.cache.encoding = {}
     kb.cache.alphaBoundaries = None
+    kb.cache.hashRegex = None
     kb.cache.intBoundaries = None
     kb.cache.parsedDbms = {}
     kb.cache.regex = {}
