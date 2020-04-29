@@ -83,9 +83,9 @@ from lib.core.enums import WEB_PLATFORM
 from lib.core.exception import SqlmapCompressionException
 from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapGenericException
+from lib.core.exception import SqlmapSkipTargetException
 from lib.core.exception import SqlmapSyntaxException
 from lib.core.exception import SqlmapTokenException
-from lib.core.exception import SqlmapUserQuitException
 from lib.core.exception import SqlmapValueException
 from lib.core.settings import ASTERISK_MARKER
 from lib.core.settings import BOUNDARY_BACKSLASH_MARKER
@@ -787,7 +787,7 @@ class Connect(object):
                     kb.connErrorChoice = readInput(message, default='N', boolean=True)
 
                 if kb.connErrorChoice is False:
-                    raise SqlmapUserQuitException
+                    raise SqlmapSkipTargetException
 
             if "forcibly closed" in tbMsg:
                 logger.critical(warnMsg)
