@@ -12,6 +12,7 @@ from lib.core.common import checkFile
 from lib.core.common import decloakToTemp
 from lib.core.common import flattenValue
 from lib.core.common import isListLike
+from lib.core.common import isNoneValue
 from lib.core.common import isStackingAvailable
 from lib.core.common import randomStr
 from lib.core.data import kb
@@ -105,7 +106,10 @@ class Takeover(GenericTakeover):
             output = inject.getValue(query, resumeValue=False)
 
             if isListLike(output):
-                output = os.linesep.join(flattenValue(output))
+                output = flattenValue(output)
+
+            if not isNoneValue(output):
+                output = os.linesep.join(output)
 
             self._cleanupCmd = "DROP TABLE %s" % self.cmdTblName
             inject.goStacked(self._cleanupCmd)
