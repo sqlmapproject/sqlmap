@@ -676,7 +676,13 @@ def paramToDict(place, parameters=None):
                                         for key in current.keys():
                                             value = current[key]
                                             if isinstance(value, (list, tuple, set, dict)):
-                                                if value:
+                                                original = current[key]
+                                                if str(value) == "['']":
+                                                    current[key] = "['%s']" % BOUNDED_INJECTION_MARKER
+                                                    candidates["%s (%s)" % (parameter, key)] = re.sub(r"\b(%s\s*=\s*)%s" % (re.escape(parameter), re.escape(testableParameters[parameter])), r"\g<1>%s" % json.dumps(deserialized, separators=(',', ':') if ", " not in testableParameters[parameter] else None), parameters)
+                                                    current[key] = original
+                                                    walk(head, value)
+                                                elif value:
                                                     walk(head, value)
                                             elif isinstance(value, (bool, int, float, six.string_types)):
                                                 original = current[key]
@@ -687,7 +693,12 @@ def paramToDict(place, parameters=None):
                                                 candidates["%s (%s)" % (parameter, key)] = re.sub(r"\b(%s\s*=\s*)%s" % (re.escape(parameter), re.escape(testableParameters[parameter])), r"\g<1>%s" % json.dumps(deserialized, separators=(',', ':') if ", " not in testableParameters[parameter] else None), parameters)
                                                 current[key] = original
 
-                                deserialized = json.loads(testableParameters[parameter])
+                                # Changes null to "null" in JSON value,
+                                # Otherwise it is None in Python.
+                                null_fixed = re.sub(r'null', '"null"', str(testableParameters[parameter]))
+                                # Changes [] to [""] in JSON value.
+                                brackets_fixed = re.sub(r'\[\]', '[""]', str(null_fixed))
+                                deserialized = json.loads(brackets_fixed)
                                 walk(deserialized)
 
                                 if candidates:
