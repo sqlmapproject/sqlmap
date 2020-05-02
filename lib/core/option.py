@@ -371,7 +371,7 @@ def _doSearch():
 
         for link in links:
             link = urldecode(link)
-            if re.search(r"(.*?)\?(.+)", link):
+            if re.search(r"(.*?)\?(.+)", link) or conf.forms:
                 kb.targets.add((link, conf.method, conf.data, conf.cookie, None))
             elif re.search(URI_INJECTABLE_REGEX, link, re.I):
                 if kb.data.onlyGETs is None and conf.data is None and not conf.googleDork:
@@ -387,14 +387,18 @@ def _doSearch():
 
         if kb.targets:
             infoMsg = "found %d results for your " % len(links)
-            infoMsg += "search dork expression, "
+            infoMsg += "search dork expression"
 
-            if len(links) == len(kb.targets):
-                infoMsg += "all "
-            else:
-                infoMsg += "%d " % len(kb.targets)
+            if not conf.forms:
+                infoMsg += ", "
 
-            infoMsg += "of them are testable targets"
+                if len(links) == len(kb.targets):
+                    infoMsg += "all "
+                else:
+                    infoMsg += "%d " % len(kb.targets)
+
+                infoMsg += "of them are testable targets"
+
             logger.info(infoMsg)
             break
 
