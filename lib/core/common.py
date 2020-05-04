@@ -675,17 +675,21 @@ def paramToDict(place, parameters=None):
                                     elif isinstance(current, dict):
                                         for key in current.keys():
                                             value = current[key]
-                                            if isinstance(value, (list, tuple, set, dict)):
-                                                if value:
-                                                    walk(head, value)
-                                            elif isinstance(value, (bool, int, float, six.string_types)):
+                                            if isinstance(value, (bool, int, float, six.string_types)) or value in (None, []):
                                                 original = current[key]
                                                 if isinstance(value, bool):
                                                     current[key] = "%s%s" % (getUnicode(value).lower(), BOUNDED_INJECTION_MARKER)
+                                                elif value is None:
+                                                    current[key] = "%s%s" % (randomInt(), BOUNDED_INJECTION_MARKER)
+                                                elif value == []:
+                                                    current[key] = ["%s%s" % (randomInt(), BOUNDED_INJECTION_MARKER)]
                                                 else:
                                                     current[key] = "%s%s" % (value, BOUNDED_INJECTION_MARKER)
                                                 candidates["%s (%s)" % (parameter, key)] = re.sub(r"\b(%s\s*=\s*)%s" % (re.escape(parameter), re.escape(testableParameters[parameter])), r"\g<1>%s" % json.dumps(deserialized, separators=(',', ':') if ", " not in testableParameters[parameter] else None), parameters)
                                                 current[key] = original
+                                            elif isinstance(value, (list, tuple, set, dict)):
+                                                if value:
+                                                    walk(head, value)
 
                                 deserialized = json.loads(testableParameters[parameter])
                                 walk(deserialized)
