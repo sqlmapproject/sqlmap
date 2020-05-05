@@ -1150,7 +1150,7 @@ class Connect(object):
 
         if conf.evalCode:
             delimiter = conf.paramDel or DEFAULT_GET_POST_DELIMITER
-            variables = {"uri": uri, "lastPage": threadData.lastPage, "_locals": locals()}
+            variables = {"uri": uri, "lastPage": threadData.lastPage, "_locals": locals(), "cookie": cookie}
             originals = {}
 
             if not get and PLACE.URI in conf.parameters:
@@ -1218,6 +1218,7 @@ class Connect(object):
                     variables[unsafeVariableNaming(variable)] = value
 
             uri = variables["uri"]
+            cookie = variables["cookie"]
 
             for name, value in variables.items():
                 if name != "__builtins__" and originals.get(name, "") != value:
