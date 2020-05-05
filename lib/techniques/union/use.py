@@ -167,6 +167,12 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
                 warnMsg += "(probably due to its length and/or content): "
                 warnMsg += safecharencode(trimmed)
                 logger.warn(warnMsg)
+            elif re.search(r"ORDER BY [^ ]+\Z", expression):
+                debugMsg = "retrying failed SQL query without the ORDER BY clause"
+                logger.debug(debugMsg)
+
+                expression = re.sub(r"\s*ORDER BY [^ ]+\Z", "", expression)
+                retVal = _oneShotUnionUse(expression, unpack=True, limited=False)
     else:
         vector = kb.injection.data[PAYLOAD.TECHNIQUE.UNION].vector
         kb.unionDuplicates = vector[7]
