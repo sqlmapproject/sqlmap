@@ -172,7 +172,7 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
                 logger.debug(debugMsg)
 
                 expression = re.sub(r"\s*ORDER BY [^ ]+\Z", "", expression)
-                retVal = _oneShotUnionUse(expression, unpack=True, limited=False)
+                retVal = _oneShotUnionUse(expression, unpack, limited)
     else:
         vector = kb.injection.data[PAYLOAD.TECHNIQUE.UNION].vector
         kb.unionDuplicates = vector[7]
