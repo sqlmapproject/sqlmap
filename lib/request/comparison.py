@@ -63,13 +63,19 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
     if any((conf.string, conf.notString, conf.regexp)):
         rawResponse = "%s%s" % (listToStrValue(_ for _ in headers.headers if not _.startswith("%s:" % URI_HTTP_HEADER)) if headers else "", page)
 
-        # String to match in page when the query is True and/or valid
+        # String to match in page when the query is True
         if conf.string:
             return conf.string in rawResponse
 
-        # String to match in page when the query is False and/or invalid
+        # String to match in page when the query is False
         if conf.notString:
-            return conf.notString not in rawResponse
+            if conf.notString in rawResponse:
+                return False
+            else:
+                if kb.errorIsNone and (wasLastResponseDBMSError() or wasLastResponseHTTPError()):
+                    return None
+                else:
+                    return True
 
         # Regular expression to match in page when the query is True and/or valid
         if conf.regexp:

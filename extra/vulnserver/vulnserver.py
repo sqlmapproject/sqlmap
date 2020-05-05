@@ -147,16 +147,21 @@ class ReqHandler(BaseHTTPRequestHandler):
                             _cursor.execute("SELECT * FROM users WHERE id=%s LIMIT 0, 1" % self.params["id"])
                         results = _cursor.fetchall()
 
-                    output += "<b>SQL results:</b>\n"
-                    output += "<table border=\"1\">\n"
+                    output += "<b>SQL results:</b><br>\n"
 
-                    for row in results:
-                        output += "<tr>"
-                        for value in row:
-                            output += "<td>%s</td>" % value
-                        output += "</tr>\n"
+                    if results:
+                        output += "<table border=\"1\">\n"
 
-                    output += "</table>\n"
+                        for row in results:
+                            output += "<tr>"
+                            for value in row:
+                                output += "<td>%s</td>" % value
+                            output += "</tr>\n"
+
+                        output += "</table>\n"
+                    else:
+                        output += "no results found"
+
                     output += "</body></html>"
                 except Exception as ex:
                     code = INTERNAL_SERVER_ERROR

@@ -939,6 +939,9 @@ def checkFalsePositives(injection):
                 if conf.string and any(conf.string in getUnicode(_) for _ in (randInt1, randInt2, randInt3)):
                     continue
 
+                if conf.notString and any(conf.notString in getUnicode(_) for _ in (randInt1, randInt2, randInt3)):
+                    continue
+
                 if randInt3 > randInt2 > randInt1:
                     break
 
