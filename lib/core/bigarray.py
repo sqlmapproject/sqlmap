@@ -10,11 +10,11 @@ try:
 except:
     import pickle
 
-import bz2
 import itertools
 import os
 import sys
 import tempfile
+import zlib
 
 from lib.core.compat import xrange
 from lib.core.enums import MKSTEMP_PREFIX
@@ -24,17 +24,17 @@ from lib.core.settings import BIGARRAY_COMPRESS_LEVEL
 
 DEFAULT_SIZE_OF = sys.getsizeof(object())
 
-def _size_of(object_):
+def _size_of(instance):
     """
-    Returns total size of a given object_ (in bytes)
+    Returns total size of a given instance / object (in bytes)
     """
 
-    retval = sys.getsizeof(object_, DEFAULT_SIZE_OF)
+    retval = sys.getsizeof(instance, DEFAULT_SIZE_OF)
 
-    if isinstance(object_, dict):
-        retval += sum(_size_of(_) for _ in itertools.chain.from_iterable(object_.items()))
-    elif hasattr(object_, "__iter__"):
-        retval += sum(_size_of(_) for _ in object_ if _ != object_)
+    if isinstance(instance, dict):
+        retval += sum(_size_of(_) for _ in itertools.chain.from_iterable(instance.items()))
+    elif hasattr(instance, "__iter__"):
+        retval += sum(_size_of(_) for _ in instance if _ != instance)
 
     return retval
 
@@ -54,8 +54,8 @@ class BigArray(list):
 
     >>> _ = BigArray(xrange(100000))
     >>> _[20] = 0
-    >>> _[100]
-    100
+    >>> _[99999]
+    99999
     """
 
     def __init__(self, items=None):
@@ -92,7 +92,7 @@ class BigArray(list):
             self.chunks.pop()
             try:
                 with open(self.chunks[-1], "rb") as f:
-                    self.chunks[-1] = pickle.loads(bz2.decompress(f.read()))
+                    self.chunks[-1] = pickle.loads(zlib.decompress(f.read()))
             except IOError as ex:
                 errMsg = "exception occurred while retrieving data "
                 errMsg += "from a temporary file ('%s')" % ex
@@ -113,7 +113,7 @@ class BigArray(list):
             self.filenames.add(filename)
             os.close(handle)
             with open(filename, "w+b") as f:
-                f.write(bz2.compress(pickle.dumps(chunk, pickle.HIGHEST_PROTOCOL), BIGARRAY_COMPRESS_LEVEL))
+                f.write(zlib.compress(pickle.dumps(chunk, pickle.HIGHEST_PROTOCOL), BIGARRAY_COMPRESS_LEVEL))
             return filename
         except (OSError, IOError) as ex:
             errMsg = "exception occurred while storing data "
@@ -131,7 +131,7 @@ class BigArray(list):
         if not (self.cache and self.cache.index == index):
             try:
                 with open(self.chunks[index], "rb") as f:
-                    self.cache = Cache(index, pickle.loads(bz2.decompress(f.read())), False)
+                    self.cache = Cache(index, pickle.loads(zlib.decompress(f.read())), False)
             except Exception as ex:
                 errMsg = "exception occurred while retrieving data "
                 errMsg += "from a temporary file ('%s')" % ex
