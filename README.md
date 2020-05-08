@@ -71,3 +71,4 @@ Translations
 * [Spanish](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-es-MX.md)
 * [Turkish](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-tr-TR.md)
 * [Ukrainian](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-uk-UA.md)
+[![Run on Repl.it](https://repl.it/badge/github/sqlmapproject/sqlmap)](https://repl.it/github/sqlmapproject/sqlmap)
