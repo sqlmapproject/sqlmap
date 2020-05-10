@@ -1454,7 +1454,20 @@ def setPaths(rootPath):
         else:
             paths.SQLMAP_HOME_PATH = os.path.join(os.path.expandvars(os.path.expanduser("~")), "sqlmap")
     else:
-        paths.SQLMAP_HOME_PATH = os.path.join(os.path.expandvars(os.path.expanduser("~")), ".sqlmap")
+        homeDir = os.path.expanduser("~")
+        oldDir = os.path.join(homeDir, ".sqlmap")
+        if os.path.exists(oldDir):
+            homePath = oldDir
+        else:
+            if "XDG_DATA_HOME" in os.environ:
+                homePath = os.path.join(os.environ["XDG_DATA_HOME"], "sqlmap")
+            else:
+                homePath = os.path.join(homeDir, ".local/share/sqlmap")
+
+            if not os.path.exists(homePath):
+                os.makedirs(homePath)
+
+        paths.SQLMAP_HOME_PATH = homePath
 
     paths.SQLMAP_OUTPUT_PATH = getUnicode(paths.get("SQLMAP_OUTPUT_PATH", os.path.join(paths.SQLMAP_HOME_PATH, "output")), encoding=sys.getfilesystemencoding() or UNICODE_ENCODING)
     paths.SQLMAP_DUMP_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "dump")
