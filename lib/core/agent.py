@@ -420,7 +420,7 @@ class Agent(object):
         rootQuery = queries[Backend.getIdentifiedDbms()]
         hexField = field
 
-        if "hex" in rootQuery:
+        if "hex" in rootQuery and hasattr(rootQuery.hex, "query"):
             hexField = rootQuery.hex.query % field
         else:
             warnMsg = "switch '--hex' is currently not supported on DBMS '%s'" % Backend.getIdentifiedDbms()
