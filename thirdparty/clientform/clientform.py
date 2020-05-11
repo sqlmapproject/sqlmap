@@ -237,9 +237,9 @@ def unescape(data, entities, encoding=DEFAULT_ENCODING):
 
         repl = entities.get(ent)
         if repl is not None:
-            if type(repl) != type("") and encoding is not None:
+            if hasattr(repl, "decode") and encoding is not None:
                 try:
-                    repl = repl.encode(encoding)
+                    repl = repl.decode(encoding)
                 except UnicodeError:
                     repl = ent
         else:
@@ -255,15 +255,11 @@ def unescape_charref(data, encoding):
         name, base= name[1:], 16
     elif not name.isdigit():
         base = 16
-    uc = _unichr(int(name, base))
-    if encoding is None:
-        return uc
-    else:
-        try:
-            repl = uc.encode(encoding)
-        except UnicodeError:
-            repl = "&#%s;" % data
-        return repl
+
+    try:
+        return _unichr(int(name, base))
+    except:
+        return data
 
 def get_entitydefs():
     from codecs import latin_1_decode
