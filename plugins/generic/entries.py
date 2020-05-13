@@ -156,7 +156,7 @@ class Entries(object):
                     logger.warn(warnMsg)
                     continue
 
-                kb.dumpColumns = colList
+                kb.dumpColumns = [unsafeSQLIdentificatorNaming(_) for _ in colList]
                 colNames = colString = ", ".join(column for column in colList)
                 rootQuery = queries[Backend.getIdentifiedDbms()].dump_table
 
