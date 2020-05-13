@@ -19,6 +19,7 @@ from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.dicts import SQL_STATEMENTS
 from lib.core.enums import AUTOCOMPLETE_TYPE
+from lib.core.enums import DBMS
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.settings import NULL
 from lib.core.settings import PARAMETER_SPLITTING_REGEX
@@ -49,6 +50,11 @@ class Custom(object):
             if not re.search(r"\b(OPENROWSET|INTO)\b", query, re.I) and (not sqlType or "SELECT" in sqlType):
                 infoMsg = "fetching %s query output: '%s'" % (sqlType if sqlType is not None else "SQL", query)
                 logger.info(infoMsg)
+
+                if Backend.isDbms(DBMS.MSSQL):
+                    match = re.search(r"(\bFROM\s+)([^\s]+)", query, re.I)
+                    if match and match.group(2).count('.') == 1:
+                        query = query.replace(match.group(0), "%s%s" % (match.group(1), match.group(2).replace('.', ".dbo.")))
 
                 output = inject.getValue(query, fromUser=True)
 
