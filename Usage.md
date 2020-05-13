@@ -3234,3 +3234,52 @@ CONCAT(0x716b706a71,0x4a754d495377744d4273616c436b4b6a504164666a5572477241596649
 api (a42ddaef02e976f0)> exit
 $
 ```
+
+General codes used in response JSON data:
+
+* `status`:
+```
+0 - in progress
+1 - complete
+```
+
+* `type`:
+
+```
+0 - target
+1 - techniques
+2 - dbms_fingerprint
+3 - banner
+4 - current_user
+5 - current_db
+6 - hostname
+7 - is_dba
+8 - users
+9 - passwords
+10 - privileges
+11 - roles
+12 - dbs
+13 - tables
+14 - columns
+15 - schema
+16 - count
+17 - dump_table
+18 - search
+19 - sql_query
+20 - common_tables
+21 - common_columns
+22 - file_read
+23 - file_write
+24 - os_cmd
+25 - reg_read
+26 - statements
+```
+
+* `returncode`
+
+```
+null - still running
+0 - ended gracefully
+1 - general error occurred
+255 - unhandled exception
+```
