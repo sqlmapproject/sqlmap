@@ -709,7 +709,7 @@ class _AbstractFormParser:
                 data = data[1:]
             map[key] = data
         else:
-            map[key] = (map[key].decode("utf8") if isinstance(map[key], six.binary_type) else map[key]) + data
+            map[key] = (map[key].decode("utf8", "replace") if isinstance(map[key], six.binary_type) else map[key]) + data
 
     def do_button(self, attrs):
         debug("%s", attrs)
