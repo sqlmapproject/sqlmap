@@ -238,6 +238,8 @@ def main():
         errMsg = getSafeExString(ex)
         logger.critical(errMsg)
 
+        os._exitcode = 1
+
         raise SystemExit
 
     except KeyboardInterrupt:
@@ -249,14 +251,16 @@ def main():
         errMsg = "exit"
         logger.error(errMsg)
 
-    except SystemExit:
-        pass
+    except SystemExit as ex:
+        os._exitcode = ex.code or 0
 
     except:
         print()
         errMsg = unhandledExceptionMessage()
         excMsg = traceback.format_exc()
         valid = checkIntegrity()
+
+        os._exitcode = 255
 
         if any(_ in excMsg for _ in ("MemoryError", "Cannot allocate memory")):
             errMsg = "memory exhaustion detected"
