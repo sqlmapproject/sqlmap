@@ -924,10 +924,13 @@ def cmdLineParser(argv=None):
             elif i == 1 and re.search(r"\A(http|www\.|\w[\w.-]+\.\w{2,})", argv[i]) is not None:
                 argv[i] = "--url=%s" % argv[i]
             elif len(argv[i]) > 1 and all(ord(_) in xrange(0x2018, 0x2020) for _ in ((argv[i].split('=', 1)[-1].strip() or ' ')[0], argv[i][-1])):
-                dataToStdout("[!] copy-pasting illegal (non-console) quote characters from Internet is, well, illegal (%s)\n" % argv[i])
+                dataToStdout("[!] copy-pasting illegal (non-console) quote characters from Internet is illegal (%s)\n" % argv[i])
                 raise SystemExit
             elif len(argv[i]) > 1 and u"\uff0c" in argv[i].split('=', 1)[-1]:
-                dataToStdout("[!] copy-pasting illegal (non-console) comma characters from Internet is, well, illegal (%s)\n" % argv[i])
+                dataToStdout("[!] copy-pasting illegal (non-console) comma characters from Internet is illegal (%s)\n" % argv[i])
+                raise SystemExit
+            elif len(argv[i]) > 1 and ord(argv[i][0]) == 0x2212:
+                dataToStdout("[!] copy-pasting illegal (non-console) minus character from Internet is illegal (%s)\n" % argv[i])
                 raise SystemExit
             elif re.search(r"\A-\w=.+", argv[i]):
                 dataToStdout("[!] potentially miswritten (illegal '=') short option detected ('%s')\n" % argv[i])
