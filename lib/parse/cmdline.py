@@ -930,7 +930,7 @@ def cmdLineParser(argv=None):
                 dataToStdout("[!] copy-pasting illegal (non-console) comma characters from Internet is illegal (%s)\n" % argv[i])
                 raise SystemExit
             elif len(argv[i]) > 1 and ord(argv[i][0]) == 0x2212:
-                dataToStdout("[!] copy-pasting illegal (non-console) minus character from Internet is illegal (%s)\n" % argv[i])
+                dataToStdout("[!] copy-pasting illegal (non-console) minus characters from Internet is illegal (%s)\n" % argv[i])
                 raise SystemExit
             elif re.search(r"\A-\w=.+", argv[i]):
                 dataToStdout("[!] potentially miswritten (illegal '=') short option detected ('%s')\n" % argv[i])
