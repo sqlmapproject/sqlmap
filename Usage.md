@@ -2384,14 +2384,14 @@ By using switch `--offline` sqlmap will use only previous session data in data e
 
 Switch `--purge`
 
-In case that user decides to safely remove all content from sqlmap's data directory (e.g. `$HOME/.sqlmap`), containing all target details from previous sqlmap runs, he can use switch `--purge`. While purging, all files from (sub)directories in data folder will be overwritten with random data, truncated, renamed to random names, (sub)directories will be renamed to random names too, and finally the whole directory tree will be deleted.
+In case that user decides to safely remove all content from sqlmap's data directory (e.g. `$HOME/.local/share/sqlmap`), containing all target details from previous sqlmap runs, he can use switch `--purge`. While purging, all files from (sub)directories in data folder will be overwritten with random data, truncated, renamed to random names, (sub)directories will be renamed to random names too, and finally the whole directory tree will be deleted.
 
 Example run:
 
 ```
 $ python sqlmap.py --purge -v 3
 [...]
-[xx:xx:55] [INFO] purging content of directory '/home/user/sqlmap'...
+[xx:xx:55] [INFO] purging content of directory '/home/testuser/.local/share/sqlmap'...
 [xx:xx:55] [DEBUG] changing file attributes
 [xx:xx:55] [DEBUG] writing random data to files
 [xx:xx:55] [DEBUG] truncating files
