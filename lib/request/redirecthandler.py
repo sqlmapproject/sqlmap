@@ -154,6 +154,7 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
                 except AttributeError:
                     def _(self):
                         return getattr(self, "hdrs") or {}
+
                     result.info = types.MethodType(_, result)
 
                 if not hasattr(result, "read"):
@@ -164,6 +165,7 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
                             retVal = ""
                         finally:
                             return retVal
+
                     result.read = types.MethodType(_, result)
 
                 if not getattr(result, "url", None):

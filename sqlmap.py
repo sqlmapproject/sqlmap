@@ -534,4 +534,4 @@ if __name__ == "__main__":
             sys.exit(getattr(os, "_exitcode", 0))
 else:
     # cancelling postponed imports (because of Travis CI checks)
-    from lib.controller.controller import start
+    __import__("lib.controller.controller")

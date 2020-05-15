@@ -1274,7 +1274,7 @@ def checkPipedInput():
     # Reference: https://stackoverflow.com/a/33873570
     """
 
-    return not os.isatty(sys.stdin.fileno()) if hasattr(sys.stdin, "fileno") else False
+    return hasattr(sys.stdin, "fileno") and not os.isatty(sys.stdin.fileno())
 
 def isZipFile(filename):
     """
@@ -1364,9 +1364,9 @@ def parsePasswordHash(password):
     >>> kb.forcedDbms = popValue()
     """
 
-    blank = " " * 8
+    blank = ' ' * 8
 
-    if isNoneValue(password) or password == " ":
+    if isNoneValue(password) or password == ' ':
         retVal = NULL
     else:
         retVal = password
@@ -1510,7 +1510,7 @@ def parseTargetDirect():
         if details:
             conf.dbms = details.group("dbms")
 
-            if details.group('credentials'):
+            if details.group("credentials"):
                 conf.dbmsUser = details.group("user")
                 conf.dbmsPass = details.group("pass")
             else:
@@ -1622,7 +1622,7 @@ def parseTargetUrl():
 
     originalUrl = conf.url
 
-    if re.search(r"\[.+\]", conf.url) and not socket.has_ipv6:
+    if re.search(r"://\[.+\]", conf.url) and not socket.has_ipv6:
         errMsg = "IPv6 communication is not supported "
         errMsg += "on this platform"
         raise SqlmapGenericException(errMsg)
