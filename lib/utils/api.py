@@ -49,6 +49,7 @@ from lib.core.settings import IS_WIN
 from lib.core.settings import RESTAPI_DEFAULT_ADAPTER
 from lib.core.settings import RESTAPI_DEFAULT_ADDRESS
 from lib.core.settings import RESTAPI_DEFAULT_PORT
+from lib.core.settings import VERSION_STRING
 from lib.core.shell import autoCompletion
 from lib.core.subprocessng import Popen
 from lib.parse.cmdline import cmdLineParser
@@ -657,6 +658,15 @@ def download(taskid, target, filename):
         logger.warning("[%s] File does not exist %s" % (taskid, target))
         return jsonize({"success": False, "message": "File does not exist"})
 
+@get("/version")
+def version(token=None):
+    """
+    Fetch server version
+    """
+
+    logger.debug("Fetched version (%s)" % ("admin" if is_admin(token) else request.remote_addr))
+    return jsonize({"success": True, "version": VERSION_STRING.split('/')[-1]})
+
 def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=RESTAPI_DEFAULT_ADAPTER, username=None, password=None):
     """
     REST-JSON API server
@@ -760,7 +770,7 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
             logger.critical(errMsg)
             return
 
-    commands = ("help", "new", "use", "data", "log", "status", "option", "stop", "kill", "list", "flush", "exit", "bye", "quit")
+    commands = ("help", "new", "use", "data", "log", "status", "option", "stop", "kill", "list", "flush", "version", "exit", "bye", "quit")
     autoCompletion(AUTOCOMPLETE_TYPE.API, commands=commands)
 
     taskid = None
@@ -849,6 +859,13 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
                 continue
             logger.info("Switching to task ID '%s' " % taskid)
 
+        elif command in ("version",):
+            raw = _client("%s/%s" % (addr, command))
+            res = dejsonize(raw)
+            if not res["success"]:
+                logger.error("Failed to execute command %s" % command)
+            dataToStdout("%s\n" % raw)
+
         elif command in ("list", "flush"):
             raw = _client("%s/admin/%s" % (addr, command))
             res = dejsonize(raw)
@@ -873,6 +890,7 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
             msg += "stop           Stop current task\n"
             msg += "kill           Kill current task\n"
             msg += "list           Display all tasks\n"
+            msg += "version        Fetch server version\n"
             msg += "flush          Flush tasks (delete all tasks)\n"
             msg += "exit           Exit this client\n"
 
