@@ -131,6 +131,8 @@ class Entries(object):
             try:
                 if Backend.isDbms(DBMS.INFORMIX):
                     kb.dumpTable = "%s:%s" % (conf.db, tbl)
+                elif Backend.isDbms(DBMS.SQLITE):
+                    kb.dumpTable = tbl
                 else:
                     kb.dumpTable = "%s.%s" % (conf.db, tbl)
 
