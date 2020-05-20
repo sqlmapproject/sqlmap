@@ -486,6 +486,9 @@ Marek Sarvas, <marek.sarvas(at)gmail.com>
 Philippe A. R. Schaeffer, <schaeff(at)compuphil.de>
 * for reporting a minor bug
 
+Henri Salo <henri(at)nerv.fi>
+* for a donation
+
 Mohd Zamiri Sanin, <zamiri.sanin(at)gmail.com>
 * for reporting a minor bug
 
