@@ -178,6 +178,10 @@ class Agent(object):
             _newValue = newValue
             _origValue = origValue
 
+            if newValue:
+                newValue = newValue.replace(BOUNDARY_BACKSLASH_MARKER, '\\')
+                newValue = self.adjustLateValues(newValue)
+
             # TODO: support for POST_HINT
             newValue = encodeBase64(newValue, binary=False, encoding=conf.encoding or UNICODE_ENCODING)
             origValue = encodeBase64(origValue, binary=False, encoding=conf.encoding or UNICODE_ENCODING)
