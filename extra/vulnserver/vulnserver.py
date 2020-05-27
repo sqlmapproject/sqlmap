@@ -18,6 +18,7 @@ import traceback
 
 PY3 = sys.version_info >= (3, 0)
 UNICODE_ENCODING = "utf-8"
+DEBUG = False
 
 if PY3:
     from http.client import INTERNAL_SERVER_ERROR
@@ -83,7 +84,8 @@ class ThreadingServer(ThreadingMixIn, HTTPServer):
         try:
             HTTPServer.finish_request(self, *args, **kwargs)
         except Exception:
-            traceback.print_exc()
+            if DEBUG:
+                traceback.print_exc()
 
 class ReqHandler(BaseHTTPRequestHandler):
     def do_REQUEST(self):

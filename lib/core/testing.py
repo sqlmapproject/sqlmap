@@ -86,9 +86,13 @@ def vulnTest():
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             s.connect((address, port))
-            break
+            s.send(b"GET / HTTP/1.0\r\n\r\n")
+            if s.recv(4096):
+                break
         except:
             time.sleep(1)
+        finally:
+            s.close()
 
     handle, config = tempfile.mkstemp(suffix=".conf")
     os.close(handle)
