@@ -3275,7 +3275,7 @@ def parseSqliteTableSchema(value):
     Parses table column names and types from specified SQLite table schema
 
     >>> kb.data.cachedColumns = {}
-    >>> parseSqliteTableSchema("CREATE TABLE users\\n\\t\\tid INTEGER\\n\\t\\tname TEXT\\n);")
+    >>> parseSqliteTableSchema("CREATE TABLE users(\\n\\t\\tid INTEGER,\\n\\t\\tname TEXT\\n);")
     True
     >>> repr(kb.data.cachedColumns).count(',') == 1
     True
