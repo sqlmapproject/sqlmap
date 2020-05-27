@@ -11,7 +11,6 @@ jobs:
           dist: trusty
         - python: 3.9-dev
           dist: bionic
-sudo: false
 git:
     depth: 1
 script:
