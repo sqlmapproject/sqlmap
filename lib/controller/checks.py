@@ -17,7 +17,6 @@ import time
 from extra.beep.beep import beep
 from lib.core.agent import agent
 from lib.core.common import Backend
-from lib.core.common import dataToStdout
 from lib.core.common import extractRegexResult
 from lib.core.common import extractTextTagContent
 from lib.core.common import filterNone
@@ -1595,10 +1594,7 @@ def checkConnection(suppressOutput=False):
 
 def checkInternet():
     content = Request.getPage(url=CHECK_INTERNET_ADDRESS, checking=True)[0]
-    result = CHECK_INTERNET_VALUE in (content or "")
-    if not result and conf.nonInteractive:
-        dataToStdout(repr(content))
-    return result
+    return CHECK_INTERNET_VALUE in (content or "")
 
 def setVerbosity():  # Cross-referenced function
     raise NotImplementedError

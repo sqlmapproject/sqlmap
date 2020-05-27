@@ -41,7 +41,7 @@ def vulnTest():
         ("-h", ("to see full list of options run with '-hh'",)),
         ("--dependencies", ("sqlmap requires", "third-party library")),
         ("-u <url> --flush-session --wizard", ("Please choose:", "back-end DBMS: SQLite", "current user is DBA: True", "banner: '3.")),
-        (u"-c <config> --flush-session --roles --statements --hostname --privileges --sql-query=\"SELECT '\u0161u\u0107uraj'\" --technique=U --check-internet", (u": '\u0161u\u0107uraj'", "on SQLite it is not possible", "~no connection detected", "~please check your Internet connection")),
+        (u"-c <config> --flush-session --roles --statements --hostname --privileges --sql-query=\"SELECT '\u0161u\u0107uraj'\" --technique=U", (u": '\u0161u\u0107uraj'", "on SQLite it is not possible")),
         (u"-u <url> --flush-session --sql-query=\"SELECT '\u0161u\u0107uraj'\" --technique=B --no-escape --string=luther --unstable", (u": '\u0161u\u0107uraj'",)),
         ("--dummy", ("all tested parameters do not appear to be injectable", "does not seem to be injectable", "there is not at least one", "~might be injectable")),
         ("--list-tampers", ("between", "MySQL", "xforwardedfor")),
