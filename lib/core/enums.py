@@ -294,6 +294,7 @@ class PAYLOAD(object):
         4: "stacked queries",
         5: "time-based blind",
         6: "UNION query",
+        7: "Customized"
     }
 
     PARAMETER = {
@@ -338,6 +339,7 @@ class PAYLOAD(object):
         STACKED = 4
         TIME = 5
         UNION = 6
+        CUSTOM = 7
 
     class WHERE(object):
         ORIGINAL = 1

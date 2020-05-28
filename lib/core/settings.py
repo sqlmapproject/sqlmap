@@ -837,7 +837,7 @@ SUHOSIN_MAX_VALUE_LENGTH = 512
 MIN_BINARY_DISK_DUMP_SIZE = 100
 
 # Filenames of payloads xml files (in order of loading)
-PAYLOAD_XML_FILES = ("boolean_blind.xml", "error_based.xml", "inline_query.xml", "stacked_queries.xml", "time_blind.xml", "union_query.xml")
+PAYLOAD_XML_FILES = ("boolean_blind.xml", "error_based.xml", "inline_query.xml", "stacked_queries.xml", "time_blind.xml", "union_query.xml", "customized.xml")
 
 # Regular expression used for extracting form tags
 FORM_SEARCH_REGEX = r"(?si)<form(?!.+<form).+?</form>"

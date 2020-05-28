@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Tag: <test>
+    SQL injection test definition.
+
+    Sub-tag: <title>
+        Title of the test.
+
+    Sub-tag: <stype>
+        SQL injection family type.
+
+        Valid values:
+            1: Boolean-based blind SQL injection
+            2: Error-based queries SQL injection
+            3: Inline queries SQL injection
+            4: Stacked queries SQL injection
+            5: Time-based blind SQL injection
+            6: UNION query SQL injection
+
+    Sub-tag: <level>
+        From which level check for this test.
+
+        Valid values:
+            1: Always (<100 requests)
+            2: Try a bit harder (100-200 requests)
+            3: Good number of requests (200-500 requests)
+            4: Extensive test (500-1000 requests)
+            5: You have plenty of time (>1000 requests)
+
+    Sub-tag: <risk>
+        Likelihood of a payload to damage the data integrity.
+
+        Valid values:
+            1: Low risk
+            2: Medium risk
+            3: High risk
+
+    Sub-tag: <clause>
+        In which clause the payload can work.
+
+        NOTE: for instance, there are some payload that do not have to be
+        tested as soon as it has been identified whether or not the
+        injection is within a WHERE clause condition.
+
+        Valid values:
+            0: Always
+            1: WHERE / HAVING
+            2: GROUP BY
+            3: ORDER BY
+            4: LIMIT
+            5: OFFSET
+            6: TOP
+            7: Table name
+            8: Column name
+            9: Pre-WHERE (non-query)
+
+        A comma separated list of these values is also possible.
+
+    Sub-tag: <where>
+        Where to add our '<prefix> <payload><comment> <suffix>' string.
+
+        Valid values:
+            1: Append the string to the parameter original value
+            2: Replace the parameter original value with a negative random
+               integer value and append our string
+            3: Replace the parameter original value with our string
+
+    Sub-tag: <vector>
+        The payload that will be used to exploit the injection point.
+
+    Sub-tag: <request>
+        What to inject for this test.
+
+        Sub-tag: <payload>
+            The payload to test for.
+
+        Sub-tag: <comment>
+            Comment to append to the payload, before the suffix.
+
+        Sub-tag: <char>
+            Character to use to bruteforce number of columns in UNION
+            query SQL injection tests.
+
+        Sub-tag: <columns>
+            Range of columns to test for in UNION query SQL injection
+            tests.
+
+    Sub-tag: <response>
+        How to identify if the injected payload succeeded.
+
+        Sub-tag: <comparison>
+            Perform a request with this string as the payload and compare
+            the response with the <payload> response. Apply the comparison
+            algorithm.
+
+            NOTE: useful to test for boolean-based blind SQL injections.
+
+        Sub-tag: <grep>
+            Regular expression to grep for in the response body.
+
+            NOTE: useful to test for error-based SQL injection.
+
+        Sub-tag: <time>
+            Time in seconds to wait before the response is returned.
+
+            NOTE: useful to test for time-based blind and stacked queries
+            SQL injections.
+
+        Sub-tag: <union>
+            Calls unionTest() function.
+
+            NOTE: useful to test for UNION query (inband) SQL injection.
+
+    Sub-tag: <details>
+        Which details can be infered if the payload succeed.
+
+        Sub-tags: <dbms>
+            What is the database management system (e.g. MySQL).
+
+        Sub-tags: <dbms_version>
+            What is the database management system version (e.g. 5.0.51).
+
+        Sub-tags: <os>
+            What is the database management system underlying operating
+            system.
+
+    <test>
+        <title></title>
+        <stype></stype>
+        <level></level>
+        <risk></risk>
+        <clause></clause>
+        <where></where>
+        <vector></vector>
+        <request>
+            <payload></payload>
+            <comment></comment>
+            <char></char>
+            <columns></columns>
+        </request>
+        <response>
+            <comparison></comparison>
+            <grep></grep>
+            <time></time>
+            <union></union>
+        </response>
+        <details>
+            <dbms></dbms>
+            <dbms_version></dbms_version>
+            <os></os>
+        </details>
+    </test>
+-->
+
+<root>
+    <test>
+        <title>Testing Customized Payload</title>
+        <stype>7</stype>
+        <level>1</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>[GENERIC_SQL_COMMENT]</comment>
+            <char>NULL</char>
+            <columns>1-10</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+    </test>
+    
+</root>
