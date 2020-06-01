@@ -47,7 +47,7 @@ class AnsiToWin32(object):
     win32 function calls.
     '''
     ANSI_CSI_RE = re.compile('\001?\033\\[((?:\\d|;)*)([a-zA-Z])\002?')     # Control Sequence Introducer
-    ANSI_OSC_RE = re.compile('\001?\033\\]((?:.|;)*?)(\x07)\002?')         # Operating System Command
+    ANSI_OSC_RE = re.compile('\001?\033\\]([^\a]*)(\a)\002?')               # Operating System Command (Note: https://github.com/tartley/colorama/issues/247)
 
     def __init__(self, wrapped, convert=None, strip=None, autoreset=False):
         # The wrapped stream (normally sys.stdout or sys.stderr)
