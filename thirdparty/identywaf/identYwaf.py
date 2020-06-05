@@ -60,7 +60,7 @@ else:
     HTTPCookieProcessor = urllib2.HTTPCookieProcessor
 
 NAME = "identYwaf"
-VERSION = "1.0.124"
+VERSION = "1.0.127"
 BANNER = r"""
                                    ` __ __ `
  ____  ___      ___  ____   ______ `|  T  T` __    __   ____  _____ 
@@ -125,7 +125,7 @@ codes = set()
 proxies = list()
 proxies_index = 0
 
-_exit = exit
+_exit = sys.exit
 
 def exit(message=None):
     if message:
