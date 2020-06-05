@@ -218,6 +218,15 @@ Formats:
         <clause>1</clause>
         <where>1,2</where>
         <ptype>3</ptype>
+        <prefix>%'</prefix>
+        <suffix> AND '[RANDSTR]%'='[RANDSTR]</suffix>
+    </boundary>
+
+    <boundary>
+        <level>2</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>3</ptype>
         <prefix>'</prefix>
         <suffix> AND '[RANDSTR]' LIKE '[RANDSTR]</suffix>
     </boundary>
