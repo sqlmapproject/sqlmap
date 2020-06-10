@@ -15,6 +15,7 @@ _defaults = {
     "delay": 0,
     "timeout": 30,
     "retries": 3,
+    "csrfRetries": 0,
     "saFreq": 0,
     "threads": 1,
     "level": 1,

@@ -1045,6 +1045,8 @@ class Connect(object):
                 auxHeaders[value.split(',')[0]] = value.split(',', 1)[-1]
 
         if conf.csrfToken:
+            token = AttribDict()
+
             def _adjustParameter(paramString, parameter, newValue):
                 retVal = paramString
 
@@ -1061,56 +1063,64 @@ class Connect(object):
 
                 return retVal
 
-            token = AttribDict()
-            page, headers, code = Connect.getPage(url=conf.csrfUrl or conf.url, data=conf.data if conf.csrfUrl == conf.url else None, method=conf.csrfMethod or (conf.method if conf.csrfUrl == conf.url else None), cookie=conf.parameters.get(PLACE.COOKIE), direct=True, silent=True, ua=conf.parameters.get(PLACE.USER_AGENT), referer=conf.parameters.get(PLACE.REFERER), host=conf.parameters.get(PLACE.HOST))
-            page = urldecode(page)  # for anti-CSRF tokens with special characters in their name (e.g. 'foo:bar=...')
+            for attempt in xrange(conf.csrfRetries + 1):
+                if token:
+                    break
 
-            match = re.search(r"(?i)<input[^>]+\bname=[\"']?(?P<name>%s)\b[^>]*\bvalue=[\"']?(?P<value>[^>'\"]*)" % conf.csrfToken, page or "", re.I)
+                if attempt > 0:
+                    warnMsg = "unable to find anti-CSRF token '%s' at '%s'" % (conf.csrfToken._original, conf.csrfUrl or conf.url)
+                    warnMsg += ". sqlmap is going to retry the request"
+                    logger.warn(warnMsg)
 
-            if not match:
-                match = re.search(r"(?i)<input[^>]+\bvalue=[\"']?(?P<value>[^>'\"]*)[\"']?[^>]*\bname=[\"']?(?P<name>%s)\b" % conf.csrfToken, page or "", re.I)
+                page, headers, code = Connect.getPage(url=conf.csrfUrl or conf.url, data=conf.data if conf.csrfUrl == conf.url else None, method=conf.csrfMethod or (conf.method if conf.csrfUrl == conf.url else None), cookie=conf.parameters.get(PLACE.COOKIE), direct=True, silent=True, ua=conf.parameters.get(PLACE.USER_AGENT), referer=conf.parameters.get(PLACE.REFERER), host=conf.parameters.get(PLACE.HOST))
+                page = urldecode(page)  # for anti-CSRF tokens with special characters in their name (e.g. 'foo:bar=...')
+
+                match = re.search(r"(?i)<input[^>]+\bname=[\"']?(?P<name>%s)\b[^>]*\bvalue=[\"']?(?P<value>[^>'\"]*)" % conf.csrfToken, page or "", re.I)
 
                 if not match:
-                    match = re.search(r"(?P<name>%s)[\"']:[\"'](?P<value>[^\"']+)" % conf.csrfToken, page or "", re.I)
+                    match = re.search(r"(?i)<input[^>]+\bvalue=[\"']?(?P<value>[^>'\"]*)[\"']?[^>]*\bname=[\"']?(?P<name>%s)\b" % conf.csrfToken, page or "", re.I)
 
                     if not match:
-                        match = re.search(r"\b(?P<name>%s)\s*[:=]\s*(?P<value>\w+)" % conf.csrfToken, str(headers), re.I)
+                        match = re.search(r"(?P<name>%s)[\"']:[\"'](?P<value>[^\"']+)" % conf.csrfToken, page or "", re.I)
 
                         if not match:
-                            match = re.search(r"\b(?P<name>%s)\s*=\s*['\"]?(?P<value>[^;'\"]+)" % conf.csrfToken, page or "", re.I)
+                            match = re.search(r"\b(?P<name>%s)\s*[:=]\s*(?P<value>\w+)" % conf.csrfToken, str(headers), re.I)
 
-            if match:
-                token.name, token.value = match.group("name"), match.group("value")
+                            if not match:
+                                match = re.search(r"\b(?P<name>%s)\s*=\s*['\"]?(?P<value>[^;'\"]+)" % conf.csrfToken, page or "", re.I)
 
-                match = re.search(r"String\.fromCharCode\(([\d+, ]+)\)", token.value)
                 if match:
-                    token.value = "".join(_unichr(int(_)) for _ in match.group(1).replace(' ', "").split(','))
+                    token.name, token.value = match.group("name"), match.group("value")
 
-            if not token:
-                if conf.csrfUrl and conf.csrfToken and conf.csrfUrl != conf.url and code == _http_client.OK:
-                    if headers and "text/plain" in headers.get(HTTP_HEADER.CONTENT_TYPE, ""):
-                        token.name = conf.csrfToken
-                        token.value = page
-
-                if not token and conf.cj and any(re.search(conf.csrfToken, _.name, re.I) for _ in conf.cj):
-                    for _ in conf.cj:
-                        if re.search(conf.csrfToken, _.name, re.I):
-                            token.name, token.value = _.name, _.value
-                            if not any(re.search(conf.csrfToken, ' '.join(_), re.I) for _ in (conf.paramDict.get(PLACE.GET, {}), conf.paramDict.get(PLACE.POST, {}))):
-                                if post:
-                                    post = "%s%s%s=%s" % (post, conf.paramDel or DEFAULT_GET_POST_DELIMITER, token.name, token.value)
-                                elif get:
-                                    get = "%s%s%s=%s" % (get, conf.paramDel or DEFAULT_GET_POST_DELIMITER, token.name, token.value)
-                                else:
-                                    get = "%s=%s" % (token.name, token.value)
-                            break
+                    match = re.search(r"String\.fromCharCode\(([\d+, ]+)\)", token.value)
+                    if match:
+                        token.value = "".join(_unichr(int(_)) for _ in match.group(1).replace(' ', "").split(','))
 
                 if not token:
-                    errMsg = "anti-CSRF token '%s' can't be found at '%s'" % (conf.csrfToken._original, conf.csrfUrl or conf.url)
-                    if not conf.csrfUrl:
-                        errMsg += ". You can try to rerun by providing "
-                        errMsg += "a valid value for option '--csrf-url'"
-                    raise SqlmapTokenException(errMsg)
+                    if conf.csrfUrl and conf.csrfToken and conf.csrfUrl != conf.url and code == _http_client.OK:
+                        if headers and "text/plain" in headers.get(HTTP_HEADER.CONTENT_TYPE, ""):
+                            token.name = conf.csrfToken
+                            token.value = page
+
+                    if not token and conf.cj and any(re.search(conf.csrfToken, _.name, re.I) for _ in conf.cj):
+                        for _ in conf.cj:
+                            if re.search(conf.csrfToken, _.name, re.I):
+                                token.name, token.value = _.name, _.value
+                                if not any(re.search(conf.csrfToken, ' '.join(_), re.I) for _ in (conf.paramDict.get(PLACE.GET, {}), conf.paramDict.get(PLACE.POST, {}))):
+                                    if post:
+                                        post = "%s%s%s=%s" % (post, conf.paramDel or DEFAULT_GET_POST_DELIMITER, token.name, token.value)
+                                    elif get:
+                                        get = "%s%s%s=%s" % (get, conf.paramDel or DEFAULT_GET_POST_DELIMITER, token.name, token.value)
+                                    else:
+                                        get = "%s=%s" % (token.name, token.value)
+                                break
+
+            if not token:
+                errMsg = "anti-CSRF token '%s' can't be found at '%s'" % (conf.csrfToken._original, conf.csrfUrl or conf.url)
+                if not conf.csrfUrl:
+                    errMsg += ". You can try to rerun by providing "
+                    errMsg += "a valid value for option '--csrf-url'"
+                raise SqlmapTokenException(errMsg)
 
             if token:
                 token.value = token.value.strip("'\"")
