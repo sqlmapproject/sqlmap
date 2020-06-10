@@ -73,7 +73,6 @@
         <details>
             <dbms>Microsoft SQL Server</dbms>
             <dbms>Sybase</dbms>
-            <os>Windows</os>
         </details>
     </test>
 
