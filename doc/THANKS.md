@@ -317,6 +317,9 @@ Michael Majchrowicz, <mmajchrowicz(at)gmail.com>
 Vinícius Henrique Marangoni, <vinicius_marangoni1(at)hotmail.com>
 * for contributing a Portuguese translation of README.md
 
+Francesco Marano, <francesco.mrn24(at)gmail.com>
+* for contributing the Microsoft SQL Server/Sybase error-based - Stacking (EXEC) payload
+
 Ahmad Maulana, <matdhule(at)gmail.com>
 * for contributing a tamper script halfversionedmorekeywords.py
 
