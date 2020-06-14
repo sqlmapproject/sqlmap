@@ -19,28 +19,26 @@ from optparse import OptionParser
 
 if sys.version_info >= (3, 0):
     xrange = range
+    ord = lambda _: _
 
-def hideAscii(data):
-    retVal = b""
-    for i in xrange(len(data)):
-        value = data[i] if isinstance(data[i], int) else ord(data[i])
-        retVal += struct.pack('B', value ^ (127 if value < 128 else 0))
+KEY = b"Beeth7hoyooleeF0"
 
-    return retVal
+def xor(message, key):
+    return b"".join(struct.pack('B', ord(message[i]) ^ ord(key[i % len(key)])) for i in range(len(message)))
 
 def cloak(inputFile=None, data=None):
     if data is None:
         with open(inputFile, "rb") as f:
             data = f.read()
 
-    return hideAscii(zlib.compress(data))
+    return xor(zlib.compress(data), KEY)
 
 def decloak(inputFile=None, data=None):
     if data is None:
         with open(inputFile, "rb") as f:
             data = f.read()
     try:
-        data = zlib.decompress(hideAscii(data))
+        data = zlib.decompress(xor(data, KEY))
     except Exception as ex:
         print(ex)
         print('ERROR: the provided input file \'%s\' does not contain valid cloaked content' % inputFile)
@@ -52,7 +50,7 @@ def decloak(inputFile=None, data=None):
 
 def main():
     usage = '%s [-d] -i <input file> [-o <output file>]' % sys.argv[0]
-    parser = OptionParser(usage=usage, version='0.1')
+    parser = OptionParser(usage=usage, version='0.2')
 
     try:
         parser.add_option('-d', dest='decrypt', action="store_true", help='Decrypt')
