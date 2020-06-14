@@ -93,7 +93,6 @@ from lib.core.exception import SqlmapInstallationException
 from lib.core.exception import SqlmapMissingDependence
 from lib.core.exception import SqlmapMissingMandatoryOptionException
 from lib.core.exception import SqlmapMissingPrivileges
-from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapSilentQuitException
 from lib.core.exception import SqlmapSyntaxException
 from lib.core.exception import SqlmapSystemException
@@ -984,15 +983,12 @@ def _setHTTPHandlers():
 
     with kb.locks.handlers:
         if conf.proxyList is not None:
-            if not conf.proxyList:
-                errMsg = "list of usable proxies is exhausted"
-                raise SqlmapNoneDataException(errMsg)
-
             conf.proxy = conf.proxyList[0]
-            conf.proxyList = conf.proxyList[1:]
+            conf.proxyList = conf.proxyList[1:] + conf.proxyList[:1]
 
-            infoMsg = "loading proxy '%s' from a supplied proxy list file" % conf.proxy
-            logger.info(infoMsg)
+            if len(conf.proxyList) > 1:
+                infoMsg = "loading proxy '%s' from a supplied proxy list file" % conf.proxy
+                logger.info(infoMsg)
 
         elif not conf.proxy:
             if conf.hostname in ("localhost", "127.0.0.1") or conf.ignoreProxy:
