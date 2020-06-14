@@ -16,9 +16,9 @@ You can also see the detailed help message typing:
 
 If you are running on a Windows system type the following command from a terminal:
 
-    C:\Python27\python.exe sqlmap.py -h
+    C:\PythonXX\python.exe sqlmap.py -h
 
-Where `C:\Python27` is the path where you installed [Python](http://www.python.org) **>= 2.6** and **< 3.0**.
+Where `C:\PythonXX` is the path where you installed [Python](http://www.python.org) **2.6**, **2.7** or **3.x**.
 
 ## Can I integrate sqlmap with a security tool I am developing?
 
