@@ -71,10 +71,10 @@ class MultipartPostHandler(_urllib.request.BaseHandler):
 
         # NOTE: https://github.com/sqlmapproject/sqlmap/issues/4235
         if request.data:
-            for match in re.finditer(r"(?i)\s*-{20,}\w+(\s+Content-Disposition[^\n]+\s+|\-\-\s*)", request.data):
+            for match in re.finditer(b"(?i)\s*-{20,}\w+(\s+Content-Disposition[^\n]+\s+|\-\-\s*)", request.data):
                 part = match.group(0)
-                if '\r' not in part:
-                    request.data = request.data.replace(part, part.replace("\n", "\r\n"))
+                if b'\r' not in part:
+                    request.data = request.data.replace(part, part.replace(b'\n', b"\r\n"))
 
         return request
 
