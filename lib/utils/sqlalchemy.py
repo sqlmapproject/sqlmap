@@ -8,6 +8,7 @@ See the file 'LICENSE' for copying permission
 import imp
 import logging
 import os
+import re
 import sys
 import traceback
 import warnings
@@ -41,7 +42,12 @@ def getSafeExString(ex, encoding=None):  # Cross-referenced function
 class SQLAlchemy(GenericConnector):
     def __init__(self, dialect=None):
         GenericConnector.__init__(self)
+
         self.dialect = dialect
+        self.address = conf.direct
+
+        if self.dialect:
+            self.address = re.sub(r"\A.+://", "%s://" % self.dialect, self.address)
 
     def connect(self):
         if _sqlalchemy:
@@ -52,18 +58,15 @@ class SQLAlchemy(GenericConnector):
                     if not os.path.exists(self.db):
                         raise SqlmapFilePathException("the provided database file '%s' does not exist" % self.db)
 
-                    _ = conf.direct.split("//", 1)
-                    conf.direct = "%s////%s" % (_[0], os.path.abspath(self.db))
-
-                if self.dialect:
-                    conf.direct = conf.direct.replace(conf.dbms, self.dialect, 1)
+                    _ = self.address.split("//", 1)
+                    self.address = "%s////%s" % (_[0], os.path.abspath(self.db))
 
                 if self.dialect == "sqlite":
-                    engine = _sqlalchemy.create_engine(conf.direct, connect_args={"check_same_thread": False})
+                    engine = _sqlalchemy.create_engine(self.address, connect_args={"check_same_thread": False})
                 elif self.dialect == "oracle":
-                    engine = _sqlalchemy.create_engine(conf.direct)
+                    engine = _sqlalchemy.create_engine(self.address)
                 else:
-                    engine = _sqlalchemy.create_engine(conf.direct, connect_args={})
+                    engine = _sqlalchemy.create_engine(self.address, connect_args={})
 
                 self.connector = engine.connect()
             except (TypeError, ValueError):
