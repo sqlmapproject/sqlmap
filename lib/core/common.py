@@ -116,6 +116,7 @@ from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DEFAULT_MSSQL_SCHEMA
 from lib.core.settings import DEV_EMAIL_ADDRESS
+from lib.core.settings import DOLLAR_MARKER
 from lib.core.settings import DUMMY_USER_INJECTION
 from lib.core.settings import DYNAMICITY_BOUNDARY_LENGTH
 from lib.core.settings import ERROR_PARSING_REGEXES
@@ -2865,6 +2866,8 @@ def urlencode(value, safe="%&=-_", convall=False, limit=False, spaceplus=False):
     result = None if value is None else ""
 
     if value:
+        value = re.sub(r"\b[$\w]+=", lambda match: match.group(0).replace('$', DOLLAR_MARKER), value)
+
         if Backend.isDbms(DBMS.MSSQL) and not kb.tamperFunctions and any(ord(_) > 255 for _ in value):
             warnMsg = "if you experience problems with "
             warnMsg += "non-ASCII identifier names "
@@ -2898,6 +2901,8 @@ def urlencode(value, safe="%&=-_", convall=False, limit=False, spaceplus=False):
 
         if spaceplus:
             result = result.replace(_urllib.parse.quote(' '), '+')
+
+        result = result.replace(DOLLAR_MARKER, '$')
 
     return result
 
