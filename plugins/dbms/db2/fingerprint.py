@@ -97,11 +97,20 @@ class Fingerprint(GenericFingerprint):
             logMsg = "confirming %s" % DBMS.DB2
             logger.info(logMsg)
 
-            version = self._versionCheck()
+            result = inject.checkBooleanExpression("JULIAN_DAY(CURRENT DATE) IS NOT NULL")
 
+            if not result:
+                warnMsg = "the back-end DBMS is not %s" % DBMS.DB2
+                logger.warn(warnMsg)
+
+                return False
+
+            version = self._versionCheck()
             if version:
                 Backend.setVersion(version)
                 setDbms("%s %s" % (DBMS.DB2, Backend.getVersion()))
+            else:
+                setDbms(DBMS.DB2)
 
             return True
         else:
