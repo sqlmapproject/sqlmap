@@ -666,7 +666,7 @@
         <stype>2</stype>
         <level>3</level>
         <risk>1</risk>
-        <clause>1,9</clause>
+        <clause>1</clause>
         <where>1</where>
         <vector>AND [RANDNUM]=('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
         <request>
@@ -685,7 +685,7 @@
         <stype>2</stype>
         <level>4</level>
         <risk>3</risk>
-        <clause>1,9</clause>
+        <clause>1</clause>
         <where>2</where>
         <vector>OR [RANDNUM]=('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
         <request>
@@ -704,7 +704,7 @@
         <stype>2</stype>
         <level>3</level>
         <risk>1</risk>
-        <clause>1,9</clause>
+        <clause>1</clause>
         <where>1</where>
         <vector>AND [RANDNUM]=('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
         <request>
@@ -723,7 +723,7 @@
         <stype>2</stype>
         <level>4</level>
         <risk>3</risk>
-        <clause>1,9</clause>
+        <clause>1</clause>
         <where>2</where>
         <vector>OR [RANDNUM]=('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
         <request>
@@ -742,7 +742,7 @@
         <stype>2</stype>
         <level>3</level>
         <risk>1</risk>
-        <clause>1,8,9</clause>
+        <clause>1</clause>
         <where>1</where>
         <vector>AND [RANDNUM]=CAST('[DELIMITER_START]'||([QUERY])::varchar||'[DELIMITER_STOP]' AS NUMERIC)</vector>
         <request>
@@ -761,7 +761,7 @@
         <stype>2</stype>
         <level>4</level>
         <risk>3</risk>
-        <clause>1,8,9</clause>
+        <clause>1</clause>
         <where>2</where>
         <vector>OR [RANDNUM]=CAST('[DELIMITER_START]'||([QUERY])::varchar||'[DELIMITER_STOP]' AS NUMERIC)</vector>
         <request>
@@ -780,7 +780,7 @@
         <stype>2</stype>
         <level>3</level>
         <risk>1</risk>
-        <clause>1,8,9</clause>
+        <clause>1</clause>
         <where>1</where>
         <vector>AND [RANDNUM]=RAISE_ERROR('70001','[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
         <request>
@@ -799,7 +799,7 @@
         <stype>2</stype>
         <level>4</level>
         <risk>1</risk>
-        <clause>1,8,9</clause>
+        <clause>1</clause>
         <where>1</where>
         <vector>OR [RANDNUM]=RAISE_ERROR('70001','[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
         <request>
