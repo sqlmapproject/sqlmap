@@ -112,6 +112,9 @@ Alessio Dalla Piazza, <alessio.dallapiazza(at)gmail.com>
 Sherif El-Deeb, <archeldeeb(at)gmail.com>
 * for reporting a minor bug
 
+Thomas Etrillard, <thomas.etrillard(at)synacktiv.com>
+* for contributing the IBM DB2 error-based payloads (RAISE_ERROR)
+
 Stefano Di Paola, <stefano.dipaola(at)wisec.it>
 * for suggesting good features
 
