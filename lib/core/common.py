@@ -4128,24 +4128,25 @@ def safeSQLIdentificatorNaming(name, isTable=False):
 
         # Note: SQL 92 has restrictions for identifiers starting with underscore (e.g. http://www.frontbase.com/documentation/FBUsers_4.pdf)
         if retVal.upper() in kb.keywords or (not isTable and (retVal or " ")[0] == '_') or (retVal or " ")[0].isdigit() or not re.match(r"\A[A-Za-z0-9_@%s\$]+\Z" % ('.' if _ else ""), retVal):  # MsSQL is the only DBMS where we automatically prepend schema to table name (dot is normal)
-            retVal = unsafeSQLIdentificatorNaming(retVal)
+            if not conf.noEscape:
+                retVal = unsafeSQLIdentificatorNaming(retVal)
 
-            if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS, DBMS.CUBRID, DBMS.SQLITE):  # Note: in SQLite double-quotes are treated as string if column/identifier is non-existent (e.g. SELECT "foobar" FROM users)
-                retVal = "`%s`" % retVal
-            elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2, DBMS.HSQLDB, DBMS.H2, DBMS.INFORMIX, DBMS.MONETDB, DBMS.VERTICA, DBMS.MCKOI, DBMS.PRESTO, DBMS.CRATEDB, DBMS.CACHE, DBMS.EXTREMEDB, DBMS.FRONTBASE):
-                retVal = "\"%s\"" % retVal
-            elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.ALTIBASE, DBMS.MIMERSQL):
-                retVal = "\"%s\"" % retVal.upper()
-            elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
-                if isTable:
-                    parts = retVal.split('.', 1)
-                    for i in xrange(len(parts)):
-                        if parts[i] and (re.search(r"\A\d|[^\w]", parts[i], re.U) or parts[i].upper() in kb.keywords):
-                            parts[i] = "[%s]" % parts[i]
-                    retVal = '.'.join(parts)
-                else:
-                    if re.search(r"\A\d|[^\w]", retVal, re.U) or retVal.upper() in kb.keywords:
-                        retVal = "[%s]" % retVal
+                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS, DBMS.CUBRID, DBMS.SQLITE):  # Note: in SQLite double-quotes are treated as string if column/identifier is non-existent (e.g. SELECT "foobar" FROM users)
+                    retVal = "`%s`" % retVal
+                elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2, DBMS.HSQLDB, DBMS.H2, DBMS.INFORMIX, DBMS.MONETDB, DBMS.VERTICA, DBMS.MCKOI, DBMS.PRESTO, DBMS.CRATEDB, DBMS.CACHE, DBMS.EXTREMEDB, DBMS.FRONTBASE):
+                    retVal = "\"%s\"" % retVal
+                elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.ALTIBASE, DBMS.MIMERSQL):
+                    retVal = "\"%s\"" % retVal.upper()
+                elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
+                    if isTable:
+                        parts = retVal.split('.', 1)
+                        for i in xrange(len(parts)):
+                            if parts[i] and (re.search(r"\A\d|[^\w]", parts[i], re.U) or parts[i].upper() in kb.keywords):
+                                parts[i] = "[%s]" % parts[i]
+                        retVal = '.'.join(parts)
+                    else:
+                        if re.search(r"\A\d|[^\w]", retVal, re.U) or retVal.upper() in kb.keywords:
+                            retVal = "[%s]" % retVal
 
         if _ and DEFAULT_MSSQL_SCHEMA not in retVal and '.' not in re.sub(r"\[[^]]+\]", "", retVal):
             retVal = "%s.%s" % (DEFAULT_MSSQL_SCHEMA, retVal)
