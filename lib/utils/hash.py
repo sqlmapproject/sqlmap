@@ -1037,7 +1037,7 @@ def dictionaryAttack(attack_dict):
             while not kb.wordlists:
 
                 # the slowest of all methods hence smaller default dict
-                if hash_regex in (HASH.ORACLE_OLD,):
+                if hash_regex in (HASH.ORACLE_OLD, HASH.PHPASS):
                     dictPaths = [paths.SMALL_DICT]
                 else:
                     dictPaths = [paths.WORDLIST]
