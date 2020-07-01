@@ -177,7 +177,7 @@ class HASH(object):
     SHA512_GENERIC = r'(?i)\A(0x)?[0-9a-f]{128}\Z'
     CRYPT_GENERIC = r'\A(?!\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\Z)(?![0-9]+\Z)[./0-9A-Za-z]{13}\Z'
     JOOMLA = r'\A[0-9a-f]{32}:\w{32}\Z'
-    WORDPRESS = r'\A\$P\$[./0-9a-zA-Z]{31}\Z'
+    PHPASS = r'\A\$[PHQS]\$[./0-9a-zA-Z]{31}\Z'
     APACHE_MD5_CRYPT = r'\A\$apr1\$.{1,8}\$[./a-zA-Z0-9]+\Z'
     UNIX_MD5_CRYPT = r'\A\$1\$.{1,8}\$[./a-zA-Z0-9]+\Z'
     APACHE_SHA1 = r'\A\{SHA\}[a-zA-Z0-9+/]+={0,2}\Z'

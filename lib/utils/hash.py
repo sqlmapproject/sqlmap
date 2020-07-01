@@ -33,6 +33,7 @@ else:
 import base64
 import binascii
 import gc
+import math
 import os
 import re
 import tempfile
@@ -481,14 +482,20 @@ def vbulletin_passwd(password, salt, **kwargs):
 
     return "%s:%s" % (md5(binascii.hexlify(md5(getBytes(password)).digest()) + getBytes(salt)).hexdigest(), salt)
 
-def wordpress_passwd(password, salt, count, prefix, **kwargs):
+def phpass_passwd(password, salt, count, prefix, **kwargs):
     """
     Reference(s):
         https://web.archive.org/web/20120219120128/packetstormsecurity.org/files/74448/phpassbrute.py.txt
         http://scriptserver.mainframe8.com/wordpress_password_hasher.php
+        https://www.openwall.com/phpass/
+        https://github.com/jedie/django-phpBB3/blob/master/django_phpBB3/hashers.py
 
-    >>> wordpress_passwd(password='testpass', salt='aD9ZLmkp', count=2048, prefix='$P$9aD9ZLmkp')
+    >>> phpass_passwd(password='testpass', salt='aD9ZLmkp', count=2048, prefix='$P$')
     '$P$9aD9ZLmkpsN4A83G8MefaaP888gVKX0'
+    >>> phpass_passwd(password='testpass', salt='Pb1j9gSb', count=2048, prefix='$H$')
+    '$H$9Pb1j9gSb/u3EVQ.4JDZ3LqtN44oIx/'
+    >>> phpass_passwd(password='testpass', salt='iwtD/g.K', count=128, prefix='$S$')
+    '$S$5iwtD/g.KZT2rwC9DASy/mGYAThkSd3lBFdkONi1Ig1IEpBpqG8W'
     """
 
     def _encode64(input_, count):
@@ -523,18 +530,24 @@ def wordpress_passwd(password, salt, count, prefix, **kwargs):
         return output
 
     password = getBytes(password)
-    salt = getBytes(salt)
+    f = {"$P$": md5, "$H$": md5, "$Q$": sha1, "$S$": sha512}[prefix]
 
-    cipher = md5(salt)
+    cipher = f(getBytes(salt))
     cipher.update(password)
     hash_ = cipher.digest()
 
     for i in xrange(count):
-        _ = md5(hash_)
+        _ = f(hash_)
         _.update(password)
         hash_ = _.digest()
 
-    return "%s%s" % (prefix, _encode64(hash_, 16))
+    retVal = "%s%s%s%s" % (prefix, ITOA64[int(math.log(count, 2))], salt, _encode64(hash_, len(hash_)))
+
+    if prefix == "$S$":
+        # Reference: https://api.drupal.org/api/drupal/includes%21password.inc/constant/DRUPAL_HASH_LENGTH/7.x
+        retVal = retVal[:55]
+
+    return retVal
 
 __functions__ = {
     HASH.MYSQL: mysql_passwd,
@@ -555,7 +568,7 @@ __functions__ = {
     HASH.JOOMLA: joomla_passwd,
     HASH.DJANGO_MD5: django_md5_passwd,
     HASH.DJANGO_SHA1: django_sha1_passwd,
-    HASH.WORDPRESS: wordpress_passwd,
+    HASH.PHPASS: phpass_passwd,
     HASH.APACHE_MD5_CRYPT: unix_md5_passwd,
     HASH.UNIX_MD5_CRYPT: unix_md5_passwd,
     HASH.APACHE_SHA1: apache_sha1_passwd,
@@ -965,7 +978,7 @@ def dictionaryAttack(attack_dict):
                     try:
                         item = None
 
-                        if hash_regex not in (HASH.CRYPT_GENERIC, HASH.JOOMLA, HASH.WORDPRESS, HASH.UNIX_MD5_CRYPT, HASH.APACHE_MD5_CRYPT, HASH.APACHE_SHA1, HASH.VBULLETIN, HASH.VBULLETIN_OLD, HASH.SSHA, HASH.SSHA256, HASH.SSHA512, HASH.DJANGO_MD5, HASH.DJANGO_SHA1, HASH.MD5_BASE64, HASH.SHA1_BASE64, HASH.SHA256_BASE64, HASH.SHA512_BASE64):
+                        if hash_regex not in (HASH.CRYPT_GENERIC, HASH.JOOMLA, HASH.PHPASS, HASH.UNIX_MD5_CRYPT, HASH.APACHE_MD5_CRYPT, HASH.APACHE_SHA1, HASH.VBULLETIN, HASH.VBULLETIN_OLD, HASH.SSHA, HASH.SSHA256, HASH.SSHA512, HASH.DJANGO_MD5, HASH.DJANGO_SHA1, HASH.MD5_BASE64, HASH.SHA1_BASE64, HASH.SHA256_BASE64, HASH.SHA512_BASE64):
                             hash_ = hash_.lower()
 
                         if hash_regex in (HASH.MD5_BASE64, HASH.SHA1_BASE64, HASH.SHA256_BASE64, HASH.SHA512_BASE64):
@@ -994,9 +1007,9 @@ def dictionaryAttack(attack_dict):
                             item = [(user, hash_), {"salt": hash_.split(':')[-1]}]
                         elif hash_regex in (HASH.DJANGO_MD5, HASH.DJANGO_SHA1):
                             item = [(user, hash_), {"salt": hash_.split('$')[1]}]
-                        elif hash_regex in (HASH.WORDPRESS,):
+                        elif hash_regex in (HASH.PHPASS,):
                             if ITOA64.index(hash_[3]) < 32:
-                                item = [(user, hash_), {"salt": hash_[4:12], "count": 1 << ITOA64.index(hash_[3]), "prefix": hash_[:12]}]
+                                item = [(user, hash_), {"salt": hash_[4:12], "count": 1 << ITOA64.index(hash_[3]), "prefix": hash_[:3]}]
                             else:
                                 warnMsg = "invalid hash '%s'" % hash_
                                 logger.warn(warnMsg)
