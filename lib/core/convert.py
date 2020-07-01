@@ -198,7 +198,19 @@ def decodeBase64(value, binary=True, encoding=None):
     True
     >>> decodeBase64("MTIz", binary=False)
     '123'
+    >>> decodeBase64(b"MTIzNA") == b"1234"
+    True
+    >>> decodeBase64("MTIzNA") == b"1234"
+    True
+    >>> decodeBase64("MTIzNA==") == b"1234"
+    True
     """
+
+    padding = b'=' if isinstance(value, bytes) else '='
+
+    # Reference: https://stackoverflow.com/a/49459036
+    if not value.endswith(padding):
+        value += 3 * padding
 
     retVal = base64.b64decode(value)
 

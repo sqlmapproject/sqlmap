@@ -484,7 +484,7 @@ def vbulletin_passwd(password, salt, **kwargs):
 def wordpress_passwd(password, salt, count, prefix, **kwargs):
     """
     Reference(s):
-        http://packetstormsecurity.org/files/74448/phpassbrute.py.txt
+        https://web.archive.org/web/20120219120128/packetstormsecurity.org/files/74448/phpassbrute.py.txt
         http://scriptserver.mainframe8.com/wordpress_password_hasher.php
 
     >>> wordpress_passwd(password='testpass', salt='aD9ZLmkp', count=2048, prefix='$P$9aD9ZLmkp')
