@@ -464,9 +464,8 @@ def main():
     finally:
         kb.threadContinue = False
 
-        _ = getDaysFromLastUpdate()
-        if _ > LAST_UPDATE_NAGGING_DAYS:
-            warnMsg = "you haven't updated sqlmap for more than %d days!!!" % _
+        if getDaysFromLastUpdate() > LAST_UPDATE_NAGGING_DAYS:
+            warnMsg = "your sqlmap version is outdated"
             logger.warn(warnMsg)
 
         if conf.get("showTime"):
