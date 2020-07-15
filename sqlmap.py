@@ -292,6 +292,11 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
+        elif "Insufficient system resources" in excMsg:
+            errMsg = "resource exhaustion detected"
+            logger.critical(errMsg)
+            raise SystemExit
+
         elif "OperationalError: disk I/O error" in excMsg:
             errMsg = "I/O error on output device"
             logger.critical(errMsg)
