@@ -450,9 +450,6 @@ class Search(object):
                         for tbl in conf.tbl.split(','):
                             values.append([safeSQLIdentificatorNaming(db), safeSQLIdentificatorNaming(tbl, True)])
 
-                if Backend.getIdentifiedDbms() in (DBMS.FIREBIRD,):
-                    values = [(conf.db, value) for value in arrayizeValue(values)]
-
                 for db, tbl in filterPairValues(values):
                     db = safeSQLIdentificatorNaming(db)
                     tbls = tbl.split(',') if not isNoneValue(tbl) else []
