@@ -549,7 +549,7 @@ class Databases(object):
                         resumeAvailable = True
                         break
 
-            if resumeAvailable and not conf.freshQueries or colList:
+            if resumeAvailable and not conf.freshQueries:
                 columns = {}
 
                 for column in colList:
