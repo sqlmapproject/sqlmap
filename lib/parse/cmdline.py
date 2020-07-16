@@ -955,7 +955,7 @@ def cmdLineParser(argv=None):
                 else:
                     argv[tamperIndex] = "%s,%s" % (argv[tamperIndex], argv[i].split('=')[1] if '=' in argv[i] else (argv[i + 1] if i + 1 < len(argv) and not argv[i + 1].startswith('-') else ""))
                     argv[i] = ""
-            elif argv[i] == "-H":
+            elif argv[i] in ("-H", "--header"):
                 if i + 1 < len(argv):
                     extraHeaders.append(argv[i + 1])
             elif argv[i] == "--deps":
