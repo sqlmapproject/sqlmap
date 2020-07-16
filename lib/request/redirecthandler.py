@@ -163,8 +163,7 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
                             retVal = getSafeExString(ex)
                         except:
                             retVal = ""
-                        finally:
-                            return retVal
+                        return retVal
 
                     result.read = types.MethodType(_, result)
 

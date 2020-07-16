@@ -722,7 +722,7 @@ class XDotAttrParser:
     def handle_font_characteristics(self, flags):
         # TODO
         if flags != 0:
-            sys.stderr.write("warning: font characteristics not supported yet\n" % op)
+            sys.stderr.write("warning: font characteristics not supported yet\n")
 
     def handle_text(self, x, y, j, w, t):
         self.shapes.append(TextShape(self.pen, x, y, j, w, t))

@@ -1930,7 +1930,7 @@ class ListControl(Control):
             raise AttributeError("control '%s' is disabled" % self.name)
         if self.readonly:
             raise AttributeError("control '%s' is readonly" % self.name)
-        action == bool(action)
+        action = bool(action)
         compat = self._form.backwards_compat
         if not compat and item.disabled:
             raise AttributeError("item is disabled")
