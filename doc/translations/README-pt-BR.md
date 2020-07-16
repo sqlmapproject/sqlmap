@@ -14,8 +14,7 @@ Você pode visitar a [coleção de imagens](https://github.com/sqlmapproject/sql
 Instalação
 ----
 
-Você pode baixar o arquivo tar mais recente clicando [aqui]
-(https://github.com/sqlmapproject/sqlmap/tarball/master) ou o arquivo zip mais recente clicando [aqui](https://github.com/sqlmapproject/sqlmap/zipball/master).
+Você pode baixar o arquivo tar mais recente clicando [aqui](https://github.com/sqlmapproject/sqlmap/tarball/master) ou o arquivo zip mais recente clicando [aqui](https://github.com/sqlmapproject/sqlmap/zipball/master).
 
 De preferência, você pode baixar o sqlmap clonando o repositório [Git](https://github.com/sqlmapproject/sqlmap):
 
