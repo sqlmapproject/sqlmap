@@ -501,6 +501,7 @@ def checkSqlInjection(place, parameter, value):
                             # Useful to set kb.matchRatio at first based on False response content
                             kb.matchRatio = None
                             kb.negativeLogic = (where == PAYLOAD.WHERE.NEGATIVE)
+                            suggestion = None
                             Request.queryPage(genCmpPayload(), place, raise404=False)
                             falsePage, falseHeaders, falseCode = threadData.lastComparisonPage or "", threadData.lastComparisonHeaders, threadData.lastComparisonCode
                             falseRawResponse = "%s%s" % (falseHeaders, falsePage)
@@ -568,7 +569,7 @@ def checkSqlInjection(place, parameter, value):
                                             candidates = sorted(candidates, key=len)
                                             for candidate in candidates:
                                                 if re.match(r"\A[\w.,! ]+\Z", candidate) and ' ' in candidate and candidate.strip() and len(candidate) > CANDIDATE_SENTENCE_MIN_LENGTH:
-                                                    conf.string = candidate
+                                                    suggestion = conf.string = candidate
                                                     injectable = True
 
                                                     infoMsg = "%sparameter '%s' appears to be '%s' injectable (with --string=\"%s\")" % ("%s " % paramType if paramType != parameter else "", parameter, title, repr(conf.string).lstrip('u').strip("'"))
@@ -579,7 +580,7 @@ def checkSqlInjection(place, parameter, value):
                             if injectable:
                                 if kb.pageStable and not any((conf.string, conf.notString, conf.regexp, conf.code, kb.nullConnection)):
                                     if all((falseCode, trueCode)) and falseCode != trueCode:
-                                        conf.code = trueCode
+                                        suggestion = conf.code = trueCode
 
                                         infoMsg = "%sparameter '%s' appears to be '%s' injectable (with --code=%d)" % ("%s " % paramType if paramType != parameter else "", parameter, title, conf.code)
                                         logger.info(infoMsg)
@@ -604,7 +605,7 @@ def checkSqlInjection(place, parameter, value):
                                                 if re.match(r"\A\w{2,}\Z", candidate):  # Note: length of 1 (e.g. --string=5) could cause trouble, especially in error message pages with partially reflected payload content
                                                     break
 
-                                            conf.string = candidate
+                                            suggestion = conf.string = candidate
 
                                             infoMsg = "%sparameter '%s' appears to be '%s' injectable (with --string=\"%s\")" % ("%s " % paramType if paramType != parameter else "", parameter, title, repr(conf.string).lstrip('u').strip("'"))
                                             logger.info(infoMsg)
@@ -618,12 +619,12 @@ def checkSqlInjection(place, parameter, value):
                                                     if re.match(r"\A\w+\Z", candidate):
                                                         break
 
-                                                conf.notString = candidate
+                                                suggestion = conf.notString = candidate
 
                                                 infoMsg = "%sparameter '%s' appears to be '%s' injectable (with --not-string=\"%s\")" % ("%s " % paramType if paramType != parameter else "", parameter, title, repr(conf.notString).lstrip('u').strip("'"))
                                                 logger.info(infoMsg)
 
-                                if not any((conf.string, conf.notString, conf.code)):
+                                if not suggestion:
                                     infoMsg = "%sparameter '%s' appears to be '%s' injectable " % ("%s " % paramType if paramType != parameter else "", parameter, title)
                                     singleTimeLogMessage(infoMsg)
 
