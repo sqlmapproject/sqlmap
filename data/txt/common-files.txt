@@ -679,17 +679,6 @@
 
 /.htaccess
 /.htpasswd
-/[jboss]/server/default/conf/jboss-minimal.xml
-/[jboss]/server/default/conf/jboss-service.xml
-/[jboss]/server/default/conf/jndi.properties
-/[jboss]/server/default/conf/log4j.xml
-/[jboss]/server/default/conf/login-config.xml
-/[jboss]/server/default/conf/server.log.properties
-/[jboss]/server/default/conf/standardjaws.xml
-/[jboss]/server/default/conf/standardjboss.xml
-/[jboss]/server/default/deploy/jboss-logging.xml
-/[jboss]/server/default/log/boot.log
-/[jboss]/server/default/log/server.log
 /access.log
 /access_log
 /apache/conf/httpd.conf
@@ -1024,17 +1013,17 @@
 /mysql/my.cnf
 /mysql/my.ini
 /netserver/bin/stable/apache/php.ini
-/opt/[jboss]/server/default/conf/jboss-minimal.xml
-/opt/[jboss]/server/default/conf/jboss-service.xml
-/opt/[jboss]/server/default/conf/jndi.properties
-/opt/[jboss]/server/default/conf/log4j.xml
-/opt/[jboss]/server/default/conf/login-config.xml
-/opt/[jboss]/server/default/conf/server.log.properties
-/opt/[jboss]/server/default/conf/standardjaws.xml
-/opt/[jboss]/server/default/conf/standardjboss.xml
-/opt/[jboss]/server/default/deploy/jboss-logging.xml
-/opt/[jboss]/server/default/log/boot.log
-/opt/[jboss]/server/default/log/server.log
+/opt/jboss/server/default/conf/jboss-minimal.xml
+/opt/jboss/server/default/conf/jboss-service.xml
+/opt/jboss/server/default/conf/jndi.properties
+/opt/jboss/server/default/conf/log4j.xml
+/opt/jboss/server/default/conf/login-config.xml
+/opt/jboss/server/default/conf/server.log.properties
+/opt/jboss/server/default/conf/standardjaws.xml
+/opt/jboss/server/default/conf/standardjboss.xml
+/opt/jboss/server/default/deploy/jboss-logging.xml
+/opt/jboss/server/default/log/boot.log
+/opt/jboss/server/default/log/server.log
 /opt/apache/apache.conf
 /opt/apache/apache2.conf
 /opt/apache/conf/apache.conf
@@ -1075,17 +1064,6 @@
 /private/etc/httpd/httpd.conf
 /private/etc/httpd/httpd.conf.default
 /private/etc/squirrelmail/config/config.php
-/private/tmp/[jboss]/server/default/conf/jboss-minimal.xml
-/private/tmp/[jboss]/server/default/conf/jboss-service.xml
-/private/tmp/[jboss]/server/default/conf/jndi.properties
-/private/tmp/[jboss]/server/default/conf/log4j.xml
-/private/tmp/[jboss]/server/default/conf/login-config.xml
-/private/tmp/[jboss]/server/default/conf/server.log.properties
-/private/tmp/[jboss]/server/default/conf/standardjaws.xml
-/private/tmp/[jboss]/server/default/conf/standardjboss.xml
-/private/tmp/[jboss]/server/default/deploy/jboss-logging.xml
-/private/tmp/[jboss]/server/default/log/boot.log
-/private/tmp/[jboss]/server/default/log/server.log
 /proc/cpuinfo
 /proc/devices
 /proc/meminfo
@@ -1114,17 +1092,17 @@
 /proc/self/stat
 /proc/self/status
 /proc/version
-/program files/[jboss]/server/default/conf/jboss-minimal.xml
-/program files/[jboss]/server/default/conf/jboss-service.xml
-/program files/[jboss]/server/default/conf/jndi.properties
-/program files/[jboss]/server/default/conf/log4j.xml
-/program files/[jboss]/server/default/conf/login-config.xml
-/program files/[jboss]/server/default/conf/server.log.properties
-/program files/[jboss]/server/default/conf/standardjaws.xml
-/program files/[jboss]/server/default/conf/standardjboss.xml
-/program files/[jboss]/server/default/deploy/jboss-logging.xml
-/program files/[jboss]/server/default/log/boot.log
-/program files/[jboss]/server/default/log/server.log
+/program files/jboss/server/default/conf/jboss-minimal.xml
+/program files/jboss/server/default/conf/jboss-service.xml
+/program files/jboss/server/default/conf/jndi.properties
+/program files/jboss/server/default/conf/log4j.xml
+/program files/jboss/server/default/conf/login-config.xml
+/program files/jboss/server/default/conf/server.log.properties
+/program files/jboss/server/default/conf/standardjaws.xml
+/program files/jboss/server/default/conf/standardjboss.xml
+/program files/jboss/server/default/deploy/jboss-logging.xml
+/program files/jboss/server/default/log/boot.log
+/program files/jboss/server/default/log/server.log
 /program files/apache group/apache/apache.conf
 /program files/apache group/apache/apache2.conf
 /program files/apache group/apache/conf/apache.conf
@@ -1177,17 +1155,17 @@
 /system/library/webobjects/adaptors/apache2.2/apache.conf
 /temp/sess_
 /thttpd_log
-/tmp/[jboss]/server/default/conf/jboss-minimal.xml
-/tmp/[jboss]/server/default/conf/jboss-service.xml
-/tmp/[jboss]/server/default/conf/jndi.properties
-/tmp/[jboss]/server/default/conf/log4j.xml
-/tmp/[jboss]/server/default/conf/login-config.xml
-/tmp/[jboss]/server/default/conf/server.log.properties
-/tmp/[jboss]/server/default/conf/standardjaws.xml
-/tmp/[jboss]/server/default/conf/standardjboss.xml
-/tmp/[jboss]/server/default/deploy/jboss-logging.xml
-/tmp/[jboss]/server/default/log/boot.log
-/tmp/[jboss]/server/default/log/server.log
+/tmp/jboss/server/default/conf/jboss-minimal.xml
+/tmp/jboss/server/default/conf/jboss-service.xml
+/tmp/jboss/server/default/conf/jndi.properties
+/tmp/jboss/server/default/conf/log4j.xml
+/tmp/jboss/server/default/conf/login-config.xml
+/tmp/jboss/server/default/conf/server.log.properties
+/tmp/jboss/server/default/conf/standardjaws.xml
+/tmp/jboss/server/default/conf/standardjboss.xml
+/tmp/jboss/server/default/deploy/jboss-logging.xml
+/tmp/jboss/server/default/log/boot.log
+/tmp/jboss/server/default/log/server.log
 /tmp/access.log
 /tmp/sess_
 /usr/apache/conf/httpd.conf
@@ -1202,17 +1180,17 @@
 /usr/lib/php.ini
 /usr/lib/php/php.ini
 /usr/lib/security/mkuser.default
-/usr/local/[jboss]/server/default/conf/jboss-minimal.xml
-/usr/local/[jboss]/server/default/conf/jboss-service.xml
-/usr/local/[jboss]/server/default/conf/jndi.properties
-/usr/local/[jboss]/server/default/conf/log4j.xml
-/usr/local/[jboss]/server/default/conf/login-config.xml
-/usr/local/[jboss]/server/default/conf/server.log.properties
-/usr/local/[jboss]/server/default/conf/standardjaws.xml
-/usr/local/[jboss]/server/default/conf/standardjboss.xml
-/usr/local/[jboss]/server/default/deploy/jboss-logging.xml
-/usr/local/[jboss]/server/default/log/boot.log
-/usr/local/[jboss]/server/default/log/server.log
+/usr/local/jboss/server/default/conf/jboss-minimal.xml
+/usr/local/jboss/server/default/conf/jboss-service.xml
+/usr/local/jboss/server/default/conf/jndi.properties
+/usr/local/jboss/server/default/conf/log4j.xml
+/usr/local/jboss/server/default/conf/login-config.xml
+/usr/local/jboss/server/default/conf/server.log.properties
+/usr/local/jboss/server/default/conf/standardjaws.xml
+/usr/local/jboss/server/default/conf/standardjboss.xml
+/usr/local/jboss/server/default/deploy/jboss-logging.xml
+/usr/local/jboss/server/default/log/boot.log
+/usr/local/jboss/server/default/log/server.log
 /usr/local/apache/apache.conf
 /usr/local/apache/apache2.conf
 /usr/local/apache/conf/access.conf
@@ -1802,3 +1780,20 @@
 /usr/share/squirrelmail/config/config.php
 /private/etc/squirrelmail/config/config.php
 /srv/www/htdos/squirrelmail/config/config.php
+
+# Web shells
+
+/var/www/html/backdoor.php
+/var/www/html/b374k.php
+/var/www/html/c99.php
+/var/www/html/cmd.php
+/var/www/html/r57.php
+/var/www/html/shell.php
+/var/www/html/wso.php
+
+# Misc
+
+/etc/lib/nfs/etab
+/app/app.js
+/app/configure.js
+/app/config/config.json
