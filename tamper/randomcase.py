@@ -42,7 +42,7 @@ def tamper(payload, **kwargs):
     >>> tamper('function()')
     'FuNcTiOn()'
     >>> tamper('SELECT id FROM `user`')
-    'SeLeCt Id FrOm `user`'
+    'SeLeCt id FrOm `user`'
     """
 
     retVal = payload
