@@ -39,16 +39,19 @@ def cachedmethod(f):
 
     @functools.wraps(f)
     def _f(*args, **kwargs):
-        key = int(hashlib.md5("|".join(str(_) for _ in (f, args, kwargs)).encode(UNICODE_ENCODING)).hexdigest(), 16) & 0x7fffffffffffffff
-
         try:
-            with _cache_lock:
-                result = _cache[f][key]
-        except KeyError:
+            key = int(hashlib.md5("|".join(str(_) for _ in (f, args, kwargs)).encode(UNICODE_ENCODING)).hexdigest(), 16) & 0x7fffffffffffffff
+        except ValueError:  # https://github.com/sqlmapproject/sqlmap/issues/4281 (NOTE: non-standard Python behavior where hexdigest returns binary value)
             result = f(*args, **kwargs)
+        else:
+            try:
+                with _cache_lock:
+                    result = _cache[f][key]
+            except KeyError:
+                result = f(*args, **kwargs)
 
-            with _cache_lock:
-                _cache[f][key] = result
+                with _cache_lock:
+                    _cache[f][key] = result
 
         return result
 
