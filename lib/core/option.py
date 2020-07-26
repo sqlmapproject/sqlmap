@@ -982,7 +982,7 @@ def _setHTTPHandlers():
     """
 
     with kb.locks.handlers:
-        if conf.proxyList is not None:
+        if conf.proxyList:
             conf.proxy = conf.proxyList[0]
             conf.proxyList = conf.proxyList[1:] + conf.proxyList[:1]
 
