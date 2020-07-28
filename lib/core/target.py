@@ -120,7 +120,7 @@ def _setRequestParams():
                     else:
                         break
                 if kb.customInjectionMark in retVal:
-                    hintNames.append((retVal.split(kb.customInjectionMark)[0], match.group("name")))
+                    hintNames.append((retVal.split(kb.customInjectionMark)[0], match.group("name").strip('"\'') if kb.postHint == POST_HINT.JSON_LIKE else match.group("name")))
 
             return retVal
 
@@ -145,6 +145,7 @@ def _setRequestParams():
             if choice == 'Q':
                 raise SqlmapUserQuitException
             elif choice == 'Y':
+                kb.postHint = POST_HINT.JSON
                 if not (kb.processUserMarks and kb.customInjectionMark in conf.data):
                     conf.data = getattr(conf.data, UNENCODED_ORIGINAL_VALUE, conf.data)
                     conf.data = conf.data.replace(kb.customInjectionMark, ASTERISK_MARKER)
@@ -159,8 +160,6 @@ def _setRequestParams():
                                 _ = re.sub(r'(\A|,|\s+)(-?\d[\d\.]*\b)', r'\g<0>%s' % kb.customInjectionMark, _)
                                 conf.data = conf.data.replace(match.group(0), match.group(0).replace(match.group(2), _))
 
-                kb.postHint = POST_HINT.JSON
-
         elif re.search(JSON_LIKE_RECOGNITION_REGEX, conf.data):
             message = "JSON-like data found in %s body. " % conf.method
             message += "Do you want to process it? [Y/n/q] "
@@ -169,13 +168,16 @@ def _setRequestParams():
             if choice == 'Q':
                 raise SqlmapUserQuitException
             elif choice == 'Y':
+                kb.postHint = POST_HINT.JSON_LIKE
                 if not (kb.processUserMarks and kb.customInjectionMark in conf.data):
                     conf.data = getattr(conf.data, UNENCODED_ORIGINAL_VALUE, conf.data)
                     conf.data = conf.data.replace(kb.customInjectionMark, ASTERISK_MARKER)
-                    conf.data = re.sub(r"('(?P<name>[^']+)'\s*:\s*'[^']+)'", functools.partial(process, repl=r"\g<1>%s'" % kb.customInjectionMark), conf.data)
-                    conf.data = re.sub(r"('(?P<name>[^']+)'\s*:\s*)(-?\d[\d\.]*\b)", functools.partial(process, repl=r"\g<0>%s" % kb.customInjectionMark), conf.data)
-
-                kb.postHint = POST_HINT.JSON_LIKE
+                    if '"' in conf.data:
+                        conf.data = re.sub(r'((?P<name>"[^"]+"|\w+)\s*:\s*"[^"]+)"', functools.partial(process, repl=r'\g<1>%s"' % kb.customInjectionMark), conf.data)
+                        conf.data = re.sub(r'((?P<name>"[^"]+"|\w+)\s*:\s*)(-?\d[\d\.]*\b)', functools.partial(process, repl=r'\g<0>%s' % kb.customInjectionMark), conf.data)
+                    else:
+                        conf.data = re.sub(r"((?P<name>'[^']+'|\w+)\s*:\s*'[^']+)'", functools.partial(process, repl=r"\g<1>%s'" % kb.customInjectionMark), conf.data)
+                        conf.data = re.sub(r"((?P<name>'[^']+'|\w+)\s*:\s*)(-?\d[\d\.]*\b)", functools.partial(process, repl=r"\g<0>%s" % kb.customInjectionMark), conf.data)
 
         elif re.search(ARRAY_LIKE_RECOGNITION_REGEX, conf.data):
             message = "Array-like data found in %s body. " % conf.method
@@ -185,11 +187,10 @@ def _setRequestParams():
             if choice == 'Q':
                 raise SqlmapUserQuitException
             elif choice == 'Y':
+                kb.postHint = POST_HINT.ARRAY_LIKE
                 if not (kb.processUserMarks and kb.customInjectionMark in conf.data):
                     conf.data = conf.data.replace(kb.customInjectionMark, ASTERISK_MARKER)
                     conf.data = re.sub(r"(=[^%s]+)" % DEFAULT_GET_POST_DELIMITER, r"\g<1>%s" % kb.customInjectionMark, conf.data)
-
-                kb.postHint = POST_HINT.ARRAY_LIKE
 
         elif re.search(XML_RECOGNITION_REGEX, conf.data):
             message = "SOAP/XML data found in %s body. " % conf.method
@@ -199,12 +200,11 @@ def _setRequestParams():
             if choice == 'Q':
                 raise SqlmapUserQuitException
             elif choice == 'Y':
+                kb.postHint = POST_HINT.SOAP if "soap" in conf.data.lower() else POST_HINT.XML
                 if not (kb.processUserMarks and kb.customInjectionMark in conf.data):
                     conf.data = getattr(conf.data, UNENCODED_ORIGINAL_VALUE, conf.data)
                     conf.data = conf.data.replace(kb.customInjectionMark, ASTERISK_MARKER)
                     conf.data = re.sub(r"(<(?P<name>[^>]+)( [^<]*)?>)([^<]+)(</\2)", functools.partial(process, repl=r"\g<1>\g<4>%s\g<5>" % kb.customInjectionMark), conf.data)
-
-                kb.postHint = POST_HINT.SOAP if "soap" in conf.data.lower() else POST_HINT.XML
 
         elif re.search(MULTIPART_RECOGNITION_REGEX, conf.data):
             message = "Multipart-like data found in %s body. " % conf.method
@@ -214,12 +214,11 @@ def _setRequestParams():
             if choice == 'Q':
                 raise SqlmapUserQuitException
             elif choice == 'Y':
+                kb.postHint = POST_HINT.MULTIPART
                 if not (kb.processUserMarks and kb.customInjectionMark in conf.data):
                     conf.data = getattr(conf.data, UNENCODED_ORIGINAL_VALUE, conf.data)
                     conf.data = conf.data.replace(kb.customInjectionMark, ASTERISK_MARKER)
                     conf.data = re.sub(r"(?si)((Content-Disposition[^\n]+?name\s*=\s*[\"']?(?P<name>[^\"'\r\n]+)[\"']?).+?)((%s)+--)" % ("\r\n" if "\r\n" in conf.data else '\n'), functools.partial(process, repl=r"\g<1>%s\g<4>" % kb.customInjectionMark), conf.data)
-
-                kb.postHint = POST_HINT.MULTIPART
 
         if not kb.postHint:
             if kb.customInjectionMark in conf.data:  # later processed
