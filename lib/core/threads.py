@@ -21,6 +21,7 @@ from lib.core.datatype import AttribDict
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapBaseException
 from lib.core.exception import SqlmapConnectionException
+from lib.core.exception import SqlmapSkipTargetException
 from lib.core.exception import SqlmapThreadException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.exception import SqlmapValueException
@@ -101,7 +102,7 @@ def exceptionHandledFunction(threadFunction, silent=False):
     except Exception as ex:
         from lib.core.common import getSafeExString
 
-        if not silent and kb.get("threadContinue") and not kb.get("multipleCtrlC") and not isinstance(ex, SqlmapUserQuitException):
+        if not silent and kb.get("threadContinue") and not kb.get("multipleCtrlC") and not isinstance(ex, (SqlmapUserQuitException, SqlmapSkipTargetException)):
             errMsg = getSafeExString(ex) if isinstance(ex, SqlmapBaseException) else "%s: %s" % (type(ex).__name__, getSafeExString(ex))
             logger.error("thread %s: '%s'" % (threading.currentThread().getName(), errMsg))
 
