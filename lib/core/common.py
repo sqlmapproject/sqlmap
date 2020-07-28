@@ -58,6 +58,7 @@ from lib.core.convert import getText
 from lib.core.convert import getUnicode
 from lib.core.convert import htmlUnescape
 from lib.core.convert import stdoutEncode
+from lib.core.data import cmdLineOptions
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -3391,7 +3392,7 @@ def setOptimize():
 
     # conf.predictOutput = True
     conf.keepAlive = True
-    conf.threads = 3 if conf.threads < 3 else conf.threads
+    conf.threads = 3 if conf.threads < 3 and cmdLineOptions.threads is None else conf.threads
     conf.nullConnection = not any((conf.data, conf.textOnly, conf.titles, conf.string, conf.notString, conf.regexp, conf.tor))
 
     if not conf.nullConnection:
