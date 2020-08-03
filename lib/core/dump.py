@@ -241,7 +241,7 @@ class Dump(object):
             lines = "-" * (int(maxlength) + 2)
 
             for db, tables in dbTables.items():
-                tables.sort()
+                tables = sorted(filter(None, tables))
 
                 self._write("Database: %s" % unsafeSQLIdentificatorNaming(db) if db else "Current database")
 
