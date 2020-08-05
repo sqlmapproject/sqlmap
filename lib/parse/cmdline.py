@@ -960,6 +960,8 @@ def cmdLineParser(argv=None):
                     extraHeaders.append(argv[i + 1])
             elif argv[i] == "--deps":
                 argv[i] = "--dependencies"
+            elif argv[i] == "--disable-colouring":
+                argv[i] = "--disable-coloring"
             elif argv[i] == "-r":
                 for j in xrange(i + 2, len(argv)):
                     value = argv[j]
