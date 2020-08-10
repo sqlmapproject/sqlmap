@@ -61,6 +61,7 @@ from thirdparty.bottle.bottle import request
 from thirdparty.bottle.bottle import response
 from thirdparty.bottle.bottle import run
 from thirdparty.bottle.bottle import server_names
+from thirdparty import six
 from thirdparty.six.moves import http_client as _http_client
 from thirdparty.six.moves import input as _input
 from thirdparty.six.moves import urllib as _urllib
@@ -717,7 +718,7 @@ def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=REST
             errMsg += "List of supported adapters: %s" % ', '.join(sorted(list(server_names.keys())))
         else:
             errMsg = "Server support for adapter '%s' is not installed on this system " % adapter
-            errMsg += "(Note: you can try to install it with 'sudo apt install python-%s' or 'sudo pip install %s')" % (adapter, adapter)
+            errMsg += "(Note: you can try to install it with 'sudo apt install python-%s' or 'sudo pip%s install %s')" % (adapter, '3' if six.PY3 else "", adapter)
         logger.critical(errMsg)
 
 def _client(url, options=None):
