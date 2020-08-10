@@ -203,6 +203,7 @@ optDict = {
         "answers": "string",
         "batch": "boolean",
         "base64Parameter": "string",
+        "base64Safe": "boolean",
         "binaryFields": "string",
         "charset": "string",
         "checkInternet": "boolean",

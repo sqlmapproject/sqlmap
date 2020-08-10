@@ -1856,6 +1856,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.arch = None
     kb.authHeader = None
     kb.bannerFp = AttribDict()
+    kb.base64Originals = {}
     kb.binaryField = False
     kb.browserVerification = None
 
