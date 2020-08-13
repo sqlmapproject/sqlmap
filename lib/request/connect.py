@@ -1125,11 +1125,13 @@ class Connect(object):
             if token:
                 token.value = token.value.strip("'\"")
 
-                for candidate in (PLACE.GET, PLACE.POST):
+                for candidate in (PLACE.GET, PLACE.POST, PLACE.CUSTOM_POST, PLACE.URI):
                     if candidate in conf.parameters:
-                        if candidate == PLACE.GET and get:
+                        if candidate == PLACE.URI and uri:
+                            uri = _adjustParameter(uri, token.name, token.value)
+                        elif candidate == PLACE.GET and get:
                             get = _adjustParameter(get, token.name, token.value)
-                        elif candidate == PLACE.POST and post:
+                        elif candidate in [PLACE.POST, PLACE.CUSTOM_POST] and post:
                             post = _adjustParameter(post, token.name, token.value)
 
                 for i in xrange(len(conf.httpHeaders)):
