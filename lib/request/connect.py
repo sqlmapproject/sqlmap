@@ -1131,7 +1131,7 @@ class Connect(object):
                             uri = _adjustParameter(uri, token.name, token.value)
                         elif candidate == PLACE.GET and get:
                             get = _adjustParameter(get, token.name, token.value)
-                        elif candidate in [PLACE.POST, PLACE.CUSTOM_POST] and post:
+                        elif candidate in (PLACE.POST, PLACE.CUSTOM_POST) and post:
                             post = _adjustParameter(post, token.name, token.value)
 
                 for i in xrange(len(conf.httpHeaders)):

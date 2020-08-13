@@ -58,7 +58,7 @@ class HTTPSConnection(_http_client.HTTPSConnection):
         # Reference(s): https://docs.python.org/2/library/ssl.html#ssl.SSLContext
         #               https://www.mnot.net/blog/2014/12/27/python_2_and_tls_sni
         if re.search(r"\A[\d.]+\Z", self.host) is None and kb.tlsSNI.get(self.host) is not False and hasattr(ssl, "SSLContext"):
-            for protocol in [_ for _ in _protocols if _ >= ssl.PROTOCOL_TLSv1]:
+            for protocol in (_ for _ in _protocols if _ >= ssl.PROTOCOL_TLSv1):
                 try:
                     sock = create_sock()
                     if protocol not in _contexts:
