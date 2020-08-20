@@ -1581,7 +1581,7 @@ def checkConnection(suppressOutput=False):
         kb.originalPage = kb.pageTemplate = threadData.lastPage
         kb.originalCode = threadData.lastCode
 
-    if conf.cj and not conf.cookie and not conf.dropSetCookie:
+    if conf.cj and not conf.cookie and not any(_[0] == HTTP_HEADER.COOKIE for _ in conf.httpHeaders) and not conf.dropSetCookie:
         candidate = DEFAULT_COOKIE_DELIMITER.join("%s=%s" % (_.name, _.value) for _ in conf.cj)
 
         message = "you have not declared cookie(s), while "

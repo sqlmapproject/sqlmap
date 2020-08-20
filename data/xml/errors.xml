@@ -83,7 +83,7 @@
         <error regexp="CLI Driver.*?DB2"/>
         <error regexp="DB2 SQL error"/>
         <error regexp="\bdb2_\w+\("/>
-        <error regexp="SQLSTATE.+SQLCODE"/>
+        <error regexp="SQLCODE[=:\d, -]+SQLSTATE"/>
         <error regexp="com\.ibm\.db2\.jcc"/>
         <error regexp="Zend_Db_(Adapter|Statement)_Db2_Exception"/>
         <error regexp="Pdo[./_\\]Ibm"/>
