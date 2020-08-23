@@ -394,7 +394,7 @@ def processResponse(page, responseHeaders, code=None, status=None):
         if msg:
             logger.warning("parsed DBMS error message: '%s'" % msg.rstrip('.'))
 
-    if kb.processResponseCounter < IDENTYWAF_PARSE_LIMIT:
+    if not conf.skipWaf and kb.processResponseCounter < IDENTYWAF_PARSE_LIMIT:
         rawResponse = "%s %s %s\n%s\n%s" % (_http_client.HTTPConnection._http_vsn_str, code or "", status or "", getUnicode("".join(responseHeaders.headers if responseHeaders else [])), page)
 
         identYwaf.non_blind.clear()
