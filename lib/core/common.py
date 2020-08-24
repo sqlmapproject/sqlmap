@@ -1051,6 +1051,16 @@ def dataToDumpFile(dumpFile, data):
             raise
 
 def dataToOutFile(filename, data):
+    """
+    Saves data to filename
+
+    >>> pushValue(conf.get("filePath"))
+    >>> conf.filePath = tempfile.gettempdir()
+    >>> "_etc_passwd" in dataToOutFile("/etc/passwd", b":::*")
+    True
+    >>> conf.filePath = popValue()
+    """
+
     retVal = None
 
     if data:
@@ -1714,6 +1724,11 @@ def escapeJsonValue(value):
     Escapes JSON value (used in payloads)
 
     # Reference: https://stackoverflow.com/a/16652683
+
+    >>> "\\n" in escapeJsonValue("foo\\nbar")
+    False
+    >>> "\\\\t" in escapeJsonValue("foo\\tbar")
+    True
     """
 
     retVal = ""
@@ -1888,6 +1903,12 @@ def getLocalIP():
 def getRemoteIP():
     """
     Get remote/target IP address
+
+    >>> pushValue(conf.hostname)
+    >>> conf.hostname = "localhost"
+    >>> getRemoteIP() == "127.0.0.1"
+    True
+    >>> conf.hostname = popValue()
     """
 
     retVal = None
@@ -2014,6 +2035,9 @@ def normalizePath(filepath):
 def safeFilepathEncode(filepath):
     """
     Returns filepath in (ASCII) format acceptable for OS handling (e.g. reading)
+
+    >>> 'sqlmap' in safeFilepathEncode(paths.SQLMAP_HOME_PATH)
+    True
     """
 
     retVal = filepath
@@ -2220,6 +2244,15 @@ def isHexEncodedString(subject):
 def isMultiThreadMode():
     """
     Checks if running in multi-thread(ing) mode
+
+    >>> isMultiThreadMode()
+    False
+    >>> _ = lambda: time.sleep(0.1)
+    >>> thread = threading.Thread(target=_)
+    >>> thread.daemon = True
+    >>> thread.start()
+    >>> isMultiThreadMode()
+    True
     """
 
     return threading.activeCount() > 1
@@ -2228,6 +2261,9 @@ def isMultiThreadMode():
 def getConsoleWidth(default=80):
     """
     Returns console width
+
+    >>> any((getConsoleWidth(), True))
+    True
     """
 
     width = None
@@ -2434,6 +2470,9 @@ def initCommonOutputs():
 def getFileItems(filename, commentPrefix='#', unicoded=True, lowercase=False, unique=False):
     """
     Returns newline delimited items contained inside file
+
+    >>> "SELECT" in getFileItems(paths.SQL_KEYWORDS)
+    True
     """
 
     retVal = list() if not unique else OrderedDict()
@@ -2540,8 +2579,8 @@ def goGoodSamaritan(prevValue, originalCharset):
 
 def getPartRun(alias=True):
     """
-    Goes through call stack and finds constructs matching conf.dbmsHandler.*.
-    Returns it or its alias used in 'txt/common-outputs.txt'
+    Goes through call stack and finds constructs matching
+    conf.dbmsHandler.*. Returns it or its alias used in 'txt/common-outputs.txt'
     """
 
     retVal = None
@@ -4997,6 +5036,12 @@ def getRequestHeader(request, name):
     Solving an issue with an urllib2 Request header case sensitivity
 
     # Reference: http://bugs.python.org/issue2275
+
+    >>> _ = lambda _: _
+    >>> _.headers = {"FOO": "BAR"}
+    >>> _.header_items = lambda: _.headers.items()
+    >>> getText(getRequestHeader(_, "foo"))
+    'BAR'
     """
 
     retVal = None
@@ -5094,6 +5139,13 @@ def pollProcess(process, suppress_errors=False):
 def parseRequestFile(reqFile, checkParams=True):
     """
     Parses WebScarab and Burp logs and adds results to the target URL list
+
+    >>> handle, reqFile = tempfile.mkstemp(suffix=".req")
+    >>> content = b"POST / HTTP/1.0\\nUser-agent: foobar\\nHost: www.example.com\\n\\nid=1\\n"
+    >>> _ = os.write(handle, content)
+    >>> os.close(handle)
+    >>> next(parseRequestFile(reqFile)) == ('http://www.example.com:80/', 'POST', 'id=1', None, (('User-agent', 'foobar'), ('Host', 'www.example.com')))
+    True
     """
 
     def _parseWebScarabLog(content):
