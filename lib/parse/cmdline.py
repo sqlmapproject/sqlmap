@@ -863,7 +863,7 @@ def cmdLineParser(argv=None):
         _ = []
         advancedHelp = True
         extraHeaders = []
-        tamperIndex = None
+        auxIndexes = {}
 
         # Reference: https://stackoverflow.com/a/4012683 (Note: previously used "...sys.getfilesystemencoding() or UNICODE_ENCODING")
         for arg in argv:
@@ -952,11 +952,15 @@ def cmdLineParser(argv=None):
                 argv[i] = ""
             elif argv[i] in DEPRECATED_OPTIONS:
                 argv[i] = ""
-            elif argv[i].startswith("--tamper"):
-                if tamperIndex is None:
-                    tamperIndex = i if '=' in argv[i] else (i + 1 if i + 1 < len(argv) and not argv[i + 1].startswith('-') else None)
+            elif any(argv[i].startswith(_) for _ in ("--tamper",)):
+                key = re.search(r"\-\-(\w+)", argv[i]).group(1)
+                index = auxIndexes.get(key, None)
+                if index is None:
+                    index = i if '=' in argv[i] else (i + 1 if i + 1 < len(argv) and not argv[i + 1].startswith('-') else None)
+                    auxIndexes[key] = index
                 else:
-                    argv[tamperIndex] = "%s,%s" % (argv[tamperIndex], argv[i].split('=')[1] if '=' in argv[i] else (argv[i + 1] if i + 1 < len(argv) and not argv[i + 1].startswith('-') else ""))
+                    delimiter = ','
+                    argv[index] = "%s%s%s" % (argv[index], delimiter, argv[i].split('=')[1] if '=' in argv[i] else (argv[i + 1] if i + 1 < len(argv) and not argv[i + 1].startswith('-') else ""))
                     argv[i] = ""
             elif argv[i] in ("-H", "--header") or any(argv[i].startswith("%s=" % _) for _ in ("-H", "--header")):
                 if '=' in argv[i]:
