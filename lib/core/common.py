@@ -5007,6 +5007,10 @@ def decloakToTemp(filename):
     >>> openFile(_, "rb", encoding=None).read().startswith(b'<%')
     True
     >>> os.remove(_)
+    >>> _ = decloakToTemp(os.path.join(paths.SQLMAP_UDF_PATH, "postgresql", "linux", "64", "11", "lib_postgresqludf_sys.so_"))
+    >>> b'sys_eval' in openFile(_, "rb", encoding=None).read()
+    True
+    >>> os.remove(_)
     """
 
     content = decloak(filename)
