@@ -5056,7 +5056,7 @@ def getRequestHeader(request, name):
 
     if request and request.headers and name:
         _ = name.upper()
-        retVal = max(getBytes(value if _ == key.upper() else "") for key, value in request.header_items()) or None
+        retVal = max(getBytes(value if _ == key.upper() else "") for key, value in request.header_items()).decode("utf-8") or None
 
     return retVal
 
