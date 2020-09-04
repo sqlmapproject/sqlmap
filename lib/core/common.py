@@ -632,6 +632,7 @@ def paramToDict(place, parameters=None):
                 if parameter in (conf.base64Parameter or []):
                     try:
                         kb.base64Originals[parameter] = oldValue = value
+                        value = urldecode(value, convall=True)
                         value = decodeBase64(value, binary=False, encoding=conf.encoding or UNICODE_ENCODING)
                         parameters = re.sub(r"\b%s(\b|\Z)" % re.escape(oldValue), value, parameters)
                     except:

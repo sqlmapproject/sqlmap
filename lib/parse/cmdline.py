@@ -623,7 +623,7 @@ def cmdLineParser(argv=None):
             help="Parameter(s) containing Base64 encoded data")
 
         general.add_argument("--base64-safe", dest="base64Safe", action="store_true",
-            help="Use URL and filename safe Base64 alphabet")
+            help="Use URL and filename safe Base64 alphabet (RFC 4648)")
 
         general.add_argument("--batch", dest="batch", action="store_true",
             help="Never ask for user input, use the default behavior")

@@ -39,6 +39,7 @@ def vulnTest():
 
     TESTS = (
         ("-h", ("to see full list of options run with '-hh'",)),
+        ("-u <base64> -p id --base64=id -v 6 --data='base64=true' --flush-session --banner --technique=BEU", ("banner: '3.",)),
         ("--dependencies", ("sqlmap requires", "third-party library")),
         ("-u <url> --flush-session --wizard", ("Please choose:", "back-end DBMS: SQLite", "current user is DBA: True", "banner: '3.")),
         (u"-c <config> --flush-session --roles --statements --hostname --privileges --sql-query=\"SELECT '\u0161u\u0107uraj'\" --technique=U", (u": '\u0161u\u0107uraj'", "on SQLite it is not possible")),
@@ -125,7 +126,10 @@ def vulnTest():
         status = '%d/%d (%d%%) ' % (count, len(TESTS), round(100.0 * count / len(TESTS)))
         dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%X"), status))
 
-        cmd = "%s %s %s --batch --non-interactive" % (sys.executable, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py")), options.replace("<url>", url).replace("<direct>", direct).replace("<request>", request).replace("<log>", log).replace("<config>", config))
+        for tag, value in (("<url>", url), ("<direct>", direct), ("<request>", request), ("<log>", log), ("<config>", config), ("<base64>", url.replace("id=1", "id=MZ=%3d"))):
+            options = options.replace(tag, value)
+
+        cmd = "%s %s %s --batch --non-interactive" % (sys.executable, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py")), options)
 
         if "<tmp>" in cmd:
             handle, tmp = tempfile.mkstemp()
