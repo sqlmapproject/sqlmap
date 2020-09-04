@@ -317,7 +317,7 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
-        elif any(_ in excMsg for _ in ("tempfile.mkdtemp", "tempfile.mkstemp")):
+        elif any(_ in excMsg for _ in ("tempfile.mkdtemp", "tempfile.mkstemp", "tempfile.py")):
             errMsg = "unable to write to the temporary directory '%s'. " % tempfile.gettempdir()
             errMsg += "Please make sure that your disk is not full and "
             errMsg += "that you have sufficient write permissions to "
