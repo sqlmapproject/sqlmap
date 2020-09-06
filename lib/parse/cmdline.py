@@ -952,8 +952,8 @@ def cmdLineParser(argv=None):
                 argv[i] = ""
             elif argv[i] in DEPRECATED_OPTIONS:
                 argv[i] = ""
-            elif any(argv[i].startswith(_) for _ in ("--tamper",)):
-                key = re.search(r"\-\-(\w+)", argv[i]).group(1)
+            elif any(argv[i].startswith(_) for _ in ("--tamper", "--ignore-code", "--skip")):
+                key = re.search(r"\-?\-(\w+)\b", argv[i]).group(1)
                 index = auxIndexes.get(key, None)
                 if index is None:
                     index = i if '=' in argv[i] else (i + 1 if i + 1 < len(argv) and not argv[i + 1].startswith('-') else None)
