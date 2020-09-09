@@ -428,6 +428,12 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
+        elif all(_ in excMsg for _ in ("HTTPNtlmAuthHandler", "'str' object has no attribute 'decode'")):
+            errMsg = "package 'python-ntlm' has a known compatibility issue with the "
+            errMsg += "Python 3 (Reference: https://github.com/mullender/python-ntlm/pull/61)"
+            logger.critical(errMsg)
+            raise SystemExit
+
         elif "'DictObject' object has no attribute '" in excMsg and all(_ in errMsg for _ in ("(fingerprinted)", "(identified)")):
             errMsg = "there has been a problem in enumeration. "
             errMsg += "Because of a considerable chance of false-positive case "
