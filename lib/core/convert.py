@@ -48,16 +48,16 @@ def base64pickle(value):
     retVal = None
 
     try:
-        retVal = encodeBase64(pickle.dumps(value, PICKLE_PROTOCOL))
+        retVal = encodeBase64(pickle.dumps(value, PICKLE_PROTOCOL), binary=False)
     except:
         warnMsg = "problem occurred while serializing "
         warnMsg += "instance of a type '%s'" % type(value)
         singleTimeWarnMessage(warnMsg)
 
         try:
-            retVal = encodeBase64(pickle.dumps(value))
+            retVal = encodeBase64(pickle.dumps(value), binary=False)
         except:
-            retVal = encodeBase64(pickle.dumps(str(value), PICKLE_PROTOCOL))
+            retVal = encodeBase64(pickle.dumps(str(value), PICKLE_PROTOCOL), binary=False)
 
     return retVal
 

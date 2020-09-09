@@ -4774,7 +4774,7 @@ def serializeObject(object_):
     """
     Serializes given object
 
-    >>> type(serializeObject([1, 2, 3, ('a', 'b')])) == six.binary_type
+    >>> type(serializeObject([1, 2, 3, ('a', 'b')])) == str
     True
     """
 
