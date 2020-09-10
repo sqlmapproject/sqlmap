@@ -23,10 +23,11 @@
 | [thirdparty/odict/](http://www.voidspace.org.uk/python/odict.html) | BSD | Used internally | - |
 | [thirdparty/pagerank/](http://code.google.com/p/corey-projects/) | MIT | Used to display page rank for Google dork results | -g |
 | [thirdparty/prettyprint/](http://code.google.com/p/python-httpclient-gui/) | MIT | Used to generate XML output | --xml, to be replaced by --report (#14) |
-| [thirdparty/pydes/](http://twhiteman.netfirms.com/des.html) | Free, public domain | Used to crack the Oracle old password format | --passwords |
-| [thirdparty/six/](https://github.com/benjaminp/six) | MIT | Used as Python 2 and 3 compatibility library | - |
+| [thirdparty/pydes/](http://twhiteman.netfirms.com/des.html) | Public domain | Used for cracking the Oracle old password format | --passwords |
+| [thirdparty/six/](https://github.com/benjaminp/six) | MIT | Used as Python 2/3 compatibility library | - |
 | [thirdparty/socks/](http://socksipy.sourceforge.net/) | BSD | Used to tunnel your requests over Tor SOCKS proxy | --tor-type and --proxy |
 | [thirdparty/termcolor/](http://pypi.python.org/pypi/termcolor) | MIT | Used to colourize output | - |
+| [thirdparty/wininetpton/](https://github.com/hickeroar/win_inet_pton) | Public domain | Used for patching `inet_pton` on Windows OS | - |
 | [thirdparty/xdot/](http://code.google.com/p/jrfonseca/wiki/XDot) | LGPL | Used for internal debug purposes | --profile |
 
 <h2 id="extra">Libraries and tools in extra/ directory</h2>
