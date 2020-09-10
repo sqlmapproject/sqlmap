@@ -16,6 +16,7 @@
 | [thirdparty/colorama/](http://pypi.python.org/pypi/colorama) | BSD | Used to make output colouring cross-platform | - |
 | [thirdparty/fcrypt/](http://carey.geek.nz/code/python-fcrypt/) | BSD | Used to crack a generic password hash | --passwords |
 | [thirdparty/gprof2dot/](http://code.google.com/p/jrfonseca/wiki/Gprof2Dot) | LGPL | Used for internal debug purposes | --profile |
+| [thirdparty/identywaf/](https://github.com/stamparm/identYwaf) | MIT | Used for identification of WAF/IPS solutions | - |
 | [thirdparty/keepalive/](http://urlgrabber.baseurl.org/) | LGPL | Used for persistent HTTP(s) requests | --keep-alive and -o |
 | [thirdparty/magic/](http://pypi.python.org/pypi/python-magic/) | PSF | Used to identify and show the file type in log messages | --file-write |
 | [thirdparty/multipartpost/](http://pipe.scs.fsu.edu/PostHandler/MultipartPostHandler.py) | LGPL | Used to upload files via web file stager | --os-cmd, --os-shell, --os-pwn |
