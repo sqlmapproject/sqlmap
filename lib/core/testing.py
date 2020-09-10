@@ -44,6 +44,7 @@ def vulnTest():
         (u"-c <config> --flush-session --roles --statements --hostname --privileges --sql-query=\"SELECT '\u0161u\u0107uraj'\" --technique=U", (u": '\u0161u\u0107uraj'", "on SQLite it is not possible")),
         (u"-u <url> --flush-session --sql-query=\"SELECT '\u0161u\u0107uraj'\" --technique=B --no-escape --string=luther --unstable", (u": '\u0161u\u0107uraj'",)),
         ("--dummy", ("all tested parameters do not appear to be injectable", "does not seem to be injectable", "there is not at least one", "~might be injectable")),
+        ("-u '<url>&id2=1' -p id2 -v 5 --flush-session --level=5 --test-filter='AND boolean-based blind - WHERE or HAVING clause (MySQL comment)'", ("~1AND",)),
         ("--list-tampers", ("between", "MySQL", "xforwardedfor")),
         ("-r <request> --flush-session -v 5 --test-skip='heavy' --save=<tmp>", ("CloudFlare", "possible DBMS: 'SQLite'", "User-agent: foobar", "~Type: time-based blind")),
         ("-l <log> --flush-session --keep-alive --skip-waf -v 5 --technique=U --union-from=users --banner --parse-errors", ("banner: '3.", "ORDER BY term out of range", "~xp_cmdshell", "Connection: keep-alive")),
