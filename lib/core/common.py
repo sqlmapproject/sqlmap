@@ -5297,7 +5297,7 @@ def parseRequestFile(reqFile, checkParams=True):
                         params = True
 
                     # Avoid proxy and connection type related headers
-                    elif key not in (HTTP_HEADER.PROXY_CONNECTION, HTTP_HEADER.CONNECTION):
+                    elif key not in (HTTP_HEADER.PROXY_CONNECTION, HTTP_HEADER.CONNECTION, HTTP_HEADER.IF_MODIFIED_SINCE, HTTP_HEADER.IF_NONE_MATCH):
                         headers.append((getUnicode(key), getUnicode(value)))
 
                     if kb.customInjectionMark in re.sub(PROBLEMATIC_CUSTOM_INJECTION_PATTERNS, "", value or ""):
