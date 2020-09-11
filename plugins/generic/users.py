@@ -617,7 +617,8 @@ class Users(object):
 
                     # In Informix we get one letter for the highest privilege
                     elif Backend.isDbms(DBMS.INFORMIX):
-                        privileges.add(INFORMIX_PRIVS[privilege.strip()])
+                        if privilege.strip() in INFORMIX_PRIVS:
+                            privileges.add(INFORMIX_PRIVS[privilege.strip()])
 
                     # In DB2 we get Y or G if the privilege is
                     # True, N otherwise
