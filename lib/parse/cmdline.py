@@ -1003,7 +1003,7 @@ def cmdLineParser(argv=None):
         for verbosity in (_ for _ in argv if re.search(r"\A\-v+\Z", _)):
             try:
                 if argv.index(verbosity) == len(argv) - 1 or not argv[argv.index(verbosity) + 1].isdigit():
-                    conf.verbose = verbosity.count('v') + 1
+                    conf.verbose = verbosity.count('v')
                     del argv[argv.index(verbosity)]
             except (IndexError, ValueError):
                 pass
