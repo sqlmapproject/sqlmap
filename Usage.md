@@ -233,7 +233,8 @@ Options:
     --hex               Use hex conversion during data retrieval
     --output-dir=OUT..  Custom output directory path
     --parse-errors      Parse and display DBMS error messages from responses
-    --preprocess=PRE..  Use given script(s) for preprocessing of response data
+    --preprocess=PRE..  Use given script(s) for preprocessing (request)
+    --postprocess=PO..  Use given script(s) for postprocessing (response)
     --repair            Redump entries having unknown character marker (?)
     --save=SAVECONFIG   Save options to a configuration INI file
     --scope=SCOPE       Regexp to filter targets from provided proxy log
@@ -2143,16 +2144,30 @@ ers (0x80040E14)
 [...]
 ```
 
-### Preprocess response data
+### Preprocess (request)
 
 Option `--preprocess`
 
-Using this option it is possible to use a preprocessing script for (HTTP) response data prior being used by the sqlmap detection engine (e.g. to decode data or to remove junk). For example, preprocessing script that transforms all lowercase characters to uppercase could be:
+Using this option it is possible to use a preprocessing script for (HTTP) request data prior being sent to the target (e.g. to fine-tune the request). For example, preprocessing script that appends the dummy parameter value `&foo=bar` to POST body:
 
 ```
 #!/usr/bin/env python
 
-def preprocess(page, headers=None, code=None):
+def preprocess(req):
+    if req.data:
+        req.data += b'&foo=bar'
+```
+
+### Postprocess (response)
+
+Option `--postprocess`
+
+Using this option it is possible to use a postprocessing script for (HTTP) response data prior being used by the sqlmap detection engine (e.g. to decode data or to remove junk). For example, postprocessing script that transforms all lowercase characters to uppercase could be:
+
+```
+#!/usr/bin/env python
+
+def postprocess(page, headers=None, code=None):
     return page.upper() if page else page, headers, code
 ```
 
