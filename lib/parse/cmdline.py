@@ -683,10 +683,10 @@ def cmdLineParser(argv=None):
             help="Parse and display DBMS error messages from responses")
 
         general.add_argument("--preprocess", dest="preprocess",
-            help="Use given script(s) for preprocessing (request data)")
+            help="Use given script(s) for preprocessing (request)")
 
         general.add_argument("--postprocess", dest="postprocess",
-            help="Use given script(s) for postprocessing (response data)")
+            help="Use given script(s) for postprocessing (response)")
 
         general.add_argument("--repair", dest="repair", action="store_true",
             help="Redump entries having unknown character marker (%s)" % INFERENCE_UNKNOWN_CHAR)
