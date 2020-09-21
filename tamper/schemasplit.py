@@ -16,7 +16,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Replaces instances of <int> UNION with <int>e0UNION
+    Splits FROM schema identifiers (e.g. 'testdb.users') with whitespace (e.g. 'testdb 9.e.users')
 
     Requirement:
         * MySQL

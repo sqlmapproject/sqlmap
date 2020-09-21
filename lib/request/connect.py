@@ -501,6 +501,16 @@ class Connect(object):
                 else:
                     return None, None, None
 
+                for function in kb.preprocessFunctions:
+                    try:
+                        function(req)
+                    except Exception as ex:
+                        errMsg = "error occurred while running preprocess "
+                        errMsg += "function '%s' ('%s')" % (function.__name__, getSafeExString(ex))
+                        raise SqlmapGenericException(errMsg)
+                    else:
+                        post, headers = req.data, req.headers
+
                 requestHeaders += "\r\n".join(["%s: %s" % (getUnicode(key.capitalize() if hasattr(key, "capitalize") else key), getUnicode(value)) for (key, value) in req.header_items()])
 
                 if not getRequestHeader(req, HTTP_HEADER.COOKIE) and conf.cj:
@@ -815,11 +825,11 @@ class Connect(object):
                 else:
                     page = getUnicode(page)
 
-            for function in kb.preprocessFunctions:
+            for function in kb.postprocessFunctions:
                 try:
                     page, responseHeaders, code = function(page, responseHeaders, code)
                 except Exception as ex:
-                    errMsg = "error occurred while running preprocess "
+                    errMsg = "error occurred while running postprocess "
                     errMsg += "function '%s' ('%s')" % (function.__name__, getSafeExString(ex))
                     raise SqlmapGenericException(errMsg)
 
