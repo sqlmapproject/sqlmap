@@ -1837,6 +1837,8 @@ def _cleanupOptions():
         if not regex:
             conf.exclude = re.sub(r"\s*,\s*", ',', conf.exclude)
             conf.exclude = r"\A%s\Z" % '|'.join(re.escape(_) for _ in conf.exclude.split(','))
+        else:
+            conf.exclude = re.sub(r"(\w+)\$", r"\g<1>\$", conf.exclude)
 
     if conf.binaryFields:
         conf.binaryFields = conf.binaryFields.replace(" ", "")
