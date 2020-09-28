@@ -870,13 +870,16 @@ def _setPreprocessFunctions():
                 raise SqlmapSyntaxException("cannot import preprocess module '%s' (%s)" % (getUnicode(filename[:-3]), getSafeExString(ex)))
 
             for name, function in inspect.getmembers(module, inspect.isfunction):
-                if name == "preprocess" and inspect.getargspec(function).args and all(_ in inspect.getargspec(function).args for _ in ("req",)):
-                    found = True
+                try:
+                    if name == "preprocess" and inspect.getargspec(function).args and all(_ in inspect.getargspec(function).args for _ in ("req",)):
+                        found = True
 
-                    kb.preprocessFunctions.append(function)
-                    function.__name__ = module.__name__
+                        kb.preprocessFunctions.append(function)
+                        function.__name__ = module.__name__
 
-                    break
+                        break
+                except ValueError:  # Note: https://github.com/sqlmapproject/sqlmap/issues/4357
+                    pass
 
             if not found:
                 errMsg = "missing function 'preprocess(req)' "
@@ -1525,7 +1528,7 @@ def _createHomeDirectories():
     if conf.get("purge"):
         return
 
-    for context in "output", "history":
+    for context in ("output", "history"):
         directory = paths["SQLMAP_%s_PATH" % context.upper()]
         try:
             if not os.path.isdir(directory):
