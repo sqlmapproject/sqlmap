@@ -36,7 +36,20 @@ To get a list of all options and switches use:
     python sqlmap.py -hh
 
 You can find a sample run [here](https://asciinema.org/a/46601).
-To get an overview of sqlmap capabilities, a list of supported features, and a description of all options and switches, along with examples, you are advised to consult the [user's manual](https://github.com/sqlmapproject/sqlmap/wiki/Usage).
+To get an overview of sqlmap capabilities, a list of supported features, and a description of all options and switches, along with examples, you are advised to consult the [user's manual](https://github.com/sqlmapproject/sqlmap/wiki/Usage).]
+
+
+
+Vulnerable Urls
+Lets say there is a web application or website that has a url in it like this
+
+http://www.site.com/section.php?id=51
+and it is prone to sql injection because the developer of that site did not properly escape the parameter id. This can be simply tested by trying to open the url
+
+http://www.site.com/section.php?id=51'
+We just added a single quote in the parameter. If this url throws an error or reacts in an unexpected manner then it is clear that the database has got the unexpected single quote which the application did not escape properly. So in this case this input parameter "id" is vulnerable to sql injection.
+
+
 
 Links
 ----
