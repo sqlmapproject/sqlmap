@@ -1529,7 +1529,7 @@ def _createHomeDirectories():
         return
 
     for context in ("output", "history"):
-        directory = paths["SQLMAP_%s_PATH" % context.upper()]
+        directory = paths["SQLMAP_%s_PATH" % getUnicode(context).upper()]   # NOTE: https://github.com/sqlmapproject/sqlmap/issues/4363
         try:
             if not os.path.isdir(directory):
                 os.makedirs(directory)
