@@ -2071,6 +2071,8 @@ def safeStringFormat(format_, params):
 
     >>> safeStringFormat('SELECT foo FROM %s LIMIT %d', ('bar', '1'))
     'SELECT foo FROM bar LIMIT 1'
+    >>> safeStringFormat("SELECT foo FROM %s WHERE name LIKE '%susan%' LIMIT %d", ('bar', '1'))
+    "SELECT foo FROM bar WHERE name LIKE '%susan%' LIMIT 1"
     """
 
     if format_.count(PAYLOAD_DELIMITER) == 2:
@@ -2114,7 +2116,10 @@ def safeStringFormat(format_, params):
                         warnMsg += "Please report by e-mail content \"%r | %r | %r\" to '%s'" % (format_, params, retVal, DEV_EMAIL_ADDRESS)
                         raise SqlmapValueException(warnMsg)
                     else:
-                        retVal = re.sub(r"(\A|[^A-Za-z0-9])(%s)([^A-Za-z0-9]|\Z)", r"\g<1>%s\g<3>" % params[count], retVal, 1)
+                        try:
+                            retVal = re.sub(r"(\A|[^A-Za-z0-9])(%s)([^A-Za-z0-9]|\Z)", r"\g<1>%s\g<3>" % params[count], retVal, 1)
+                        except re.error:
+                            retVal = retVal.replace(match.group(0), match.group(0) % params[count], 1)
                         count += 1
                 else:
                     break
