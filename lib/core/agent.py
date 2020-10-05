@@ -1207,7 +1207,7 @@ class Agent(object):
 
     def whereQuery(self, query):
         if conf.dumpWhere and query:
-            if Backend.isDbms(DBMS.ORACLE) and re.search("qq ORDER BY \w+\)", query, re.I) is not None:
+            if Backend.isDbms(DBMS.ORACLE) and re.search(r"qq ORDER BY \w+\)", query, re.I) is not None:
                 prefix, suffix = re.sub(r"(?i)(qq)( ORDER BY \w+\))", r"\g<1> WHERE %s\g<2>" % conf.dumpWhere, query), ""
             else:
                 match = re.search(r" (LIMIT|ORDER).+", query, re.I)
