@@ -35,6 +35,38 @@ To get a list of all options and switches use:
 
     python sqlmap.py -hh
 
+## Using Docker
+
+Download the Dockerfile:
+
+```bash
+mkdir docker
+cd docker
+wget https://github.com/sqlmapproject/sqlmap/raw/master/docker/Dockerfile
+```
+
+Build the Docker images:
+
+```bash
+docker build -t sqlmap:latest .
+```
+
+Run the sqlmap from image:
+
+```bash
+docker run -it --rm sqlmap python sqlmap.py -h
+```
+Or
+```bash
+docker run -it --rm sqlmap python sqlmap.py -hh
+```
+
+Run and attach interactive shell to the sqlmap docker container to work from inside the running container:
+
+```bash
+docker run -it --rm sqlmap /bin/bash
+```
+
 You can find a sample run [here](https://asciinema.org/a/46601).
 To get an overview of sqlmap capabilities, a list of supported features, and a description of all options and switches, along with examples, you are advised to consult the [user's manual](https://github.com/sqlmapproject/sqlmap/wiki/Usage).
 
