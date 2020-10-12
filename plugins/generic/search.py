@@ -410,9 +410,11 @@ class Search(object):
 
             if tblCond:
                 if conf.tbl:
-                    _ = conf.tbl.split(',')
-                    whereTblsQuery = " AND (" + " OR ".join("%s = '%s'" % (tblCond, unsafeSQLIdentificatorNaming(tbl)) for tbl in _) + ")"
-                    infoMsgTbl = " for table%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(tbl) for tbl in _))
+                    tbls = conf.tbl.split(',')
+                    if conf.exclude:
+                        tbls = [_ for _ in tbls if re.search(conf.exclude, _, re.I) is None]
+                    whereTblsQuery = " AND (" + " OR ".join("%s = '%s'" % (tblCond, unsafeSQLIdentificatorNaming(tbl)) for tbl in tbls) + ")"
+                    infoMsgTbl = " for table%s '%s'" % ("s" if len(tbls) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(tbl) for tbl in tbls))
 
             if conf.db == CURRENT_DB:
                 conf.db = self.getCurrentDb()

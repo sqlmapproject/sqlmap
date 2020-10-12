@@ -5,6 +5,7 @@ Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+import os
 import re
 
 from lib.core.common import singleTimeWarnMessage

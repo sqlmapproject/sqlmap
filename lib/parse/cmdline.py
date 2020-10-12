@@ -623,7 +623,7 @@ def cmdLineParser(argv=None):
             help="Parameter(s) containing Base64 encoded data")
 
         general.add_argument("--base64-safe", dest="base64Safe", action="store_true",
-            help="Use URL and filename safe Base64 alphabet")
+            help="Use URL and filename safe Base64 alphabet (RFC 4648)")
 
         general.add_argument("--batch", dest="batch", action="store_true",
             help="Never ask for user input, use the default behavior")
@@ -683,7 +683,10 @@ def cmdLineParser(argv=None):
             help="Parse and display DBMS error messages from responses")
 
         general.add_argument("--preprocess", dest="preprocess",
-            help="Use given script(s) for preprocessing of response data")
+            help="Use given script(s) for preprocessing (request)")
+
+        general.add_argument("--postprocess", dest="postprocess",
+            help="Use given script(s) for postprocessing (response)")
 
         general.add_argument("--repair", dest="repair", action="store_true",
             help="Redump entries having unknown character marker (%s)" % INFERENCE_UNKNOWN_CHAR)
@@ -863,7 +866,7 @@ def cmdLineParser(argv=None):
         _ = []
         advancedHelp = True
         extraHeaders = []
-        tamperIndex = None
+        auxIndexes = {}
 
         # Reference: https://stackoverflow.com/a/4012683 (Note: previously used "...sys.getfilesystemencoding() or UNICODE_ENCODING")
         for arg in argv:
@@ -952,14 +955,20 @@ def cmdLineParser(argv=None):
                 argv[i] = ""
             elif argv[i] in DEPRECATED_OPTIONS:
                 argv[i] = ""
-            elif argv[i].startswith("--tamper"):
-                if tamperIndex is None:
-                    tamperIndex = i if '=' in argv[i] else (i + 1 if i + 1 < len(argv) and not argv[i + 1].startswith('-') else None)
+            elif any(argv[i].startswith(_) for _ in ("--tamper", "--ignore-code", "--skip")):
+                key = re.search(r"\-?\-(\w+)\b", argv[i]).group(1)
+                index = auxIndexes.get(key, None)
+                if index is None:
+                    index = i if '=' in argv[i] else (i + 1 if i + 1 < len(argv) and not argv[i + 1].startswith('-') else None)
+                    auxIndexes[key] = index
                 else:
-                    argv[tamperIndex] = "%s,%s" % (argv[tamperIndex], argv[i].split('=')[1] if '=' in argv[i] else (argv[i + 1] if i + 1 < len(argv) and not argv[i + 1].startswith('-') else ""))
+                    delimiter = ','
+                    argv[index] = "%s%s%s" % (argv[index], delimiter, argv[i].split('=')[1] if '=' in argv[i] else (argv[i + 1] if i + 1 < len(argv) and not argv[i + 1].startswith('-') else ""))
                     argv[i] = ""
-            elif argv[i] in ("-H", "--header"):
-                if i + 1 < len(argv):
+            elif argv[i] in ("-H", "--header") or any(argv[i].startswith("%s=" % _) for _ in ("-H", "--header")):
+                if '=' in argv[i]:
+                    extraHeaders.append(argv[i].split('=', 1)[1])
+                elif i + 1 < len(argv):
                     extraHeaders.append(argv[i + 1])
             elif argv[i] == "--deps":
                 argv[i] = "--dependencies"
@@ -997,7 +1006,7 @@ def cmdLineParser(argv=None):
         for verbosity in (_ for _ in argv if re.search(r"\A\-v+\Z", _)):
             try:
                 if argv.index(verbosity) == len(argv) - 1 or not argv[argv.index(verbosity) + 1].isdigit():
-                    conf.verbose = verbosity.count('v') + 1
+                    conf.verbose = verbosity.count('v')
                     del argv[argv.index(verbosity)]
             except (IndexError, ValueError):
                 pass

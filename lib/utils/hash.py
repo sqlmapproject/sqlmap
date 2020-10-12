@@ -1147,16 +1147,18 @@ def dictionaryAttack(attack_dict):
                     warnMsg = "user aborted during dictionary-based attack phase (Ctrl+C was pressed)"
                     logger.warn(warnMsg)
 
+                finally:
+                    if _multiprocessing:
+                        gc.enable()
+
+                    # NOTE: https://github.com/sqlmapproject/sqlmap/issues/4367
+                    # NOTE: https://dzone.com/articles/python-101-creating-multiple-processes
                     for process in processes:
                         try:
                             process.terminate()
                             process.join()
                         except (OSError, AttributeError):
                             pass
-
-                finally:
-                    if _multiprocessing:
-                        gc.enable()
 
                     if retVal:
                         if conf.hashDB:

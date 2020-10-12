@@ -239,6 +239,7 @@ class HTTP_HEADER(object):
     EXPIRES = "Expires"
     HOST = "Host"
     IF_MODIFIED_SINCE = "If-Modified-Since"
+    IF_NONE_MATCH = "If-None-Match"
     LAST_MODIFIED = "Last-Modified"
     LOCATION = "Location"
     PRAGMA = "Pragma"

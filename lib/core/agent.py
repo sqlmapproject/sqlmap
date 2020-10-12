@@ -42,6 +42,7 @@ from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.enums import POST_HINT
 from lib.core.exception import SqlmapNoneDataException
+from lib.core.settings import BOUNDED_BASE64_MARKER
 from lib.core.settings import BOUNDARY_BACKSLASH_MARKER
 from lib.core.settings import BOUNDED_INJECTION_MARKER
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
@@ -183,7 +184,7 @@ class Agent(object):
                 newValue = self.adjustLateValues(newValue)
 
             # TODO: support for POST_HINT
-            newValue = encodeBase64(newValue, binary=False, encoding=conf.encoding or UNICODE_ENCODING, safe=conf.base64Safe)
+            newValue = "%s%s%s" % (BOUNDED_BASE64_MARKER, newValue, BOUNDED_BASE64_MARKER)
 
             if parameter in kb.base64Originals:
                 origValue = kb.base64Originals[parameter]
@@ -397,6 +398,10 @@ class Agent(object):
         """
 
         if payload:
+            for match in re.finditer(r"%s(.*?)%s" % (BOUNDED_BASE64_MARKER, BOUNDED_BASE64_MARKER), payload):
+                _ = encodeBase64(match.group(1), binary=False, encoding=conf.encoding or UNICODE_ENCODING, safe=conf.base64Safe)
+                payload = payload.replace(match.group(0), _)
+
             payload = payload.replace(SLEEP_TIME_MARKER, str(conf.timeSec))
             payload = payload.replace(SINGLE_QUOTE_MARKER, "'")
 
@@ -1202,12 +1207,15 @@ class Agent(object):
 
     def whereQuery(self, query):
         if conf.dumpWhere and query:
-            match = re.search(r" (LIMIT|ORDER).+", query, re.I)
-            if match:
-                suffix = match.group(0)
-                prefix = query[:-len(suffix)]
+            if Backend.isDbms(DBMS.ORACLE) and re.search(r"qq ORDER BY \w+\)", query, re.I) is not None:
+                prefix, suffix = re.sub(r"(?i)(qq)( ORDER BY \w+\))", r"\g<1> WHERE %s\g<2>" % conf.dumpWhere, query), ""
             else:
-                prefix, suffix = query, ""
+                match = re.search(r" (LIMIT|ORDER).+", query, re.I)
+                if match:
+                    suffix = match.group(0)
+                    prefix = query[:-len(suffix)]
+                else:
+                    prefix, suffix = query, ""
 
             if conf.tbl and "%s)" % conf.tbl.upper() in prefix.upper():
                 prefix = re.sub(r"(?i)%s\)" % re.escape(conf.tbl), "%s WHERE %s)" % (conf.tbl, conf.dumpWhere), prefix)

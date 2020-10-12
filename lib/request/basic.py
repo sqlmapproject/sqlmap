@@ -353,7 +353,7 @@ def decodePage(page, contentEncoding, contentType, percentDecode=True):
 
             if (kb.pageEncoding or "").lower() == "utf-8-sig":
                 kb.pageEncoding = "utf-8"
-                if page and page.startswith("\xef\xbb\xbf"):  # Reference: https://docs.python.org/2/library/codecs.html (Note: noticed problems when "utf-8-sig" is left to Python for handling)
+                if page and page.startswith(b"\xef\xbb\xbf"):  # Reference: https://docs.python.org/2/library/codecs.html (Note: noticed problems when "utf-8-sig" is left to Python for handling)
                     page = page[3:]
 
             page = getUnicode(page, kb.pageEncoding)
@@ -394,7 +394,7 @@ def processResponse(page, responseHeaders, code=None, status=None):
         if msg:
             logger.warning("parsed DBMS error message: '%s'" % msg.rstrip('.'))
 
-    if kb.processResponseCounter < IDENTYWAF_PARSE_LIMIT:
+    if not conf.skipWaf and kb.processResponseCounter < IDENTYWAF_PARSE_LIMIT:
         rawResponse = "%s %s %s\n%s\n%s" % (_http_client.HTTPConnection._http_vsn_str, code or "", status or "", getUnicode("".join(responseHeaders.headers if responseHeaders else [])), page)
 
         identYwaf.non_blind.clear()

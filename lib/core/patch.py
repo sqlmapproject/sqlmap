@@ -6,6 +6,7 @@ See the file 'LICENSE' for copying permission
 """
 
 import codecs
+import os
 import random
 
 import lib.controller.checks
@@ -75,6 +76,15 @@ def dirtyPatches():
 
     # to prevent too much "guessing" in case of binary data retrieval
     thirdparty.chardet.universaldetector.MINIMUM_THRESHOLD = 0.90
+
+    # https://github.com/sqlmapproject/sqlmap/issues/4314
+    try:
+        os.urandom(1)
+    except NotImplemented:
+        if six.PY3:
+            os.urandom = lambda size: bytes(random.randint(0, 255) for _ in range(size))
+        else:
+            os.urandom = lambda size: "".join(chr(random.randint(0, 255)) for _ in xrange(size))
 
 def resolveCrossReferences():
     """

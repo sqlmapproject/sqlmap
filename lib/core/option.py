@@ -825,7 +825,7 @@ def _setTamperingFunctions():
 
 def _setPreprocessFunctions():
     """
-    Loads preprocess functions from given script(s)
+    Loads preprocess function(s) from given script(s)
     """
 
     if conf.preprocess:
@@ -870,17 +870,95 @@ def _setPreprocessFunctions():
                 raise SqlmapSyntaxException("cannot import preprocess module '%s' (%s)" % (getUnicode(filename[:-3]), getSafeExString(ex)))
 
             for name, function in inspect.getmembers(module, inspect.isfunction):
-                if name == "preprocess" and inspect.getargspec(function).args and all(_ in inspect.getargspec(function).args for _ in ("page", "headers", "code")):
+                try:
+                    if name == "preprocess" and inspect.getargspec(function).args and all(_ in inspect.getargspec(function).args for _ in ("req",)):
+                        found = True
+
+                        kb.preprocessFunctions.append(function)
+                        function.__name__ = module.__name__
+
+                        break
+                except ValueError:  # Note: https://github.com/sqlmapproject/sqlmap/issues/4357
+                    pass
+
+            if not found:
+                errMsg = "missing function 'preprocess(req)' "
+                errMsg += "in preprocess script '%s'" % script
+                raise SqlmapGenericException(errMsg)
+            else:
+                try:
+                    function(_urllib.request.Request("http://localhost"))
+                except:
+                    handle, filename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.PREPROCESS, suffix=".py")
+                    os.close(handle)
+
+                    openFile(filename, "w+b").write("#!/usr/bin/env\n\ndef preprocess(req):\n    pass\n")
+                    openFile(os.path.join(os.path.dirname(filename), "__init__.py"), "w+b").write("pass")
+
+                    errMsg = "function 'preprocess(req)' "
+                    errMsg += "in preprocess script '%s' " % script
+                    errMsg += "appears to be invalid "
+                    errMsg += "(Note: find template script at '%s')" % filename
+                    raise SqlmapGenericException(errMsg)
+
+def _setPostprocessFunctions():
+    """
+    Loads postprocess function(s) from given script(s)
+    """
+
+    if conf.postprocess:
+        for script in re.split(PARAMETER_SPLITTING_REGEX, conf.postprocess):
+            found = False
+            function = None
+
+            script = safeFilepathEncode(script.strip())
+
+            try:
+                if not script:
+                    continue
+
+                if not os.path.exists(script):
+                    errMsg = "postprocess script '%s' does not exist" % script
+                    raise SqlmapFilePathException(errMsg)
+
+                elif not script.endswith(".py"):
+                    errMsg = "postprocess script '%s' should have an extension '.py'" % script
+                    raise SqlmapSyntaxException(errMsg)
+            except UnicodeDecodeError:
+                errMsg = "invalid character provided in option '--postprocess'"
+                raise SqlmapSyntaxException(errMsg)
+
+            dirname, filename = os.path.split(script)
+            dirname = os.path.abspath(dirname)
+
+            infoMsg = "loading postprocess module '%s'" % filename[:-3]
+            logger.info(infoMsg)
+
+            if not os.path.exists(os.path.join(dirname, "__init__.py")):
+                errMsg = "make sure that there is an empty file '__init__.py' "
+                errMsg += "inside of postprocess scripts directory '%s'" % dirname
+                raise SqlmapGenericException(errMsg)
+
+            if dirname not in sys.path:
+                sys.path.insert(0, dirname)
+
+            try:
+                module = __import__(safeFilepathEncode(filename[:-3]))
+            except Exception as ex:
+                raise SqlmapSyntaxException("cannot import postprocess module '%s' (%s)" % (getUnicode(filename[:-3]), getSafeExString(ex)))
+
+            for name, function in inspect.getmembers(module, inspect.isfunction):
+                if name == "postprocess" and inspect.getargspec(function).args and all(_ in inspect.getargspec(function).args for _ in ("page", "headers", "code")):
                     found = True
 
-                    kb.preprocessFunctions.append(function)
+                    kb.postprocessFunctions.append(function)
                     function.__name__ = module.__name__
 
                     break
 
             if not found:
-                errMsg = "missing function 'preprocess(page, headers=None, code=None)' "
-                errMsg += "in preprocess script '%s'" % script
+                errMsg = "missing function 'postprocess(page, headers=None, code=None)' "
+                errMsg += "in postprocess script '%s'" % script
                 raise SqlmapGenericException(errMsg)
             else:
                 try:
@@ -889,11 +967,11 @@ def _setPreprocessFunctions():
                     handle, filename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.PREPROCESS, suffix=".py")
                     os.close(handle)
 
-                    open(filename, "w+b").write("#!/usr/bin/env\n\ndef preprocess(page, headers=None, code=None):\n    return page, headers, code\n")
-                    open(os.path.join(os.path.dirname(filename), "__init__.py"), "w+b").write("pass")
+                    openFile(filename, "w+b").write("#!/usr/bin/env\n\ndef postprocess(page, headers=None, code=None):\n    return page, headers, code\n")
+                    openFile(os.path.join(os.path.dirname(filename), "__init__.py"), "w+b").write("pass")
 
-                    errMsg = "function 'preprocess(page, headers=None, code=None)' "
-                    errMsg += "in preprocess script '%s' " % script
+                    errMsg = "function 'postprocess(page, headers=None, code=None)' "
+                    errMsg += "in postprocess script '%s' " % script
                     errMsg += "should return a tuple '(page, headers, code)' "
                     errMsg += "(Note: find template script at '%s')" % filename
                     raise SqlmapGenericException(errMsg)
@@ -1450,8 +1528,8 @@ def _createHomeDirectories():
     if conf.get("purge"):
         return
 
-    for context in "output", "history":
-        directory = paths["SQLMAP_%s_PATH" % context.upper()]
+    for context in ("output", "history"):
+        directory = paths["SQLMAP_%s_PATH" % getUnicode(context).upper()]   # NOTE: https://github.com/sqlmapproject/sqlmap/issues/4363
         try:
             if not os.path.isdir(directory):
                 os.makedirs(directory)
@@ -1762,6 +1840,8 @@ def _cleanupOptions():
         if not regex:
             conf.exclude = re.sub(r"\s*,\s*", ',', conf.exclude)
             conf.exclude = r"\A%s\Z" % '|'.join(re.escape(_) for _ in conf.exclude.split(','))
+        else:
+            conf.exclude = re.sub(r"(\w+)\$", r"\g<1>\$", conf.exclude)
 
     if conf.binaryFields:
         conf.binaryFields = conf.binaryFields.replace(" ", "")
@@ -2009,10 +2089,11 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.skipSeqMatcher = False
     kb.smokeMode = False
     kb.reduceTests = None
-    kb.tlsSNI = {}
+    kb.sslSuccess = False
     kb.stickyDBMS = False
     kb.storeHashesChoice = None
     kb.suppressResumeInfo = False
+    kb.tableExistsChoice = None
     kb.tableFrom = None
     kb.technique = None
     kb.tempDir = None
@@ -2022,7 +2103,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.testType = None
     kb.threadContinue = True
     kb.threadException = False
-    kb.tableExistsChoice = None
+    kb.tlsSNI = {}
     kb.uChar = NULL
     kb.udfFail = False
     kb.unionDuplicates = False
@@ -2037,6 +2118,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
         kb.keywords = set(getFileItems(paths.SQL_KEYWORDS))
         kb.normalizeCrawlingChoice = None
         kb.passwordMgr = None
+        kb.postprocessFunctions = []
         kb.preprocessFunctions = []
         kb.skipVulnHost = None
         kb.storeCrawlingChoice = None
@@ -2683,6 +2765,7 @@ def init():
     _listTamperingFunctions()
     _setTamperingFunctions()
     _setPreprocessFunctions()
+    _setPostprocessFunctions()
     _setTrafficOutputFP()
     _setupHTTPCollector()
     _setHttpChunked()

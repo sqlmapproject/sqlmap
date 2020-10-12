@@ -7,7 +7,7 @@
 
 export SQLMAP_DREI=1
 #for i in $(find . -iname "*.py" | grep -v __init__); do python3 -c 'import '`echo $i | cut -d '.' -f 2 | cut -d '/' -f 2- | sed 's/\//./g'`''; done
-for i in $(find . -iname "*.py" | grep -v __init__); do PYTHONWARNINGS=all python3.7 -m compileall $i | sed 's/Compiling/Checking/g'; done
+for i in $(find . -iname "*.py" | grep -v __init__); do PYTHONWARNINGS=all python3 -m compileall $i | sed 's/Compiling/Checking/g'; done
 unset SQLMAP_DREI
 source `dirname "$0"`"/junk.sh"
 

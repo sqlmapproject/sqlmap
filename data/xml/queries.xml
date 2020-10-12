@@ -301,8 +301,8 @@
             <blind query="SELECT COLUMN_NAME FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s' AND OWNER='%s'" query2="SELECT DATA_TYPE FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s' AND COLUMN_NAME='%s' AND OWNER='%s'" count="SELECT COUNT(COLUMN_NAME) FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s' AND OWNER='%s'" condition="COLUMN_NAME"/>
         </columns>
         <dump_table>
-            <inband query="SELECT %s FROM %s"/>
-            <blind query="SELECT %s FROM (SELECT qq.*,ROWNUM AS LIMIT FROM %s qq) WHERE LIMIT=%d" count="SELECT COUNT(*) FROM %s"/>
+            <inband query="SELECT %s FROM %s ORDER BY ROWNUM"/>
+            <blind query="SELECT %s FROM (SELECT qq.*,ROWNUM AS LIMIT FROM %s qq ORDER BY ROWNUM) WHERE LIMIT=%d" count="SELECT COUNT(*) FROM %s"/>
         </dump_table>
         <!-- NOTE: in Oracle schema names are the counterpart to database names on other DBMSes -->
         <search_db>

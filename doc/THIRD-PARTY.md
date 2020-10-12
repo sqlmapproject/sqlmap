@@ -277,7 +277,7 @@ be bound by the terms and conditions of this License Agreement.
 * The `bottle` web framework library located under `thirdparty/bottle/`.
   Copyright (C) 2012, Marcel Hellkamp.
 * The `identYwaf` library located under `thirdparty/identywaf/`.
-  Copyright (C) 2019, Miroslav Stampar.
+  Copyright (C) 2019-2020, Miroslav Stampar.
 * The `ordereddict` library located under `thirdparty/odict/`.
   Copyright (C) 2009, Raymond Hettinger.
 * The `six` Python 2 and 3 compatibility library located under `thirdparty/six/`.

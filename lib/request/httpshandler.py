@@ -11,6 +11,8 @@ import socket
 
 from lib.core.common import filterNone
 from lib.core.common import getSafeExString
+from lib.core.compat import xrange
+from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import SqlmapConnectionException
@@ -43,6 +45,8 @@ class HTTPSConnection(_http_client.HTTPSConnection):
                 _contexts[None] = ssl._create_default_https_context()
             kwargs["context"] = _contexts[None]
 
+        self.retrying = False
+
         _http_client.HTTPSConnection.__init__(self, *args, **kwargs)
 
     def connect(self):
@@ -58,7 +62,7 @@ class HTTPSConnection(_http_client.HTTPSConnection):
         # Reference(s): https://docs.python.org/2/library/ssl.html#ssl.SSLContext
         #               https://www.mnot.net/blog/2014/12/27/python_2_and_tls_sni
         if re.search(r"\A[\d.]+\Z", self.host) is None and kb.tlsSNI.get(self.host) is not False and hasattr(ssl, "SSLContext"):
-            for protocol in [_ for _ in _protocols if _ >= ssl.PROTOCOL_TLSv1]:
+            for protocol in (_ for _ in _protocols if _ >= ssl.PROTOCOL_TLSv1):
                 try:
                     sock = create_sock()
                     if protocol not in _contexts:
@@ -101,7 +105,21 @@ class HTTPSConnection(_http_client.HTTPSConnection):
             # Reference: https://docs.python.org/2/library/ssl.html
             if distutils.version.LooseVersion(PYVERSION) < distutils.version.LooseVersion("2.7.9"):
                 errMsg += " (please retry with Python >= 2.7.9)"
+
+            if kb.sslSuccess and not self.retrying:
+                self.retrying = True
+
+                for _ in xrange(conf.retries):
+                    try:
+                        self.connect()
+                    except SqlmapConnectionException:
+                        pass
+                    else:
+                        return
+
             raise SqlmapConnectionException(errMsg)
+        else:
+            kb.sslSuccess = True
 
 class HTTPSHandler(_urllib.request.HTTPSHandler):
     def https_open(self, req):

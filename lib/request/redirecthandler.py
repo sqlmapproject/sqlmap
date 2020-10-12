@@ -160,7 +160,7 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
                 if not hasattr(result, "read"):
                     def _(self, length=None):
                         try:
-                            retVal = getSafeExString(ex)
+                            retVal = getSafeExString(ex)        # Note: pyflakes mistakenly marks 'ex' as undefined (NOTE: tested in both Python2 and Python3)
                         except:
                             retVal = ""
                         return retVal

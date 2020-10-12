@@ -9,6 +9,7 @@ See the file 'LICENSE' for copying permission
 
 from __future__ import print_function
 
+import base64
 import json
 import re
 import sqlite3
@@ -146,7 +147,10 @@ class ReqHandler(BaseHTTPRequestHandler):
                         if "query" in self.params:
                             _cursor.execute(self.params["query"])
                         elif "id" in self.params:
-                            _cursor.execute("SELECT * FROM users WHERE id=%s LIMIT 0, 1" % self.params["id"])
+                            if "base64" in self.params:
+                                _cursor.execute("SELECT * FROM users WHERE id=%s LIMIT 0, 1" % base64.b64decode("%s===" % self.params["id"], altchars=self.params.get("altchars")).decode())
+                            else:
+                                _cursor.execute("SELECT * FROM users WHERE id=%s LIMIT 0, 1" % self.params["id"])
                         results = _cursor.fetchall()
 
                     output += "<b>SQL results:</b><br>\n"

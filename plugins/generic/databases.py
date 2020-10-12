@@ -525,6 +525,9 @@ class Databases(object):
             else:
                 return kb.data.cachedColumns
 
+        if conf.exclude:
+            tblList = [_ for _ in tblList if re.search(conf.exclude, _, re.I) is None]
+
         tblList = filterNone(safeSQLIdentificatorNaming(_, True) for _ in tblList)
 
         if bruteForce is None:

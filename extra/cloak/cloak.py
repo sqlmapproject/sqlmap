@@ -21,7 +21,7 @@ if sys.version_info >= (3, 0):
     xrange = range
     ord = lambda _: _
 
-KEY = b"Beeth7hoyooleeF0"
+KEY = b"MOZFqVjlk1CY436G"
 
 def xor(message, key):
     return b"".join(struct.pack('B', ord(message[i]) ^ ord(key[i % len(key)])) for i in range(len(message)))

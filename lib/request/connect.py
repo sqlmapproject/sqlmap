@@ -501,6 +501,16 @@ class Connect(object):
                 else:
                     return None, None, None
 
+                for function in kb.preprocessFunctions:
+                    try:
+                        function(req)
+                    except Exception as ex:
+                        errMsg = "error occurred while running preprocess "
+                        errMsg += "function '%s' ('%s')" % (function.__name__, getSafeExString(ex))
+                        raise SqlmapGenericException(errMsg)
+                    else:
+                        post, headers = req.data, req.headers
+
                 requestHeaders += "\r\n".join(["%s: %s" % (getUnicode(key.capitalize() if hasattr(key, "capitalize") else key), getUnicode(value)) for (key, value) in req.header_items()])
 
                 if not getRequestHeader(req, HTTP_HEADER.COOKIE) and conf.cj:
@@ -539,7 +549,7 @@ class Connect(object):
                 conn = _urllib.request.urlopen(req)
 
                 if not kb.authHeader and getRequestHeader(req, HTTP_HEADER.AUTHORIZATION) and (conf.authType or "").lower() == AUTH_TYPE.BASIC.lower():
-                    kb.authHeader = getRequestHeader(req, HTTP_HEADER.AUTHORIZATION)
+                    kb.authHeader = getUnicode(getRequestHeader(req, HTTP_HEADER.AUTHORIZATION))
 
                 if not kb.proxyAuthHeader and getRequestHeader(req, HTTP_HEADER.PROXY_AUTHORIZATION):
                     kb.proxyAuthHeader = getRequestHeader(req, HTTP_HEADER.PROXY_AUTHORIZATION)
@@ -815,11 +825,11 @@ class Connect(object):
                 else:
                     page = getUnicode(page)
 
-            for function in kb.preprocessFunctions:
+            for function in kb.postprocessFunctions:
                 try:
                     page, responseHeaders, code = function(page, responseHeaders, code)
                 except Exception as ex:
-                    errMsg = "error occurred while running preprocess "
+                    errMsg = "error occurred while running postprocess "
                     errMsg += "function '%s' ('%s')" % (function.__name__, getSafeExString(ex))
                     raise SqlmapGenericException(errMsg)
 
@@ -1089,6 +1099,9 @@ class Connect(object):
                             if not match:
                                 match = re.search(r"\b(?P<name>%s)\s*=\s*['\"]?(?P<value>[^;'\"]+)" % conf.csrfToken, page or "", re.I)
 
+                                if not match:
+                                    match = re.search(r"<meta\s+name=[\"']?(?P<name>%s)[\"']?[^>]+\b(value|content)=[\"']?(?P<value>[^>\"']+)" % conf.csrfToken, page or "", re.I)
+
                 if match:
                     token.name, token.value = match.group("name"), match.group("value")
 
@@ -1131,7 +1144,7 @@ class Connect(object):
                             uri = _adjustParameter(uri, token.name, token.value)
                         elif candidate == PLACE.GET and get:
                             get = _adjustParameter(get, token.name, token.value)
-                        elif candidate in [PLACE.POST, PLACE.CUSTOM_POST] and post:
+                        elif candidate in (PLACE.POST, PLACE.CUSTOM_POST) and post:
                             post = _adjustParameter(post, token.name, token.value)
 
                 for i in xrange(len(conf.httpHeaders)):

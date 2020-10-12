@@ -632,6 +632,7 @@ def paramToDict(place, parameters=None):
                 if parameter in (conf.base64Parameter or []):
                     try:
                         kb.base64Originals[parameter] = oldValue = value
+                        value = urldecode(value, convall=True)
                         value = decodeBase64(value, binary=False, encoding=conf.encoding or UNICODE_ENCODING)
                         parameters = re.sub(r"\b%s(\b|\Z)" % re.escape(oldValue), value, parameters)
                     except:
@@ -1051,6 +1052,16 @@ def dataToDumpFile(dumpFile, data):
             raise
 
 def dataToOutFile(filename, data):
+    """
+    Saves data to filename
+
+    >>> pushValue(conf.get("filePath"))
+    >>> conf.filePath = tempfile.gettempdir()
+    >>> "_etc_passwd" in dataToOutFile("/etc/passwd", b":::*")
+    True
+    >>> conf.filePath = popValue()
+    """
+
     retVal = None
 
     if data:
@@ -1714,6 +1725,11 @@ def escapeJsonValue(value):
     Escapes JSON value (used in payloads)
 
     # Reference: https://stackoverflow.com/a/16652683
+
+    >>> "\\n" in escapeJsonValue("foo\\nbar")
+    False
+    >>> "\\\\t" in escapeJsonValue("foo\\tbar")
+    True
     """
 
     retVal = ""
@@ -1888,6 +1904,12 @@ def getLocalIP():
 def getRemoteIP():
     """
     Get remote/target IP address
+
+    >>> pushValue(conf.hostname)
+    >>> conf.hostname = "localhost"
+    >>> getRemoteIP() == "127.0.0.1"
+    True
+    >>> conf.hostname = popValue()
     """
 
     retVal = None
@@ -2014,6 +2036,9 @@ def normalizePath(filepath):
 def safeFilepathEncode(filepath):
     """
     Returns filepath in (ASCII) format acceptable for OS handling (e.g. reading)
+
+    >>> 'sqlmap' in safeFilepathEncode(paths.SQLMAP_HOME_PATH)
+    True
     """
 
     retVal = filepath
@@ -2046,6 +2071,8 @@ def safeStringFormat(format_, params):
 
     >>> safeStringFormat('SELECT foo FROM %s LIMIT %d', ('bar', '1'))
     'SELECT foo FROM bar LIMIT 1'
+    >>> safeStringFormat("SELECT foo FROM %s WHERE name LIKE '%susan%' LIMIT %d", ('bar', '1'))
+    "SELECT foo FROM bar WHERE name LIKE '%susan%' LIMIT 1"
     """
 
     if format_.count(PAYLOAD_DELIMITER) == 2:
@@ -2089,7 +2116,10 @@ def safeStringFormat(format_, params):
                         warnMsg += "Please report by e-mail content \"%r | %r | %r\" to '%s'" % (format_, params, retVal, DEV_EMAIL_ADDRESS)
                         raise SqlmapValueException(warnMsg)
                     else:
-                        retVal = re.sub(r"(\A|[^A-Za-z0-9])(%s)([^A-Za-z0-9]|\Z)", r"\g<1>%s\g<3>" % params[count], retVal, 1)
+                        try:
+                            retVal = re.sub(r"(\A|[^A-Za-z0-9])(%s)([^A-Za-z0-9]|\Z)", r"\g<1>%s\g<3>" % params[count], retVal, 1)
+                        except re.error:
+                            retVal = retVal.replace(match.group(0), match.group(0) % params[count], 1)
                         count += 1
                 else:
                     break
@@ -2220,6 +2250,15 @@ def isHexEncodedString(subject):
 def isMultiThreadMode():
     """
     Checks if running in multi-thread(ing) mode
+
+    >>> isMultiThreadMode()
+    False
+    >>> _ = lambda: time.sleep(0.1)
+    >>> thread = threading.Thread(target=_)
+    >>> thread.daemon = True
+    >>> thread.start()
+    >>> isMultiThreadMode()
+    True
     """
 
     return threading.activeCount() > 1
@@ -2228,6 +2267,9 @@ def isMultiThreadMode():
 def getConsoleWidth(default=80):
     """
     Returns console width
+
+    >>> any((getConsoleWidth(), True))
+    True
     """
 
     width = None
@@ -2434,6 +2476,9 @@ def initCommonOutputs():
 def getFileItems(filename, commentPrefix='#', unicoded=True, lowercase=False, unique=False):
     """
     Returns newline delimited items contained inside file
+
+    >>> "SELECT" in getFileItems(paths.SQL_KEYWORDS)
+    True
     """
 
     retVal = list() if not unique else OrderedDict()
@@ -2540,8 +2585,8 @@ def goGoodSamaritan(prevValue, originalCharset):
 
 def getPartRun(alias=True):
     """
-    Goes through call stack and finds constructs matching conf.dbmsHandler.*.
-    Returns it or its alias used in 'txt/common-outputs.txt'
+    Goes through call stack and finds constructs matching
+    conf.dbmsHandler.*. Returns it or its alias used in 'txt/common-outputs.txt'
     """
 
     retVal = None
@@ -4734,7 +4779,7 @@ def serializeObject(object_):
     """
     Serializes given object
 
-    >>> type(serializeObject([1, 2, 3, ('a', 'b')])) == six.binary_type
+    >>> type(serializeObject([1, 2, 3, ('a', 'b')])) == str
     True
     """
 
@@ -4964,6 +5009,14 @@ def decloakToTemp(filename):
     >>> openFile(_, "rb", encoding=None).read().startswith(b'<%')
     True
     >>> os.remove(_)
+    >>> _ = decloakToTemp(os.path.join(paths.SQLMAP_SHELL_PATH, "backdoors", "backdoor.asp_"))
+    >>> openFile(_, "rb", encoding=None).read().startswith(b'<%')
+    True
+    >>> os.remove(_)
+    >>> _ = decloakToTemp(os.path.join(paths.SQLMAP_UDF_PATH, "postgresql", "linux", "64", "11", "lib_postgresqludf_sys.so_"))
+    >>> b'sys_eval' in openFile(_, "rb", encoding=None).read()
+    True
+    >>> os.remove(_)
     """
 
     content = decloak(filename)
@@ -4997,6 +5050,12 @@ def getRequestHeader(request, name):
     Solving an issue with an urllib2 Request header case sensitivity
 
     # Reference: http://bugs.python.org/issue2275
+
+    >>> _ = lambda _: _
+    >>> _.headers = {"FOO": "BAR"}
+    >>> _.header_items = lambda: _.headers.items()
+    >>> getText(getRequestHeader(_, "foo"))
+    'BAR'
     """
 
     retVal = None
@@ -5094,6 +5153,13 @@ def pollProcess(process, suppress_errors=False):
 def parseRequestFile(reqFile, checkParams=True):
     """
     Parses WebScarab and Burp logs and adds results to the target URL list
+
+    >>> handle, reqFile = tempfile.mkstemp(suffix=".req")
+    >>> content = b"POST / HTTP/1.0\\nUser-agent: foobar\\nHost: www.example.com\\n\\nid=1\\n"
+    >>> _ = os.write(handle, content)
+    >>> os.close(handle)
+    >>> next(parseRequestFile(reqFile)) == ('http://www.example.com:80/', 'POST', 'id=1', None, (('User-agent', 'foobar'), ('Host', 'www.example.com')))
+    True
     """
 
     def _parseWebScarabLog(content):
@@ -5236,7 +5302,7 @@ def parseRequestFile(reqFile, checkParams=True):
                         params = True
 
                     # Avoid proxy and connection type related headers
-                    elif key not in (HTTP_HEADER.PROXY_CONNECTION, HTTP_HEADER.CONNECTION):
+                    elif key not in (HTTP_HEADER.PROXY_CONNECTION, HTTP_HEADER.CONNECTION, HTTP_HEADER.IF_MODIFIED_SINCE, HTTP_HEADER.IF_NONE_MATCH):
                         headers.append((getUnicode(key), getUnicode(value)))
 
                     if kb.customInjectionMark in re.sub(PROBLEMATIC_CUSTOM_INJECTION_PATTERNS, "", value or ""):

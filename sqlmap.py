@@ -317,7 +317,7 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
-        elif any(_ in excMsg for _ in ("tempfile.mkdtemp", "tempfile.mkstemp")):
+        elif any(_ in excMsg for _ in ("tempfile.mkdtemp", "tempfile.mkstemp", "tempfile.py")):
             errMsg = "unable to write to the temporary directory '%s'. " % tempfile.gettempdir()
             errMsg += "Please make sure that your disk is not full and "
             errMsg += "that you have sufficient write permissions to "
@@ -425,6 +425,12 @@ def main():
             errMsg = "corrupted installation detected ('%s'). " % excMsg.strip().split('\n')[-1]
             errMsg += "You should retrieve the latest development version from official GitHub "
             errMsg += "repository at '%s'" % GIT_PAGE
+            logger.critical(errMsg)
+            raise SystemExit
+
+        elif all(_ in excMsg for _ in ("HTTPNtlmAuthHandler", "'str' object has no attribute 'decode'")):
+            errMsg = "package 'python-ntlm' has a known compatibility issue with the "
+            errMsg += "Python 3 (Reference: https://github.com/mullender/python-ntlm/pull/61)"
             logger.critical(errMsg)
             raise SystemExit
 
