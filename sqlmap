@@ -1,0 +1,9 @@
+#!/usr/bin bash
+# @Author: Jingyuexing
+# @Date:   2020-10-10 02:24:47
+# @Last Modified by:   Jingyuexing
+# @Last Modified time: 2020-10-12 21:30:09
+# $thisPath=$(pwd)
+# python "$thisPath/sqlmap.py" $@
+SHELL_FOLDER=$(cd "$(dirname "$0")";pwd)
+python "$SHELL_FOLDER\sqlmap.py" $@
