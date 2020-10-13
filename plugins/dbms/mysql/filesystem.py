@@ -96,7 +96,7 @@ class Filesystem(GenericFilesystem):
         fcEncodedStrLen = len(fcEncodedStr)
 
         if kb.injection.place == PLACE.GET and fcEncodedStrLen > 8000:
-            warnMsg = "the injection is on a GET parameter and the file "
+            warnMsg = "as the injection is on a GET parameter and the file "
             warnMsg += "to be written hexadecimal value is %d " % fcEncodedStrLen
             warnMsg += "bytes, this might cause errors in the file "
             warnMsg += "writing process"
