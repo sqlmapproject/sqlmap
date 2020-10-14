@@ -418,14 +418,30 @@ def _setBulkMultipleTargets():
         return
 
     if isinstance(conf.bulkFile, collections.Iterable):
-        def _():
-            for line in conf.bulkFile:
+        class _(object):
+            def __init__(self):
+                self.__rest = set()
+
+            def __iter__(self):
+                return self
+
+            def __next__(self):
+                return self.next()
+
+            def next(self):
+                line = next(conf.bulkFile)
                 if line:
                     match = re.search(r"\bhttps?://[^\s'\"]+", line, re.I)
                     if match:
-                        yield (match.group(0), conf.method, conf.data, conf.cookie, None)
+                        return (match.group(0), conf.method, conf.data, conf.cookie, None)
+                elif self.__rest:
+                    return self.__rest.pop()
                 else:
-                    break
+                    raise StopIteration()
+
+            def add(self, elem):
+                self.__rest.add(elem)
+
         kb.targets = _()
     else:
         conf.bulkFile = safeExpandUser(conf.bulkFile)
