@@ -8,6 +8,7 @@ See the file 'LICENSE' for copying permission
 from __future__ import division
 
 import codecs
+import collections
 import functools
 import glob
 import inspect
@@ -416,28 +417,39 @@ def _setBulkMultipleTargets():
     if not conf.bulkFile:
         return
 
-    conf.bulkFile = safeExpandUser(conf.bulkFile)
+    if isinstance(conf.bulkFile, collections.Iterable):
+        def _():
+            for line in conf.bulkFile:
+                if line:
+                    match = re.search(r"\bhttps?://[^\s'\"]+", line, re.I)
+                    if match:
+                        yield (match.group(0), conf.method, conf.data, conf.cookie, None)
+                else:
+                    break
+        kb.targets = _()
+    else:
+        conf.bulkFile = safeExpandUser(conf.bulkFile)
 
-    infoMsg = "parsing multiple targets list from '%s'" % conf.bulkFile
-    logger.info(infoMsg)
+        infoMsg = "parsing multiple targets list from '%s'" % conf.bulkFile
+        logger.info(infoMsg)
 
-    if not checkFile(conf.bulkFile, False):
-        errMsg = "the specified bulk file "
-        errMsg += "does not exist"
-        raise SqlmapFilePathException(errMsg)
+        if not checkFile(conf.bulkFile, False):
+            errMsg = "the specified bulk file "
+            errMsg += "does not exist"
+            raise SqlmapFilePathException(errMsg)
 
-    found = False
-    for line in getFileItems(conf.bulkFile):
-        if conf.scope and not re.search(conf.scope, line, re.I):
-            continue
+        found = False
+        for line in getFileItems(conf.bulkFile):
+            if conf.scope and not re.search(conf.scope, line, re.I):
+                continue
 
-        if re.match(r"[^ ]+\?(.+)", line, re.I) or kb.customInjectionMark in line:
-            found = True
-            kb.targets.add((line.strip(), conf.method, conf.data, conf.cookie, None))
+            if re.match(r"[^ ]+\?(.+)", line, re.I) or kb.customInjectionMark in line:
+                found = True
+                kb.targets.add((line.strip(), conf.method, conf.data, conf.cookie, None))
 
-    if not found and not conf.forms and not conf.crawlDepth:
-        warnMsg = "no usable links found (with GET parameters)"
-        logger.warn(warnMsg)
+        if not found and not conf.forms and not conf.crawlDepth:
+            warnMsg = "no usable links found (with GET parameters)"
+            logger.warn(warnMsg)
 
 def _findPageForms():
     if not conf.forms or conf.crawlDepth:
@@ -1631,7 +1643,8 @@ def _cleanupOptions():
 
     for key, value in conf.items():
         if value and any(key.endswith(_) for _ in ("Path", "File", "Dir")):
-            conf[key] = safeExpandUser(value)
+            if isinstance(value, str):
+                conf[key] = safeExpandUser(value)
 
     if conf.testParameter:
         conf.testParameter = urldecode(conf.testParameter)

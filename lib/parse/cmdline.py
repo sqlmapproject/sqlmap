@@ -1035,6 +1035,9 @@ def cmdLineParser(argv=None):
         if args.dummy:
             args.url = args.url or DUMMY_URL
 
+        if hasattr(sys.stdin, "fileno") and not os.isatty(sys.stdin.fileno()) and '-' not in sys.argv:
+            args.bulkFile = iter(sys.stdin.readline, None)
+
         if not any((args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, args.requestFile, args.updateAll, args.smokeTest, args.vulnTest, args.bedTest, args.fuzzTest, args.wizard, args.dependencies, args.purge, args.listTampers, args.hashFile)):
             errMsg = "missing a mandatory option (-d, -u, -l, -m, -r, -g, -c, --list-tampers, --wizard, --update, --purge or --dependencies). "
             errMsg += "Use -h for basic and -hh for advanced help\n"
