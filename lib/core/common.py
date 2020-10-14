@@ -3614,7 +3614,7 @@ def isListLike(value):
     False
     """
 
-    return isinstance(value, (list, tuple, set, BigArray))
+    return isinstance(value, (list, tuple, set, OrderedSet, BigArray))
 
 def getSortedInjectionTests():
     """
