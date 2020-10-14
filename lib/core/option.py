@@ -2040,7 +2040,6 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.injections = []
     kb.laggingChecked = False
     kb.lastParserStatus = None
-    kb.lastCtrlCTime = None
 
     kb.locks = AttribDict()
     for _ in ("cache", "connError", "count", "handlers", "hint", "index", "io", "limit", "log", "socket", "redirect", "request", "value"):
@@ -2129,6 +2128,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
         kb.checkSitemap = None
         kb.headerPaths = {}
         kb.keywords = set(getFileItems(paths.SQL_KEYWORDS))
+        kb.lastCtrlCTime = None
         kb.normalizeCrawlingChoice = None
         kb.passwordMgr = None
         kb.postprocessFunctions = []

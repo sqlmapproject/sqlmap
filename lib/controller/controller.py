@@ -704,6 +704,12 @@ def start():
                     action()
 
         except KeyboardInterrupt:
+            if kb.lastCtrlCTime and (time.time() - kb.lastCtrlCTime < 1):
+                kb.multipleCtrlC = True
+                raise SqlmapUserQuitException("user aborted (Ctrl+C was pressed multiple times)")
+
+            kb.lastCtrlCTime = time.time()
+
             if conf.multipleTargets:
                 warnMsg = "user aborted in multiple target mode"
                 logger.warn(warnMsg)
