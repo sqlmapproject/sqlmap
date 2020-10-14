@@ -351,6 +351,16 @@ Sample content of a HTTP request file provided as an argument to this option:
 
 Note that if the request is over HTTPS, you can use this in conjunction with switch `--force-ssl` to force SSL connection to 443/tcp. Alternatively, you can append `:443` to the end of the `Host` header value.
 
+### Parse target addresses from piped-input (i.e. `stdin`)
+
+Even though sqlmap already has capabilities for target crawling, in case that user has other preferences for such task, he can provide the target addresses as a piped-in input directly from some other tool of choice (e.g. [waybackurls](https://github.com/tomnomnom/waybackurls)). It should be noted that links will be automatically parsed from such content, thus there are no constraints for input format.
+
+For example:
+
+```
+waybackurls www.target.com | python sqlmap.py
+```
+
 ### Process Google dork results as target addresses
 
 Option: `-g`
