@@ -47,6 +47,7 @@ def vulnTest():
         ("-u '<url>&id2=1' -p id2 -v 5 --flush-session --level=5 --test-filter='AND boolean-based blind - WHERE or HAVING clause (MySQL comment)'", ("~1AND",)),
         ("--list-tampers", ("between", "MySQL", "xforwardedfor")),
         ("-r <request> --flush-session -v 5 --test-skip='heavy' --save=<tmp>", ("CloudFlare", "possible DBMS: 'SQLite'", "User-agent: foobar", "~Type: time-based blind")),
+        ("<piped> -r <request> -l <log> --flush-session --banner --technique=B", ("banner: '3.", "STDIN")),
         ("-l <log> --flush-session --keep-alive --skip-waf -v 5 --technique=U --union-from=users --banner --parse-errors", ("banner: '3.", "ORDER BY term out of range", "~xp_cmdshell", "Connection: keep-alive")),
         ("-l <log> --offline --banner -v 5", ("banner: '3.", "~[TRAFFIC OUT]")),
         ("-u <base64> -p id --base64=id --data='base64=true' --flush-session --banner --technique=B", ("banner: '3.",)),
@@ -137,6 +138,10 @@ def vulnTest():
             handle, tmp = tempfile.mkstemp()
             os.close(handle)
             cmd = cmd.replace("<tmp>", tmp)
+
+        if "<piped>" in cmd:
+            cmd = re.sub(r"<piped>\s*", "", cmd)
+            cmd = "echo %s | %s" % (url, cmd)
 
         output = shellExec(cmd)
 
