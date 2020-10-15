@@ -803,6 +803,9 @@ def cmdLineParser(argv=None):
         parser.add_argument("--smoke-test", dest="smokeTest", action="store_true",
             help=SUPPRESS)
 
+        parser.add_argument("--stdin-pipe", dest="stdinPipe",
+            help=SUPPRESS)
+
         parser.add_argument("--vuln-test", dest="vulnTest", action="store_true",
             help=SUPPRESS)
 
@@ -1036,9 +1039,9 @@ def cmdLineParser(argv=None):
             args.url = args.url or DUMMY_URL
 
         if hasattr(sys.stdin, "fileno") and not os.isatty(sys.stdin.fileno()) and '-' not in sys.argv:
-            args.bulkFile = iter(sys.stdin.readline, None)
+            args.stdinPipe = iter(sys.stdin.readline, None)
 
-        if not any((args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, args.requestFile, args.updateAll, args.smokeTest, args.vulnTest, args.bedTest, args.fuzzTest, args.wizard, args.dependencies, args.purge, args.listTampers, args.hashFile)):
+        if not any((args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, args.requestFile, args.updateAll, args.smokeTest, args.vulnTest, args.bedTest, args.fuzzTest, args.wizard, args.dependencies, args.purge, args.listTampers, args.hashFile, args.stdinPipe)):
             errMsg = "missing a mandatory option (-d, -u, -l, -m, -r, -g, -c, --list-tampers, --wizard, --update, --purge or --dependencies). "
             errMsg += "Use -h for basic and -hh for advanced help\n"
             parser.error(errMsg)

@@ -413,14 +413,14 @@ def _doSearch():
             else:
                 conf.googlePage += 1
 
-def _setBulkMultipleTargets():
-    if not conf.bulkFile:
-        return
+def _setStdinPipeTargets():
+    if isinstance(conf.stdinPipe, collections.Iterable):
+        infoMsg = "using 'STDIN' for parsing targets list"
+        logger.info(infoMsg)
 
-    if isinstance(conf.bulkFile, collections.Iterable):
         class _(object):
             def __init__(self):
-                self.__rest = set()
+                self.__rest = OrderedSet()
 
             def __iter__(self):
                 return self
@@ -429,43 +429,47 @@ def _setBulkMultipleTargets():
                 return self.next()
 
             def next(self):
-                line = next(conf.bulkFile)
+                line = next(conf.stdinPipe)
                 if line:
-                    match = re.search(r"\bhttps?://[^\s'\"]+", line, re.I)
+                    match = re.search(r"\b(https?://[^\s'\"]+|[\w.]+\.\w{2,3}[/\w+]*\?[^\s'\"]+)", line, re.I)
                     if match:
                         return (match.group(0), conf.method, conf.data, conf.cookie, None)
                 elif self.__rest:
                     return self.__rest.pop()
-                else:
-                    raise StopIteration()
+
+                raise StopIteration()
 
             def add(self, elem):
                 self.__rest.add(elem)
 
         kb.targets = _()
-    else:
-        conf.bulkFile = safeExpandUser(conf.bulkFile)
 
-        infoMsg = "parsing multiple targets list from '%s'" % conf.bulkFile
-        logger.info(infoMsg)
+def _setBulkMultipleTargets():
+    if not conf.bulkFile:
+        return
 
-        if not checkFile(conf.bulkFile, False):
-            errMsg = "the specified bulk file "
-            errMsg += "does not exist"
-            raise SqlmapFilePathException(errMsg)
+    conf.bulkFile = safeExpandUser(conf.bulkFile)
 
-        found = False
-        for line in getFileItems(conf.bulkFile):
-            if conf.scope and not re.search(conf.scope, line, re.I):
-                continue
+    infoMsg = "parsing multiple targets list from '%s'" % conf.bulkFile
+    logger.info(infoMsg)
 
-            if re.match(r"[^ ]+\?(.+)", line, re.I) or kb.customInjectionMark in line:
-                found = True
-                kb.targets.add((line.strip(), conf.method, conf.data, conf.cookie, None))
+    if not checkFile(conf.bulkFile, False):
+        errMsg = "the specified bulk file "
+        errMsg += "does not exist"
+        raise SqlmapFilePathException(errMsg)
 
-        if not found and not conf.forms and not conf.crawlDepth:
-            warnMsg = "no usable links found (with GET parameters)"
-            logger.warn(warnMsg)
+    found = False
+    for line in getFileItems(conf.bulkFile):
+        if conf.scope and not re.search(conf.scope, line, re.I):
+            continue
+
+        if re.match(r"[^ ]+\?(.+)", line, re.I) or kb.customInjectionMark in line:
+            found = True
+            kb.targets.add((line.strip(), conf.method, conf.data, conf.cookie, None))
+
+    if not found and not conf.forms and not conf.crawlDepth:
+        warnMsg = "no usable links found (with GET parameters)"
+        logger.warn(warnMsg)
 
 def _findPageForms():
     if not conf.forms or conf.crawlDepth:
@@ -2802,7 +2806,7 @@ def init():
 
     parseTargetDirect()
 
-    if any((conf.url, conf.logFile, conf.bulkFile, conf.requestFile, conf.googleDork)):
+    if any((conf.url, conf.logFile, conf.bulkFile, conf.requestFile, conf.googleDork, conf.stdinPipe)):
         _setHostname()
         _setHTTPTimeout()
         _setHTTPExtraHeaders()
@@ -2816,6 +2820,7 @@ def init():
         _setSocketPreConnect()
         _setSafeVisit()
         _doSearch()
+        _setStdinPipeTargets()
         _setBulkMultipleTargets()
         _checkTor()
         _setCrawler()
