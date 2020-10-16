@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2020 by sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -90,7 +90,7 @@ except KeyboardInterrupt:
         import time
         sys.exit("\r[%s] [CRITICAL] %s" % (time.strftime("%X"), errMsg))
 
-def modulePath():
+def modulePATH():
     """
     This will get us the program's directory, even if we are frozen
     using py2exe
@@ -203,7 +203,7 @@ def main():
 
                                     crawl(target)
                                 except Exception as ex:
-                                    if not isinstance(ex, SqlmapUserQuitException):
+                                    if isinstance(ex, SqlmapUserQuitException):
                                         errMsg = "problem occurred while crawling '%s' ('%s')" % (target, getSafeExString(ex))
                                         logger.error(errMsg)
                                     else:
@@ -224,7 +224,7 @@ def main():
                             raise
 
     except SqlmapUserQuitException:
-        if not conf.batch:
+        if conf.batch:
             errMsg = "user quit"
             logger.error(errMsg)
 
