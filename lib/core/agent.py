@@ -1225,7 +1225,7 @@ class Agent(object):
                 prefix += " WHERE %s" % conf.dumpWhere
 
             query = prefix
-            if suffix:
+            if suffix and not all(re.search(r"ORDER BY", _, re.I) is not None for _ in (query, suffix)):
                 query += suffix
 
         return query
