@@ -335,6 +335,12 @@
                 "c669:RVZXum60OEhCWKpAYKYPkoJyWOpohM4IiUYMrmRWg1qQJLX2uhdOnthsOj+hX7AB16FcPhJPdLsXomtKaK59nui7c4RmkwI2FZjxtDtAeq+c3qA5chW1XaTC"
             ]
         },
+        "gtmc": {
+            "company": "GTMC",
+            "name": "GTMC WAF",
+            "regex": "GTMC WAF1 Protection:|Please consult with administrator or waf@nm.gtmc.com.tw",
+            "signatures": []
+        },
         "imunify360": {
             "company": "CloudLinux",
             "name": "Imunify360",
