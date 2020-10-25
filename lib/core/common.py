@@ -215,7 +215,7 @@ class UnicodeRawConfigParser(_configparser.RawConfigParser):
             fp.write("[%s]\n" % _configparser.DEFAULTSECT)
 
             for (key, value) in self._defaults.items():
-                fp.write("%s = %s\n" % (key, getUnicode(value, UNICODE_ENCODING).replace('\n', '\n\t')))
+                fp.write("\t%s = %s" % (key, getUnicode(value, UNICODE_ENCODING)))
 
             fp.write("\n")
 
@@ -225,9 +225,9 @@ class UnicodeRawConfigParser(_configparser.RawConfigParser):
             for (key, value) in self._sections[section].items():
                 if key != "__name__":
                     if value is None:
-                        fp.write("%s\n" % (key))
-                    else:
-                        fp.write("%s = %s\n" % (key, getUnicode(value, UNICODE_ENCODING).replace('\n', '\n\t')))
+                        fp.write("\t%s\n" % (key))
+                    elif not isListLike(value):
+                        fp.write("\t%s = %s\n" % (key, getUnicode(value, UNICODE_ENCODING)))
 
             fp.write("\n")
 
