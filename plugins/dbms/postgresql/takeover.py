@@ -11,6 +11,7 @@ from lib.core.common import Backend
 from lib.core.common import checkFile
 from lib.core.common import decloakToTemp
 from lib.core.common import flattenValue
+from lib.core.common import filterNone
 from lib.core.common import isListLike
 from lib.core.common import isNoneValue
 from lib.core.common import isStackingAvailable
@@ -107,6 +108,7 @@ class Takeover(GenericTakeover):
 
             if isListLike(output):
                 output = flattenValue(output)
+                output = filterNone(output)
 
             if not isNoneValue(output):
                 output = os.linesep.join(output)
