@@ -506,7 +506,7 @@ class Metasploit(object):
                 if IS_WIN:
                     timeout = 3
 
-                    inp = ""
+                    inp = b""
                     _ = time.time()
 
                     while True:
