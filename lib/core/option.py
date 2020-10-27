@@ -2058,6 +2058,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.identifiedWafs = set()
     kb.injection = InjectionDict()
     kb.injections = []
+    kb.jsonAggMode = False
     kb.laggingChecked = False
     kb.lastParserStatus = None
 

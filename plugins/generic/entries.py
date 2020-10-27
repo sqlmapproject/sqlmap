@@ -159,7 +159,7 @@ class Entries(object):
                     continue
 
                 kb.dumpColumns = [unsafeSQLIdentificatorNaming(_) for _ in colList]
-                colNames = colString = ", ".join(column for column in colList)
+                colNames = colString = ','.join(column for column in colList)
                 rootQuery = queries[Backend.getIdentifiedDbms()].dump_table
 
                 infoMsg = "fetching entries"

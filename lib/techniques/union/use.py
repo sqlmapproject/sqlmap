@@ -6,6 +6,7 @@ See the file 'LICENSE' for copying permission
 """
 
 import binascii
+import json
 import re
 import time
 import xml.etree.ElementTree
@@ -74,7 +75,7 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
     if retVal is None:
         vector = kb.injection.data[PAYLOAD.TECHNIQUE.UNION].vector
 
-        if not kb.rowXmlMode:
+        if not any((kb.rowXmlMode, kb.jsonAggMode)):
             injExpression = unescaper.escape(agent.concatQuery(expression, unpack))
             kb.unionDuplicates = vector[7]
             kb.forcePartialUnion = vector[8]
@@ -99,24 +100,8 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
 
         incrementCounter(PAYLOAD.TECHNIQUE.UNION)
 
-        if not kb.rowXmlMode:
-            # Parse the returned page to get the exact UNION-based
-            # SQL injection output
-            def _(regex):
-                return firstNotNone(
-                    extractRegexResult(regex, removeReflectiveValues(page, payload), re.DOTALL | re.IGNORECASE),
-                    extractRegexResult(regex, removeReflectiveValues(listToStrValue((_ for _ in headers.headers if not _.startswith(HTTP_HEADER.URI)) if headers else None), payload, True), re.DOTALL | re.IGNORECASE)
-                )
-
-            # Automatically patching last char trimming cases
-            if kb.chars.stop not in (page or "") and kb.chars.stop[:-1] in (page or ""):
-                warnMsg = "automatically patching output having last char trimmed"
-                singleTimeWarnMessage(warnMsg)
-                page = page.replace(kb.chars.stop[:-1], kb.chars.stop)
-
-            retVal = _("(?P<result>%s.*%s)" % (kb.chars.start, kb.chars.stop))
-        else:
-            output = extractRegexResult(r"(?P<result>(<row.+?/>)+)", page)
+        if kb.rowXmlMode:
+            output = extractRegexResult(r"(?P<result>(<row.+?/>)+)", page or "")
             if output:
                 try:
                     root = xml.etree.ElementTree.fromstring(safeStringFormat("<root>%s</root>", getBytes(output)))
@@ -149,6 +134,28 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
                     pass
                 else:
                     retVal = getUnicode(retVal)
+        elif kb.jsonAggMode:
+            output = extractRegexResult(r"(?P<result>%s.*?%s)" % (kb.chars.start, kb.chars.stop), page or "")
+            if output:
+                retVal = ""
+                for row in json.loads(output[len(kb.chars.start):-len(kb.chars.stop)]):
+                    retVal += "%s%s%s" % (kb.chars.start, row, kb.chars.stop)
+        else:
+            # Parse the returned page to get the exact UNION-based
+            # SQL injection output
+            def _(regex):
+                return firstNotNone(
+                    extractRegexResult(regex, removeReflectiveValues(page, payload), re.DOTALL | re.IGNORECASE),
+                    extractRegexResult(regex, removeReflectiveValues(listToStrValue((_ for _ in headers.headers if not _.startswith(HTTP_HEADER.URI)) if headers else None), payload, True), re.DOTALL | re.IGNORECASE)
+                )
+
+            # Automatically patching last char trimming cases
+            if kb.chars.stop not in (page or "") and kb.chars.stop[:-1] in (page or ""):
+                warnMsg = "automatically patching output having last char trimmed"
+                singleTimeWarnMessage(warnMsg)
+                page = page.replace(kb.chars.stop[:-1], kb.chars.stop)
+
+            retVal = _("(?P<result>%s.*%s)" % (kb.chars.start, kb.chars.stop))
 
         if retVal is not None:
             retVal = getUnicode(retVal, kb.pageEncoding)
@@ -159,7 +166,7 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
 
             hashDBWrite("%s%s" % (conf.hexConvert or False, expression), retVal)
 
-        elif not kb.rowXmlMode:
+        elif not any((kb.rowXmlMode, kb.jsonAggMode)):
             trimmed = _("%s(?P<result>.*?)<" % (kb.chars.start))
 
             if trimmed:
@@ -236,7 +243,15 @@ def unionUse(expression, unpack=True, dump=False):
     # Set kb.partRun in case the engine is called from the API
     kb.partRun = getPartRun(alias=False) if conf.api else None
 
-    if Backend.isDbms(DBMS.MSSQL) and kb.dumpColumns:
+    if Backend.isDbms(DBMS.MYSQL) and expressionFields:
+        match = re.search(r"SELECT\s*(.+?)\bFROM", expression, re.I)
+        if match:
+            kb.jsonAggMode = True
+            _ = expression.replace(expressionFields, "CONCAT('%s',JSON_ARRAYAGG(CONCAT_WS('%s',%s)),'%s')" % (kb.chars.start, kb.chars.delimiter, expressionFields, kb.chars.stop), 1)
+            output = _oneShotUnionUse(_, False)
+            value = parseUnionPage(output)
+            kb.jsonAggMode = False
+    elif Backend.isDbms(DBMS.MSSQL) and kb.dumpColumns:
         kb.rowXmlMode = True
         _ = "(%s FOR XML RAW, BINARY BASE64)" % expression
         output = _oneShotUnionUse(_, False)
