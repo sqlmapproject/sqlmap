@@ -108,7 +108,7 @@ def dnsUse(payload, expression):
                     hashDBWrite(expression, output)
 
         if not kb.bruteMode:
-            debugMsg = "performed %d queries in %.2f seconds" % (count, calculateDeltaSeconds(start))
+            debugMsg = "performed %d quer%s in %.2f seconds" % (count, 'y' if count == 1 else "ies", calculateDeltaSeconds(start))
             logger.debug(debugMsg)
 
     elif conf.dnsDomain:

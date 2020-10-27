@@ -719,7 +719,7 @@ def queryOutputLength(expression, payload):
     lengthExprUnescaped = agent.forgeQueryOutputLength(expression)
     count, length = bisection(payload, lengthExprUnescaped, charsetType=CHARSET_TYPE.DIGITS)
 
-    debugMsg = "performed %d queries in %.2f seconds" % (count, calculateDeltaSeconds(start))
+    debugMsg = "performed %d quer%s in %.2f seconds" % (count, 'y' if count == 1 else "ies", calculateDeltaSeconds(start))
     logger.debug(debugMsg)
 
     if length == " ":
