@@ -137,9 +137,14 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
         elif kb.jsonAggMode:
             output = extractRegexResult(r"(?P<result>%s.*?%s)" % (kb.chars.start, kb.chars.stop), page or "")
             if output:
-                retVal = ""
-                for row in json.loads(output[len(kb.chars.start):-len(kb.chars.stop)]):
-                    retVal += "%s%s%s" % (kb.chars.start, row, kb.chars.stop)
+                try:
+                    retVal = ""
+                    for row in json.loads(output[len(kb.chars.start):-len(kb.chars.stop)]):
+                        retVal += "%s%s%s" % (kb.chars.start, row, kb.chars.stop)
+                except:
+                    pass
+                else:
+                    retVal = getUnicode(retVal)
         else:
             # Parse the returned page to get the exact UNION-based
             # SQL injection output
