@@ -248,11 +248,15 @@ def unionUse(expression, unpack=True, dump=False):
     # Set kb.partRun in case the engine is called from the API
     kb.partRun = getPartRun(alias=False) if conf.api else None
 
-    if Backend.isDbms(DBMS.MYSQL) and expressionFields:
+    if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ORACLE) and expressionFields:
         match = re.search(r"SELECT\s*(.+?)\bFROM", expression, re.I)
-        if match:
+        if match and not (Backend.isDbms(DBMS.ORACLE) and FROM_DUMMY_TABLE[DBMS.ORACLE] in expression):
             kb.jsonAggMode = True
-            _ = expression.replace(expressionFields, "CONCAT('%s',JSON_ARRAYAGG(CONCAT_WS('%s',%s)),'%s')" % (kb.chars.start, kb.chars.delimiter, expressionFields, kb.chars.stop), 1)
+            if Backend.isDbms(DBMS.MYSQL):
+                _ = expression.replace(expressionFields, "CONCAT('%s',JSON_ARRAYAGG(CONCAT_WS('%s',%s)),'%s')" % (kb.chars.start, kb.chars.delimiter, expressionFields, kb.chars.stop), 1)
+            else:
+                _ = expression.replace(expressionFields, "'%s'||JSON_ARRAYAGG(%s)||'%s'" % (kb.chars.start, ("||'%s'||" % kb.chars.delimiter).join(expressionFieldsList), kb.chars.stop), 1)
+                _ = re.sub(r"(?i)\s*ORDER BY ROWNUM", "", _)
             output = _oneShotUnionUse(_, False)
             value = parseUnionPage(output)
             kb.jsonAggMode = False
