@@ -639,18 +639,6 @@ class Databases(object):
                     logger.info(infoMsg)
 
                     values = None
-                    if Backend.isDbms(DBMS.MSSQL) and isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION):
-                        expression = query
-                        kb.dumpColumns = []
-                        kb.rowXmlMode = True
-
-                        for column in (extractRegexResult(r"SELECT (?P<result>.+?) FROM", query) or "").split(','):
-                            kb.dumpColumns.append(randomStr().lower())
-                            expression = expression.replace(column, "%s AS %s" % (column, kb.dumpColumns[-1]), 1)
-
-                        values = unionUse(expression)
-                        kb.rowXmlMode = False
-                        kb.dumpColumns = None
 
                     if values is None:
                         values = inject.getValue(query, blind=False, time=False)

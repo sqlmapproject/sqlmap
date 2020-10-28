@@ -2113,7 +2113,6 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.responseTimeMode = None
     kb.responseTimePayload = None
     kb.resumeValues = True
-    kb.rowXmlMode = False
     kb.safeCharEncode = False
     kb.safeReq = AttribDict()
     kb.secondReq = None
