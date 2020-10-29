@@ -463,7 +463,7 @@ def _setBulkMultipleTargets():
         if conf.scope and not re.search(conf.scope, line, re.I):
             continue
 
-        if re.match(r"[^ ]+\?(.+)", line, re.I) or kb.customInjectionMark in line:
+        if re.match(r"[^ ]+\?(.+)", line, re.I) or kb.customInjectionMark in line or conf.data:
             found = True
             kb.targets.add((line.strip(), conf.method, conf.data, conf.cookie, None))
 
