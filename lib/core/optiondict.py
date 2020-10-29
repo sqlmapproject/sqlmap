@@ -27,6 +27,7 @@ optDict = {
         "paramDel": "string",
         "cookie": "string",
         "cookieDel": "string",
+        "liveCookies": "string",
         "loadCookies": "string",
         "dropSetCookie": "boolean",
         "agent": "string",

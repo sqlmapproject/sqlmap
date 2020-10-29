@@ -10,7 +10,6 @@ import re
 from lib.core.agent import agent
 from lib.core.common import arrayizeValue
 from lib.core.common import Backend
-from lib.core.common import extractRegexResult
 from lib.core.common import filterNone
 from lib.core.common import filterPairValues
 from lib.core.common import flattenValue
@@ -23,7 +22,6 @@ from lib.core.common import isTechniqueAvailable
 from lib.core.common import parseSqliteTableSchema
 from lib.core.common import popValue
 from lib.core.common import pushValue
-from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import safeSQLIdentificatorNaming
 from lib.core.common import safeStringFormat
@@ -54,7 +52,6 @@ from lib.core.settings import REFLECTED_VALUE_MARKER
 from lib.core.settings import UPPER_CASE_DBMSES
 from lib.core.settings import VERTICA_DEFAULT_SCHEMA
 from lib.request import inject
-from lib.techniques.union.use import unionUse
 from lib.utils.brute import columnExists
 from lib.utils.brute import tableExists
 from thirdparty import six

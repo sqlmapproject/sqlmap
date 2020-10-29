@@ -168,6 +168,9 @@ def cmdLineParser(argv=None):
         request.add_argument("--cookie-del", dest="cookieDel",
             help="Character used for splitting cookie values (e.g. ;)")
 
+        request.add_argument("--live-cookies", dest="liveCookies",
+            help="Live cookies file used for loading up-to-date values")
+
         request.add_argument("--load-cookies", dest="loadCookies",
             help="File containing cookies in Netscape/wget format")
 

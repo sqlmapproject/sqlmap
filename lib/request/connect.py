@@ -7,6 +7,7 @@ See the file 'LICENSE' for copying permission
 
 import binascii
 import logging
+import os
 import random
 import re
 import socket
@@ -25,6 +26,7 @@ except ImportError:
 from lib.core.agent import agent
 from lib.core.common import asciifyUrl
 from lib.core.common import calculateDeltaSeconds
+from lib.core.common import checkFile
 from lib.core.common import checkSameHost
 from lib.core.common import chunkSplitPostData
 from lib.core.common import clearConsoleLine
@@ -100,6 +102,7 @@ from lib.core.settings import IPS_WAF_CHECK_PAYLOAD
 from lib.core.settings import IS_WIN
 from lib.core.settings import JAVASCRIPT_HREF_REGEX
 from lib.core.settings import LARGE_READ_TRIM_MARKER
+from lib.core.settings import LIVE_COOKIES_TIMEOUT
 from lib.core.settings import MAX_CONNECTION_READ_SIZE
 from lib.core.settings import MAX_CONNECTIONS_REGEX
 from lib.core.settings import MAX_CONNECTION_TOTAL_SIZE
@@ -291,6 +294,30 @@ class Connect(object):
             threadData.lastCode = code
 
             return page, headers, code
+
+        if conf.liveCookies:
+            with kb.locks.liveCookies:
+                if not checkFile(conf.liveCookies, raiseOnError=False) or os.path.getsize(conf.liveCookies) == 0:
+                    warnMsg = "[%s] [WARNING] live cookies file '%s' is empty or non-existent. Waiting for timeout (%d seconds)" % (time.strftime("%X"), conf.liveCookies, LIVE_COOKIES_TIMEOUT)
+                    dataToStdout(warnMsg)
+
+                    valid = False
+                    for _ in xrange(LIVE_COOKIES_TIMEOUT):
+                        if checkFile(conf.liveCookies, raiseOnError=False) and os.path.getsize(conf.liveCookies) > 0:
+                            valid = True
+                            break
+                        else:
+                            dataToStdout('.')
+                            time.sleep(1)
+
+                    dataToStdout("\n")
+
+                    if not valid:
+                        errMsg = "problem occurred while loading cookies from file '%s'" % conf.liveCookies
+                        raise SqlmapValueException(errMsg)
+
+                cookie = openFile(conf.liveCookies).read().strip()
+                cookie = re.sub(r"(?i)\ACookie:\s*", "", cookie)
 
         if multipart:
             post = multipart

@@ -5,11 +5,9 @@ Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
-import binascii
 import json
 import re
 import time
-import xml.etree.ElementTree
 
 from lib.core.agent import agent
 from lib.core.bigarray import BigArray
@@ -33,14 +31,11 @@ from lib.core.common import isNumPosStrValue
 from lib.core.common import listToStrValue
 from lib.core.common import parseUnionPage
 from lib.core.common import removeReflectiveValues
-from lib.core.common import safeStringFormat
 from lib.core.common import singleTimeDebugMessage
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import unArrayizeValue
 from lib.core.common import wasLastResponseDBMSError
 from lib.core.compat import xrange
-from lib.core.convert import decodeBase64
-from lib.core.convert import getBytes
 from lib.core.convert import getUnicode
 from lib.core.convert import htmlUnescape
 from lib.core.data import conf
