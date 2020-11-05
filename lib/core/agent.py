@@ -471,6 +471,12 @@ class Agent(object):
         @rtype: C{str}
         """
 
+        match = re.search(r"(?i)(.+)( AS \w+)\Z", field)
+        if match:
+            field, suffix = match.groups()
+        else:
+            suffix = ""
+
         nulledCastedField = field
 
         if field and Backend.getIdentifiedDbms():
@@ -489,6 +495,9 @@ class Agent(object):
             kb.binaryField = conf.binaryFields and field in conf.binaryFields
             if conf.hexConvert or kb.binaryField:
                 nulledCastedField = self.hexConvertField(nulledCastedField)
+
+        if suffix:
+            nulledCastedField += suffix
 
         return nulledCastedField
 
@@ -533,6 +542,7 @@ class Agent(object):
             nulledCastedFields = []
 
             for field in fieldsSplitted:
+                field = re.sub(r"(?i) AS \w+\Z", "", field)         # NOTE: fields such as "... AS type_name" have to be stripped from the alias part for this functionality to work
                 nulledCastedFields.append(self.nullAndCastField(field))
 
             delimiterStr = "%s'%s'%s" % (dbmsDelimiter, kb.chars.delimiter, dbmsDelimiter)
