@@ -12,6 +12,7 @@ import time
 
 from lib.core.agent import agent
 from lib.core.bigarray import BigArray
+from lib.core.common import applyFunctionRecursively
 from lib.core.common import Backend
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import cleanQuery
@@ -504,6 +505,26 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
         warnMsg += "a switch '--no-cast' "
         warnMsg += "or switch '--hex'" if hasattr(queries[Backend.getIdentifiedDbms()], "hex") else ""
         singleTimeWarnMessage(warnMsg)
+
+    # Dirty patch (MSSQL --binary-fields with 0x31003200...)
+    if Backend.isDbms(DBMS.MSSQL) and conf.binaryFields:
+        def _(value):
+            if isinstance(value, six.text_type):
+                if value.startswith(u"0x"):
+                    value = value[2:]
+                    if value and len(value) % 4 == 0:
+                        candidate = ""
+                        for i in xrange(len(value)):
+                            if i % 4 < 2:
+                                candidate += value[i]
+                            elif value[i] != '0':
+                                candidate = None
+                                break
+                        if candidate:
+                            value = candidate
+            return value
+
+        value = applyFunctionRecursively(value, _)
 
     # Dirty patch (safe-encoded unicode characters)
     if isinstance(value, six.text_type) and "\\x" in value:
