@@ -700,6 +700,9 @@ def cmdLineParser(argv=None):
         general.add_argument("--scope", dest="scope",
             help="Regexp for filtering targets")
 
+        general.add_argument("--skip-heuristics", dest="skipHeuristics", action="store_true",
+            help="Skip heuristic detection of SQLi/XSS vulnerabilities")
+
         general.add_argument("--skip-waf", dest="skipWaf", action="store_true",
             help="Skip heuristic detection of WAF/IPS protection")
 

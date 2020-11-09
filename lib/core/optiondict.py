@@ -228,6 +228,7 @@ optDict = {
         "repair": "boolean",
         "saveConfig": "string",
         "scope": "string",
+        "skipHeuristics": "boolean",
         "skipWaf": "boolean",
         "testFilter": "string",
         "testSkip": "string",

@@ -876,7 +876,11 @@ def heuristicCheckDbms(injection):
     to identify with a simple DBMS specific boolean-based test what the DBMS
     may be
     """
+
     retVal = False
+
+    if conf.skipHeuristics:
+        return retVal
 
     pushValue(kb.injection)
     kb.injection = injection
@@ -1031,6 +1035,9 @@ def checkFilteredChars(injection):
     kb.injection = popValue()
 
 def heuristicCheckSqlInjection(place, parameter):
+    if conf.skipHeuristics:
+        return None
+
     if kb.heavilyDynamic:
         debugMsg = "heuristic check skipped because of heavy dynamicity"
         logger.debug(debugMsg)
