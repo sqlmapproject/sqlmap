@@ -2,6 +2,7 @@
 
 ## 2020
 
+* **Nov 7**, Miroslav presents **sqlmap - "One Tiny Step At a Time"** ([slides](https://www.slideshare.net/stamparm/sqlmap-one-tinystepatatime/stamparm/sqlmap-one-tinystepatatime)) at Bsides Chile 2020 (online).
 * **Jan 1**, stable version [1.4](https://github.com/sqlmapproject/sqlmap/releases/tag/1.4) released ([changeset](https://github.com/sqlmapproject/sqlmap/compare/1.3...1.4), [issues](https://github.com/sqlmapproject/sqlmap/milestone/5?closed=1)).
 
 ## 2019
