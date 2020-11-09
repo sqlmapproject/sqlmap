@@ -28,4 +28,4 @@ def tamper(payload, **kwargs):
     'SELECT id FROM testdb 9.e.users'
     """
 
-    return re.sub(r"( FROM \w+)\.(\w+)", r"\g<1> 9.e.\g<2>", payload, re.I) if payload else payload
+    return re.sub(r"(?i)( FROM \w+)\.(\w+)", r"\g<1> 9.e.\g<2>", payload) if payload else payload

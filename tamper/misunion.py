@@ -33,4 +33,4 @@ def tamper(payload, **kwargs):
     '1"-.1UNION ALL SELECT'
     """
 
-    return re.sub(r"\s+(UNION )", r"-.1\g<1>", payload, re.I) if payload else payload
+    return re.sub(r"(?i)\s+(UNION )", r"-.1\g<1>", payload) if payload else payload
