@@ -7,7 +7,7 @@
 
 ## 2019
 
-* **May 8**, support for Python 3 is [done](https://github.com/sqlmapproject/sqlmap/issues/93#issuecomment-490458365)
+* **May 8**, support for Python 3 is [done](https://github.com/sqlmapproject/sqlmap/issues/93#issuecomment-490458365).
 * **Jan 5**, stable version [1.3](https://github.com/sqlmapproject/sqlmap/releases/tag/1.3) released ([changeset](https://github.com/sqlmapproject/sqlmap/compare/1.2...1.3)).
 
 ## 2018
