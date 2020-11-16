@@ -583,6 +583,41 @@ __functions__ = {
     HASH.SHA512_BASE64: sha512_generic_passwd,
 }
 
+def _finalize(retVal, results, processes, attack_info=None):
+    if _multiprocessing:
+        gc.enable()
+
+    # NOTE: https://github.com/sqlmapproject/sqlmap/issues/4367
+    # NOTE: https://dzone.com/articles/python-101-creating-multiple-processes
+    for process in processes:
+        try:
+            process.terminate()
+            process.join()
+        except (OSError, AttributeError):
+            pass
+
+    if retVal:
+        removals = set()
+
+        if conf.hashDB:
+            conf.hashDB.beginTransaction()
+
+        while not retVal.empty():
+            user, hash_, word = item = retVal.get(block=False)
+            results.append(item)
+            removals.add((user, hash_))
+            hashDBWrite(hash_, word)
+
+        for item in attack_info or []:
+            if (item[0][0], item[0][1]) in removals:
+                attack_info.remove(item)
+
+        if conf.hashDB:
+            conf.hashDB.endTransaction()
+
+        if hasattr(retVal, "close"):
+            retVal.close()
+
 def storeHashesToFile(attack_dict):
     if not attack_dict:
         return
@@ -1148,30 +1183,7 @@ def dictionaryAttack(attack_dict):
                     logger.warn(warnMsg)
 
                 finally:
-                    if _multiprocessing:
-                        gc.enable()
-
-                    # NOTE: https://github.com/sqlmapproject/sqlmap/issues/4367
-                    # NOTE: https://dzone.com/articles/python-101-creating-multiple-processes
-                    for process in processes:
-                        try:
-                            process.terminate()
-                            process.join()
-                        except (OSError, AttributeError):
-                            pass
-
-                    if retVal:
-                        if conf.hashDB:
-                            conf.hashDB.beginTransaction()
-
-                        while not retVal.empty():
-                            user, hash_, word = item = retVal.get(block=False)
-                            attack_info = [_ for _ in attack_info if _[0][0] != user or _[0][1] != hash_]
-                            hashDBWrite(hash_, word)
-                            results.append(item)
-
-                        if conf.hashDB:
-                            conf.hashDB.endTransaction()
+                    _finalize(retVal, results, processes, attack_info)
 
             clearConsoleLine()
 
@@ -1253,20 +1265,7 @@ def dictionaryAttack(attack_dict):
                                 pass
 
                     finally:
-                        if _multiprocessing:
-                            gc.enable()
-
-                        if retVal and conf.hashDB:
-                            if conf.hashDB:
-                                conf.hashDB.beginTransaction()
-
-                            while not retVal.empty():
-                                user, hash_, word = item = retVal.get(block=False)
-                                hashDBWrite(hash_, word)
-                                results.append(item)
-
-                            if conf.hashDB:
-                                conf.hashDB.endTransaction()
+                        _finalize(retVal, results, processes, attack_info)
 
                 clearConsoleLine()
 
