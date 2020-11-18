@@ -572,7 +572,20 @@ class Connect(object):
                         else:
                             for char in (r"\r", r"\n"):
                                 cookie.value = re.sub(r"(%s)([^ \t])" % char, r"\g<1>\t\g<2>", cookie.value)
-
+                
+                # You need to set the proxy in the request, just conside to add the http, you can consider to add more proxy
+                if conf.proxy:
+                    _ = _urllib.parse.urlsplit(conf.proxy)
+                    hostnamePort = _.netloc.rsplit(":", 1)
+                    hostname = hostnamePort[0]
+                    if len(hostnamePort) == 2:
+                        try:
+                            port = int(hostnamePort[1])
+                        except:
+                            pass  # drops into the next check block
+                    proxyString = "%s:%d" % (hostname, port)
+                    req.set_proxy(proxyString, 'http')
+                    
                 conn = _urllib.request.urlopen(req)
 
                 if not kb.authHeader and getRequestHeader(req, HTTP_HEADER.AUTHORIZATION) and (conf.authType or "").lower() == AUTH_TYPE.BASIC.lower():
