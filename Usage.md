@@ -29,6 +29,7 @@ Options:
     --param-del=PARA..  Character used for splitting parameter values (e.g. &)
     --cookie=COOKIE     HTTP Cookie header value (e.g. "PHPSESSID=a8d127e..")
     --cookie-del=COO..  Character used for splitting cookie values (e.g. ;)
+    --live-cookies=L..  Live cookies file used for loading up-to-date values
     --load-cookies=L..  File containing cookies in Netscape/wget format
     --drop-set-cookie   Ignore Set-Cookie header from response
     --user-agent=AGENT  HTTP User-Agent header value
@@ -421,7 +422,7 @@ $ python sqlmap.py -u "http://www.target.com/vuln.php" --data="query=foobar;id=\
 
 ### HTTP `Cookie` header
 
-Options and switch: `--cookie`, `--cookie-del`, `--load-cookies` and `--drop-set-cookie`
+Options and switch: `--cookie`, `--cookie-del`, `--live-cookies`, `--load-cookies` and `--drop-set-cookie`
 
 These options and switches can be used in two situations:
 
@@ -440,6 +441,8 @@ If at any time during the communication, the web application responds with `Set-
 
 Vice versa, if you provide a HTTP `Cookie` header with option `--cookie` and the target URL sends an HTTP
 `Set-Cookie` header at any time, sqlmap will ask you which set of cookies to use for the following HTTP requests.
+
+Option `--live-cookies` can be used to provide a cookies file which will be used for loading of up-to-date values. This means that that same file will be read prior to each request to get the latest value for HTTP `Cookie` header.
 
 There is also an option `--load-cookies` which can be used to provide a special file containing Netscape/wget formatted cookies.
 
