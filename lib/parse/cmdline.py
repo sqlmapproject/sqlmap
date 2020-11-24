@@ -963,6 +963,8 @@ def cmdLineParser(argv=None):
                 argv[i] = ""
             elif argv[i].startswith("--data-raw"):
                 argv[i] = argv[i].replace("--data-raw", "--data", 1)
+            elif argv[i].startswith("--drop-cookie"):
+                argv[i] = argv[i].replace("--drop-cookie", "--drop-set-cookie", 1)
             elif any(argv[i].startswith(_) for _ in ("--tamper", "--ignore-code", "--skip")):
                 key = re.search(r"\-?\-(\w+)\b", argv[i]).group(1)
                 index = auxIndexes.get(key, None)
