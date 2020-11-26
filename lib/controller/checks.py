@@ -30,6 +30,7 @@ from lib.core.common import getSortedInjectionTests
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
 from lib.core.common import intersect
+from lib.core.common import isDigit
 from lib.core.common import joinValue
 from lib.core.common import listToStrValue
 from lib.core.common import parseFilePaths
@@ -117,7 +118,7 @@ def checkSqlInjection(place, parameter, value):
     threadData = getCurrentThreadData()
 
     # Favoring non-string specific boundaries in case of digit-like parameter values
-    if value.isdigit():
+    if isDigit(value):
         kb.cache.intBoundaries = kb.cache.intBoundaries or sorted(copy.deepcopy(conf.boundaries), key=lambda boundary: any(_ in (boundary.prefix or "") or _ in (boundary.suffix or "") for _ in ('"', '\'')))
         boundaries = kb.cache.intBoundaries
     elif value.isalpha():
@@ -226,8 +227,8 @@ def checkSqlInjection(place, parameter, value):
             # Skip test if the user's wants to test only for a specific
             # technique
             if conf.technique and isinstance(conf.technique, list) and stype not in conf.technique:
-                debugMsg = "skipping test '%s' because the user " % title
-                debugMsg += "specified to test only for "
+                debugMsg = "skipping test '%s' because user " % title
+                debugMsg += "specified testing of only "
                 debugMsg += "%s techniques" % " & ".join(PAYLOAD.SQLINJECTION[_] for _ in conf.technique)
                 logger.debug(debugMsg)
                 continue
@@ -651,7 +652,7 @@ def checkSqlInjection(place, parameter, value):
                             except SqlmapConnectionException as ex:
                                 debugMsg = "problem occurred most likely because the "
                                 debugMsg += "server hasn't recovered as expected from the "
-                                debugMsg += "error-based payload used ('%s')" % getSafeExString(ex)
+                                debugMsg += "used error-based payload ('%s')" % getSafeExString(ex)
                                 logger.debug(debugMsg)
 
                         # In case of time-based blind or stacked queries
