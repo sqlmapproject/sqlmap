@@ -789,7 +789,6 @@ class Agent(object):
             elif fieldsNoSelect:
                 concatenatedQuery = "CONCAT(CONCAT('%s',%s),'%s')" % (kb.chars.start, concatenatedQuery, kb.chars.stop)
 
-
         return concatenatedQuery
 
     def forgeUnionQuery(self, query, position, count, comment, prefix, suffix, char, where, multipleUnions=None, limited=False, fromTable=None):

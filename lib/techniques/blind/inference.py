@@ -123,10 +123,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             payload = payload.replace("SUBSTRING", "(SELECT%sSUBSTRING" % (match.group(1) if match.group(1) else " "), 1)
             expression = match.group(2).strip()
 
-
-#<inference query="(SELECT SUBSTRING((%s) FROM %d FOR 1) FROM %s)>'%c'"/>
-
-    try:
+   try:
         # Set kb.partRun in case "common prediction" feature (a.k.a. "good samaritan") is used or the engine is called from the API
         if conf.predictOutput:
             kb.partRun = getPartRun()
