@@ -856,7 +856,9 @@ def checkSqlInjection(place, parameter, value):
             logger.warn(warnMsg)
 
         if not checkFalsePositives(injection):
-            kb.vulnHosts.remove(conf.hostname)
+            if conf.hostname in kb.vulnHosts:
+                kb.vulnHosts.remove(conf.hostname)
+
             if NOTE.FALSE_POSITIVE_OR_UNEXPLOITABLE not in injection.notes:
                 injection.notes.append(NOTE.FALSE_POSITIVE_OR_UNEXPLOITABLE)
 
