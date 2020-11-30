@@ -76,17 +76,20 @@ class DNSServer(object):
         self._check_localhost()
         self._requests = []
         self._lock = threading.Lock()
+
         try:
             self._socket = socket._orig_socket(socket.AF_INET, socket.SOCK_DGRAM)
         except AttributeError:
             self._socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
         self._socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self._socket.bind(("", 53))
         self._running = False
         self._initialized = False
 
     def _check_localhost(self):
-        response = ""
+        response = b""
+
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             s.connect(("", 53))
@@ -96,7 +99,7 @@ class DNSServer(object):
             pass
         finally:
             if response and b"google" in response:
-                raise socket.error("another DNS service already running on *:53")
+                raise socket.error("another DNS service already running on '0.0.0.0:53'")
 
     def pop(self, prefix=None, suffix=None):
         """

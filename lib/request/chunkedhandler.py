@@ -6,6 +6,7 @@ See the file 'LICENSE' for copying permission
 """
 
 from lib.core.data import conf
+from lib.core.enums import HTTP_HEADER
 from thirdparty.six.moves import urllib as _urllib
 
 class ChunkedHandler(_urllib.request.HTTPHandler):
@@ -20,20 +21,17 @@ class ChunkedHandler(_urllib.request.HTTPHandler):
 
         if request.data is not None:  # POST
             data = request.data
-            if not request.has_header("Content-type"):
-                request.add_unredirected_header(
-                    "Content-type",
-                    "application/x-www-form-urlencoded")
-            if not request.has_header("Content-length") and not conf.chunked:
-                request.add_unredirected_header(
-                    "Content-length", "%d" % len(data))
+            if not request.has_header(HTTP_HEADER.CONTENT_TYPE):
+                request.add_unredirected_header(HTTP_HEADER.CONTENT_TYPE, "application/x-www-form-urlencoded")
+            if not request.has_header(HTTP_HEADER.CONTENT_LENGTH) and not conf.chunked:
+                request.add_unredirected_header(HTTP_HEADER.CONTENT_LENGTH, "%d" % len(data))
 
         sel_host = host
         if request.has_proxy():
             sel_host = _urllib.parse.urlsplit(request.get_selector()).netloc
 
-        if not request.has_header("Host"):
-            request.add_unredirected_header("Host", sel_host)
+        if not request.has_header(HTTP_HEADER.HOST):
+            request.add_unredirected_header(HTTP_HEADER.HOST, sel_host)
         for name, value in self.parent.addheaders:
             name = name.capitalize()
             if not request.has_header(name):

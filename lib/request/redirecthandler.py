@@ -13,6 +13,7 @@ from lib.core.common import getHostHeader
 from lib.core.common import getSafeExString
 from lib.core.common import logHTTPTraffic
 from lib.core.common import readInput
+from lib.core.convert import getBytes
 from lib.core.convert import getUnicode
 from lib.core.data import conf
 from lib.core.data import kb
@@ -64,8 +65,7 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
                 self.redirect_request = self._redirect_request
 
     def _redirect_request(self, req, fp, code, msg, headers, newurl):
-        newurl = newurl.replace(' ', '%20')
-        return _urllib.request.Request(newurl, data=req.data, headers=req.headers, origin_req_host=req.get_origin_req_host())
+        return _urllib.request.Request(newurl.replace(' ', '%20'), data=req.data, headers=req.headers, origin_req_host=req.get_origin_req_host())
 
     def http_error_302(self, req, fp, code, msg, headers):
         start = time.time()
@@ -75,7 +75,7 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
         try:
             content = fp.read(MAX_CONNECTION_TOTAL_SIZE)
         except:  # e.g. IncompleteRead
-            content = ""
+            content = b""
         finally:
             if content:
                 try:  # try to write it back to the read buffer so we could reuse it in further steps
@@ -163,7 +163,7 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
                             retVal = getSafeExString(ex)        # Note: pyflakes mistakenly marks 'ex' as undefined (NOTE: tested in both Python2 and Python3)
                         except:
                             retVal = ""
-                        return retVal
+                        return getBytes(retVal)
 
                     result.read = types.MethodType(_, result)
 

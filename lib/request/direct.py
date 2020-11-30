@@ -45,8 +45,9 @@ def direct(query, content=True):
                 break
 
     if select:
-        if not query.upper().startswith("SELECT "):
+        if re.search(r"(?i)\ASELECT ", query) is None:
             query = "SELECT %s" % query
+
         if conf.binaryFields:
             for field in conf.binaryFields:
                 field = field.strip()
@@ -58,7 +59,7 @@ def direct(query, content=True):
     output = hashDBRetrieve(query, True, True)
     start = time.time()
 
-    if not select and "EXEC " not in query.upper():
+    if not select and re.search(r"(?i)\bEXEC ", query) is None:
         timeout(func=conf.dbmsConnector.execute, args=(query,), duration=conf.timeout, default=None)
     elif not (output and ("%soutput" % conf.tablePrefix) not in query and ("%sfile" % conf.tablePrefix) not in query):
         output, state = timeout(func=conf.dbmsConnector.select, args=(query,), duration=conf.timeout, default=None)

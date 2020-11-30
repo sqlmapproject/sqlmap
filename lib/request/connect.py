@@ -222,7 +222,7 @@ class Connect(object):
                         try:
                             part = conn.read(MAX_CONNECTION_READ_SIZE)
                         except AssertionError:
-                            part = ""
+                            part = b""
 
                     if len(part) == MAX_CONNECTION_READ_SIZE:
                         warnMsg = "large response detected. This could take a while"
