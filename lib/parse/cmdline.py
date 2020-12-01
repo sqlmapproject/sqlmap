@@ -728,7 +728,7 @@ def cmdLineParser(argv=None):
             help="Run host OS command(s) when SQL injection is found")
 
         miscellaneous.add_argument("--beep", dest="beep", action="store_true",
-            help="Beep on question and/or when SQL injection is found")
+            help="Beep on question and/or when SQLi/XSS/FI is found")
 
         miscellaneous.add_argument("--dependencies", dest="dependencies", action="store_true",
             help="Check for missing (optional) sqlmap dependencies")
