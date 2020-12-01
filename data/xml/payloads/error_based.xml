@@ -175,7 +175,7 @@
     <test>
         <title>MySQL &gt;= 5.0 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (FLOOR)</title>
         <stype>2</stype>
-        <level>1</level>
+        <level>2</level>
         <risk>1</risk>
         <clause>1,2,3,8,9</clause>
         <where>1</where>
@@ -199,7 +199,7 @@
     <test>
         <title>MySQL &gt;= 5.0 OR error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (FLOOR)</title>
         <stype>2</stype>
-        <level>1</level>
+        <level>2</level>
         <risk>3</risk>
         <clause>1,2,3,8,9</clause>
         <!-- Despite this is an OR payload, keep where to 1 because otherwise it will not work when injecting in ORDER BY or GROUP BY -->
@@ -224,7 +224,7 @@
     <test>
         <title>MySQL &gt;= 5.1 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (EXTRACTVALUE)</title>
         <stype>2</stype>
-        <level>2</level>
+        <level>1</level>
         <risk>1</risk>
         <clause>1,2,3,8,9</clause>
         <where>1</where>
@@ -248,7 +248,7 @@
     <test>
         <title>MySQL &gt;= 5.1 OR error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (EXTRACTVALUE)</title>
         <stype>2</stype>
-        <level>2</level>
+        <level>1</level>
         <risk>3</risk>
         <clause>1,2,3,8,9</clause>
         <!-- Despite this is an OR payload, keep where to 1 because otherwise it will not work when injecting in ORDER BY or GROUP BY -->
@@ -322,7 +322,7 @@
     <test>
         <title>MySQL &gt;= 4.1 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (FLOOR)</title>
         <stype>2</stype>
-        <level>2</level>
+        <level>3</level>
         <risk>1</risk>
         <clause>1,2,3,8,9</clause>
         <where>1</where>
@@ -347,7 +347,7 @@
         <!-- It does not work against ORDER BY or GROUP BY clause -->
         <title>MySQL &gt;= 4.1 OR error-based - WHERE or HAVING clause (FLOOR)</title>
         <stype>2</stype>
-        <level>2</level>
+        <level>3</level>
         <risk>3</risk>
         <clause>1,8,9</clause>
         <where>1</where>
@@ -372,7 +372,7 @@
     <test>
         <title>MySQL OR error-based - WHERE or HAVING clause (FLOOR)</title>
         <stype>2</stype>
-        <level>3</level>
+        <level>4</level>
         <risk>3</risk>
         <clause>1,8,9</clause>
         <where>2</where>
@@ -969,7 +969,7 @@
     <test>
         <title>MySQL &gt;= 5.0 error-based - Parameter replace (FLOOR)</title>
         <stype>2</stype>
-        <level>1</level>
+        <level>2</level>
         <risk>1</risk>
         <clause>1,2,3,9</clause>
         <where>3</where>
@@ -1017,7 +1017,7 @@
     <test>
         <title>MySQL &gt;= 5.1 error-based - Parameter replace (EXTRACTVALUE)</title>
         <stype>2</stype>
-        <level>3</level>
+        <level>2</level>
         <risk>1</risk>
         <clause>1,2,3,9</clause>
         <where>3</where>
@@ -1258,7 +1258,7 @@
     <test>
         <title>MySQL &gt;= 5.0 error-based - ORDER BY, GROUP BY clause (FLOOR)</title>
         <stype>2</stype>
-        <level>3</level>
+        <level>4</level>
         <risk>1</risk>
         <clause>2,3</clause>
         <where>1</where>
@@ -1278,7 +1278,7 @@
     <test>
         <title>MySQL &gt;= 5.1 error-based - ORDER BY, GROUP BY clause (EXTRACTVALUE)</title>
         <stype>2</stype>
-        <level>4</level>
+        <level>3</level>
         <risk>1</risk>
         <clause>2,3</clause>
         <where>1</where>
@@ -1318,7 +1318,7 @@
     <test>
         <title>MySQL &gt;= 4.1 error-based - ORDER BY, GROUP BY clause (FLOOR)</title>
         <stype>2</stype>
-        <level>2</level>
+        <level>3</level>
         <risk>1</risk>
         <clause>2,3</clause>
         <where>1</where>
