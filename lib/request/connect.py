@@ -597,6 +597,10 @@ class Connect(object):
                     code = (code or conn.code) if conn.code == kb.originalCode else conn.code  # do not override redirection code (for comparison purposes)
                     responseHeaders = conn.info()
                     responseHeaders[URI_HTTP_HEADER] = conn.geturl()
+
+                    if hasattr(conn, "redurl"):
+                        responseHeaders[HTTP_HEADER.LOCATION] = conn.redurl
+
                     patchHeaders(responseHeaders)
                     kb.serverHeader = responseHeaders.get(HTTP_HEADER.SERVER, kb.serverHeader)
                 else:
