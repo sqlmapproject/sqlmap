@@ -499,6 +499,9 @@ class Agent(object):
         if suffix:
             nulledCastedField += suffix
 
+        if not kb.nchar:
+            nulledCastedField = re.sub(r"( AS )N(CHAR|VARCHAR)", r"\g<1>\g<2>", nulledCastedField)
+
         return nulledCastedField
 
     def nullCastConcatFields(self, fields):

@@ -2071,6 +2071,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.mergeCookies = None
     kb.multipleCtrlC = False
     kb.negativeLogic = False
+    kb.nchar = True
     kb.nullConnection = None
     kb.oldMsf = None
     kb.orderByColumns = None

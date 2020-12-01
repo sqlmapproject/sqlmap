@@ -157,11 +157,19 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
                 warnMsg += "(probably due to its length and/or content): "
                 warnMsg += safecharencode(trimmed)
                 logger.warn(warnMsg)
+
             elif re.search(r"ORDER BY [^ ]+\Z", expression):
                 debugMsg = "retrying failed SQL query without the ORDER BY clause"
                 singleTimeDebugMessage(debugMsg)
 
                 expression = re.sub(r"\s*ORDER BY [^ ]+\Z", "", expression)
+                retVal = _oneShotUnionUse(expression, unpack, limited)
+
+            elif kb.nchar and re.search(r" AS N(CHAR|VARCHAR)", agent.nullAndCastField(expression)):
+                debugMsg = "turning off NATIONAL CHARACTER casting"  # NOTE: in some cases there are "known" incompatibilities between original columns and NCHAR (e.g. http://testphp.vulnweb.com/artists.php?artist=1)
+                singleTimeDebugMessage(debugMsg)
+
+                kb.nchar = False
                 retVal = _oneShotUnionUse(expression, unpack, limited)
     else:
         vector = kb.injection.data[PAYLOAD.TECHNIQUE.UNION].vector
