@@ -2900,10 +2900,12 @@ def urlencode(value, safe="%&=-_", convall=False, limit=False, spaceplus=False):
 
     >>> urlencode('AND 1>(2+3)#')
     'AND%201%3E%282%2B3%29%23'
-    >>> urlencode('AND COUNT(SELECT name FROM users WHERE name LIKE \\'%DBA%\\')>0')
+    >>> urlencode("AND COUNT(SELECT name FROM users WHERE name LIKE '%DBA%')>0")
     'AND%20COUNT%28SELECT%20name%20FROM%20users%20WHERE%20name%20LIKE%20%27%25DBA%25%27%29%3E0'
-    >>> urlencode('AND COUNT(SELECT name FROM users WHERE name LIKE \\'%_SYSTEM%\\')>0')
+    >>> urlencode("AND COUNT(SELECT name FROM users WHERE name LIKE '%_SYSTEM%')>0")
     'AND%20COUNT%28SELECT%20name%20FROM%20users%20WHERE%20name%20LIKE%20%27%25_SYSTEM%25%27%29%3E0'
+    >>> urlencode("SELECT NAME FROM TABLE WHERE VALUE LIKE '%SOME%BEGIN%'")
+    'SELECT%20NAME%20FROM%20TABLE%20WHERE%20VALUE%20LIKE%20%27%25SOME%25BEGIN%25%27'
     """
 
     if conf.get("direct"):
@@ -2928,7 +2930,7 @@ def urlencode(value, safe="%&=-_", convall=False, limit=False, spaceplus=False):
         # encoded (when not representing URL encoded char)
         # except in cases when tampering scripts are used
         if all('%' in _ for _ in (safe, value)) and not kb.tamperFunctions:
-            value = re.sub(r"(?<= ')%", "%25", value)   # e.g. LIKE '%DBA%'
+            value = re.sub(r"(?i)\bLIKE\s+'[^']+'", lambda match: match.group(0).replace('%', "%25"), value)
             value = re.sub(r"%(?![0-9a-fA-F]{2})", "%25", value)
 
         while True:
