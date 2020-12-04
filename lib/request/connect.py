@@ -1278,7 +1278,7 @@ class Connect(object):
 
             for name, value in variables.items():
                 if name != "__builtins__" and originals.get(name, "") != value:
-                    if isinstance(value, (int, float, six.string_types)):
+                    if isinstance(value, (int, float, six.string_types, six.binary_type)):
                         found = False
                         value = getUnicode(value, UNICODE_ENCODING)
 
