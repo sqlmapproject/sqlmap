@@ -67,6 +67,12 @@ class HTTPSConnection(_http_client.HTTPSConnection):
                     sock = create_sock()
                     if protocol not in _contexts:
                         _contexts[protocol] = ssl.SSLContext(protocol)
+                        try:
+                            # Reference(s): https://askubuntu.com/a/1263098
+                            #               https://askubuntu.com/a/1250807
+                            _contexts[protocol].set_ciphers("DEFAULT@SECLEVEL=1")
+                        except ssl.SSLError:
+                            pass
                     result = _contexts[protocol].wrap_socket(sock, do_handshake_on_connect=True, server_hostname=self.host)
                     if result:
                         success = True
