@@ -601,7 +601,7 @@ def scan_log_limited(taskid, start, end):
         logger.warning("[%s] Invalid task ID provided to scan_log_limited()" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
-    if not start.isdigit() or not end.isdigit() or end < start:
+    if not start.isdigit() or not end.isdigit() or int(end) < int(start):
         logger.warning("[%s] Invalid start or end value provided to scan_log_limited()" % taskid)
         return jsonize({"success": False, "message": "Invalid start or end value, must be digits"})
 
