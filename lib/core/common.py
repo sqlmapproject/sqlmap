@@ -4989,7 +4989,7 @@ def resetCookieJar(cookieJar):
             cookieJar.load(cookieJar.filename, ignore_expires=True)
 
             for cookie in cookieJar:
-                if cookie.expires < time.time():
+                if getattr(cookie, "expires", MAX_INT) < time.time():
                     warnMsg = "cookie '%s' has expired" % cookie
                     singleTimeWarnMessage(warnMsg)
 
