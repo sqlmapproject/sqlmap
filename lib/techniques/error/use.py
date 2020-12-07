@@ -80,6 +80,7 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
         debugMsg = "searching for error chunk length..."
         logger.debug(debugMsg)
 
+        seen = set()
         current = MAX_ERROR_CHUNK_LENGTH
         while current >= MIN_ERROR_CHUNK_LENGTH:
             testChar = str(current % 10)
@@ -91,6 +92,7 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
                 testQuery = "SELECT %s" % (agent.hexConvertField(testQuery) if conf.hexConvert else testQuery)
 
             result = unArrayizeValue(_oneShotErrorUse(testQuery, chunkTest=True))
+            seen.add(current)
 
             if (result or "").startswith(testChar):
                 if result == testChar * current:
@@ -99,7 +101,7 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
                 else:
                     result = re.search(r"\A\w+", result).group(0)
                     candidate = len(result) - len(kb.chars.stop)
-                    current = candidate if candidate != current else current - 1
+                    current = candidate if candidate != current and candidate not in seen else current - 1
             else:
                 current = current // 2
 
