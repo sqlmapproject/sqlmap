@@ -12,6 +12,7 @@ import functools
 import math
 import os
 import random
+import string
 import sys
 import time
 import uuid
@@ -186,7 +187,19 @@ def cmp(a, b):
 
 # Reference: https://github.com/urllib3/urllib3/blob/master/src/urllib3/filepost.py
 def choose_boundary():
-    return uuid.uuid4().hex
+    """
+    >>> len(choose_boundary()) == 32
+    True
+    """
+
+    retval = ""
+
+    try:
+        retval = uuid.uuid4().hex
+    except AttributeError:
+        retval = "".join(random.sample("0123456789abcdef", 1)[0] for _ in xrange(32))
+
+    return retval
 
 # Reference: http://python3porting.com/differences.html
 def round(x, d=0):
