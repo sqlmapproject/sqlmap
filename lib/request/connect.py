@@ -707,7 +707,7 @@ class Connect(object):
             responseMsg += "[#%d] (%s %s):\r\n" % (threadData.lastRequestUID, code, status)
 
             if responseHeaders:
-                logHeaders = getUnicode("".join(responseHeaders.headers).strip())
+                logHeaders = "".join(getUnicode(responseHeaders.headers)).strip()
 
             logHTTPTraffic(requestMsg, "%s%s\r\n\r\n%s" % (responseMsg, logHeaders, (page or "")[:MAX_CONNECTION_READ_SIZE]), start, time.time())
 
@@ -887,7 +887,7 @@ class Connect(object):
                 responseMsg += "[#%d] (%s %s):\r\n" % (threadData.lastRequestUID, code, status)
 
             if responseHeaders:
-                logHeaders = getUnicode("".join(responseHeaders.headers).strip())
+                logHeaders = "".join(getUnicode(responseHeaders.headers)).strip()
 
             logHTTPTraffic(requestMsg, "%s%s\r\n\r\n%s" % (responseMsg, logHeaders, (page or "")[:MAX_CONNECTION_READ_SIZE]), start, time.time())
 
