@@ -34,7 +34,7 @@
     <!-- Reference: https://msdn.microsoft.com/en-us/library/windows/desktop/ms724832%28v=vs.85%29.aspx -->
 
     <regexp value="Windows.*\b10\.0">
-        <info type="Windows" distrib="2016|10"/>
+        <info type="Windows" distrib="2019|2016|10"/>
     </regexp>
 
     <regexp value="Windows.*\b6\.3">
@@ -151,7 +151,7 @@
         <info type="Linux" distrib="Ubuntu"/>
     </regexp>
 
-    <!-- Unices -->
+    <!-- BSD -->
 
     <regexp value="FreeBSD">
         <info type="FreeBSD"/>

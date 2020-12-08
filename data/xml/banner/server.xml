@@ -10,7 +10,7 @@
     <!-- Microsoft IIS -->
 
     <regexp value="Microsoft-IIS/(10\.0)">
-        <info technology="Microsoft IIS" tech_version="1" type="Windows" distrib="2016|10"/>
+        <info technology="Microsoft IIS" tech_version="1" type="Windows" distrib="2019|2016|10"/>
     </regexp>
 
     <regexp value="Microsoft-IIS/(8\.5)">
@@ -74,23 +74,27 @@
     <!-- Apache: CentOS -->
 
     <regexp value="Apache/2\.0\.46 \(CentOS\)">
-        <info type="Linux" distrib="CentOS" release="3.9"/>
+        <info type="Linux" distrib="CentOS" release="3"/>
     </regexp>
 
     <regexp value="Apache/2\.0\.52 \(CentOS\)">
-        <info type="Linux" distrib="CentOS" release="4.9"/>
+        <info type="Linux" distrib="CentOS" release="4"/>
     </regexp>
 
     <regexp value="Apache/2\.2\.3 \(CentOS\)">
-        <info type="Linux" distrib="CentOS" release="5.10"/>
+        <info type="Linux" distrib="CentOS" release="5"/>
     </regexp>
 
     <regexp value="Apache/2\.2\.15 \(CentOS\)">
-        <info type="Linux" distrib="CentOS" release="6.8"/>
+        <info type="Linux" distrib="CentOS" release="6"/>
     </regexp>
 
     <regexp value="Apache/2\.4\.6 \(CentOS\)">
-        <info type="Linux" distrib="CentOS" release="7-1708"/>
+        <info type="Linux" distrib="CentOS" release="7"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.37 \(CentOS\)">
+        <info type="Linux" distrib="CentOS" release="8"/>
     </regexp>
 
     <!-- Apache: Debian -->
@@ -131,36 +135,32 @@
         <info type="Linux" distrib="Debian" release="3.1" codename="sarge"/>
     </regexp>
 
-    <regexp value="Apache/1\.3\.34 \(Debian GNU\/Linux\)">
-        <info type="Linux" distrib="Debian" release="4.0" codename="etch"/>
-    </regexp>
-
     <regexp value="Apache/2\.2\.3 \(Debian\)">
-        <info type="Linux" distrib="Debian" release="4.0" codename="etch"/>
-    </regexp>
-
-    <regexp value="Apache/2\.2\.6 \(Debian\)">
-        <info type="Linux" distrib="Debian" release="4.0" codename="etch" updated="True"/>
+        <info type="Linux" distrib="Debian" release="4" codename="etch"/>
     </regexp>
 
     <regexp value="Apache/2\.2\.9 \(Debian\)">
-        <info type="Linux" distrib="Debian" release="5.0" codename="lenny"/>
+        <info type="Linux" distrib="Debian" release="5" codename="lenny"/>
     </regexp>
 
     <regexp value="Apache/2\.2\.16 \(Debian\)">
-        <info type="Linux" distrib="Debian" release="6.0" codename="squeeze"/>
+        <info type="Linux" distrib="Debian" release="6" codename="squeeze"/>
     </regexp>
 
     <regexp value="Apache/2\.2\.22 \(Debian\)">
-        <info type="Linux" distrib="Debian" release="7.0" codename="wheezy"/>
+        <info type="Linux" distrib="Debian" release="7" codename="wheezy"/>
     </regexp>
 
     <regexp value="Apache/2\.4\.10 \(Debian\)">
-        <info type="Linux" distrib="Debian" release="8.0" codename="jessie"/>
+        <info type="Linux" distrib="Debian" release="8" codename="jessie"/>
     </regexp>
 
     <regexp value="Apache/2\.4\.25 \(Debian\)">
-        <info type="Linux" distrib="Debian" release="9.0" codename="stretch"/>
+        <info type="Linux" distrib="Debian" release="9" codename="stretch"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.38 \(Debian\)">
+        <info type="Linux" distrib="Debian" release="10" codename="buster"/>
     </regexp>
 
     <!-- Apache: Fedora -->
@@ -293,6 +293,31 @@
         <info type="Linux" distrib="Fedora" release="27"/>
     </regexp>
 
+
+    <regexp value="Apache/2\.4\.33 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="28"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.34 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="29"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.39 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="30"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.41 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="31"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.43 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="32"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.46 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="33"/>
+    </regexp>
+
     <!-- Apache: FreeBSD -->
 
     <regexp value="Apache/2\.0\.16 \(FreeBSD\)">
@@ -405,6 +430,14 @@
 
     <regexp value="Apache/2\.4\.26 \(FreeBSD\)">
         <info type="FreeBSD" release="11.1"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.39 \(FreeBSD\)">
+        <info type="FreeBSD" release="11.3"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.46 \(FreeBSD\)">
+        <info type="FreeBSD" release="12.2"/>
     </regexp>
 
     <!-- Apache: Mandrake / Mandriva -->
@@ -587,6 +620,10 @@
         <info type="Linux" distrib="Red Hat" release="Enterprise 7" codename="Maipo"/>
     </regexp>
 
+    <regexp value="Apache/2\.4\.37 \(Red Hat\)">
+        <info type="Linux" distrib="Red Hat" release="Enterprise 8" codename="Ootpa"/>
+    </regexp>
+
     <!-- Apache: SuSE -->
 
     <regexp value="Apache/1\.3\.6 \(Unix\) \(SuSE/Linux\)">
@@ -714,6 +751,14 @@
         <info type="Linux" distrib="SuSE" release="42.2|42.3"/>
     </regexp>
 
+    <regexp value="Apache/2\.4\.33 \(Linux/SuSE\)">
+        <info type="Linux" distrib="SuSE" release="15"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.43 \(Linux/SuSE\)">
+        <info type="Linux" distrib="SuSE" release="15.2"/>
+    </regexp>
+
     <!-- Apache: Ubuntu -->
 
     <regexp value="Apache/2\.0\.50 \(Ubuntu\)">
@@ -798,6 +843,22 @@
 
     <regexp value="Apache/2\.4\.27 \(Ubuntu\)">
         <info type="Linux" distrib="Ubuntu" release="17.10" codename="artful"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.29 \(Ubuntu\)">
+        <info type="Linux" distrib="Ubuntu" release="18.04" codename="bionic"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.34 \(Ubuntu\)">
+        <info type="Linux" distrib="Ubuntu" release="18.10" codename="cosmic"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.38 \(Ubuntu\)">
+        <info type="Linux" distrib="Ubuntu" release="19.04" codename="disco"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.41 \(Ubuntu\)">
+        <info type="Linux" distrib="Ubuntu" release="19.10|20.04" codename="eoan|focal"/>
     </regexp>
 
     <!-- Nginx -->

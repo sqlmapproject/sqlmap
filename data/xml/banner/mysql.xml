@@ -64,6 +64,10 @@
         <info dbms_version="1" type="Linux" distrib="Debian" release="12" codename="bookworm"/>
     </regexp>
 
+    <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+trixie">
+        <info dbms_version="1" type="Linux" distrib="Debian" release="13" codename="trixie"/>
+    </regexp>
+
     <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+(sid|unstable)">
         <info dbms_version="1" type="Linux" distrib="Debian" codename="unstable"/>
     </regexp>
