@@ -31,6 +31,7 @@ from lib.core.settings import MAX_TOTAL_REDIRECTIONS
 from lib.core.threads import getCurrentThreadData
 from lib.request.basic import decodePage
 from lib.request.basic import parseResponse
+from thirdparty import six
 from thirdparty.six.moves import urllib as _urllib
 
 class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
@@ -182,7 +183,7 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
         threadData.lastRedirectURL = (threadData.lastRequestUID, redurl)
 
         result.redcode = code
-        result.redurl = getUnicode(redurl)
+        result.redurl = getUnicode(redurl) if six.PY3 else redurl
         return result
 
     http_error_301 = http_error_303 = http_error_307 = http_error_302
