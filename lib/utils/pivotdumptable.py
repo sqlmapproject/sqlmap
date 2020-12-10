@@ -113,7 +113,7 @@ def pivotDumpTable(table, colList, count=None, blind=True, alias=None):
                     break
 
         if not validColumnList:
-            errMsg = "all column name(s) provided are non-existent"
+            errMsg = "all provided column name(s) are non-existent"
             raise SqlmapNoneDataException(errMsg)
 
         if not validPivotValue:

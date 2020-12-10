@@ -328,20 +328,20 @@ def main():
 
         elif all(_ in excMsg for _ in ("twophase", "sqlalchemy")):
             errMsg = "please update the 'sqlalchemy' package (>= 1.1.11) "
-            errMsg += "(Reference: https://qiita.com/tkprof/items/7d7b2d00df9c5f16fffe)"
+            errMsg += "(Reference: 'https://qiita.com/tkprof/items/7d7b2d00df9c5f16fffe')"
             logger.critical(errMsg)
             raise SystemExit
 
         elif all(_ in excMsg for _ in ("scramble_caching_sha2", "TypeError")):
             errMsg = "please downgrade the 'PyMySQL' package (=< 0.8.1) "
-            errMsg += "(Reference: https://github.com/PyMySQL/PyMySQL/issues/700)"
+            errMsg += "(Reference: 'https://github.com/PyMySQL/PyMySQL/issues/700')"
             logger.critical(errMsg)
             raise SystemExit
 
         elif "must be pinned buffer, not bytearray" in excMsg:
             errMsg = "error occurred at Python interpreter which "
             errMsg += "is fixed in 2.7. Please update accordingly "
-            errMsg += "(Reference: https://bugs.python.org/issue8104)"
+            errMsg += "(Reference: 'https://bugs.python.org/issue8104')"
             logger.critical(errMsg)
             raise SystemExit
 
@@ -431,7 +431,7 @@ def main():
 
         elif all(_ in excMsg for _ in ("HTTPNtlmAuthHandler", "'str' object has no attribute 'decode'")):
             errMsg = "package 'python-ntlm' has a known compatibility issue with the "
-            errMsg += "Python 3 (Reference: https://github.com/mullender/python-ntlm/pull/61)"
+            errMsg += "Python 3 (Reference: 'https://github.com/mullender/python-ntlm/pull/61')"
             logger.critical(errMsg)
             raise SystemExit
 

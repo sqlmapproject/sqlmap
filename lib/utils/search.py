@@ -130,7 +130,7 @@ def _search(dork):
             url = "https://www.bing.com/search?q=%s&first=%d" % (urlencode(dork, convall=True), (gpage - 1) * 10 + 1)
             regex = BING_REGEX
         else:
-            url = "https://duckduckgo.com/html/"
+            url = "https://html.duckduckgo.com/html/"
             data = "q=%s&s=%d" % (urlencode(dork, convall=True), (gpage - 1) * 30)
             regex = DUCKDUCKGO_REGEX
 

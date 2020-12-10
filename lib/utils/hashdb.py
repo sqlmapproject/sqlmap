@@ -116,7 +116,7 @@ class HashDB(object):
             self._write_cache[hash_] = getUnicode(value) if not serialize else serializeObject(value)
             self._cache_lock.release()
 
-        if getCurrentThreadName() in ('0', 'MainThread'):
+        if getCurrentThreadName() in ('0', "MainThread"):
             self.flush()
 
     def flush(self, forced=False):
