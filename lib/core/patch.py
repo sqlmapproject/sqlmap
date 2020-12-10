@@ -8,6 +8,8 @@ See the file 'LICENSE' for copying permission
 import codecs
 import os
 import random
+import re
+import sys
 
 import lib.controller.checks
 import lib.core.common
@@ -30,6 +32,7 @@ from lib.core.common import singleTimeWarnMessage
 from lib.core.compat import xrange
 from lib.core.convert import stdoutEncode
 from lib.core.data import conf
+from lib.core.enums import PLACE
 from lib.core.option import _setHTTPHandlers
 from lib.core.option import setVerbosity
 from lib.core.settings import IS_WIN
@@ -76,6 +79,10 @@ def dirtyPatches():
 
     # to prevent too much "guessing" in case of binary data retrieval
     thirdparty.chardet.universaldetector.MINIMUM_THRESHOLD = 0.90
+
+    match = re.search(r" --method[= ](\w+)", " ".join(sys.argv))
+    if match and match.group(1).upper() != PLACE.POST:
+        PLACE.CUSTOM_POST = PLACE.CUSTOM_POST.replace("POST", "%s (body)" % match.group(1))
 
     # https://github.com/sqlmapproject/sqlmap/issues/4314
     try:

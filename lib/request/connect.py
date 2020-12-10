@@ -64,6 +64,7 @@ from lib.core.compat import xrange
 from lib.core.convert import getBytes
 from lib.core.convert import getText
 from lib.core.convert import getUnicode
+from lib.core.data import cmdLineOptions
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -520,9 +521,9 @@ class Connect(object):
 
                 logger.log(CUSTOM_LOGGING.TRAFFIC_OUT, requestMsg)
             else:
-                if method and method not in (HTTPMETHOD.GET, HTTPMETHOD.POST):
+                if target and cmdLineOptions.method or method and method not in (HTTPMETHOD.GET, HTTPMETHOD.POST):
                     req = MethodRequest(url, post, headers)
-                    req.set_method(method)
+                    req.set_method(cmdLineOptions.method or method)
                 elif url is not None:
                     req = _urllib.request.Request(url, post, headers)
                 else:
