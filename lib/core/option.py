@@ -1868,6 +1868,8 @@ def _cleanupOptions():
 
     if conf.exclude:
         regex = False
+        original = conf.exclude
+
         if any(_ in conf.exclude for _ in ('+', '*')):
             try:
                 re.compile(conf.exclude)
@@ -1881,6 +1883,12 @@ def _cleanupOptions():
             conf.exclude = r"\A%s\Z" % '|'.join(re.escape(_) for _ in conf.exclude.split(','))
         else:
             conf.exclude = re.sub(r"(\w+)\$", r"\g<1>\$", conf.exclude)
+
+        class _(six.text_type):
+            pass
+
+        conf.exclude = _(conf.exclude)
+        conf.exclude._original = original
 
     if conf.binaryFields:
         conf.binaryFields = conf.binaryFields.replace(" ", "")

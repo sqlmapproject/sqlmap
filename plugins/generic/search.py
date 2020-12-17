@@ -194,6 +194,9 @@ class Search(object):
             else:
                 whereDbsQuery = ""
 
+            if dbCond and conf.exclude:
+                whereDbsQuery += " AND %s NOT LIKE '%s'" % (dbCond, re.sub(r"\.[*+]", '%', conf.exclude._original))
+
             logger.info(infoMsg)
 
             tblQuery = "%s%s" % (tblCond, tblCondParam)
@@ -430,6 +433,9 @@ class Search(object):
                     logger.info(msg)
                 else:
                     infoMsgDb = " across all databases"
+
+                if conf.exclude:
+                    whereDbsQuery += " AND %s NOT LIKE '%s'" % (dbCond, re.sub(r"\.[*+]", '%', conf.exclude._original))
 
             logger.info("%s%s%s" % (infoMsg, infoMsgTbl, infoMsgDb))
 
