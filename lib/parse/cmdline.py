@@ -1009,7 +1009,7 @@ def cmdLineParser(argv=None):
                             found = True
                     if not found:
                         get_groups(parser).remove(group)
-            elif '=' in argv[i] and not argv[i].startswith('-') and argv[i].split('=')[0] in longOptions and re.search(r"\A-\w\Z", argv[i - 1]) is None:
+            elif '=' in argv[i] and not argv[i].startswith('-') and argv[i].split('=')[0] in longOptions and re.search(r"\A-{1,2}\w", argv[i - 1]) is None:
                 dataToStdout("[!] detected usage of long-option without a starting hyphen ('%s')\n" % argv[i])
                 raise SystemExit
 
