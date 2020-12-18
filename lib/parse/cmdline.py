@@ -936,7 +936,7 @@ def cmdLineParser(argv=None):
 
         for i in xrange(len(argv)):
             # Reference: https://en.wiktionary.org/wiki/-
-            argv[i] = re.sub(u"\A(\u2010|\u2013|\u2212|\u2014|\u4e00|\u1680|\uFE63|\uFF0D)+", lambda match: '-' * len(match.group(0)), argv[i])
+            argv[i] = re.sub(u"\\A(\u2010|\u2013|\u2212|\u2014|\u4e00|\u1680|\uFE63|\uFF0D)+", lambda match: '-' * len(match.group(0)), argv[i])
 
             # Reference: https://unicode-table.com/en/sets/quotation-marks/
             argv[i] = argv[i].strip(u"\u00AB\u2039\u00BB\u203A\u201E\u201C\u201F\u201D\u2019\u0022\u275D\u275E\u276E\u276F\u2E42\u301D\u301E\u301F\uFF02\u201A\u2018\u201B\u275B\u275C")
