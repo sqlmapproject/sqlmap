@@ -61,7 +61,7 @@ class HTTPSConnection(_http_client.HTTPSConnection):
 
         # Reference(s): https://docs.python.org/2/library/ssl.html#ssl.SSLContext
         #               https://www.mnot.net/blog/2014/12/27/python_2_and_tls_sni
-        if re.search(r"\A[\d.]+\Z", self.host) is None and kb.tlsSNI.get(self.host) is not False and hasattr(ssl, "SSLContext"):
+        if re.search(r"\A[\d.]+\Z", conf.hostname) is None and kb.tlsSNI.get(conf.hostname) is not False and hasattr(ssl, "SSLContext"):
             for protocol in (_ for _ in _protocols if _ >= ssl.PROTOCOL_TLSv1):
                 try:
                     sock = create_sock()
@@ -73,7 +73,7 @@ class HTTPSConnection(_http_client.HTTPSConnection):
                             _contexts[protocol].set_ciphers("DEFAULT@SECLEVEL=1")
                         except ssl.SSLError:
                             pass
-                    result = _contexts[protocol].wrap_socket(sock, do_handshake_on_connect=True, server_hostname=self.host)
+                    result = _contexts[protocol].wrap_socket(sock, do_handshake_on_connect=True, server_hostname=conf.hostname)
                     if result:
                         success = True
                         self.sock = result
@@ -86,8 +86,8 @@ class HTTPSConnection(_http_client.HTTPSConnection):
                     self._tunnel_host = None
                     logger.debug("SSL connection error occurred for '%s' ('%s')" % (_lut[protocol], getSafeExString(ex)))
 
-            if kb.tlsSNI.get(self.host) is None:
-                kb.tlsSNI[self.host] = success
+            if kb.tlsSNI.get(conf.hostname) is None:
+                kb.tlsSNI[conf.hostname] = success
 
         if not success:
             for protocol in _protocols:
