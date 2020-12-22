@@ -798,7 +798,9 @@ news
 nick
 number
 nummer
+passhash
 pass_hash
+password_hash
 passwordsalt
 personal_key
 phone
@@ -2726,3 +2728,4 @@ confidential
 # Misc
 
 u_pass
+hashedPw

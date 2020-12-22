@@ -1825,6 +1825,7 @@ jos_comprofiler_members
 jos_joomblog_users
 jos_moschat_users
 knews_lostpass
+korisnik
 korisnici
 kpro_adminlogs
 kpro_user
@@ -2215,6 +2216,7 @@ admin_pwd
 admin_pass
 adminpassword
 admin_password
+admin_passwords
 usrpass
 usr_pass
 pass
