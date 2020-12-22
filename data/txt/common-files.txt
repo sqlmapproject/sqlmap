@@ -1797,3 +1797,5 @@
 /app/app.js
 /app/configure.js
 /app/config/config.json
+/flag.txt
+/readflag
