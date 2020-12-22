@@ -31,6 +31,10 @@
         <info technology="Express"/>
     </regexp>
 
+    <regexp value="WP Engine">
+        <info technology="WP Engine"/>
+    </regexp>
+
     <regexp value="PleskLin">
         <info technology="Plesk" type="Linux"/>
     </regexp>
