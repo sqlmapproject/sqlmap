@@ -587,7 +587,15 @@ class Backend(object):
 
     @staticmethod
     def isVersionGreaterOrEqualThan(version):
-        return Backend.getVersion() is not None and version is not None and distutils.version.LooseVersion(str(Backend.getVersion()) or ' ') >= distutils.version.LooseVersion(str(version) or ' ')
+        retVal = False
+
+        if Backend.getVersion() is not None and version is not None:
+            try:
+                retVal = distutils.version.LooseVersion(Backend.getVersion()) >= distutils.version.LooseVersion(version)
+            except:
+                retVal = str(Backend.getVersion()) >= str(version)
+
+        return retVal
 
     @staticmethod
     def isOs(os):
