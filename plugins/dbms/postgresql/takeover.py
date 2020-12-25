@@ -5,6 +5,7 @@ Copyright (c) 2006-2020 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+import distutils.version
 import os
 
 from lib.core.common import Backend
@@ -50,9 +51,9 @@ class Takeover(GenericTakeover):
 
         banVer = kb.bannerFp["dbmsVersion"]
 
-        if banVer >= "10":
+        if distutils.version.LooseVersion(banVer) >= distutils.version.LooseVersion("10"):
             majorVer = banVer.split('.')[0]
-        elif banVer >= "8.2" and '.' in banVer:
+        elif distutils.version.LooseVersion(banVer) >= distutils.version.LooseVersion("8.2") and '.' in banVer:
             majorVer = '.'.join(banVer.split('.')[:2])
         else:
             errMsg = "unsupported feature on versions of PostgreSQL before 8.2"
