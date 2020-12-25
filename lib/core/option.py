@@ -2591,6 +2591,13 @@ def _basicOptionValidation():
         errMsg = "switch '--no-cast' is incompatible with switch '--hex'"
         raise SqlmapSyntaxException(errMsg)
 
+    if conf.crawlDepth:
+        try:
+            xrange(conf.crawlDepth)
+        except OverflowError as ex:
+            errMsg = "invalid value used for option '--crawl' ('%s')" % getSafeExString(ex)
+            raise SqlmapSyntaxException(errMsg)
+
     if conf.dumpAll and conf.search:
         errMsg = "switch '--dump-all' is incompatible with switch '--search'"
         raise SqlmapSyntaxException(errMsg)
