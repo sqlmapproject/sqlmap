@@ -285,6 +285,15 @@ class Connect(object):
             kb.requestCounter += 1
             threadData.lastRequestUID = kb.requestCounter
 
+            if conf.proxyFreq:
+                if kb.requestCounter % conf.proxyFreq == 1:
+                    conf.proxy = None
+
+                    warnMsg = "changing proxy"
+                    logger.warn(warnMsg)
+
+                    setHTTPHandlers()
+
         if conf.dummy or conf.murphyRate and randomInt() % conf.murphyRate == 0:
             if conf.murphyRate:
                 time.sleep(randomInt() % (MAX_MURPHY_SLEEP_TIME + 1))

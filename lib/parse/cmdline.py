@@ -222,6 +222,9 @@ def cmdLineParser(argv=None):
         request.add_argument("--proxy-file", dest="proxyFile",
             help="Load proxy list from a file")
 
+        request.add_argument("--proxy-freq", dest="proxyFreq", type=int,
+            help="Requests between change of proxy from a given list")
+
         request.add_argument("--tor", dest="tor", action="store_true",
             help="Use Tor anonymity network")
 

@@ -46,6 +46,7 @@ optDict = {
         "proxy": "string",
         "proxyCred": "string",
         "proxyFile": "string",
+        "proxyFreq": "integer",
         "tor": "boolean",
         "torPort": "integer",
         "torType": "string",

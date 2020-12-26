@@ -2714,6 +2714,10 @@ def _basicOptionValidation():
         errMsg = "switch '--proxy' is incompatible with option '--proxy-file'"
         raise SqlmapSyntaxException(errMsg)
 
+    if conf.proxyFreq and not conf.proxyFile:
+        errMsg = "option '--proxy-freq' requires usage of option '--proxy-file'"
+        raise SqlmapSyntaxException(errMsg)
+
     if conf.checkTor and not any((conf.tor, conf.proxy)):
         errMsg = "switch '--check-tor' requires usage of switch '--tor' (or option '--proxy' with HTTP proxy address of Tor service)"
         raise SqlmapSyntaxException(errMsg)
