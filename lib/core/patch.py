@@ -87,7 +87,7 @@ def dirtyPatches():
     # https://github.com/sqlmapproject/sqlmap/issues/4314
     try:
         os.urandom(1)
-    except NotImplemented:
+    except NotImplementedError:
         if six.PY3:
             os.urandom = lambda size: bytes(random.randint(0, 255) for _ in range(size))
         else:
