@@ -60,7 +60,7 @@ else:
     HTTPCookieProcessor = urllib2.HTTPCookieProcessor
 
 NAME = "identYwaf"
-VERSION = "1.0.129"
+VERSION = "1.0.131"
 BANNER = r"""
                                    ` __ __ `
  ____  ___      ___  ____   ______ `|  T  T` __    __   ____  _____ 
@@ -509,7 +509,7 @@ def run():
 
     print(colorize("%s[=] results: '%s'" % ("\n" if IS_TTY else "", results)))
 
-    hardness = 100 * results.count('x') / len(results)
+    hardness = 100 * results.count('x') // len(results)
     print(colorize("[=] hardness: %s (%d%%)" % ("insane" if hardness >= 80 else ("hard" if hardness >= 50 else ("moderate" if hardness >= 30 else "easy")), hardness)))
 
     if blocked:
@@ -545,7 +545,7 @@ def run():
                         counter_y += 1
                     elif any(_ in markers for _ in (part & ~1, part | 1)):
                         counter_n += 1
-                result = int(round(100 * counter_y / (counter_y + counter_n)))
+                result = int(round(100.0 * counter_y / (counter_y + counter_n)))
                 if SIGNATURES[candidate] in matches:
                     if result > matches[SIGNATURES[candidate]]:
                         matches[SIGNATURES[candidate]] = result
