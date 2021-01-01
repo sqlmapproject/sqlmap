@@ -253,7 +253,7 @@ def unionUse(expression, unpack=True, dump=False):
                 query = expression.replace(expressionFields, "ARRAY_AGG('%s'||%s||'%s')::text" % (kb.chars.start, ("||'%s'||" % kb.chars.delimiter).join("COALESCE(%s::text,' ')" % field for field in expressionFieldsList), kb.chars.stop), 1)
             elif Backend.isDbms(DBMS.MSSQL):
                 query = "'%s'+(%s FOR JSON AUTO, INCLUDE_NULL_VALUES)+'%s'" % (kb.chars.start, expression, kb.chars.stop)
-            output = _oneShotUnionUse(query, False)
+            output = _oneShotUnionUse(unescaper.escape(query), False)
             value = parseUnionPage(output)
             kb.jsonAggMode = False
 
