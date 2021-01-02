@@ -244,16 +244,19 @@ def unionUse(expression, unpack=True, dump=False):
     if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ORACLE, DBMS.PGSQL, DBMS.MSSQL) and expressionFields and not conf.binaryFields:
         match = re.search(r"SELECT\s*(.+?)\bFROM", expression, re.I)
         if match and not (Backend.isDbms(DBMS.ORACLE) and FROM_DUMMY_TABLE[DBMS.ORACLE] in expression):
+            escapedKbCharsStart = unescaper.escape("'%s'" % kb.chars.start)
+            escapedKbCharsStop = unescaper.escape("'%s'" % kb.chars.stop)
+            escapedKbCharsDelimiter = unescaper.escape("'%s'" % kb.chars.delimiter)
             kb.jsonAggMode = True
             if Backend.isDbms(DBMS.MYSQL):
-                query = expression.replace(expressionFields, "CONCAT('%s',JSON_ARRAYAGG(CONCAT_WS('%s',%s)),'%s')" % (kb.chars.start, kb.chars.delimiter, expressionFields, kb.chars.stop), 1)
+                query = expression.replace(expressionFields, "CONCAT(%s,JSON_ARRAYAGG(CONCAT_WS(%s,%s)),%s)" % (escapedKbCharsStart, escapedKbCharsDelimiter, expressionFields, escapedKbCharsStop), 1)
             elif Backend.isDbms(DBMS.ORACLE):
-                query = expression.replace(expressionFields, "'%s'||JSON_ARRAYAGG(%s)||'%s'" % (kb.chars.start, ("||'%s'||" % kb.chars.delimiter).join(expressionFieldsList), kb.chars.stop), 1)
+                query = expression.replace(expressionFields, "%s||JSON_ARRAYAGG(%s)||%s" % (escapedKbCharsStart, ("||%s||" % escapedKbCharsDelimiter).join(expressionFieldsList), escapedKbCharsStop), 1)
             elif Backend.isDbms(DBMS.PGSQL):    # Note: ARRAY_AGG does CSV alike output, thus enclosing start/end inside each item
-                query = expression.replace(expressionFields, "ARRAY_AGG('%s'||%s||'%s')::text" % (kb.chars.start, ("||'%s'||" % kb.chars.delimiter).join("COALESCE(%s::text,' ')" % field for field in expressionFieldsList), kb.chars.stop), 1)
+                query = expression.replace(expressionFields, "ARRAY_AGG(%s||%s||%s)::text" % (escapedKbCharsStart, ("||%s||" % escapedKbCharsDelimiter).join("COALESCE(%s::text,' ')" % field for field in expressionFieldsList), escapedKbCharsStop), 1)
             elif Backend.isDbms(DBMS.MSSQL):
-                query = "'%s'+(%s FOR JSON AUTO, INCLUDE_NULL_VALUES)+'%s'" % (kb.chars.start, expression, kb.chars.stop)
-            output = _oneShotUnionUse(unescaper.escape(query), False)
+                query = "%s+(%s FOR JSON AUTO, INCLUDE_NULL_VALUES)+%s" % (escapedKbCharsStart, expression, escapedKbCharsStop)
+            output = _oneShotUnionUse(query, False)
             value = parseUnionPage(output)
             kb.jsonAggMode = False
 
