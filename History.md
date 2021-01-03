@@ -1,5 +1,9 @@
 # History
 
+## 2021
+
+* **Jan 3**, stable version [1.5](https://github.com/sqlmapproject/sqlmap/releases/tag/1.5) released ([changeset](https://github.com/sqlmapproject/sqlmap/compare/1.4...1.5), [issues](https://github.com/sqlmapproject/sqlmap/milestone/6?closed=1)).
+
 ## 2020
 
 * **Nov 7**, Miroslav presents **sqlmap - "One Tiny Step At a Time"** ([slides](https://www.slideshare.net/stamparm/sqlmap-one-tinystepatatime/stamparm/sqlmap-one-tinystepatatime)) at Bsides Chile 2020 (online).
