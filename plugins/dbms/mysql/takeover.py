@@ -38,7 +38,7 @@ class Takeover(GenericTakeover):
 
         banVer = kb.bannerFp["dbmsVersion"]
 
-        if distutils.version.LooseVersion(banVer) >= distutils.version.LooseVersion("5.0.67"):
+        if banVer and distutils.version.LooseVersion(banVer) >= distutils.version.LooseVersion("5.0.67"):
             if self.__plugindir is None:
                 logger.info("retrieving MySQL plugin directory absolute path")
                 self.__plugindir = unArrayizeValue(inject.getValue("SELECT @@plugin_dir"))

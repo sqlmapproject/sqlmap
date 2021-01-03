@@ -51,7 +51,10 @@ class Takeover(GenericTakeover):
 
         banVer = kb.bannerFp["dbmsVersion"]
 
-        if distutils.version.LooseVersion(banVer) >= distutils.version.LooseVersion("10"):
+        if not banVer:
+            errMsg = "unsupported feature on unknown version of PostgreSQL"
+            raise SqlmapUnsupportedFeatureException(errMsg)
+        elif distutils.version.LooseVersion(banVer) >= distutils.version.LooseVersion("10"):
             majorVer = banVer.split('.')[0]
         elif distutils.version.LooseVersion(banVer) >= distutils.version.LooseVersion("8.2") and '.' in banVer:
             majorVer = '.'.join(banVer.split('.')[:2])
