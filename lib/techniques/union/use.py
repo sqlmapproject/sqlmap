@@ -85,8 +85,9 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
             query = agent.forgeUnionQuery(injExpression, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], vector[6], None, limited)
             where = PAYLOAD.WHERE.NEGATIVE if conf.limitStart or conf.limitStop else vector[6]
         else:
+            injExpression = unescaper.escape(expression)
             where = vector[6]
-            query = agent.forgeUnionQuery(expression, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], vector[6], None, False)
+            query = agent.forgeUnionQuery(injExpression, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], vector[6], None, False)
 
         payload = agent.payload(newValue=query, where=where)
 
