@@ -98,7 +98,7 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
 
         if kb.jsonAggMode:
             if Backend.isDbms(DBMS.MSSQL):
-                output = extractRegexResult(r"%s(?P<result>.*)%s" % (kb.chars.start, kb.chars.stop), page or "")
+                output = extractRegexResult(r"%s(?P<result>.*)%s" % (kb.chars.start, kb.chars.stop), removeReflectiveValues(page or "", payload))
                 if output:
                     try:
                         retVal = ""
@@ -110,11 +110,11 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
                     else:
                         retVal = getUnicode(retVal)
             elif Backend.isDbms(DBMS.PGSQL):
-                output = extractRegexResult(r"(?P<result>%s.*%s)" % (kb.chars.start, kb.chars.stop), page or "")
+                output = extractRegexResult(r"(?P<result>%s.*%s)" % (kb.chars.start, kb.chars.stop), removeReflectiveValues(page or "", payload))
                 if output:
                     retVal = output
             else:
-                output = extractRegexResult(r"%s(?P<result>.*?)%s" % (kb.chars.start, kb.chars.stop), page or "")
+                output = extractRegexResult(r"%s(?P<result>.*?)%s" % (kb.chars.start, kb.chars.stop), removeReflectiveValues(page or "", payload))
                 if output:
                     try:
                         retVal = ""
