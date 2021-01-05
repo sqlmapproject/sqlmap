@@ -330,6 +330,8 @@ def getUnicode(value, encoding=None, noneToNull=False):
     True
     >>> getUnicode(1) == u'1'
     True
+    >>> getUnicode(None) == 'None'
+    True
     """
 
     if noneToNull and value is None:

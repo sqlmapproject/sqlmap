@@ -1270,9 +1270,11 @@ def sanitizeStr(value):
 
     >>> sanitizeStr('foo\\n\\rbar') == 'foo bar'
     True
+    >>> sanitizeStr(None) == 'None'
+    True
     """
 
-    return getUnicode(value).replace("\n", " ").replace("\r", "") if value else value
+    return getUnicode(value).replace("\n", " ").replace("\r", "")
 
 def getHeader(headers, key):
     """
