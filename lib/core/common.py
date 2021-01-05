@@ -1272,7 +1272,7 @@ def sanitizeStr(value):
     True
     """
 
-    return getUnicode(value).replace("\n", " ").replace("\r", "")
+    return getUnicode(value).replace("\n", " ").replace("\r", "") if value else value
 
 def getHeader(headers, key):
     """

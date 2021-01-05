@@ -20,7 +20,7 @@ class FingerprintHandler(ContentHandler):
     def __init__(self, banner, info):
         ContentHandler.__init__(self)
 
-        self._banner = sanitizeStr(banner)
+        self._banner = sanitizeStr(banner or "")
         self._regexp = None
         self._match = None
         self._dbmsVersion = None
@@ -47,7 +47,7 @@ class FingerprintHandler(ContentHandler):
             self._regexp = sanitizeStr(attrs.get("value"))
             _ = re.match(r"\A[A-Za-z0-9]+", self._regexp)  # minor trick avoiding compiling of large amount of regexes
 
-            if _ and _.group(0).lower() in self._banner.lower() or not _:
+            if _ and self._banner and _.group(0).lower() in self._banner.lower() or not _:
                 self._match = re.search(self._regexp, self._banner, re.I | re.M)
             else:
                 self._match = None
