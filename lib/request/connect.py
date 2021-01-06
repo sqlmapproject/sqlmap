@@ -6,6 +6,7 @@ See the file 'LICENSE' for copying permission
 """
 
 import binascii
+import inspect
 import logging
 import os
 import random
@@ -13,6 +14,7 @@ import re
 import socket
 import string
 import struct
+import sys
 import time
 import traceback
 
@@ -145,6 +147,10 @@ class Connect(object):
 
     @staticmethod
     def _getPageProxy(**kwargs):
+        if (len(inspect.stack()) > sys.getrecursionlimit() // 2):   # Note: https://github.com/sqlmapproject/sqlmap/issues/4525
+            warnMsg = "unable to connect to the target URL"
+            raise SqlmapConnectionException(warnMsg)
+
         try:
             return Connect.getPage(**kwargs)
         except RuntimeError:
