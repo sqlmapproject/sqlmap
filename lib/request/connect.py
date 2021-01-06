@@ -241,7 +241,7 @@ class Connect(object):
                     if len(part) == MAX_CONNECTION_READ_SIZE:
                         warnMsg = "large response detected. This could take a while"
                         singleTimeWarnMessage(warnMsg)
-                        part = re.sub(r"(?si)%s.+?%s" % (kb.chars.stop, kb.chars.start), "%s%s%s" % (kb.chars.stop, LARGE_READ_TRIM_MARKER, kb.chars.start), part)
+                        part = re.sub(getBytes(r"(?si)%s.+?%s" % (kb.chars.stop, kb.chars.start)), getBytes("%s%s%s" % (kb.chars.stop, LARGE_READ_TRIM_MARKER, kb.chars.start)), part)
                         retVal += part
                     else:
                         retVal += part

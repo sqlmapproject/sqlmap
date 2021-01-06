@@ -303,7 +303,7 @@ def decodePage(page, contentEncoding, contentType, percentDecode=True):
 
             page = data.read()
         except Exception as ex:
-            if "<html" not in page:  # in some cases, invalid "Content-Encoding" appears for plain HTML (should be ignored)
+            if b"<html" not in page:  # in some cases, invalid "Content-Encoding" appears for plain HTML (should be ignored)
                 errMsg = "detected invalid data for declared content "
                 errMsg += "encoding '%s' ('%s')" % (contentEncoding, getSafeExString(ex))
                 singleTimeLogMessage(errMsg, logging.ERROR)
