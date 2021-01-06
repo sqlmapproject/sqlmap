@@ -193,11 +193,18 @@ class Connect(object):
                     warnMsg += "(e.g. 'https://help.ubuntu.com/community/Tor')"
             else:
                 warnMsg = "if the problem persists please check that the provided "
-                warnMsg += "target URL is reachable. In case that it is, "
-                warnMsg += "you can try to rerun with "
+                warnMsg += "target URL is reachable"
+
+                items = []
                 if not conf.randomAgent:
-                    warnMsg += "switch '--random-agent' and/or "
-                warnMsg += "proxy switches ('--ignore-proxy', '--proxy',...)"
+                    items.append("switch '--random-agent'")
+                if not any((conf.proxy, conf.proxyFile, conf.tor)):
+                    items.append("proxy switches ('--proxy', '--proxy-file'...)")
+                if items:
+                    warnMsg += ". In case that it is, "
+                    warnMsg += "you can try to rerun with "
+                    warnMsg += " and/or ".join(items)
+
             singleTimeWarnMessage(warnMsg)
 
         elif conf.threads > 1:
