@@ -182,7 +182,7 @@ class Connect(object):
                 warnMsg += "you could successfully use "
                 warnMsg += "switch '--tor' "
                 if IS_WIN:
-                    warnMsg += "(e.g. 'https://www.torproject.org/download/download.html.en')"
+                    warnMsg += "(e.g. 'https://www.torproject.org/download/')"
                 else:
                     warnMsg += "(e.g. 'https://help.ubuntu.com/community/Tor')"
             else:
