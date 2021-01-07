@@ -18,7 +18,7 @@ from lib.core.enums import OS
 from thirdparty.six import unichr as _unichr
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.5.1.15"
+VERSION = "1.5.1.16"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -757,7 +757,7 @@ MAX_CONNECTION_TOTAL_SIZE = 100 * 1024 * 1024
 # For preventing MemoryError exceptions (caused when using large sequences in difflib.SequenceMatcher)
 MAX_DIFFLIB_SEQUENCE_LENGTH = 10 * 1024 * 1024
 
-# Maximum size used per page content in getHeuristicCharEncoding()
+# Maximum size used per page content in getHeuristicCharEncoding() and identYwaf
 MAX_CHAR_HEURISTICS_SIZE = 10000
 
 # Maximum (multi-threaded) length of entry in bisection algorithm
