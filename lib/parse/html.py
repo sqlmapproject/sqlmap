@@ -13,6 +13,7 @@ from lib.core.common import urldecode
 from lib.core.common import parseXmlFile
 from lib.core.data import kb
 from lib.core.data import paths
+from lib.core.settings import HEURISTIC_PAGE_SIZE_THRESHOLD
 from lib.core.threads import getCurrentThreadData
 
 class HTMLHandler(ContentHandler):
@@ -68,6 +69,8 @@ def htmlParser(page):
     >>> threadData = getCurrentThreadData()
     >>> threadData.lastErrorPage = None
     """
+
+    page = page[:HEURISTIC_PAGE_SIZE_THRESHOLD]
 
     xmlfile = paths.ERRORS_XML
     handler = HTMLHandler(page)

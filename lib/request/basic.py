@@ -43,8 +43,8 @@ from lib.core.exception import SqlmapCompressionException
 from lib.core.settings import BLOCKED_IP_REGEX
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import EVENTVALIDATION_REGEX
+from lib.core.settings import HEURISTIC_PAGE_SIZE_THRESHOLD
 from lib.core.settings import IDENTYWAF_PARSE_LIMIT
-from lib.core.settings import MAX_CHAR_HEURISTICS_SIZE
 from lib.core.settings import MAX_CONNECTION_TOTAL_SIZE
 from lib.core.settings import META_CHARSET_REGEX
 from lib.core.settings import PARSE_HEADERS_LIMIT
@@ -259,7 +259,7 @@ def getHeuristicCharEncoding(page):
     """
 
     key = hash(page)
-    retVal = kb.cache.encoding.get(key) or detect(page[:MAX_CHAR_HEURISTICS_SIZE])["encoding"]
+    retVal = kb.cache.encoding.get(key) or detect(page[:HEURISTIC_PAGE_SIZE_THRESHOLD])["encoding"]
     kb.cache.encoding[key] = retVal
 
     if retVal and retVal.lower().replace('-', "") == UNICODE_ENCODING.lower().replace('-', ""):
@@ -396,7 +396,7 @@ def processResponse(page, responseHeaders, code=None, status=None):
             logger.warning("parsed DBMS error message: '%s'" % msg.rstrip('.'))
 
     if not conf.skipWaf and kb.processResponseCounter < IDENTYWAF_PARSE_LIMIT:
-        rawResponse = "%s %s %s\n%s\n%s" % (_http_client.HTTPConnection._http_vsn_str, code or "", status or "", "".join(getUnicode(responseHeaders.headers if responseHeaders else [])), page[:MAX_CHAR_HEURISTICS_SIZE])
+        rawResponse = "%s %s %s\n%s\n%s" % (_http_client.HTTPConnection._http_vsn_str, code or "", status or "", "".join(getUnicode(responseHeaders.headers if responseHeaders else [])), page[:HEURISTIC_PAGE_SIZE_THRESHOLD])
 
         identYwaf.non_blind.clear()
         if identYwaf.non_blind_check(rawResponse, silent=True):
