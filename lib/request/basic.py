@@ -44,6 +44,7 @@ from lib.core.settings import BLOCKED_IP_REGEX
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import EVENTVALIDATION_REGEX
 from lib.core.settings import IDENTYWAF_PARSE_LIMIT
+from lib.core.settings import MAX_CHAR_HEURISTICS_SIZE
 from lib.core.settings import MAX_CONNECTION_TOTAL_SIZE
 from lib.core.settings import META_CHARSET_REGEX
 from lib.core.settings import PARSE_HEADERS_LIMIT
@@ -258,7 +259,7 @@ def getHeuristicCharEncoding(page):
     """
 
     key = hash(page)
-    retVal = kb.cache.encoding.get(key) or detect(page)["encoding"]
+    retVal = kb.cache.encoding.get(key) or detect(page[:MAX_CHAR_HEURISTICS_SIZE])["encoding"]
     kb.cache.encoding[key] = retVal
 
     if retVal and retVal.lower().replace('-', "") == UNICODE_ENCODING.lower().replace('-', ""):
