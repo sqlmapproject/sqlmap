@@ -151,11 +151,6 @@ Giorgio Fedon, <giorgio.fedon(at)gmail.com>
 Kasper Fons, <thefeds(at)mail.dk>
 * for reporting several bugs
 
-Jose Fonseca, <jose.r.fonseca(at)gmail.com>
-* for his Gprof2Dot utility for converting profiler output to dot graph(s) and for his XDot utility to render nicely dot graph(s), both included in sqlmap tree inside extra folder. These libraries are used for sqlmap development purposes only
-    http://code.google.com/p/jrfonseca/wiki/Gprof2Dot
-    http://code.google.com/p/jrfonseca/wiki/XDot
-
 Alan Franzoni, <alan.franzoni(at)gmail.com>
 * for helping out with Python subprocess library
 

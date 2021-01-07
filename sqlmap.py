@@ -182,7 +182,7 @@ def main():
                 fuzzTest()
             else:
                 from lib.controller.controller import start
-                if conf.profile and six.PY2:
+                if conf.profile:
                     from lib.core.profiling import profile
                     globals()["start"] = start
                     profile()
