@@ -15,7 +15,6 @@
 | [thirdparty/clientform/](http://wwwsearch.sourceforge.net/old/ClientForm/) | BSD | Used to parse HTML forms | --forms |
 | [thirdparty/colorama/](http://pypi.python.org/pypi/colorama) | BSD | Used to make output colouring cross-platform | - |
 | [thirdparty/fcrypt/](http://carey.geek.nz/code/python-fcrypt/) | BSD | Used to crack a generic password hash | --passwords |
-| [thirdparty/gprof2dot/](http://code.google.com/p/jrfonseca/wiki/Gprof2Dot) | LGPL | Used for internal debug purposes | --profile |
 | [thirdparty/identywaf/](https://github.com/stamparm/identYwaf) | MIT | Used for identification of WAF/IPS solutions | - |
 | [thirdparty/keepalive/](http://urlgrabber.baseurl.org/) | LGPL | Used for persistent HTTP(s) requests | --keep-alive and -o |
 | [thirdparty/magic/](http://pypi.python.org/pypi/python-magic/) | PSF | Used to identify and show the file type in log messages | --file-write |
@@ -28,7 +27,6 @@
 | [thirdparty/socks/](http://socksipy.sourceforge.net/) | BSD | Used to tunnel your requests over Tor SOCKS proxy | --tor-type and --proxy |
 | [thirdparty/termcolor/](http://pypi.python.org/pypi/termcolor) | MIT | Used to colourize output | - |
 | [thirdparty/wininetpton/](https://github.com/hickeroar/win_inet_pton) | Public domain | Used for patching `inet_pton` on Windows OS | - |
-| [thirdparty/xdot/](http://code.google.com/p/jrfonseca/wiki/XDot) | LGPL | Used for internal debug purposes | --profile |
 
 <h2 id="extra">Libraries and tools in extra/ directory</h2>
 
