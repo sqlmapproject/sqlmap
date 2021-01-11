@@ -113,7 +113,7 @@ def _goInference(payload, expression, charsetType=None, firstChar=None, lastChar
                 else:
                     expression = "SELECT %s FROM (%s)" % (field, expression)
 
-            if field and conf.hexConvert or conf.binaryFields and field in conf.binaryFields:
+            if field and conf.hexConvert or conf.binaryFields and field in conf.binaryFields or Backend.getIdentifiedDbms() in (DBMS.RAIMA,):
                 nulledCastedField = agent.nullAndCastField(field)
                 injExpression = expression.replace(field, nulledCastedField, 1)
             else:

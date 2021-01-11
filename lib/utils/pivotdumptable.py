@@ -30,6 +30,7 @@ from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.settings import MAX_INT
 from lib.core.settings import NULL
+from lib.core.settings import SINGLE_QUOTE_MARKER
 from lib.core.unescaper import unescaper
 from lib.request import inject
 from lib.utils.safe2bin import safechardecode
@@ -128,7 +129,7 @@ def pivotDumpTable(table, colList, count=None, blind=True, alias=None):
         if column == colList[0]:
             query = dumpNode.query.replace("'%s'" if unescaper.escape(pivotValue, False) != pivotValue else "%s", "%s") % (agent.preprocessField(table, column), table, agent.preprocessField(table, column), unescaper.escape(pivotValue, False))
         else:
-            query = dumpNode.query2.replace("'%s'" if unescaper.escape(pivotValue, False) != pivotValue else "%s", "%s") % (agent.preprocessField(table, column), table, agent.preprocessField(table, colList[0]), unescaper.escape(pivotValue, False))
+            query = dumpNode.query2.replace("'%s'" if unescaper.escape(pivotValue, False) != pivotValue else "%s", "%s") % (agent.preprocessField(table, column), table, agent.preprocessField(table, colList[0]), unescaper.escape(pivotValue, False) if SINGLE_QUOTE_MARKER not in dumpNode.query2 else pivotValue)
 
         query = agent.whereQuery(query)
         return unArrayizeValue(inject.getValue(query, blind=blind, time=blind, union=not blind, error=not blind))

@@ -1626,4 +1626,43 @@
             <blind query="SELECT &quot;schema_name&quot; FROM INFORMATION_SCHEMA.COLUMNS,INFORMATION_SCHEMA.TABLES,INFORMATION_SCHEMA.SCHEMATA WHERE INFORMATION_SCHEMA.COLUMNS.table_pk=INFORMATION_SCHEMA.TABLES.table_pk AND INFORMATION_SCHEMA.TABLES.schema_pk=INFORMATION_SCHEMA.SCHEMATA.schema_pk AND %s" query2="SELECT &quot;table_name&quot; FROM INFORMATION_SCHEMA.COLUMNS,INFORMATION_SCHEMA.TABLES,INFORMATION_SCHEMA.SCHEMATA WHERE INFORMATION_SCHEMA.COLUMNS.table_pk=INFORMATION_SCHEMA.TABLES.table_pk AND INFORMATION_SCHEMA.TABLES.schema_pk=INFORMATION_SCHEMA.SCHEMATA.schema_pk AND &quot;schema_name&quot;='%s'" count="SELECT COUNT(&quot;schema_name&quot;) FROM INFORMATION_SCHEMA.COLUMNS,INFORMATION_SCHEMA.TABLES,INFORMATION_SCHEMA.SCHEMATA WHERE INFORMATION_SCHEMA.COLUMNS.table_pk=INFORMATION_SCHEMA.TABLES.table_pk AND INFORMATION_SCHEMA.TABLES.schema_pk=INFORMATION_SCHEMA.SCHEMATA.schema_pk AND %s" count2="SELECT COUNT(&quot;table_name&quot;) FROM INFORMATION_SCHEMA.COLUMNS,INFORMATION_SCHEMA.TABLES,INFORMATION_SCHEMA.SCHEMATA WHERE INFORMATION_SCHEMA.COLUMNS.table_pk=INFORMATION_SCHEMA.TABLES.table_pk AND INFORMATION_SCHEMA.TABLES.schema_pk=INFORMATION_SCHEMA.SCHEMATA.schema_pk AND &quot;schema_name&quot;='%s'" condition="&quot;column_name&quot;" condition2="&quot;schema_name&quot;" condition3="&quot;table_name&quot;"/>
         </search_column>
     </dbms>
+
+    <dbms value="Raima Database Manager">
+        <cast query="CONVERT(%s,CHAR)"/>
+        <length query="LENGTH(%s)"/>
+        <isnull query="IFNULL(%s,' ')"/>
+        <delimiter query="||"/>
+        <limit/>
+        <limitregexp/>
+        <limitgroupstart/>
+        <limitgroupstop/>
+        <limitstring/>
+        <order query="ORDER BY %s ASC"/>
+        <count query="COUNT(%s)"/>
+        <comment query="/*"/>
+        <concatenate query="%s||%s"/>
+        <case query="SELECT (IF(%s,1,0))"/>
+        <inference query="UNICODE(SUBSTRING((%s),%d,1))>%d"/>
+        <banner/>
+        <current_user/>
+        <current_db/>
+        <hostname/>
+        <table_comment/>
+        <column_comment/>
+        <is_dba/>
+        <dbs/>
+        <tables/>
+        <dump_table>
+            <inband query="SELECT %s FROM %s"/>
+            <!-- NOTE: Raima does not like escaping of LIKE strings (e.g. ...LIKE CHAR(32)) -->
+            <blind query="SELECT MIN(%s) FROM %s WHERE CONVERT(%s,CHAR)>'%s'" query2="SELECT MAX(%s) FROM %s WHERE CONVERT(%s,CHAR) LIKE [SINGLE_QUOTE]%s[SINGLE_QUOTE]" count="SELECT COUNT(*) FROM %s" count2="SELECT COUNT(DISTINCT(%s)) FROM %s"/>
+        </dump_table>
+        <users/>
+        <privileges/>
+        <roles/>
+        <statements/>
+        <search_db/>
+        <search_table/>
+        <search_column/>
+   </dbms>
 </root>

@@ -33,6 +33,7 @@ from lib.core.settings import NULL
 from lib.core.settings import ORACLE_ALIASES
 from lib.core.settings import PGSQL_ALIASES
 from lib.core.settings import PRESTO_ALIASES
+from lib.core.settings import RAIMA_ALIASES
 from lib.core.settings import SQLITE_ALIASES
 from lib.core.settings import SYBASE_ALIASES
 from lib.core.settings import VERTICA_ALIASES
@@ -244,6 +245,7 @@ DBMS_DICT = {
     DBMS.CACHE: (CACHE_ALIASES, "python jaydebeapi & python-jpype", "https://pypi.python.org/pypi/JayDeBeApi/ & http://jpype.sourceforge.net/", None),
     DBMS.EXTREMEDB: (EXTREMEDB_ALIASES, None, None, None),
     DBMS.FRONTBASE: (FRONTBASE_ALIASES, None, None, None),
+    DBMS.RAIMA: (RAIMA_ALIASES, None, None, None),
 }
 
 # Reference: https://blog.jooq.org/tag/sysibm-sysdummy1/
@@ -280,6 +282,7 @@ HEURISTIC_NULL_EVAL = {
     DBMS.CUBRID: "(NULL SETEQ NULL)",
     DBMS.CACHE: "%SQLUPPER NULL",
     DBMS.EXTREMEDB: "NULLIFZERO(hashcode(NULL))",
+    DBMS.RAIMA: "IF(ROWNUMBER()>0,CONVERT(NULL,TINYINT),NULL))",
 }
 
 SQL_STATEMENTS = {

@@ -217,4 +217,9 @@
         <error regexp="encountered after end of query"/>
         <error regexp="A comparison operator is required here"/>
     </dbms>
+
+    <dbms value="Raima Database Manager">
+        <error regexp="-10048: Syntax error"/>
+        <error regexp="rdmStmtPrepare\(.+?\) returned"/>
+    </dbms>
 </root>

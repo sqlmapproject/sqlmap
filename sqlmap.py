@@ -80,7 +80,6 @@ try:
     from lib.core.settings import VERSION
     from lib.parse.cmdline import cmdLineParser
     from lib.utils.crawler import crawl
-    from thirdparty import six
 except KeyboardInterrupt:
     errMsg = "user aborted"
 

@@ -243,7 +243,7 @@ class Dump(object):
             for db, tables in dbTables.items():
                 tables = sorted(filter(None, tables))
 
-                self._write("Database: %s" % unsafeSQLIdentificatorNaming(db) if db else "Current database")
+                self._write("Database: %s" % unsafeSQLIdentificatorNaming(db) if db and METADB_SUFFIX not in db else "<current>")
 
                 if len(tables) == 1:
                     self._write("[1 table]")
@@ -298,7 +298,7 @@ class Dump(object):
                         maxlength2 = max(maxlength2, len("TYPE"))
                         lines2 = "-" * (maxlength2 + 2)
 
-                    self._write("Database: %s\nTable: %s" % (unsafeSQLIdentificatorNaming(db) if db else "Current database", unsafeSQLIdentificatorNaming(table)))
+                    self._write("Database: %s\nTable: %s" % (unsafeSQLIdentificatorNaming(db) if db and METADB_SUFFIX not in db else "<current>", unsafeSQLIdentificatorNaming(table)))
 
                     if len(columns) == 1:
                         self._write("[1 column]")
@@ -353,7 +353,7 @@ class Dump(object):
                         maxlength1 = max(maxlength1, getConsoleLength(getUnicode(table)))
 
             for db, counts in dbTables.items():
-                self._write("Database: %s" % unsafeSQLIdentificatorNaming(db) if db else "Current database")
+                self._write("Database: %s" % unsafeSQLIdentificatorNaming(db) if db and METADB_SUFFIX not in db else "<current>")
 
                 lines1 = "-" * (maxlength1 + 2)
                 blank1 = " " * (maxlength1 - len("Table"))
@@ -479,7 +479,7 @@ class Dump(object):
                 separator += "+%s" % lines
 
         separator += "+"
-        self._write("Database: %s\nTable: %s" % (unsafeSQLIdentificatorNaming(db) if db else "Current database", unsafeSQLIdentificatorNaming(table)))
+        self._write("Database: %s\nTable: %s" % (unsafeSQLIdentificatorNaming(db) if db and METADB_SUFFIX not in db else "<current>", unsafeSQLIdentificatorNaming(table)))
 
         if conf.dumpFormat == DUMP_FORMAT.SQLITE:
             cols = []

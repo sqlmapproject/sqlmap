@@ -47,6 +47,7 @@ from lib.core.exception import SqlmapMissingMandatoryOptionException
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import CURRENT_DB
+from lib.core.settings import METADB_SUFFIX
 from lib.core.settings import PLUS_ONE_DBMSES
 from lib.core.settings import REFLECTED_VALUE_MARKER
 from lib.core.settings import UPPER_CASE_DBMSES
@@ -222,7 +223,7 @@ class Databases(object):
                 logger.warn(warnMsg)
                 bruteForce = True
 
-            elif Backend.getIdentifiedDbms() in (DBMS.MCKOI, DBMS.EXTREMEDB):
+            elif Backend.getIdentifiedDbms() in (DBMS.MCKOI, DBMS.EXTREMEDB, DBMS.RAIMA):
                 bruteForce = True
 
             elif Backend.getIdentifiedDbms() in (DBMS.ACCESS,):
@@ -336,8 +337,9 @@ class Databases(object):
 
                                 comment = unArrayizeValue(inject.getValue(query, blind=False, time=False))
                                 if not isNoneValue(comment):
-                                    infoMsg = "retrieved comment '%s' for table '%s' " % (comment, unsafeSQLIdentificatorNaming(table))
-                                    infoMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(db)
+                                    infoMsg = "retrieved comment '%s' for table '%s'" % (comment, unsafeSQLIdentificatorNaming(table))
+                                    if METADB_SUFFIX not in db:
+                                        infoMsg += " in database '%s'" % unsafeSQLIdentificatorNaming(db)
                                     logger.info(infoMsg)
                             else:
                                 warnMsg = "on %s it is not " % Backend.getIdentifiedDbms()
@@ -418,8 +420,9 @@ class Databases(object):
 
                                 comment = unArrayizeValue(inject.getValue(query, union=False, error=False))
                                 if not isNoneValue(comment):
-                                    infoMsg = "retrieved comment '%s' for table '%s' " % (comment, unsafeSQLIdentificatorNaming(table))
-                                    infoMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(db)
+                                    infoMsg = "retrieved comment '%s' for table '%s'" % (comment, unsafeSQLIdentificatorNaming(table))
+                                    if METADB_SUFFIX not in db:
+                                        infoMsg += " in database '%s'" % unsafeSQLIdentificatorNaming(db)
                                     logger.info(infoMsg)
                             else:
                                 warnMsg = "on %s it is not " % Backend.getIdentifiedDbms()
@@ -516,8 +519,9 @@ class Databases(object):
 
                 tblList = list(tblList)
             elif not conf.search:
-                errMsg = "unable to retrieve the tables "
-                errMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                errMsg = "unable to retrieve the tables"
+                if METADB_SUFFIX not in conf.db:
+                    errMsg += " in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 raise SqlmapNoneDataException(errMsg)
             else:
                 return kb.data.cachedColumns
@@ -534,7 +538,7 @@ class Databases(object):
                 logger.warn(warnMsg)
                 bruteForce = True
 
-            elif Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB):
+            elif Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB, DBMS.RAIMA):
                 warnMsg = "cannot retrieve column names, "
                 warnMsg += "back-end DBMS is %s" % Backend.getIdentifiedDbms()
                 logger.warn(warnMsg)
@@ -549,7 +553,7 @@ class Databases(object):
                         resumeAvailable = True
                         break
 
-            if resumeAvailable and not conf.freshQueries:
+            if resumeAvailable and not (conf.freshQueries and not colList):
                 columns = {}
 
                 for column in colList:
@@ -632,7 +636,8 @@ class Databases(object):
                     values = [(_,) for _ in colList]
                 else:
                     infoMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
-                    infoMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                    if METADB_SUFFIX not in conf.db:
+                        infoMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                     logger.info(infoMsg)
 
                     values = None
@@ -781,7 +786,8 @@ class Databases(object):
                         columns[safeSQLIdentificatorNaming(value)] = None
                 else:
                     infoMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
-                    infoMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                    if METADB_SUFFIX not in conf.db:
+                        infoMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                     logger.info(infoMsg)
 
                     count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
@@ -802,7 +808,8 @@ class Databases(object):
                         if not columns:
                             errMsg = "unable to retrieve the %scolumns " % ("number of " if not Backend.isDbms(DBMS.MSSQL) else "")
                             errMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
-                            errMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                            if METADB_SUFFIX not in conf.db:
+                                errMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                             logger.error(errMsg)
                             continue
 
@@ -904,7 +911,8 @@ class Databases(object):
         if not kb.data.cachedColumns:
             warnMsg = "unable to retrieve column names for "
             warnMsg += ("table '%s' " % unsafeSQLIdentificatorNaming(unArrayizeValue(tblList))) if len(tblList) == 1 else "any table "
-            warnMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+            if METADB_SUFFIX not in conf.db:
+                warnMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
             logger.warn(warnMsg)
 
             if bruteForce is None:

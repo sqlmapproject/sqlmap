@@ -104,7 +104,7 @@ def tableExists(tableFile, regex=None):
     tables = filterListValue(tables, regex)
 
     for conf.db in (conf.db.split(',') if conf.db else [conf.db]):
-        if conf.db:
+        if conf.db and METADB_SUFFIX not in conf.db:
             infoMsg = "checking database '%s'" % conf.db
             logger.info(infoMsg)
 

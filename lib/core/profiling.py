@@ -5,14 +5,11 @@ Copyright (c) 2006-2021 sqlmap developers (http://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
-import codecs
 import cProfile
 import os
 
-from lib.core.common import getSafeExString
 from lib.core.data import logger
 from lib.core.data import paths
-from lib.core.settings import UNICODE_ENCODING
 
 def profile(profileOutputFile=None):
     """

@@ -57,6 +57,7 @@ class DBMS(object):
     CACHE = "InterSystems Cache"
     EXTREMEDB = "eXtremeDB"
     FRONTBASE = "FrontBase"
+    RAIMA = "Raima Database Manager"
 
 class DBMS_DIRECTORY_NAME(object):
     ACCESS = "access"
@@ -84,6 +85,7 @@ class DBMS_DIRECTORY_NAME(object):
     CACHE = "cache"
     EXTREMEDB = "extremedb"
     FRONTBASE = "frontbase"
+    RAIMA = "raima"
 
 class FORK(object):
     MARIADB = "MariaDB"

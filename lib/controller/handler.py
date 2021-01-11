@@ -33,6 +33,7 @@ from lib.core.settings import MYSQL_ALIASES
 from lib.core.settings import ORACLE_ALIASES
 from lib.core.settings import PGSQL_ALIASES
 from lib.core.settings import PRESTO_ALIASES
+from lib.core.settings import RAIMA_ALIASES
 from lib.core.settings import SQLITE_ALIASES
 from lib.core.settings import SYBASE_ALIASES
 from lib.core.settings import VERTICA_ALIASES
@@ -82,6 +83,8 @@ from plugins.dbms.postgresql.connector import Connector as PostgreSQLConn
 from plugins.dbms.postgresql import PostgreSQLMap
 from plugins.dbms.presto.connector import Connector as PrestoConn
 from plugins.dbms.presto import PrestoMap
+from plugins.dbms.raima.connector import Connector as RaimaConn
+from plugins.dbms.raima import RaimaMap
 from plugins.dbms.sqlite.connector import Connector as SQLiteConn
 from plugins.dbms.sqlite import SQLiteMap
 from plugins.dbms.sybase.connector import Connector as SybaseConn
@@ -121,6 +124,7 @@ def setHandler():
         (DBMS.CACHE, CACHE_ALIASES, CacheMap, CacheConn),
         (DBMS.EXTREMEDB, EXTREMEDB_ALIASES, ExtremeDBMap, ExtremeDBConn),
         (DBMS.FRONTBASE, FRONTBASE_ALIASES, FrontBaseMap, FrontBaseConn),
+        (DBMS.RAIMA, RAIMA_ALIASES, RaimaMap, RaimaConn),
     ]
 
     _ = max(_ if (conf.get("dbms") or Backend.getIdentifiedDbms() or kb.heuristicExtendedDbms or "").lower() in _[1] else () for _ in items)

@@ -42,6 +42,7 @@ from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.core.settings import CHECK_ZERO_COLUMNS_THRESHOLD
 from lib.core.settings import CURRENT_DB
+from lib.core.settings import METADB_SUFFIX
 from lib.core.settings import NULL
 from lib.core.settings import PLUS_ONE_DBMSES
 from lib.core.settings import UPPER_CASE_DBMSES
@@ -137,9 +138,9 @@ class Entries(object):
                     kb.dumpTable = "%s.%s" % (conf.db, tbl)
 
                 if safeSQLIdentificatorNaming(conf.db) not in kb.data.cachedColumns or safeSQLIdentificatorNaming(tbl, True) not in kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] or not kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)]:
-                    warnMsg = "unable to enumerate the columns for table "
-                    warnMsg += "'%s' in database" % unsafeSQLIdentificatorNaming(tbl)
-                    warnMsg += " '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                    warnMsg = "unable to enumerate the columns for table '%s'" % unsafeSQLIdentificatorNaming(tbl)
+                    if METADB_SUFFIX not in conf.db:
+                        warnMsg += " in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                     warnMsg += ", skipping" if len(tblList) > 1 else ""
                     logger.warn(warnMsg)
 
@@ -153,7 +154,8 @@ class Entries(object):
 
                 if not colList:
                     warnMsg = "skipping table '%s'" % unsafeSQLIdentificatorNaming(tbl)
-                    warnMsg += " in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                    if METADB_SUFFIX not in conf.db:
+                        warnMsg += " in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                     warnMsg += " (no usable column names)"
                     logger.warn(warnMsg)
                     continue
@@ -166,7 +168,8 @@ class Entries(object):
                 if conf.col:
                     infoMsg += " of column(s) '%s'" % colNames
                 infoMsg += " for table '%s'" % unsafeSQLIdentificatorNaming(tbl)
-                infoMsg += " in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                if METADB_SUFFIX not in conf.db:
+                    infoMsg += " in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 logger.info(infoMsg)
 
                 for column in colList:
@@ -182,7 +185,7 @@ class Entries(object):
 
                     if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE, DBMS.MIMERSQL):
                         query = rootQuery.inband.query % (colString, tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())))
-                    elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD, DBMS.MAXDB, DBMS.MCKOI, DBMS.EXTREMEDB):
+                    elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD, DBMS.MAXDB, DBMS.MCKOI, DBMS.EXTREMEDB, DBMS.RAIMA):
                         query = rootQuery.inband.query % (colString, tbl)
                     elif Backend.getIdentifiedDbms() in (DBMS.SYBASE, DBMS.MSSQL):
                         # Partial inband and error
@@ -291,12 +294,10 @@ class Entries(object):
 
                     if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE, DBMS.MIMERSQL):
                         query = rootQuery.blind.count % (tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())))
-                    elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD, DBMS.MCKOI, DBMS.EXTREMEDB):
+                    elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.MAXDB, DBMS.ACCESS, DBMS.FIREBIRD, DBMS.MCKOI, DBMS.EXTREMEDB, DBMS.RAIMA):
                         query = rootQuery.blind.count % tbl
                     elif Backend.getIdentifiedDbms() in (DBMS.SYBASE, DBMS.MSSQL):
                         query = rootQuery.blind.count % ("%s.%s" % (conf.db, tbl))
-                    elif Backend.isDbms(DBMS.MAXDB):
-                        query = rootQuery.blind.count % tbl
                     elif Backend.isDbms(DBMS.INFORMIX):
                         query = rootQuery.blind.count % (conf.db, tbl)
                     else:
@@ -329,8 +330,8 @@ class Entries(object):
 
                         continue
 
-                    elif Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.SYBASE, DBMS.MAXDB, DBMS.MSSQL, DBMS.INFORMIX, DBMS.MCKOI):
-                        if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB):
+                    elif Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.SYBASE, DBMS.MAXDB, DBMS.MSSQL, DBMS.INFORMIX, DBMS.MCKOI, DBMS.RAIMA):
+                        if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.RAIMA):
                             table = tbl
                         elif Backend.getIdentifiedDbms() in (DBMS.SYBASE, DBMS.MSSQL, DBMS.MAXDB):
                             table = "%s.%s" % (conf.db, tbl)
