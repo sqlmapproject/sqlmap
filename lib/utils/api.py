@@ -49,6 +49,7 @@ from lib.core.settings import IS_WIN
 from lib.core.settings import RESTAPI_DEFAULT_ADAPTER
 from lib.core.settings import RESTAPI_DEFAULT_ADDRESS
 from lib.core.settings import RESTAPI_DEFAULT_PORT
+from lib.core.settings import RESTAPI_UNSUPPORTED_OPTIONS
 from lib.core.settings import VERSION_STRING
 from lib.core.shell import autoCompletion
 from lib.core.subprocessng import Popen
@@ -502,6 +503,11 @@ def scan_start(taskid):
         logger.warning("[%s] Invalid JSON options provided to scan_start()" % taskid)
         return jsonize({"success": False, "message": "Invalid JSON options"})
 
+    for key in request.json:
+        if key in RESTAPI_UNSUPPORTED_OPTIONS:
+            logger.warning("[%s] Unsupported option '%s' provided to scan_start()" % (taskid, key))
+            return jsonize({"success": False, "message": "Unsupported option '%s'" % key})
+
     # Initialize sqlmap engine's options with user's provided options, if any
     for option, value in request.json.items():
         DataStore.tasks[taskid].set_option(option, value)
@@ -836,7 +842,7 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
             raw = _client("%s/task/new" % addr)
             res = dejsonize(raw)
             if not res["success"]:
-                logger.error("Failed to create new task")
+                logger.error("Failed to create new task ('%s')" % res.get("message", ""))
                 continue
             taskid = res["taskid"]
             logger.info("New task ID is '%s'" % taskid)
@@ -844,7 +850,7 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
             raw = _client("%s/scan/%s/start" % (addr, taskid), cmdLineOptions)
             res = dejsonize(raw)
             if not res["success"]:
-                logger.error("Failed to start scan")
+                logger.error("Failed to start scan ('%s')" % res.get("message", ""))
                 continue
             logger.info("Scanning started")
 
