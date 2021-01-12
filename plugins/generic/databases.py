@@ -540,7 +540,7 @@ class Databases(object):
 
             elif Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB, DBMS.RAIMA):
                 warnMsg = "cannot retrieve column names, "
-                warnMsg += "back-end DBMS is '%s'" % Backend.getIdentifiedDbms()
+                warnMsg += "back-end DBMS is %s" % Backend.getIdentifiedDbms()
                 singleTimeWarnMessage(warnMsg)
                 bruteForce = True
 
