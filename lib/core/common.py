@@ -1831,6 +1831,9 @@ def getLimitRange(count, plusOne=False):
 def parseUnionPage(page):
     """
     Returns resulting items from UNION query inside provided page content
+
+    >>> parseUnionPage("%sfoo%s%sbar%s" % (kb.chars.start, kb.chars.stop, kb.chars.start, kb.chars.stop))
+    ['foo', 'bar']
     """
 
     if page is None:
@@ -2064,6 +2067,9 @@ def safeFilepathEncode(filepath):
 def safeExpandUser(filepath):
     """
     Patch for a Python Issue18171 (http://bugs.python.org/issue18171)
+
+    >>> os.path.basename(__file__) in safeExpandUser(__file__)
+    True
     """
 
     retVal = filepath
