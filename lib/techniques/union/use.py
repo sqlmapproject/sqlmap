@@ -242,14 +242,16 @@ def unionUse(expression, unpack=True, dump=False):
         debugMsg += "it does not play well with UNION query SQL injection"
         singleTimeDebugMessage(debugMsg)
 
-    if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ORACLE, DBMS.PGSQL, DBMS.MSSQL) and expressionFields and not conf.binaryFields:
+    if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ORACLE, DBMS.PGSQL, DBMS.MSSQL, DBMS.SQLITE) and expressionFields and not conf.binaryFields:
         match = re.search(r"SELECT\s*(.+?)\bFROM", expression, re.I)
-        if match and not (Backend.isDbms(DBMS.ORACLE) and FROM_DUMMY_TABLE[DBMS.ORACLE] in expression):
+        if match and not (Backend.isDbms(DBMS.ORACLE) and FROM_DUMMY_TABLE[DBMS.ORACLE] in expression) and not re.search(r"\b(MIN|MAX|COUNT)\(", expression):
             kb.jsonAggMode = True
             if Backend.isDbms(DBMS.MYSQL):
                 query = expression.replace(expressionFields, "CONCAT('%s',JSON_ARRAYAGG(CONCAT_WS('%s',%s)),'%s')" % (kb.chars.start, kb.chars.delimiter, expressionFields, kb.chars.stop), 1)
             elif Backend.isDbms(DBMS.ORACLE):
                 query = expression.replace(expressionFields, "'%s'||JSON_ARRAYAGG(%s)||'%s'" % (kb.chars.start, ("||'%s'||" % kb.chars.delimiter).join(expressionFieldsList), kb.chars.stop), 1)
+            elif Backend.isDbms(DBMS.SQLITE):
+                query = expression.replace(expressionFields, "'%s'||JSON_GROUP_ARRAY(%s)||'%s'" % (kb.chars.start, ("||'%s'||" % kb.chars.delimiter).join("COALESCE(%s,' ')" % field for field in expressionFieldsList), kb.chars.stop), 1)
             elif Backend.isDbms(DBMS.PGSQL):    # Note: ARRAY_AGG does CSV alike output, thus enclosing start/end inside each item
                 query = expression.replace(expressionFields, "ARRAY_AGG('%s'||%s||'%s')::text" % (kb.chars.start, ("||'%s'||" % kb.chars.delimiter).join("COALESCE(%s::text,' ')" % field for field in expressionFieldsList), kb.chars.stop), 1)
             elif Backend.isDbms(DBMS.MSSQL):
