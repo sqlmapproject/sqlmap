@@ -6,8 +6,6 @@ sqlmap là một công cụ kiểm tra thâm nhập mã nguồn mở, nhằm t�
 một hệ thống phát hiện mạnh mẽ, nhiều tính năng thích hợp cho người kiểm tra thâm nhập và một loạt các tùy chọn bao gồm lấy dấu cơ sở dữ liệu, truy xuất dữ liệu từ cơ sở dữ 
 liệu, truy cập tệp của hệ thống và thực hiện các lệnh trên hệ điều hành thông qua kết nối ngoài.
 
-**sqlmap được tài trợ bởi [SpyderSec](https://spydersec.com/).**
-
 Ảnh chụp màn hình
 ----
 
@@ -53,26 +51,3 @@ Liên kết
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
 * Demo: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
 * Ảnh chụp màn hình: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
-
-(Toàn bộ đều là Tiếng Anh)
-
-Bản dịch
-----
-
-* [Bulgarian](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-bg-BG.md)
-* [Chinese](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-zh-CN.md)
-* [Croatian](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-hr-HR.md)
-* [French](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-fr-FR.md)
-* [German](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-de-GER.md)
-* [Greek](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-gr-GR.md)
-* [Indonesian](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-id-ID.md)
-* [Italian](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-it-IT.md)
-* [Japanese](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-ja-JP.md)
-* [Korean](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-ko-KR.md)
-* [Persian](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-fa-IR.md)
-* [Polish](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-pl-PL.md)
-* [Portuguese](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-pt-BR.md)
-* [Russian](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-ru-RUS.md)
-* [Spanish](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-es-MX.md)
-* [Turkish](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-tr-TR.md)
-* [Ukrainian](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-uk-UA.md)
