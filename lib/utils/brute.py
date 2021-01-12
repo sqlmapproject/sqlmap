@@ -63,15 +63,15 @@ def _addPageTextWords():
 
 @stackedmethod
 def tableExists(tableFile, regex=None):
-    if kb.tableExistsChoice is None and not any(_ for _ in kb.injection.data if _ not in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED)) and not conf.direct:
+    if kb.choices.tableExists is None and not any(_ for _ in kb.injection.data if _ not in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED)) and not conf.direct:
         warnMsg = "it's not recommended to use '%s' and/or '%s' " % (PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.TIME], PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.STACKED])
         warnMsg += "for common table existence check"
         logger.warn(warnMsg)
 
         message = "are you sure you want to continue? [y/N] "
-        kb.tableExistsChoice = readInput(message, default='N', boolean=True)
+        kb.choices.tableExists = readInput(message, default='N', boolean=True)
 
-        if not kb.tableExistsChoice:
+        if not kb.choices.tableExists:
             return None
 
     result = inject.checkBooleanExpression("%s" % safeStringFormat(BRUTE_TABLE_EXISTS_TEMPLATE, (randomInt(1), randomStr())))
@@ -187,15 +187,15 @@ def tableExists(tableFile, regex=None):
     return kb.data.cachedTables
 
 def columnExists(columnFile, regex=None):
-    if kb.columnExistsChoice is None and not any(_ for _ in kb.injection.data if _ not in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED)) and not conf.direct:
+    if kb.choices.columnExists is None and not any(_ for _ in kb.injection.data if _ not in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED)) and not conf.direct:
         warnMsg = "it's not recommended to use '%s' and/or '%s' " % (PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.TIME], PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.STACKED])
         warnMsg += "for common column existence check"
         logger.warn(warnMsg)
 
         message = "are you sure you want to continue? [y/N] "
-        kb.columnExistsChoice = readInput(message, default='N', boolean=True)
+        kb.choices.columnExists = readInput(message, default='N', boolean=True)
 
-        if not kb.columnExistsChoice:
+        if not kb.choices.columnExists:
             return None
 
     if not conf.tbl:

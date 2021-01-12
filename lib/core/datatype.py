@@ -21,13 +21,14 @@ class AttribDict(dict):
     1
     """
 
-    def __init__(self, indict=None, attribute=None):
+    def __init__(self, indict=None, attribute=None, keycheck=True):
         if indict is None:
             indict = {}
 
         # Set any attributes here - before initialisation
         # these remain as normal attributes
         self.attribute = attribute
+        self.keycheck = keycheck
         dict.__init__(self, indict)
         self.__initialised = True
 
@@ -43,7 +44,10 @@ class AttribDict(dict):
         try:
             return self.__getitem__(item)
         except KeyError:
-            raise AttributeError("unable to access item '%s'" % item)
+            if self.keycheck:
+                raise AttributeError("unable to access item '%s'" % item)
+            else:
+                return None
 
     def __setattr__(self, item, value):
         """

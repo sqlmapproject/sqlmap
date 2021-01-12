@@ -184,8 +184,8 @@ def _search(dork):
 
 @stackedmethod
 def search(dork):
-    pushValue(kb.redirectChoice)
-    kb.redirectChoice = REDIRECTION.YES
+    pushValue(kb.choices.redirect)
+    kb.choices.redirect = REDIRECTION.YES
 
     try:
         return _search(dork)
@@ -203,7 +203,7 @@ def search(dork):
         else:
             raise
     finally:
-        kb.redirectChoice = popValue()
+        kb.choices.redirect = popValue()
 
 def setHTTPHandlers():  # Cross-referenced function
     raise NotImplementedError

@@ -610,8 +610,8 @@ class Connect(object):
 
                 # Get HTTP response
                 if hasattr(conn, "redurl"):
-                    page = (threadData.lastRedirectMsg[1] if kb.redirectChoice == REDIRECTION.NO else Connect._connReadProxy(conn)) if not skipRead else None
-                    skipLogTraffic = kb.redirectChoice == REDIRECTION.NO
+                    page = (threadData.lastRedirectMsg[1] if kb.choices.redirect == REDIRECTION.NO else Connect._connReadProxy(conn)) if not skipRead else None
+                    skipLogTraffic = kb.choices.redirect == REDIRECTION.NO
                     code = conn.redcode if not finalCode else code
                 else:
                     page = Connect._connReadProxy(conn) if not skipRead else None
@@ -844,13 +844,13 @@ class Connect(object):
             with kb.locks.connError:
                 kb.connErrorCounter += 1
 
-                if kb.connErrorCounter >= MAX_CONSECUTIVE_CONNECTION_ERRORS and kb.connErrorChoice is None:
+                if kb.connErrorCounter >= MAX_CONSECUTIVE_CONNECTION_ERRORS and kb.choices.connError is None:
                     message = "there seems to be a continuous problem with connection to the target. "
                     message += "Are you sure that you want to continue? [y/N] "
 
-                    kb.connErrorChoice = readInput(message, default='N', boolean=True)
+                    kb.choices.connError = readInput(message, default='N', boolean=True)
 
-                if kb.connErrorChoice is False:
+                if kb.choices.connError is False:
                     raise SqlmapSkipTargetException
 
             if "forcibly closed" in tbMsg:
@@ -1025,10 +1025,10 @@ class Connect(object):
                     skip = False
 
                     if place == PLACE.COOKIE or place == PLACE.CUSTOM_HEADER and value.split(',')[0].upper() == HTTP_HEADER.COOKIE.upper():
-                        if kb.cookieEncodeChoice is None:
+                        if kb.choices.cookieEncode is None:
                             msg = "do you want to URL encode cookie values (implementation specific)? %s" % ("[Y/n]" if not conf.url.endswith(".aspx") else "[y/N]")  # Reference: https://support.microsoft.com/en-us/kb/313282
-                            kb.cookieEncodeChoice = readInput(msg, default='Y' if not conf.url.endswith(".aspx") else 'N', boolean=True)
-                        if not kb.cookieEncodeChoice:
+                            kb.choices.cookieEncode = readInput(msg, default='Y' if not conf.url.endswith(".aspx") else 'N', boolean=True)
+                        if not kb.choices.cookieEncode:
                             skip = True
 
                     if not skip:

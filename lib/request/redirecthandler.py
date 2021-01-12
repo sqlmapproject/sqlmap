@@ -48,13 +48,13 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
 
     def _ask_redirect_choice(self, redcode, redurl, method):
         with kb.locks.redirect:
-            if kb.redirectChoice is None:
+            if kb.choices.redirect is None:
                 msg = "got a %d redirect to " % redcode
                 msg += "'%s'. Do you want to follow? [Y/n] " % redurl
 
-                kb.redirectChoice = REDIRECTION.YES if readInput(msg, default='Y', boolean=True) else REDIRECTION.NO
+                kb.choices.redirect = REDIRECTION.YES if readInput(msg, default='Y', boolean=True) else REDIRECTION.NO
 
-            if kb.redirectChoice == REDIRECTION.YES and method == HTTPMETHOD.POST and kb.resendPostOnRedirect is None:
+            if kb.choices.redirect == REDIRECTION.YES and method == HTTPMETHOD.POST and kb.resendPostOnRedirect is None:
                 msg = "redirect is a result of a "
                 msg += "POST request. Do you want to "
                 msg += "resend original POST data to a new "
@@ -116,7 +116,7 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
                 redurl = None
                 result = fp
 
-        if redurl and kb.redirectChoice == REDIRECTION.YES:
+        if redurl and kb.choices.redirect == REDIRECTION.YES:
             parseResponse(content, headers)
 
             req.headers[HTTP_HEADER.HOST] = getHostHeader(redurl)

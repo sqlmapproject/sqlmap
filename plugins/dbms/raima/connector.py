@@ -10,6 +10,6 @@ from plugins.generic.connector import Connector as GenericConnector
 
 class Connector(GenericConnector):
     def connect(self):
-        errMsg = "on Raima it is not (currently) possible to establish a "
+        errMsg = "on Raima Database Manager it is not (currently) possible to establish a "
         errMsg += "direct connection"
         raise SqlmapUnsupportedFeatureException(errMsg)

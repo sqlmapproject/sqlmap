@@ -1167,7 +1167,7 @@ def checkDynParam(place, parameter, value):
     dynamicity might depend on another parameter.
     """
 
-    if kb.redirectChoice:
+    if kb.choices.redirect:
         return None
 
     kb.matchRatio = None
@@ -1268,7 +1268,7 @@ def checkStability():
 
     secondPage, _, _ = Request.queryPage(content=True, noteResponseTime=False, raise404=False)
 
-    if kb.redirectChoice:
+    if kb.choices.redirect:
         return None
 
     kb.pageStable = (firstPage == secondPage)
@@ -1415,11 +1415,11 @@ def checkWaf():
         value = "" if not conf.parameters.get(PLACE.GET) else conf.parameters[PLACE.GET] + DEFAULT_GET_POST_DELIMITER
         value += "%s=%s" % (randomStr(), agent.addPayloadDelimiters(payload))
 
-    pushValue(kb.redirectChoice)
+    pushValue(kb.choices.redirect)
     pushValue(kb.resendPostOnRedirect)
     pushValue(conf.timeout)
 
-    kb.redirectChoice = REDIRECTION.YES
+    kb.choices.redirect = REDIRECTION.YES
     kb.resendPostOnRedirect = False
     conf.timeout = IPS_WAF_CHECK_TIMEOUT
 
@@ -1432,7 +1432,7 @@ def checkWaf():
 
         conf.timeout = popValue()
         kb.resendPostOnRedirect = popValue()
-        kb.redirectChoice = popValue()
+        kb.choices.redirect = popValue()
 
     hashDBWrite(HASHDB_KEYS.CHECK_WAF_RESULT, retVal, True)
 
@@ -1565,7 +1565,7 @@ def checkConnection(suppressOutput=False):
         else:
             kb.errorIsNone = True
 
-        if kb.redirectChoice == REDIRECTION.YES and threadData.lastRedirectURL and threadData.lastRedirectURL[0] == threadData.lastRequestUID:
+        if kb.choices.redirect == REDIRECTION.YES and threadData.lastRedirectURL and threadData.lastRedirectURL[0] == threadData.lastRequestUID:
             if (threadData.lastRedirectURL[1] or "").startswith("https://") and conf.hostname in getUnicode(threadData.lastRedirectURL[1]):
                 conf.url = re.sub(r"https?://", "https://", conf.url)
                 match = re.search(r":(\d+)", threadData.lastRedirectURL[1])

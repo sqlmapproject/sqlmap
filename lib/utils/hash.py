@@ -637,13 +637,13 @@ def storeHashesToFile(attack_dict):
                 if item and item not in items:
                     items.add(item)
 
-    if kb.storeHashesChoice is None:
+    if kb.choices.storeHashes is None:
         message = "do you want to store hashes to a temporary file "
         message += "for eventual further processing with other tools [y/N] "
 
-        kb.storeHashesChoice = readInput(message, default='N', boolean=True)
+        kb.choices.storeHashes = readInput(message, default='N', boolean=True)
 
-    if items and kb.storeHashesChoice:
+    if items and kb.choices.storeHashes:
         handle, filename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.HASHES, suffix=".txt")
         os.close(handle)
 

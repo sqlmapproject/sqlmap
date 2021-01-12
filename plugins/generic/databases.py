@@ -540,8 +540,8 @@ class Databases(object):
 
             elif Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB, DBMS.RAIMA):
                 warnMsg = "cannot retrieve column names, "
-                warnMsg += "back-end DBMS is %s" % Backend.getIdentifiedDbms()
-                logger.warn(warnMsg)
+                warnMsg += "back-end DBMS is '%s'" % Backend.getIdentifiedDbms()
+                singleTimeWarnMessage(warnMsg)
                 bruteForce = True
 
         if bruteForce:
@@ -571,12 +571,17 @@ class Databases(object):
 
                 return kb.data.cachedColumns
 
-            message = "do you want to use common column existence check? %s" % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB) else "[y/N/q]")
-            choice = readInput(message, default='Y' if 'Y' in message else 'N').upper()
+            if kb.choices.columnExists is None:
+                message = "do you want to use common column existence check? %s" % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB) else "[y/N/q]")
+                kb.choices.columnExists = readInput(message, default='Y' if 'Y' in message else 'N').upper()
 
-            if choice == 'N':
-                return
-            elif choice == 'Q':
+            if kb.choices.columnExists == 'N':
+                if dumpMode and colList:
+                    kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] = {safeSQLIdentificatorNaming(tbl, True): dict((_, None) for _ in colList)}
+                    return kb.data.cachedColumns
+                else:
+                    return None
+            elif kb.choices.columnExists == 'Q':
                 raise SqlmapUserQuitException
             else:
                 return columnExists(paths.COMMON_COLUMNS)

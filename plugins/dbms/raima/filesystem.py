@@ -10,9 +10,9 @@ from plugins.generic.filesystem import Filesystem as GenericFilesystem
 
 class Filesystem(GenericFilesystem):
     def readFile(self, remoteFile):
-        errMsg = "on Raima it is not possible to read files"
+        errMsg = "on Raima Database Manager it is not possible to read files"
         raise SqlmapUnsupportedFeatureException(errMsg)
 
     def writeFile(self, localFile, remoteFile, fileType=None, forceCheck=False):
-        errMsg = "on Raima it is not possible to write files"
+        errMsg = "on Raima Database Manager it is not possible to write files"
         raise SqlmapUnsupportedFeatureException(errMsg)
