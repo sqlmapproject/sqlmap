@@ -166,9 +166,12 @@ class XP_cmdshell(object):
         # Obfuscate the command to execute, also useful to bypass filters
         # on single-quotes
         self._randStr = randomStr(lowercase=True)
-        self._cmd = "0x%s" % encodeHex(cmd, binary=False)
         self._forgedCmd = "DECLARE @%s VARCHAR(8000);" % self._randStr
-        self._forgedCmd += "SET @%s=%s;" % (self._randStr, self._cmd)
+
+        try:
+            self._forgedCmd += "SET @%s=%s;" % (self._randStr, "0x%s" % encodeHex(cmd, binary=False))
+        except UnicodeError:
+            self._forgedCmd += "SET @%s='%s';" % (self._randStr, cmd)
 
         # Insert the command standard output into a support table,
         # 'sqlmapoutput', except when DBMS credentials are provided because
