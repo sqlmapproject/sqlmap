@@ -101,6 +101,7 @@ class FORK(object):
     ENTERPRISEDB = "EnterpriseDB"
     YELLOWBRICK = "Yellowbrick"
     IRIS = "Iris"
+    YUGABYTEDB = "YugabyteDB"
 
 class CUSTOM_LOGGING(object):
     PAYLOAD = 9

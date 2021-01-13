@@ -39,6 +39,8 @@ class Fingerprint(GenericFingerprint):
                 fork = FORK.YELLOWBRICK
             elif inject.checkBooleanExpression("VERSION() LIKE '%EnterpriseDB%'"):  # Reference: https://www.enterprisedb.com/edb-docs/d/edb-postgres-advanced-server/user-guides/user-guide/11/EDB_Postgres_Advanced_Server_Guide.1.087.html
                 fork = FORK.ENTERPRISEDB
+            elif inject.checkBooleanExpression("VERSION() LIKE '%YB-%'"):           # Reference: https://github.com/yugabyte/yugabyte-db/issues/2447#issue-499562926
+                fork = FORK.YUGABYTEDB
             elif inject.checkBooleanExpression("AURORA_VERSION() LIKE '%'"):        # Reference: https://aws.amazon.com/premiumsupport/knowledge-center/aurora-version-number/
                 fork = FORK.AURORA
             else:
