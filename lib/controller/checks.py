@@ -157,6 +157,7 @@ def checkSqlInjection(place, parameter, value):
                 # error message, simple heuristic check or via DBMS-specific
                 # payload), ask the user to limit the tests to the fingerprinted
                 # DBMS
+
                 if kb.reduceTests is None and not conf.testFilter and (intersect(Backend.getErrorParsedDBMSes(), SUPPORTED_DBMS, True) or kb.heuristicDbms or injection.dbms):
                     msg = "it looks like the back-end DBMS is '%s'. " % (Format.getErrorParsedDBMSes() or kb.heuristicDbms or joinValue(injection.dbms, '/'))
                     msg += "Do you want to skip test payloads specific for other DBMSes? [Y/n]"
@@ -1041,11 +1042,6 @@ def heuristicCheckSqlInjection(place, parameter):
     if conf.skipHeuristics:
         return None
 
-    if kb.heavilyDynamic:
-        debugMsg = "heuristic check skipped because of heavy dynamicity"
-        logger.debug(debugMsg)
-        return None
-
     origValue = conf.paramDict[place][parameter]
     paramType = conf.method if conf.method not in (None, HTTPMETHOD.GET, HTTPMETHOD.POST) else place
 
@@ -1082,7 +1078,7 @@ def heuristicCheckSqlInjection(place, parameter):
 
     casting = _(page) and not _(kb.originalPage)
 
-    if not casting and not result and kb.dynamicParameter and origValue.isdigit():
+    if not casting and not result and kb.dynamicParameter and origValue.isdigit() and not kb.heavilyDynamic:
         randInt = int(randomInt())
         payload = "%s%s%s" % (prefix, "%d-%d" % (int(origValue) + randInt, randInt), suffix)
         payload = agent.payload(place, parameter, newValue=payload, where=PAYLOAD.WHERE.REPLACE)
@@ -1095,6 +1091,11 @@ def heuristicCheckSqlInjection(place, parameter):
             casting = Request.queryPage(payload, place, raise404=False)
 
     kb.heuristicTest = HEURISTIC_TEST.CASTED if casting else HEURISTIC_TEST.NEGATIVE if not result else HEURISTIC_TEST.POSITIVE
+
+    if kb.heavilyDynamic:
+        debugMsg = "heuristic check stopped because of heavy dynamicity"
+        logger.debug(debugMsg)
+        return kb.heuristicTest
 
     if casting:
         errMsg = "possible %s casting detected (e.g. '" % ("integer" if origValue.isdigit() else "type")

@@ -42,7 +42,7 @@
         <error regexp="\bSQL Server[^&lt;&quot;]+Driver"/>
         <error regexp="Warning.*?\W(mssql|sqlsrv)_"/>
         <error regexp="\bSQL Server[^&lt;&quot;]+[0-9a-fA-F]{8}"/>
-        <error regexp="System\.Data\.SqlClient\.SqlException"/>
+        <error regexp="System\.Data\.SqlClient\.(SqlException|SqlConnection\.OnError)"/>
         <error regexp="(?s)Exception.*?\bRoadhouse\.Cms\."/>
         <error regexp="Microsoft SQL Native Client error '[0-9a-fA-F]{8}"/>
         <error regexp="\[SQL Server\]"/>
@@ -55,6 +55,7 @@
         <error regexp="com\.microsoft\.sqlserver\.jdbc"/>
         <error regexp="Pdo[./_\\](Mssql|SqlSrv)"/>
         <error regexp="SQL(Srv|Server)Exception"/>
+        <error regexp="Unclosed quotation mark after the character string"/>
     </dbms>
 
     <dbms value="Microsoft Access">
