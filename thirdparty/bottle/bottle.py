@@ -134,13 +134,17 @@ except IOError:
 
 # Lots of stdlib and builtin differences.
 if py3k:
+    try:
+        from collections.abc import MutableMapping as DictMixin
+    except ImportError:
+        from collections import MutableMapping as DictMixin
+
     import http.client as httplib
     import _thread as thread
     from urllib.parse import urljoin, SplitResult as UrlSplitResult
     from urllib.parse import urlencode, quote as urlquote, unquote as urlunquote
     urlunquote = functools.partial(urlunquote, encoding='latin1')
     from http.cookies import SimpleCookie
-    from collections import MutableMapping as DictMixin
     import pickle
     from io import BytesIO
     from configparser import ConfigParser, Error as ConfigParserError

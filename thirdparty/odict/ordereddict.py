@@ -23,7 +23,10 @@
 try:
     from UserDict import DictMixin
 except ImportError:
-    from collections import MutableMapping as DictMixin
+    try:
+        from collections.abc import MutableMapping as DictMixin
+    except ImportError:
+        from collections import MutableMapping as DictMixin
 
 class OrderedDict(dict, DictMixin):
 
