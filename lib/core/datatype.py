@@ -10,6 +10,7 @@ import copy
 import types
 
 from thirdparty.odict import OrderedDict
+from thirdparty.six.moves import collections_abc
 
 class AttribDict(dict):
     """
@@ -159,7 +160,7 @@ class LRUDict(object):
         return self.cache.keys()
 
 # Reference: https://code.activestate.com/recipes/576694/
-class OrderedSet(collections.MutableSet):
+class OrderedSet(collections_abc.MutableSet):
     """
     This class defines the set with ordered (as added) items
 

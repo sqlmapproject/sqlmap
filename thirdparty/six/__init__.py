@@ -223,6 +223,12 @@ class _SixMetaPathImporter(object):
         return None
     get_source = get_code  # same as get_code
 
+    def create_module(self, spec):
+        return self.load_module(spec.name)
+
+    def exec_module(self, module):
+        pass
+
 _importer = _SixMetaPathImporter(__name__)
 
 
