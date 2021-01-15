@@ -9,7 +9,6 @@ from __future__ import division
 
 import binascii
 import codecs
-import collections
 import contextlib
 import copy
 import distutils.version
@@ -194,6 +193,7 @@ from thirdparty.colorama.initialise import init as coloramainit
 from thirdparty.magic import magic
 from thirdparty.odict import OrderedDict
 from thirdparty.six import unichr as _unichr
+from thirdparty.six.moves import collections_abc as _collections
 from thirdparty.six.moves import configparser as _configparser
 from thirdparty.six.moves import http_client as _http_client
 from thirdparty.six.moves import input as _input
@@ -3267,7 +3267,7 @@ def filterNone(values):
 
     retVal = values
 
-    if isinstance(values, collections.Iterable):
+    if isinstance(values, _collections.Iterable):
         retVal = [_ for _ in values if _]
 
     return retVal
@@ -3558,7 +3558,7 @@ def arrayizeValue(value):
     ['1']
     """
 
-    if isinstance(value, collections.KeysView):
+    if isinstance(value, _collections.KeysView):
         value = [_ for _ in value]
     elif not isListLike(value):
         value = [value]

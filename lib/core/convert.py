@@ -13,7 +13,6 @@ except:
 import base64
 import binascii
 import codecs
-import collections
 import json
 import re
 import sys
@@ -31,6 +30,7 @@ from lib.core.settings import SAFE_HEX_MARKER
 from lib.core.settings import UNICODE_ENCODING
 from thirdparty import six
 from thirdparty.six import unichr as _unichr
+from thirdparty.six.moves import collections_abc as _collections
 
 try:
     from html import escape as htmlEscape
@@ -106,7 +106,7 @@ def singleTimeWarnMessage(message):  # Cross-referenced function
     sys.stdout.flush()
 
 def filterNone(values):  # Cross-referenced function
-    return [_ for _ in values if _] if isinstance(values, collections.Iterable) else values
+    return [_ for _ in values if _] if isinstance(values, _collections.Iterable) else values
 
 def isListLike(value):  # Cross-referenced function
     return isinstance(value, (list, tuple, set, BigArray))

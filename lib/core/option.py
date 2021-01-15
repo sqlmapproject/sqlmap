@@ -8,7 +8,6 @@ See the file 'LICENSE' for copying permission
 from __future__ import division
 
 import codecs
-import collections
 import functools
 import glob
 import inspect
@@ -154,6 +153,7 @@ from lib.utils.search import search
 from thirdparty import six
 from thirdparty.keepalive import keepalive
 from thirdparty.multipart import multipartpost
+from thirdparty.six.moves import collections_abc as _collections
 from thirdparty.six.moves import http_client as _http_client
 from thirdparty.six.moves import http_cookiejar as _http_cookiejar
 from thirdparty.six.moves import urllib as _urllib
@@ -415,7 +415,7 @@ def _doSearch():
                 conf.googlePage += 1
 
 def _setStdinPipeTargets():
-    if isinstance(conf.stdinPipe, collections.Iterable):
+    if isinstance(conf.stdinPipe, _collections.Iterable):
         infoMsg = "using 'STDIN' for parsing targets list"
         logger.info(infoMsg)
 
