@@ -1059,7 +1059,8 @@ def dataToDumpFile(dumpFile, data):
             errMsg = "permission denied when flushing dump data"
             logger.error(errMsg)
         else:
-            raise
+            errMsg = "error occurred when writing dump data to file ('%s')" % getUnicode(ex)
+            logger.error(errMsg)
 
 def dataToOutFile(filename, data):
     """
