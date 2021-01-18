@@ -4603,7 +4603,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
             if filtered and filtered != content:
                 try:
                     forms = ParseResponse(filtered, backwards_compat=False)
-                except ParseError:
+                except:
                     errMsg = "no success"
                     if raise_:
                         raise SqlmapGenericException(errMsg)
