@@ -8,6 +8,7 @@ See the file 'LICENSE' for copying permission
 import ntpath
 import os
 
+from lib.core.common import checkFile
 from lib.core.common import getLimitRange
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isTechniqueAvailable
@@ -384,13 +385,13 @@ class Filesystem(GenericFilesystem):
         # procedure to write a file on the back-end Microsoft SQL Server
         # file system
         self.initEnv()
-
         self.getRemoteTempPath()
 
         tmpPath = posixToNtSlashes(conf.tmpPath)
         remoteFile = posixToNtSlashes(remoteFile)
-        with open(localFile, "rb") as f:
-            localFileContent = f.read()
+
+        checkFile(localFile)
+        localFileContent = open(localFile, "rb").read()
 
         self._stackedWriteFilePS(tmpPath, localFileContent, remoteFile, fileType)
         written = self.askCheckWrittenFile(localFile, remoteFile, forceCheck)
