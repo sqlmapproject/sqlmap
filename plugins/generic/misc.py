@@ -25,7 +25,6 @@ from lib.core.enums import DBMS
 from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import OS
 from lib.core.exception import SqlmapNoneDataException
-from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.request import inject
 
 class Miscellaneous(object):
@@ -83,25 +82,16 @@ class Miscellaneous(object):
         infoMsg = "detecting back-end DBMS version from its banner"
         logger.info(infoMsg)
 
-        if Backend.isDbms(DBMS.MYSQL):
-            first, last = 1, 6
-
-        elif Backend.isDbms(DBMS.PGSQL):
-            first, last = 12, 6
-
-        elif Backend.isDbms(DBMS.MSSQL):
-            first, last = 29, 9
-
-        else:
-            raise SqlmapUnsupportedFeatureException("unsupported DBMS")
-
-        query = queries[Backend.getIdentifiedDbms()].substring.query % (queries[Backend.getIdentifiedDbms()].banner.query, first, last)
+        query = queries[Backend.getIdentifiedDbms()].banner.query
 
         if conf.direct:
             query = "SELECT %s" % query
 
-        kb.bannerFp["dbmsVersion"] = unArrayizeValue(inject.getValue(query))
-        kb.bannerFp["dbmsVersion"] = (kb.bannerFp["dbmsVersion"] or "").replace(',', "").replace('-', "").replace(' ', "")
+        kb.bannerFp["dbmsVersion"] = unArrayizeValue(inject.getValue(query)) or ""
+
+        match = re.search(r"\d[\d.-]*", kb.bannerFp["dbmsVersion"])
+        if match:
+            kb.bannerFp["dbmsVersion"] = match.group(0)
 
     def delRemoteFile(self, filename):
         if not filename:
