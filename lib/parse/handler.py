@@ -30,7 +30,7 @@ class FingerprintHandler(ContentHandler):
     def _feedInfo(self, key, value):
         value = sanitizeStr(value)
 
-        if value in (None, "None"):
+        if value in (None, "None", ""):
             return
 
         if key == "dbmsVersion":
@@ -62,10 +62,10 @@ class FingerprintHandler(ContentHandler):
             self._techVersion = sanitizeStr(attrs.get("tech_version"))
             self._sp = sanitizeStr(attrs.get("sp"))
 
-            if self._dbmsVersion.isdigit():
+            if self._dbmsVersion and self._dbmsVersion.isdigit():
                 self._feedInfo("dbmsVersion", self._match.group(int(self._dbmsVersion)))
 
-            if self._techVersion.isdigit():
+            if self._techVersion and self._techVersion.isdigit():
                 self._feedInfo("technology", "%s %s" % (attrs.get("technology"), self._match.group(int(self._techVersion))))
             else:
                 self._feedInfo("technology", attrs.get("technology"))
