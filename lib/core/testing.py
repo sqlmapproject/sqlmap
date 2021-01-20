@@ -46,7 +46,7 @@ def vulnTest():
         ("--dummy", ("all tested parameters do not appear to be injectable", "does not seem to be injectable", "there is not at least one", "~might be injectable")),
         ("-u '<url>&id2=1' -p id2 -v 5 --flush-session --level=5 --test-filter='AND boolean-based blind - WHERE or HAVING clause (MySQL comment)'", ("~1AND",)),
         ("--list-tampers", ("between", "MySQL", "xforwardedfor")),
-        ("-r <request> --flush-session -v 5 --test-skip='heavy' --save=<config>", ("CloudFlare", "possible DBMS: 'SQLite'", "User-agent: foobar", "~Type: time-based blind", "saved command line options to the configuration file")),
+        ("-r <request> --flush-session -v 5 --test-skip='heavy' --save=<config>", ("CloudFlare", "web application technology: Express", "possible DBMS: 'SQLite'", "User-agent: foobar", "~Type: time-based blind", "saved command line options to the configuration file")),
         ("-c <config>", ("CloudFlare", "possible DBMS: 'SQLite'", "User-agent: foobar", "~Type: time-based blind")),
         ("<piped> -r <request> -l <log> --flush-session --banner --technique=B", ("banner: '3.", "STDIN")),
         ("-l <log> --flush-session --keep-alive --skip-waf -v 5 --technique=U --union-from=users --banner --parse-errors", ("banner: '3.", "ORDER BY term out of range", "~xp_cmdshell", "Connection: keep-alive")),

@@ -98,6 +98,7 @@ class ReqHandler(BaseHTTPRequestHandler):
 
             if "<script>" in unquote_plus(query):
                 self.send_response(INTERNAL_SERVER_ERROR)
+                self.send_header("X-Powered-By", "Express")
                 self.send_header("Connection", "close")
                 self.end_headers()
                 self.wfile.write("CLOUDFLARE_ERROR_500S_BOX".encode(UNICODE_ENCODING))

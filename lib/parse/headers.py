@@ -11,7 +11,6 @@ from lib.core.common import parseXmlFile
 from lib.core.data import kb
 from lib.core.data import paths
 from lib.parse.handler import FingerprintHandler
-from thirdparty.six.moves import filter as _filter
 
 def headersParser(headers):
     """
@@ -30,7 +29,7 @@ def headersParser(headers):
             "x-powered-by": os.path.join(paths.SQLMAP_XML_BANNER_PATH, "x-powered-by.xml"),
         }
 
-    for header in _filter(lambda _: _ in kb.headerPaths, headers):
+    for header in (_.lower() for _ in headers if _.lower() in kb.headerPaths):
         value = headers[header]
         xmlfile = kb.headerPaths[header]
         handler = FingerprintHandler(value, kb.headersFp)
