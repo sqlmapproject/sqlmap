@@ -779,6 +779,9 @@ def cmdLineParser(argv=None):
         parser.add_argument("--debug", dest="debug", action="store_true",
             help=SUPPRESS)
 
+        parser.add_argument("--deprecations", dest="deprecations", action="store_true",
+            help=SUPPRESS)
+
         parser.add_argument("--disable-multi", dest="disableMulti", action="store_true",
             help=SUPPRESS)
 
