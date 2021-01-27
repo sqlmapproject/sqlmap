@@ -659,7 +659,7 @@ def _createTargetDirs():
 
     try:
         with openFile(os.path.join(conf.outputPath, "target.txt"), "w+") as f:
-            f.write(kb.originalUrls.get(conf.url) or conf.url or conf.hostname)
+            f.write(getUnicode(kb.originalUrls.get(conf.url) or conf.url or conf.hostname))
             f.write(" (%s)" % (HTTPMETHOD.POST if conf.data else HTTPMETHOD.GET))
             f.write("  # %s" % getUnicode(subprocess.list2cmdline(sys.argv), encoding=sys.stdin.encoding))
             if conf.data:
@@ -672,6 +672,9 @@ def _createTargetDirs():
         errMsg += "to write to the output directory '%s' (%s)" % (paths.SQLMAP_OUTPUT_PATH, getSafeExString(ex))
 
         raise SqlmapMissingPrivileges(errMsg)
+    except UnicodeError as ex:
+        warnMsg = "something went wrong while saving target data ('%s')" % getSafeExString(ex)
+        logger.warn(warnMsg)
 
     _createDumpDir()
     _createFilesDir()
