@@ -51,6 +51,7 @@ def vulnTest():
         ("<piped> -r <request> -l <log> --flush-session --banner --technique=B", ("banner: '3.", "STDIN")),
         ("-l <log> --flush-session --keep-alive --skip-waf -v 5 --technique=U --union-from=users --banner --parse-errors", ("banner: '3.", "ORDER BY term out of range", "~xp_cmdshell", "Connection: keep-alive")),
         ("-l <log> --offline --banner -v 5", ("banner: '3.", "~[TRAFFIC OUT]")),
+        ("-u <url> --flush-session --data='id=1&_=Eewef6oh' --chunked --randomize=_ --random-agent --banner", ("Parameter: id (POST)", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "banner: '3.")),
         ("-u <base64> -p id --base64=id --data='base64=true' --flush-session --banner --technique=B", ("banner: '3.",)),
         ("-u <base64> -p id --base64=id --data='base64=true' --flush-session --tables --technique=U", (" users ",)),
         ("-u <url> --flush-session --banner --technique=B --not-string 'no results'", ("banner: '3.",)),
