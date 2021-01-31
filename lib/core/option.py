@@ -2477,7 +2477,7 @@ def _setTorSocksProxySettings():
 
 def _setHttpChunked():
     if conf.chunked and conf.data:
-        _http_client.HTTPConnection._set_content_length = lambda self, a, b: None
+        _http_client.HTTPConnection._set_content_length = lambda self, body: None
 
 def _checkWebSocket():
     if conf.url and (conf.url.startswith("ws:/") or conf.url.startswith("wss:/")):
