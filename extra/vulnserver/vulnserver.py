@@ -140,9 +140,11 @@ class ReqHandler(BaseHTTPRequestHandler):
                 code, output = OK, ""
 
                 try:
-
                     if self.params.get("echo", ""):
                         output += "%s<br>" % self.params["echo"]
+
+                    if self.params.get("reflect", ""):
+                        output += "%s<br>" % self.params.get("id")
 
                     with _lock:
                         if "query" in self.params:
