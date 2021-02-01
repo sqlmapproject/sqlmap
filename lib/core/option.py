@@ -2477,7 +2477,15 @@ def _setTorSocksProxySettings():
 
 def _setHttpChunked():
     if conf.chunked and conf.data:
-        _http_client.HTTPConnection._set_content_length = lambda self, *args, **kwargs: None
+        if hasattr(_http_client.HTTPConnection, "_set_content_length"):
+            _http_client.HTTPConnection._set_content_length = lambda self, *args, **kwargs: None
+        else:
+            def putheader(self, header, *values):
+                if header != HTTP_HEADER.CONTENT_LENGTH:
+                    self._putheader(header, *values)
+
+            _http_client.HTTPConnection._putheader = _http_client.HTTPConnection.putheader
+            _http_client.HTTPConnection.putheader = putheader
 
 def _checkWebSocket():
     if conf.url and (conf.url.startswith("ws:/") or conf.url.startswith("wss:/")):

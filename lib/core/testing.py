@@ -134,7 +134,7 @@ def vulnTest():
         for tag, value in (("<url>", url), ("<direct>", direct), ("<request>", request), ("<log>", log), ("<config>", config), ("<base64>", url.replace("id=1", "id=MZ=%3d"))):
             options = options.replace(tag, value)
 
-        cmd = "%s %s %s --batch --non-interactive --debug" % (sys.executable, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py")), options)
+        cmd = "%s \"%s\" %s --batch --non-interactive --debug" % (sys.executable, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py")), options)
 
         if "<tmp>" in cmd:
             handle, tmp = tempfile.mkstemp()

@@ -1068,7 +1068,7 @@ def cmdLineParser(argv=None):
 
     except SystemExit:
         # Protection against Windows dummy double clicking
-        if IS_WIN:
+        if IS_WIN and "--non-interactive" not in sys.argv:
             dataToStdout("\nPress Enter to continue...")
             _input()
         raise
