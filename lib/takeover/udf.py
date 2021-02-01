@@ -130,7 +130,7 @@ class UDF(object):
         errMsg = "udfSetLocalPaths() method must be defined within the plugin"
         raise SqlmapUnsupportedFeatureException(errMsg)
 
-    def udfCreateFromSharedLib(self, udf=None, inpRet=None):
+    def udfCreateFromSharedLib(self, udf, inpRet):
         errMsg = "udfCreateFromSharedLib() method must be defined within the plugin"
         raise SqlmapUnsupportedFeatureException(errMsg)
 
