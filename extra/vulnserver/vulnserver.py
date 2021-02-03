@@ -129,7 +129,6 @@ class ReqHandler(BaseHTTPRequestHandler):
         self.url, self.params = path, params
 
         if self.url == '/':
-
             if not any(_ in self.params for _ in ("id", "query")):
                 self.send_response(OK)
                 self.send_header("Content-type", "text/html; charset=%s" % UNICODE_ENCODING)
@@ -158,18 +157,22 @@ class ReqHandler(BaseHTTPRequestHandler):
 
                     output += "<b>SQL results:</b><br>\n"
 
-                    if results:
-                        output += "<table border=\"1\">\n"
-
-                        for row in results:
-                            output += "<tr>"
-                            for value in row:
-                                output += "<td>%s</td>" % value
-                            output += "</tr>\n"
-
-                        output += "</table>\n"
+                    if self.params.get("code", ""):
+                        if not results:
+                            code = INTERNAL_SERVER_ERROR
                     else:
-                        output += "no results found"
+                        if results:
+                            output += "<table border=\"1\">\n"
+
+                            for row in results:
+                                output += "<tr>"
+                                for value in row:
+                                    output += "<td>%s</td>" % value
+                                output += "</tr>\n"
+
+                            output += "</table>\n"
+                        else:
+                            output += "no results found"
 
                     output += "</body></html>"
                 except Exception as ex:
@@ -196,7 +199,7 @@ class ReqHandler(BaseHTTPRequestHandler):
         self.do_REQUEST()
 
     def do_PUT(self):
-        self.do_REQUEST()
+        self.do_POST()
 
     def do_HEAD(self):
         self.do_REQUEST()

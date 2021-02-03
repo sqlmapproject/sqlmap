@@ -41,6 +41,7 @@ def vulnTest():
         ("-h", ("to see full list of options run with '-hh'",)),
         ("--dependencies --deprecations", ("sqlmap requires", "third-party library", "~DeprecationWarning:")),
         ("-u <url> --data='reflect=1' --flush-session --wizard", ("Please choose:", "back-end DBMS: SQLite", "current user is DBA: True", "banner: '3.")),
+        ("-u <url> --data='code=1' --code=200 --technique=B --banner --flush-session", ("back-end DBMS: SQLite", "banner: '3.")),
         (u"-c <config> --flush-session --smart --roles --statements --hostname --privileges --sql-query=\"SELECT '\u0161u\u0107uraj'\" --technique=U", (u": '\u0161u\u0107uraj'", "on SQLite it is not possible")),
         (u"-u <url> --flush-session --sql-query=\"SELECT '\u0161u\u0107uraj'\" --technique=B --no-escape --string=luther --unstable", (u": '\u0161u\u0107uraj'",)),
         ("--dummy", ("all tested parameters do not appear to be injectable", "does not seem to be injectable", "there is not at least one", "~might be injectable")),
@@ -51,15 +52,15 @@ def vulnTest():
         ("<piped> -r <request> -l <log> --flush-session --banner --technique=B", ("banner: '3.", "STDIN")),
         ("-l <log> --flush-session --keep-alive --skip-waf -v 5 --technique=U --union-from=users --banner --parse-errors", ("banner: '3.", "ORDER BY term out of range", "~xp_cmdshell", "Connection: keep-alive")),
         ("-l <log> --offline --banner -v 5", ("banner: '3.", "~[TRAFFIC OUT]")),
-        ("-u <url> --flush-session --data='id=1&_=Eewef6oh' --chunked --randomize=_ --random-agent --banner", ("fetched random HTTP User-Agent header value", "Parameter: id (POST)", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "banner: '3.")),
+        ("-u <base> --flush-session --data='id=1&_=Eewef6oh' --chunked --randomize=_ --random-agent --banner", ("fetched random HTTP User-Agent header value", "Parameter: id (POST)", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "banner: '3.")),
         ("-u <base64> -p id --base64=id --data='base64=true' --flush-session --banner --technique=B", ("banner: '3.",)),
         ("-u <base64> -p id --base64=id --data='base64=true' --flush-session --tables --technique=U", (" users ",)),
         ("-u <url> --flush-session --banner --technique=B --not-string 'no results'", ("banner: '3.",)),
         ("-u <url> --flush-session --banner --technique=B --first=1 --last=2", ("banner: '3.'",)),
         ("-u <url> --flush-session --encoding=ascii --forms --crawl=2 --threads=2 --banner", ("total of 2 targets", "might be injectable", "Type: UNION query", "banner: '3.")),
-        ("-u <url> --flush-session --data='{\"id\": 1}' --banner", ("might be injectable", "3 columns", "Payload: {\"id\"", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "banner: '3.")),
-        ("-u <url> --flush-session -H 'Foo: Bar' -H 'Sna: Fu' --data='<root><param name=\"id\" value=\"1*\"/></root>' --union-char=1 --mobile --answers='smartphone=3' --banner --smart -v 5", ("might be injectable", "Payload: <root><param name=\"id\" value=\"1", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "banner: '3.", "Nexus", "Sna: Fu", "Foo: Bar")),
-        ("-u <url> --flush-session --method=PUT --data='a=1&b=2&c=3&id=1' --skip-static --har=<tmp> --dump -T users --start=1 --stop=2", ("might be injectable", "Parameter: id (PUT)", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "2 entries")),
+        ("-u <base> --flush-session --data='{\"id\": 1}' --banner", ("might be injectable", "3 columns", "Payload: {\"id\"", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "banner: '3.")),
+        ("-u <base> --flush-session -H 'Foo: Bar' -H 'Sna: Fu' --data='<root><param name=\"id\" value=\"1*\"/></root>' --union-char=1 --mobile --answers='smartphone=3' --banner --smart -v 5", ("might be injectable", "Payload: <root><param name=\"id\" value=\"1", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "banner: '3.", "Nexus", "Sna: Fu", "Foo: Bar")),
+        ("-u <base> --flush-session --method=PUT --data='a=1;id=1;b=2' --param-del=';' --skip-static --har=<tmp> --dump -T users --start=1 --stop=2", ("might be injectable", "Parameter: id (PUT)", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "2 entries")),
         ("-u <url> --flush-session -H 'id: 1*' --tables -t <tmp>", ("might be injectable", "Parameter: id #1* ((custom) HEADER)", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", " users ")),
         ("-u <url> --flush-session --banner --invalid-logical --technique=B --predict-output --test-filter='OR boolean' --tamper=space2dash", ("banner: '3.", " LIKE ")),
         ("-u <url> --flush-session --cookie=\"PHPSESSID=d41d8cd98f00b204e9800998ecf8427e; id=1*; id2=2\" --tables --union-cols=3", ("might be injectable", "Cookie #1* ((custom) HEADER)", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", " users ")),
@@ -121,7 +122,8 @@ def vulnTest():
     open(request, "w+").write(content)
     open(log, "w+").write('<port>%d</port><request base64="true"><![CDATA[%s]]></request>' % (port, encodeBase64(content, binary=False)))
 
-    url = "http://%s:%d/?id=1" % (address, port)
+    base = "http://%s:%d/" % (address, port)
+    url = "%s?id=1" % base
     direct = "sqlite3://%s" % database
 
     content = open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.conf"))).read().replace("url =", "url = %s" % url)
@@ -131,7 +133,7 @@ def vulnTest():
         status = '%d/%d (%d%%) ' % (count, len(TESTS), round(100.0 * count / len(TESTS)))
         dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%X"), status))
 
-        for tag, value in (("<url>", url), ("<direct>", direct), ("<request>", request), ("<log>", log), ("<config>", config), ("<base64>", url.replace("id=1", "id=MZ=%3d"))):
+        for tag, value in (("<url>", url), ("<base>", base), ("<direct>", direct), ("<request>", request), ("<log>", log), ("<config>", config), ("<base64>", url.replace("id=1", "id=MZ=%3d"))):
             options = options.replace(tag, value)
 
         cmd = "%s \"%s\" %s --batch --non-interactive --debug" % (sys.executable, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py")), options)

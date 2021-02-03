@@ -529,7 +529,7 @@ def checkSqlInjection(place, parameter, value):
                             truePage, trueHeaders, trueCode = threadData.lastComparisonPage or "", threadData.lastComparisonHeaders, threadData.lastComparisonCode
                             trueRawResponse = "%s%s" % (trueHeaders, truePage)
 
-                            if trueResult and not(truePage == falsePage and not kb.nullConnection):
+                            if trueResult and not(truePage == falsePage and not any((kb.nullConnection, conf.code))):
                                 # Perform the test's False request
                                 falseResult = Request.queryPage(genCmpPayload(), place, raise404=False)
 
