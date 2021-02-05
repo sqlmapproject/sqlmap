@@ -50,7 +50,7 @@ def vulnTest():
         ("-r <request> --flush-session -v 5 --test-skip='heavy' --save=<config>", ("CloudFlare", "web application technology: Express", "possible DBMS: 'SQLite'", "User-agent: foobar", "~Type: time-based blind", "saved command line options to the configuration file")),
         ("-c <config>", ("CloudFlare", "possible DBMS: 'SQLite'", "User-agent: foobar", "~Type: time-based blind")),
         ("<piped> -r <request> -l <log> --flush-session --banner --technique=B", ("banner: '3.", "STDIN")),
-        ("-u <url> --flush-session --technique=U --dump -T users --answers=\"crack=n\" -v 3", ("JSON_GROUP_ARRAY", "NULL", "nameisnull", "~performed 2 queries")),
+        ("-u <url> --flush-session --technique=U --dump -T users --answers=\"crack=n\" -v 6", ("JSON_GROUP_ARRAY", "NULL", "nameisnull", "~performed 2 queries")),
         ("-l <log> --flush-session --keep-alive --skip-waf -v 5 --technique=U --union-from=users --banner --parse-errors", ("banner: '3.", "ORDER BY term out of range", "~xp_cmdshell", "Connection: keep-alive")),
         ("-l <log> --offline --banner -v 5", ("banner: '3.", "~[TRAFFIC OUT]")),
         ("-u <base> --flush-session --data='id=1&_=Eewef6oh' --chunked --randomize=_ --random-agent --banner", ("fetched random HTTP User-Agent header value", "Parameter: id (POST)", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "banner: '3.")),
