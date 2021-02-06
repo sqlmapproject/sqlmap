@@ -3223,6 +3223,10 @@ nuke_gallery_pictures_newpicture
 Books
 grupo
 facturas
+aclaraciones
+preguntas
+personas
+estadisticas
 
 # site:cn
 

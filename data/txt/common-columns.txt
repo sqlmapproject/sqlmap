@@ -485,6 +485,8 @@ llave
 chaveta
 tono
 cuna
+correo
+contrasenia
 
 # german
 
