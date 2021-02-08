@@ -2542,7 +2542,7 @@ def _basicOptionValidation():
         errMsg = "value for option '--first' (firstChar) must be smaller than or equal to value for --last (lastChar) option"
         raise SqlmapSyntaxException(errMsg)
 
-    if conf.proxyFile and not any((conf.randomAgent, conf.mobile, conf.agent)):
+    if conf.proxyFile and not any((conf.randomAgent, conf.mobile, conf.agent, conf.requestFile)):
         warnMsg = "usage of switch '--random-agent' is strongly recommended when "
         warnMsg += "using option '--proxy-file'"
         logger.warn(warnMsg)
