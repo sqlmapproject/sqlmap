@@ -161,7 +161,7 @@ def update():
         if IS_WIN:
             infoMsg = "for Windows platform it's recommended "
             infoMsg += "to use a GitHub for Windows client for updating "
-            infoMsg += "purposes (http://windows.github.com/) or just "
+            infoMsg += "purposes (https://desktop.github.com/) or just "
             infoMsg += "download the latest snapshot from "
             infoMsg += "https://github.com/sqlmapproject/sqlmap/downloads"
         else:
