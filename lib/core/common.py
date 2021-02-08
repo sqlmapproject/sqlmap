@@ -3024,6 +3024,8 @@ def getPublicTypeMembers(type_, onlyValues=False):
 
     >>> [_ for _ in getPublicTypeMembers(OS, True)]
     ['Linux', 'Windows']
+    >>> [_ for _ in getPublicTypeMembers(PAYLOAD.TECHNIQUE, True)]
+    [1, 2, 3, 4, 5, 6]
     """
 
     retVal = []

@@ -25,6 +25,8 @@ def cachedmethod(f):
     >>> __ = cachedmethod(lambda _: _)
     >>> __(1)
     1
+    >>> __(1)
+    1
     >>> __ = cachedmethod(lambda *args, **kwargs: args[0])
     >>> __(2)
     2
