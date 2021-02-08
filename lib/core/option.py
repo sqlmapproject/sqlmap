@@ -2542,6 +2542,11 @@ def _basicOptionValidation():
         errMsg = "value for option '--first' (firstChar) must be smaller than or equal to value for --last (lastChar) option"
         raise SqlmapSyntaxException(errMsg)
 
+    if conf.proxyFile and not any((conf.randomAgent, conf.mobile, conf.agent)):
+        warnMsg = "usage of switch '--random-agent' is strongly recommended when "
+        warnMsg += "using option '--proxy-file'"
+        logger.warn(warnMsg)
+
     if conf.textOnly and conf.nullConnection:
         errMsg = "switch '--text-only' is incompatible with switch '--null-connection'"
         raise SqlmapSyntaxException(errMsg)
