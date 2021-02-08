@@ -2882,33 +2882,31 @@ def urldecode(value, encoding=None, unsafe="%%?&=;+%s" % CUSTOM_INJECTION_MARK_C
     True
     >>> urldecode('AND%201%3E%282%2B3%29%23', convall=False) == 'AND 1>(2%2B3)#'
     True
+    >>> urldecode(b'AND%201%3E%282%2B3%29%23', convall=False) == 'AND 1>(2%2B3)#'
+    True
     """
 
     result = value
 
     if value:
-        try:
-            # for cases like T%C3%BCrk%C3%A7e
-            value = str(value)
-        except ValueError:
-            pass
-        finally:
-            if convall:
-                result = _urllib.parse.unquote_plus(value) if spaceplus else _urllib.parse.unquote(value)
-            else:
-                result = value
-                charset = set(string.printable) - set(unsafe)
+        value = getUnicode(value)
 
-                def _(match):
-                    char = decodeHex(match.group(1), binary=False)
-                    return char if char in charset else match.group(0)
+        if convall:
+            result = _urllib.parse.unquote_plus(value) if spaceplus else _urllib.parse.unquote(value)
+        else:
+            result = value
+            charset = set(string.printable) - set(unsafe)
 
-                if spaceplus:
-                    result = result.replace('+', ' ')  # plus sign has a special meaning in URL encoded data (hence the usage of _urllib.parse.unquote_plus in convall case)
+            def _(match):
+                char = decodeHex(match.group(1), binary=False)
+                return char if char in charset else match.group(0)
 
-                result = re.sub(r"%([0-9a-fA-F]{2})", _, result)
+            if spaceplus:
+                result = result.replace('+', ' ')  # plus sign has a special meaning in URL encoded data (hence the usage of _urllib.parse.unquote_plus in convall case)
 
-            result = getUnicode(result, encoding or UNICODE_ENCODING)
+            result = re.sub(r"%([0-9a-fA-F]{2})", _, result)
+
+        result = getUnicode(result, encoding or UNICODE_ENCODING)
 
     return result
 

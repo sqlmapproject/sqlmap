@@ -498,8 +498,6 @@ class Connect(object):
             if six.PY2:
                 url = getBytes(url)  # Note: Python3 requires text while Python2 has problems when mixing text with binary POST
 
-            post = getBytes(post)
-
             if webSocket:
                 ws = websocket.WebSocket()
                 ws.settimeout(WEBSOCKET_INITIAL_TIMEOUT if kb.webSocketRecvCount is None else timeout)
@@ -543,6 +541,8 @@ class Connect(object):
 
                 logger.log(CUSTOM_LOGGING.TRAFFIC_OUT, requestMsg)
             else:
+                post = getBytes(post)
+
                 if target and cmdLineOptions.method or method and method not in (HTTPMETHOD.GET, HTTPMETHOD.POST):
                     req = MethodRequest(url, post, headers)
                     req.set_method(cmdLineOptions.method or method)
