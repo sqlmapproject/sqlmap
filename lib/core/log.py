@@ -23,7 +23,7 @@ try:
 
     class _ColorizingStreamHandler(ColorizingStreamHandler):
         def colorize(self, message, levelno, force=False):
-            if levelno in self.level_map and self.is_tty or force:
+            if levelno in self.level_map and (self.is_tty or force):
                 bg, fg, bold = self.level_map[levelno]
                 params = []
 
