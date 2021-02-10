@@ -2484,7 +2484,9 @@ def _setHttpChunked():
                 if header != HTTP_HEADER.CONTENT_LENGTH:
                     self._putheader(header, *values)
 
-            _http_client.HTTPConnection._putheader = _http_client.HTTPConnection.putheader
+            if not hasattr(_http_client.HTTPConnection, "_putheader"):
+                _http_client.HTTPConnection._putheader = _http_client.HTTPConnection.putheader
+
             _http_client.HTTPConnection.putheader = putheader
 
 def _checkWebSocket():
