@@ -256,9 +256,9 @@ Options:
     --mobile            Imitate smartphone through HTTP User-Agent header
     --offline           Work in offline mode (only use session data)
     --purge             Safely remove all content from sqlmap data directory
+    --shell             Prompt for an interactive sqlmap shell
     --skip-waf          Skip heuristic detection of WAF/IPS protection
     --smart             Conduct thorough tests only if positive heuristic(s)
-    --sqlmap-shell      Prompt for an interactive sqlmap shell
     --tmp-dir=TMPDIR    Local directory for storing temporary files
     --web-root=WEBROOT  Web server document root directory (e.g. "/var/www")
     --wizard            Simple wizard interface for beginner users
@@ -2533,13 +2533,13 @@ In case that you want to skip tests by their payloads and/or titles you can use 
 
 ### Interactive sqlmap shell
 
-Switch: `--sqlmap-shell`
+Switch: `--shell`
 
-By using switch `--sqlmap-shell` user will be presented with the interactive sqlmap shell which has the history of all previous runs with used options and/or switches:
+By using switch `--shell` user will be presented with the interactive sqlmap shell which has the history of all previous runs with used options and/or switches:
 
 ```
-$ python sqlmap.py --sqlmap-shell
-sqlmap-shell> -u "http://testphp.vulnweb.com/artists.php?artist=1" --technique=\
+$ python sqlmap.py --shell
+sqlmap > -u "http://testphp.vulnweb.com/artists.php?artist=1" --technique=\
 BEU --batch
          _
  ___ ___| |_____ ___ ___  {1.0-dev-2188502}
