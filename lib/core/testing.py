@@ -44,6 +44,7 @@ def vulnTest():
         ("-u <url> --data='code=1' --code=200 --technique=B --banner --no-cast --flush-session", ("back-end DBMS: SQLite", "banner: '3.", "~COALESCE(CAST(")),
         (u"-c <config> --flush-session --smart --roles --statements --hostname --privileges --sql-query=\"SELECT '\u0161u\u0107uraj'\" --technique=U", (u": '\u0161u\u0107uraj'", "on SQLite it is not possible")),
         (u"-u <url> --flush-session --sql-query=\"SELECT '\u0161u\u0107uraj'\" --technique=B --no-escape --string=luther --unstable", (u": '\u0161u\u0107uraj'",)),
+        ("-m <multiple> --flush-session --technique=B --banner", ("URL 3:", "back-end DBMS: SQLite", "banner: '3.")),
         ("--dummy", ("all tested parameters do not appear to be injectable", "does not seem to be injectable", "there is not at least one", "~might be injectable")),
         ("-u '<url>&id2=1' -p id2 -v 5 --flush-session --level=5 --text-only --test-filter='AND boolean-based blind - WHERE or HAVING clause (MySQL comment)'", ("~1AND",)),
         ("--list-tampers", ("between", "MySQL", "xforwardedfor")),
@@ -117,6 +118,9 @@ def vulnTest():
     handle, log = tempfile.mkstemp(suffix=".log")
     os.close(handle)
 
+    handle, multiple = tempfile.mkstemp(suffix=".lst")
+    os.close(handle)
+
     content = "POST / HTTP/1.0\nUser-agent: foobar\nHost: %s:%s\n\nid=1\n" % (address, port)
 
     open(request, "w+").write(content)
@@ -129,11 +133,13 @@ def vulnTest():
     content = open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.conf"))).read().replace("url =", "url = %s" % url)
     open(config, "w+").write(content)
 
+    open(multiple, "w+").write("%s?%s=%d\n%s?%s=%d\n%s&%s=1" % (base, randomStr(), randomInt(), base, randomStr(), randomInt(), url, randomStr()))
+
     for options, checks in TESTS:
         status = '%d/%d (%d%%) ' % (count, len(TESTS), round(100.0 * count / len(TESTS)))
         dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%X"), status))
 
-        for tag, value in (("<url>", url), ("<base>", base), ("<direct>", direct), ("<request>", request), ("<log>", log), ("<config>", config), ("<base64>", url.replace("id=1", "id=MZ=%3d"))):
+        for tag, value in (("<url>", url), ("<base>", base), ("<direct>", direct), ("<request>", request), ("<log>", log), ("<multiple>", multiple), ("<config>", config), ("<base64>", url.replace("id=1", "id=MZ=%3d"))):
             options = options.replace(tag, value)
 
         cmd = "%s \"%s\" %s --batch --non-interactive --debug" % (sys.executable, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py")), options)
