@@ -751,7 +751,7 @@ def cmdLineParser(argv=None):
         miscellaneous.add_argument("--results-file", dest="resultsFile",
             help="Location of CSV results file in multiple targets mode")
 
-        miscellaneous.add_argument("--sqlmap-shell", dest="sqlmapShell", action="store_true",
+        miscellaneous.add_argument("--shell", dest="shell", action="store_true",
             help="Prompt for an interactive sqlmap shell")
 
         miscellaneous.add_argument("--tmp-dir", dest="tmpDir",
@@ -894,7 +894,7 @@ def cmdLineParser(argv=None):
 
             raise SqlmapSilentQuitException
 
-        elif "--sqlmap-shell" in argv:
+        elif "--shell" in argv:
             _createHomeDirectories()
 
             parser.usage = ""
@@ -907,13 +907,16 @@ def cmdLineParser(argv=None):
 
             while True:
                 command = None
+                prompt = "sqlmap > "
 
                 try:
                     # Note: in Python2 command should not be converted to Unicode before passing to shlex (Reference: https://bugs.python.org/issue1170)
-                    command = _input("sqlmap-shell> ").strip()
+                    command = _input(prompt).strip()
                 except (KeyboardInterrupt, EOFError):
                     print()
                     raise SqlmapShellQuitException
+
+                command = re.sub(r"(?i)\Anew\s+", "", command or "")
 
                 if not command:
                     continue
@@ -924,8 +927,9 @@ def cmdLineParser(argv=None):
                 elif command.lower() in ("x", "q", "exit", "quit"):
                     raise SqlmapShellQuitException
                 elif command[0] != '-':
-                    dataToStdout("[!] invalid option(s) provided\n")
-                    dataToStdout("[i] proper example: '-u http://www.site.com/vuln.php?id=1 --banner'\n")
+                    if not re.search(r"(?i)\A(\?|help)\Z", command):
+                        dataToStdout("[!] invalid option(s) provided\n")
+                    dataToStdout("[i] valid example: '-u http://www.site.com/vuln.php?id=1 --banner'\n")
                 else:
                     saveHistory(AUTOCOMPLETE_TYPE.SQLMAP)
                     loadHistory(AUTOCOMPLETE_TYPE.SQLMAP)
@@ -1057,7 +1061,7 @@ def cmdLineParser(argv=None):
             args.stdinPipe = None
 
         if not any((args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, args.requestFile, args.updateAll, args.smokeTest, args.vulnTest, args.bedTest, args.fuzzTest, args.wizard, args.dependencies, args.purge, args.listTampers, args.hashFile, args.stdinPipe)):
-            errMsg = "missing a mandatory option (-d, -u, -l, -m, -r, -g, -c, --list-tampers, --wizard, --update, --purge or --dependencies). "
+            errMsg = "missing a mandatory option (-d, -u, -l, -m, -r, -g, -c, --wizard, --shell, --update, --purge, --list-tampers or --dependencies). "
             errMsg += "Use -h for basic and -hh for advanced help\n"
             parser.error(errMsg)
 

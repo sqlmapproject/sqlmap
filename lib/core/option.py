@@ -1916,7 +1916,7 @@ def _cleanupOptions():
 
 def _cleanupEnvironment():
     """
-    Cleanup environment (e.g. from leftovers after --sqlmap-shell).
+    Cleanup environment (e.g. from leftovers after --shell).
     """
 
     if issubclass(_http_client.socket.socket, socks.socksocket):
