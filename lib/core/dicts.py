@@ -37,6 +37,7 @@ from lib.core.settings import RAIMA_ALIASES
 from lib.core.settings import SQLITE_ALIASES
 from lib.core.settings import SYBASE_ALIASES
 from lib.core.settings import VERTICA_ALIASES
+from lib.core.settings import VIRTUOSO_ALIASES
 
 FIREBIRD_TYPES = {
     261: "BLOB",
@@ -246,6 +247,7 @@ DBMS_DICT = {
     DBMS.EXTREMEDB: (EXTREMEDB_ALIASES, None, None, None),
     DBMS.FRONTBASE: (FRONTBASE_ALIASES, None, None, None),
     DBMS.RAIMA: (RAIMA_ALIASES, None, None, None),
+    DBMS.VIRTUOSO: (VIRTUOSO_ALIASES, None, None, None),
 }
 
 # Reference: https://blog.jooq.org/tag/sysibm-sysdummy1/
@@ -283,6 +285,7 @@ HEURISTIC_NULL_EVAL = {
     DBMS.CACHE: "%SQLUPPER NULL",
     DBMS.EXTREMEDB: "NULLIFZERO(hashcode(NULL))",
     DBMS.RAIMA: "IF(ROWNUMBER()>0,CONVERT(NULL,TINYINT),NULL))",
+    DBMS.VIRTUOSO: "__MAX_NOTNULL(NULL)",
 }
 
 SQL_STATEMENTS = {

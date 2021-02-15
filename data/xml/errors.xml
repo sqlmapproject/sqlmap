@@ -223,4 +223,12 @@
         <error regexp="-10048: Syntax error"/>
         <error regexp="rdmStmtPrepare\(.+?\) returned"/>
     </dbms>
+
+    <dbms value="Virtuoso">
+        <error regexp="SQ074: Line \d+:"/>
+        <error regexp="SR185: Undefined procedure"/>
+        <error regexp="SQ200: No table "/>
+        <error regexp="Virtuoso S0002 Error"/>
+        <error regexp="\[(Virtuoso Driver|Virtuoso iODBC Driver)\]\[Virtuoso Server\]"/>
+    </dbms>
 </root>

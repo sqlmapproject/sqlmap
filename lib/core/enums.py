@@ -58,6 +58,7 @@ class DBMS(object):
     EXTREMEDB = "eXtremeDB"
     FRONTBASE = "FrontBase"
     RAIMA = "Raima Database Manager"
+    VIRTUOSO = "Virtuoso"
 
 class DBMS_DIRECTORY_NAME(object):
     ACCESS = "access"
@@ -86,6 +87,7 @@ class DBMS_DIRECTORY_NAME(object):
     EXTREMEDB = "extremedb"
     FRONTBASE = "frontbase"
     RAIMA = "raima"
+    VIRTUOSO = "virtuoso"
 
 class FORK(object):
     MARIADB = "MariaDB"

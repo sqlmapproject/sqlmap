@@ -276,7 +276,7 @@ class Users(object):
                     if user in retrievedUsers:
                         continue
 
-                    if Backend.isDbms(DBMS.INFORMIX):
+                    if Backend.getIdentifiedDbms() in (DBMS.INFORMIX, DBMS.VIRTUOSO):
                         count = 1
                     else:
                         infoMsg = "fetching number of password hashes "
@@ -322,7 +322,7 @@ class Users(object):
                             if fallback:
                                 query = query.replace("master.dbo.fn_varbintohexstr", "sys.fn_sqlvarbasetostr")
 
-                        elif Backend.isDbms(DBMS.INFORMIX):
+                        elif Backend.getIdentifiedDbms() in (DBMS.INFORMIX, DBMS.VIRTUOSO):
                             query = rootQuery.blind.query % (user,)
 
                         elif Backend.isDbms(DBMS.HSQLDB):
