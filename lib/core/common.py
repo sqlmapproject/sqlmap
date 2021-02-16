@@ -5250,7 +5250,8 @@ def parseRequestFile(reqFile, checkParams=True):
                 continue
 
             if re.search(r"^[\n]*%s.*?\.(%s)\sHTTP\/" % (HTTPMETHOD.GET, "|".join(CRAWL_EXCLUDE_EXTENSIONS)), request, re.I | re.M):
-                continue
+                if not re.search(r"^[\n]*%s[^\n]*\*[^\n]*\sHTTP\/" % HTTPMETHOD.GET, request, re.I | re.M):
+                    continue
 
             getPostReq = False
             url = None
