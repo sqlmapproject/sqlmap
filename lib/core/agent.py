@@ -488,7 +488,7 @@ class Agent(object):
                 if not (Backend.isDbms(DBMS.SQLITE) and not isDBMSVersionAtLeast('3')):
                     nulledCastedField = rootQuery.cast.query % field
 
-                if re.search("COUNT\(", field) and Backend.getIdentifiedDbms() in (DBMS.RAIMA,):
+                if re.search(r"COUNT\(", field) and Backend.getIdentifiedDbms() in (DBMS.RAIMA,):
                     pass
                 elif Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI):
                     nulledCastedField = rootQuery.isnull.query % (nulledCastedField, nulledCastedField)
