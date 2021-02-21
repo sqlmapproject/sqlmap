@@ -488,6 +488,9 @@ class Connect(object):
                         header, value = line.split(':', 1)
                         headers[header] = value
 
+            if conf.localhost:
+                headers[HTTP_HEADER.HOST] = "localhost"
+
             for key, value in list(headers.items()):
                 del headers[key]
                 if isinstance(value, six.string_types):

@@ -794,6 +794,9 @@ def cmdLineParser(argv=None):
         parser.add_argument("--profile", dest="profile", action="store_true",
             help=SUPPRESS)
 
+        parser.add_argument("--localhost", dest="localhost", action="store_true",
+            help=SUPPRESS)
+
         parser.add_argument("--force-dbms", dest="forceDbms",
             help=SUPPRESS)
 
