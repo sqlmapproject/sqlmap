@@ -25,6 +25,7 @@ from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
 from lib.core.common import incrementCounter
 from lib.core.common import initTechnique
+from lib.core.common import isDigit
 from lib.core.common import isListLike
 from lib.core.common import isNoneValue
 from lib.core.common import isNumPosStrValue
@@ -186,25 +187,25 @@ def configUnion(char=None, columns=None):
         kb.uChar = char
 
         if conf.uChar is not None:
-            kb.uChar = char.replace("[CHAR]", conf.uChar if conf.uChar.isdigit() else "'%s'" % conf.uChar.strip("'"))
+            kb.uChar = char.replace("[CHAR]", conf.uChar if isDigit(conf.uChar) else "'%s'" % conf.uChar.strip("'"))
 
     def _configUnionCols(columns):
         if not isinstance(columns, six.string_types):
             return
 
-        columns = columns.replace(" ", "")
-        if "-" in columns:
-            colsStart, colsStop = columns.split("-")
+        columns = columns.replace(' ', "")
+        if '-' in columns:
+            colsStart, colsStop = columns.split('-')
         else:
             colsStart, colsStop = columns, columns
 
-        if not colsStart.isdigit() or not colsStop.isdigit():
+        if not isDigit(colsStart) or not isDigit(colsStop):
             raise SqlmapSyntaxException("--union-cols must be a range of integers")
 
         conf.uColsStart, conf.uColsStop = int(colsStart), int(colsStop)
 
         if conf.uColsStart > conf.uColsStop:
-            errMsg = "--union-cols range has to be from lower to "
+            errMsg = "--union-cols range has to represent lower to "
             errMsg += "higher number of columns"
             raise SqlmapSyntaxException(errMsg)
 
@@ -329,8 +330,8 @@ def unionUse(expression, unpack=True, dump=False):
 
                 if stopLimit > TURN_OFF_RESUME_INFO_LIMIT:
                     kb.suppressResumeInfo = True
-                    debugMsg = "suppressing possible resume console info because of "
-                    debugMsg += "large number of rows. It might take too long"
+                    debugMsg = "suppressing possible resume console info for "
+                    debugMsg += "large number of rows as it might take too long"
                     logger.debug(debugMsg)
 
                 try:

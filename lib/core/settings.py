@@ -18,7 +18,7 @@ from lib.core.enums import OS
 from thirdparty.six import unichr as _unichr
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.5.2.22"
+VERSION = "1.5.2.23"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -287,8 +287,8 @@ VIRTUOSO_SYSTEM_DBS = ("",)
 
 # Note: (<regular>) + (<forks>)
 MSSQL_ALIASES = ("microsoft sql server", "mssqlserver", "mssql", "ms")
-MYSQL_ALIASES = ("mysql", "my") + ("mariadb", "maria", "memsql", "tidb", "percona")
-PGSQL_ALIASES = ("postgresql", "postgres", "pgsql", "psql", "pg") + ("cockroach", "cockroachdb", "redshift", "greenplum", "yellowbrick", "enterprisedb", "aurora")
+MYSQL_ALIASES = ("mysql", "my") + ("mariadb", "maria", "memsql", "tidb", "percona", "drizzle")
+PGSQL_ALIASES = ("postgresql", "postgres", "pgsql", "psql", "pg") + ("cockroach", "cockroachdb", "redshift", "greenplum", "yellowbrick", "enterprisedb", "yugabyte", "yugabytedb")
 ORACLE_ALIASES = ("oracle", "orcl", "ora", "or")
 SQLITE_ALIASES = ("sqlite", "sqlite3")
 ACCESS_ALIASES = ("microsoft access", "msaccess", "access", "jet")
@@ -297,7 +297,7 @@ MAXDB_ALIASES = ("max", "maxdb", "sap maxdb", "sap db")
 SYBASE_ALIASES = ("sybase", "sybase sql server")
 DB2_ALIASES = ("db2", "ibm db2", "ibmdb2")
 HSQLDB_ALIASES = ("hsql", "hsqldb", "hs", "hypersql")
-H2_ALIASES = ("h2",)
+H2_ALIASES = ("h2", "ignite")
 INFORMIX_ALIASES = ("informix", "ibm informix", "ibminformix")
 MONETDB_ALIASES = ("monet", "monetdb",)
 DERBY_ALIASES = ("derby", "apache derby",)
@@ -308,7 +308,7 @@ ALTIBASE_ALIASES = ("altibase",)
 MIMERSQL_ALIASES = ("mimersql", "mimer")
 CRATEDB_ALIASES = ("cratedb", "crate")
 CUBRID_ALIASES = ("cubrid",)
-CACHE_ALIASES = ("intersystems cache", "cachedb", "cache")
+CACHE_ALIASES = ("intersystems cache", "cachedb", "cache", "iris")
 EXTREMEDB_ALIASES = ("extremedb", "extreme")
 FRONTBASE_ALIASES = ("frontbase",)
 RAIMA_ALIASES = ("raima database manager", "raima", "raimadb", "raimadm", "rdm", "rds", "velocis")

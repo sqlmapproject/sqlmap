@@ -104,6 +104,7 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
 
         if kb.orderByColumns is None and (lowerCount == 1 or conf.uCols):  # Note: ORDER BY is not bullet-proof
             found = _orderByTechnique(lowerCount, upperCount) if conf.uCols else _orderByTechnique()
+
             if found:
                 kb.orderByColumns = found
                 infoMsg = "target URL appears to have %d column%s in query" % (found, 's' if found > 1 else "")
@@ -122,8 +123,10 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
             query = agent.forgeUnionQuery('', -1, count, comment, prefix, suffix, kb.uChar, where)
             payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
             page, headers, code = Request.queryPage(payload, place=place, content=True, raise404=False)
+
             if not isNullValue(kb.uChar):
                 pages[count] = page
+
             ratio = comparison(page, headers, code, getRatioValue=True) or MIN_RATIO
             ratios.append(ratio)
             min_, max_ = min(min_, ratio), max(max_, ratio)
