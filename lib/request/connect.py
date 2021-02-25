@@ -750,7 +750,9 @@ class Connect(object):
             if ex.code not in (conf.ignoreCode or []):
                 if ex.code == _http_client.UNAUTHORIZED:
                     errMsg = "not authorized, try to provide right HTTP "
-                    errMsg += "authentication type and valid credentials (%d)" % code
+                    errMsg += "authentication type and valid credentials (%d). " % code
+                    errMsg += "If this is intended, try to rerun by providing "
+                    errMsg += "a valid value for option '--ignore-code'"
                     raise SqlmapConnectionException(errMsg)
                 elif chunked and ex.code in (_http_client.METHOD_NOT_ALLOWED, _http_client.LENGTH_REQUIRED):
                     warnMsg = "turning off HTTP chunked transfer encoding "
