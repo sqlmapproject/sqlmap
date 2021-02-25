@@ -42,7 +42,7 @@ def vulnTest():
         ("--dependencies --deprecations", ("sqlmap requires", "third-party library", "~DeprecationWarning:")),
         ("-u <url> --data='reflect=1' --flush-session --wizard --disable-coloring", ("Please choose:", "back-end DBMS: SQLite", "current user is DBA: True", "banner: '3.")),
         ("-u <url> --data='code=1' --code=200 --technique=B --banner --no-cast --flush-session", ("back-end DBMS: SQLite", "banner: '3.", "~COALESCE(CAST(")),
-        (u"-c <config> --flush-session --smart --roles --statements --hostname --privileges --sql-query=\"SELECT '\u0161u\u0107uraj'\" --technique=U", (u": '\u0161u\u0107uraj'", "on SQLite it is not possible")),
+        (u"-c <config> --flush-session --output-dir=\"<tmdir>\"--smart --roles --statements --hostname --privileges --sql-query=\"SELECT '\u0161u\u0107uraj'\" --technique=U", (u": '\u0161u\u0107uraj'", "on SQLite it is not possible", "as the output directory")),
         (u"-u <url> --flush-session --sql-query=\"SELECT '\u0161u\u0107uraj'\" --technique=B --no-escape --string=luther --unstable", (u": '\u0161u\u0107uraj'",)),
         ("-m <multiple> --flush-session --technique=B --banner", ("URL 3:", "back-end DBMS: SQLite", "banner: '3.")),
         ("--dummy", ("all tested parameters do not appear to be injectable", "does not seem to be injectable", "there is not at least one", "~might be injectable")),
@@ -65,7 +65,7 @@ def vulnTest():
         ("-u <url> --flush-session -H 'id: 1*' --tables -t <tmp>", ("might be injectable", "Parameter: id #1* ((custom) HEADER)", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", " users ")),
         ("-u <url> --flush-session --banner --invalid-logical --technique=B --predict-output --test-filter='OR boolean' --tamper=space2dash", ("banner: '3.", " LIKE ")),
         ("-u <url> --flush-session --cookie=\"PHPSESSID=d41d8cd98f00b204e9800998ecf8427e; id=1*; id2=2\" --tables --union-cols=3", ("might be injectable", "Cookie #1* ((custom) HEADER)", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", " users ")),
-        ("-u <url> --flush-session --null-connection --technique=B --tamper=between,randomcase --banner", ("NULL connection is supported with HEAD method", "banner: '3.")),
+        ("-u <url> --flush-session --null-connection --technique=B --tamper=between,randomcase --banner --count -T users", ("NULL connection is supported with HEAD method", "banner: '3.", "users | 5")),
         ("-u <url> --flush-session --parse-errors --test-filter=\"subquery\" --eval=\"import hashlib; id2=2; id3=hashlib.md5(id.encode()).hexdigest()\" --referer=\"localhost\"", ("might be injectable", ": syntax error", "back-end DBMS: SQLite", "WHERE or HAVING clause (subquery")),
         ("-u <url> --banner --schema --dump -T users --binary-fields=surname --where \"id>3\"", ("banner: '3.", "INTEGER", "TEXT", "id", "name", "surname", "2 entries", "6E616D6569736E756C6C")),
         ("-u <url> --technique=U --fresh-queries --force-partial --dump -T users --dump-format=HTML --answers=\"crack=n\" -v 3", ("performed 6 queries", "nameisnull", "~using default dictionary", "dumped to HTML file")),
@@ -129,6 +129,7 @@ def vulnTest():
     base = "http://%s:%d/" % (address, port)
     url = "%s?id=1" % base
     direct = "sqlite3://%s" % database
+    tmpdir = tempfile.mkdtemp()
 
     content = open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.conf"))).read().replace("url =", "url = %s" % url)
     open(config, "w+").write(content)
@@ -139,7 +140,7 @@ def vulnTest():
         status = '%d/%d (%d%%) ' % (count, len(TESTS), round(100.0 * count / len(TESTS)))
         dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%X"), status))
 
-        for tag, value in (("<url>", url), ("<base>", base), ("<direct>", direct), ("<request>", request), ("<log>", log), ("<multiple>", multiple), ("<config>", config), ("<base64>", url.replace("id=1", "id=MZ=%3d"))):
+        for tag, value in (("<url>", url), ("<base>", base), ("<direct>", direct), ("<tmpdir>", tmpdir), ("<request>", request), ("<log>", log), ("<multiple>", multiple), ("<config>", config), ("<base64>", url.replace("id=1", "id=MZ=%3d"))):
             options = options.replace(tag, value)
 
         cmd = "%s \"%s\" %s --batch --non-interactive --debug" % (sys.executable, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py")), options)

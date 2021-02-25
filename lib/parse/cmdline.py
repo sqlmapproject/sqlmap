@@ -704,7 +704,7 @@ def cmdLineParser(argv=None):
             help="Regexp for filtering targets")
 
         general.add_argument("--skip-heuristics", dest="skipHeuristics", action="store_true",
-            help="Skip heuristic detection of SQLi/XSS vulnerabilities")
+            help="Skip heuristic detection of SQLi/XSS/FI vulnerabilities")
 
         general.add_argument("--skip-waf", dest="skipWaf", action="store_true",
             help="Skip heuristic detection of WAF/IPS protection")
