@@ -383,7 +383,7 @@ DUMP_DATA_PREPROCESS = {
 
 DEFAULT_DOC_ROOTS = {
     OS.WINDOWS: ("C:/xampp/htdocs/", "C:/wamp/www/", "C:/Inetpub/wwwroot/"),
-    OS.LINUX: ("/var/www/", "/var/www/html", "/var/www/htdocs", "/usr/local/apache2/htdocs", "/usr/local/www/data", "/var/apache2/htdocs", "/var/www/nginx-default", "/srv/www/htdocs")  # Reference: https://wiki.apache.org/httpd/DistrosDefaultLayout
+    OS.LINUX: ("/var/www/", "/var/www/html", "/var/www/htdocs", "/usr/local/apache2/htdocs", "/usr/local/www/data", "/var/apache2/htdocs", "/var/www/nginx-default", "/srv/www/htdocs", "/usr/local/var/www")  # Reference: https://wiki.apache.org/httpd/DistrosDefaultLayout
 }
 
 PART_RUN_CONTENT_TYPES = {
