@@ -773,6 +773,9 @@ def cmdLineParser(argv=None):
         parser.add_argument("--dummy", dest="dummy", action="store_true",
             help=SUPPRESS)
 
+        parser.add_argument("--yuge", dest="yuge", action="store_true",
+            help=SUPPRESS)
+
         parser.add_argument("--murphy-rate", dest="murphyRate", type=int,
             help=SUPPRESS)
 

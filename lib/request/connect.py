@@ -252,6 +252,9 @@ class Connect(object):
                         singleTimeWarnMessage(warnMsg)
                         break
 
+        if conf.yuge:
+            retVal = 100 * retVal
+
         return retVal
 
     @staticmethod

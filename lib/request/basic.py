@@ -259,7 +259,7 @@ def getHeuristicCharEncoding(page):
     """
 
     key = hash(page)
-    retVal = kb.cache.encoding.get(key) or detect(page[:HEURISTIC_PAGE_SIZE_THRESHOLD])["encoding"]
+    retVal = kb.cache.encoding[key] if key in kb.cache.encoding else detect(page[:HEURISTIC_PAGE_SIZE_THRESHOLD])["encoding"]
     kb.cache.encoding[key] = retVal
 
     if retVal and retVal.lower().replace('-', "") == UNICODE_ENCODING.lower().replace('-', ""):
