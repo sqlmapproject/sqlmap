@@ -1997,6 +1997,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.cache = AttribDict()
     kb.cache.addrinfo = {}
     kb.cache.content = {}
+    kb.cache.comparison = {}
     kb.cache.encoding = {}
     kb.cache.alphaBoundaries = None
     kb.cache.hashRegex = None
