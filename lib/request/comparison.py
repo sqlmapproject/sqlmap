@@ -154,14 +154,18 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
             seqMatcher.set_seq1(seq1)
             seqMatcher.set_seq2(seq2)
 
-            key = (hash(seq1), hash(seq2))
+            try:
+                key = (hash(seq1), hash(seq2))
+            except:
+                key = None
 
             if key in kb.cache.comparison:
                 ratio = kb.cache.comparison[key]
             else:
                 ratio = round(seqMatcher.quick_ratio() if not kb.heavilyDynamic else seqMatcher.ratio(), 3)
 
-            kb.cache.comparison[key] = ratio
+            if key:
+                kb.cache.comparison[key] = ratio
 
     # If the url is stable and we did not set yet the match ratio and the
     # current injected value changes the url page content
