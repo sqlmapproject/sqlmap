@@ -2554,6 +2554,10 @@ def _basicOptionValidation():
         errMsg = "switch '--text-only' is incompatible with switch '--null-connection'"
         raise SqlmapSyntaxException(errMsg)
 
+    if conf.base64Parameter and conf.tamper:
+        errMsg = "option '--base64' is incompatible with option '--tamper'"
+        raise SqlmapSyntaxException(errMsg)
+
     if conf.eta and conf.verbose > defaults.verbose:
         errMsg = "switch '--eta' is incompatible with option '-v'"
         raise SqlmapSyntaxException(errMsg)
