@@ -20,6 +20,7 @@ from lib.core.data import paths
 from lib.core.defaults import defaults
 from lib.core.enums import MKSTEMP_PREFIX
 from lib.core.exception import SqlmapMissingDependence
+from lib.core.exception import SqlmapSystemException
 from lib.core.settings import DEV_EMAIL_ADDRESS
 from lib.core.settings import IS_WIN
 from lib.core.settings import ISSUES_PAGE
@@ -72,7 +73,12 @@ def runGui(parser):
             tab = event.widget.nametowidget(event.widget.select())
             event.widget.configure(height=tab.winfo_reqheight())
 
-    window = _tkinter.Tk()
+    try:
+        window = _tkinter.Tk()
+    except Exception as ex:
+        errMsg = "unable to create GUI window ('%s')" % getSafeExString(ex)
+        raise SqlmapSystemException(errMsg)
+
     window.title(VERSION_STRING)
 
     # Reference: https://www.holadevs.com/pregunta/64750/change-selected-tab-color-in-ttknotebook
