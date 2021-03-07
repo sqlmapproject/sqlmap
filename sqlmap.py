@@ -193,6 +193,8 @@ def main():
                             targets = getFileItems(conf.bulkFile)
 
                             for i in xrange(len(targets)):
+                                target = None
+
                                 try:
                                     kb.targets.clear()
                                     target = targets[i]
@@ -205,7 +207,7 @@ def main():
 
                                     crawl(target)
                                 except Exception as ex:
-                                    if not isinstance(ex, SqlmapUserQuitException):
+                                    if target and not isinstance(ex, SqlmapUserQuitException):
                                         errMsg = "problem occurred while crawling '%s' ('%s')" % (target, getSafeExString(ex))
                                         logger.error(errMsg)
                                     else:
