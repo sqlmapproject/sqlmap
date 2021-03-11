@@ -402,6 +402,7 @@ class CONTENT_STATUS(object):
 class AUTH_TYPE(object):
     BASIC = "basic"
     DIGEST = "digest"
+    BEARER = "bearer"
     NTLM = "ntlm"
     PKI = "pki"
 

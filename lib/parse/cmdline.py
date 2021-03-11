@@ -193,7 +193,7 @@ def cmdLineParser(argv=None):
             help="Extra headers (e.g. \"Accept-Language: fr\\nETag: 123\")")
 
         request.add_argument("--auth-type", dest="authType",
-            help="HTTP authentication type (Basic, Digest, NTLM or PKI)")
+            help="HTTP authentication type (Basic, Digest, Bearer, ...)")
 
         request.add_argument("--auth-cred", dest="authCred",
             help="HTTP authentication credentials (name:password)")
@@ -976,6 +976,8 @@ def cmdLineParser(argv=None):
                 argv[i] = ""
             elif argv[i].startswith("--data-raw"):
                 argv[i] = argv[i].replace("--data-raw", "--data", 1)
+            elif argv[i].startswith("--auth-creds"):
+                argv[i] = argv[i].replace("--auth-creds", "--auth-cred", 1)
             elif argv[i].startswith("--drop-cookie"):
                 argv[i] = argv[i].replace("--drop-cookie", "--drop-set-cookie", 1)
             elif any(argv[i].startswith(_) for _ in ("--tamper", "--ignore-code", "--skip")):

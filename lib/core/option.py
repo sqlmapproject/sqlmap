@@ -1310,7 +1310,7 @@ def _setAuthCred():
 
 def _setHTTPAuthentication():
     """
-    Check and set the HTTP(s) authentication method (Basic, Digest, NTLM or PKI),
+    Check and set the HTTP(s) authentication method (Basic, Digest, Bearer, NTLM or PKI),
     username and password for first three methods, or PEM private key file for
     PKI authentication
     """
@@ -1333,9 +1333,9 @@ def _setHTTPAuthentication():
         errMsg += "but did not provide the type (e.g. --auth-type=\"basic\")"
         raise SqlmapSyntaxException(errMsg)
 
-    elif (conf.authType or "").lower() not in (AUTH_TYPE.BASIC, AUTH_TYPE.DIGEST, AUTH_TYPE.NTLM, AUTH_TYPE.PKI):
+    elif (conf.authType or "").lower() not in (AUTH_TYPE.BASIC, AUTH_TYPE.DIGEST, AUTH_TYPE.BEARER, AUTH_TYPE.NTLM, AUTH_TYPE.PKI):
         errMsg = "HTTP authentication type value must be "
-        errMsg += "Basic, Digest, NTLM or PKI"
+        errMsg += "Basic, Digest, Bearer, NTLM or PKI"
         raise SqlmapSyntaxException(errMsg)
 
     if not conf.authFile:
@@ -1348,6 +1348,9 @@ def _setHTTPAuthentication():
             regExp = "^(.*?):(.*?)$"
             errMsg = "HTTP %s authentication credentials " % authType
             errMsg += "value must be in format 'username:password'"
+        elif authType == AUTH_TYPE.BEARER:
+            conf.httpHeaders.append((HTTP_HEADER.AUTHORIZATION, "Bearer %s" % conf.authCred.strip()))
+            return
         elif authType == AUTH_TYPE.NTLM:
             regExp = "^(.*\\\\.*):(.*?)$"
             errMsg = "HTTP NTLM authentication credentials value must "
