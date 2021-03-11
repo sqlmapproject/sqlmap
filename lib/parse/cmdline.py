@@ -704,7 +704,7 @@ def cmdLineParser(argv=None):
             help="Regexp for filtering targets")
 
         general.add_argument("--skip-heuristics", dest="skipHeuristics", action="store_true",
-            help="Skip heuristic detection of SQLi/XSS/FI vulnerabilities")
+            help="Skip heuristic detection of vulnerabilities")
 
         general.add_argument("--skip-waf", dest="skipWaf", action="store_true",
             help="Skip heuristic detection of WAF/IPS protection")
@@ -731,7 +731,7 @@ def cmdLineParser(argv=None):
             help="Run host OS command(s) when SQL injection is found")
 
         miscellaneous.add_argument("--beep", dest="beep", action="store_true",
-            help="Beep on question and/or when SQLi/XSS/FI is found")
+            help="Beep on question and/or when vulnerability is found")
 
         miscellaneous.add_argument("--dependencies", dest="dependencies", action="store_true",
             help="Check for missing (optional) sqlmap dependencies")
