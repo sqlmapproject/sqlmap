@@ -594,7 +594,7 @@ class Databases(object):
                 if conf.db is not None and len(kb.data.cachedColumns) > 0 \
                    and conf.db in kb.data.cachedColumns and tbl in \
                    kb.data.cachedColumns[conf.db]:
-                    infoMsg = "fetched tables' columns on "
+                    infoMsg = "fetched table columns from "
                     infoMsg += "database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                     logger.info(infoMsg)
 
@@ -619,7 +619,7 @@ class Databases(object):
                     query += condQuery
 
                     if Backend.isFork(FORK.DRIZZLE):
-                        query = query.replace("column_type", "data_type")
+                        query = re.sub("column_type", "data_type", query, flags=re.I)
 
                 elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE, DBMS.MIMERSQL):
                     query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(tbl.upper()), unsafeSQLIdentificatorNaming(conf.db.upper()))
@@ -730,7 +730,7 @@ class Databases(object):
                 if conf.db is not None and len(kb.data.cachedColumns) > 0 \
                    and conf.db in kb.data.cachedColumns and tbl in \
                    kb.data.cachedColumns[conf.db]:
-                    infoMsg = "fetched tables' columns on "
+                    infoMsg = "fetched table columns from "
                     infoMsg += "database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                     logger.info(infoMsg)
 
@@ -1050,7 +1050,7 @@ class Databases(object):
             query = rootQuery.blind.count
 
             if Backend.isFork(FORK.DRIZZLE):
-                query = query.replace("INFORMATION_SCHEMA", "DATA_DICTIONARY")
+                query = re.sub("INFORMATION_SCHEMA", "DATA_DICTIONARY", query, flags=re.I)
 
             count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
@@ -1078,7 +1078,7 @@ class Databases(object):
                     query = rootQuery.blind.query % index
 
                     if Backend.isFork(FORK.DRIZZLE):
-                        query = query.replace("INFORMATION_SCHEMA", "DATA_DICTIONARY")
+                        query = re.sub("INFORMATION_SCHEMA", "DATA_DICTIONARY", query, flags=re.I)
 
                     value = unArrayizeValue(inject.getValue(query, union=False, error=False))
 
