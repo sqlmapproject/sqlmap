@@ -208,11 +208,15 @@ def fuzzTest():
             if any(_ in lines[j] for _ in ("googleDork",)):
                 continue
 
+            if re.search(r"= (True|False)", lines[j]):
+                lines[j] = lines[j].replace(" = False", " = True")
+                continue
+
             if lines[j].strip().endswith('='):
                 lines[j] += random.sample(("True", "False", randomStr(), str(randomInt())), 1)[0]
 
             k = random.randint(0, len(lines) - 1)
-            if '=' in lines[k]:
+            if '=' in lines[k] and not re.search(r"= (True|False)", lines[k]):
                 lines[k] += chr(random.randint(0, 255))
 
         open(config, "w+").write("\n".join(lines))
