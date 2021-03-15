@@ -13,22 +13,6 @@ except:  # removed ImportError because of https://github.com/sqlmapproject/sqlma
     from thirdparty.fcrypt.fcrypt import crypt
 
 _multiprocessing = None
-try:
-    import multiprocessing
-
-    # problems on FreeBSD (Reference: https://web.archive.org/web/20110710041353/http://www.eggheadcafe.com/microsoft/Python/35880259/multiprocessing-on-freebsd.aspx)
-    _ = multiprocessing.Queue()
-
-    # problems with ctypes (Reference: https://github.com/sqlmapproject/sqlmap/issues/2952)
-    _ = multiprocessing.Value('i')
-except (ImportError, OSError, AttributeError):
-    pass
-else:
-    try:
-        if multiprocessing.cpu_count() > 1:
-            _multiprocessing = multiprocessing
-    except NotImplementedError:
-        pass
 
 import base64
 import binascii
@@ -983,6 +967,24 @@ def dictionaryAttack(attack_dict):
 
     if conf.disableMulti:
         _multiprocessing = None
+    else:
+        # Note: https://github.com/sqlmapproject/sqlmap/issues/4367
+        try:
+            import multiprocessing
+
+            # problems on FreeBSD (Reference: https://web.archive.org/web/20110710041353/http://www.eggheadcafe.com/microsoft/Python/35880259/multiprocessing-on-freebsd.aspx)
+            _ = multiprocessing.Queue()
+
+            # problems with ctypes (Reference: https://github.com/sqlmapproject/sqlmap/issues/2952)
+            _ = multiprocessing.Value('i')
+        except (ImportError, OSError, AttributeError):
+            pass
+        else:
+            try:
+                if multiprocessing.cpu_count() > 1:
+                    _multiprocessing = multiprocessing
+            except NotImplementedError:
+                pass
 
     for (_, hashes) in attack_dict.items():
         for hash_ in hashes:
