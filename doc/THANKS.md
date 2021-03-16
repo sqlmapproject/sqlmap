@@ -734,6 +734,9 @@ rmillet, <rmillet42(at)gmail.com>
 Rub3nCT, <rub3nct(at)gmail.com>
 * for reporting a minor bug
 
+sapra, <amanistaken(at)gmail.com>
+* for helping out with Python multiprocessing library on MacOS
+
 shiftzwei, <shiftzwei(at)gmail.com>
 * for reporting a couple of bugs
 
