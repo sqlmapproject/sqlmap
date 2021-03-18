@@ -1135,7 +1135,7 @@ def dictionaryAttack(attack_dict):
                 custom_wordlist.append(normalizeUnicode(user))
 
         # Algorithms without extra arguments (e.g. salt and/or username)
-        if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC, HASH.SHA224_GENERIC, HASH.SHA256_GENERIC, HASH.SHA384_GENERIC, HASH.SHA512_GENERIC, HASH.APACHE_SHA1, HASH.VBULLETIN, HASH.VBULLETIN_OLD):
+        if hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC, HASH.SHA224_GENERIC, HASH.SHA256_GENERIC, HASH.SHA384_GENERIC, HASH.SHA512_GENERIC, HASH.APACHE_SHA1):
             for suffix in suffix_list:
                 if not attack_info or processException:
                     break
