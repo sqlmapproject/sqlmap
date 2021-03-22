@@ -76,6 +76,7 @@ from lib.core.enums import ADJUST_TIME_DELAY
 from lib.core.enums import AUTH_TYPE
 from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import DUMP_FORMAT
+from lib.core.enums import FORK
 from lib.core.enums import HTTP_HEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import MKSTEMP_PREFIX
@@ -727,7 +728,7 @@ def _setDBMS():
 
     if conf.dbms not in SUPPORTED_DBMS:
         errMsg = "you provided an unsupported back-end database management "
-        errMsg += "system. Supported DBMSes are as follows: %s. " % ', '.join(sorted(_ for _ in DBMS_DICT))
+        errMsg += "system. Supported DBMSes are as follows: %s. " % ', '.join(sorted((_ for _ in (list(DBMS_DICT) + getPublicTypeMembers(FORK, True))), key=str.lower))
         errMsg += "If you do not know the back-end DBMS, do not provide "
         errMsg += "it and sqlmap will fingerprint it for you."
         raise SqlmapUnsupportedDBMSException(errMsg)
