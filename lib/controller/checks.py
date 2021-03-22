@@ -991,7 +991,7 @@ def checkSuhosinPatch(injection):
     Checks for existence of Suhosin-patch (and alike) protection mechanism(s)
     """
 
-    if injection.place == PLACE.GET:
+    if injection.place in (PLACE.GET, PLACE.URI):
         debugMsg = "checking for parameter length "
         debugMsg += "constraining mechanisms"
         logger.debug(debugMsg)
