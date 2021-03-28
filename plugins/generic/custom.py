@@ -21,6 +21,7 @@ from lib.core.dicts import SQL_STATEMENTS
 from lib.core.enums import AUTOCOMPLETE_TYPE
 from lib.core.enums import DBMS
 from lib.core.exception import SqlmapNoneDataException
+from lib.core.settings import METADB_SUFFIX
 from lib.core.settings import NULL
 from lib.core.settings import PARAMETER_SPLITTING_REGEX
 from lib.core.shell import autoCompletion
@@ -55,6 +56,8 @@ class Custom(object):
                     match = re.search(r"(\bFROM\s+)([^\s]+)", query, re.I)
                     if match and match.group(2).count('.') == 1:
                         query = query.replace(match.group(0), "%s%s" % (match.group(1), match.group(2).replace('.', ".dbo.")))
+
+                query = re.sub(r"(?i)\w+%s\.?" % METADB_SUFFIX, "", query)
 
                 output = inject.getValue(query, fromUser=True)
 
