@@ -789,7 +789,7 @@ class Connect(object):
                     debugMsg = "got HTTP error code: %d ('%s')" % (code, status)
                     logger.debug(debugMsg)
 
-        except (_urllib.error.URLError, socket.error, socket.timeout, _http_client.HTTPException, struct.error, binascii.Error, ProxyError, SqlmapCompressionException, WebSocketException, TypeError, ValueError, OverflowError):
+        except (_urllib.error.URLError, socket.error, socket.timeout, _http_client.HTTPException, struct.error, binascii.Error, ProxyError, SqlmapCompressionException, WebSocketException, TypeError, ValueError, OverflowError, AttributeError):
             tbMsg = traceback.format_exc()
 
             if conf.debug:
@@ -797,6 +797,11 @@ class Connect(object):
 
             if checking:
                 return None, None, None
+            elif "AttributeError:" in tbMsg:
+                if "WSAECONNREFUSED" in tbMsg:
+                    return None, None, None
+                else:
+                    raise
             elif "no host given" in tbMsg:
                 warnMsg = "invalid URL address used (%s)" % repr(url)
                 raise SqlmapSyntaxException(warnMsg)
