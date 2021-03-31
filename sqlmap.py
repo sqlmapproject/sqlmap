@@ -435,6 +435,11 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
+        elif all(_ in excMsg for _ in ("No such file", "sqlmap.conf", "Test")):
+            errMsg = "you are trying to run (hidden) development tests inside the production environment"
+            logger.critical(errMsg)
+            raise SystemExit
+
         elif all(_ in excMsg for _ in ("HTTPNtlmAuthHandler", "'str' object has no attribute 'decode'")):
             errMsg = "package 'python-ntlm' has a known compatibility issue with the "
             errMsg += "Python 3 (Reference: 'https://github.com/mullender/python-ntlm/pull/61')"
