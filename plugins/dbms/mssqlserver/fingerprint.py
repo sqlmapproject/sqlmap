@@ -150,7 +150,8 @@ class Fingerprint(GenericFingerprint):
             "Vista or 2008": ("6.0", (2, 1)),
             "7 or 2008 R2": ("6.1", (1, 0)),
             "8 or 2012": ("6.2", (0,)),
-            "8.1 or 2012 R2": ("6.3", (0,))
+            "8.1 or 2012 R2": ("6.3", (0,)),
+            "10 or 2016 or 2019": ("10.0", (0,))
         }
 
         # Get back-end DBMS underlying operating system version
