@@ -386,6 +386,12 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
+        elif "'WebSocket' object has no attribute 'status'" in excMsg:
+            errMsg = "wrong websocket library detected"
+            errMsg += " (Reference: 'https://github.com/sqlmapproject/sqlmap/issues/4572#issuecomment-775041086')"
+            logger.critical(errMsg)
+            raise SystemExit
+
         elif all(_ in excMsg for _ in ("window = tkinter.Tk()",)):
             errMsg = "there has been a problem in initialization of GUI interface "
             errMsg += "('%s')" % excMsg.strip().split('\n')[-1]
