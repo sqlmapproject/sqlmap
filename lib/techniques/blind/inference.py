@@ -504,6 +504,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                         else:
                             break
 
+                        # NOTE: https://github.com/sqlmapproject/sqlmap/issues/4629
+                        if not isListLike(threadData.shared.value):
+                            break
+
                         with kb.locks.value:
                             threadData.shared.value[currentCharIndex - 1 - firstChar] = val
                             currentValue = list(threadData.shared.value)
