@@ -16,9 +16,11 @@ from lib.core.common import Backend
 from lib.core.common import checkFile
 from lib.core.common import dataToDumpFile
 from lib.core.common import dataToStdout
+from lib.core.common import filterNone
 from lib.core.common import getSafeExString
 from lib.core.common import isListLike
 from lib.core.common import isMultiThreadMode
+from lib.core.common import isNoneValue
 from lib.core.common import normalizeUnicode
 from lib.core.common import openFile
 from lib.core.common import prioritySortColumns
@@ -200,9 +202,9 @@ class Dump(object):
             self._write("%s:" % header)
 
         for user in users:
-            settings = userSettings[user]
+            settings = filterNone(userSettings[user])
 
-            if settings is None:
+            if isNoneValue(settings):
                 stringSettings = ""
             else:
                 stringSettings = " [%d]:" % len(settings)
