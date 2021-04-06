@@ -29,7 +29,7 @@ def tamper(payload, **kwargs):
     Notes:
         * Useful in cases when web application block single quotes or use addslashes()
     >>> tamper("SELECT CAST(X'4142' AS TEXT)")
-    "SELECT CAST(CHAR(65) AS TEXT) || CAST(CHAR(66) AS TEXT)"
+    "SELECT CAST(CHAR(65) AS TEXT)||CAST(CHAR(66) AS TEXT)"
     """
 
     retVal = payload
