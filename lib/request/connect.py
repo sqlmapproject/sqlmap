@@ -514,7 +514,7 @@ class Connect(object):
                 if conf.proxy:
                     ws_proxy_uri = _urllib.parse.urlsplit(conf.proxy)
                     ws_proxy_port = ws_proxy_uri.port
-                    ws_proxy_host = ws_proxy_uri.netloc.split(":")[0]
+                    ws_proxy_host = ws_proxy_uri.hostname
                     ws_proxy_scheme = ws_proxy_uri.scheme
 
                 if conf.proxyCred:
