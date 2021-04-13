@@ -86,7 +86,7 @@ class Entries(object):
                 singleTimeLogMessage(infoMsg)
                 return
 
-        conf.db = safeSQLIdentificatorNaming(conf.db)
+        conf.db = safeSQLIdentificatorNaming(conf.db) or ""
 
         if conf.tbl:
             if Backend.getIdentifiedDbms() in UPPER_CASE_DBMSES:
@@ -101,7 +101,7 @@ class Entries(object):
 
                 if tblList and isListLike(tblList[0]):
                     tblList = tblList[0]
-            elif not conf.search:
+            elif conf.db and not conf.search:
                 errMsg = "unable to retrieve the tables "
                 errMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 raise SqlmapNoneDataException(errMsg)
@@ -190,7 +190,7 @@ class Entries(object):
                     elif Backend.getIdentifiedDbms() in (DBMS.SYBASE, DBMS.MSSQL):
                         # Partial inband and error
                         if not (isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) and kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.ORIGINAL):
-                            table = "%s.%s" % (conf.db, tbl)
+                            table = "%s.%s" % (conf.db, tbl) if conf.db else tbl
 
                             if Backend.isDbms(DBMS.MSSQL) and not conf.forcePivoting:
                                 warnMsg = "in case of table dumping problems (e.g. column entry order) "
@@ -297,7 +297,7 @@ class Entries(object):
                     elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.MAXDB, DBMS.ACCESS, DBMS.FIREBIRD, DBMS.MCKOI, DBMS.EXTREMEDB, DBMS.RAIMA):
                         query = rootQuery.blind.count % tbl
                     elif Backend.getIdentifiedDbms() in (DBMS.SYBASE, DBMS.MSSQL):
-                        query = rootQuery.blind.count % ("%s.%s" % (conf.db, tbl))
+                        query = rootQuery.blind.count % ("%s.%s" % (conf.db, tbl)) if conf.db else tbl
                     elif Backend.isDbms(DBMS.INFORMIX):
                         query = rootQuery.blind.count % (conf.db, tbl)
                     else:
@@ -334,9 +334,9 @@ class Entries(object):
                         if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.RAIMA):
                             table = tbl
                         elif Backend.getIdentifiedDbms() in (DBMS.SYBASE, DBMS.MSSQL, DBMS.MAXDB):
-                            table = "%s.%s" % (conf.db, tbl)
+                            table = "%s.%s" % (conf.db, tbl) if conf.db else tbl
                         elif Backend.isDbms(DBMS.INFORMIX):
-                            table = "%s:%s" % (conf.db, tbl)
+                            table = "%s:%s" % (conf.db, tbl) if conf.db else tbl
 
                         if Backend.isDbms(DBMS.MSSQL) and not conf.forcePivoting:
                             warnMsg = "in case of table dumping problems (e.g. column entry order) "
