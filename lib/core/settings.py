@@ -132,7 +132,7 @@ DUCKDUCKGO_REGEX = r'<a class="result__url" href="(htt[^"]+)'
 BING_REGEX = r'<h2><a href="([^"]+)" h='
 
 # Dummy user agent for search (if default one returns different results)
-DUMMY_SEARCH_USER_AGENT = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:49.0) Gecko/20100101 Firefox/49.0"
+DUMMY_SEARCH_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0"
 
 # Regular expression used for extracting content from "textual" tags
 TEXT_TAG_REGEX = r"(?si)<(abbr|acronym|b|blockquote|br|center|cite|code|dt|em|font|h\d|i|li|p|pre|q|strong|sub|sup|td|th|title|tt|u)(?!\w).*?>(?P<result>[^<]+)"
