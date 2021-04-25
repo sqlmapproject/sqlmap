@@ -63,7 +63,7 @@ def _search(dork):
     gpage = conf.googlePage if conf.googlePage > 1 else 1
     logger.info("using search result page #%d" % gpage)
 
-    url = "https://www.google.com/search?"               # NOTE: https version goes to the consent
+    url = "http://www.google.com/search?"               # NOTE: https version goes to the consent
     url += "q=%s&" % urlencode(dork, convall=True)
     url += "num=100&hl=en&complete=0&safe=off&filter=0&btnG=Search"
     url += "&start=%d" % ((gpage - 1) * 100)
