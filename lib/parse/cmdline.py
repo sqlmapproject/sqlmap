@@ -1060,10 +1060,12 @@ def cmdLineParser(argv=None):
         if args.dummy:
             args.url = args.url or DUMMY_URL
 
+        args.stdinPipe = None
         if hasattr(sys.stdin, "fileno") and not os.isatty(sys.stdin.fileno()) and '-' not in sys.argv:
-            args.stdinPipe = iter(sys.stdin.readline, None)
-        else:
-            args.stdinPipe = None
+            if args.api:
+                logger.info("Ignoring stdin in API mode")
+            else:
+                args.stdinPipe = iter(sys.stdin.readline, None)
 
         if not any((args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, args.requestFile, args.updateAll, args.smokeTest, args.vulnTest, args.fuzzTest, args.wizard, args.dependencies, args.purge, args.listTampers, args.hashFile, args.stdinPipe)):
             errMsg = "missing a mandatory option (-d, -u, -l, -m, -r, -g, -c, --wizard, --shell, --update, --purge, --list-tampers or --dependencies). "
