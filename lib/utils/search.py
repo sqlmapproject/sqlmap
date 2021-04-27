@@ -28,6 +28,7 @@ from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import BING_REGEX
 from lib.core.settings import DUCKDUCKGO_REGEX
 from lib.core.settings import DEFAULT_USER_AGENT
+from lib.core.settings import SEARCH_COOKIE 
 from lib.core.settings import GOOGLE_REGEX
 from lib.core.settings import HTTP_ACCEPT_ENCODING_HEADER_VALUE
 from lib.core.settings import UNICODE_ENCODING
@@ -52,7 +53,7 @@ def _search(dork):
 
     requestHeaders[HTTP_HEADER.USER_AGENT] = DEFAULT_USER_AGENT
     requestHeaders[HTTP_HEADER.ACCEPT_ENCODING] = HTTP_ACCEPT_ENCODING_HEADER_VALUE
-
+    requestHeaders[HTTP_HEADER.COOKIE] = SEARCH_COOKIE
     try:
         req = _urllib.request.Request("https://www.google.com/ncr", headers=requestHeaders)
         conn = _urllib.request.urlopen(req)

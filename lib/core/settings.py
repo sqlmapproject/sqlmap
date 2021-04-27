@@ -134,6 +134,9 @@ BING_REGEX = r'<h2><a href="([^"]+)" h='
 # Dummy user agent for search (if default one returns different results)
 DUMMY_SEARCH_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0"
 
+#to update on terms update
+SEARCH_COOKIE = "CONSENT=YES+shp.gws-20210419-0-RC1.nl+FX+740"
+
 # Regular expression used for extracting content from "textual" tags
 TEXT_TAG_REGEX = r"(?si)<(abbr|acronym|b|blockquote|br|center|cite|code|dt|em|font|h\d|i|li|p|pre|q|strong|sub|sup|td|th|title|tt|u)(?!\w).*?>(?P<result>[^<]+)"
 
