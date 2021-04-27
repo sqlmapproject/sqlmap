@@ -27,7 +27,7 @@ from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import BING_REGEX
 from lib.core.settings import DUCKDUCKGO_REGEX
-from lib.core.settings import DUMMY_SEARCH_USER_AGENT
+from lib.core.settings import DEFAULT_USER_AGENT
 from lib.core.settings import GOOGLE_REGEX
 from lib.core.settings import HTTP_ACCEPT_ENCODING_HEADER_VALUE
 from lib.core.settings import UNICODE_ENCODING
@@ -50,7 +50,7 @@ def _search(dork):
     requestHeaders = {}
     responseHeaders = {}
 
-    requestHeaders[HTTP_HEADER.USER_AGENT] = dict(conf.httpHeaders).get(HTTP_HEADER.USER_AGENT, DUMMY_SEARCH_USER_AGENT)
+    requestHeaders[HTTP_HEADER.USER_AGENT] = DEFAULT_USER_AGENT
     requestHeaders[HTTP_HEADER.ACCEPT_ENCODING] = HTTP_ACCEPT_ENCODING_HEADER_VALUE
 
     try:
@@ -63,7 +63,7 @@ def _search(dork):
     gpage = conf.googlePage if conf.googlePage > 1 else 1
     logger.info("using search result page #%d" % gpage)
 
-    url = "http://www.google.com/search?"               # NOTE: https version goes to the consent
+    url = "https://www.google.com/search?"               # NOTE: https version goes to the consent
     url += "q=%s&" % urlencode(dork, convall=True)
     url += "num=100&hl=en&complete=0&safe=off&filter=0&btnG=Search"
     url += "&start=%d" % ((gpage - 1) * 100)
