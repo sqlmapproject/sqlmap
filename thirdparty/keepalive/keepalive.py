@@ -165,11 +165,11 @@ class ConnectionManager:
 
     def get_ready_conn(self, host):
         conn = None
-        self._lock.acquire()
         try:
+            self._lock.acquire()
             if host in self._hostmap:
                 for c in self._hostmap[host]:
-                    if self._readymap[c]:
+                    if self._readymap.get(c):
                         self._readymap[c] = 0
                         conn = c
                         break
