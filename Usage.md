@@ -2329,68 +2329,13 @@ Switch: `--hpp`
 
 HTTP parameter pollution (HPP) is a method for bypassing WAF/IPS protection mechanisms (explained [here](https://www.imperva.com/resources/glossary/http-parameter-pollution)) that is particularly effective against ASP/IIS and ASP.NET/IIS platforms. If you suspect that the target is behind such protection, you can try to bypass it by using this switch.
 
-### Make a thorough testing for a WAF/IPS protection
-
-Switch: `--identify-waf`
-
-sqlmap can try to identify backend WAF/IPS protection (if any) so user could do appropriate steps (e.g. use tamper scripts with `--tamper`). Currently around 30 different products are supported (Airlock, Barracuda WAF, etc.) and their respective WAF scripts can be found inside `waf` directory.
-
-Example against a MySQL target protected by the ModSecurity WAF:
-
-```
-$ python sqlmap.py -u "http://192.168.21.128/sqlmap/mysql/get_int.php?id=1" --i\
-dentify-waf -v 3
-[...]
-[xx:xx:23] [INFO] testing connection to the target URL
-[xx:xx:23] [INFO] heuristics detected web page charset 'ascii'
-[xx:xx:23] [INFO] using WAF scripts to detect backend WAF/IPS protection
-[xx:xx:23] [DEBUG] checking for WAF/IPS product 'USP Secure Entry Server (Un
-ited Security Providers)'
-[xx:xx:23] [DEBUG] checking for WAF/IPS product 'BinarySEC Web Application F
-irewall (BinarySEC)'
-[xx:xx:23] [DEBUG] checking for WAF/IPS product 'NetContinuum Web Applicatio
-n Firewall (NetContinuum/Barracuda Networks)'
-[xx:xx:23] [DEBUG] checking for WAF/IPS product 'Hyperguard Web Application 
-Firewall (art of defence Inc.)'
-[xx:xx:23] [DEBUG] checking for WAF/IPS product 'Cisco ACE XML Gateway (Cisc
-o Systems)'
-[xx:xx:23] [DEBUG] checking for WAF/IPS product 'TrafficShield (F5 Networks)
-'
-[xx:xx:23] [DEBUG] checking for WAF/IPS product 'Teros/Citrix Application Fi
-rewall Enterprise (Teros/Citrix Systems)'
-[xx:xx:23] [DEBUG] checking for WAF/IPS product 'KONA Security Solutions (Ak
-amai Technologies)'
-[xx:xx:23] [DEBUG] checking for WAF/IPS product 'Incapsula Web Application F
-irewall (Incapsula/Imperva)'
-[xx:xx:23] [DEBUG] checking for WAF/IPS product 'CloudFlare Web Application 
-Firewall (CloudFlare)'
-[xx:xx:23] [DEBUG] checking for WAF/IPS product 'Barracuda Web Application F
-irewall (Barracuda Networks)'
-[xx:xx:23] [DEBUG] checking for WAF/IPS product 'webApp.secure (webScurity)'
-[xx:xx:23] [DEBUG] checking for WAF/IPS product 'Proventia Web Application S
-ecurity (IBM)'
-[xx:xx:23] [DEBUG] declared web page charset 'iso-8859-1'
-[xx:xx:23] [DEBUG] page not found (404)
-[xx:xx:23] [DEBUG] checking for WAF/IPS product 'KS-WAF (Knownsec)'
-[xx:xx:23] [DEBUG] checking for WAF/IPS product 'NetScaler (Citrix Systems)'
-[xx:xx:23] [DEBUG] checking for WAF/IPS product 'Jiasule Web Application Fir
-ewall (Jiasule)'
-[xx:xx:23] [DEBUG] checking for WAF/IPS product 'WebKnight Application Firew
-all (AQTRONIX)'
-[xx:xx:23] [DEBUG] checking for WAF/IPS product 'AppWall (Radware)'
-[xx:xx:23] [DEBUG] checking for WAF/IPS product 'ModSecurity: Open Source We
-b Application Firewall (Trustwave)'
-[xx:xx:23] [CRITICAL] WAF/IPS identified 'ModSecurity: Open Source Web Appli
-cation Firewall (Trustwave)'. Please consider usage of tamper scripts (option '-
--tamper')
-[...]
-```
-
-Skip heuristic detection of WAF/IPS protection
+### Skip heuristic detection of WAF/IPS protection
 
 Switch: `--skip-waf`
 
-By default, sqlmap automatically sends inside one of starting requests a dummy parameter value containing a deliberately "suspicious" SQL injection payload (e.g. `...&foobar=AND 1=1 UNION ALL SELECT 1,2,3,table_name FROM information_schema.tables WHERE 2>1`). If target responds differently than for the original request, there is a high possibility that it's under some kind of protection. In case of any problems, user can disable this mechanism by providing switch `--skip-waf`.
+By default, sqlmap automatically sends inside one of starting requests a dummy parameter value containing a deliberately "suspicious" SQL injection payload (e.g. `...&foobar=AND 1=1 UNION ALL SELECT 1,2,3,table_name FROM information_schema.tables WHERE 2>1`). If target responds differently than for the original request, there is a high possibility that it's under some kind of protection.
+
+sqlmap will automatically try to identify backend WAF/IPS protection (if any) so user could do appropriate steps (e.g. use tamper scripts with `--tamper`). Currently around 80 different products are supported (Airlock, Barracuda WAF, etc.) In case of any problems, user can disable this whole mechanism by providing switch `--skip-waf`.
 
 ### Imitate smartphone
 
