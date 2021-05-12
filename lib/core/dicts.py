@@ -370,10 +370,10 @@ OBSOLETE_OPTIONS = {
     "--check-payload": None,
     "--check-waf": None,
     "--pickled-options": "use '--api -c ...' instead",
+    "--identify-waf": "functionality being done automatically",
 }
 
 DEPRECATED_OPTIONS = {
-    "--identify-waf": "functionality being done automatically",
 }
 
 DUMP_DATA_PREPROCESS = {

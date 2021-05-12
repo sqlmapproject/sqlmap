@@ -404,8 +404,8 @@ def checkSqlInjection(place, parameter, value):
                     continue
 
                 # Parse boundary's <prefix>, <suffix> and <ptype>
-                prefix = boundary.prefix if boundary.prefix else ""
-                suffix = boundary.suffix if boundary.suffix else ""
+                prefix = boundary.prefix or ""
+                suffix = boundary.suffix or ""
                 ptype = boundary.ptype
 
                 # Options --prefix/--suffix have a higher priority (if set by user)
@@ -642,7 +642,7 @@ def checkSqlInjection(place, parameter, value):
                                 output = output or extractRegexResult(check, threadData.lastRedirectMsg[1] if threadData.lastRedirectMsg and threadData.lastRedirectMsg[0] == threadData.lastRequestUID else None, re.DOTALL | re.IGNORECASE)
 
                                 if output:
-                                    result = output == "1"
+                                    result = output == '1'
 
                                     if result:
                                         infoMsg = "%sparameter '%s' is '%s' injectable " % ("%s " % paramType if paramType != parameter else "", parameter, title)
