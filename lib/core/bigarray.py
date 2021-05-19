@@ -56,6 +56,12 @@ class BigArray(list):
     >>> _[20] = 0
     >>> _[99999]
     99999
+    >>> _ += [0]
+    >>> _[100000]
+    0
+    >>> _ = _ + [1]
+    >>> _[-1]
+    1
     """
 
     def __init__(self, items=None):
@@ -68,6 +74,20 @@ class BigArray(list):
 
         for item in (items or []):
             self.append(item)
+
+    def __add__(self, value):
+        retval = BigArray(self)
+
+        for _ in value:
+            retval.append(_)
+
+        return retval
+
+    def __iadd__(self, value):
+        for _ in value:
+            self.append(_)
+
+        return self
 
     def append(self, value):
         self.chunks[-1].append(value)
@@ -145,7 +165,7 @@ class BigArray(list):
         self.chunks, self.filenames = state
 
     def __getitem__(self, y):
-        if y < 0:
+        while y < 0:
             y += len(self)
 
         index = y // self.chunk_length

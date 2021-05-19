@@ -131,7 +131,9 @@ class Fingerprint(GenericFingerprint):
             infoMsg = "actively fingerprinting %s" % DBMS.PGSQL
             logger.info(infoMsg)
 
-            if inject.checkBooleanExpression("SINH(0)=0"):
+            if inject.checkBooleanExpression("GEN_RANDOM_UUID() IS NOT NULL"):
+                Backend.setVersion(">= 13.0")
+            elif inject.checkBooleanExpression("SINH(0)=0"):
                 Backend.setVersion(">= 12.0")
             elif inject.checkBooleanExpression("SHA256(NULL) IS NULL"):
                 Backend.setVersion(">= 11.0")
