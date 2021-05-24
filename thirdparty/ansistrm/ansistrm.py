@@ -5,6 +5,7 @@
 
 import logging
 import sys
+import re
 
 from lib.core.settings import IS_WIN
 
