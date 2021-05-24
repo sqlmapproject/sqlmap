@@ -2270,6 +2270,7 @@ def isMultiThreadMode():
     """
     Checks if running in multi-thread(ing) mode
 
+    >>> import time
     >>> isMultiThreadMode()
     False
     >>> _ = lambda: time.sleep(0.1)

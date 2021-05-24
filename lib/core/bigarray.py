@@ -22,7 +22,10 @@ from lib.core.exception import SqlmapSystemException
 from lib.core.settings import BIGARRAY_CHUNK_SIZE
 from lib.core.settings import BIGARRAY_COMPRESS_LEVEL
 
-DEFAULT_SIZE_OF = sys.getsizeof(object())
+try:
+    DEFAULT_SIZE_OF = sys.getsizeof(object())
+except TypeError:
+    DEFAULT_SIZE_OF = 16
 
 def _size_of(instance):
     """

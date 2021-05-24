@@ -351,7 +351,7 @@ def crypt_generic_passwd(password, salt, **kwargs):
     'rl.3StKT.4T8M'
     """
 
-    return crypt(password, salt)
+    return getText(crypt(password, salt))
 
 def unix_md5_passwd(password, salt, magic="$1$", **kwargs):
     """
