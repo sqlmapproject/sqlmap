@@ -4,8 +4,6 @@
 #
 
 import logging
-import os
-import re
 import sys
 
 from lib.core.settings import IS_WIN

@@ -29,7 +29,7 @@ import sys
 import types
 
 __author__ = "Benjamin Peterson <benjamin@python.org>"
-__version__ = "1.15.0"
+__version__ = "1.16.0"
 
 
 # Useful for very coarse version differentiation.
@@ -70,6 +70,11 @@ else:
             # 64-bit
             MAXSIZE = int((1 << 63) - 1)
         del X
+
+if PY34:
+    from importlib.util import spec_from_loader
+else:
+    spec_from_loader = None
 
 
 def _add_doc(func, doc):
@@ -184,6 +189,11 @@ class _SixMetaPathImporter(object):
     def find_module(self, fullname, path=None):
         if fullname in self.known_modules:
             return self
+        return None
+
+    def find_spec(self, fullname, path, target=None):
+        if fullname in self.known_modules:
+            return spec_from_loader(fullname, self)
         return None
 
     def __get_module(self, fullname):

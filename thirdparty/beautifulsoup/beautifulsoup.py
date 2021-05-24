@@ -85,7 +85,6 @@ __copyright__ = "Copyright (c) 2004-2012 Leonard Richardson"
 __license__ = "New-style BSD"
 
 import codecs
-import types
 import re
 import sys
 
@@ -2029,6 +2028,5 @@ class UnicodeDammit:
 
 #By default, act as an HTML pretty-printer.
 if __name__ == '__main__':
-    import sys
     soup = BeautifulSoup(sys.stdin)
     print(soup.prettify())
