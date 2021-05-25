@@ -13,6 +13,7 @@ from lib.core.common import extractRegexResult
 from lib.core.common import getFilteredPageContent
 from lib.core.common import listToStrValue
 from lib.core.common import removeDynamicContent
+from lib.core.common import getLastRequestHTTPError
 from lib.core.common import wasLastResponseDBMSError
 from lib.core.common import wasLastResponseHTTPError
 from lib.core.convert import getBytes
@@ -91,7 +92,8 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
     if page:
         # In case of an DBMS error page return None
         if kb.errorIsNone and (wasLastResponseDBMSError() or wasLastResponseHTTPError()) and not kb.negativeLogic:
-            return None
+            if not (wasLastResponseHTTPError() and getLastRequestHTTPError() in (conf.ignoreCode or [])):
+                return None
 
         # Dynamic content lines to be excluded before comparison
         if not kb.nullConnection:
