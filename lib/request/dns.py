@@ -68,8 +68,8 @@ class DNSServer(object):
     raw request
 
     Reference(s):
-        http://code.activestate.com/recipes/491264-mini-fake-dns-server/
-        https://code.google.com/p/marlon-tools/source/browse/tools/dnsproxy/dnsproxy.py
+        https://code.activestate.com/recipes/491264-mini-fake-dns-server/
+        https://web.archive.org/web/20150418152405/https://code.google.com/p/marlon-tools/source/browse/tools/dnsproxy/dnsproxy.py
     """
 
     def __init__(self):

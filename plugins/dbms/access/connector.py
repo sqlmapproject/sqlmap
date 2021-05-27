@@ -22,9 +22,8 @@ from plugins.generic.connector import Connector as GenericConnector
 
 class Connector(GenericConnector):
     """
-    Homepage: http://pyodbc.googlecode.com/
-    User guide: http://code.google.com/p/pyodbc/wiki/GettingStarted
-    API: http://code.google.com/p/pyodbc/w/list
+    Homepage: https://github.com/mkleehammer/pyodbc
+    User guide: https://github.com/mkleehammer/pyodbc/wiki
     Debian package: python-pyodbc
     License: MIT
     """
