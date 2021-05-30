@@ -2708,7 +2708,14 @@ def popValue():
     'foobar'
     """
 
-    return getCurrentThreadData().valueStack.pop()
+    retVal = None
+
+    try:
+        retVal = getCurrentThreadData().valueStack.pop()
+    except IndexError:
+        pass
+
+    return retVal
 
 def wasLastResponseDBMSError():
     """
