@@ -16,10 +16,11 @@ import time
 from lib.core.enums import DBMS
 from lib.core.enums import DBMS_DIRECTORY_NAME
 from lib.core.enums import OS
+from thirdparty import six
 from thirdparty.six import unichr as _unichr
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.5.6.0"
+VERSION = "1.5.6.1"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -905,6 +906,9 @@ KB_CHARS_BOUNDARY_CHAR = 'q'
 
 # Letters of lower frequency used in kb.chars
 KB_CHARS_LOW_FREQUENCY_ALPHABET = "zqxjkvbp"
+
+# Printable bytes
+PRINTABLE_BYTES = set(bytes(string.printable, "ascii") if six.PY3 else string.printable)
 
 # SQL keywords used for splitting in HTTP chunked transfer encoded requests (switch --chunk)
 HTTP_CHUNKED_SPLIT_KEYWORDS = ("SELECT", "UPDATE", "INSERT", "FROM", "LOAD_FILE", "UNION", "information_schema", "sysdatabases", "msysaccessobjects", "msysqueries", "sysmodules")
