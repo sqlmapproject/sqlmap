@@ -165,7 +165,7 @@ class Response(object):
         try:
             content = response.read()
         except _http_client.IncompleteRead:
-            content = raw[raw.find("\r\n\r\n") + 4:].rstrip("\r\n")
+            content = raw[raw.find(b"\r\n\r\n") + 4:].rstrip(b"\r\n")
 
         return cls(httpVersion="HTTP/1.1" if response.version == 11 else "HTTP/1.0",
                    status=response.status,
