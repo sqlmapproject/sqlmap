@@ -626,7 +626,7 @@ class Connect(object):
                 if conn:
                     code = (code or conn.code) if conn.code == kb.originalCode else conn.code  # do not override redirection code (for comparison purposes)
                     responseHeaders = conn.info()
-                    responseHeaders[URI_HTTP_HEADER] = conn.geturl()
+                    responseHeaders[URI_HTTP_HEADER] = conn.geturl() if hasattr(conn, "geturl") else url
 
                     if hasattr(conn, "redurl"):
                         responseHeaders[HTTP_HEADER.LOCATION] = conn.redurl
