@@ -29,7 +29,7 @@ class Replication(object):
             self.cursor = self.connection.cursor()
         except sqlite3.OperationalError as ex:
             errMsg = "error occurred while opening a replication "
-            errMsg += "file '%s' ('%s')" % (self.filepath, getSafeExString(ex))
+            errMsg += "file '%s' ('%s')" % (dbpath, getSafeExString(ex))
             raise SqlmapConnectionException(errMsg)
 
     class DataType(object):
