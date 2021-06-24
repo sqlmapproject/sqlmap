@@ -26,6 +26,7 @@ from lib.core.common import openFile
 from lib.core.common import prioritySortColumns
 from lib.core.common import randomInt
 from lib.core.common import safeCSValue
+from lib.core.common import unArrayizeValue
 from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.compat import xrange
 from lib.core.convert import getBytes
@@ -115,6 +116,9 @@ class Dump(object):
     def string(self, header, data, content_type=None, sort=True):
         if conf.api:
             self._write(data, content_type=content_type)
+
+        if isListLike(data) and len(data) == 1:
+            data = unArrayizeValue(data)
 
         if isListLike(data):
             self.lister(header, data, content_type, sort)
