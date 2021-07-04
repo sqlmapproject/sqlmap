@@ -10,7 +10,9 @@ import re
 import string
 import sys
 
-if sys.version_info >= (3, 0):
+PY3 = sys.version_info >= (3, 0)
+
+if PY3:
     xrange = range
     text_type = str
     string_types = (str,)
@@ -92,7 +94,7 @@ def safechardecode(value, binary=False):
 
         if binary:
             if isinstance(retVal, text_type):
-                retVal = retVal.encode("utf8")
+                retVal = retVal.encode("utf8", errors="surrogatepass" if PY3 else "strict")
 
     elif isinstance(value, (list, tuple)):
         for i in xrange(len(value)):
