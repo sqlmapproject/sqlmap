@@ -81,7 +81,7 @@ class Users(object):
 
         if Backend.isDbms(DBMS.MYSQL):
             self.getCurrentUser()
-            if Backend.isFork(FORK.DRIZZLE):
+            if Backend.isDbms(DBMS.MYSQL) and Backend.isFork(FORK.DRIZZLE):
                 kb.data.isDba = "root" in (kb.data.currentUser or "")
             elif kb.data.currentUser:
                 query = queries[Backend.getIdentifiedDbms()].is_dba.query % kb.data.currentUser.split("@")[0]
@@ -106,7 +106,7 @@ class Users(object):
         condition |= (Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema)
 
         if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
-            if Backend.isFork(FORK.DRIZZLE):
+            if Backend.isDbms(DBMS.MYSQL) and Backend.isFork(FORK.DRIZZLE):
                 query = rootQuery.inband.query3
             elif condition:
                 query = rootQuery.inband.query2
@@ -126,7 +126,7 @@ class Users(object):
             infoMsg = "fetching number of database users"
             logger.info(infoMsg)
 
-            if Backend.isFork(FORK.DRIZZLE):
+            if Backend.isDbms(DBMS.MYSQL) and Backend.isFork(FORK.DRIZZLE):
                 query = rootQuery.blind.count3
             elif condition:
                 query = rootQuery.blind.count2
@@ -147,7 +147,7 @@ class Users(object):
             for index in indexRange:
                 if Backend.getIdentifiedDbms() in (DBMS.SYBASE, DBMS.MAXDB):
                     query = rootQuery.blind.query % (kb.data.cachedUsers[-1] if kb.data.cachedUsers else " ")
-                elif Backend.isFork(FORK.DRIZZLE):
+                elif Backend.isDbms(DBMS.MYSQL) and Backend.isFork(FORK.DRIZZLE):
                     query = rootQuery.blind.query3 % index
                 elif condition:
                     query = rootQuery.blind.query2 % index

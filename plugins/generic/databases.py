@@ -618,7 +618,7 @@ class Databases(object):
                     query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
                     query += condQuery
 
-                    if Backend.isFork(FORK.DRIZZLE):
+                    if Backend.isDbms(DBMS.MYSQL) and Backend.isFork(FORK.DRIZZLE):
                         query = re.sub("column_type", "data_type", query, flags=re.I)
 
                 elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE, DBMS.MIMERSQL):
@@ -1022,7 +1022,7 @@ class Databases(object):
         rootQuery = queries[Backend.getIdentifiedDbms()].statements
 
         if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
-            if Backend.isFork(FORK.DRIZZLE):
+            if Backend.isDbms(DBMS.MYSQL) and Backend.isFork(FORK.DRIZZLE):
                 query = rootQuery.inband.query2
             else:
                 query = rootQuery.inband.query
@@ -1049,7 +1049,7 @@ class Databases(object):
 
             query = rootQuery.blind.count
 
-            if Backend.isFork(FORK.DRIZZLE):
+            if Backend.isDbms(DBMS.MYSQL) and Backend.isFork(FORK.DRIZZLE):
                 query = re.sub("INFORMATION_SCHEMA", "DATA_DICTIONARY", query, flags=re.I)
 
             count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
@@ -1077,7 +1077,7 @@ class Databases(object):
                 if isNoneValue(value):
                     query = rootQuery.blind.query % index
 
-                    if Backend.isFork(FORK.DRIZZLE):
+                    if Backend.isDbms(DBMS.MYSQL) and Backend.isFork(FORK.DRIZZLE):
                         query = re.sub("INFORMATION_SCHEMA", "DATA_DICTIONARY", query, flags=re.I)
 
                     value = unArrayizeValue(inject.getValue(query, union=False, error=False))
