@@ -125,7 +125,7 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
                 delimiter = conf.cookieDel or DEFAULT_COOKIE_DELIMITER
                 last = None
 
-                for part in req.headers.get(HTTP_HEADER.COOKIE, "").split(delimiter) + ([headers[HTTP_HEADER.SET_COOKIE]] if HTTP_HEADER.SET_COOKIE in headers else []):
+                for part in getUnicode(req.headers.get(HTTP_HEADER.COOKIE, "")).split(delimiter) + ([headers[HTTP_HEADER.SET_COOKIE]] if HTTP_HEADER.SET_COOKIE in headers else []):
                     if '=' in part:
                         part = part.strip()
                         key, value = part.split('=', 1)
