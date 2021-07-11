@@ -14,7 +14,7 @@
 
 برای مشاهده اسکرین‌شات‌های بیشتر می‌توانید به [بخش آموزش -> اسکرین‌شات‌ها](https://github.com/sqlmapproject/sqlmap/wiki/Screenshots) مراجعه کنید.
 
-نحوه‌نصب
+نحوه نصب
 ----
 
 برای دانلود آخرین نسخه tarball، [اینجا](https://github.com/sqlmapproject/sqlmap/tarball/master) یا برای دانلود آخرین نسخه zipball [اینجا](https://github.com/sqlmapproject/sqlmap/zipball/master) کلیک کنید.
