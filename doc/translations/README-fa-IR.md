@@ -17,11 +17,22 @@
 
 برای مشاهده اسکرین‌شات‌های بیشتر می‌توانید به [بخش آموزش -> اسکرین‌شات‌ها](https://github.com/sqlmapproject/sqlmap/wiki/Screenshots) مراجعه کنید.
 
-نصب
+نحوه‌نصب
 ----
 
-برای دانلود اخرین نسخه tarball، با کلیک در [اینجا](https://github.com/sqlmapproject/sqlmap/tarball/master) یا دانلود اخرین نسخه zipball با کلیک در [اینجا](https://github.com/sqlmapproject/sqlmap/zipball/master) میتوانید این کار را انجام دهید.
+برای دانلود آخرین نسخه tarball، [اینجا](https://github.com/sqlmapproject/sqlmap/tarball/master) یا برای دانلود آخرین نسخه zipball [اینجا](https://github.com/sqlmapproject/sqlmap/zipball/master) کلیک کنید.
 
+ترجیحا، شما می‌توانید `sqlmap` را با clone کردن از مخزن [Git](https://github.com/sqlmapproject/sqlmap) نیز دانلود کنید.
+
+<div dir="ltr">
+
+```
+git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
+```
+
+</div>
+
+`sqlmap` به صورت خارج از جعبه برروی هر پلتفرمی با پایتون نسخه‌های **2.6**, **2.7** و **3.x** کار می‌کند.
 
 طرز استفاده
 ----
