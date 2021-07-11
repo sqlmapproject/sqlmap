@@ -61,15 +61,15 @@ python sqlmap.py -hh
 لینک‌ها
 ----
 
-* خانه: http://sqlmap.org
-* دانلود: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) or [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
-* کایمت و نظرات: https://github.com/sqlmapproject/sqlmap/commits/master.atom
+* صفحه‌اصلی: http://sqlmap.org
+* دانلود: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) یا [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
+* خبرخوان کامیت‌ها: https://github.com/sqlmapproject/sqlmap/commits/master.atom
 * پیگری مشکلات: https://github.com/sqlmapproject/sqlmap/issues
 * راهنمای کاربران: https://github.com/sqlmapproject/sqlmap/wiki
 * سوالات متداول: https://github.com/sqlmapproject/sqlmap/wiki/FAQ
 * تویتر: [@sqlmap](https://twitter.com/sqlmap)
-* رسانه: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
-* عکس‌ها: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
+* کانال‌یوتیوب: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
+* اسکرین‌شات‌ها: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
 
 <!-- End RTL Direction -->
 </div>
