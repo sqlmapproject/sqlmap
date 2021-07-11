@@ -10,21 +10,12 @@
 `sqlmap` یک ابزار تست نفوذ متن‌باز است، که فرایند تست نفوذپذیری `SQL injection` و گرفتن کنترل دیتابیس های SQL را به شکل خودکار انجام می‌دهد. این برنامه به همراه یک موتور تشخیص قدرتمند، امکانات پیشرفته برای تست نفوذ گوناگون، و همچنین طیف گسترده‌ای از سوئیچ ها شامل دیتابیس fingerprinting، استخراج داده از دیتابیس، دستیابی به سیستم فایل های زیرین، و اجرای دستورات در سیستم عامل به وسیله اتصالات خارجی (out-of-band) عرضه می‌شود.
 
 
-عکس
+اسکرین‌شات
 ----
-
-
-<div dir=ltr>
-
-
 
 ![Screenshot](https://raw.github.com/wiki/sqlmapproject/sqlmap/images/sqlmap_screenshot.png)
 
-
-<div dir=rtl>
-
-برای دیدن کردن از [مجموعه‌ی از اسکریپت‌ها](https://github.com/sqlmapproject/sqlmap/wiki/Screenshots) می‌توانید از ویکی دیدن کنید.
-
+برای مشاهده اسکرین‌شات‌های بیشتر می‌توانید به [بخش آموزش -> اسکرین‌شات‌ها](https://github.com/sqlmapproject/sqlmap/wiki/Screenshots) مراجعه کنید.
 
 نصب
 ----
