@@ -1275,7 +1275,7 @@ class Connect(object):
 
             while True:
                 try:
-                    compile(getBytes(conf.evalCode.replace(';', '\n')), "", "exec")
+                    compile(getBytes(re.sub(r"\s*;\s*", "\n", conf.evalCode)), "", "exec")
                 except SyntaxError as ex:
                     if ex.text:
                         original = replacement = ex.text.strip()
