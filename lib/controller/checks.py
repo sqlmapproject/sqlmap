@@ -435,7 +435,7 @@ def checkSqlInjection(place, parameter, value):
                         origValue = origValue.split(kb.customInjectionMark)[0]
                         origValue = re.search(r"(\w*)\Z", origValue).group(1)
 
-                    # Threat the parameter original value according to the
+                    # Treat the parameter original value according to the
                     # test's <where> tag
                     if where == PAYLOAD.WHERE.ORIGINAL or conf.prefix:
                         if kb.tamperFunctions:
