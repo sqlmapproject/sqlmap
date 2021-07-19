@@ -88,7 +88,7 @@ class SQLAlchemy(GenericConnector):
 
             self.printConnected()
         else:
-            raise SqlmapMissingDependence("SQLAlchemy not available")
+            raise SqlmapMissingDependence("SQLAlchemy not available (e.g. 'pip install SQLAlchemy')")
 
     def fetchall(self):
         try:
