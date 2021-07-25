@@ -1,19 +1,19 @@
-# sqlmap ![](https://i.imgur.com/fe85aVR.png)
+# sqlmap ![Owl Eyes](https://i.imgur.com/fe85aVR.png)
 
 [![Build Status](https://api.travis-ci.org/sqlmapproject/sqlmap.svg?branch=master)](https://travis-ci.org/sqlmapproject/sqlmap) [![Python 2.6|2.7|3.x](https://img.shields.io/badge/python-2.6|2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![GitHub closed issues](https://img.shields.io/github/issues-closed-raw/sqlmapproject/sqlmap.svg?colorB=ff69b4)](https://github.com/sqlmapproject/sqlmap/issues?q=is%3Aissue+is%3Aclosed) [![Twitter](https://img.shields.io/badge/twitter-@sqlmap-blue.svg)](https://twitter.com/sqlmap)
 
 sqlmap is an open source penetration testing tool that automates the process of detecting and exploiting SQL injection flaws and taking over of database servers. It comes with a powerful detection engine, many niche features for the ultimate penetration tester, and a broad range of switches including database fingerprinting, over data fetching from the database, accessing the underlying file system, and executing commands on the operating system via out-of-band connections.
 
-Screenshots
-----
+## Screenshots
 
+----
 ![Screenshot](https://raw.github.com/wiki/sqlmapproject/sqlmap/images/sqlmap_screenshot.png)
 
 You can visit the [collection of screenshots](https://github.com/sqlmapproject/sqlmap/wiki/Screenshots) demonstrating some of the features on the wiki.
 
-Installation
-----
+## Installation
 
+----
 You can download the latest tarball by clicking [here](https://github.com/sqlmapproject/sqlmap/tarball/master) or latest zipball by clicking [here](https://github.com/sqlmapproject/sqlmap/zipball/master).
 
 Preferably, you can download sqlmap by cloning the [Git](https://github.com/sqlmapproject/sqlmap) repository:
@@ -22,7 +22,8 @@ Preferably, you can download sqlmap by cloning the [Git](https://github.com/sqlm
 
 sqlmap works out of the box with [Python](http://www.python.org/download/) version **2.6**, **2.7** and **3.x** on any platform.
 
-Usage
+## Usage
+
 ----
 
 To get a list of basic options and switches use:
@@ -36,20 +37,22 @@ To get a list of all options and switches use:
 You can find a sample run [here](https://asciinema.org/a/46601).
 To get an overview of sqlmap capabilities, a list of supported features, and a description of all options and switches, along with examples, you are advised to consult the [user's manual](https://github.com/sqlmapproject/sqlmap/wiki/Usage).
 
-Links
+## Links
+
 ----
 
-* Homepage: http://sqlmap.org
+* Homepage: <http://sqlmap.org>
 * Download: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) or [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
-* Commits RSS feed: https://github.com/sqlmapproject/sqlmap/commits/master.atom
-* Issue tracker: https://github.com/sqlmapproject/sqlmap/issues
-* User's manual: https://github.com/sqlmapproject/sqlmap/wiki
-* Frequently Asked Questions (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
+* Commits RSS feed: <https://github.com/sqlmapproject/sqlmap/commits/master.atom>
+* Issue tracker: <https://github.com/sqlmapproject/sqlmap/issues>
+* User's manual: <https://github.com/sqlmapproject/sqlmap/wiki>
+* Frequently Asked Questions (FAQ): <https://github.com/sqlmapproject/sqlmap/wiki/FAQ>
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
 * Demos: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
-* Screenshots: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
+* Screenshots: <https://github.com/sqlmapproject/sqlmap/wiki/Screenshots>
 
-Translations
+## Translations
+
 ----
 
 * [Bulgarian](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-bg-BG.md)

@@ -5,7 +5,7 @@
 **Bug reports are welcome**!
 Please report all bugs on the [issue tracker](https://github.com/sqlmapproject/sqlmap/issues).
 
-### Guidelines
+### Guidelines For Reporting Bugs
 
 * Before you submit a bug report, search both [open](https://github.com/sqlmapproject/sqlmap/issues?q=is%3Aopen+is%3Aissue) and [closed](https://github.com/sqlmapproject/sqlmap/issues?q=is%3Aissue+is%3Aclosed) issues to make sure the issue has not come up before. Also, check the [user's manual](https://github.com/sqlmapproject/sqlmap/wiki) for anything relevant.
 * Make sure you can reproduce the bug with the latest development version of sqlmap.
@@ -19,7 +19,7 @@ All code contributions are greatly appreciated. First off, clone the [Git reposi
 Our preferred method of patch submission is via a Git [pull request](https://help.github.com/articles/using-pull-requests).
 Many [people](https://raw.github.com/sqlmapproject/sqlmap/master/doc/THANKS.md) have contributed in different ways to the sqlmap development. **You** can be the next!
 
-### Guidelines
+### Guidelines for Submitting Code Changes
 
 In order to maintain consistency and readability throughout the code, we ask that you adhere to the following instructions:
 

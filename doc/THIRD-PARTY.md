@@ -1,6 +1,6 @@
-This file lists bundled packages and their associated licensing terms.
+# This file lists bundled packages and their associated licensing terms
 
-# BSD
+## BSD
 
 * The `Ansistrm` library located under `thirdparty/ansistrm/`.
   Copyright (C) 2010-2012, Vinay Sajip.
@@ -20,7 +20,7 @@ This file lists bundled packages and their associated licensing terms.
 * The `SocksiPy` library located under `thirdparty/socks/`.
   Copyright (C) 2006, Dan-Haim.
 
-````
+````Legal Text
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
      - Redistributions of source code must retain the above copyright
@@ -44,7 +44,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ````
 
-# LGPL
+## LGPL
 
 * The `Chardet` library located under `thirdparty/chardet/`.
   Copyright (C) 2008, Mark Pilgrim.
@@ -55,7 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * The `icmpsh` tool located under `extra/icmpsh/`.
   Copyright (C) 2010, Nico Leidecker, Bernardo Damele.
 
-````
+````Legal Text
                    GNU LESSER GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 
@@ -223,12 +223,12 @@ permanent authorization for you to choose that version for the
 Library.
 ````
 
-# PSF
+## PSF
 
 * The `Magic` library located under `thirdparty/magic/`.
   Copyright (C) 2011, Adam Hupp.
 
-````
+````Legal Text
 PSF LICENSE AGREEMENT FOR PYTHON 2.7.3
 
 This LICENSE AGREEMENT is between the Python Software Foundation (“PSF”),
@@ -268,7 +268,7 @@ By copying, installing or otherwise using Python 2.7.3, Licensee agrees to
 be bound by the terms and conditions of this License Agreement.
 ````
 
-# MIT
+## MIT
 
 * The `bottle` web framework library located under `thirdparty/bottle/`.
   Copyright (C) 2012, Marcel Hellkamp.
@@ -281,7 +281,7 @@ be bound by the terms and conditions of this License Agreement.
 * The `Termcolor` library located under `thirdparty/termcolor/`.
   Copyright (C) 2008-2011, Volvox Development Team.
 
-````
+````Legal Text
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
 "Software"), to deal in the Software without restriction, including
@@ -303,7 +303,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ````
 
-# Public domain
+## Public domain
 
 * The `PyDes` library located under `thirdparty/pydes/`.
    Copyleft 2009, Todd Whiteman.

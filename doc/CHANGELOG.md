@@ -1,24 +1,26 @@
-# Version 1.4 (2020-01-01)
+# Changelog
+
+## Version 1.4 (2020-01-01)
 
 * [View changes](https://github.com/sqlmapproject/sqlmap/compare/1.3...1.4)
 * [View issues](https://github.com/sqlmapproject/sqlmap/milestone/5?closed=1)
 
-# Version 1.3 (2019-01-05)
+## Version 1.3 (2019-01-05)
 
 * [View changes](https://github.com/sqlmapproject/sqlmap/compare/1.2...1.3)
 * [View issues](https://github.com/sqlmapproject/sqlmap/milestone/4?closed=1)
 
-# Version 1.2 (2018-01-08)
+## Version 1.2 (2018-01-08)
 
 * [View changes](https://github.com/sqlmapproject/sqlmap/compare/1.1...1.2)
 * [View issues](https://github.com/sqlmapproject/sqlmap/milestone/3?closed=1)
 
-# Version 1.1 (2017-04-07)
+## Version 1.1 (2017-04-07)
 
 * [View changes](https://github.com/sqlmapproject/sqlmap/compare/1.0...1.1)
 * [View issues](https://github.com/sqlmapproject/sqlmap/milestone/2?closed=1)
 
-# Version 1.0 (2016-02-27)
+## Version 1.0 (2016-02-27)
 
 * Implemented support for automatic decoding of page content through detected charset.
 * Implemented mechanism for proper data dumping on DBMSes not supporting `LIMIT/OFFSET` like mechanism(s) (e.g. Microsoft SQL Server, Sybase, etc.).
@@ -113,7 +115,7 @@
 * Added option `-x` to set URL of sitemap(.xml) for target(s) parsing.
 * Added option `-z` for usage of short mnemonics (e.g. `"flu,bat,ban,tec=EU"`).
 
-# Version 0.9 (2011-04-10)
+## Version 0.9 (2011-04-10)
 
 * Rewritten SQL injection detection engine.
 * Support to directly connect to the database without passing via a SQL injection, option `-d`.
@@ -144,7 +146,7 @@
 * Major code refactoring.
 * User's manual updated.
 
-# Version 0.8 (2010-03-14)
+## Version 0.8 (2010-03-14)
 
 * Support to enumerate and dump all databases' tables containing user provided column(s) by specifying for instance `--dump -C user,pass`. Useful to identify for instance tables containing custom application credentials.
 * Support to parse `-C` (column name(s)) when fetching columns of a table with `--columns`: it will enumerate only columns like the provided one(s) within the specified table.
@@ -155,7 +157,7 @@
 * Added support to properly read (`--read-file`) also binary files via PostgreSQL by injecting sqlmap new `sys_fileread()` user-defined function.
 * Updated active fingerprint and comment injection fingerprint for MySQL 5.1, MySQL 5.4 and MySQL 5.5.
 * Updated active fingerprint for PostgreSQL 8.4.
-* Support for NTLM authentication via python-ntlm third party library, http://code.google.com/p/python-ntlm/, `--auth-type NTLM`.
+* Support for NTLM authentication via python-ntlm third party library, <http://code.google.com/p/python-ntlm/>, `--auth-type NTLM`.
 * Support to automatically decode `deflate`, `gzip` and `x-gzip` HTTP responses.
 * Support for Certificate authentication, `--auth-cert` option added.
 * Added support for regular expression based scope when parsing Burp or Web Scarab proxy log file (`-l`), `--scope`.
@@ -167,13 +169,13 @@
 * Fixed URL encoding/decoding of GET/POST parameters and Cookie header.
 * Refactored `--update` to use `python-svn` third party library if available or `svn` command to update sqlmap to the latest development version from subversion repository.
 * Major bugs fixed.
-* Cleanup of UDF source code repository, https://svn.sqlmap.org/sqlmap/trunk/sqlmap/extra/udfhack.
+* Cleanup of UDF source code repository, <https://svn.sqlmap.org/sqlmap/trunk/sqlmap/extra/udfhack>.
 * Major code cleanup.
 * Added simple file encryption/compression utility, extra/cloak/cloak.py, used by sqlmap to decrypt on the fly Churrasco, UPX executable and web shells consequently reducing drastically the number of anti-virus software that mistakenly mark sqlmap as a malware.
 * Updated user's manual.
-* Created several demo videos, hosted on YouTube (http://www.youtube.com/user/inquisb) and linked from http://sqlmap.org/demo.html.
+* Created several demo videos, hosted on YouTube (<http://www.youtube.com/user/inquisb>) and linked from <http://sqlmap.org/demo.html>.
 
-# Version 0.8 release candidate (2009-09-21)
+## Version 0.8 release candidate (2009-09-21)
 
 * Major enhancement to the Microsoft SQL Server stored procedure heap-based buffer overflow exploit (`--os-bof`) to automatically bypass DEP memory protection.
 * Added support for MySQL and PostgreSQL to execute Metasploit shellcode via UDF 'sys_bineval' (in-memory, anti-forensics technique) as an option instead of uploading the standalone payload stager executable.
@@ -185,7 +187,7 @@
 * Minor bugs fixed.
 * Major code refactoring.
 
-# Version 0.7 (2009-07-25)
+## Version 0.7 (2009-07-25)
 
 * Adapted Metasploit wrapping functions to work with latest 3.3 development version too.
 * Adjusted code to make sqlmap 0.7 to work again on Mac OSX too.
@@ -200,7 +202,7 @@
 * Fixed basic Microsoft SQL Server 2000 fingerprint.
 * Many minor bug fixes and code refactoring.
 
-# Version 0.7 release candidate (2009-04-22)
+## Version 0.7 release candidate (2009-04-22)
 
 * Added support to execute arbitrary commands on the database server underlying operating system either returning the standard output or not via UDF injection on MySQL and PostgreSQL and via xp_cmdshell() stored procedure on Microsoft SQL Server;
 * Added support for out-of-band connection between the attacker box and the database server underlying operating system via stand-alone payload stager created by Metasploit and supporting Meterpreter, shell and VNC payloads for both Windows and Linux;
@@ -212,7 +214,7 @@
 * Major bug fix in the comparison algorithm to correctly handle also the case that the url is stable and the False response changes the page content very little;
 * Many minor bug fixes, minor enhancements and layout adjustments.
 
-# Version 0.6.4 (2009-02-03)
+## Version 0.6.4 (2009-02-03)
 
 * Major enhancement to make the comparison algorithm work properly also on url not stables automatically by using the difflib Sequence Matcher object;
 * Major enhancement to support SQL data definition statements, SQL data manipulation statements, etc from user in SQL query and SQL shell if stacked queries are supported by the web application technology;
@@ -228,9 +230,9 @@
 * Minor bug fix to make the `--postfix` work even if `--prefix` is not provided;
 * Updated documentation.
 
-# Version 0.6.3 (2008-12-18)
+## Version 0.6.3 (2008-12-18)
 
-* Major enhancement to get list of targets to test from Burp proxy (http://portswigger.net/suite/) requests log file path or WebScarab proxy (http://www.owasp.org/index.php/Category:OWASP_WebScarab_Project) 'conversations/' folder path by providing option -l <filepath>;
+* Major enhancement to get list of targets to test from Burp proxy (<http://portswigger.net/suite/>) requests log file path or WebScarab proxy (<http://www.owasp.org/index.php/Category:OWASP_WebScarab_Project>) 'conversations/' folder path by providing option -l "filepath";
 * Major enhancement to support Partial UNION query SQL injection technique too;
 * Major enhancement to test if the web application technology supports stacked queries (multiple statements) by providing option `--stacked-test` which will be then used someday also by takeover functionality;
 * Major enhancement to test if the injectable parameter is affected by a time based blind SQL injection technique by providing option `--time-test`;
@@ -244,7 +246,7 @@
 * Minor enhancement to be able to specify extra HTTP headers by providing option `--headers`. By default Accept, Accept-Language and Accept-Charset headers are set;
 * Minor improvement to be able to provide CU (as current user) as user value (`-U`) when enumerating users privileges or users passwords;
 * Minor improvements to sqlmap Debian package files;
-* Minor improvement to use Python psyco (http://psyco.sourceforge.net/) library if available to speed up the sqlmap algorithmic operations;
+* Minor improvement to use Python psyco (<http://psyco.sourceforge.net/>) library if available to speed up the sqlmap algorithmic operations;
 * Minor improvement to retry the HTTP request up to three times in case an exception is raised during the connection to the target url;
 * Major bug fix to correctly enumerate columns on Microsoft SQL Server;
 * Major bug fix so that when the user provide a SELECT statement to be processed with an asterisk as columns, now it also work if in the FROM there is no database name specified;
@@ -254,7 +256,7 @@
 * Increased default output level from 0 to 1;
 * Updated documentation.
 
-# Version 0.6.2 (2008-11-02)
+## Version 0.6.2 (2008-11-02)
 
 * Major bug fix to correctly dump tables entries when `--stop` is not specified;
 * Major bug fix so that the users' privileges enumeration now works properly also on both MySQL < 5.0 and MySQL >= 5.0;
@@ -267,7 +269,7 @@
 * Updated the database management system fingerprint checks to correctly identify MySQL 5.1.x, MySQL 6.0.x and PostgreSQL 8.3;
 * More user-friendly warning messages.
 
-# Version 0.6.1 (2008-08-20)
+## Version 0.6.1 (2008-08-20)
 
 * Major bug fix to blind SQL injection bisection algorithm to handle an exception;
 * Added a Metasploit Framework 3 auxiliary module to run sqlmap;
@@ -278,7 +280,7 @@
 * Changed the order sqlmap dump table entries from column by column to row by row. Now it also dumps entries as they are stored in the tables, not forcing the entries' order alphabetically anymore;
 * Minor bug fix to correctly handle parameters' value with `%` character.
 
-# Version 0.6 (2008-09-01)
+## Version 0.6 (2008-09-01)
 
 * Complete code refactor and many bugs fixed;
 * Added multithreading support to set the maximum number of concurrent HTTP requests;
@@ -315,7 +317,7 @@
 * Updated some docstrings;
 * Updated documentation files.
 
-# Version 0.5 (2007-11-04)
+## Version 0.5 (2007-11-04)
 
 * Added support for Oracle database management system
 * Extended inband SQL injection functionality (`--union-use`) to all other possible queries since it only worked with `-e` and `--file` on all DMBS plugins;
@@ -337,7 +339,7 @@
 * Complete code refactoring, a lot of minor and some major fixes in libraries, many minor improvements;
 * Updated all documentation files.
 
-# Version 0.4 (2007-06-15)
+## Version 0.4 (2007-06-15)
 
 * Added DBMS fingerprint based also upon HTML error messages parsing defined in lib/parser.py which reads an XML file defining default error messages for each supported DBMS;
 * Added Microsoft SQL Server extensive DBMS fingerprint checks based upon accurate '@@version' parsing matching on an XML file to get also the exact patching level of the DBMS;
@@ -358,7 +360,7 @@
 * Split lib/common.py: inband injection functionalities now are moved to lib/union.py;
 * Updated documentation files.
 
-# Version 0.3 (2007-01-20)
+## Version 0.3 (2007-01-20)
 
 * Added module for MS SQL Server;
 * Strongly improved MySQL dbms active fingerprint and added MySQL comment injection check;
@@ -372,13 +374,13 @@
 * Rewritten documentation files;
 * Complete code restyling.
 
-# Version 0.2 (2006-12-13)
+## Version 0.2 (2006-12-13)
 
 * complete refactor of entire program;
 * added TODO and THANKS files;
 * added some papers references in README file;
 * moved headers to user-agents.txt, now -f parameter specifies a file (user-agents.txt) and randomize the selection of User-Agent header;
-* strongly improved program plugins (mysqlmap.py and postgres.py), major enhancements: * improved active mysql fingerprint check_dbms(); * improved enumeration functions for both databases; * minor changes in the unescape() functions;
+* strongly improved program plugins (mysqlmap.py and postgres.py), major enhancements: *improved active mysql fingerprint check_dbms();* improved enumeration functions for both databases; * minor changes in the unescape() functions;
 * replaced old inference algorithm with a new bisection algorithm.
 * reviewed command line parameters, now with -p it's possible to specify the parameter you know it's vulnerable to sql injection, this way the script won't perform the sql injection checks itself; removed the TOKEN parameter;
 * improved Common class, adding support for http proxy and http post method in hash_page;
