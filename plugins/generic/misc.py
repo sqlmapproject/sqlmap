@@ -158,7 +158,7 @@ class Miscellaneous(object):
                 udfDict = {"master..new_xp_cmdshell": {}}
 
             if udfDict is None:
-                udfDict = self.sysUdfs
+                udfDict = getattr(self, "sysUdfs", {})
 
             for udf, inpRet in udfDict.items():
                 message = "do you want to remove UDF '%s'? [Y/n] " % udf
