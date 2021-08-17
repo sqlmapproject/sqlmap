@@ -636,7 +636,10 @@ def storeHashesToFile(attack_dict):
 
         with openFile(filename, "w+") as f:
             for item in items:
-                f.write(item)
+                try:
+                    f.write(item)
+                except (UnicodeError, TypeError):
+                    pass
 
 def attackCachedUsersPasswords():
     if kb.data.cachedUsersPasswords:
