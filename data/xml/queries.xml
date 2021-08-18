@@ -127,8 +127,8 @@
             <blind query="SELECT DISTINCT(schemaname) FROM pg_tables ORDER BY schemaname OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(schemaname)) FROM pg_tables"/>
         </dbs>
         <tables>
-            <inband query="SELECT schemaname,tablename FROM pg_tables" condition="schemaname"/>
-            <blind query="SELECT tablename FROM pg_tables WHERE schemaname='%s' ORDER BY tablename OFFSET %d LIMIT 1" count="SELECT COUNT(tablename) FROM pg_tables WHERE schemaname='%s'"/>
+            <inband query="SELECT schemaname,tablename FROM pg_tables" condition="schemaname" query2="SELECT table_schema,table_name FROM information_schema.tables" condition2="table_schema"/>
+            <blind query="SELECT tablename FROM pg_tables WHERE schemaname='%s' ORDER BY tablename OFFSET %d LIMIT 1" count="SELECT COUNT(tablename) FROM pg_tables WHERE schemaname='%s'" query2="SELECT table_name FROM information_schema.tables WHERE table_schema='%s' OFFSET %d LIMIT 1" count2="SELECT COUNT(table_name) FROM information_schema.tables WHERE table_schema='%s'"/>
         </tables>
         <columns>
             <inband query="SELECT attname,typname FROM pg_attribute b JOIN pg_class a ON a.oid=b.attrelid JOIN pg_type c ON c.oid=b.atttypid JOIN pg_namespace d ON a.relnamespace=d.oid WHERE b.attnum>0 AND a.relname='%s' AND nspname='%s' ORDER BY attname" condition="attname"/>
