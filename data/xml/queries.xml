@@ -128,7 +128,7 @@
         </dbs>
         <tables>
             <inband query="SELECT schemaname,tablename FROM pg_tables" condition="schemaname"/>
-            <blind query="SELECT table_name FROM INFORMATION_SCHEMA.TABLES WHERE LENGTH('%s')>0 OFFSET %d LIMIT 1" count="SELECT COUNT(table_name) FROM INFORMATION_SCHEMA.TABLES WHERE LENGTH('%s')>0"/>
+            <blind query="SELECT tablename FROM pg_tables WHERE schemaname='%s' ORDER BY tablename OFFSET %d LIMIT 1" count="SELECT COUNT(tablename) FROM pg_tables WHERE schemaname='%s'"/>
         </tables>
         <columns>
             <inband query="SELECT attname,typname FROM pg_attribute b JOIN pg_class a ON a.oid=b.attrelid JOIN pg_type c ON c.oid=b.atttypid JOIN pg_namespace d ON a.relnamespace=d.oid WHERE b.attnum>0 AND a.relname='%s' AND nspname='%s' ORDER BY attname" condition="attname"/>
