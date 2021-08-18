@@ -363,8 +363,8 @@ class Databases(object):
                     singleTimeLogMessage(infoMsg)
                     continue
 
-                for query, count in ((rootQuery.blind.query, rootQuery.blind.count), (getattr(rootQuery.blind, "query2", None), getattr(rootQuery.blind, "count2", None))):
-                    if query is None:
+                for _query, _count in ((rootQuery.blind.query, rootQuery.blind.count), (getattr(rootQuery.blind, "query2", None), getattr(rootQuery.blind, "count2", None))):
+                    if _query is None:
                         break
 
                     infoMsg = "fetching number of tables for "
@@ -372,9 +372,11 @@ class Databases(object):
                     logger.info(infoMsg)
 
                     if Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.FIREBIRD, DBMS.MAXDB, DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB):
-                        count = count % unsafeSQLIdentificatorNaming(db)
+                        query = _count % unsafeSQLIdentificatorNaming(db)
+                    else:
+                        query = _count
 
-                    count = inject.getValue(count, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                    count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                     if count == 0:
                         warnMsg = "database '%s' " % unsafeSQLIdentificatorNaming(db)
@@ -395,15 +397,15 @@ class Databases(object):
 
                     for index in indexRange:
                         if Backend.isDbms(DBMS.SYBASE):
-                            query = query % (db, (kb.data.cachedTables[-1] if kb.data.cachedTables else " "))
+                            query = _query % (db, (kb.data.cachedTables[-1] if kb.data.cachedTables else " "))
                         elif Backend.getIdentifiedDbms() in (DBMS.MAXDB, DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB):
-                            query = query % (kb.data.cachedTables[-1] if kb.data.cachedTables else " ")
+                            query = _query % (kb.data.cachedTables[-1] if kb.data.cachedTables else " ")
                         elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD):
-                            query = query % index
+                            query = _query % index
                         elif Backend.getIdentifiedDbms() in (DBMS.HSQLDB, DBMS.INFORMIX, DBMS.FRONTBASE, DBMS.VIRTUOSO):
-                            query = query % (index, unsafeSQLIdentificatorNaming(db))
+                            query = _query % (index, unsafeSQLIdentificatorNaming(db))
                         else:
-                            query = query % (unsafeSQLIdentificatorNaming(db), index)
+                            query = _query % (unsafeSQLIdentificatorNaming(db), index)
 
                         table = unArrayizeValue(inject.getValue(query, union=False, error=False))
 
