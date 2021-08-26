@@ -295,10 +295,12 @@ def start():
         infoMsg = "found a total of %d targets" % len(kb.targets)
         logger.info(infoMsg)
 
-    hostCount = 0
+    targetCount = 0
     initialHeaders = list(conf.httpHeaders)
 
     for targetUrl, targetMethod, targetData, targetCookie, targetHeaders in kb.targets:
+        targetCount += 1
+
         try:
             if conf.checkInternet:
                 infoMsg = "checking for Internet connection"
@@ -375,12 +377,10 @@ def start():
                 continue
 
             if conf.multipleTargets:
-                hostCount += 1
-
                 if conf.forms and conf.method:
-                    message = "[#%d] form:\n%s %s" % (hostCount, conf.method, targetUrl)
+                    message = "[%d/%d] Form:\n%s %s" % (targetCount, len(kb.targets), conf.method, targetUrl)
                 else:
-                    message = "URL %d:\n%s %s" % (hostCount, HTTPMETHOD.GET, targetUrl)
+                    message = "[%d/%d] URL:\n%s %s" % (targetCount, len(kb.targets), HTTPMETHOD.GET, targetUrl)
 
                 if conf.cookie:
                     message += "\nCookie: %s" % conf.cookie
@@ -738,7 +738,7 @@ def start():
             if conf.multipleTargets:
                 _saveToResultsFile()
 
-                errMsg += ", skipping to the next %s" % ("form" if conf.forms else "URL")
+                errMsg += ", skipping to the next target"
                 logger.error(errMsg.lstrip(", "))
             else:
                 logger.critical(errMsg)
