@@ -978,7 +978,7 @@ class Connect(object):
 
         if conf.httpHeaders:
             headers = OrderedDict(conf.httpHeaders)
-            contentType = max(headers[_] if _.upper() == HTTP_HEADER.CONTENT_TYPE.upper() else "" for _ in headers) or None
+            contentType = max(headers[_] or "" if _.upper() == HTTP_HEADER.CONTENT_TYPE.upper() else "" for _ in headers) or None
 
             if (kb.postHint or conf.skipUrlEncode) and postUrlEncode:
                 postUrlEncode = False
