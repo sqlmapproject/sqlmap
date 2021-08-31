@@ -378,9 +378,9 @@ def start():
 
             if conf.multipleTargets:
                 if conf.forms and conf.method:
-                    message = "[%d/%d] Form:\n%s %s" % (targetCount, len(kb.targets), conf.method, targetUrl)
+                    message = "[%d/%s] Form:\n%s %s" % (targetCount, len(kb.targets) if isListLike(kb.targets) else '?', conf.method, targetUrl)
                 else:
-                    message = "[%d/%d] URL:\n%s %s" % (targetCount, len(kb.targets), HTTPMETHOD.GET, targetUrl)
+                    message = "[%d/%s] URL:\n%s %s" % (targetCount, len(kb.targets) if isListLike(kb.targets) else '?', HTTPMETHOD.GET, targetUrl)
 
                 if conf.cookie:
                     message += "\nCookie: %s" % conf.cookie
