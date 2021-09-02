@@ -695,7 +695,7 @@ class Connect(object):
 
         except SqlmapConnectionException as ex:
             if conf.proxyList and not kb.threadException:
-                warnMsg = "unable to connect to the target URL ('%s')" % ex
+                warnMsg = "unable to connect to the target URL ('%s')" % getSafeExString(ex)
                 logger.critical(warnMsg)
                 threadData.retriesCount = conf.retries
                 return Connect._retryProxy(**kwargs)

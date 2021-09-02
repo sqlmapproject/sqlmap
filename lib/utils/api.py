@@ -773,7 +773,7 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
         if not isinstance(ex, _urllib.error.HTTPError) or ex.code == _http_client.UNAUTHORIZED:
             errMsg = "There has been a problem while connecting to the "
             errMsg += "REST-JSON API server at '%s' " % addr
-            errMsg += "(%s)" % ex
+            errMsg += "(%s)" % getSafeExString(ex)
             logger.critical(errMsg)
             return
 
@@ -825,7 +825,7 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
             try:
                 argv = ["sqlmap.py"] + shlex.split(command)[1:]
             except Exception as ex:
-                logger.error("Error occurred while parsing arguments ('%s')" % ex)
+                logger.error("Error occurred while parsing arguments ('%s')" % getSafeExString(ex))
                 taskid = None
                 continue
 
