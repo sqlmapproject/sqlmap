@@ -39,7 +39,7 @@ Kako biste dobili pregled mogućnosti sqlmap-a, liste podržanih funkcija, te op
 Linkovi
 ----
 
-* Početna stranica: http://sqlmap.org
+* Početna stranica: https://sqlmap.org
 * Preuzimanje: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) ili [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
 * RSS feed promena u kodu: https://github.com/sqlmapproject/sqlmap/commits/master.atom
 * Prijava problema: https://github.com/sqlmapproject/sqlmap/issues

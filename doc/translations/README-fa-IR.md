@@ -73,7 +73,7 @@
 ----
 
 
-* خانه: http://sqlmap.org
+* خانه: https://sqlmap.org
 * دانلود: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) or [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
 * کایمت و نظرات: https://github.com/sqlmapproject/sqlmap/commits/master.atom
 * پیگری مشکلات: https://github.com/sqlmapproject/sqlmap/issues

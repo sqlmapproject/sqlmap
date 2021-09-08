@@ -38,7 +38,7 @@ Pour obtenir un aperçu des ressources de __sqlmap__, une liste des fonctionnali
 Liens
 ----
 
-* Page d'acceuil: http://sqlmap.org
+* Page d'acceuil: https://sqlmap.org
 * Téléchargement: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) ou [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
 * Commits RSS feed: https://github.com/sqlmapproject/sqlmap/commits/master.atom
 * Suivi des issues: https://github.com/sqlmapproject/sqlmap/issues

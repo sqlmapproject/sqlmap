@@ -39,7 +39,7 @@ Untuk mendapatkan gambaran singkat kemampuan sqlmap, daftar fitur yang didukung,
 Tautan
 ----
 
-* Situs: http://sqlmap.org
+* Situs: https://sqlmap.org
 * Unduh: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) atau [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
 * RSS feed dari commits: https://github.com/sqlmapproject/sqlmap/commits/master.atom
 * Pelacak Masalah: https://github.com/sqlmapproject/sqlmap/issues

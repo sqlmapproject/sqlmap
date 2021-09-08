@@ -41,7 +41,7 @@ Bạn có thể xem video chạy thử [tại đây](https://asciinema.org/a/466
 Liên kết
 ----
 
-* Trang chủ: http://sqlmap.org
+* Trang chủ: https://sqlmap.org
 * Tải xuống: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) hoặc [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
 * Nguồn cấp dữ liệu RSS về commits: https://github.com/sqlmapproject/sqlmap/commits/master.atom
 * Theo dõi vấn đề: https://github.com/sqlmapproject/sqlmap/issues

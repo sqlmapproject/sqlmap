@@ -39,7 +39,7 @@ Aby uzyskać listę wszystkich dostępnych fukcji, parametrów i opisów ich dzi
 Odnośniki
 ----
 
-* Strona projektu: http://sqlmap.org
+* Strona projektu: https://sqlmap.org
 * Pobieranie: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) or [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
 * RSS feed: https://github.com/sqlmapproject/sqlmap/commits/master.atom
 * Raportowanie błędów: https://github.com/sqlmapproject/sqlmap/issues

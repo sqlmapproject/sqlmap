@@ -42,7 +42,7 @@ Program ile ilgili örnekleri [burada](https://asciinema.org/a/46601) bulabilirs
 Links
 ----
 
-* Anasayfa: http://sqlmap.org
+* Anasayfa: https://sqlmap.org
 * İndirme bağlantıları: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) or [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
 * Commitlerin RSS beslemeleri: https://github.com/sqlmapproject/sqlmap/commits/master.atom
 * Hata takip etme sistemi: https://github.com/sqlmapproject/sqlmap/issues

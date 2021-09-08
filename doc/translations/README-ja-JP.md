@@ -40,7 +40,7 @@ sqlmapの概要、機能の一覧、全てのオプションやスイッチの�
 リンク
 ----
 
-* ホームページ: http://sqlmap.org
+* ホームページ: https://sqlmap.org
 * ダウンロード: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) or [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
 * コミットのRSSフィード: https://github.com/sqlmapproject/sqlmap/commits/master.atom
 * 課題管理: https://github.com/sqlmapproject/sqlmap/issues

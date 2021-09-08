@@ -39,7 +39,7 @@ To get an overview of sqlmap capabilities, a list of supported features, and a d
 Links
 ----
 
-* Homepage: http://sqlmap.org
+* Homepage: https://sqlmap.org
 * Download: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) or [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
 * Commits RSS feed: https://github.com/sqlmapproject/sqlmap/commits/master.atom
 * Issue tracker: https://github.com/sqlmapproject/sqlmap/issues
