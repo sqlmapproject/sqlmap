@@ -23,6 +23,7 @@ from lib.core.common import dataToStdout
 from lib.core.common import getSafeExString
 from lib.core.common import openFile
 from lib.core.common import saveConfig
+from lib.core.common import setColor
 from lib.core.common import unArrayizeValue
 from lib.core.compat import xrange
 from lib.core.convert import decodeBase64
@@ -778,6 +779,7 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
             return
 
     commands = ("help", "new", "use", "data", "log", "status", "option", "stop", "kill", "list", "flush", "version", "exit", "bye", "quit")
+    colors =  ('red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'lightgrey', 'lightred', 'lightgreen', 'lightyellow', 'lightblue', 'lightmagenta', 'lightcyan')
     autoCompletion(AUTOCOMPLETE_TYPE.API, commands=commands)
 
     taskid = None
@@ -785,7 +787,8 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
 
     while True:
         try:
-            command = _input("api%s> " % (" (%s)" % taskid if taskid else "")).strip()
+            color = colors[int(taskid or "0", 16) % len(colors)]
+            command = _input("api%s> " % (" (%s)" % setColor(taskid, color) if taskid else "")).strip()
             command = re.sub(r"\A(\w+)", lambda match: match.group(1).lower(), command)
         except (EOFError, KeyboardInterrupt):
             print()
