@@ -1,6 +1,12 @@
 # Copyright (c) 2006-2021 sqlmap developers (https://sqlmap.org/)
 # See the file 'LICENSE' for copying permission
 
+# CTFs
+
+/flag
+/flag.txt
+/readflag
+
 # Reference: https://gist.github.com/sckalath/78ad449346171d29241a
 
 /apache/logs/access.log
@@ -1718,6 +1724,7 @@
 /etc/php4/apache2/php.ini
 /etc/php5/apache/php.ini
 /etc/php5/apache2/php.ini
+/etc/php/7.4/apache2/php.ini
 /etc/php/php.ini
 /usr/local/apache/conf/modsec.conf
 /var/cpanel/cpanel.config
@@ -1793,9 +1800,10 @@
 
 # Misc
 
-/etc/lib/nfs/etab
 /app/app.js
 /app/configure.js
 /app/config/config.json
-/flag.txt
-/readflag
+/etc/grafana/grafana.ini
+/opt/kibana/config/kibana.yml
+/etc/kibana/kibana.yml
+/etc/elasticsearch/elasticsearch.yml

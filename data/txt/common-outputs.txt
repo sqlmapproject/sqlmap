@@ -12,7 +12,9 @@
 5.1.
 5.5.
 5.6.
+5.7.
 6.0.
+8.0.
 
 # PostgreSQL
 PostgreSQL 7.0
@@ -30,6 +32,13 @@ PostgreSQL 9.0
 PostgreSQL 9.1
 PostgreSQL 9.2
 PostgreSQL 9.3
+PostgreSQL 9.4
+PostgreSQL 9.5
+PostgreSQL 9.6
+PostgreSQL 10.
+PostgreSQL 11.
+PostgreSQL 12.
+PostgreSQL 13.
 
 # Oracle
 Oracle Database 9i Standard Edition Release
@@ -49,12 +58,18 @@ Oracle Database 11g Express Edition Release
 Oracle Database 11g Express Edition Release 11.
 Oracle Database 11g Enterprise Edition Release
 Oracle Database 11g Enterprise Edition Release 11.
+Oracle Database 12c
 
 # Microsoft SQL Server
 Microsoft SQL Server 7.0
 Microsoft SQL Server 2000
 Microsoft SQL Server 2005
 Microsoft SQL Server 2008
+Microsoft SQL Server 2012
+Microsoft SQL Server 2014
+Microsoft SQL Server 2016
+Microsoft SQL Server 2017
+Microsoft SQL Server 2019
 
 
 [Users]
