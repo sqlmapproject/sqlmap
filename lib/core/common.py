@@ -36,6 +36,7 @@ import threading
 import time
 import types
 import unicodedata
+import json
 
 from difflib import SequenceMatcher
 from math import sqrt
@@ -5362,6 +5363,53 @@ def parseRequestFile(reqFile, checkParams=True):
                 if not(conf.scope and not re.search(conf.scope, url, re.I)):
                     yield (url, conf.method or method, data, cookie, tuple(headers))
 
+    def _parseSwagger(content):
+        """
+        Parses Swagger OpenAPI 3.x.x JSON documents
+        """
+
+        try:
+            swagger = json.loads(content)
+            logger.debug("swagger OpenAPI version '%s'" % swagger["openapi"])
+
+            for path in swagger["paths"]:
+                for operation in swagger["paths"][path]:
+                    op =  swagger["paths"][path][operation]
+
+                    tags = conf.swaggerTags.split(",") if conf.swaggerTags is not None else None
+
+                    if ((tags is None or any(tag in op["tags"] for tag in tags))
+                        and operation == "get"):
+
+                        url = None
+                        method = None
+                        data = None
+                        cookie = None
+
+                        url = "%s%s" % (swagger["servers"][0]["url"], path)
+                        method = operation.upper()
+                        q = list(filter(lambda p: (p["in"] == "query"), op["parameters"]))
+                        qs = ""
+                        for qp in q:
+                            qs += "&%s=%s" %(qp["name"], qp["example"])
+                        qs = qs.replace('&', '?', 1)
+
+                        if op["parameters"] is not None and len(q) > 0:
+                            url += qs
+
+                            logger.debug("swagger url '%s', method '%s', data '%s', cookie '%s'" %(url, method, data, cookie))
+                            yield (url, method, data, cookie, None)
+
+                        else:
+                            logger.info("excluding url '%s', method '%s' as target since there are no parameters to inject" %(url, method))
+
+
+        except json.decoder.JSONDecodeError:
+            errMsg = "swagger file is not valid JSON"
+            raise SqlmapSyntaxException(errMsg)
+
+
+
     content = readCachedFileContent(reqFile)
 
     if conf.scope:
@@ -5371,6 +5419,9 @@ def parseRequestFile(reqFile, checkParams=True):
         yield target
 
     for target in _parseWebScarabLog(content):
+        yield target
+
+    for target in _parseSwagger(content):
         yield target
 
 def getSafeExString(ex, encoding=None):

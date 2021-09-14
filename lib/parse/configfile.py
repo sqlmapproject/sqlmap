@@ -79,14 +79,14 @@ def configFileParser(configFile):
 
     mandatory = False
 
-    for option in ("direct", "url", "logFile", "bulkFile", "googleDork", "requestFile", "wizard"):
+    for option in ("direct", "url", "logFile", "bulkFile", "googleDork", "requestFile", "wizard", "swaggerFile"):
         if config.has_option("Target", option) and config.get("Target", option) or cmdLineOptions.get(option):
             mandatory = True
             break
 
     if not mandatory:
         errMsg = "missing a mandatory option in the configuration file "
-        errMsg += "(direct, url, logFile, bulkFile, googleDork, requestFile or wizard)"
+        errMsg += "(direct, url, logFile, bulkFile, googleDork, requestFile, wizard or swaggerFile)"
         raise SqlmapMissingMandatoryOptionException(errMsg)
 
     for family, optionData in optDict.items():
