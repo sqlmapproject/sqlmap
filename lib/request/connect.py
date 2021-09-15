@@ -764,6 +764,10 @@ class Connect(object):
                     singleTimeWarnMessage(warnMsg)
                     conf.chunked = kwargs["chunked"] = False
                     return Connect.getPage(**kwargs)
+                elif ex.code == _http_client.REQUEST_URI_TOO_LONG:
+                    warnMsg = "request URI is marked as too long by the target. "
+                    warnMsg += "you are advised to try a switch '--no-cast' and/or '--no-escape'"
+                    singleTimeWarnMessage(warnMsg)
                 elif ex.code == _http_client.NOT_FOUND:
                     if raise404:
                         errMsg = "page not found (%d)" % code
