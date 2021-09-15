@@ -5363,6 +5363,29 @@ def parseRequestFile(reqFile, checkParams=True):
                 if not(conf.scope and not re.search(conf.scope, url, re.I)):
                     yield (url, conf.method or method, data, cookie, tuple(headers))
 
+    def _swaggerOperationParameters(parameters, types):
+        return list(filter(lambda p: (p["in"] in types), parameters))
+
+    def _swaggerOperationQueryString(parameters):
+        queryParameters = _swaggerOperationParameters(parameters, ["query"])
+        if len(queryParameters) < 1:
+            return None
+        queryString = ""
+        for qp in queryParameters:
+            queryString += "&%s=%s" %(qp["name"], qp["example"])
+ 
+        return queryString.replace('&', '', 1)
+
+    def _swaggerOperationPath(path, parameters):
+        pathParameters = _swaggerOperationParameters(parameters, ["path"])
+        if len(pathParameters) < 1:
+            return path
+        parameterPath = path
+        for p in pathParameters:
+            parameterPath = parameterPath.replace("{%s}" %p["name"], "%s*" %p["example"])
+        return parameterPath
+
+
     def _parseSwagger(content):
         """
         Parses Swagger OpenAPI 3.x.x JSON documents
@@ -5381,27 +5404,26 @@ def parseRequestFile(reqFile, checkParams=True):
                     if ((tags is None or any(tag in op["tags"] for tag in tags))
                         and operation == "get"):
 
-                        url = None
-                        method = None
-                        data = None
-                        cookie = None
+                        # header injection is not currently supported
+                        if len(_swaggerOperationParameters(op["parameters"], ["query", "path"])) > 0:
+                            url = None
+                            method = None
+                            data = None
+                            cookie = None
 
-                        url = "%s%s" % (swagger["servers"][0]["url"], path)
-                        method = operation.upper()
-                        q = list(filter(lambda p: (p["in"] == "query"), op["parameters"]))
-                        qs = ""
-                        for qp in q:
-                            qs += "&%s=%s" %(qp["name"], qp["example"])
-                        qs = qs.replace('&', '?', 1)
+                            parameterPath = _swaggerOperationPath(path, op["parameters"])
+                            qs = _swaggerOperationQueryString(op["parameters"])
+                            url = "%s%s" % (swagger["servers"][0]["url"], parameterPath)
+                            method = operation.upper()
 
-                        if op["parameters"] is not None and len(q) > 0:
-                            url += qs
+                            if qs is not None:
+                                url += "?" + qs
 
                             logger.debug("swagger url '%s', method '%s', data '%s', cookie '%s'" %(url, method, data, cookie))
                             yield (url, method, data, cookie, None)
 
                         else:
-                            logger.info("excluding url '%s', method '%s' as target since there are no parameters to inject" %(url, method))
+                            logger.info("excluding path '%s', operation '%s' as there are no parameters to inject" %(path, operation))
 
 
         except json.decoder.JSONDecodeError:
