@@ -5393,7 +5393,22 @@ def parseRequestFile(reqFile, checkParams=True):
 
         try:
             swagger = json.loads(content)
-            logger.debug("swagger OpenAPI version '%s'" % swagger["openapi"])
+
+            # extra validations
+            if "openapi" not in swagger or not swagger["openapi"].startswith("3."):
+              errMsg = "swagger must be OpenAPI 3.x.x!"
+              raise SqlmapSyntaxException(errMsg)
+
+            if ("servers" not in swagger or
+                    not isinstance(swagger["servers"], list) or
+                    len(swagger["servers"]) < 1 or
+                    "url" not in swagger["servers"][0]):
+              errMsg = "swagger server is missing!"
+              raise SqlmapSyntaxException(errMsg)
+
+            server = swagger["servers"][0]["url"]
+
+            logger.info("swagger OpenAPI version '%s', server '%s'" %(swagger["openapi"], server))
 
             for path in swagger["paths"]:
                 for operation in swagger["paths"][path]:
@@ -5413,7 +5428,7 @@ def parseRequestFile(reqFile, checkParams=True):
 
                             parameterPath = _swaggerOperationPath(path, op["parameters"])
                             qs = _swaggerOperationQueryString(op["parameters"])
-                            url = "%s%s" % (swagger["servers"][0]["url"], parameterPath)
+                            url = "%s%s" % (server, parameterPath)
                             method = operation.upper()
 
                             if qs is not None:
