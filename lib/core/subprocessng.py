@@ -99,8 +99,8 @@ class Popen(subprocess.Popen):
                 (_, written) = WriteFile(x, input)
             except ValueError:
                 return self._close('stdin')
-            except (subprocess.pywintypes.error, Exception) as ex:
-                if ex.args[0] in (109, errno.ESHUTDOWN):
+            except Exception as ex:
+                if getattr(ex, "args", None) and ex.args[0] in (109, errno.ESHUTDOWN):
                     return self._close('stdin')
                 raise
 
@@ -120,8 +120,8 @@ class Popen(subprocess.Popen):
                     (_, read) = ReadFile(x, nAvail, None)
             except (ValueError, NameError):
                 return self._close(which)
-            except (subprocess.pywintypes.error, Exception) as ex:
-                if ex.args[0] in (109, errno.ESHUTDOWN):
+            except Exception as ex:
+                if getattr(ex, "args", None) and ex.args[0] in (109, errno.ESHUTDOWN):
                     return self._close(which)
                 raise
 
