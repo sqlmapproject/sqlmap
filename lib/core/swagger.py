@@ -9,24 +9,27 @@ import json
 
 from lib.core.data import logger
 from lib.core.exception import SqlmapSyntaxException
+from lib.core.exception import SqlmapSkipTargetException
 
 class Operation:
 
-    def __init__(self, op):
-        self.op = op
+    def __init__(self, name, method, props):
+        self.name = name
+        self.method = method
+        self.props = props 
 
     def tags(self):
-        return self.op["tags"]
+        return self.props["tags"]
 
     def parameters(self):
-        return self.op["parameters"]
+        return self.props["parameters"]
 
     def parametersForTypes(self, types):
         return list(filter(lambda p: (p["in"] in types), self.parameters()))
 
     def bodyRef(self):
-        if "requestBody" in self.op:
-            return self.op["requestBody"]["content"]["application/json"]["schema"]["$ref"]
+        if "requestBody" in self.props:
+            return self.props["requestBody"]["content"]["application/json"]["schema"]["$ref"]
         return None
 
     # header injection is not currently supported
@@ -39,6 +42,8 @@ class Operation:
             return None
         queryString = ""
         for qp in queryParameters:
+            if "example" not in qp:
+                raise SqlmapSkipTargetException("missing example for parameter '%s'" %qp["name"])
             queryString += "&%s=%s" %(qp["name"], qp["example"])
 
         return queryString.replace('&', '', 1)
@@ -49,6 +54,8 @@ class Operation:
             return path
         parameterPath = path
         for p in pathParameters:
+            if "example" not in p:
+                raise SqlmapSkipTargetException("missing example for parameter '%s'" %p["name"])
             parameterPath = parameterPath.replace("{%s}" %p["name"], "%s*" %p["example"])
         return parameterPath
 
@@ -72,6 +79,9 @@ def _example(swagger, refPath):
                 example[prop] = _example(swagger, properties[prop]["$ref"])
             elif properties[prop]["type"] == "array" and "$ref" in properties[prop]["items"]:
                 example[prop] =  [ _example(swagger, properties[prop]["items"]["$ref"]) ]
+            else:
+                raise SqlmapSkipTargetException("missing example for parameter '%s'" %prop)
+
 
     return example
 
@@ -100,39 +110,41 @@ def parse(content, tags):
         logger.info("swagger OpenAPI version '%s', server '%s'" %(swagger["openapi"], server))
 
         for path in swagger["paths"]:
-            for operation in swagger["paths"][path]:
-                op = Operation(swagger["paths"][path][operation])
+            for method in swagger["paths"][path]:
+                op = Operation(path, method, swagger["paths"][path][method])
+                method = method.upper()
 
                 # skip any operations without one of our tags
                 if tags is not None and not any(tag in op.tags() for tag in tags):
                     continue
 
-                body = {}
-                bodyRef = op.bodyRef()
-                if bodyRef:
-                  body = _example(swagger, bodyRef)
+                try:
+                    body = {}
+                    bodyRef = op.bodyRef()
+                    if bodyRef:
+                      body = _example(swagger, bodyRef)
 
-                if not op.injectable(body):
-                    logger.info("excluding path '%s', operation '%s' as there are no parameters to inject" %(path, operation))
-                    continue
+                    if op.injectable(body):
+                        url = None
+                        data = None
+                        cookie = None
 
-                url = None
-                method = None
-                data = None
-                cookie = None
+                        parameterPath = op.path(path)
+                        qs = op.queryString()
+                        url = "%s%s" % (server, parameterPath)
+                        if body:
+                            data = json.dumps(body)
 
-                parameterPath = op.path(path)
-                qs = op.queryString()
-                url = "%s%s" % (server, parameterPath)
-                method = operation.upper()
-                if body:
-                    data = json.dumps(body)
+                        if qs is not None:
+                            url += "?" + qs
 
-                if qs is not None:
-                    url += "?" + qs
+                        logger.debug("including url '%s', method '%s', data '%s', cookie '%s'" %(url, method, data, cookie))
+                        yield (url, method, data, cookie, None)
+                    else:
+                        logger.info("excluding path '%s', method '%s' as there are no parameters to inject" %(path, method))
 
-                logger.debug("including url '%s', method '%s', data '%s', cookie '%s'" %(url, method, data, cookie))
-                yield (url, method, data, cookie, None)
+                except SqlmapSkipTargetException as e:
+                    logger.warn("excluding path '%s', method '%s': %s" %(path, method, e))
 
     except json.decoder.JSONDecodeError:
         errMsg = "swagger file is not valid JSON"
