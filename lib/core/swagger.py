@@ -10,27 +10,47 @@ import json
 from lib.core.data import logger
 from lib.core.exception import SqlmapSyntaxException
 
-def _operationParameters(parameters, types):
-    return list(filter(lambda p: (p["in"] in types), parameters))
+class Operation:
 
-def _operationQueryString(parameters):
-    queryParameters = _operationParameters(parameters, ["query"])
-    if len(queryParameters) < 1:
+    def __init__(self, op):
+        self.op = op
+
+    def tags(self):
+        return self.op["tags"]
+
+    def parameters(self):
+        return self.op["parameters"]
+
+    def parametersForTypes(self, types):
+        return list(filter(lambda p: (p["in"] in types), self.parameters()))
+
+    def bodyRef(self):
+        if "requestBody" in self.op:
+            return self.op["requestBody"]["content"]["application/json"]["schema"]["$ref"]
         return None
-    queryString = ""
-    for qp in queryParameters:
-        queryString += "&%s=%s" %(qp["name"], qp["example"])
 
-    return queryString.replace('&', '', 1)
+    # header injection is not currently supported
+    def injectable(self, body):
+     return len(self.parametersForTypes(["query", "path"])) > 0 or body
 
-def _operationPath(path, parameters):
-    pathParameters = _operationParameters(parameters, ["path"])
-    if len(pathParameters) < 1:
-        return path
-    parameterPath = path
-    for p in pathParameters:
-        parameterPath = parameterPath.replace("{%s}" %p["name"], "%s*" %p["example"])
-    return parameterPath
+    def queryString(self):
+        queryParameters = self.parametersForTypes(["query"])
+        if len(queryParameters) < 1:
+            return None
+        queryString = ""
+        for qp in queryParameters:
+            queryString += "&%s=%s" %(qp["name"], qp["example"])
+
+        return queryString.replace('&', '', 1)
+
+    def path(self, path):
+        pathParameters = self.parametersForTypes(["path"])
+        if len(pathParameters) < 1:
+            return path
+        parameterPath = path
+        for p in pathParameters:
+            parameterPath = parameterPath.replace("{%s}" %p["name"], "%s*" %p["example"])
+        return parameterPath
 
 def _ref(swagger, refPath):
      paths = refPath.replace("#/", "", 1).split('/')
@@ -39,21 +59,21 @@ def _ref(swagger, refPath):
         r = r[p]
      return r
 
-def _body(swagger, refPath):
-    body = {}
+def _example(swagger, refPath):
+    example = {}
     ref = _ref(swagger, refPath)
     if "type" in ref and ref["type"] == "object" and "properties" in ref:
         properties = ref["properties"]
         for prop in properties:
             if "example" in properties[prop]:
                 value = properties[prop]["example"]
-                body[prop] = value
+                example[prop] = value
             elif "$ref" in properties[prop]:
-                body[prop] = _body(swagger, properties[prop]["$ref"])
+                example[prop] = _example(swagger, properties[prop]["$ref"])
             elif properties[prop]["type"] == "array" and "$ref" in properties[prop]["items"]:
-                body[prop] =  [ _body(swagger, properties[prop]["items"]["$ref"]) ]
+                example[prop] =  [ _example(swagger, properties[prop]["items"]["$ref"]) ]
 
-    return body
+    return example
 
 def parse(content, tags):
     """
@@ -81,19 +101,18 @@ def parse(content, tags):
 
         for path in swagger["paths"]:
             for operation in swagger["paths"][path]:
-                op =  swagger["paths"][path][operation]
+                op = Operation(swagger["paths"][path][operation])
 
                 # skip any operations without one of our tags
-                if tags is not None and not any(tag in op["tags"] for tag in tags):
+                if tags is not None and not any(tag in op.tags() for tag in tags):
                     continue
 
                 body = {}
-                if "requestBody" in op:
-                  ref = op["requestBody"]["content"]["application/json"]["schema"]["$ref"]
-                  body = _body(swagger, ref)
+                bodyRef = op.bodyRef()
+                if bodyRef:
+                  body = _example(swagger, bodyRef)
 
-                # header injection is not currently supported
-                if (len(_operationParameters(op["parameters"], ["query", "path"]))) < 1 and not body:
+                if not op.injectable(body):
                     logger.info("excluding path '%s', operation '%s' as there are no parameters to inject" %(path, operation))
                     continue
 
@@ -102,8 +121,8 @@ def parse(content, tags):
                 data = None
                 cookie = None
 
-                parameterPath = _operationPath(path, op["parameters"])
-                qs = _operationQueryString(op["parameters"])
+                parameterPath = op.path(path)
+                qs = op.queryString()
                 url = "%s%s" % (server, parameterPath)
                 method = operation.upper()
                 if body:
@@ -112,7 +131,7 @@ def parse(content, tags):
                 if qs is not None:
                     url += "?" + qs
 
-                logger.debug("swagger url '%s', method '%s', data '%s', cookie '%s'" %(url, method, data, cookie))
+                logger.debug("including url '%s', method '%s', data '%s', cookie '%s'" %(url, method, data, cookie))
                 yield (url, method, data, cookie, None)
 
     except json.decoder.JSONDecodeError:
