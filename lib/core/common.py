@@ -5385,6 +5385,31 @@ def parseRequestFile(reqFile, checkParams=True):
             parameterPath = parameterPath.replace("{%s}" %p["name"], "%s*" %p["example"])
         return parameterPath
 
+    def _swaggerRef(swagger, refPath):
+         paths = refPath.replace("#/", "", 1).split('/')
+         r = swagger
+         for p in paths:
+            r = r[p]
+         return r
+
+    def _swaggerBody(swagger, refPath):
+        body = {}
+        ref = _swaggerRef(swagger, refPath)
+        if "type" in ref and ref["type"] == "object" and "properties" in ref:
+            properties = ref["properties"]
+            for prop in properties:
+                if "example" in properties[prop]:
+                    value = properties[prop]["example"]
+                    #if properties[prop]["type"] in ["string", "enum"] and value[0] != '"':
+                    #    value = "\"%s\"" %value
+                    body[prop] = value
+                elif "$ref" in properties[prop]:
+                    body[prop] = _swaggerBody(swagger, properties[prop]["$ref"])
+                elif properties[prop]["type"] == "array" and "$ref" in properties[prop]["items"]:
+                    body[prop] =  [ _swaggerBody(swagger, properties[prop]["items"]["$ref"]) ]
+
+        return body
+
 
     def _parseSwagger(content):
         """
@@ -5414,13 +5439,17 @@ def parseRequestFile(reqFile, checkParams=True):
                 for operation in swagger["paths"][path]:
                     op =  swagger["paths"][path][operation]
 
-                    tags = conf.swaggerTags.split(",") if conf.swaggerTags is not None else None
+                    tags = conf.swaggerTags
 
-                    if ((tags is None or any(tag in op["tags"] for tag in tags))
-                        and operation == "get"):
+                    if tags is None or any(tag in op["tags"] for tag in tags):
+
+                        body = {}
+                        if "requestBody" in op:
+                          ref = op["requestBody"]["content"]["application/json"]["schema"]["$ref"]
+                          body = _swaggerBody(swagger, ref)
 
                         # header injection is not currently supported
-                        if len(_swaggerOperationParameters(op["parameters"], ["query", "path"])) > 0:
+                        if (len(_swaggerOperationParameters(op["parameters"], ["query", "path"]))) > 0 or body:
                             url = None
                             method = None
                             data = None
@@ -5430,6 +5459,8 @@ def parseRequestFile(reqFile, checkParams=True):
                             qs = _swaggerOperationQueryString(op["parameters"])
                             url = "%s%s" % (server, parameterPath)
                             method = operation.upper()
+                            if body:
+                                data = json.dumps(body)
 
                             if qs is not None:
                                 url += "?" + qs
@@ -5458,8 +5489,9 @@ def parseRequestFile(reqFile, checkParams=True):
     for target in _parseWebScarabLog(content):
         yield target
 
-    for target in _parseSwagger(content):
-        yield target
+    if conf.swaggerFile:
+      for target in _parseSwagger(content):
+          yield target
 
 def getSafeExString(ex, encoding=None):
     """

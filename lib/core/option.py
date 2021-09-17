@@ -1793,7 +1793,7 @@ def _cleanupOptions():
     if conf.tmpPath:
         conf.tmpPath = ntToPosixSlashes(normalizePath(conf.tmpPath))
 
-    if any((conf.googleDork, conf.logFile, conf.bulkFile, conf.forms, conf.crawlDepth, conf.stdinPipe)):
+    if any((conf.googleDork, conf.logFile, conf.bulkFile, conf.forms, conf.crawlDepth, conf.stdinPipe, conf.swaggerFile)):
         conf.multipleTargets = True
 
     if conf.optimize:
@@ -1939,6 +1939,9 @@ def _cleanupOptions():
 
     if conf.dummy:
         conf.batch = True
+
+    if conf.swaggerTags:
+        conf.swaggerTags = [_.strip() for _ in re.split(PARAMETER_SPLITTING_REGEX, conf.swaggerTags)]
 
     threadData = getCurrentThreadData()
     threadData.reset()
