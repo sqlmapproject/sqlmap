@@ -88,6 +88,9 @@ def _example(swagger, refPath):
 def parse(content, tags):
     """
     Parses Swagger OpenAPI 3.x.x JSON documents
+
+    Target injectable parameter values are generated from the "example" properties.
+    Only property-level "example" is supported. The "examples" property is not supported.
     """
 
     try:
