@@ -366,7 +366,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             if threadData.lastCode is not None:
                                 warnMsg = "unexpected HTTP code '%s' detected." % threadData.lastCode
                             else:
-                                warnMsg = "unexpected response detected." % threadData.lastCode
+                                warnMsg = "unexpected response detected."
 
                             warnMsg += " Will use (extra) validation step in similar cases"
 
