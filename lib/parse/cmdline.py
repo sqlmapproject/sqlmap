@@ -815,6 +815,9 @@ def cmdLineParser(argv=None):
         parser.add_argument("--non-interactive", dest="nonInteractive", action="store_true",
             help=SUPPRESS)
 
+        parser.add_argument("--testing", dest="testing", action="store_true",
+            help=SUPPRESS)
+
         parser.add_argument("--gui", dest="gui", action="store_true",
             help=SUPPRESS)
 

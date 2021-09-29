@@ -143,7 +143,7 @@ def vulnTest():
         for tag, value in (("<url>", url), ("<base>", base), ("<direct>", direct), ("<tmpdir>", tmpdir), ("<request>", request), ("<log>", log), ("<multiple>", multiple), ("<config>", config), ("<base64>", url.replace("id=1", "id=MZ=%3d"))):
             options = options.replace(tag, value)
 
-        cmd = "%s \"%s\" %s --batch --non-interactive --debug" % (sys.executable, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py")), options)
+        cmd = "%s \"%s\" %s --batch --non-interactive --testing --debug" % (sys.executable, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py")), options)
 
         if "<tmpfile>" in cmd:
             handle, tmp = tempfile.mkstemp()
@@ -153,6 +153,7 @@ def vulnTest():
         if "<piped>" in cmd:
             cmd = re.sub(r"<piped>\s*", "", cmd)
             cmd = "echo %s | %s" % (url, cmd)
+            cmd = cmd.replace("--testing ", "")
 
         output = shellExec(cmd)
 
