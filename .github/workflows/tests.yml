@@ -13,8 +13,6 @@ jobs:
         python-version: [ '2.x', '3.x', 'pypy-2.7', 'pypy-3.6', 'pypy-3.7' ]
     steps:
       - uses: actions/checkout@v2
-      - name: faketty
-        uses: Yuri6037/Action-FakeTTY@v1.1
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
