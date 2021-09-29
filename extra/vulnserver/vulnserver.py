@@ -110,6 +110,7 @@ class ReqHandler(BaseHTTPRequestHandler):
             elif self.data.startswith('<') and self.data.endswith('>'):
                 params.update(dict((_[0], _[1].replace("&apos;", "'").replace("&quot;", '"').replace("&lt;", '<').replace("&gt;", '>').replace("&amp;", '&')) for _ in re.findall(r'name="([^"]+)" value="([^"]*)"', self.data)))
             else:
+                self.data = self.data.replace(';', '&')     # Note: seems that Python3 started ignoring parameter splitting with ';'
                 params.update(parse_qs(self.data))
 
         for name in self.headers:
