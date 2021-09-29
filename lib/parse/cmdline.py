@@ -1063,7 +1063,7 @@ def cmdLineParser(argv=None):
         if args.dummy:
             args.url = args.url or DUMMY_URL
 
-        if hasattr(sys.stdin, "fileno") and not os.isatty(sys.stdin.fileno()) and '-' not in sys.argv:
+        if hasattr(sys.stdin, "fileno") and not os.isatty(sys.stdin.fileno()) and '-' not in sys.argv and "--testing" not in sys.argv:
             args.stdinPipe = iter(sys.stdin.readline, None)
         else:
             args.stdinPipe = None

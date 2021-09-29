@@ -416,7 +416,7 @@ def _doSearch():
                 conf.googlePage += 1
 
 def _setStdinPipeTargets():
-    if isinstance(conf.stdinPipe, _collections.Iterable) and not conf.testing:
+    if isinstance(conf.stdinPipe, _collections.Iterable):
         infoMsg = "using 'STDIN' for parsing targets list"
         logger.info(infoMsg)
 
