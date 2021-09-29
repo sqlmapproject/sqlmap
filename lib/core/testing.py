@@ -31,6 +31,7 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.patch import unisonRandom
+from lib.core.settings import IS_WIN
 
 def vulnTest():
     """
@@ -72,8 +73,8 @@ def vulnTest():
         ("-u <url> -z \"tec=B\" --hex --fresh-queries --threads=4 --sql-query=\"SELECT * FROM users\"", ("SELECT * FROM users [5]", "nameisnull")),
         ("-u \"<url>&echo=foobar*\" --flush-session", ("might be vulnerable to cross-site scripting",)),
         ("-u \"<url>&query=*\" --flush-session --technique=Q --banner", ("Title: SQLite inline queries", "banner: '3.")),
-        ("-d <direct> --flush-session --dump -T users --dump-format=SQLITE --binary-fields=name --where \"id=3\"", ("7775", "179ad45c6ce2cb97cf1029e212046e81 (testpass)", "dumped to SQLITE database")),
-        ("-d <direct> --flush-session --banner --schema --sql-query=\"UPDATE users SET name='foobar' WHERE id=5; SELECT * FROM users; SELECT 987654321\"", ("banner: '3.", "INTEGER", "TEXT", "id", "name", "surname", "5, foobar, nameisnull", "'987654321'",)),
+        ("-d \"<direct>\" --flush-session --dump -T users --dump-format=SQLITE --binary-fields=name --where \"id=3\"", ("7775", "179ad45c6ce2cb97cf1029e212046e81 (testpass)", "dumped to SQLITE database")),
+        ("-d \"<direct>\" --flush-session --banner --schema --sql-query=\"UPDATE users SET name='foobar' WHERE id=5; SELECT * FROM users; SELECT 987654321\"", ("banner: '3.", "INTEGER", "TEXT", "id", "name", "surname", "5, foobar, nameisnull", "'987654321'",)),
         ("--purge -v 3", ("~ERROR", "~CRITICAL", "deleting the whole directory tree")),
     )
 
@@ -148,6 +149,10 @@ def vulnTest():
     for options, checks in TESTS:
         status = '%d/%d (%d%%) ' % (count, len(TESTS), round(100.0 * count / len(TESTS)))
         dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%X"), status))
+
+        if IS_WIN and "uraj" in options:
+            options = options.replace(u"\u0161u\u0107uraj", "sucuraj")
+            checks = [check.replace(u"\u0161u\u0107uraj", "sucuraj") for check in checks]
 
         for tag, value in (("<url>", url), ("<base>", base), ("<direct>", direct), ("<tmpdir>", tmpdir), ("<request>", request), ("<log>", log), ("<multiple>", multiple), ("<config>", config), ("<base64>", url.replace("id=1", "id=MZ=%3d"))):
             options = options.replace(tag, value)
