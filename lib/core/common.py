@@ -5017,18 +5017,14 @@ def decloakToTemp(filename):
     """
     Decloaks content of a given file to a temporary file with similar name and extension
 
-    >>> _ = decloakToTemp(os.path.join(paths.SQLMAP_SHELL_PATH, "stagers", "stager.asp_"))
-    >>> openFile(_, "rb", encoding=None).read().startswith(b'<%')
+    NOTE: using in-memory decloak() in docTests because of the "problem" on Windows platform
+
+    >>> decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "stagers", "stager.asp_")).startswith(b'<%')
     True
-    >>> os.remove(_)
-    >>> _ = decloakToTemp(os.path.join(paths.SQLMAP_SHELL_PATH, "backdoors", "backdoor.asp_"))
-    >>> openFile(_, "rb", encoding=None).read().startswith(b'<%')
+    >>> decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "backdoors", "backdoor.asp_")).startswith(b'<%')
     True
-    >>> os.remove(_)
-    >>> _ = decloakToTemp(os.path.join(paths.SQLMAP_UDF_PATH, "postgresql", "linux", "64", "11", "lib_postgresqludf_sys.so_"))
-    >>> b'sys_eval' in openFile(_, "rb", encoding=None).read()
+    >>> b'sys_eval' in decloak(os.path.join(paths.SQLMAP_UDF_PATH, "postgresql", "linux", "64", "11", "lib_postgresqludf_sys.so_"))
     True
-    >>> os.remove(_)
     """
 
     content = decloak(filename)
