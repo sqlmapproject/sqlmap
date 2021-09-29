@@ -1016,7 +1016,7 @@ def dataToStdout(data, forceOutput=False, bold=False, contentType=None, status=C
 
     if not kb.get("threadException"):
         if forceOutput or not (getCurrentThreadData().disableStdOut or kb.get("wizardMode")):
-            multiThreadMode = isMultiThreadMode()
+            multiThreadMode = kb.get("multiThreadMode")
             if multiThreadMode:
                 logging._acquireLock()
 
@@ -2265,25 +2265,6 @@ def isHexEncodedString(subject):
     """
 
     return re.match(r"\A[0-9a-fA-Fx]+\Z", subject) is not None
-
-def isMultiThreadMode():
-    """
-    Checks if running in multi-thread(ing) mode
-
-    >>> import time
-    >>> threading.activeCount()
-    1
-    >>> isMultiThreadMode()
-    False
-    >>> _ = lambda: time.sleep(0.1)
-    >>> thread = threading.Thread(target=_)
-    >>> thread.daemon = True
-    >>> thread.start()
-    >>> isMultiThreadMode()
-    True
-    """
-
-    return threading.activeCount() > 1
 
 @cachedmethod
 def getConsoleWidth(default=80):

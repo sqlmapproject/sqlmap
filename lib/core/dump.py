@@ -19,7 +19,6 @@ from lib.core.common import dataToStdout
 from lib.core.common import filterNone
 from lib.core.common import getSafeExString
 from lib.core.common import isListLike
-from lib.core.common import isMultiThreadMode
 from lib.core.common import isNoneValue
 from lib.core.common import normalizeUnicode
 from lib.core.common import openFile
@@ -80,7 +79,7 @@ class Dump(object):
         elif console:
             dataToStdout(text)
 
-        multiThreadMode = isMultiThreadMode()
+        multiThreadMode = kb.multiThreadMode
         if multiThreadMode:
             self._lock.acquire()
 

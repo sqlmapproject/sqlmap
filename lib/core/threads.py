@@ -123,31 +123,32 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
     kb.threadContinue = True
     kb.threadException = False
     kb.technique = ThreadData.technique
-
-    if threadChoice and conf.threads == numThreads == 1 and not (kb.injection.data and not any(_ not in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED) for _ in kb.injection.data)):
-        while True:
-            message = "please enter number of threads? [Enter for %d (current)] " % numThreads
-            choice = readInput(message, default=str(numThreads))
-            if choice:
-                skipThreadCheck = False
-
-                if choice.endswith('!'):
-                    choice = choice[:-1]
-                    skipThreadCheck = True
-
-                if isDigit(choice):
-                    if int(choice) > MAX_NUMBER_OF_THREADS and not skipThreadCheck:
-                        errMsg = "maximum number of used threads is %d avoiding potential connection issues" % MAX_NUMBER_OF_THREADS
-                        logger.critical(errMsg)
-                    else:
-                        conf.threads = numThreads = int(choice)
-                        break
-
-        if numThreads == 1:
-            warnMsg = "running in a single-thread mode. This could take a while"
-            logger.warn(warnMsg)
+    kb.multiThreadMode = False
 
     try:
+        if threadChoice and conf.threads == numThreads == 1 and not (kb.injection.data and not any(_ not in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED) for _ in kb.injection.data)):
+            while True:
+                message = "please enter number of threads? [Enter for %d (current)] " % numThreads
+                choice = readInput(message, default=str(numThreads))
+                if choice:
+                    skipThreadCheck = False
+
+                    if choice.endswith('!'):
+                        choice = choice[:-1]
+                        skipThreadCheck = True
+
+                    if isDigit(choice):
+                        if int(choice) > MAX_NUMBER_OF_THREADS and not skipThreadCheck:
+                            errMsg = "maximum number of used threads is %d avoiding potential connection issues" % MAX_NUMBER_OF_THREADS
+                            logger.critical(errMsg)
+                        else:
+                            conf.threads = numThreads = int(choice)
+                            break
+
+            if numThreads == 1:
+                warnMsg = "running in a single-thread mode. This could take a while"
+                logger.warn(warnMsg)
+
         if numThreads > 1:
             if startThreadMsg:
                 infoMsg = "starting %d threads" % numThreads
@@ -155,6 +156,8 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
         else:
             threadFunction()
             return
+
+        kb.multiThreadMode = True
 
         # Start the threads
         for numThread in xrange(numThreads):
@@ -225,6 +228,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
             traceback.print_exc()
 
     finally:
+        kb.multiThreadMode = False
         kb.threadContinue = True
         kb.threadException = False
         kb.technique = None

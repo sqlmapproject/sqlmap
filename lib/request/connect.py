@@ -43,7 +43,6 @@ from lib.core.common import getHeader
 from lib.core.common import getHostHeader
 from lib.core.common import getRequestHeader
 from lib.core.common import getSafeExString
-from lib.core.common import isMultiThreadMode
 from lib.core.common import logHTTPTraffic
 from lib.core.common import openFile
 from lib.core.common import popValue
@@ -884,7 +883,7 @@ class Connect(object):
                 else:
                     logger.debug(warnMsg)
                 return Connect._retryProxy(**kwargs)
-            elif kb.testMode or isMultiThreadMode():
+            elif kb.testMode or kb.multiThreadMode:
                 logger.critical(warnMsg)
                 return None, None, None
             else:
