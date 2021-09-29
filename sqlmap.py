@@ -515,6 +515,7 @@ def main():
 
         if conf.get("hashDB"):
             conf.hashDB.flush(True)
+            conf.hashDB.close()         # NOTE: because of PyPy
 
         if conf.get("harFile"):
             try:
