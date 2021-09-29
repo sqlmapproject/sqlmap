@@ -79,7 +79,7 @@ def vulnTest():
 
     retVal = True
     count = 0
-    address, port = "127.0.0.10", random.randint(1025, 65535)
+    address, port = "127.0.0.1", random.randint(1025, 65535)
 
     def _thread():
         vulnserver.init(quiet=True)
