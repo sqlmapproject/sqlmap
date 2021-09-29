@@ -432,6 +432,9 @@ def _setHashDB():
 
     if os.path.exists(conf.hashDBFile):
         if conf.flushSession:
+            if conf.hashDB:
+                conf.hashDB.close()
+
             try:
                 os.remove(conf.hashDBFile)
                 logger.info("flushing session file")
