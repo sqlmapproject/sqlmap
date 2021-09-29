@@ -121,9 +121,14 @@ def vulnTest():
     os.close(handle)
 
     content = "POST / HTTP/1.0\nUser-agent: foobar\nHost: %s:%s\n\nid=1\n" % (address, port)
+    with open(request, "w+") as f:
+        f.write(content)
+        f.flush()
 
-    open(request, "w+").write(content)
-    open(log, "w+").write('<port>%d</port><request base64="true"><![CDATA[%s]]></request>' % (port, encodeBase64(content, binary=False)))
+    content = '<port>%d</port><request base64="true"><![CDATA[%s]]></request>' % (port, encodeBase64(content, binary=False))
+    with open(log, "w+") as f:
+        f.write(content)
+        f.flush()
 
     base = "http://%s:%d/" % (address, port)
     url = "%s?id=1" % base
@@ -131,9 +136,14 @@ def vulnTest():
     tmpdir = tempfile.mkdtemp()
 
     content = open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.conf"))).read().replace("url =", "url = %s" % url)
-    open(config, "w+").write(content)
+    with open(config, "w+") as f:
+        f.write(content)
+        f.flush()
 
-    open(multiple, "w+").write("%s?%s=%d\n%s?%s=%d\n%s&%s=1" % (base, randomStr(), randomInt(), base, randomStr(), randomInt(), url, randomStr()))
+    content = "%s?%s=%d\n%s?%s=%d\n%s&%s=1" % (base, randomStr(), randomInt(), base, randomStr(), randomInt(), url, randomStr())
+    with open(multiple, "w+") as f:
+        f.write(content)
+        f.flush()
 
     for options, checks in TESTS:
         status = '%d/%d (%d%%) ' % (count, len(TESTS), round(100.0 * count / len(TESTS)))
