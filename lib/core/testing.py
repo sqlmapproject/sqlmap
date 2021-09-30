@@ -87,9 +87,10 @@ def vulnTest():
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             if s.connect_ex((address, port)):
                 break
+            else:
+                time.sleep(1)
         finally:
             s.close()
-            time.sleep(1)
 
     def _thread():
         vulnserver.init(quiet=True)
