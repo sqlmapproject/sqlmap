@@ -80,7 +80,16 @@ def vulnTest():
 
     retVal = True
     count = 0
-    address, port = "127.0.0.1", random.randint(1025, 65535)
+
+    while True:
+        address, port = "127.0.0.1", random.randint(10000, 65535)
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            if s.connect_ex((address, port)):
+                break
+        finally:
+            s.close()
+            time.sleep(1)
 
     def _thread():
         vulnserver.init(quiet=True)
