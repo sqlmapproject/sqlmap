@@ -6,10 +6,11 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: [ '3.x', 'pypy-3.7' ]
+        os: [ubuntu-latest, macos-latest]
+        python-version: [ '2.x', '3.x', 'pypy-2.7', 'pypy-3.7' ]
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
