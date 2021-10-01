@@ -111,9 +111,11 @@ def vulnTest():
                 success = True
                 break
         except:
-            time.sleep(1)
+            pass
         finally:
             s.close()
+            if not success:
+                time.sleep(1)
 
     if not success:
         logger.error("problem occurred in vulnserver instantiation (address: 'http://%s:%s', alive: %s)" % (address, port, vulnserver._alive))
