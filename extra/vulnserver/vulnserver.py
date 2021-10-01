@@ -60,6 +60,7 @@ _conn = None
 _cursor = None
 _lock = None
 _server = None
+_alive = False
 
 def init(quiet=False):
     global _conn
@@ -236,14 +237,18 @@ class ReqHandler(BaseHTTPRequestHandler):
         return
 
 def run(address=LISTEN_ADDRESS, port=LISTEN_PORT):
+    global _alive
     global _server
     try:
+        _alive = True
         _server = ThreadingServer((address, port), ReqHandler)
         print("[i] running HTTP server at 'http://%s:%d'" % (address, port))
         _server.serve_forever()
     except KeyboardInterrupt:
         _server.socket.close()
         raise
+    finally:
+        _alive = False
 
 if __name__ == "__main__":
     try:
