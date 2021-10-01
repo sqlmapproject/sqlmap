@@ -31,7 +31,6 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.patch import unisonRandom
-from lib.core.settings import MAX_CONSECUTIVE_CONNECTION_ERRORS
 from lib.core.settings import IS_WIN
 
 def vulnTest():
@@ -97,28 +96,27 @@ def vulnTest():
         vulnserver.init(quiet=True)
         vulnserver.run(address=address, port=port)
 
+    vulnserver._alive = True
+
     thread = threading.Thread(target=_thread)
     thread.daemon = True
     thread.start()
 
-    success = False
-    for i in xrange(MAX_CONSECUTIVE_CONNECTION_ERRORS):
+    while vulnserver._alive:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             s.connect((address, port))
             s.send(b"GET / HTTP/1.0\r\n\r\n")
             if b"vulnserver" in s.recv(4096):
-                success = True
                 break
         except:
             pass
         finally:
             s.close()
-            if not success:
-                time.sleep(1)
+        time.sleep(1)
 
-    if not success:
-        logger.error("problem occurred in vulnserver instantiation (address: 'http://%s:%s', alive: %s)" % (address, port, vulnserver._alive))
+    if not vulnserver._alive:
+        logger.error("problem occurred in vulnserver instantiation (address: 'http://%s:%s')" % (address, port))
         return False
     else:
         logger.info("vulnserver running at 'http://%s:%s'..." % (address, port))
