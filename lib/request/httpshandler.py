@@ -5,12 +5,12 @@ Copyright (c) 2006-2021 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
-import distutils.version
 import re
 import socket
 
 from lib.core.common import filterNone
 from lib.core.common import getSafeExString
+from lib.core.compat import LooseVersion
 from lib.core.compat import xrange
 from lib.core.data import conf
 from lib.core.data import kb
@@ -109,7 +109,7 @@ class HTTPSConnection(_http_client.HTTPSConnection):
         if not success:
             errMsg = "can't establish SSL connection"
             # Reference: https://docs.python.org/2/library/ssl.html
-            if distutils.version.LooseVersion(PYVERSION) < distutils.version.LooseVersion("2.7.9"):
+            if LooseVersion(PYVERSION) < LooseVersion("2.7.9"):
                 errMsg += " (please retry with Python >= 2.7.9)"
 
             if kb.sslSuccess and not self.retrying:

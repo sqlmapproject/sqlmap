@@ -11,7 +11,6 @@ import binascii
 import codecs
 import contextlib
 import copy
-import distutils.version
 import functools
 import getpass
 import hashlib
@@ -47,6 +46,7 @@ from extra.beep.beep import beep
 from extra.cloak.cloak import decloak
 from lib.core.bigarray import BigArray
 from lib.core.compat import cmp
+from lib.core.compat import LooseVersion
 from lib.core.compat import round
 from lib.core.compat import xrange
 from lib.core.convert import base64pickle
@@ -591,7 +591,7 @@ class Backend(object):
 
         if Backend.getVersion() is not None and version is not None:
             try:
-                retVal = distutils.version.LooseVersion(Backend.getVersion()) >= distutils.version.LooseVersion(version)
+                retVal = LooseVersion(Backend.getVersion()) >= LooseVersion(version)
             except:
                 retVal = str(Backend.getVersion()) >= str(version)
 

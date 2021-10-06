@@ -5,7 +5,6 @@ Copyright (c) 2006-2021 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
-import distutils.version
 import os
 
 from lib.core.agent import agent
@@ -17,6 +16,7 @@ from lib.core.common import normalizePath
 from lib.core.common import ntToPosixSlashes
 from lib.core.common import randomStr
 from lib.core.common import unArrayizeValue
+from lib.core.compat import LooseVersion
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
@@ -38,13 +38,13 @@ class Takeover(GenericTakeover):
 
         banVer = kb.bannerFp["dbmsVersion"]
 
-        if banVer and distutils.version.LooseVersion(banVer) >= distutils.version.LooseVersion("5.0.67"):
+        if banVer and LooseVersion(banVer) >= LooseVersion("5.0.67"):
             if self.__plugindir is None:
                 logger.info("retrieving MySQL plugin directory absolute path")
                 self.__plugindir = unArrayizeValue(inject.getValue("SELECT @@plugin_dir"))
 
             # On MySQL 5.1 >= 5.1.19 and on any version of MySQL 6.0
-            if self.__plugindir is None and distutils.version.LooseVersion(banVer) >= distutils.version.LooseVersion("5.1.19"):
+            if self.__plugindir is None and LooseVersion(banVer) >= LooseVersion("5.1.19"):
                 logger.info("retrieving MySQL base directory absolute path")
 
                 # Reference: http://dev.mysql.com/doc/refman/5.1/en/server-options.html#option_mysqld_basedir

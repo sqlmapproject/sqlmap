@@ -257,3 +257,8 @@ if sys.version_info >= (3, 0):
 else:
     xrange = xrange
     buffer = buffer
+
+try:
+    from pkg_resources import parse_version as LooseVersion
+except ImportError:
+    from distutils.version import LooseVersion

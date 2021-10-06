@@ -18,7 +18,6 @@ try:
         sys.exit("[!] wrong installation detected (missing modules). Visit 'https://github.com/sqlmapproject/sqlmap/#installation' for further details")
 
     import bdb
-    import distutils
     import glob
     import inspect
     import json
@@ -64,6 +63,7 @@ try:
     from lib.core.common import MKSTEMP_PREFIX
     from lib.core.common import setColor
     from lib.core.common import unhandledExceptionMessage
+    from lib.core.compat import LooseVersion
     from lib.core.compat import xrange
     from lib.core.exception import SqlmapBaseException
     from lib.core.exception import SqlmapShellQuitException
@@ -114,7 +114,7 @@ def checkEnvironment():
         logger.critical(errMsg)
         raise SystemExit
 
-    if distutils.version.LooseVersion(VERSION) < distutils.version.LooseVersion("1.0"):
+    if LooseVersion(VERSION) < LooseVersion("1.0"):
         errMsg = "your runtime environment (e.g. PYTHONPATH) is "
         errMsg += "broken. Please make sure that you are not running "
         errMsg += "newer versions of sqlmap with runtime scripts for older "
