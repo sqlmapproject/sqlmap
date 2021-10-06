@@ -105,8 +105,15 @@ def vulnTest():
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             s.connect((address, port))
-            s.send(b"GET / HTTP/1.0\r\n\r\n")
-            if b"vulnserver" in s.recv(4096):
+            s.sendall(b"GET / HTTP/1.1\r\n\r\n")
+            result = b""
+            while True:
+                current = s.recv(1024)
+                if not current:
+                    break
+                else:
+                    result += current
+            if b"vulnserver" in result:
                 break
         except:
             pass
