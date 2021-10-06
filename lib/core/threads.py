@@ -198,7 +198,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
         if numThreads > 1:
             logger.info("waiting for threads to finish%s" % (" (Ctrl+C was pressed)" if isinstance(ex, KeyboardInterrupt) else ""))
         try:
-            while (threading.activeCount() > 1):
+            while (threading.active_count() > 1):
                 pass
 
         except KeyboardInterrupt:

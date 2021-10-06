@@ -533,7 +533,7 @@ def main():
 
         # short delay for thread finalization
         _ = time.time()
-        while threading.activeCount() > 1 and (time.time() - _) > THREAD_FINALIZATION_TIMEOUT:
+        while threading.active_count() > 1 and (time.time() - _) > THREAD_FINALIZATION_TIMEOUT:
             time.sleep(0.01)
 
         if cmdLineOptions.get("sqlmapShell"):
@@ -554,7 +554,7 @@ if __name__ == "__main__":
         traceback.print_exc()
     finally:
         # Reference: http://stackoverflow.com/questions/1635080/terminate-a-multi-thread-python-program
-        if threading.activeCount() > 1:
+        if threading.active_count() > 1:
             os._exit(getattr(os, "_exitcode", 0))
         else:
             sys.exit(getattr(os, "_exitcode", 0))
