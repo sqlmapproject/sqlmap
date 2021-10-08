@@ -2674,6 +2674,7 @@ jeda
 jenis
 jml
 judul
+jumlah
 kata_kunci
 kata_sandi
 katakunci
@@ -2686,6 +2687,7 @@ kunci
 lahir
 nama
 nama_akun
+nama_ibu_kandung
 nama_pengguna
 namaakun
 namapengguna
@@ -2695,6 +2697,7 @@ pengguna
 penjelasan
 perusahaan
 ponsel
+profesi
 ruang
 sandi
 soal
@@ -2702,6 +2705,7 @@ surat_elektronik
 surel
 tanggal
 tanggal_lahir
+telepon
 tempat
 tempat_lahir
 tmp_lahir
