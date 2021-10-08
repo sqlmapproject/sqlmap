@@ -98,33 +98,37 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
         incrementCounter(PAYLOAD.TECHNIQUE.UNION)
 
         if kb.jsonAggMode:
-            if Backend.isDbms(DBMS.MSSQL):
-                output = extractRegexResult(r"%s(?P<result>.*)%s" % (kb.chars.start, kb.chars.stop), removeReflectiveValues(page or "", payload))
-                if output:
-                    try:
-                        retVal = ""
-                        fields = re.findall(r'"([^"]+)":', extractRegexResult(r"{(?P<result>[^}]+)}", output))
-                        for row in json.loads(output):
-                            retVal += "%s%s%s" % (kb.chars.start, kb.chars.delimiter.join(getUnicode(row[field] or NULL) for field in fields), kb.chars.stop)
-                    except:
-                        pass
-                    else:
-                        retVal = getUnicode(retVal)
-            elif Backend.isDbms(DBMS.PGSQL):
-                output = extractRegexResult(r"(?P<result>%s.*%s)" % (kb.chars.start, kb.chars.stop), removeReflectiveValues(page or "", payload))
-                if output:
-                    retVal = output
-            else:
-                output = extractRegexResult(r"%s(?P<result>.*?)%s" % (kb.chars.start, kb.chars.stop), removeReflectiveValues(page or "", payload))
-                if output:
-                    try:
-                        retVal = ""
-                        for row in json.loads(output):
-                            retVal += "%s%s%s" % (kb.chars.start, row, kb.chars.stop)
-                    except:
-                        pass
-                    else:
-                        retVal = getUnicode(retVal)
+            for _page in (page or "", (page or "").replace('\\"', '"')):
+                if Backend.isDbms(DBMS.MSSQL):
+                    output = extractRegexResult(r"%s(?P<result>.*)%s" % (kb.chars.start, kb.chars.stop), removeReflectiveValues(_page, payload))
+                    if output:
+                        try:
+                            retVal = ""
+                            fields = re.findall(r'"([^"]+)":', extractRegexResult(r"{(?P<result>[^}]+)}", output))
+                            for row in json.loads(output):
+                                retVal += "%s%s%s" % (kb.chars.start, kb.chars.delimiter.join(getUnicode(row[field] or NULL) for field in fields), kb.chars.stop)
+                        except:
+                            pass
+                        else:
+                            retVal = getUnicode(retVal)
+                elif Backend.isDbms(DBMS.PGSQL):
+                    output = extractRegexResult(r"(?P<result>%s.*%s)" % (kb.chars.start, kb.chars.stop), removeReflectiveValues(_page, payload))
+                    if output:
+                        retVal = output
+                else:
+                    output = extractRegexResult(r"%s(?P<result>.*?)%s" % (kb.chars.start, kb.chars.stop), removeReflectiveValues(_page, payload))
+                    if output:
+                        try:
+                            retVal = ""
+                            for row in json.loads(output):
+                                retVal += "%s%s%s" % (kb.chars.start, row, kb.chars.stop)
+                        except:
+                            pass
+                        else:
+                            retVal = getUnicode(retVal)
+
+                if retVal:
+                    break
         else:
             # Parse the returned page to get the exact UNION-based
             # SQL injection output
