@@ -761,8 +761,8 @@
         },
         "tencent": {
             "company": "Tencent Cloud Computing",
-            "name": "Tencent Cloud",
-            "regex": "waf\\.tencent-cloud\\.com",
+            "name": "Tencent Cloud|Waterproof Wall",
+            "regex": "waf\\.tencent-cloud\\.com|window.location.href=.https://waf.tencent.com/501page.html",
             "signatures": [
                 "3f82:RVZXum60OEhCWapBYKcPk4JzWOpohM4IiUYMr2RXg1uQJbX3uhdOnthtOj+hX7AB16FcPxJPdLsXo2tKaK99nui7c4RmkgI2FZjxtDtAeq+c36A5chW1XaTD"
             ]

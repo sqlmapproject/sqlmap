@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2021 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2021 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -11,7 +11,6 @@ import binascii
 import codecs
 import contextlib
 import copy
-import distutils.version
 import functools
 import getpass
 import hashlib
@@ -47,6 +46,7 @@ from extra.beep.beep import beep
 from extra.cloak.cloak import decloak
 from lib.core.bigarray import BigArray
 from lib.core.compat import cmp
+from lib.core.compat import LooseVersion
 from lib.core.compat import round
 from lib.core.compat import xrange
 from lib.core.convert import base64pickle
@@ -591,7 +591,7 @@ class Backend(object):
 
         if Backend.getVersion() is not None and version is not None:
             try:
-                retVal = distutils.version.LooseVersion(Backend.getVersion()) >= distutils.version.LooseVersion(version)
+                retVal = LooseVersion(Backend.getVersion()) >= LooseVersion(version)
             except:
                 retVal = str(Backend.getVersion()) >= str(version)
 
@@ -1016,7 +1016,7 @@ def dataToStdout(data, forceOutput=False, bold=False, contentType=None, status=C
 
     if not kb.get("threadException"):
         if forceOutput or not (getCurrentThreadData().disableStdOut or kb.get("wizardMode")):
-            multiThreadMode = isMultiThreadMode()
+            multiThreadMode = kb.get("multiThreadMode")
             if multiThreadMode:
                 logging._acquireLock()
 
@@ -1531,7 +1531,7 @@ def parseTargetDirect():
     remote = False
 
     for dbms in SUPPORTED_DBMS:
-        details = re.search(r"^(?P<dbms>%s)://(?P<credentials>(?P<user>.*?)\:(?P<pass>.*)\@)?(?P<remote>(?P<hostname>[\w.-]+?)\:(?P<port>[\d]+)\/)?(?P<db>[\w\d\ \:\.\_\-\/\\]*)$" % dbms, conf.direct, re.I)
+        details = re.search(r"^(?P<dbms>%s)://(?P<credentials>(?P<user>.*?)\:(?P<pass>.*)\@)?(?P<remote>(?P<hostname>[\w.-]+?)\:(?P<port>[\d]+)\/)?(?P<db>[\w\d\ \:\.\_~\-\/\\]*)$" % dbms, conf.direct, re.I)
 
         if details:
             conf.dbms = details.group("dbms")
@@ -2266,22 +2266,6 @@ def isHexEncodedString(subject):
 
     return re.match(r"\A[0-9a-fA-Fx]+\Z", subject) is not None
 
-def isMultiThreadMode():
-    """
-    Checks if running in multi-thread(ing) mode
-
-    >>> isMultiThreadMode()
-    False
-    >>> _ = lambda: time.sleep(0.1)
-    >>> thread = threading.Thread(target=_)
-    >>> thread.daemon = True
-    >>> thread.start()
-    >>> isMultiThreadMode()
-    True
-    """
-
-    return threading.activeCount() > 1
-
 @cachedmethod
 def getConsoleWidth(default=80):
     """
@@ -2707,7 +2691,14 @@ def popValue():
     'foobar'
     """
 
-    return getCurrentThreadData().valueStack.pop()
+    retVal = None
+
+    try:
+        retVal = getCurrentThreadData().valueStack.pop()
+    except IndexError:
+        pass
+
+    return retVal
 
 def wasLastResponseDBMSError():
     """
@@ -5026,18 +5017,14 @@ def decloakToTemp(filename):
     """
     Decloaks content of a given file to a temporary file with similar name and extension
 
-    >>> _ = decloakToTemp(os.path.join(paths.SQLMAP_SHELL_PATH, "stagers", "stager.asp_"))
-    >>> openFile(_, "rb", encoding=None).read().startswith(b'<%')
+    NOTE: using in-memory decloak() in docTests because of the "problem" on Windows platform
+
+    >>> decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "stagers", "stager.asp_")).startswith(b'<%')
     True
-    >>> os.remove(_)
-    >>> _ = decloakToTemp(os.path.join(paths.SQLMAP_SHELL_PATH, "backdoors", "backdoor.asp_"))
-    >>> openFile(_, "rb", encoding=None).read().startswith(b'<%')
+    >>> decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "backdoors", "backdoor.asp_")).startswith(b'<%')
     True
-    >>> os.remove(_)
-    >>> _ = decloakToTemp(os.path.join(paths.SQLMAP_UDF_PATH, "postgresql", "linux", "64", "11", "lib_postgresqludf_sys.so_"))
-    >>> b'sys_eval' in openFile(_, "rb", encoding=None).read()
+    >>> b'sys_eval' in decloak(os.path.join(paths.SQLMAP_UDF_PATH, "postgresql", "linux", "64", "11", "lib_postgresqludf_sys.so_"))
     True
-    >>> os.remove(_)
     """
 
     content = decloak(filename)
@@ -5249,7 +5236,7 @@ def parseRequestFile(reqFile, checkParams=True):
             if "HTTP/" not in request:
                 continue
 
-            if re.search(r"^[\n]*%s.*?\.(%s)\sHTTP\/" % (HTTPMETHOD.GET, "|".join(CRAWL_EXCLUDE_EXTENSIONS)), request, re.I | re.M):
+            if re.search(r"^[\n]*%s[^?]*?\.(%s)\sHTTP\/" % (HTTPMETHOD.GET, "|".join(CRAWL_EXCLUDE_EXTENSIONS)), request, re.I | re.M):
                 if not re.search(r"^[\n]*%s[^\n]*\*[^\n]*\sHTTP\/" % HTTPMETHOD.GET, request, re.I | re.M):
                     continue
 

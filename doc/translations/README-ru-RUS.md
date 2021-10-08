@@ -39,7 +39,7 @@ sqlmap работает из коробки с [Python](http://www.python.org/do
 Ссылки
 ----
 
-* Основной сайт: http://sqlmap.org
+* Основной сайт: https://sqlmap.org
 * Скачивание: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) или [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
 * Канал новостей RSS: https://github.com/sqlmapproject/sqlmap/commits/master.atom
 * Отслеживание проблем: https://github.com/sqlmapproject/sqlmap/issues

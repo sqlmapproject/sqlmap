@@ -1,0 +1,243 @@
+openapi: 3.0.1
+info:
+  title: sqlmapapi OpenAPI/Swagger specification
+  version: '0.1'
+paths:
+  /version:
+    get:
+      description: Fetch server version
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version:
+                    type: string
+                    example: "1.5.7.7#dev"
+                  success:
+                    type: boolean
+                    example: true
+  /task/new:
+    get:
+      description: Create a new task
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  taskid:
+                    type: string
+                    example: "fad44d6beef72285"
+                  success:
+                    type: boolean
+                    example: true
+  /scan/{taskid}/start:
+    post:
+      description: Launch a scan
+      parameters:
+        - in: path
+          name: taskid
+          required: true
+          schema:
+            type: string
+          description: Scan task ID
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  type: string
+            examples:
+              '0':
+                value: '{"url":"http://testphp.vulnweb.com/artists.php?artist=1"}'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  engineid:
+                    type: integer
+                    example: 19720
+                  success:
+                    type: boolean
+                    example: true
+  /scan/{taskid}/stop:
+    get:
+      description: Stop a scan
+      parameters:
+        - in: path
+          name: taskid
+          required: true
+          schema:
+            type: string
+          description: Scan task ID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+  /scan/{taskid}/status:
+    get:
+      description: Fetch status of a scan
+      parameters:
+        - in: path
+          name: taskid
+          required: true
+          schema:
+            type: string
+          description: Scan task ID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: terminated
+                  returncode:
+                    type: integer
+                    example: 0
+                  success:
+                    type: boolean
+                    example: true
+  /scan/{taskid}/list:
+    get:
+      description: List options for a given task ID
+      parameters:
+        - in: path
+          name: taskid
+          required: true
+          schema:
+            type: string
+          description: Scan task ID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  options:
+                    type: array
+                    items:
+                      type: object
+  /scan/{taskid}/data:
+    get:
+      description: Retrieve the scan resulting data
+      parameters:
+        - in: path
+          name: taskid
+          required: true
+          schema:
+            type: string
+          description: Scan task ID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                  success:
+                    type: boolean
+                    example: true
+                  error:
+                    type: array
+                    items:
+                      type: object
+  /scan/{taskid}/log:
+    get:
+      description: Retrieve the log messages
+      parameters:
+        - in: path
+          name: taskid
+          required: true
+          schema:
+            type: string
+          description: Scan task ID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  log:
+                    type: array
+                    items:
+                      type: object
+                  success:
+                    type: boolean
+                    example: true
+  /scan/{taskid}/kill:
+    get:
+      description: Kill a scan
+      parameters:
+        - in: path
+          name: taskid
+          required: true
+          schema:
+            type: string
+          description: Scan task ID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+  /task/{taskid}/delete:
+    get:
+      description: Delete an existing task
+      parameters:
+        - in: path
+          name: taskid
+          required: true
+          schema:
+            type: string
+          description: Scan task ID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true

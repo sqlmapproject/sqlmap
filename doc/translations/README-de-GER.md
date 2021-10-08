@@ -38,7 +38,7 @@ Ein Probelauf ist [hier](https://asciinema.org/a/46601) zu finden. Um einen Übe
 Links
 ---
 
-* Webseite: http://sqlmap.org
+* Webseite: https://sqlmap.org
 * Download: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) or [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
 * Commits RSS feed: https://github.com/sqlmapproject/sqlmap/commits/master.atom
 * Problemverfolgung: https://github.com/sqlmapproject/sqlmap/issues

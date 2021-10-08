@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2021 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2021 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -68,8 +68,8 @@ class DNSServer(object):
     raw request
 
     Reference(s):
-        http://code.activestate.com/recipes/491264-mini-fake-dns-server/
-        https://code.google.com/p/marlon-tools/source/browse/tools/dnsproxy/dnsproxy.py
+        https://code.activestate.com/recipes/491264-mini-fake-dns-server/
+        https://web.archive.org/web/20150418152405/https://code.google.com/p/marlon-tools/source/browse/tools/dnsproxy/dnsproxy.py
     """
 
     def __init__(self):

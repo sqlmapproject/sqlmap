@@ -3,7 +3,7 @@
 """
 vulnserver.py - Trivial SQLi vulnerable HTTP server (Note: for testing purposes)
 
-Copyright (c) 2006-2021 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2021 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -49,7 +49,7 @@ SCHEMA = """
     INSERT INTO users (id, name, surname) VALUES (1, 'luther', 'blisset');
     INSERT INTO users (id, name, surname) VALUES (2, 'fluffy', 'bunny');
     INSERT INTO users (id, name, surname) VALUES (3, 'wu', '179ad45c6ce2cb97cf1029e212046e81');
-    INSERT INTO users (id, name, surname) VALUES (4, 'sqlmap/1.0-dev (http://sqlmap.org)', 'user agent header');
+    INSERT INTO users (id, name, surname) VALUES (4, 'sqlmap/1.0-dev (https://sqlmap.org)', 'user agent header');
     INSERT INTO users (id, name, surname) VALUES (5, NULL, 'nameisnull');
 """
 
@@ -60,6 +60,7 @@ _conn = None
 _cursor = None
 _lock = None
 _server = None
+_alive = False
 
 def init(quiet=False):
     global _conn
@@ -110,6 +111,7 @@ class ReqHandler(BaseHTTPRequestHandler):
             elif self.data.startswith('<') and self.data.endswith('>'):
                 params.update(dict((_[0], _[1].replace("&apos;", "'").replace("&quot;", '"').replace("&lt;", '<').replace("&gt;", '>').replace("&amp;", '&')) for _ in re.findall(r'name="([^"]+)" value="([^"]*)"', self.data)))
             else:
+                self.data = self.data.replace(';', '&')     # Note: seems that Python3 started ignoring parameter splitting with ';'
                 params.update(parse_qs(self.data))
 
         for name in self.headers:
@@ -235,14 +237,18 @@ class ReqHandler(BaseHTTPRequestHandler):
         return
 
 def run(address=LISTEN_ADDRESS, port=LISTEN_PORT):
+    global _alive
     global _server
     try:
+        _alive = True
         _server = ThreadingServer((address, port), ReqHandler)
         print("[i] running HTTP server at 'http://%s:%d'" % (address, port))
         _server.serve_forever()
     except KeyboardInterrupt:
         _server.socket.close()
         raise
+    finally:
+        _alive = False
 
 if __name__ == "__main__":
     try:

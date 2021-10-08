@@ -119,7 +119,7 @@ __all__ = ['crypt']
 # ----- END fcrypt.c LICENSE -----
 
 
-import string, struct, sys
+import struct, sys
 
 if sys.version_info >= (3, 0):
     xrange = range

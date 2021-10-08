@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2006-2021 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2021 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -23,6 +23,7 @@ from lib.core.common import dataToStdout
 from lib.core.common import getSafeExString
 from lib.core.common import openFile
 from lib.core.common import saveConfig
+from lib.core.common import setColor
 from lib.core.common import unArrayizeValue
 from lib.core.compat import xrange
 from lib.core.convert import decodeBase64
@@ -724,7 +725,7 @@ def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=REST
             errMsg += "List of supported adapters: %s" % ', '.join(sorted(list(server_names.keys())))
         else:
             errMsg = "Server support for adapter '%s' is not installed on this system " % adapter
-            errMsg += "(Note: you can try to install it with 'sudo apt install python-%s' or 'sudo pip%s install %s')" % (adapter, '3' if six.PY3 else "", adapter)
+            errMsg += "(Note: you can try to install it with 'apt install python-%s' or 'pip%s install %s')" % (adapter, '3' if six.PY3 else "", adapter)
         logger.critical(errMsg)
 
 def _client(url, options=None):
@@ -773,11 +774,12 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
         if not isinstance(ex, _urllib.error.HTTPError) or ex.code == _http_client.UNAUTHORIZED:
             errMsg = "There has been a problem while connecting to the "
             errMsg += "REST-JSON API server at '%s' " % addr
-            errMsg += "(%s)" % ex
+            errMsg += "(%s)" % getSafeExString(ex)
             logger.critical(errMsg)
             return
 
     commands = ("help", "new", "use", "data", "log", "status", "option", "stop", "kill", "list", "flush", "version", "exit", "bye", "quit")
+    colors =  ('red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'lightgrey', 'lightred', 'lightgreen', 'lightyellow', 'lightblue', 'lightmagenta', 'lightcyan')
     autoCompletion(AUTOCOMPLETE_TYPE.API, commands=commands)
 
     taskid = None
@@ -785,7 +787,8 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
 
     while True:
         try:
-            command = _input("api%s> " % (" (%s)" % taskid if taskid else "")).strip()
+            color = colors[int(taskid or "0", 16) % len(colors)]
+            command = _input("api%s> " % (" (%s)" % setColor(taskid, color) if taskid else "")).strip()
             command = re.sub(r"\A(\w+)", lambda match: match.group(1).lower(), command)
         except (EOFError, KeyboardInterrupt):
             print()
@@ -825,7 +828,7 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
             try:
                 argv = ["sqlmap.py"] + shlex.split(command)[1:]
             except Exception as ex:
-                logger.error("Error occurred while parsing arguments ('%s')" % ex)
+                logger.error("Error occurred while parsing arguments ('%s')" % getSafeExString(ex))
                 taskid = None
                 continue
 

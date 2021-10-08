@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2021 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2021 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -19,13 +19,13 @@ from lib.core.common import dataToStdout
 from lib.core.common import filterNone
 from lib.core.common import getSafeExString
 from lib.core.common import isListLike
-from lib.core.common import isMultiThreadMode
 from lib.core.common import isNoneValue
 from lib.core.common import normalizeUnicode
 from lib.core.common import openFile
 from lib.core.common import prioritySortColumns
 from lib.core.common import randomInt
 from lib.core.common import safeCSValue
+from lib.core.common import unArrayizeValue
 from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.compat import xrange
 from lib.core.convert import getBytes
@@ -79,7 +79,7 @@ class Dump(object):
         elif console:
             dataToStdout(text)
 
-        multiThreadMode = isMultiThreadMode()
+        multiThreadMode = kb.multiThreadMode
         if multiThreadMode:
             self._lock.acquire()
 
@@ -115,6 +115,9 @@ class Dump(object):
     def string(self, header, data, content_type=None, sort=True):
         if conf.api:
             self._write(data, content_type=content_type)
+
+        if isListLike(data) and len(data) == 1:
+            data = unArrayizeValue(data)
 
         if isListLike(data):
             self.lister(header, data, content_type, sort)
@@ -611,7 +614,7 @@ class Dump(object):
                                     _ = safechardecode(value, True)
                                     f.write(_)
 
-                        except magic.MagicException as ex:
+                        except Exception as ex:
                             logger.debug(getSafeExString(ex))
 
                     if conf.dumpFormat == DUMP_FORMAT.CSV:

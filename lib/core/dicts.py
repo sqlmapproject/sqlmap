@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2021 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2021 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -370,10 +370,10 @@ OBSOLETE_OPTIONS = {
     "--check-payload": None,
     "--check-waf": None,
     "--pickled-options": "use '--api -c ...' instead",
+    "--identify-waf": "functionality being done automatically",
 }
 
 DEPRECATED_OPTIONS = {
-    "--identify-waf": "functionality being done automatically",
 }
 
 DUMP_DATA_PREPROCESS = {

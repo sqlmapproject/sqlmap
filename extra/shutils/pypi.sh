@@ -16,7 +16,7 @@ cat > $TMP_DIR/setup.py << EOF
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2021 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2021 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -30,7 +30,7 @@ setup(
     long_description_content_type='text/x-rst',
     author='Bernardo Damele Assumpcao Guimaraes, Miroslav Stampar',
     author_email='bernardo@sqlmap.org, miroslav@sqlmap.org',
-    url='http://sqlmap.org',
+    url='https://sqlmap.org',
     project_urls={
         'Documentation': 'https://github.com/sqlmapproject/sqlmap/wiki',
         'Source': 'https://github.com/sqlmapproject/sqlmap/',
@@ -67,7 +67,7 @@ cat > sqlmap/__init__.py << EOF
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2021 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2021 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -149,7 +149,7 @@ manual <https://github.com/sqlmapproject/sqlmap/wiki/Usage>`__.
 Links
 -----
 
--  Homepage: http://sqlmap.org
+-  Homepage: https://sqlmap.org
 -  Download:
    `.tar.gz <https://github.com/sqlmapproject/sqlmap/tarball/master>`__
    or `.zip <https://github.com/sqlmapproject/sqlmap/zipball/master>`__

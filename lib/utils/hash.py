@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2021 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2021 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -351,7 +351,7 @@ def crypt_generic_passwd(password, salt, **kwargs):
     'rl.3StKT.4T8M'
     """
 
-    return crypt(password, salt)
+    return getText(crypt(password, salt))
 
 def unix_md5_passwd(password, salt, magic="$1$", **kwargs):
     """
@@ -636,7 +636,10 @@ def storeHashesToFile(attack_dict):
 
         with openFile(filename, "w+") as f:
             for item in items:
-                f.write(item)
+                try:
+                    f.write(item)
+                except (UnicodeError, TypeError):
+                    pass
 
 def attackCachedUsersPasswords():
     if kb.data.cachedUsersPasswords:

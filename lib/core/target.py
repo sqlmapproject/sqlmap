@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2021 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2021 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -73,6 +73,7 @@ from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.core.settings import URI_INJECTABLE_REGEX
 from lib.core.settings import USER_AGENT_ALIASES
 from lib.core.settings import XML_RECOGNITION_REGEX
+from lib.core.threads import getCurrentThreadData
 from lib.utils.hashdb import HashDB
 from thirdparty import six
 from thirdparty.odict import OrderedDict
@@ -431,6 +432,9 @@ def _setHashDB():
 
     if os.path.exists(conf.hashDBFile):
         if conf.flushSession:
+            if conf.hashDB:
+                conf.hashDB.closeAll()
+
             try:
                 os.remove(conf.hashDBFile)
                 logger.info("flushing session file")
@@ -707,6 +711,9 @@ def initTargetEnv():
 
         if conf.cj:
             resetCookieJar(conf.cj)
+
+        threadData = getCurrentThreadData()
+        threadData.reset()
 
         conf.paramDict = {}
         conf.parameters = {}

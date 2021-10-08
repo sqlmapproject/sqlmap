@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2021 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2021 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -363,7 +363,13 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     if not timeBasedCompare and getTechniqueData() is not None:
                         unexpectedCode |= threadData.lastCode not in (getTechniqueData().falseCode, getTechniqueData().trueCode)
                         if unexpectedCode:
-                            warnMsg = "unexpected HTTP code '%s' detected. Will use (extra) validation step in similar cases" % threadData.lastCode
+                            if threadData.lastCode is not None:
+                                warnMsg = "unexpected HTTP code '%s' detected." % threadData.lastCode
+                            else:
+                                warnMsg = "unexpected response detected."
+
+                            warnMsg += " Will use (extra) validation step in similar cases"
+
                             singleTimeWarnMessage(warnMsg)
 
                     if result:

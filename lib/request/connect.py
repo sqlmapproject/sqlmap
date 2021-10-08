@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2021 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2021 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -43,7 +43,6 @@ from lib.core.common import getHeader
 from lib.core.common import getHostHeader
 from lib.core.common import getRequestHeader
 from lib.core.common import getSafeExString
-from lib.core.common import isMultiThreadMode
 from lib.core.common import logHTTPTraffic
 from lib.core.common import openFile
 from lib.core.common import popValue
@@ -626,7 +625,7 @@ class Connect(object):
                 if conn:
                     code = (code or conn.code) if conn.code == kb.originalCode else conn.code  # do not override redirection code (for comparison purposes)
                     responseHeaders = conn.info()
-                    responseHeaders[URI_HTTP_HEADER] = conn.geturl()
+                    responseHeaders[URI_HTTP_HEADER] = conn.geturl() if hasattr(conn, "geturl") else url
 
                     if hasattr(conn, "redurl"):
                         responseHeaders[HTTP_HEADER.LOCATION] = conn.redurl
@@ -695,7 +694,7 @@ class Connect(object):
 
         except SqlmapConnectionException as ex:
             if conf.proxyList and not kb.threadException:
-                warnMsg = "unable to connect to the target URL ('%s')" % ex
+                warnMsg = "unable to connect to the target URL ('%s')" % getSafeExString(ex)
                 logger.critical(warnMsg)
                 threadData.retriesCount = conf.retries
                 return Connect._retryProxy(**kwargs)
@@ -764,6 +763,10 @@ class Connect(object):
                     singleTimeWarnMessage(warnMsg)
                     conf.chunked = kwargs["chunked"] = False
                     return Connect.getPage(**kwargs)
+                elif ex.code == _http_client.REQUEST_URI_TOO_LONG:
+                    warnMsg = "request URI is marked as too long by the target. "
+                    warnMsg += "you are advised to try a switch '--no-cast' and/or '--no-escape'"
+                    singleTimeWarnMessage(warnMsg)
                 elif ex.code == _http_client.NOT_FOUND:
                     if raise404:
                         errMsg = "page not found (%d)" % code
@@ -880,7 +883,7 @@ class Connect(object):
                 else:
                     logger.debug(warnMsg)
                 return Connect._retryProxy(**kwargs)
-            elif kb.testMode or isMultiThreadMode():
+            elif kb.testMode or kb.multiThreadMode:
                 logger.critical(warnMsg)
                 return None, None, None
             else:
@@ -978,7 +981,7 @@ class Connect(object):
 
         if conf.httpHeaders:
             headers = OrderedDict(conf.httpHeaders)
-            contentType = max(headers[_] if _.upper() == HTTP_HEADER.CONTENT_TYPE.upper() else "" for _ in headers) or None
+            contentType = max(headers[_] or "" if _.upper() == HTTP_HEADER.CONTENT_TYPE.upper() else "" for _ in headers) or None
 
             if (kb.postHint or conf.skipUrlEncode) and postUrlEncode:
                 postUrlEncode = False
@@ -1275,7 +1278,7 @@ class Connect(object):
 
             while True:
                 try:
-                    compile(getBytes(conf.evalCode.replace(';', '\n')), "", "exec")
+                    compile(getBytes(re.sub(r"\s*;\s*", "\n", conf.evalCode)), "", "exec")
                 except SyntaxError as ex:
                     if ex.text:
                         original = replacement = ex.text.strip()

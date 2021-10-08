@@ -38,7 +38,7 @@ sqlmap 可以运行在 [Python](http://www.python.org/download/)  **2.6**, **2.7
 链接
 ----
 
-* 项目主页: http://sqlmap.org
+* 项目主页: https://sqlmap.org
 * 源代码下载: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) or [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
 * RSS 订阅: https://github.com/sqlmapproject/sqlmap/commits/master.atom
 * Issue tracker: https://github.com/sqlmapproject/sqlmap/issues

@@ -117,7 +117,6 @@ try:
             pass
 
     if not libmagic or not libmagic._name:
-        import sys
         platform_to_lib = {'darwin': ['/opt/local/lib/libmagic.dylib',
                                       '/usr/local/lib/libmagic.dylib',
                                       '/usr/local/Cellar/libmagic/5.10/lib/libmagic.dylib'],

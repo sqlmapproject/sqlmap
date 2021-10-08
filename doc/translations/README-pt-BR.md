@@ -39,7 +39,7 @@ Para ter uma visão geral dos recursos do sqlmap, lista de recursos suportados e
 Links
 ----
 
-* Homepage: http://sqlmap.org
+* Homepage: https://sqlmap.org
 * Download: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) ou [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
 * Commits RSS feed: https://github.com/sqlmapproject/sqlmap/commits/master.atom
 * Issue tracker: https://github.com/sqlmapproject/sqlmap/issues

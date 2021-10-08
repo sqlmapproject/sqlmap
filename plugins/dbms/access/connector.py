@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2021 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2021 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -22,9 +22,8 @@ from plugins.generic.connector import Connector as GenericConnector
 
 class Connector(GenericConnector):
     """
-    Homepage: http://pyodbc.googlecode.com/
-    User guide: http://code.google.com/p/pyodbc/wiki/GettingStarted
-    API: http://code.google.com/p/pyodbc/w/list
+    Homepage: https://github.com/mkleehammer/pyodbc
+    User guide: https://github.com/mkleehammer/pyodbc/wiki
     Debian package: python-pyodbc
     License: MIT
     """

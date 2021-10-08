@@ -165,11 +165,11 @@ class ConnectionManager:
 
     def get_ready_conn(self, host):
         conn = None
-        self._lock.acquire()
         try:
+            self._lock.acquire()
             if host in self._hostmap:
                 for c in self._hostmap[host]:
-                    if self._readymap[c]:
+                    if self._readymap.get(c):
                         self._readymap[c] = 0
                         conn = c
                         break
@@ -517,7 +517,7 @@ def error_handler(url):
     keepalive_handler.close_all()
 
 def continuity(url):
-    import md5
+    from hashlib import md5
     format = '%25s: %s'
 
     # first fetch the file with the normal http handler
@@ -526,7 +526,7 @@ def continuity(url):
     fo = _urllib.request.urlopen(url)
     foo = fo.read()
     fo.close()
-    m = md5.new(foo)
+    m = md5(foo)
     print(format % ('normal urllib', m.hexdigest()))
 
     # now install the keepalive handler and try again
@@ -536,7 +536,7 @@ def continuity(url):
     fo = _urllib.request.urlopen(url)
     foo = fo.read()
     fo.close()
-    m = md5.new(foo)
+    m = md5(foo)
     print(format % ('keepalive read', m.hexdigest()))
 
     fo = _urllib.request.urlopen(url)
@@ -546,7 +546,7 @@ def continuity(url):
         if f: foo = foo + f
         else: break
     fo.close()
-    m = md5.new(foo)
+    m = md5(foo)
     print(format % ('keepalive readline', m.hexdigest()))
 
 def comp(N, url):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2021 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2021 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -145,7 +145,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
             except ImportError:
                 errMsg = "sqlmap requires 'python-impacket' third-party library "
                 errMsg += "in order to run icmpsh master. You can get it at "
-                errMsg += "http://code.google.com/p/impacket/downloads/list"
+                errMsg += "https://github.com/SecureAuthCorp/impacket"
                 raise SqlmapMissingDependence(errMsg)
 
             filename = "/proc/sys/net/ipv4/icmp_echo_ignore_all"

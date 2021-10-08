@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2021 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2021 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -18,7 +18,6 @@ try:
         sys.exit("[!] wrong installation detected (missing modules). Visit 'https://github.com/sqlmapproject/sqlmap/#installation' for further details")
 
     import bdb
-    import distutils
     import glob
     import inspect
     import json
@@ -64,6 +63,7 @@ try:
     from lib.core.common import MKSTEMP_PREFIX
     from lib.core.common import setColor
     from lib.core.common import unhandledExceptionMessage
+    from lib.core.compat import LooseVersion
     from lib.core.compat import xrange
     from lib.core.exception import SqlmapBaseException
     from lib.core.exception import SqlmapShellQuitException
@@ -114,7 +114,7 @@ def checkEnvironment():
         logger.critical(errMsg)
         raise SystemExit
 
-    if distutils.version.LooseVersion(VERSION) < distutils.version.LooseVersion("1.0"):
+    if LooseVersion(VERSION) < LooseVersion("1.0"):
         errMsg = "your runtime environment (e.g. PYTHONPATH) is "
         errMsg += "broken. Please make sure that you are not running "
         errMsg += "newer versions of sqlmap with runtime scripts for older "
@@ -175,9 +175,6 @@ def main():
             elif conf.vulnTest:
                 from lib.core.testing import vulnTest
                 os._exitcode = 1 - (vulnTest() or 0)
-            elif conf.fuzzTest:
-                from lib.core.testing import fuzzTest
-                fuzzTest()
             else:
                 from lib.controller.controller import start
                 if conf.profile:
@@ -518,6 +515,7 @@ def main():
 
         if conf.get("hashDB"):
             conf.hashDB.flush(True)
+            conf.hashDB.close()         # NOTE: because of PyPy
 
         if conf.get("harFile"):
             try:
@@ -535,7 +533,7 @@ def main():
 
         # short delay for thread finalization
         _ = time.time()
-        while threading.activeCount() > 1 and (time.time() - _) > THREAD_FINALIZATION_TIMEOUT:
+        while threading.active_count() > 1 and (time.time() - _) > THREAD_FINALIZATION_TIMEOUT:
             time.sleep(0.01)
 
         if cmdLineOptions.get("sqlmapShell"):
@@ -556,7 +554,7 @@ if __name__ == "__main__":
         traceback.print_exc()
     finally:
         # Reference: http://stackoverflow.com/questions/1635080/terminate-a-multi-thread-python-program
-        if threading.activeCount() > 1:
+        if threading.active_count() > 1:
             os._exit(getattr(os, "_exitcode", 0))
         else:
             sys.exit(getattr(os, "_exitcode", 0))

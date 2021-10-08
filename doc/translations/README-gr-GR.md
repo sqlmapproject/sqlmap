@@ -39,7 +39,7 @@
 Σύνδεσμοι
 ----
 
-* Αρχική σελίδα: http://sqlmap.org
+* Αρχική σελίδα: https://sqlmap.org
 * Λήψεις: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) ή [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
 * Commits RSS feed: https://github.com/sqlmapproject/sqlmap/commits/master.atom
 * Προβλήματα: https://github.com/sqlmapproject/sqlmap/issues

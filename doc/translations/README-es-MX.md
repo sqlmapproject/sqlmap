@@ -38,7 +38,7 @@ Para obtener una visión general de las capacidades de sqlmap, así como un list
 Enlaces
 ---
 
-* Página principal: http://sqlmap.org 
+* Página principal: https://sqlmap.org 
 * Descargar: [. tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) o [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
 * Fuente de Cambios "Commit RSS feed": https://github.com/sqlmapproject/sqlmap/commits/master.atom
 * Seguimiento de problemas "Issue tracker": https://github.com/sqlmapproject/sqlmap/issues

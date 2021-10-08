@@ -39,7 +39,7 @@ sqlmap의 능력, 지원되는 기능과 모든 옵션과 스위치들의 목록
 링크
 ----
 
-* 홈페이지: http://sqlmap.org
+* 홈페이지: https://sqlmap.org
 * 다운로드: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) or [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
 * RSS 피드 커밋: https://github.com/sqlmapproject/sqlmap/commits/master.atom
 * Issue tracker: https://github.com/sqlmapproject/sqlmap/issues

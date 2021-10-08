@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2021 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2021 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -363,78 +363,85 @@ class Databases(object):
                     singleTimeLogMessage(infoMsg)
                     continue
 
-                infoMsg = "fetching number of tables for "
-                infoMsg += "database '%s'" % unsafeSQLIdentificatorNaming(db)
-                logger.info(infoMsg)
+                for _query, _count in ((rootQuery.blind.query, rootQuery.blind.count), (getattr(rootQuery.blind, "query2", None), getattr(rootQuery.blind, "count2", None))):
+                    if _query is None:
+                        break
 
-                if Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD, DBMS.MAXDB, DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB):
-                    query = rootQuery.blind.count
-                else:
-                    query = rootQuery.blind.count % unsafeSQLIdentificatorNaming(db)
+                    infoMsg = "fetching number of tables for "
+                    infoMsg += "database '%s'" % unsafeSQLIdentificatorNaming(db)
+                    logger.info(infoMsg)
 
-                count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
-
-                if count == 0:
-                    warnMsg = "database '%s' " % unsafeSQLIdentificatorNaming(db)
-                    warnMsg += "appears to be empty"
-                    logger.warn(warnMsg)
-                    continue
-
-                elif not isNumPosStrValue(count):
-                    warnMsg = "unable to retrieve the number of "
-                    warnMsg += "tables for database '%s'" % unsafeSQLIdentificatorNaming(db)
-                    logger.warn(warnMsg)
-                    continue
-
-                tables = []
-
-                plusOne = Backend.getIdentifiedDbms() in PLUS_ONE_DBMSES
-                indexRange = getLimitRange(count, plusOne=plusOne)
-
-                for index in indexRange:
-                    if Backend.isDbms(DBMS.SYBASE):
-                        query = rootQuery.blind.query % (db, (kb.data.cachedTables[-1] if kb.data.cachedTables else " "))
-                    elif Backend.getIdentifiedDbms() in (DBMS.MAXDB, DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB):
-                        query = rootQuery.blind.query % (kb.data.cachedTables[-1] if kb.data.cachedTables else " ")
-                    elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD):
-                        query = rootQuery.blind.query % index
-                    elif Backend.getIdentifiedDbms() in (DBMS.HSQLDB, DBMS.INFORMIX, DBMS.FRONTBASE, DBMS.VIRTUOSO):
-                        query = rootQuery.blind.query % (index, unsafeSQLIdentificatorNaming(db))
+                    if Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.FIREBIRD, DBMS.MAXDB, DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB):
+                        query = _count % unsafeSQLIdentificatorNaming(db)
                     else:
-                        query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(db), index)
+                        query = _count
 
-                    table = unArrayizeValue(inject.getValue(query, union=False, error=False))
+                    count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
-                    if not isNoneValue(table):
-                        kb.hintValue = table
-                        table = safeSQLIdentificatorNaming(table, True)
-                        tables.append(table)
+                    if count == 0:
+                        warnMsg = "database '%s' " % unsafeSQLIdentificatorNaming(db)
+                        warnMsg += "appears to be empty"
+                        logger.warn(warnMsg)
+                        break
+
+                    elif not isNumPosStrValue(count):
+                        warnMsg = "unable to retrieve the number of "
+                        warnMsg += "tables for database '%s'" % unsafeSQLIdentificatorNaming(db)
+                        singleTimeWarnMessage(warnMsg)
+                        continue
+
+                    tables = []
+
+                    plusOne = Backend.getIdentifiedDbms() in PLUS_ONE_DBMSES
+                    indexRange = getLimitRange(count, plusOne=plusOne)
+
+                    for index in indexRange:
+                        if Backend.isDbms(DBMS.SYBASE):
+                            query = _query % (db, (kb.data.cachedTables[-1] if kb.data.cachedTables else " "))
+                        elif Backend.getIdentifiedDbms() in (DBMS.MAXDB, DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB):
+                            query = _query % (kb.data.cachedTables[-1] if kb.data.cachedTables else " ")
+                        elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD):
+                            query = _query % index
+                        elif Backend.getIdentifiedDbms() in (DBMS.HSQLDB, DBMS.INFORMIX, DBMS.FRONTBASE, DBMS.VIRTUOSO):
+                            query = _query % (index, unsafeSQLIdentificatorNaming(db))
+                        else:
+                            query = _query % (unsafeSQLIdentificatorNaming(db), index)
+
+                        table = unArrayizeValue(inject.getValue(query, union=False, error=False))
+
+                        if not isNoneValue(table):
+                            kb.hintValue = table
+                            table = safeSQLIdentificatorNaming(table, True)
+                            tables.append(table)
+
+                    if tables:
+                        kb.data.cachedTables[db] = tables
 
                         if conf.getComments:
-                            _ = queries[Backend.getIdentifiedDbms()].table_comment
-                            if hasattr(_, "query"):
-                                if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE):
-                                    query = _.query % (unsafeSQLIdentificatorNaming(db.upper()), unsafeSQLIdentificatorNaming(table.upper()))
+                            for table in tables:
+                                _ = queries[Backend.getIdentifiedDbms()].table_comment
+                                if hasattr(_, "query"):
+                                    if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE):
+                                        query = _.query % (unsafeSQLIdentificatorNaming(db.upper()), unsafeSQLIdentificatorNaming(table.upper()))
+                                    else:
+                                        query = _.query % (unsafeSQLIdentificatorNaming(db), unsafeSQLIdentificatorNaming(table))
+
+                                    comment = unArrayizeValue(inject.getValue(query, union=False, error=False))
+                                    if not isNoneValue(comment):
+                                        infoMsg = "retrieved comment '%s' for table '%s'" % (comment, unsafeSQLIdentificatorNaming(table))
+                                        if METADB_SUFFIX not in db:
+                                            infoMsg += " in database '%s'" % unsafeSQLIdentificatorNaming(db)
+                                        logger.info(infoMsg)
                                 else:
-                                    query = _.query % (unsafeSQLIdentificatorNaming(db), unsafeSQLIdentificatorNaming(table))
+                                    warnMsg = "on %s it is not " % Backend.getIdentifiedDbms()
+                                    warnMsg += "possible to get table comments"
+                                    singleTimeWarnMessage(warnMsg)
 
-                                comment = unArrayizeValue(inject.getValue(query, union=False, error=False))
-                                if not isNoneValue(comment):
-                                    infoMsg = "retrieved comment '%s' for table '%s'" % (comment, unsafeSQLIdentificatorNaming(table))
-                                    if METADB_SUFFIX not in db:
-                                        infoMsg += " in database '%s'" % unsafeSQLIdentificatorNaming(db)
-                                    logger.info(infoMsg)
-                            else:
-                                warnMsg = "on %s it is not " % Backend.getIdentifiedDbms()
-                                warnMsg += "possible to get table comments"
-                                singleTimeWarnMessage(warnMsg)
-
-                if tables:
-                    kb.data.cachedTables[db] = tables
-                else:
-                    warnMsg = "unable to retrieve the table names "
-                    warnMsg += "for database '%s'" % unsafeSQLIdentificatorNaming(db)
-                    logger.warn(warnMsg)
+                        break
+                    else:
+                        warnMsg = "unable to retrieve the table names "
+                        warnMsg += "for database '%s'" % unsafeSQLIdentificatorNaming(db)
+                        logger.warn(warnMsg)
 
         if isNoneValue(kb.data.cachedTables):
             kb.data.cachedTables.clear()
@@ -618,7 +625,7 @@ class Databases(object):
                     query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
                     query += condQuery
 
-                    if Backend.isFork(FORK.DRIZZLE):
+                    if Backend.isDbms(DBMS.MYSQL) and Backend.isFork(FORK.DRIZZLE):
                         query = re.sub("column_type", "data_type", query, flags=re.I)
 
                 elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE, DBMS.MIMERSQL):
@@ -1022,7 +1029,7 @@ class Databases(object):
         rootQuery = queries[Backend.getIdentifiedDbms()].statements
 
         if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
-            if Backend.isFork(FORK.DRIZZLE):
+            if Backend.isDbms(DBMS.MYSQL) and Backend.isFork(FORK.DRIZZLE):
                 query = rootQuery.inband.query2
             else:
                 query = rootQuery.inband.query
@@ -1049,7 +1056,7 @@ class Databases(object):
 
             query = rootQuery.blind.count
 
-            if Backend.isFork(FORK.DRIZZLE):
+            if Backend.isDbms(DBMS.MYSQL) and Backend.isFork(FORK.DRIZZLE):
                 query = re.sub("INFORMATION_SCHEMA", "DATA_DICTIONARY", query, flags=re.I)
 
             count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
@@ -1077,7 +1084,7 @@ class Databases(object):
                 if isNoneValue(value):
                     query = rootQuery.blind.query % index
 
-                    if Backend.isFork(FORK.DRIZZLE):
+                    if Backend.isDbms(DBMS.MYSQL) and Backend.isFork(FORK.DRIZZLE):
                         query = re.sub("INFORMATION_SCHEMA", "DATA_DICTIONARY", query, flags=re.I)
 
                     value = unArrayizeValue(inject.getValue(query, union=False, error=False))

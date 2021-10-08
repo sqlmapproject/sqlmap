@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2021 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2021 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -33,6 +33,7 @@ class HashDB(object):
         self.filepath = filepath
         self._write_cache = {}
         self._cache_lock = threading.Lock()
+        self._connections = []
 
     def _get_cursor(self):
         threadData = getCurrentThreadData()
@@ -40,6 +41,7 @@ class HashDB(object):
         if threadData.hashDBCursor is None:
             try:
                 connection = sqlite3.connect(self.filepath, timeout=3, isolation_level=None)
+                self._connections.append(connection)
                 threadData.hashDBCursor = connection.cursor()
                 threadData.hashDBCursor.execute("CREATE TABLE IF NOT EXISTS storage (id INTEGER PRIMARY KEY, value TEXT)")
                 connection.commit()
@@ -65,6 +67,14 @@ class HashDB(object):
                 threadData.hashDBCursor = None
         except:
             pass
+
+    def closeAll(self):
+        for connection in self._connections:
+            try:
+                connection.commit()
+                connection.close()
+            except:
+                pass
 
     @staticmethod
     def hashKey(key):

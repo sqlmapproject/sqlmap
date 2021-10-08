@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2021 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2021 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
-import distutils.version
 import os
 
 from lib.core.common import Backend
@@ -17,6 +16,7 @@ from lib.core.common import isListLike
 from lib.core.common import isNoneValue
 from lib.core.common import isStackingAvailable
 from lib.core.common import randomStr
+from lib.core.compat import LooseVersion
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
@@ -51,12 +51,12 @@ class Takeover(GenericTakeover):
 
         banVer = kb.bannerFp["dbmsVersion"]
 
-        if not banVer:
+        if not banVer or not banVer[0].isdigit():
             errMsg = "unsupported feature on unknown version of PostgreSQL"
             raise SqlmapUnsupportedFeatureException(errMsg)
-        elif distutils.version.LooseVersion(banVer) >= distutils.version.LooseVersion("10"):
+        elif LooseVersion(banVer) >= LooseVersion("10"):
             majorVer = banVer.split('.')[0]
-        elif distutils.version.LooseVersion(banVer) >= distutils.version.LooseVersion("8.2") and '.' in banVer:
+        elif LooseVersion(banVer) >= LooseVersion("8.2") and '.' in banVer:
             majorVer = '.'.join(banVer.split('.')[:2])
         else:
             errMsg = "unsupported feature on versions of PostgreSQL before 8.2"

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2021 sqlmap developers (http://sqlmap.org/)
+Copyright (c) 2006-2021 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -45,10 +45,10 @@ class Fingerprint(GenericFingerprint):
         # Reference: https://dev.mysql.com/doc/relnotes/mysql/<major>.<minor>/en/
 
         versions = (
-            (80000, 80021),  # MySQL 8.0
+            (80000, 80029),  # MySQL 8.0
             (60000, 60014),  # MySQL 6.0
-            (50700, 50731),  # MySQL 5.7
-            (50600, 50649),  # MySQL 5.6
+            (50700, 50737),  # MySQL 5.7
+            (50600, 50652),  # MySQL 5.6
             (50500, 50563),  # MySQL 5.5
             (50400, 50404),  # MySQL 5.4
             (50100, 50174),  # MySQL 5.1
