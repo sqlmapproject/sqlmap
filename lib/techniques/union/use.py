@@ -95,6 +95,11 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
         # Perform the request
         page, headers, _ = Request.queryPage(payload, content=True, raise404=False)
 
+        if page and kb.chars.start.upper() in page and kb.chars.start not in page:
+            singleTimeWarnMessage("results seems to be upper-cased by force. sqlmap will automatically lower-case them")
+
+            page = page.lower()
+
         incrementCounter(PAYLOAD.TECHNIQUE.UNION)
 
         if kb.jsonAggMode:
