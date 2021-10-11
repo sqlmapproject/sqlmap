@@ -200,16 +200,16 @@ class Fingerprint(GenericFingerprint):
             # reading information_schema on some platforms is causing annoying timeout exits
             # Reference: http://bugs.mysql.com/bug.php?id=15855
 
+            kb.data.has_information_schema = True
+
             # Determine if it is MySQL >= 8.0.0
             if inject.checkBooleanExpression("ISNULL(JSON_STORAGE_FREE(NULL))"):
-                kb.data.has_information_schema = True
                 Backend.setVersion(">= 8.0.0")
                 setDbms("%s 8" % DBMS.MYSQL)
                 self.getBanner()
 
             # Determine if it is MySQL >= 5.0.0
             elif inject.checkBooleanExpression("ISNULL(TIMESTAMPADD(MINUTE,[RANDNUM],NULL))"):
-                kb.data.has_information_schema = True
                 Backend.setVersion(">= 5.0.0")
                 setDbms("%s 5" % DBMS.MYSQL)
                 self.getBanner()
@@ -269,6 +269,8 @@ class Fingerprint(GenericFingerprint):
                 setDbms("%s 4" % DBMS.MYSQL)
                 self.getBanner()
 
+                kb.data.has_information_schema = False
+
                 if not conf.extensiveFp:
                     return True
 
@@ -290,6 +292,8 @@ class Fingerprint(GenericFingerprint):
                 Backend.setVersion("< 4.0.0")
                 setDbms("%s 3" % DBMS.MYSQL)
                 self.getBanner()
+
+                kb.data.has_information_schema = False
 
             return True
         else:
