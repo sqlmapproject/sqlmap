@@ -590,10 +590,13 @@ class Backend(object):
         retVal = False
 
         if Backend.getVersion() is not None and version is not None:
+            _version = unArrayizeValue(Backend.getVersion())
+            _version = re.sub(r"[<>= ]", "", _version)
+
             try:
-                retVal = LooseVersion(Backend.getVersion()) >= LooseVersion(version)
+                retVal = LooseVersion(_version) >= LooseVersion(version)
             except:
-                retVal = str(Backend.getVersion()) >= str(version)
+                retVal = str(_version) >= str(version)
 
         return retVal
 
@@ -3562,6 +3565,8 @@ def unArrayizeValue(value):
     Makes a value out of iterable if it is a list or tuple itself
 
     >>> unArrayizeValue(['1'])
+    '1'
+    >>> unArrayizeValue('1')
     '1'
     >>> unArrayizeValue(['1', '2'])
     '1'
