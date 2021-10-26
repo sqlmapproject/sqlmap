@@ -151,7 +151,7 @@ class HashDB(object):
                             self.cursor.execute("INSERT INTO storage VALUES (?, ?)", (hash_, value,))
                         except sqlite3.IntegrityError:
                             self.cursor.execute("UPDATE storage SET value=? WHERE id=?", (value, hash_,))
-                    except UnicodeError:  # e.g. surrogates not allowed (Issue #3851)
+                    except (UnicodeError, OverflowError):  # e.g. surrogates not allowed (Issue #3851)
                         break
                     except sqlite3.DatabaseError as ex:
                         if not os.path.exists(self.filepath):
