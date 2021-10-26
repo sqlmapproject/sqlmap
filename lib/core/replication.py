@@ -7,6 +7,7 @@ See the file 'LICENSE' for copying permission
 
 import sqlite3
 
+from lib.core.common import cleanReplaceUnicode
 from lib.core.common import getSafeExString
 from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.exception import SqlmapConnectionException
@@ -81,7 +82,10 @@ class Replication(object):
 
         def execute(self, sql, parameters=None):
             try:
-                self.parent.cursor.execute(sql, parameters or [])
+                try:
+                    self.parent.cursor.execute(sql, parameters or [])
+                except UnicodeError:
+                    self.parent.cursor.execute(sql, cleanReplaceUnicode(parameters or []))
             except sqlite3.OperationalError as ex:
                 errMsg = "problem occurred ('%s') while accessing sqlite database " % getSafeExString(ex, UNICODE_ENCODING)
                 errMsg += "located at '%s'. Please make sure that " % self.parent.dbpath

@@ -1431,6 +1431,19 @@ def cleanQuery(query):
 
     return retVal
 
+def cleanReplaceUnicode(value):
+    """
+    Cleans unicode for proper encode/decode
+
+    >>> cleanReplaceUnicode(['a', 'b'])
+    ['a', 'b']
+    """
+
+    def clean(value):
+        return value.encode(UNICODE_ENCODING, errors="replace").decode(UNICODE_ENCODING) if isinstance(value, six.text_type) else value
+
+    return applyFunctionRecursively(value, clean)
+
 def setPaths(rootPath):
     """
     Sets absolute paths for project directories and files
