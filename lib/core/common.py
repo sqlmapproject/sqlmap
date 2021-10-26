@@ -1537,6 +1537,12 @@ def parseTargetDirect():
     'testdb'
     >>> conf.dbmsPass
     'testpass'
+    >>> conf.direct = "mysql://user:'P@ssw0rd'@127.0.0.1:3306/test"
+    >>> parseTargetDirect()
+    >>> conf.dbmsPass
+    'P@ssw0rd'
+    >>> conf.hostname
+    '127.0.0.1'
     >>> conf.direct = popValue()
     """
 
@@ -1553,8 +1559,8 @@ def parseTargetDirect():
             conf.dbms = details.group("dbms")
 
             if details.group("credentials"):
-                conf.dbmsUser = details.group("user")
-                conf.dbmsPass = details.group("pass")
+                conf.dbmsUser = details.group("user").strip("'\"")
+                conf.dbmsPass = details.group("pass").strip("'\"")
             else:
                 if conf.dbmsCred:
                     conf.dbmsUser, conf.dbmsPass = conf.dbmsCred.split(':')
