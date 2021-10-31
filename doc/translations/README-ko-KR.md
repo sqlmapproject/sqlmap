@@ -20,7 +20,7 @@ sqlmap은 SQL 인젝션 결함 탐지 및 활용, 데이터베이스 서버 장�
 
     git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
-sqlmap은 [Python](http://www.python.org/download/) 버전 **2.6**, **2.7** 그리고 **3.x** 을 통해 모든 플랫폼 위에서 사용 가능합니다.
+sqlmap은 [Python](https://www.python.org/download/) 버전 **2.6**, **2.7** 그리고 **3.x** 을 통해 모든 플랫폼 위에서 사용 가능합니다.
 
 사용법
 ----
@@ -46,5 +46,5 @@ sqlmap의 능력, 지원되는 기능과 모든 옵션과 스위치들의 목록
 * 사용자 매뉴얼: https://github.com/sqlmapproject/sqlmap/wiki
 * 자주 묻는 질문 (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
 * 트위터: [@sqlmap](https://twitter.com/sqlmap)
-* 시연 영상: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
+* 시연 영상: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * 스크린샷: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

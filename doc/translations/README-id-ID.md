@@ -20,7 +20,7 @@ Sebagai alternatif, Anda dapat mengunduh sqlmap dengan men-_clone_ repositori [G
 
     git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
-sqlmap berfungsi langsung pada [Python](http://www.python.org/download/) versi **2.6**, **2.7** dan **3.x** pada platform apapun.
+sqlmap berfungsi langsung pada [Python](https://www.python.org/download/) versi **2.6**, **2.7** dan **3.x** pada platform apapun.
 
 Penggunaan
 ----
@@ -46,5 +46,5 @@ Tautan
 * Wiki Manual Penggunaan: https://github.com/sqlmapproject/sqlmap/wiki
 * Pertanyaan yang Sering Ditanyakan (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
-* Video Demo [#1](http://www.youtube.com/user/inquisb/videos) dan [#2](http://www.youtube.com/user/stamparm/videos)
+* Video Demo [#1](https://www.youtube.com/user/inquisb/videos) dan [#2](https://www.youtube.com/user/stamparm/videos)
 * Tangkapan Layar: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

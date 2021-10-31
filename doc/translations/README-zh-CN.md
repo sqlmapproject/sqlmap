@@ -20,7 +20,7 @@ sqlmap 是一个开源的渗透测试工具，可以用来自动化的检测，�
 
     git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
-sqlmap 可以运行在 [Python](http://www.python.org/download/)  **2.6**, **2.7**  和  **3.x** 版本的任何平台上
+sqlmap 可以运行在 [Python](https://www.python.org/download/)  **2.6**, **2.7**  和  **3.x** 版本的任何平台上
 
 使用方法
 ----
@@ -45,5 +45,5 @@ sqlmap 可以运行在 [Python](http://www.python.org/download/)  **2.6**, **2.7
 * 使用手册: https://github.com/sqlmapproject/sqlmap/wiki
 * 常见问题 (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
-* 教程: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
+* 教程: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * 截图: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

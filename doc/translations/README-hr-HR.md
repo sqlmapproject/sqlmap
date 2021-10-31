@@ -20,7 +20,7 @@ Po mogućnosti, možete preuzeti sqlmap kloniranjem [Git](https://github.com/sql
 
     git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
-sqlmap radi bez posebnih zahtjeva korištenjem [Python](http://www.python.org/download/) verzije **2.6**, **2.7** i/ili **3.x** na bilo kojoj platformi.
+sqlmap radi bez posebnih zahtjeva korištenjem [Python](https://www.python.org/download/) verzije **2.6**, **2.7** i/ili **3.x** na bilo kojoj platformi.
 
 Korištenje
 ----
@@ -46,5 +46,5 @@ Poveznice
 * Korisnički priručnik: https://github.com/sqlmapproject/sqlmap/wiki
 * Najčešće postavljena pitanja (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
-* Demo: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
+* Demo: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * Slike zaslona: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

@@ -22,7 +22,7 @@ Tốt hơn là bạn nên tải xuống sqlmap bằng cách clone với [Git](ht
 
     git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
-sqlmap hoạt động hiệu quả với [Python](http://www.python.org/download/) phiên bản **2.6**, **2.7** và **3.x** trên bất kì hệ điều hành nào.
+sqlmap hoạt động hiệu quả với [Python](https://www.python.org/download/) phiên bản **2.6**, **2.7** và **3.x** trên bất kì hệ điều hành nào.
 
 Sử dụng
 ----
@@ -48,5 +48,5 @@ Liên kết
 * Hướng dẫn sử dụng: https://github.com/sqlmapproject/sqlmap/wiki
 * Các câu hỏi thường gặp (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
-* Demo: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
+* Demo: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * Ảnh chụp màn hình: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

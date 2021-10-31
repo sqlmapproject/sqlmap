@@ -1,4 +1,4 @@
-# sqlmap
+r# sqlmap
 
 [![Build Status](https://api.travis-ci.org/sqlmapproject/sqlmap.svg?branch=master)](https://travis-ci.org/sqlmapproject/sqlmap) [![Python 2.6|2.7|3.x](https://img.shields.io/badge/python-2.6|2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![PyPI version](https://badge.fury.io/py/sqlmap.svg)](https://badge.fury.io/py/sqlmap) [![GitHub closed issues](https://img.shields.io/github/issues-closed-raw/sqlmapproject/sqlmap.svg?colorB=ff69b4)](https://github.com/sqlmapproject/sqlmap/issues?q=is%3Aissue+is%3Aclosed) [![Twitter](https://img.shields.io/badge/twitter-@sqlmap-blue.svg)](https://twitter.com/sqlmap)
 
@@ -20,7 +20,7 @@ La cosa migliore sarebbe però scaricare sqlmap clonando la repository [Git](htt
 
     git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
-sqlmap è in grado di funzionare con le versioni **2.6**, **2.7** e **3.x** di [Python](http://www.python.org/download/) su ogni piattaforma.
+sqlmap è in grado di funzionare con le versioni **2.6**, **2.7** e **3.x** di [Python](https://www.python.org/download/) su ogni piattaforma.
 
 Utilizzo
 ----
@@ -46,5 +46,5 @@ Link
 * Manuale dell'utente: https://github.com/sqlmapproject/sqlmap/wiki
 * Domande più frequenti (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
-* Dimostrazioni: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
+* Dimostrazioni: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * Screenshot: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

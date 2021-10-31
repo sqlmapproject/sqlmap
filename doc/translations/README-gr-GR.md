@@ -20,7 +20,7 @@
 
     git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
-Το sqlmap λειτουργεί χωρίς περαιτέρω κόπο με την [Python](http://www.python.org/download/) έκδοσης **2.6**, **2.7** και **3.x** σε όποια πλατφόρμα.
+Το sqlmap λειτουργεί χωρίς περαιτέρω κόπο με την [Python](https://www.python.org/download/) έκδοσης **2.6**, **2.7** και **3.x** σε όποια πλατφόρμα.
 
 Χρήση
 ----
@@ -46,5 +46,5 @@
 * Εγχειρίδιο Χρήστη: https://github.com/sqlmapproject/sqlmap/wiki
 * Συχνές Ερωτήσεις (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
-* Demos: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
+* Demos: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * Εικόνες: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

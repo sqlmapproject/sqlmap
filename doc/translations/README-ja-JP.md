@@ -21,7 +21,7 @@ wikiに載っているいくつかの機能のデモをスクリーンショッ�
 
     git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
-sqlmapは、 [Python](http://www.python.org/download/) バージョン **2.6**, **2.7** または **3.x** がインストールされていれば、全てのプラットフォームですぐに使用できます。
+sqlmapは、 [Python](https://www.python.org/download/) バージョン **2.6**, **2.7** または **3.x** がインストールされていれば、全てのプラットフォームですぐに使用できます。
 
 使用法
 ----
@@ -47,5 +47,5 @@ sqlmapの概要、機能の一覧、全てのオプションやスイッチの�
 * ユーザーマニュアル: https://github.com/sqlmapproject/sqlmap/wiki
 * よくある質問 (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
-* デモ: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
+* デモ: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * スクリーンショット: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

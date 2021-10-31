@@ -20,7 +20,7 @@ Można również pobrać sqlmap klonując rezozytorium [Git](https://github.com/
 
     git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
-do użycia sqlmap potrzebny jest [Python](http://www.python.org/download/) w wersji **2.6**, **2.7** lub **3.x** na dowolnej platformie systemowej.
+do użycia sqlmap potrzebny jest [Python](https://www.python.org/download/) w wersji **2.6**, **2.7** lub **3.x** na dowolnej platformie systemowej.
 
 Sposób użycia
 ----
@@ -46,5 +46,5 @@ Odnośniki
 * Instrukcja użytkowania: https://github.com/sqlmapproject/sqlmap/wiki
 * Często zadawane pytania (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
-* Dema: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
+* Dema: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * Zrzuty ekranowe: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

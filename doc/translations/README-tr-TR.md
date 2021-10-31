@@ -23,7 +23,7 @@ Veya tercihen, [Git](https://github.com/sqlmapproject/sqlmap) reposunu klonlayar
 
     git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
-sqlmap [Python](http://www.python.org/download/) sitesinde bulunan **2.6**, **2.7** and **3.x** versiyonları ile bütün platformlarda çalışabilmektedir.
+sqlmap [Python](https://www.python.org/download/) sitesinde bulunan **2.6**, **2.7** and **3.x** versiyonları ile bütün platformlarda çalışabilmektedir.
 
 Kullanım
 ----
@@ -49,5 +49,5 @@ Bağlantılar
 * Kullanıcı Manueli: https://github.com/sqlmapproject/sqlmap/wiki
 * Sıkça Sorulan Sorular(SSS): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
-* Demolar: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
+* Demolar: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * Ekran görüntüleri: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

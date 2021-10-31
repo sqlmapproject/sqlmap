@@ -20,7 +20,7 @@ sqlmap - это инструмент для тестирования уязви�
 
     git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
-sqlmap работает из коробки с [Python](http://www.python.org/download/) версии **2.6**, **2.7** и **3.x** на любой платформе.
+sqlmap работает из коробки с [Python](https://www.python.org/download/) версии **2.6**, **2.7** и **3.x** на любой платформе.
 
 Использование
 ----
@@ -46,5 +46,5 @@ sqlmap работает из коробки с [Python](http://www.python.org/do
 * Пользовательский мануал: https://github.com/sqlmapproject/sqlmap/wiki
 * Часто задаваемые вопросы (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
-* Демки: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
+* Демки: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * Скриншоты: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
