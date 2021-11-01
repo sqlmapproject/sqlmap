@@ -914,11 +914,6 @@ class Connect(object):
                 warnMsg = "forced retry of the request because of undesired page content"
                 logger.warn(warnMsg)
                 return Connect._retryProxy(**kwargs)
-            else:
-                errMsg = "unable to get the page content not matching "
-                errMsg += "the given regular expression '%s'. Please use as high " % conf.retryOn
-                errMsg += "value for option '--retries' as possible (e.g. 20 or more)"
-                raise SqlmapConnectionException(errMsg)
 
         processResponse(page, responseHeaders, code, status)
 

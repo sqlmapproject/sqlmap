@@ -2655,6 +2655,15 @@ def _basicOptionValidation():
             errMsg = "invalid regular expression '%s' ('%s')" % (conf.retryOn, getSafeExString(ex))
             raise SqlmapSyntaxException(errMsg)
 
+        if conf.retries == defaults.retries:
+            conf.retries = 5 * conf.retries
+
+            warnMsg = "increasing default value for "
+            warnMsg += "option '--retries' to %d because " % conf.retries
+            warnMsg += "option '--retry-on' was provided"
+            logger.warn(warnMsg)
+
+
     if conf.cookieDel and len(conf.cookieDel):
         errMsg = "option '--cookie-del' should contain a single character (e.g. ';')"
         raise SqlmapSyntaxException(errMsg)
