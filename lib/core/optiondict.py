@@ -54,6 +54,7 @@ optDict = {
         "delay": "float",
         "timeout": "float",
         "retries": "integer",
+        "retryOn": "string",
         "rParam": "string",
         "safeUrl": "string",
         "safePost": "string",

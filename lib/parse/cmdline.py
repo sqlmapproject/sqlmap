@@ -246,6 +246,9 @@ def cmdLineParser(argv=None):
         request.add_argument("--retries", dest="retries", type=int,
             help="Retries when the connection timeouts (default %d)" % defaults.retries)
 
+        request.add_argument("--retry-on", dest="retryOn",
+            help="Retry request on regexp matching content (e.g. \"drop\")")
+
         request.add_argument("--randomize", dest="rParam",
             help="Randomly change value for given parameter(s)")
 
