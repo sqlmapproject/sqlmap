@@ -34,7 +34,7 @@ class Operation:
 
     # header injection is not currently supported
     def injectable(self, body):
-     return len(self.parametersForTypes(["query", "path"])) > 0 or body
+     return len(self.parametersForTypes(["query", "path", "header"])) > 0 or body
 
     def queryString(self):
         queryParameters = self.parametersForTypes(["query"])
@@ -58,6 +58,17 @@ class Operation:
                 raise SqlmapSkipTargetException("missing example for parameter '%s'" %p["name"])
             parameterPath = parameterPath.replace("{%s}" %p["name"], "%s*" %p["example"])
         return parameterPath
+
+    def headers(self):
+        hdrs = []
+        headerParameters = self.parametersForTypes(["header"])
+        if len(headerParameters) < 1:
+            return hdrs
+        for hp in headerParameters:
+            if "example" not in hp:
+                raise SqlmapSkipTargetException("missing example for header '%s'" %hp["name"])
+            hdrs.append((hp["name"], "%s*" %hp["example"]))
+        return hdrs
 
 def _ref(swagger, refPath):
      paths = refPath.replace("#/", "", 1).split('/')
@@ -133,6 +144,7 @@ def parse(content, tags):
                         cookie = None
 
                         parameterPath = op.path(path)
+                        headers = op.headers()
                         qs = op.queryString()
                         url = "%s%s" % (server, parameterPath)
                         if body:
@@ -142,7 +154,7 @@ def parse(content, tags):
                             url += "?" + qs
 
                         logger.debug("including url '%s', method '%s', data '%s', cookie '%s'" %(url, method, data, cookie))
-                        yield (url, method, data, cookie, None)
+                        yield (url, method, data, cookie, tuple(headers))
                     else:
                         logger.info("excluding path '%s', method '%s' as there are no parameters to inject" %(path, method))
 
