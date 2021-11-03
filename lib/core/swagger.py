@@ -10,6 +10,7 @@ import json
 from lib.core.data import logger
 from lib.core.exception import SqlmapSyntaxException
 from lib.core.exception import SqlmapSkipTargetException
+from typing import Dict
 
 class Operation:
 
@@ -70,28 +71,39 @@ class Operation:
             hdrs.append((hp["name"], "%s*" %hp["example"]))
         return hdrs
 
-def _ref(swagger, refPath):
-     paths = refPath.replace("#/", "", 1).split('/')
+def _obj(swagger, objOrRefPath):
+     if isinstance(objOrRefPath, Dict):
+         return objOrRefPath
+     paths = objOrRefPath.replace("#/", "", 1).split('/')
      r = swagger
      for p in paths:
         r = r[p]
      return r
 
-def _example(swagger, refPath):
+def _example(swagger, objOrRefPath):
     example = {}
-    ref = _ref(swagger, refPath)
-    if "type" in ref and ref["type"] == "object" and "properties" in ref:
-        properties = ref["properties"]
+    obj = _obj(swagger, objOrRefPath)
+
+    if "type" in obj and obj["type"] == "object" and "properties" in obj:
+        properties = obj["properties"]
         for prop in properties:
-            if "example" in properties[prop]:
-                value = properties[prop]["example"]
-                example[prop] = value
+            if properties[prop]["type"] == "object":
+                example[prop] = {}
+                for objectProp in properties[prop]["properties"]:
+                  example[prop][objectProp] = _example(swagger, properties[prop]["properties"][objectProp])
             elif "$ref" in properties[prop]:
                 example[prop] = _example(swagger, properties[prop]["$ref"])
             elif properties[prop]["type"] == "array" and "$ref" in properties[prop]["items"]:
                 example[prop] =  [ _example(swagger, properties[prop]["items"]["$ref"]) ]
+            elif "example" in properties[prop]:
+                value = properties[prop]["example"]
+                example[prop] = value
             else:
                 raise SqlmapSkipTargetException("missing example for parameter '%s'" %prop)
+    elif "example" in obj:
+        return obj["example"]
+    else:
+        raise SqlmapSkipTargetException("missing example for object '%s'" %obj)
 
 
     return example
