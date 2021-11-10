@@ -1028,10 +1028,12 @@ def dataToStdout(data, forceOutput=False, bold=False, contentType=None, status=C
                     sys.stdout.write(stdoutEncode(clearColors(data)), status, contentType)
                 else:
                     sys.stdout.write(stdoutEncode(setColor(data, bold=bold) if coloring else clearColors(data)))
-
-                sys.stdout.flush()
             except IOError:
                 pass
+            except UnicodeEncodeError:
+                sys.stdout.write(re.sub(r"[^ -~]", '?', clearColors(data)))
+            finally:
+                sys.stdout.flush()
 
             if multiThreadMode:
                 logging._releaseLock()
