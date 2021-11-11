@@ -163,6 +163,10 @@
         <info type="Linux" distrib="Debian" release="10" codename="buster"/>
     </regexp>
 
+    <regexp value="Apache/2\.4\.48 \(Debian\)">
+        <info type="Linux" distrib="Debian" release="11" codename="bullseye"/>
+    </regexp>
+
     <!-- Apache: Fedora -->
 
     <regexp value="Apache/2\.0\.47 \(Fedora\)">
@@ -315,7 +319,11 @@
     </regexp>
 
     <regexp value="Apache/2\.4\.46 \(Fedora\)">
-        <info type="Linux" distrib="Fedora" release="33"/>
+        <info type="Linux" distrib="Fedora" release="33|34"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.51 \(Fedora\)">
+        <info type="Linux" distrib="Fedora" release="35"/>
     </regexp>
 
     <!-- Apache: FreeBSD -->
@@ -858,7 +866,7 @@
     </regexp>
 
     <regexp value="Apache/2\.4\.41 \(Ubuntu\)">
-        <info type="Linux" distrib="Ubuntu" release="19.10|20.04" codename="eoan|focal"/>
+        <info type="Linux" distrib="Ubuntu" release="19.10|20.04|20.10" codename="eoan|focal"/>
     </regexp>
 
     <!-- Nginx -->
