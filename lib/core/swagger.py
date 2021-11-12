@@ -29,8 +29,15 @@ class Operation:
         return list(filter(lambda p: (p["in"] in types), self.parameters()))
 
     def bodyRef(self):
+        # OpenAPI v3
         if "requestBody" in self.props:
             return self.props["requestBody"]["content"]["application/json"]["schema"]["$ref"]
+        # swagger v2
+        elif "parameters" in self.props:
+            inParameters = self.parametersForTypes(["body"])
+            if not isinstance(inParameters, list) or len(inParameters) < 1:
+                return None
+            return inParameters[0]["schema"]["$ref"]
         return None
 
     # header injection is not currently supported
