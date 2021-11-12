@@ -110,7 +110,7 @@ def _example(swagger, objOrRefPath):
 
 def parse(content, tags):
     """
-    Parses Swagger OpenAPI 3.x.x JSON documents
+    Parses Swagger 2.x and OpenAPI 3.x.x JSON documents
 
     Target injectable parameter values are generated from the "example" properties.
     Only property-level "example" is supported. The "examples" property is not supported.
@@ -119,21 +119,54 @@ def parse(content, tags):
     try:
         swagger = json.loads(content)
 
-        # extra validations
-        if "openapi" not in swagger or not swagger["openapi"].startswith("3."):
-          errMsg = "swagger must be OpenAPI 3.x.x!"
-          raise SqlmapSyntaxException(errMsg)
+        openapiv3 = False
+        swaggerv2 = False
 
-        if ("servers" not in swagger or
+        # extra validations
+        if "openapi" in swagger and swagger["openapi"].startswith("3."):
+            openapiv3 = True
+
+        if "swagger" in swagger and swagger["swagger"].startswith("2."):
+            swaggerv2 = True
+
+        if not (openapiv3 or swaggerv2):
+            errMsg = "swagger must be either Swagger 2.x or OpenAPI 3.x.x!"
+            raise SqlmapSyntaxException(errMsg)
+
+        if (openapiv3 and
+               ("servers" not in swagger or
                 not isinstance(swagger["servers"], list) or
                 len(swagger["servers"]) < 1 or
-                "url" not in swagger["servers"][0]):
+                "url" not in swagger["servers"][0])):
           errMsg = "swagger server is missing!"
           raise SqlmapSyntaxException(errMsg)
 
-        server = swagger["servers"][0]["url"]
+        if swaggerv2 and "host" not in swagger:
+          errMsg = "swagger server is missing!"
+          raise SqlmapSyntaxException(errMsg)
 
-        logger.info("swagger OpenAPI version '%s', server '%s'" %(swagger["openapi"], server))
+        if openapiv3:
+           # only one server supported
+           server = swagger["servers"][0]["url"]
+
+           logger.info("swagger OpenAPI version '%s', server '%s'" %(swagger["openapi"], server))
+        elif swaggerv2:
+           logger.info("swagger version '%s'" %swagger["swagger"])
+
+           basePath = ""
+           if "basePath" in swagger:
+               basePath = swagger["basePath"]
+
+           scheme = "https"
+           if ("schemes" in swagger and
+                   isinstance(swagger["schemes"], list) and
+                   len(swagger["schemes"]) > 0):
+               scheme = swagger["schemes"][0]
+
+           server = "%s://%s%s" % (scheme, swagger["host"], basePath)
+
+           logger.info("swagger version '%s', server '%s'" %(swagger["swagger"], server))
+
 
         for path in swagger["paths"]:
             for method in swagger["paths"][path]:
