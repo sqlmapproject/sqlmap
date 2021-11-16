@@ -486,7 +486,7 @@
 
     <test>
         <title>IBM DB2 stacked queries (heavy query - comment)</title>
-        <stype>5</stype>
+        <stype>4</stype>
         <level>3</level>
         <risk>2</risk>
         <clause>1-8</clause>
@@ -506,7 +506,7 @@
 
     <test>
         <title>IBM DB2 stacked queries (heavy query)</title>
-        <stype>5</stype>
+        <stype>4</stype>
         <level>5</level>
         <risk>2</risk>
         <clause>1-8</clause>
@@ -607,7 +607,7 @@
 
     <test>
         <title>SAP MaxDB stacked queries (heavy query - comment)</title>
-        <stype>5</stype>
+        <stype>4</stype>
         <level>4</level>
         <risk>2</risk>
         <clause>1-8</clause>
@@ -627,7 +627,7 @@
 
     <test>
         <title>SAP MaxDB stacked queries (heavy query)</title>
-        <stype>5</stype>
+        <stype>4</stype>
         <level>5</level>
         <risk>2</risk>
         <clause>1-8</clause>
