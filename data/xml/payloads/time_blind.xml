@@ -169,7 +169,7 @@
     </test>
 
     <test>
-        <title>MySQL &lt; 5.0.12 AND time-based blind (heavy query)</title>
+        <title>MySQL &lt; 5.0.12 AND time-based blind (BENCHMARK)</title>
         <stype>5</stype>
         <level>2</level>
         <risk>2</risk>
@@ -189,7 +189,7 @@
     </test>
 
     <test>
-        <title>MySQL &lt; 5.0.12 OR time-based blind (heavy query)</title>
+        <title>MySQL &lt; 5.0.12 OR time-based blind (BENCHMARK)</title>
         <stype>5</stype>
         <level>2</level>
         <risk>3</risk>
@@ -209,7 +209,7 @@
     </test>
 
     <test>
-        <title>MySQL &lt; 5.0.12 AND time-based blind (heavy query - comment)</title>
+        <title>MySQL &lt; 5.0.12 AND time-based blind (BENCHMARK - comment)</title>
         <stype>5</stype>
         <level>5</level>
         <risk>2</risk>
@@ -230,7 +230,7 @@
     </test>
 
     <test>
-        <title>MySQL &lt; 5.0.12 OR time-based blind (heavy query - comment)</title>
+        <title>MySQL &lt; 5.0.12 OR time-based blind (BENCHMARK - comment)</title>
         <stype>5</stype>
         <level>5</level>
         <risk>3</risk>
@@ -1500,7 +1500,7 @@
     </test>
 
     <test>
-        <title>MySQL &lt; 5.0.12 time-based blind - Parameter replace (heavy queries)</title>
+        <title>MySQL &lt; 5.0.12 time-based blind - Parameter replace (BENCHMARK)</title>
         <stype>5</stype>
         <level>4</level>
         <risk>2</risk>
@@ -1854,7 +1854,7 @@
     </test>
 
     <test>
-        <title>MySQL &lt; 5.0.12 time-based blind - ORDER BY, GROUP BY clause (heavy query)</title>
+        <title>MySQL &lt; 5.0.12 time-based blind - ORDER BY, GROUP BY clause (BENCHMARK)</title>
         <stype>5</stype>
         <level>4</level>
         <risk>2</risk>

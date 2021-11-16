@@ -85,7 +85,7 @@
     </test>
 
     <test>
-        <title>MySQL &lt; 5.0.12 stacked queries (heavy query - comment)</title>
+        <title>MySQL &lt; 5.0.12 stacked queries (BENCHMARK - comment)</title>
         <stype>4</stype>
         <level>3</level>
         <risk>2</risk>
@@ -105,7 +105,7 @@
     </test>
 
     <test>
-        <title>MySQL &lt; 5.0.12 stacked queries (heavy query)</title>
+        <title>MySQL &lt; 5.0.12 stacked queries (BENCHMARK)</title>
         <stype>4</stype>
         <level>5</level>
         <risk>2</risk>
