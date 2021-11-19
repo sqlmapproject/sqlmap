@@ -509,7 +509,7 @@ def checkSqlInjection(place, parameter, value):
                             falseRawResponse = "%s%s" % (falseHeaders, falsePage)
 
                             # Checking if there is difference between current FALSE, original and heuristics page (i.e. not used parameter)
-                            if not any((kb.negativeLogic, conf.string, conf.notString)):
+                            if not any((kb.negativeLogic, conf.string, conf.notString, conf.code)):
                                 try:
                                     ratio = 1.0
                                     seqMatcher = getCurrentThreadData().seqMatcher
