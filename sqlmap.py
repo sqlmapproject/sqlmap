@@ -349,6 +349,13 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
+        elif "hash_randomization" in excMsg:
+            errMsg = "error occurred at Python interpreter which "
+            errMsg += "is fixed in 2.7.3. Please update accordingly "
+            errMsg += "(Reference: 'https://docs.python.org/2/library/sys.html')"
+            logger.critical(errMsg)
+            raise SystemExit
+
         elif all(_ in excMsg for _ in ("Resource temporarily unavailable", "os.fork()", "dictionaryAttack")):
             errMsg = "there has been a problem while running the multiprocessing hash cracking. "
             errMsg += "Please rerun with option '--threads=1'"
