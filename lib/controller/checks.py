@@ -1340,44 +1340,6 @@ def checkStability():
 
     return kb.pageStable
 
-def checkString():
-    if not conf.string:
-        return True
-
-    infoMsg = "testing if the provided string is within the "
-    infoMsg += "target URL page content"
-    logger.info(infoMsg)
-
-    page, headers, _ = Request.queryPage(content=True)
-    rawResponse = "%s%s" % (listToStrValue(headers.headers if headers else ""), page)
-
-    if conf.string not in rawResponse:
-        warnMsg = "you provided '%s' as the string to " % conf.string
-        warnMsg += "match, but such a string is not within the target "
-        warnMsg += "URL raw response, sqlmap will carry on anyway"
-        logger.warn(warnMsg)
-
-    return True
-
-def checkRegexp():
-    if not conf.regexp:
-        return True
-
-    infoMsg = "testing if the provided regular expression matches within "
-    infoMsg += "the target URL page content"
-    logger.info(infoMsg)
-
-    page, headers, _ = Request.queryPage(content=True)
-    rawResponse = "%s%s" % (listToStrValue(headers.headers if headers else ""), page)
-
-    if not re.search(conf.regexp, rawResponse, re.I | re.M):
-        warnMsg = "you provided '%s' as the regular expression " % conf.regexp
-        warnMsg += "which does not have any match within the target URL raw response. sqlmap "
-        warnMsg += "will carry on anyway"
-        logger.warn(warnMsg)
-
-    return True
-
 @stackedmethod
 def checkWaf():
     """
@@ -1542,7 +1504,31 @@ def checkConnection(suppressOutput=False):
 
     try:
         kb.originalPageTime = time.time()
-        Request.queryPage(content=True, noteResponseTime=False)
+        page, headers, _ = Request.queryPage(content=True, noteResponseTime=False)
+
+        rawResponse = "%s%s" % (listToStrValue(headers.headers if headers else ""), page)
+
+        if conf.string:
+            infoMsg = "testing if the provided string is within the "
+            infoMsg += "target URL page content"
+            logger.info(infoMsg)
+
+            if conf.string not in rawResponse:
+                warnMsg = "you provided '%s' as the string to " % conf.string
+                warnMsg += "match, but such a string is not within the target "
+                warnMsg += "URL raw response, sqlmap will carry on anyway"
+                logger.warn(warnMsg)
+
+        if conf.regexp:
+            infoMsg = "testing if the provided regular expression matches within "
+            infoMsg += "the target URL page content"
+            logger.info(infoMsg)
+
+            if not re.search(conf.regexp, rawResponse, re.I | re.M):
+                warnMsg = "you provided '%s' as the regular expression " % conf.regexp
+                warnMsg += "which does not have any match within the target URL raw response. sqlmap "
+                warnMsg += "will carry on anyway"
+                logger.warn(warnMsg)
 
         kb.errorIsNone = False
 

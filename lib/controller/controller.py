@@ -16,10 +16,8 @@ from lib.controller.checks import checkConnection
 from lib.controller.checks import checkDynParam
 from lib.controller.checks import checkInternet
 from lib.controller.checks import checkNullConnection
-from lib.controller.checks import checkRegexp
 from lib.controller.checks import checkSqlInjection
 from lib.controller.checks import checkStability
-from lib.controller.checks import checkString
 from lib.controller.checks import checkWaf
 from lib.controller.checks import heuristicCheckSqlInjection
 from lib.core.agent import agent
@@ -434,7 +432,7 @@ def start():
 
             setupTargetEnv()
 
-            if not checkConnection(suppressOutput=conf.forms) or not checkString() or not checkRegexp():
+            if not checkConnection(suppressOutput=conf.forms):
                 continue
 
             if conf.rParam and kb.originalPage:
