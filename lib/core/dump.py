@@ -407,7 +407,10 @@ class Dump(object):
         if conf.api:
             self._write(tableValues, content_type=CONTENT_TYPE.DUMP_TABLE)
 
-        dumpDbPath = os.path.join(conf.dumpPath, unsafeSQLIdentificatorNaming(db))
+        try:
+            dumpDbPath = os.path.join(conf.dumpPath, unsafeSQLIdentificatorNaming(db))
+        except UnicodeError:
+            dumpDbPath = os.path.join(conf.dumpPath, normalizeUnicode(unsafeSQLIdentificatorNaming(db)))
 
         if conf.dumpFormat == DUMP_FORMAT.SQLITE:
             replication = Replication(os.path.join(conf.dumpPath, "%s.sqlite3" % unsafeSQLIdentificatorNaming(db)))
