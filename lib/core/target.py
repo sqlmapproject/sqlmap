@@ -609,7 +609,7 @@ def _createFilesDir():
             tempDir = tempfile.mkdtemp(prefix="sqlmapfiles")
             warnMsg = "unable to create files directory "
             warnMsg += "'%s' (%s). " % (conf.filePath, getUnicode(ex))
-            warnMsg += "Using temporary directory '%s' instead" % tempDir
+            warnMsg += "Using temporary directory '%s' instead" % getUnicode(tempDir)
             logger.warn(warnMsg)
 
             conf.filePath = tempDir
@@ -631,7 +631,7 @@ def _createDumpDir():
             tempDir = tempfile.mkdtemp(prefix="sqlmapdump")
             warnMsg = "unable to create dump directory "
             warnMsg += "'%s' (%s). " % (conf.dumpPath, getUnicode(ex))
-            warnMsg += "Using temporary directory '%s' instead" % tempDir
+            warnMsg += "Using temporary directory '%s' instead" % getUnicode(tempDir)
             logger.warn(warnMsg)
 
             conf.dumpPath = tempDir
