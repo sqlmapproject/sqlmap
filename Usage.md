@@ -2097,7 +2097,7 @@ Provide sqlmap with `--forms` as well as the page where the form can be found as
 
 Switch: `--fresh-queries`
 
-As you are already familiar with the concept of a session file from the description above, it is good to know that you can ignore the content of that file using option `--fresh-queries`. This way you can keep the session file untouched and for a selected run, avoid the resuming/restoring of queries output. 
+As you are already familiar with the concept of a session file from the description above, it is good to know that you can ignore the query results by using option `--fresh-queries`. This way you can keep the session file untouched and for a selected run, avoid the resuming/restoring of queries output. 
 
 ### Use DBMS hex function(s) for data retrieval
 
