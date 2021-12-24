@@ -4158,10 +4158,11 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
                         if not suppressWarning:
                             debugMsg = "turning off reflection removal mechanism (for optimization purposes)"
                             logger.debug(debugMsg)
-    except MemoryError:
+
+    except (MemoryError, SystemError):
         kb.reflectiveMechanism = False
         if not suppressWarning:
-            debugMsg = "turning off reflection removal mechanism (because of low memory issues)"
+            debugMsg = "turning off reflection removal mechanism"
             logger.debug(debugMsg)
 
     return retVal
