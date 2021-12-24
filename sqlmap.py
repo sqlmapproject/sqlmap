@@ -464,6 +464,12 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
+        elif "AttributeError: 'module' object has no attribute 'F_GETFD'" in excMsg:
+            errMsg = "invalid runtime (\"%s\") " % excMsg.split("Error: ")[-1].strip()
+            errMsg += "(Reference: 'https://stackoverflow.com/a/38841364' & 'https://bugs.python.org/issue24944#msg249231')"
+            logger.critical(errMsg)
+            raise SystemExit
+
         elif "bad marshal data (unknown type code)" in excMsg:
             match = re.search(r"\s*(.+)\s+ValueError", excMsg)
             errMsg = "one of your .pyc files are corrupted%s" % (" ('%s')" % match.group(1) if match else "")
