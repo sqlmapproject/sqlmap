@@ -430,8 +430,8 @@ def _setHashDB():
     if not conf.hashDBFile:
         conf.hashDBFile = conf.sessionFile or os.path.join(conf.outputPath, SESSION_SQLITE_FILE)
 
-    if os.path.exists(conf.hashDBFile):
-        if conf.flushSession:
+    if conf.flushSession:
+        if os.path.exists(conf.hashDBFile):
             if conf.hashDB:
                 conf.hashDB.closeAll()
 
