@@ -815,6 +815,9 @@ def cmdLineParser(argv=None):
         parser.add_argument("--force-pivoting", dest="forcePivoting", action="store_true",
             help=SUPPRESS)
 
+        parser.add_argument("--ignore-stdin", dest="ignoreStdin", action="store_true",
+            help=SUPPRESS)
+
         parser.add_argument("--non-interactive", dest="nonInteractive", action="store_true",
             help=SUPPRESS)
 
@@ -1060,7 +1063,7 @@ def cmdLineParser(argv=None):
         if args.dummy:
             args.url = args.url or DUMMY_URL
 
-        if hasattr(sys.stdin, "fileno") and not any((os.isatty(sys.stdin.fileno()), args.api, "GITHUB_ACTIONS" in os.environ)):
+        if hasattr(sys.stdin, "fileno") and not any((os.isatty(sys.stdin.fileno()), args.api, args.ignoreStdin, "GITHUB_ACTIONS" in os.environ)):
             args.stdinPipe = iter(sys.stdin.readline, None)
         else:
             args.stdinPipe = None
