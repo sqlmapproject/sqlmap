@@ -163,8 +163,6 @@ Links
 -  Demos: http://www.youtube.com/user/inquisb/videos
 -  Screenshots: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
 
-.. |Build Status| image:: https://api.travis-ci.org/sqlmapproject/sqlmap.svg?branch=master
-   :target: https://api.travis-ci.org/sqlmapproject/sqlmap
 .. |Python 2.6|2.7|3.x| image:: https://img.shields.io/badge/python-2.6|2.7|3.x-yellow.svg
    :target: https://www.python.org/
 .. |License| image:: https://img.shields.io/badge/license-GPLv2-red.svg
