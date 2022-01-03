@@ -1,6 +1,6 @@
 # History
 
-## 2021
+## 2022
 
 * **Jan 3**, stable version [1.6](https://github.com/sqlmapproject/sqlmap/releases/tag/1.6) released ([changeset](https://github.com/sqlmapproject/sqlmap/compare/1.5...1.6), [issues](https://github.com/sqlmapproject/sqlmap/milestone/7?closed=1)).
 
