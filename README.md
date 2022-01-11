@@ -47,6 +47,7 @@ Links
 * Frequently Asked Questions (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
 * Demos: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
+* PoC's and demos in real time: [https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-44655](https://www.nu11secur1ty.com/search?q=SQL-Injection)
 * Screenshots: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
 
 Translations
