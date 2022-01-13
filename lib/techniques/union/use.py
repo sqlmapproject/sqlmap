@@ -113,7 +113,7 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
                             for row in json.loads(output):
                                 retVal += "%s%s%s" % (kb.chars.start, kb.chars.delimiter.join(getUnicode(row[field] or NULL) for field in fields), kb.chars.stop)
                         except:
-                            pass
+                            retVal = None
                         else:
                             retVal = getUnicode(retVal)
                 elif Backend.isDbms(DBMS.PGSQL):
@@ -128,7 +128,7 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
                             for row in json.loads(output):
                                 retVal += "%s%s%s" % (kb.chars.start, row, kb.chars.stop)
                         except:
-                            pass
+                            retVal = None
                         else:
                             retVal = getUnicode(retVal)
 
