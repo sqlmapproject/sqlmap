@@ -25,6 +25,7 @@ from lib.core.common import randomStr
 from lib.core.common import readInput
 from lib.core.common import removePostHintPrefix
 from lib.core.common import resetCookieJar
+from lib.core.common import safeStringFormat
 from lib.core.common import urldecode
 from lib.core.compat import xrange
 from lib.core.convert import getUnicode
@@ -622,7 +623,7 @@ def _createDumpDir():
     if not conf.dumpTable and not conf.dumpAll and not conf.search:
         return
 
-    conf.dumpPath = paths.SQLMAP_DUMP_PATH % conf.hostname
+    conf.dumpPath = safeStringFormat(paths.SQLMAP_DUMP_PATH, conf.hostname)
 
     if not os.path.isdir(conf.dumpPath):
         try:
