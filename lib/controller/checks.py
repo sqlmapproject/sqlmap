@@ -11,7 +11,6 @@ import random
 import re
 import socket
 import subprocess
-import sys
 import time
 
 from extra.beep.beep import beep
@@ -46,7 +45,6 @@ from lib.core.common import unArrayizeValue
 from lib.core.common import wasLastResponseDBMSError
 from lib.core.common import wasLastResponseHTTPError
 from lib.core.compat import xrange
-from lib.core.convert import getBytes
 from lib.core.convert import getUnicode
 from lib.core.data import conf
 from lib.core.data import kb
@@ -95,7 +93,6 @@ from lib.core.settings import SINGLE_QUOTE_MARKER
 from lib.core.settings import SLEEP_TIME_MARKER
 from lib.core.settings import SUHOSIN_MAX_VALUE_LENGTH
 from lib.core.settings import SUPPORTED_DBMS
-from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.settings import URI_HTTP_HEADER
 from lib.core.threads import getCurrentThreadData
@@ -792,7 +789,7 @@ def checkSqlInjection(place, parameter, value):
                                 logger.info(infoMsg)
 
                                 try:
-                                    process = subprocess.Popen(getBytes(conf.alert, sys.getfilesystemencoding() or UNICODE_ENCODING), shell=True)
+                                    process = subprocess.Popen(conf.alert, shell=True)
                                     process.wait()
                                 except Exception as ex:
                                     errMsg = "error occurred while executing '%s' ('%s')" % (conf.alert, getSafeExString(ex))
