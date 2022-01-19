@@ -48,6 +48,7 @@ try:
     from lib.core.common import checkPipedInput
     from lib.core.common import createGithubIssue
     from lib.core.common import dataToStdout
+    from lib.core.common import extractRegexResult
     from lib.core.common import filterNone
     from lib.core.common import getDaysFromLastUpdate
     from lib.core.common import getFileItems
@@ -346,6 +347,11 @@ def main():
             errMsg = "error occurred at Python interpreter which "
             errMsg += "is fixed in 2.7. Please update accordingly "
             errMsg += "(Reference: 'https://bugs.python.org/issue8104')"
+            logger.critical(errMsg)
+            raise SystemExit
+
+        elif all(_ in excMsg for _ in ("OSError: [Errno 22] Invalid argument: '", "importlib")):
+            errMsg = "unable to read file '%s'" % extractRegexResult(r"OSError: \[Errno 22\] Invalid argument: '(?P<result>[^']+)", excMsg)
             logger.critical(errMsg)
             raise SystemExit
 
