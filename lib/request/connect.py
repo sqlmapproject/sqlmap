@@ -147,9 +147,12 @@ class Connect(object):
 
     @staticmethod
     def _getPageProxy(**kwargs):
-        if (len(inspect.stack()) > sys.getrecursionlimit() // 2):   # Note: https://github.com/sqlmapproject/sqlmap/issues/4525
-            warnMsg = "unable to connect to the target URL"
-            raise SqlmapConnectionException(warnMsg)
+        try:
+            if (len(inspect.stack()) > sys.getrecursionlimit() // 2):   # Note: https://github.com/sqlmapproject/sqlmap/issues/4525
+                warnMsg = "unable to connect to the target URL"
+                raise SqlmapConnectionException(warnMsg)
+        except TypeError:
+            pass
 
         try:
             return Connect.getPage(**kwargs)
