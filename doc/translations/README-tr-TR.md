@@ -11,7 +11,7 @@ Ekran görüntüleri
 ![Screenshot](https://raw.github.com/wiki/sqlmapproject/sqlmap/images/sqlmap_screenshot.png)
 
 
-İsterseniz özelliklerin tanıtımının yapıldığı [collection of screenshots](https://github.com/sqlmapproject/sqlmap/wiki/Screenshots) sayfasını ziyaret edebilirsiniz.
+İsterseniz özelliklerin tanıtımının yapıldığı [ekran görüntüleri](https://github.com/sqlmapproject/sqlmap/wiki/Screenshots) sayfasını ziyaret edebilirsiniz.
 
 
 Kurulum
