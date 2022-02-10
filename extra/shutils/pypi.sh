@@ -81,7 +81,7 @@ cat > README.rst << "EOF"
 sqlmap
 ======
 
-|Build Status| |Python 2.6|2.7|3.x| |License| |Twitter|
+|Python 2.6|2.7|3.x| |License| |Twitter|
 
 sqlmap is an open source penetration testing tool that automates the
 process of detecting and exploiting SQL injection flaws and taking over
