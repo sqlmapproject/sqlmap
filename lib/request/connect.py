@@ -1250,6 +1250,12 @@ class Connect(object):
                     origValue = match.group("value")
                     newValue = randomizeParameterValue(origValue) if randomParameter not in kb.randomPool else random.sample(kb.randomPool[randomParameter], 1)[0]
                     retVal = re.sub(r"(\A|\b)%s=[^&;]*" % re.escape(randomParameter), "%s=%s" % (randomParameter, newValue), paramString)
+                else:
+                    match = re.search(r"(\A|\b)(%s\b[^\w]+)(?P<value>\w+)" % re.escape(randomParameter), paramString)
+                    if match:
+                        origValue = match.group("value")
+                        newValue = randomizeParameterValue(origValue) if randomParameter not in kb.randomPool else random.sample(kb.randomPool[randomParameter], 1)[0]
+                        retVal = paramString.replace(match.group(0), "%s%s" % (match.group(2), newValue))
                 return retVal
 
             for randomParameter in conf.rParam:
