@@ -2116,6 +2116,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.pageStable = None
     kb.partRun = None
     kb.permissionFlag = False
+    kb.place = None
     kb.postHint = None
     kb.postSpaceToPlus = False
     kb.postUrlEncode = True

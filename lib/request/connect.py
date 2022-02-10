@@ -56,12 +56,14 @@ from lib.core.common import safeVariableNaming
 from lib.core.common import singleTimeLogMessage
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import stdev
+from lib.core.common import unArrayizeValue
 from lib.core.common import unsafeVariableNaming
 from lib.core.common import urldecode
 from lib.core.common import urlencode
 from lib.core.common import wasLastResponseDelayed
 from lib.core.compat import patchHeaders
 from lib.core.compat import xrange
+from lib.core.convert import encodeBase64
 from lib.core.convert import getBytes
 from lib.core.convert import getText
 from lib.core.convert import getUnicode
@@ -466,7 +468,7 @@ class Connect(object):
                         break
 
             if post is not None and not multipart and not getHeader(headers, HTTP_HEADER.CONTENT_TYPE):
-                headers[HTTP_HEADER.CONTENT_TYPE] = POST_HINT_CONTENT_TYPES.get(kb.postHint, DEFAULT_CONTENT_TYPE)
+                headers[HTTP_HEADER.CONTENT_TYPE] = POST_HINT_CONTENT_TYPES.get(kb.postHint, DEFAULT_CONTENT_TYPE if unArrayizeValue(conf.base64Parameter) != HTTPMETHOD.POST else PLAIN_TEXT_CONTENT_TYPE)
 
             if headers.get(HTTP_HEADER.CONTENT_TYPE) == POST_HINT_CONTENT_TYPES[POST_HINT.MULTIPART]:
                 warnMsg = "missing 'boundary parameter' in '%s' header. " % HTTP_HEADER.CONTENT_TYPE
@@ -551,6 +553,13 @@ class Connect(object):
                 logger.log(CUSTOM_LOGGING.TRAFFIC_OUT, requestMsg)
             else:
                 post = getBytes(post)
+
+                if unArrayizeValue(conf.base64Parameter) == HTTPMETHOD.POST:
+                    if kb.place != HTTPMETHOD.POST:
+                        conf.data = getattr(conf.data, UNENCODED_ORIGINAL_VALUE, conf.data)
+                    else:
+                        post = urldecode(post, convall=True)
+                        post = encodeBase64(post)
 
                 if target and cmdLineOptions.method or method and method not in (HTTPMETHOD.GET, HTTPMETHOD.POST):
                     req = MethodRequest(url, post, headers)
@@ -976,6 +985,8 @@ class Connect(object):
         if not place:
             place = kb.injection.place or PLACE.GET
 
+        kb.place = place
+
         if not auxHeaders:
             auxHeaders = {}
 
@@ -1191,7 +1202,7 @@ class Connect(object):
 
                 if not token:
                     if conf.csrfUrl and conf.csrfToken and conf.csrfUrl != conf.url and code == _http_client.OK:
-                        if headers and "text/plain" in headers.get(HTTP_HEADER.CONTENT_TYPE, ""):
+                        if headers and PLAIN_TEXT_CONTENT_TYPE in headers.get(HTTP_HEADER.CONTENT_TYPE, ""):
                             token.name = conf.csrfToken
                             token.value = page
 
