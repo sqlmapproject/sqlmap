@@ -2,19 +2,19 @@
 
 [![Build Status](https://api.travis-ci.org/sqlmapproject/sqlmap.svg?branch=master)](https://travis-ci.org/sqlmapproject/sqlmap) [![Python 2.6|2.7|3.x](https://img.shields.io/badge/python-2.6|2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![PyPI version](https://badge.fury.io/py/sqlmap.svg)](https://badge.fury.io/py/sqlmap) [![GitHub closed issues](https://img.shields.io/github/issues-closed-raw/sqlmapproject/sqlmap.svg?colorB=ff69b4)](https://github.com/sqlmapproject/sqlmap/issues?q=is%3Aissue+is%3Aclosed) [![Twitter](https://img.shields.io/badge/twitter-@sqlmap-blue.svg)](https://twitter.com/sqlmap)
 
-sqlmap to open sourceowe narzędzie do testów penetracyjnych, które automatyzuje procesy detekcji, przejmowania i testowania odporności serwerów SQL na podatność na iniekcję niechcianego kodu. Zawiera potężny mechanizm detekcji, wiele niszowych funkcji dla zaawansowanych testów penetracyjnych oraz szeroki wachlarz opcji począwszy od identyfikacji bazy danych, poprzez wydobywanie z nich danych, a nawet pozwalającuch na dostęp do systemu plików o uruchamianie poleceń w systemie operacyjnym serwera poprzez niestandardowe połączenia.
+sqlmap to open sourceowe narzędzie do testów penetracyjnych, które automatyzuje procesy detekcji, przejmowania i testowania odporności serwerów SQL na podatność na iniekcję niechcianego kodu. Zawiera potężny mechanizm detekcji, wiele niszowych funkcji dla zaawansowanych testów penetracyjnych oraz szeroki wachlarz opcji począwszy od identyfikacji bazy danych, poprzez wydobywanie z nich danych, a nawet pozwalających na dostęp do systemu plików o uruchamianie poleceń w systemie operacyjnym serwera poprzez niestandardowe połączenia.
 
 Zrzuty ekranowe
 ----
 
 ![Screenshot](https://raw.github.com/wiki/sqlmapproject/sqlmap/images/sqlmap_screenshot.png)
 
-Możesz odwiedzić [kolekcję zrzutów](https://github.com/sqlmapproject/sqlmap/wiki/Screenshots) demonstruującą na wiki niektóre możliwości.
+Możesz odwiedzić [kolekcję zrzutów](https://github.com/sqlmapproject/sqlmap/wiki/Screenshots) demonstrującą na wiki niektóre możliwości.
 
 Instalacja
 ----
 
-Najnowsze tarball archiwum jest dostępne po klikcięciu [tutaj](https://github.com/sqlmapproject/sqlmap/tarball/master) lub najnowsze zipball archiwum po kliknięciu [tutaj](https://github.com/sqlmapproject/sqlmap/zipball/master).
+Najnowsze tarball archiwum jest dostępne po kliknięciu [tutaj](https://github.com/sqlmapproject/sqlmap/tarball/master) lub najnowsze zipball archiwum po kliknięciu [tutaj](https://github.com/sqlmapproject/sqlmap/zipball/master).
 
 Można również pobrać sqlmap klonując rezozytorium [Git](https://github.com/sqlmapproject/sqlmap):
 
@@ -33,8 +33,8 @@ Aby uzyskać listę wszystkich funkcji i parametrów użyj polecenia:
 
     python sqlmap.py -hh
 
-Przykładowy wynik działania dostępny [tutaj](https://asciinema.org/a/46601).
-Aby uzyskać listę wszystkich dostępnych fukcji, parametrów i opisów ich działania wraz z przykładami użycia sqlnap proponujemy odwiedzić [instrukjcę użytkowania](https://github.com/sqlmapproject/sqlmap/wiki/Usage).
+Przykładowy wynik działania dostępny jest [tutaj](https://asciinema.org/a/46601).
+Aby uzyskać listę wszystkich dostępnych funkcji, parametrów i opisów ich działania wraz z przykładami użycia sqlmap proponujemy odwiedzić [instrukcję użytkowania](https://github.com/sqlmapproject/sqlmap/wiki/Usage).
 
 Odnośniki
 ----
