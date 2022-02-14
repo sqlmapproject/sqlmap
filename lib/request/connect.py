@@ -1430,7 +1430,7 @@ class Connect(object):
 
                 deviation = stdev(kb.responseTimes[kb.responseTimeMode])
 
-                if deviation > WARN_TIME_STDEV:
+                if deviation is not None and deviation > WARN_TIME_STDEV:
                     kb.adjustTimeDelay = ADJUST_TIME_DELAY.DISABLE
 
                     warnMsg = "considerable lagging has been detected "
