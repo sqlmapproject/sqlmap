@@ -3079,6 +3079,8 @@ def extractRegexResult(regex, content, flags=0):
 
     >>> extractRegexResult(r'a(?P<result>[^g]+)g', 'abcdefg')
     'bcdef'
+    >>> extractRegexResult(r'a(?P<result>[^g]+)g', 'ABCDEFG', re.I)
+    'BCDEF'
     """
 
     retVal = None

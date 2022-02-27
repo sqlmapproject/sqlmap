@@ -20,7 +20,7 @@ from thirdparty import six
 from thirdparty.six import unichr as _unichr
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.6.2.5"
+VERSION = "1.6.2.6"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -592,7 +592,7 @@ LEGAL_DISCLAIMER = "Usage of sqlmap for attacking targets without prior mutual c
 REFLECTIVE_MISS_THRESHOLD = 20
 
 # Regular expression used for extracting HTML title
-HTML_TITLE_REGEX = r"<title>(?P<result>[^<]+)</title>"
+HTML_TITLE_REGEX = r"(?i)<title>(?P<result>[^<]+)</title>"
 
 # Table used for Base64 conversion in WordPress hash cracking routine
 ITOA64 = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
