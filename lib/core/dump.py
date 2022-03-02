@@ -410,7 +410,15 @@ class Dump(object):
         try:
             dumpDbPath = os.path.join(conf.dumpPath, unsafeSQLIdentificatorNaming(db))
         except UnicodeError:
-            dumpDbPath = os.path.join(conf.dumpPath, normalizeUnicode(unsafeSQLIdentificatorNaming(db)))
+            try:
+                dumpDbPath = os.path.join(conf.dumpPath, normalizeUnicode(unsafeSQLIdentificatorNaming(db)))
+            except (UnicodeError, OSError):
+                tempDir = tempfile.mkdtemp(prefix="sqlmapdb")
+                warnMsg = "currently unable to use regular dump directory. "
+                warnMsg += "Using temporary directory '%s' instead" % tempDir
+                logger.warn(warnMsg)
+
+                dumpDbPath = tempDir
 
         if conf.dumpFormat == DUMP_FORMAT.SQLITE:
             replication = Replication(os.path.join(conf.dumpPath, "%s.sqlite3" % unsafeSQLIdentificatorNaming(db)))
