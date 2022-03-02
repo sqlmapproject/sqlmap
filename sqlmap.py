@@ -41,49 +41,51 @@ try:
     if "--deprecations" not in sys.argv:
         warnings.filterwarnings(action="ignore", category=DeprecationWarning)
 
-    from lib.core.data import logger
-
-    from lib.core.common import banner
-    from lib.core.common import checkIntegrity
-    from lib.core.common import checkPipedInput
-    from lib.core.common import createGithubIssue
-    from lib.core.common import dataToStdout
-    from lib.core.common import extractRegexResult
-    from lib.core.common import filterNone
-    from lib.core.common import getDaysFromLastUpdate
-    from lib.core.common import getFileItems
-    from lib.core.common import getSafeExString
-    from lib.core.common import maskSensitiveData
-    from lib.core.common import openFile
-    from lib.core.common import setPaths
-    from lib.core.common import weAreFrozen
-    from lib.core.convert import getUnicode
-    from lib.core.common import MKSTEMP_PREFIX
-    from lib.core.common import setColor
-    from lib.core.common import unhandledExceptionMessage
-    from lib.core.data import cmdLineOptions
-    from lib.core.data import conf
-    from lib.core.data import kb
-    from lib.core.datatype import OrderedSet
-    from lib.core.compat import LooseVersion
-    from lib.core.compat import xrange
-    from lib.core.exception import SqlmapBaseException
-    from lib.core.exception import SqlmapShellQuitException
-    from lib.core.exception import SqlmapSilentQuitException
-    from lib.core.exception import SqlmapUserQuitException
-    from lib.core.option import init
-    from lib.core.option import initOptions
-    from lib.core.patch import dirtyPatches
-    from lib.core.patch import resolveCrossReferences
-    from lib.core.settings import GIT_PAGE
-    from lib.core.settings import IS_WIN
-    from lib.core.settings import LAST_UPDATE_NAGGING_DAYS
-    from lib.core.settings import LEGAL_DISCLAIMER
-    from lib.core.settings import THREAD_FINALIZATION_TIMEOUT
-    from lib.core.settings import UNICODE_ENCODING
-    from lib.core.settings import VERSION
+    from lib.core.patch import dirtyPatches, resolveCrossReferences
+    from lib.core.data import cmdLineOptions, logger, conf, kb
+    from lib.core.compat import LooseVersion, xrange
+    from lib.core.option import init, initOptions
     from lib.parse.cmdline import cmdLineParser
+    from lib.core.datatype import OrderedSet
+    from lib.core.convert import getUnicode
     from lib.utils.crawler import crawl
+    from lib.core.common import (
+      unhandledExceptionMessage,
+      getDaysFromLastUpdate, 
+      createGithubIssue, 
+      extractRegexResult, 
+      maskSensitiveData, 
+      getSafeExString, 
+      checkPipedInput, 
+      MKSTEMP_PREFIX, 
+      checkIntegrity, 
+      dataToStdout,
+      getFileItems,
+      weAreFrozen,
+      filterNone, 
+      setPaths, 
+      openFile, 
+      setColor, 
+      banner
+    )
+
+    from lib.core.exception import (
+      SqlmapBaseException,
+      SqlmapShellQuitException,
+      SqlmapSilentQuitException,
+      SqlmapUserQuitException
+    )
+
+    from lib.core.settings import (
+      THREAD_FINALIZATION_TIMEOUT,
+      LAST_UPDATE_NAGGING_DAYS,
+      LEGAL_DISCLAIMER,
+      UNICODE_ENCODING,
+      GIT_PAGE,
+      VERSION,
+      IS_WIN
+    )
+
 except KeyboardInterrupt:
     errMsg = "user aborted"
 
@@ -154,8 +156,7 @@ def main():
 
         if conf.get("api"):
             # heavy imports
-            from lib.utils.api import StdDbOut
-            from lib.utils.api import setRestAPILog
+            from lib.utils.api import StdDbOut, setRestAPILog
 
             # Overwrite system standard output and standard error to write
             # to an IPC database
