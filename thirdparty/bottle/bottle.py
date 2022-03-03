@@ -1363,7 +1363,7 @@ class BaseRequest(object):
 
     def _get_body_string(self, maxread):
         """ Read body into a string. Raise HTTPError(413) on requests that are
-            to large. """
+            too large. """
         if self.content_length > maxread:
             raise HTTPError(413, 'Request entity too large')
         data = self.body.read(maxread + 1)
@@ -1594,7 +1594,7 @@ class BaseRequest(object):
     def __setattr__(self, name, value):
         if name == 'environ': return object.__setattr__(self, name, value)
         key = 'bottle.request.ext.%s' % name
-        if key in self.environ:
+        if hasattr(self, name):
             raise AttributeError("Attribute already defined: %s" % name)
         self.environ[key] = value
 
@@ -1655,7 +1655,7 @@ class BaseResponse(object):
     default_status = 200
     default_content_type = 'text/html; charset=UTF-8'
 
-    # Header blacklist for specific response codes
+    # Header denylist for specific response codes
     # (rfc2616 section 10.2.3 and 10.3.5)
     bad_headers = {
         204: frozenset(('Content-Type', 'Content-Length')),
@@ -2928,8 +2928,8 @@ def static_file(filename, root,
     ims = getenv('HTTP_IF_MODIFIED_SINCE')
     if ims:
         ims = parse_date(ims.split(";")[0].strip())
-    if ims is not None and ims >= int(stats.st_mtime):
-        return HTTPResponse(status=304, **headers)
+        if ims is not None and ims >= int(stats.st_mtime):
+            return HTTPResponse(status=304, **headers)
 
     body = '' if request.method == 'HEAD' else open(filename, 'rb')
 
