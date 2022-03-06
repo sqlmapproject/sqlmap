@@ -6,7 +6,9 @@ See the file 'LICENSE' for copying permission
 """
 
 import binascii
+import copy
 import inspect
+import json
 import logging
 import os
 import random
@@ -141,6 +143,8 @@ from thirdparty.six import unichr as _unichr
 from thirdparty.six.moves import http_client as _http_client
 from thirdparty.six.moves import urllib as _urllib
 from thirdparty.socks.socks import ProxyError
+from thirdparty.requests_toolbelt.multipart.decoder import MultipartDecoder
+from thirdparty.xmltodict import xmltodict
 
 class Connect(object):
     """
@@ -1009,6 +1013,15 @@ class Connect(object):
                 contentType = POST_HINT_CONTENT_TYPES.get(kb.postHint, PLAIN_TEXT_CONTENT_TYPE)
                 conf.httpHeaders.append((HTTP_HEADER.CONTENT_TYPE, contentType))
 
+        if kb.postHint == POST_HINT.JSON_LIKE:
+            json_like_type = 1                      # {"key": "value"}
+            if re.search(r"'\s*:", conf.data):
+                json_like_type = 2                  # {'key': 'value'}
+            elif re.search(r':\s*"', conf.data):
+                json_like_type = 3                  # {key: "value"}
+            elif re.search(r":\s*'", conf.data):
+                json_like_type = 4                  # {key: 'value'}
+
         if payload:
             delimiter = conf.paramDel or (DEFAULT_GET_POST_DELIMITER if place != PLACE.COOKIE else DEFAULT_COOKIE_DELIMITER)
 
@@ -1052,9 +1065,11 @@ class Connect(object):
                 elif kb.postHint == POST_HINT.JSON:
                     payload = escapeJsonValue(payload)
                 elif kb.postHint == POST_HINT.JSON_LIKE:
-                    payload = payload.replace("'", REPLACEMENT_MARKER).replace('"', "'").replace(REPLACEMENT_MARKER, '"')
+                    if json_like_type in (2, 4):
+                        payload = payload.replace("'", REPLACEMENT_MARKER).replace('"', "'").replace(REPLACEMENT_MARKER, '"')
                     payload = escapeJsonValue(payload)
-                    payload = payload.replace("'", REPLACEMENT_MARKER).replace('"', "'").replace(REPLACEMENT_MARKER, '"')
+                    if json_like_type in (2, 4):
+                        payload = payload.replace("'", REPLACEMENT_MARKER).replace('"', "'").replace(REPLACEMENT_MARKER, '"')
                 value = agent.replacePayload(value, payload)
             else:
                 # GET, POST, URI and Cookie payload needs to be thoroughly URL encoded
@@ -1272,121 +1287,81 @@ class Connect(object):
 
         if conf.evalCode:
             delimiter = conf.paramDel or DEFAULT_GET_POST_DELIMITER
-            variables = {"uri": uri, "lastPage": threadData.lastPage, "_locals": locals(), "cookie": cookie}
-            originals = {}
+            variables = {"uri": uri, "get_query": get, "headers": headers, "post_body": post, "get_data": {}, "post_data": {}, "lastPage": threadData.lastPage, "_locals": locals()}
 
-            if not get and PLACE.URI in conf.parameters:
-                query = _urllib.parse.urlsplit(uri).query or ""
-            else:
-                query = None
+            original_get = get
+            original_post = post
 
-            for item in filterNone((get, post if not kb.postHint else None, query)):
-                for part in item.split(delimiter):
+            if get:
+                for part in get.split(delimiter):
                     if '=' in part:
                         name, value = part.split('=', 1)
                         name = name.strip()
-                        if safeVariableNaming(name) != name:
-                            conf.evalCode = re.sub(r"\b%s\b" % re.escape(name), safeVariableNaming(name), conf.evalCode)
-                            name = safeVariableNaming(name)
-                        value = urldecode(value, convall=True, spaceplus=(item == post and kb.postSpaceToPlus))
-                        variables[name] = value
-
-            if cookie:
-                for part in cookie.split(conf.cookieDel or DEFAULT_COOKIE_DELIMITER):
-                    if '=' in part:
-                        name, value = part.split('=', 1)
-                        name = name.strip()
-                        if safeVariableNaming(name) != name:
-                            conf.evalCode = re.sub(r"\b%s\b" % re.escape(name), safeVariableNaming(name), conf.evalCode)
-                            name = safeVariableNaming(name)
                         value = urldecode(value, convall=True)
-                        variables[name] = value
+                        variables['get_data'][name] = value
 
-            while True:
-                try:
-                    compile(getBytes(re.sub(r"\s*;\s*", "\n", conf.evalCode)), "", "exec")
-                except SyntaxError as ex:
-                    if ex.text:
-                        original = replacement = ex.text.strip()
+            if kb.postHint:
+                if kb.postHint in (POST_HINT.XML, POST_HINT.SOAP):
+                    variables['post_data'] = xmltodict.parse(post)
+                if kb.postHint == POST_HINT.JSON:
+                    variables['post_data'] = json.loads(post)
+                if kb.postHint == POST_HINT.JSON_LIKE:
+                    if json_like_type == 3:
+                        post = re.sub(r'(,|\{)\s*([^\'\s{,]+)\s*:', '\g<1>"\g<2>":', post)
+                    if json_like_type == 4:
+                        post = re.sub(r'(,|\{)\s*([^\'\s{,]+)\s*:', "\g<1>'\g<2>':", post)
+                    if json_like_type in (2, 4):
+                        post = post.replace("\\'", REPLACEMENT_MARKER).replace('\"','\\"').replace("'",'"').replace(REPLACEMENT_MARKER, "'")
+                    variables['post_data'] = json.loads(post)
+                if kb.postHint == POST_HINT.MULTIPART:
+                    multipart = MultipartDecoder(bytes(post, 'utf-8'), contentType)
+                    boundary = '--' + multipart.boundary.decode('utf-8')
+                    for part in multipart.parts:
+                        name = re.search(r'"([^\"]*)"', part.headers._store[b'content-disposition'][1].decode('utf-8')).group(1)
+                        value = part.text
+                        variables['post_data'][name] = value
+                if kb.postHint == POST_HINT.ARRAY_LIKE:
+                    post = re.sub(r"\A%s" % delimiter, "", post)
+                    array_name = re.findall(r"%s(.*?)\[\]=" % delimiter, post)[0].strip()
+                    variables['post_data'] = []
+                    for value in post.split("%s[]=" % array_name)[1:]:
+                        variables['post_data'].append(value.replace(delimiter, ""))
+            elif post:
+                for part in post.split(delimiter):
+                    if '=' in part:
+                        name, value = part.split('=', 1)
+                        name = name.strip()
+                        value = urldecode(value, convall=True, spaceplus=kb.postSpaceToPlus)
+                        variables['post_data'][name] = value
 
-                        if '=' in original:
-                            name, value = original.split('=', 1)
-                            name = name.strip()
-                            if safeVariableNaming(name) != name:
-                                replacement = re.sub(r"\b%s\b" % re.escape(name), safeVariableNaming(name), replacement)
-                        else:
-                            for _ in re.findall(r"[A-Za-z_]+", original)[::-1]:
-                                if safeVariableNaming(_) != _:
-                                    replacement = replacement.replace(_, safeVariableNaming(_))
-                                    break
-
-                        if original == replacement:
-                            conf.evalCode = conf.evalCode.replace(EVALCODE_ENCODED_PREFIX, "")
-                            break
-                        else:
-                            conf.evalCode = conf.evalCode.replace(getUnicode(ex.text.strip(), UNICODE_ENCODING), replacement)
-                    else:
-                        break
-                else:
-                    break
-
-            originals.update(variables)
             evaluateCode(conf.evalCode, variables)
 
-            for variable in list(variables.keys()):
-                if unsafeVariableNaming(variable) != variable:
-                    value = variables[variable]
-                    del variables[variable]
-                    variables[unsafeVariableNaming(variable)] = value
+            if kb.postHint:
+                if kb.postHint in (POST_HINT.XML, POST_HINT.SOAP):
+                    post = xmltodict.unparse(variables['post_data'])
+                if kb.postHint == POST_HINT.JSON:
+                    post = json.dumps(variables['post_data'])
+                if kb.postHint == POST_HINT.JSON_LIKE:
+                    post = json.dumps(variables['post_data'])
+                    if json_like_type in (3, 4):
+                        post = re.sub(r'"([^"]+)":', '\g<1>:', post)
+                    if json_like_type in (2, 4):
+                        post = post.replace('\\"', REPLACEMENT_MARKER).replace("'", "\\'").replace('"', "'").replace(REPLACEMENT_MARKER, '"')
+                if kb.postHint == POST_HINT.MULTIPART:
+                    for name, value in variables['post_data'].items():
+                        post = re.sub(r"(?s)(name=\"%s\"(?:; ?filename=.+?)?\r\n\r\n).*?(%s)" % (name, boundary), r"\g<1>%s\r\n\g<2>" % value.replace('\\', r'\\'), post)
+                if kb.postHint == POST_HINT.ARRAY_LIKE:
+                    post = array_name + "[]=" + (delimiter + array_name + "[]=").join(variables['post_data'])
+            else:
+                post = delimiter.join(f'{key}={value}' for key, value in variables['post_data'].items())
 
-            uri = variables["uri"]
-            cookie = variables["cookie"]
+            uri = variables['uri']
+            get = delimiter.join(f'{key}={value}' for key, value in variables['get_data'].items())
+            auxHeaders.update(variables['headers'])
+            cookie = variables['headers']['Cookie'] if 'Cookie' in variables['headers'] else None
 
-            for name, value in variables.items():
-                if name != "__builtins__" and originals.get(name, "") != value:
-                    if isinstance(value, (int, float, six.string_types, six.binary_type)):
-                        found = False
-                        value = getUnicode(value, UNICODE_ENCODING)
-
-                        if kb.postHint and re.search(r"\b%s\b" % re.escape(name), post or ""):
-                            if kb.postHint in (POST_HINT.XML, POST_HINT.SOAP):
-                                if re.search(r"<%s\b" % re.escape(name), post):
-                                    found = True
-                                    post = re.sub(r"(?s)(<%s\b[^>]*>)(.*?)(</%s)" % (re.escape(name), re.escape(name)), r"\g<1>%s\g<3>" % value.replace('\\', r'\\'), post)
-                                elif re.search(r"\b%s>" % re.escape(name), post):
-                                    found = True
-                                    post = re.sub(r"(?s)(\b%s>)(.*?)(</[^<]*\b%s>)" % (re.escape(name), re.escape(name)), r"\g<1>%s\g<3>" % value.replace('\\', r'\\'), post)
-
-                            regex = r"\b(%s)\b([^\w]+)(\w+)" % re.escape(name)
-                            if not found and re.search(regex, (post or "")):
-                                found = True
-                                post = re.sub(regex, r"\g<1>\g<2>%s" % value.replace('\\', r'\\'), post)
-
-                        regex = r"((\A|%s)%s=).+?(%s|\Z)" % (re.escape(delimiter), re.escape(name), re.escape(delimiter))
-                        if not found and re.search(regex, (post or "")):
-                            found = True
-                            post = re.sub(regex, r"\g<1>%s\g<3>" % value.replace('\\', r'\\'), post)
-
-                        if re.search(regex, (get or "")):
-                            found = True
-                            get = re.sub(regex, r"\g<1>%s\g<3>" % value.replace('\\', r'\\'), get)
-
-                        if re.search(regex, (query or "")):
-                            found = True
-                            uri = re.sub(regex.replace(r"\A", r"\?"), r"\g<1>%s\g<3>" % value.replace('\\', r'\\'), uri)
-
-                        regex = r"((\A|%s)%s=).+?(%s|\Z)" % (re.escape(conf.cookieDel or DEFAULT_COOKIE_DELIMITER), re.escape(name), re.escape(conf.cookieDel or DEFAULT_COOKIE_DELIMITER))
-                        if re.search(regex, (cookie or "")):
-                            found = True
-                            cookie = re.sub(regex, r"\g<1>%s\g<3>" % value.replace('\\', r'\\'), cookie)
-
-                        if not found:
-                            if post is not None:
-                                post += "%s%s=%s" % (delimiter, name, value)
-                            elif get is not None:
-                                get += "%s%s=%s" % (delimiter, name, value)
-                            elif cookie is not None:
-                                cookie += "%s%s=%s" % (conf.cookieDel or DEFAULT_COOKIE_DELIMITER, name, value)
+            get = variables['get_query'] if variables['get_query'] != original_get else get
+            post = variables['post_body'] if variables['post_body'] != original_post else post
 
         if not conf.skipUrlEncode:
             get = urlencode(get, limit=True)

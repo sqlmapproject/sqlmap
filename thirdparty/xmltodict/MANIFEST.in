@@ -1,0 +1,4 @@
+include README.md
+include LICENSE
+include ez_setup.py
+recursive-include tests *

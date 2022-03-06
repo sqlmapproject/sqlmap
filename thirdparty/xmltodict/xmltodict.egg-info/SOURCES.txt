@@ -1,0 +1,13 @@
+LICENSE
+MANIFEST.in
+README.md
+ez_setup.py
+setup.cfg
+setup.py
+xmltodict.py
+tests/test_dicttoxml.py
+tests/test_xmltodict.py
+xmltodict.egg-info/PKG-INFO
+xmltodict.egg-info/SOURCES.txt
+xmltodict.egg-info/dependency_links.txt
+xmltodict.egg-info/top_level.txt
