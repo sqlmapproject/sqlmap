@@ -167,7 +167,26 @@ class WichmannHill(random.Random):
 
 def patchHeaders(headers):
     if headers is not None and not hasattr(headers, "headers"):
+        if isinstance(headers, dict):
+            class _(dict):
+                def __getitem__(self, key):
+                    for key_ in self:
+                        if key_.lower() == key.lower():
+                            return super(_, self).__getitem__(key_)
+
+                    raise KeyError(key)
+
+                def get(self, key, default=None):
+                    try:
+                        return self[key]
+                    except KeyError:
+                        return default
+
+            headers = _(headers)
+
         headers.headers = ["%s: %s\r\n" % (header, headers[header]) for header in headers]
+
+    return headers
 
 def cmp(a, b):
     """

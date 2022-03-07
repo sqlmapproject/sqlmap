@@ -642,7 +642,7 @@ class Connect(object):
                     if hasattr(conn, "redurl"):
                         responseHeaders[HTTP_HEADER.LOCATION] = conn.redurl
 
-                    patchHeaders(responseHeaders)
+                    responseHeaders = patchHeaders(responseHeaders)
                     kb.serverHeader = responseHeaders.get(HTTP_HEADER.SERVER, kb.serverHeader)
                 else:
                     code = None
@@ -724,7 +724,7 @@ class Connect(object):
                 page = ex.read() if not skipRead else None
                 responseHeaders = ex.info()
                 responseHeaders[URI_HTTP_HEADER] = ex.geturl()
-                patchHeaders(responseHeaders)
+                responseHeaders = patchHeaders(responseHeaders)
                 page = decodePage(page, responseHeaders.get(HTTP_HEADER.CONTENT_ENCODING), responseHeaders.get(HTTP_HEADER.CONTENT_TYPE), percentDecode=not crawling)
             except socket.timeout:
                 warnMsg = "connection timed out while trying "
@@ -1535,7 +1535,7 @@ class Connect(object):
             kb.permissionFlag = True
             singleTimeWarnMessage("potential permission problems detected ('%s')" % message)
 
-        patchHeaders(headers)
+        headers = patchHeaders(headers)
 
         if content or response:
             return page, headers, code
