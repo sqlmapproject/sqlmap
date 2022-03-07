@@ -104,6 +104,7 @@ from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
 from lib.core.settings import BANNER
 from lib.core.settings import BOLD_PATTERNS
+from lib.core.settings import BOUNDARY_BACKSLASH_MARKER
 from lib.core.settings import BOUNDED_INJECTION_MARKER
 from lib.core.settings import BRUTE_DOC_ROOT_PREFIXES
 from lib.core.settings import BRUTE_DOC_ROOT_SUFFIXES
@@ -1383,6 +1384,38 @@ def banner():
             coloramainit()
 
         dataToStdout(result, forceOutput=True)
+
+def parseJson(content):
+    """
+    This function parses POST_HINT.JSON and POST_HINT.JSON_LIKE content
+
+    >>> parseJson("{'id':1}")["id"] == 1
+    True
+    >>> parseJson('{"id":1}')["id"] == 1
+    True
+    """
+
+    quote = None
+    retVal = None
+
+    for regex in (r"'[^']+'\s*:", r'"[^"]+"\s*:'):
+        match = re.search(regex, content)
+        if match:
+            quote = match.group(0)[0]
+
+    try:
+        if quote == '"':
+            retVal = json.loads(content)
+        elif quote == "'":
+            content = content.replace('"', '\\"')
+            content = content.replace("\\'", BOUNDARY_BACKSLASH_MARKER)
+            content = content.replace("'", '"')
+            content = content.replace(BOUNDARY_BACKSLASH_MARKER, "'")
+            retVal = json.loads(content)
+    except:
+        pass
+
+    return retVal
 
 def parsePasswordHash(password):
     """

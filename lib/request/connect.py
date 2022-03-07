@@ -46,6 +46,7 @@ from lib.core.common import getSafeExString
 from lib.core.common import logHTTPTraffic
 from lib.core.common import openFile
 from lib.core.common import popValue
+from lib.core.common import parseJson
 from lib.core.common import pushValue
 from lib.core.common import randomizeParameterValue
 from lib.core.common import randomInt
@@ -1291,6 +1292,13 @@ class Connect(object):
                         value = urldecode(value, convall=True, spaceplus=(item == post and kb.postSpaceToPlus))
                         variables[name] = value
 
+            if post and kb.postHint in (POST_HINT.JSON, POST_HINT.JSON_LIKE):
+                for name, value in (parseJson(post) or {}).items():
+                    if safeVariableNaming(name) != name:
+                        conf.evalCode = re.sub(r"\b%s\b" % re.escape(name), safeVariableNaming(name), conf.evalCode)
+                        name = safeVariableNaming(name)
+                    variables[name] = value
+
             if cookie:
                 for part in cookie.split(conf.cookieDel or DEFAULT_COOKIE_DELIMITER):
                     if '=' in part:
@@ -1393,7 +1401,13 @@ class Connect(object):
 
                         if not found:
                             if post is not None:
-                                post += "%s%s=%s" % (delimiter, name, value)
+                                if kb.postHint in (POST_HINT.JSON, POST_HINT.JSON_LIKE):
+                                    match = re.search(r"['\"]", post)
+                                    if match:
+                                        quote = match.group(0)
+                                        post = re.sub(r"\}\Z", "%s%s}" % (',' if re.search(r"\w", post) else "", "%s%s%s:%s" % (quote, name, quote, value if value.isdigit() else "%s%s%s" % (quote, value, quote))), post)
+                                else:
+                                    post += "%s%s=%s" % (delimiter, name, value)
                             elif get is not None:
                                 get += "%s%s=%s" % (delimiter, name, value)
                             elif cookie is not None:
