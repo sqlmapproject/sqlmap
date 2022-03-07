@@ -398,7 +398,7 @@ class Agent(object):
         """
 
         if payload:
-            for match in re.finditer(r"%s(.*?)%s" % (BOUNDED_BASE64_MARKER, BOUNDED_BASE64_MARKER), payload):
+            for match in re.finditer(r"(?s)%s(.*?)%s" % (BOUNDED_BASE64_MARKER, BOUNDED_BASE64_MARKER), payload):
                 _ = encodeBase64(match.group(1), binary=False, encoding=conf.encoding or UNICODE_ENCODING, safe=conf.base64Safe)
                 payload = payload.replace(match.group(0), _)
 
