@@ -1367,6 +1367,9 @@ class Connect(object):
                                         found = True
                                         post = post.replace(match.group(0), "%s%s" % (match.group(1), value if value.isdigit() else "%s%s%s" % (match.group(0)[0], value, match.group(0)[0])))
                                     post = post.replace(BOUNDARY_BACKSLASH_MARKER, "\\%s" % quote)
+                            elif kb.postHint == POST_HINT.MULTIPART:
+                                boundary = '--' + re.search(r"boundary=(.*)", contentType).group(1)
+                                post = re.sub(r"(?s)(name=\"%s\"(?:; ?filename=.+?)?\r\n\r\n).*?(%s)" % (name, boundary), r"\g<1>%s\r\n\g<2>" % value.replace('\\', r'\\'), post)
 
                             regex = r"\b(%s)\b([^\w]+)(\w+)" % re.escape(name)
                             if not found and re.search(regex, (post or "")):
