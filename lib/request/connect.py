@@ -1357,6 +1357,17 @@ class Connect(object):
                                     found = True
                                     post = re.sub(r"(?s)(\b%s>)(.*?)(</[^<]*\b%s>)" % (re.escape(name), re.escape(name)), r"\g<1>%s\g<3>" % value.replace('\\', r'\\'), post)
 
+                            elif kb.postHint in (POST_HINT.JSON, POST_HINT.JSON_LIKE):
+                                match = re.search(r"['\"]%s['\"]:" % re.escape(name), post)
+                                if match:
+                                    quote = match.group(0)[0]
+                                    post = post.replace("\\%s" % quote, BOUNDARY_BACKSLASH_MARKER)
+                                    match = re.search(r"(%s%s%s:\s*)(\d+|%s[^%s]*%s)" % (quote, re.escape(name), quote, quote, quote, quote), post)
+                                    if match:
+                                        found = True
+                                        post = post.replace(match.group(0), "%s%s" % (match.group(1), value if value.isdigit() else "%s%s%s" % (match.group(0)[0], value, match.group(0)[0])))
+                                    post = post.replace(BOUNDARY_BACKSLASH_MARKER, "\\%s" % quote)
+
                             regex = r"\b(%s)\b([^\w]+)(\w+)" % re.escape(name)
                             if not found and re.search(regex, (post or "")):
                                 found = True
