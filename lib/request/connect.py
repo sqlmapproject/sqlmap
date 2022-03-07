@@ -1356,7 +1356,27 @@ class Connect(object):
                         found = False
                         value = getUnicode(value, UNICODE_ENCODING)
 
-                        if kb.postHint and re.search(r"\b%s\b" % re.escape(name), post or ""):
+                        if kb.postHint == POST_HINT.MULTIPART:
+                            boundary = "--%s" % re.search(r"boundary=([^\s]+)", contentType).group(1)
+                            if boundary:
+                                parts = post.split(boundary)
+                                match = re.search(r'\bname="%s"' % re.escape(name), post)
+                                if not match and parts:
+                                    parts.insert(2, parts[1])
+                                    parts[2] = re.sub(r'\bname="[^"]+".*', 'name="%s"' % re.escape(name), parts[2])
+                                for i in xrange(len(parts)):
+                                    part = parts[i]
+                                    if re.search(r'\bname="%s"' % re.escape(name), part):
+                                        match = re.search(r"(?s)\A.+?\r?\n\r?\n", part)
+                                        if match:
+                                            found = True
+                                            first = match.group(0)
+                                            second = part[len(first):]
+                                            second = re.sub(r"(?s).+?(\r?\n?\-*\Z)", r"%s\g<1>" % re.escape(value), second)
+                                            parts[i] = "%s%s" % (first, second)
+                                post = boundary.join(parts)
+
+                        elif kb.postHint and re.search(r"\b%s\b" % re.escape(name), post or ""):
                             if kb.postHint in (POST_HINT.XML, POST_HINT.SOAP):
                                 if re.search(r"<%s\b" % re.escape(name), post):
                                     found = True
