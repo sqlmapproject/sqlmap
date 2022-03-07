@@ -383,17 +383,17 @@ def main():
             raise SystemExit
 
         elif all(_ in excMsg for _ in ("pymysql", "configparser")):
-            errMsg = "wrong initialization of pymsql detected (using Python3 dependencies)"
+            errMsg = "wrong initialization of 'pymsql' detected (using Python3 dependencies)"
             logger.critical(errMsg)
             raise SystemExit
 
         elif all(_ in excMsg for _ in ("ntlm", "socket.error, err", "SyntaxError")):
-            errMsg = "wrong initialization of python-ntlm detected (using Python2 syntax)"
+            errMsg = "wrong initialization of 'python-ntlm' detected (using Python2 syntax)"
             logger.critical(errMsg)
             raise SystemExit
 
         elif all(_ in excMsg for _ in ("drda", "to_bytes")):
-            errMsg = "wrong initialization of drda detected (using Python3 syntax)"
+            errMsg = "wrong initialization of 'drda' detected (using Python3 syntax)"
             logger.critical(errMsg)
             raise SystemExit
 

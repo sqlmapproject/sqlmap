@@ -3,7 +3,7 @@
 <!--
      References:
      * https://en.wikipedia.org/wiki/Internet_Information_Services
-     * http://distrowatch.com
+     * https://distrowatch.com
 -->
 
 <root>
@@ -95,6 +95,10 @@
 
     <regexp value="Apache/2\.4\.37 \(CentOS\)">
         <info type="Linux" distrib="CentOS" release="8"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.48 \(CentOS\)">
+        <info type="Linux" distrib="CentOS" release="9"/>
     </regexp>
 
     <!-- Apache: Debian -->
@@ -444,8 +448,12 @@
         <info type="FreeBSD" release="11.3"/>
     </regexp>
 
+    <regexp value="Apache/2\.4\.51 \(FreeBSD\)">
+        <info type="FreeBSD" release="12.3"/>
+    </regexp>
+
     <regexp value="Apache/2\.4\.46 \(FreeBSD\)">
-        <info type="FreeBSD" release="12.2"/>
+        <info type="FreeBSD" release="13.0"/>
     </regexp>
 
     <!-- Apache: Mandrake / Mandriva -->
@@ -764,7 +772,7 @@
     </regexp>
 
     <regexp value="Apache/2\.4\.43 \(Linux/SuSE\)">
-        <info type="Linux" distrib="SuSE" release="15.2"/>
+        <info type="Linux" distrib="SuSE" release="15.3"/>
     </regexp>
 
     <!-- Apache: Ubuntu -->
@@ -867,6 +875,10 @@
 
     <regexp value="Apache/2\.4\.41 \(Ubuntu\)">
         <info type="Linux" distrib="Ubuntu" release="19.10|20.04|20.10" codename="eoan|focal"/>
+    </regexp>
+
+    <regexp value="Apache/2\.4\.46 \(Ubuntu\)">
+        <info type="Linux" distrib="Ubuntu" release="21.04|21.10" codename="eoan|focal"/>
     </regexp>
 
     <!-- Nginx -->
