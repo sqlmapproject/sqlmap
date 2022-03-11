@@ -429,7 +429,7 @@ def main():
             dataToStdout(excMsg)
             raise SystemExit
 
-        elif any(_ in excMsg for _ in ("tamper/", "waf/")):
+        elif any(_ in "%s\n%s" % (errMsg, excMsg) for _ in ("tamper/", "waf/", "--engagement-dojo")):
             logger.critical(errMsg)
             print()
             dataToStdout(excMsg)
