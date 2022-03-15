@@ -1721,13 +1721,13 @@ def parseTargetUrl():
 
     try:
         urlSplit = _urllib.parse.urlsplit(conf.url)
+        hostnamePort = [urlSplit.hostname, urlSplit.port]
     except ValueError as ex:
         errMsg = "invalid URL '%s' has been given ('%s'). " % (conf.url, getSafeExString(ex))
         errMsg += "Please be sure that you don't have any leftover characters (e.g. '[' or ']') "
         errMsg += "in the hostname part"
         raise SqlmapGenericException(errMsg)
 
-    hostnamePort = urlSplit.netloc.split(":") if not re.search(r"\[.+\]", urlSplit.netloc) else filterNone((re.search(r"\[.+\]", urlSplit.netloc).group(0), re.search(r"\](:(?P<port>\d+))?", urlSplit.netloc).group("port")))
 
     conf.scheme = (urlSplit.scheme.strip().lower() or "http")
     conf.path = urlSplit.path.strip()
@@ -1736,8 +1736,8 @@ def parseTargetUrl():
     if conf.forceSSL:
         conf.scheme = re.sub(r"(?i)\A(http|ws)\Z", r"\g<1>s", conf.scheme)
 
-    conf.ipv6 = conf.hostname != conf.hostname.strip("[]")
-    conf.hostname = conf.hostname.strip("[]").replace(kb.customInjectionMark, "")
+    conf.ipv6 = ":" in conf.hostname
+    conf.hostname = conf.hostname.replace(kb.customInjectionMark, "")
 
     try:
         conf.hostname.encode("idna")

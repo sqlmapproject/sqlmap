@@ -1527,7 +1527,7 @@ def _setHostname():
 
     if conf.url:
         try:
-            conf.hostname = _urllib.parse.urlsplit(conf.url).netloc.split(':')[0]
+            conf.hostname = _urllib.parse.urlsplit(conf.url).hostname
         except ValueError as ex:
             errMsg = "problem occurred while "
             errMsg += "parsing an URL '%s' ('%s')" % (conf.url, getSafeExString(ex))
