@@ -166,9 +166,8 @@ class Fingerprint(GenericFingerprint):
         if not conf.extensiveFp and Backend.isDbmsWithin(MYSQL_ALIASES):
             setDbms("%s %s" % (DBMS.MYSQL, Backend.getVersion()))
 
-            if Backend.isVersionGreaterOrEqualThan("5"):
+            if Backend.isVersionGreaterOrEqualThan("5") or inject.checkBooleanExpression("DATABASE() LIKE SCHEMA()"):
                 kb.data.has_information_schema = True
-
             self.getBanner()
 
             return True
