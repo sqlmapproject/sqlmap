@@ -23,19 +23,19 @@ wikiに載っているいくつかの機能のデモをスクリーンショッ�
 
 sqlmapは、 [Python](https://www.python.org/download/) バージョン **2.6**, **2.7** または **3.x** がインストールされていれば、全てのプラットフォームですぐに使用できます。
 
-使用法
+使用方法
 ----
 
-基本的なオプションとスイッチの使用法をリストするには:
+基本的なオプションとスイッチの使用方法をリストで取得するには:
 
     python sqlmap.py -h
 
-全てのオプションとスイッチの使用法をリストするには:
+全てのオプションとスイッチの使用方法をリストで取得するには:
 
     python sqlmap.py -hh
 
 実行例を [こちら](https://asciinema.org/a/46601) で見ることができます。
-sqlmapの概要、機能の一覧、全てのオプションやスイッチの使用法を例とともに、 [ユーザーマニュアル](https://github.com/sqlmapproject/sqlmap/wiki/Usage) で確認することができます。
+sqlmapの概要、機能の一覧、全てのオプションやスイッチの使用方法を例とともに、 [ユーザーマニュアル](https://github.com/sqlmapproject/sqlmap/wiki/Usage) で確認することができます。
 
 リンク
 ----
