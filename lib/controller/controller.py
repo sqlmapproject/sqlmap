@@ -496,7 +496,7 @@ def start():
                     if skip:
                         continue
 
-                    if place not in conf.paramDict:
+                    if place not in conf.paramDict or place not in conf.parameters:
                         continue
 
                     paramDict = conf.paramDict[place]
