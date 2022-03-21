@@ -5408,6 +5408,12 @@ def parseRequestFile(reqFile, checkParams=True):
     if conf.scope:
         logger.info("using regular expression '%s' for filtering targets" % conf.scope)
 
+        try:
+            re.compile(conf.scope)
+        except Exception as ex:
+            errMsg = "invalid regular expression '%s' ('%s')" % (conf.scope, getSafeExString(ex))
+            raise SqlmapSyntaxException(errMsg)
+
     for target in _parseBurpLog(content):
         yield target
 
