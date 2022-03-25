@@ -243,6 +243,7 @@ optDict = {
         "dependencies": "boolean",
         "disableColoring": "boolean",
         "listTampers": "boolean",
+        "noLogging": "boolean",
         "offline": "boolean",
         "purge": "boolean",
         "resultsFile": "string",

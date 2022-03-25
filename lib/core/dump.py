@@ -79,18 +79,19 @@ class Dump(object):
         elif console:
             dataToStdout(text)
 
-        multiThreadMode = kb.multiThreadMode
-        if multiThreadMode:
-            self._lock.acquire()
+        if self._outputFP:
+            multiThreadMode = kb.multiThreadMode
+            if multiThreadMode:
+                self._lock.acquire()
 
-        try:
-            self._outputFP.write(text)
-        except IOError as ex:
-            errMsg = "error occurred while writing to log file ('%s')" % getSafeExString(ex)
-            raise SqlmapGenericException(errMsg)
+            try:
+                self._outputFP.write(text)
+            except IOError as ex:
+                errMsg = "error occurred while writing to log file ('%s')" % getSafeExString(ex)
+                raise SqlmapGenericException(errMsg)
 
-        if multiThreadMode:
-            self._lock.release()
+            if multiThreadMode:
+                self._lock.release()
 
         kb.dataOutputFlag = True
 
@@ -102,6 +103,10 @@ class Dump(object):
                 pass
 
     def setOutputFile(self):
+        if conf.noLogging:
+            self._outputFP = None
+            return
+
         self._outputFile = os.path.join(conf.outputPath, "log")
         try:
             self._outputFP = openFile(self._outputFile, "ab" if not conf.flushSession else "wb")

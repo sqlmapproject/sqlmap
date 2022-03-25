@@ -745,6 +745,9 @@ def cmdLineParser(argv=None):
         miscellaneous.add_argument("--list-tampers", dest="listTampers", action="store_true",
             help="Display list of available tamper scripts")
 
+        miscellaneous.add_argument("--no-logging", dest="noLogging", action="store_true",
+            help="Disable logging to a file")
+
         miscellaneous.add_argument("--offline", dest="offline", action="store_true",
             help="Work in offline mode (only use session data)")
 
