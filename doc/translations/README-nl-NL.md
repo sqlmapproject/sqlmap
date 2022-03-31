@@ -14,7 +14,7 @@ Je kunt de [collectie met screenshots](https://github.com/sqlmapproject/sqlmap/w
 Installatie
 ----
 
-Je kan de laatste tarball installeren door [hier](https://github.com/sqlmapproject/sqlmap/tarball/master) te klikken of de laatste zipball door [hier](https://github.com/sqlmapproject/sqlmap/zipball/master) te klikken.
+Je kunt de laatste tarball installeren door [hier](https://github.com/sqlmapproject/sqlmap/tarball/master) te klikken of de laatste zipball door [hier](https://github.com/sqlmapproject/sqlmap/zipball/master) te klikken.
 
 Bij voorkeur, kun je sqlmap downloaden door de [Git](https://github.com/sqlmapproject/sqlmap) repository te clonen:
 
