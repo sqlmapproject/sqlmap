@@ -263,7 +263,7 @@ _moved_attributes = [
     MovedAttribute("reduce", "__builtin__", "functools"),
     MovedAttribute("shlex_quote", "pipes", "shlex", "quote"),
     MovedAttribute("StringIO", "StringIO", "io"),
-    MovedAttribute("UserDict", "UserDict", "collections"),
+    MovedAttribute("UserDict", "UserDict", "collections", "IterableUserDict", "UserDict"),
     MovedAttribute("UserList", "UserList", "collections"),
     MovedAttribute("UserString", "UserString", "collections"),
     MovedAttribute("xrange", "__builtin__", "builtins", "xrange", "range"),
