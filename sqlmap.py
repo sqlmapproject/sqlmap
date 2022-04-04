@@ -61,12 +61,12 @@ try:
     from lib.core.common import MKSTEMP_PREFIX
     from lib.core.common import setColor
     from lib.core.common import unhandledExceptionMessage
+    from lib.core.compat import LooseVersion
+    from lib.core.compat import xrange
     from lib.core.data import cmdLineOptions
     from lib.core.data import conf
     from lib.core.data import kb
     from lib.core.datatype import OrderedSet
-    from lib.core.compat import LooseVersion
-    from lib.core.compat import xrange
     from lib.core.exception import SqlmapBaseException
     from lib.core.exception import SqlmapShellQuitException
     from lib.core.exception import SqlmapSilentQuitException
@@ -161,6 +161,7 @@ def main():
             # to an IPC database
             sys.stdout = StdDbOut(conf.taskid, messagetype="stdout")
             sys.stderr = StdDbOut(conf.taskid, messagetype="stderr")
+
             setRestAPILog()
 
         conf.showTime = True
@@ -579,5 +580,5 @@ if __name__ == "__main__":
         else:
             sys.exit(getattr(os, "_exitcode", 0))
 else:
-    # cancelling postponed imports (because of Travis CI checks)
+    # cancelling postponed imports (because of CI/CD checks)
     __import__("lib.controller.controller")
