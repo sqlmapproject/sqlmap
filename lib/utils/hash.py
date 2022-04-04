@@ -12,6 +12,13 @@ try:
 except:  # removed ImportError because of https://github.com/sqlmapproject/sqlmap/issues/3171
     from thirdparty.fcrypt.fcrypt import crypt
 
+try:
+    from Crypto.Cipher.DES import MODE_CBC as CBC
+    from Crypto.Cipher.DES import new as des
+except:
+    from thirdparty.pydes.pyDes import CBC
+    from thirdparty.pydes.pyDes import des
+
 _multiprocessing = None
 
 import base64
@@ -80,8 +87,6 @@ from lib.core.settings import UNICODE_ENCODING
 from lib.core.wordlist import Wordlist
 from thirdparty import six
 from thirdparty.colorama.initialise import init as coloramainit
-from thirdparty.pydes.pyDes import CBC
-from thirdparty.pydes.pyDes import des
 from thirdparty.six.moves import queue as _queue
 
 def mysql_passwd(password, uppercase=True):
@@ -219,14 +224,21 @@ def oracle_old_passwd(password, username, uppercase=True):  # prior to version '
     'F894844C34402B67'
     """
 
-    IV, pad = "\0" * 8, "\0"
+    IV, pad = b"\0" * 8, b"\0"
 
     unistr = b"".join((b"\0" + _.encode(UNICODE_ENCODING)) if ord(_) < 256 else _.encode(UNICODE_ENCODING) for _ in (username + password).upper())
 
-    cipher = des(decodeHex("0123456789ABCDEF"), CBC, IV, pad)
-    encrypted = cipher.encrypt(unistr)
-    cipher = des(encrypted[-8:], CBC, IV, pad)
-    encrypted = cipher.encrypt(unistr)
+    if des.__module__ == "Crypto.Cipher.DES":
+        unistr += b"\0" * ((8 - len(unistr) % 8) & 7)
+        cipher = des(decodeHex("0123456789ABCDEF"), CBC, iv=IV)
+        encrypted = cipher.encrypt(unistr)
+        cipher = des(encrypted[-8:], CBC, iv=IV)
+        encrypted = cipher.encrypt(unistr)
+    else:
+        cipher = des(decodeHex("0123456789ABCDEF"), CBC, IV, pad)
+        encrypted = cipher.encrypt(unistr)
+        cipher = des(encrypted[-8:], CBC, IV, pad)
+        encrypted = cipher.encrypt(unistr)
 
     retVal = encodeHex(encrypted[-8:], binary=False)
 
