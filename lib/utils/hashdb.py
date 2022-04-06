@@ -62,6 +62,7 @@ class HashDB(object):
         threadData = getCurrentThreadData()
         try:
             if threadData.hashDBCursor:
+                threadData.hashDBCursor.connection.commit()
                 threadData.hashDBCursor.close()
                 threadData.hashDBCursor.connection.close()
                 threadData.hashDBCursor = None

@@ -119,6 +119,13 @@ def setDaemon(thread):
 def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardException=True, threadChoice=False, startThreadMsg=True):
     threads = []
 
+    def _threadFunction():
+        try:
+            threadFunction()
+        finally:
+            if conf.hashDB:
+                conf.hashDB.close()
+
     kb.multipleCtrlC = False
     kb.threadContinue = True
     kb.threadException = False
@@ -154,14 +161,14 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
                 infoMsg = "starting %d threads" % numThreads
                 logger.info(infoMsg)
         else:
-            threadFunction()
+            _threadFunction()
             return
 
         kb.multiThreadMode = True
 
         # Start the threads
         for numThread in xrange(numThreads):
-            thread = threading.Thread(target=exceptionHandledFunction, name=str(numThread), args=[threadFunction])
+            thread = threading.Thread(target=exceptionHandledFunction, name=str(numThread), args=[_threadFunction])
 
             setDaemon(thread)
 
