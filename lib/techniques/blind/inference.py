@@ -556,6 +556,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                     output += status if _ != length else " " * len(status)
 
                                     dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), output))
+                        if conf.get("hashDB"):
+                            conf.hashDB.close()
 
                 runThreads(numThreads, blindThread, startThreadMsg=False)
 
