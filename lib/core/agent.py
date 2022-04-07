@@ -418,6 +418,11 @@ class Agent(object):
                 payload = re.sub(r"(?i)\bMID\(", "SUBSTR(", payload)
                 payload = re.sub(r"(?i)\bNCHAR\b", "CHAR", payload)
 
+            # NOTE: https://github.com/sqlmapproject/sqlmap/issues/5057
+            match = re.search(r"(=0x)(303a303a)3(\d{2,})", payload)
+            if match:
+                payload = payload.replace(match.group(0), "%s%s%s" % (match.group(1), match.group(2).upper(), "".join("3%s" % _ for _ in match.group(3))))
+
         return payload
 
     def getComment(self, request):
