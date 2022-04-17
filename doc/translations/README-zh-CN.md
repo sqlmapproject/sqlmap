@@ -43,6 +43,7 @@ sqlmap 可以运行在 [Python](https://www.python.org/download/)  **2.6**, **2.
 * RSS 订阅: https://github.com/sqlmapproject/sqlmap/commits/master.atom
 * Issue tracker: https://github.com/sqlmapproject/sqlmap/issues
 * 使用手册: https://github.com/sqlmapproject/sqlmap/wiki
+  * 简体中文版: https://github.com/kvko/sqlmap-wiki-zhcn
 * 常见问题 (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
 * 教程: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
