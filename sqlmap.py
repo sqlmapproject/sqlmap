@@ -338,6 +338,12 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
+        elif "invalid maximum character passed to PyUnicode_New" in excMsg and re.search(r"\A3\.[34]", sys.version) is not None:
+            errMsg = "please upgrade the Python version (>= 3.5) "
+            errMsg += "(Reference: 'https://bugs.python.org/issue18183')"
+            logger.critical(errMsg)
+            raise SystemExit
+
         elif all(_ in excMsg for _ in ("scramble_caching_sha2", "TypeError")):
             errMsg = "please downgrade the 'PyMySQL' package (=< 0.8.1) "
             errMsg += "(Reference: 'https://github.com/PyMySQL/PyMySQL/issues/700')"
