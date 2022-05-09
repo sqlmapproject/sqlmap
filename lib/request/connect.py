@@ -922,11 +922,13 @@ class Connect(object):
 
             socket.setdefaulttimeout(conf.timeout)
 
-        if conf.retryOn and re.search(conf.retryOn, page, re.I):
-            if threadData.retriesCount < conf.retries:
-                warnMsg = "forced retry of the request because of undesired page content"
-                logger.warn(warnMsg)
-                return Connect._retryProxy(**kwargs)
+        # Dirty patch for Python3.11.0a7 (e.g. https://github.com/sqlmapproject/sqlmap/issues/5091)
+        if not sys.version.startswith("3.11."):
+            if conf.retryOn and re.search(conf.retryOn, page, re.I):
+                if threadData.retriesCount < conf.retries:
+                    warnMsg = "forced retry of the request because of undesired page content"
+                    logger.warn(warnMsg)
+                    return Connect._retryProxy(**kwargs)
 
         processResponse(page, responseHeaders, code, status)
 
