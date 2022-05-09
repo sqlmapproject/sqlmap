@@ -126,6 +126,8 @@ def crawl(target, post=None, cookie=None):
                         pass
                     except ValueError:          # for non-valid links
                         pass
+                    except AssertionError:      # for invalid HTML
+                        pass
                     finally:
                         if conf.forms:
                             threadData.shared.formsFound |= len(findPageForms(content, current, False, True)) > 0
