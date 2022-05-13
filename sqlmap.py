@@ -452,6 +452,12 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
+        elif all(_ in excMsg for _ in ("PermissionError: [WinError 5]", "multiprocessing")):
+            errMsg = "there is a permission problem in running multiprocessing on this system. "
+            errMsg += "Please rerun with '--disable-multi'"
+            logger.critical(errMsg)
+            raise SystemExit
+
         elif all(_ in excMsg for _ in ("No such file", "_'")):
             errMsg = "corrupted installation detected ('%s'). " % excMsg.strip().split('\n')[-1]
             errMsg += "You should retrieve the latest development version from official GitHub "
