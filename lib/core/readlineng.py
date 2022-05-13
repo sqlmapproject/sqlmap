@@ -5,12 +5,7 @@ Copyright (c) 2006-2022 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
-from lib.core.data import logger
-from lib.core.settings import IS_WIN
-from lib.core.settings import PLATFORM
-
 _readline = None
-
 try:
     from readline import *
     import readline as _readline
@@ -20,6 +15,10 @@ except:
         import pyreadline as _readline
     except:
         pass
+
+from lib.core.data import logger
+from lib.core.settings import IS_WIN
+from lib.core.settings import PLATFORM
 
 if IS_WIN and _readline:
     try:
