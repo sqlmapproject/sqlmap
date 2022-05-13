@@ -369,6 +369,12 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
+        elif "AttributeError: unable to access item" in excMsg and re.search(r"3\.11\.\d+a", sys.version):
+            errMsg = "there is a known issue when sqlmap is run with ALPHA versions of Python 3.11. "
+            errMsg += "Please downgrade to some stable Python version"
+            logger.critical(errMsg)
+            raise SystemExit
+
         elif all(_ in excMsg for _ in ("Resource temporarily unavailable", "os.fork()", "dictionaryAttack")):
             errMsg = "there has been a problem while running the multiprocessing hash cracking. "
             errMsg += "Please rerun with option '--threads=1'"
