@@ -1,11 +1,10 @@
-# sqlmap ![](https://i.imgur.com/fe85aVR.png)
+# Giới thiệu sqlmap ![](https://i.imgur.com/fe85aVR.png)
 
 [![.github/workflows/tests.yml](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml/badge.svg)](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml) [![Python 2.6|2.7|3.x](https://img.shields.io/badge/python-2.6|2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![Twitter](https://img.shields.io/badge/twitter-@sqlmap-blue.svg)](https://twitter.com/sqlmap)
 
-sqlmap là một công cụ kiểm tra thâm nhập mã nguồn mở, nhằm tự động hóa quá trình phát hiện, khai thác lỗ hổng tiêm SQL và tiếp quản các máy chủ cơ sở dữ liệu. Nó đi kèm với 
-một hệ thống phát hiện mạnh mẽ, nhiều tính năng thích hợp cho người kiểm tra thâm nhập (pentester) và một loạt các tùy chọn bao gồm phát hiện cơ sở dữ liệu, truy xuất dữ liệu từ cơ sở dữ liệu, truy cập tệp của hệ thống và thực hiện các lệnh trên hệ điều hành từ xa.
+Công cụ kiểm thử `sqlmap` là một công cụ kiểm tra thâm nhập với mã nguồn mở, nhằm tự động hóa tiến trình tìm kiếm, khai thác lỗ hổng của ngôn ngữ SQL -sau đó, chiếm đoạt các máy chủ CSDL (cơ sở dữ liệu / database). Được phát triển với khả năng tìm kiếm lỗ hổng mạnh mẽ, nhiều tính năng thích hợp cho người kiểm tra thâm nhập (pentester) hỗ trợ người dùng với nhiều tính năng tích hợp như nhận dạng CSDL, truy xuất dữ liệu từ CSDL, truy cập tệp hệ thống và khởi chạy các lệnh trên hệ điều hành từ xa.
 
-Ảnh chụp màn hình
+Tổng quan
 ----
 
 ![Screenshot](https://raw.github.com/wiki/sqlmapproject/sqlmap/images/sqlmap_screenshot.png)
