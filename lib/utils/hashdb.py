@@ -198,6 +198,10 @@ class HashDB(object):
                     threadData.inTransaction = False
                 except sqlite3.OperationalError:
                     pass
+                except sqlite3.ProgrammingError:
+                    self.cursor = None
+                    threadData.inTransaction = False
+                    return
                 else:
                     return
 
