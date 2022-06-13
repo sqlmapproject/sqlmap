@@ -199,6 +199,7 @@
         <error regexp="io\.prestosql\.jdbc"/>
         <error regexp="com\.simba\.presto\.jdbc"/>
         <error regexp="UNION query has different number of fields: \d+, \d+"/>
+        <error regexp="line \d+:\d+: mismatched input '[^']+'. Expecting:"/>
     </dbms>
 
     <dbms value="Altibase">
