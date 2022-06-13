@@ -1367,11 +1367,10 @@ def checkWaf():
     retVal = False
     payload = "%d %s" % (randomInt(), IPS_WAF_CHECK_PAYLOAD)
 
+    place = PLACE.GET
     if PLACE.URI in conf.parameters:
-        place = PLACE.POST
         value = "%s=%s" % (randomStr(), agent.addPayloadDelimiters(payload))
     else:
-        place = PLACE.GET
         value = "" if not conf.parameters.get(PLACE.GET) else conf.parameters[PLACE.GET] + DEFAULT_GET_POST_DELIMITER
         value += "%s=%s" % (randomStr(), agent.addPayloadDelimiters(payload))
 
