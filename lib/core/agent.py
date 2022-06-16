@@ -134,7 +134,7 @@ class Agent(object):
                 origValue = extractRegexResult(r"%s\s*:\s*(?P<result>\d+)\Z" % quote, origValue) or extractRegexResult(r"(?P<result>[^%s]*)\Z" % quote, origValue)
             else:
                 _ = extractRegexResult(r"(?s)(?P<result>[^\s<>{}();'\"&]+\Z)", origValue) or ""
-                origValue = _.split('=', 1)[1] if '=' in _ else ""
+                origValue = _.split('=', 1)[1] if '=' in _ else _
         elif place == PLACE.CUSTOM_HEADER:
             paramString = origValue
             origValue = origValue[origValue.find(',') + 1:]
