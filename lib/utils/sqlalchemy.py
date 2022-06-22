@@ -5,7 +5,7 @@ Copyright (c) 2006-2022 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
-import imp
+import importlib
 import logging
 import os
 import re
@@ -13,15 +13,18 @@ import sys
 import traceback
 import warnings
 
+_path = list(sys.path)
 _sqlalchemy = None
 try:
-    f, pathname, desc = imp.find_module("sqlalchemy", sys.path[1:])
-    _ = imp.load_module("sqlalchemy", f, pathname, desc)
-    if hasattr(_, "dialects"):
-        _sqlalchemy = _
+    sys.path = sys.path[1:]
+    module = importlib.import_module("sqlalchemy")
+    if hasattr(module, "dialects"):
+        _sqlalchemy = module
         warnings.simplefilter(action="ignore", category=_sqlalchemy.exc.SAWarning)
 except ImportError:
     pass
+finally:
+    sys.path = _path
 
 try:
     import MySQLdb  # used by SQLAlchemy in case of MySQL

@@ -36,7 +36,10 @@ try:
         warnings.filterwarnings(action="ignore", category=DeprecationWarning)
     else:
         warnings.resetwarnings()
-        warnings.simplefilter("ignore", category=ResourceWarning, append=1)
+        warnings.filterwarnings(action="ignore", message="'crypt'", category=DeprecationWarning)
+        warnings.simplefilter("ignore", category=ImportWarning)
+        if sys.version_info >= (3, 0):
+            warnings.simplefilter("ignore", category=ResourceWarning)
 
     warnings.filterwarnings(action="ignore", message="Python 2 is no longer supported")
     warnings.filterwarnings(action="ignore", message=".*was already imported", category=UserWarning)
