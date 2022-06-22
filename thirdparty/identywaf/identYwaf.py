@@ -13,7 +13,7 @@ from __future__ import print_function
 import base64
 import codecs
 import difflib
-import json
+import jsondasdsa
 import locale
 import optparse
 import os
