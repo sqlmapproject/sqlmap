@@ -106,7 +106,7 @@ def _setRequestParams():
 
     # Perform checks on POST parameters
     if conf.method == HTTPMETHOD.POST and conf.data is None:
-        logger.warn("detected empty POST body")
+        logger.warning("detected empty POST body")
         conf.data = ""
 
     if conf.data is not None:
@@ -247,7 +247,7 @@ def _setRequestParams():
         warnMsg += "parameters (e.g. 'http://www.site.com/article.php?id=1') "
         warnMsg += "and without providing any POST parameters "
         warnMsg += "through option '--data'"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
         message = "do you want to try URI injections "
         message += "in the target URL itself? [Y/n/q] "
@@ -283,7 +283,7 @@ def _setRequestParams():
                             warnMsg = "it seems that you've provided empty parameter value(s) "
                             warnMsg += "for testing. Please, always use only valid parameter values "
                             warnMsg += "so sqlmap could be able to run properly"
-                            logger.warn(warnMsg)
+                            logger.warning(warnMsg)
 
             if not kb.processUserMarks:
                 if place == PLACE.URI:
@@ -582,7 +582,7 @@ def _setResultsFile():
                 os.close(handle)
                 conf.resultsFP = openFile(conf.resultsFile, "w+", UNICODE_ENCODING, buffering=0)
                 warnMsg += "Using temporary file '%s' instead" % conf.resultsFile
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
             except IOError as _:
                 errMsg = "unable to write to the temporary directory ('%s'). " % _
                 errMsg += "Please make sure that your disk is not full and "
@@ -613,7 +613,7 @@ def _createFilesDir():
             warnMsg = "unable to create files directory "
             warnMsg += "'%s' (%s). " % (conf.filePath, getUnicode(ex))
             warnMsg += "Using temporary directory '%s' instead" % getUnicode(tempDir)
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
             conf.filePath = tempDir
 
@@ -635,7 +635,7 @@ def _createDumpDir():
             warnMsg = "unable to create dump directory "
             warnMsg += "'%s' (%s). " % (conf.dumpPath, getUnicode(ex))
             warnMsg += "Using temporary directory '%s' instead" % getUnicode(tempDir)
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
             conf.dumpPath = tempDir
 
@@ -658,7 +658,7 @@ def _createTargetDirs():
         warnMsg = "unable to create output directory "
         warnMsg += "'%s' (%s). " % (conf.outputPath, getUnicode(ex))
         warnMsg += "Using temporary directory '%s' instead" % getUnicode(tempDir)
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
         conf.outputPath = tempDir
 
@@ -681,7 +681,7 @@ def _createTargetDirs():
         raise SqlmapMissingPrivileges(errMsg)
     except UnicodeError as ex:
         warnMsg = "something went wrong while saving target data ('%s')" % getSafeExString(ex)
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
     _createDumpDir()
     _createFilesDir()

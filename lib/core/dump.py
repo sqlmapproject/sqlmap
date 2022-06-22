@@ -421,7 +421,7 @@ class Dump(object):
                 tempDir = tempfile.mkdtemp(prefix="sqlmapdb")
                 warnMsg = "currently unable to use regular dump directory. "
                 warnMsg += "Using temporary directory '%s' instead" % tempDir
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
 
                 dumpDbPath = tempDir
 
@@ -445,7 +445,7 @@ class Dump(object):
                             warnMsg = "unable to create dump directory "
                             warnMsg += "'%s' (%s). " % (dumpDbPath, getSafeExString(ex))
                             warnMsg += "Using temporary directory '%s' instead" % tempDir
-                            logger.warn(warnMsg)
+                            logger.warning(warnMsg)
 
                             dumpDbPath = tempDir
 
@@ -624,7 +624,7 @@ class Dump(object):
                                 _ = re.sub(r"[^\w]", UNSAFE_DUMP_FILEPATH_REPLACEMENT, normalizeUnicode(unsafeSQLIdentificatorNaming(column)))
                                 filepath = os.path.join(dumpDbPath, "%s-%d.bin" % (_, randomInt(8)))
                                 warnMsg = "writing binary ('%s') content to file '%s' " % (mimetype, filepath)
-                                logger.warn(warnMsg)
+                                logger.warning(warnMsg)
 
                                 with openFile(filepath, "w+b", None) as f:
                                     _ = safechardecode(value, True)
@@ -672,7 +672,7 @@ class Dump(object):
             if not warnFile:
                 logger.info(msg)
             else:
-                logger.warn(msg)
+                logger.warning(msg)
 
     def dbColumns(self, dbColumnsDict, colConsider, dbs):
         if conf.api:

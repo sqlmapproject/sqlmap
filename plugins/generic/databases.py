@@ -106,13 +106,13 @@ class Databases(object):
             warnMsg = "information_schema not available, "
             warnMsg += "back-end DBMS is MySQL < 5. database "
             warnMsg += "names will be fetched from 'mysql' database"
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
         elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.PGSQL, DBMS.MONETDB, DBMS.DERBY, DBMS.VERTICA, DBMS.PRESTO, DBMS.MIMERSQL, DBMS.CRATEDB, DBMS.CACHE, DBMS.FRONTBASE):
             warnMsg = "schema names are going to be used on %s " % Backend.getIdentifiedDbms()
             warnMsg += "for enumeration as the counterpart to database "
             warnMsg += "names on other DBMSes"
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
             infoMsg = "fetching database (schema) names"
 
@@ -120,7 +120,7 @@ class Databases(object):
             warnMsg = "user names are going to be used on %s " % Backend.getIdentifiedDbms()
             warnMsg += "for enumeration as the counterpart to database "
             warnMsg += "names on other DBMSes"
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
             infoMsg = "fetching database (user) names"
 
@@ -220,7 +220,7 @@ class Databases(object):
             if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
                 warnMsg = "information_schema not available, "
                 warnMsg += "back-end DBMS is MySQL < 5.0"
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
                 bruteForce = True
 
             elif Backend.getIdentifiedDbms() in (DBMS.MCKOI, DBMS.EXTREMEDB, DBMS.RAIMA):
@@ -235,7 +235,7 @@ class Databases(object):
                 if not tables:
                     warnMsg = "cannot retrieve table names, "
                     warnMsg += "back-end DBMS is %s" % Backend.getIdentifiedDbms()
-                    logger.warn(warnMsg)
+                    logger.warning(warnMsg)
                     bruteForce = True
                 else:
                     return tables
@@ -381,7 +381,7 @@ class Databases(object):
                     if count == 0:
                         warnMsg = "database '%s' " % unsafeSQLIdentificatorNaming(db)
                         warnMsg += "appears to be empty"
-                        logger.warn(warnMsg)
+                        logger.warning(warnMsg)
                         break
 
                     elif not isNumPosStrValue(count):
@@ -441,7 +441,7 @@ class Databases(object):
                     else:
                         warnMsg = "unable to retrieve the table names "
                         warnMsg += "for database '%s'" % unsafeSQLIdentificatorNaming(db)
-                        logger.warn(warnMsg)
+                        logger.warning(warnMsg)
 
         if isNoneValue(kb.data.cachedTables):
             kb.data.cachedTables.clear()
@@ -471,7 +471,7 @@ class Databases(object):
                 warnMsg = "missing database parameter. sqlmap is going "
                 warnMsg += "to use the current database to enumerate "
                 warnMsg += "table(s) columns"
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
 
             conf.db = self.getCurrentDb()
 
@@ -542,7 +542,7 @@ class Databases(object):
             if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
                 warnMsg = "information_schema not available, "
                 warnMsg += "back-end DBMS is MySQL < 5.0"
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
                 bruteForce = True
 
             elif Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB, DBMS.RAIMA):
@@ -925,7 +925,7 @@ class Databases(object):
             warnMsg += ("table '%s' " % unsafeSQLIdentificatorNaming(unArrayizeValue(tblList))) if len(tblList) == 1 else "any table "
             if METADB_SUFFIX not in conf.db:
                 warnMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
             if bruteForce is None:
                 return self.getColumns(onlyColNames=onlyColNames, colTuple=colTuple, bruteForce=True)
@@ -994,7 +994,7 @@ class Databases(object):
             warnMsg = "missing table parameter, sqlmap will retrieve "
             warnMsg += "the number of entries for all database "
             warnMsg += "management system databases' tables"
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
         elif "." in conf.tbl:
             if not conf.db:
@@ -1004,7 +1004,7 @@ class Databases(object):
             warnMsg = "missing database parameter. sqlmap is going to "
             warnMsg += "use the current database to retrieve the "
             warnMsg += "number of entries for table '%s'" % unsafeSQLIdentificatorNaming(conf.tbl)
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
             conf.db = self.getCurrentDb()
 

@@ -117,7 +117,7 @@ class Fingerprint(GenericFingerprint):
             return True
         else:
             warnMsg = "the back-end DBMS is not %s" % DBMS.MSSQL
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
             return False
 
@@ -172,7 +172,7 @@ class Fingerprint(GenericFingerprint):
             warnMsg = "unable to fingerprint the underlying operating "
             warnMsg += "system version, assuming it is Windows "
             warnMsg += "%s Service Pack %d" % (Backend.getOsVersion(), Backend.getOsServicePack())
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
             self.cleanup(onlyFileTbl=True)
 

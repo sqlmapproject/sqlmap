@@ -167,7 +167,7 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
                             warnMsg = "possible server trimmed output detected "
                             warnMsg += "(due to its length and/or content): "
                             warnMsg += safecharencode(trimmed)
-                            logger.warn(warnMsg)
+                            logger.warning(warnMsg)
 
                         if not kb.testMode:
                             check = r"(?P<result>[^<>\n]*?)%s" % kb.chars.stop[:2]
@@ -351,7 +351,7 @@ def errorUse(expression, dump=False):
                 warnMsg += "of entries for the SQL query provided. "
                 warnMsg += "sqlmap will assume that it returns only "
                 warnMsg += "one entry"
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
 
                 stopLimit = 1
 
@@ -359,7 +359,7 @@ def errorUse(expression, dump=False):
                 if not count:
                     warnMsg = "the SQL query provided does not "
                     warnMsg += "return any output"
-                    logger.warn(warnMsg)
+                    logger.warning(warnMsg)
                 else:
                     value = []  # for empty tables
                 return value
@@ -445,7 +445,7 @@ def errorUse(expression, dump=False):
                     abortedFlag = True
                     warnMsg = "user aborted during enumeration. sqlmap "
                     warnMsg += "will display partial output"
-                    logger.warn(warnMsg)
+                    logger.warning(warnMsg)
 
                 finally:
                     threadData.shared.value.extend(_[1] for _ in sorted(threadData.shared.buffered))

@@ -65,7 +65,7 @@ class Custom(object):
             elif not isStackingAvailable() and not conf.direct:
                 warnMsg = "execution of non-query SQL statements is only "
                 warnMsg += "available when stacked queries are supported"
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
 
                 return None
             else:
@@ -80,7 +80,7 @@ class Custom(object):
                 output = NULL
 
         except SqlmapNoneDataException as ex:
-            logger.warn(ex)
+            logger.warning(ex)
 
         return output
 

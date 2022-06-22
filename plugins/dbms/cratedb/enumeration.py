@@ -11,12 +11,12 @@ from plugins.generic.enumeration import Enumeration as GenericEnumeration
 class Enumeration(GenericEnumeration):
     def getPasswordHashes(self):
         warnMsg = "on CrateDB it is not possible to enumerate the user password hashes"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
         return {}
 
     def getRoles(self, *args, **kwargs):
         warnMsg = "on CrateDB it is not possible to enumerate the user roles"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
         return {}

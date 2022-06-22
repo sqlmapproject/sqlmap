@@ -137,7 +137,7 @@ class Web(object):
             if "File uploaded" not in (page or ""):
                 warnMsg = "unable to upload the file through the web file "
                 warnMsg += "stager to '%s'" % directory
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
                 return False
             else:
                 return True
@@ -202,10 +202,10 @@ class Web(object):
             choice = readInput(message, default=str(default))
 
             if not isDigit(choice):
-                logger.warn("invalid value, only digits are allowed")
+                logger.warning("invalid value, only digits are allowed")
 
             elif int(choice) < 1 or int(choice) > len(choices):
-                logger.warn("invalid value, it must be between 1 and %d" % len(choices))
+                logger.warning("invalid value, it must be between 1 and %d" % len(choices))
 
             else:
                 self.webPlatform = choices[int(choice) - 1]
@@ -362,7 +362,7 @@ class Web(object):
             if "<%" in uplPage or "<?" in uplPage:
                 warnMsg = "file stager uploaded on '%s', " % directory
                 warnMsg += "but not dynamically interpreted"
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
                 continue
 
             elif self.webPlatform == WEB_PLATFORM.ASPX:
@@ -399,7 +399,7 @@ class Web(object):
                     warnMsg += "was able to upload the file stager or "
                     warnMsg += "because the DBMS and web server sit on "
                     warnMsg += "different servers"
-                    logger.warn(warnMsg)
+                    logger.warning(warnMsg)
 
                     message = "do you want to try the same method used "
                     message += "for the file stager? [Y/n] "

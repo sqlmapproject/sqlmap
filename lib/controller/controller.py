@@ -186,12 +186,12 @@ def _showInjections():
     if conf.tamper:
         warnMsg = "changes made by tampering scripts are not "
         warnMsg += "included in shown payload content(s)"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
     if conf.hpp:
         warnMsg = "changes made by HTTP parameter pollution are not "
         warnMsg += "included in shown payload content(s)"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
 def _randomFillBlankFields(value):
     retVal = value
@@ -556,7 +556,7 @@ def start():
 
                             if not check:
                                 warnMsg = "%sparameter '%s' does not appear to be dynamic" % ("%s " % paramType if paramType != parameter else "", parameter)
-                                logger.warn(warnMsg)
+                                logger.warning(warnMsg)
 
                                 if conf.skipStatic:
                                     infoMsg = "skipping static %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
@@ -612,7 +612,7 @@ def start():
 
                                 if not injectable:
                                     warnMsg = "%sparameter '%s' does not seem to be injectable" % ("%s " % paramType if paramType != parameter else "", parameter)
-                                    logger.warn(warnMsg)
+                                    logger.warning(warnMsg)
 
                             finally:
                                 if place == PLACE.COOKIE:
@@ -709,7 +709,7 @@ def start():
 
             if conf.multipleTargets:
                 warnMsg = "user aborted in multiple target mode"
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
 
                 message = "do you want to skip to the next target in list? [Y/n/q]"
                 choice = readInput(message, default='Y').upper()
@@ -749,7 +749,7 @@ def start():
                 warnMsg = "it appears that the target "
                 warnMsg += "has a maximum connections "
                 warnMsg += "constraint"
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
 
     if kb.dataOutputFlag and not conf.multipleTargets:
         logger.info("fetched data logged to text files under '%s'" % conf.outputPath)

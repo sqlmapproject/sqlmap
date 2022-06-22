@@ -11,28 +11,28 @@ from plugins.generic.enumeration import Enumeration as GenericEnumeration
 class Enumeration(GenericEnumeration):
     def searchDb(self):
         warnMsg = "on Informix searching of databases is not implemented"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
         return []
 
     def searchTable(self):
         warnMsg = "on Informix searching of tables is not implemented"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
         return []
 
     def searchColumn(self):
         warnMsg = "on Informix searching of columns is not implemented"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
         return []
 
     def search(self):
         warnMsg = "on Informix search option is not available"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
     def getStatements(self):
         warnMsg = "on Informix it is not possible to enumerate the SQL statements"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
         return []

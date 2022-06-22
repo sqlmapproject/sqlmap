@@ -701,7 +701,7 @@ def attackDumpedTable():
             _ = ','.join(binary_fields)
             warnMsg = "potential binary fields detected ('%s'). In case of any problems you are " % _
             warnMsg += "advised to rerun table dump with '--fresh-queries --binary-fields=\"%s\"'" % _
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
         for i in xrange(count):
             if not found and i > HASH_RECOGNITION_QUIT_THRESHOLD:
@@ -1064,7 +1064,7 @@ def dictionaryAttack(attack_dict):
                                 item = [(user, hash_), {"salt": hash_[4:12], "count": 1 << ITOA64.index(hash_[3]), "prefix": hash_[:3]}]
                             else:
                                 warnMsg = "invalid hash '%s'" % hash_
-                                logger.warn(warnMsg)
+                                logger.warning(warnMsg)
 
                         if item and hash_ not in keys:
                             resumed = hashDBRetrieve(hash_)
@@ -1197,7 +1197,7 @@ def dictionaryAttack(attack_dict):
                     print()
                     processException = True
                     warnMsg = "user aborted during dictionary-based attack phase (Ctrl+C was pressed)"
-                    logger.warn(warnMsg)
+                    logger.warning(warnMsg)
 
                 finally:
                     _finalize(retVal, results, processes, attack_info)
@@ -1272,7 +1272,7 @@ def dictionaryAttack(attack_dict):
                         print()
                         processException = True
                         warnMsg = "user aborted during dictionary-based attack phase (Ctrl+C was pressed)"
-                        logger.warn(warnMsg)
+                        logger.warning(warnMsg)
 
                         for process in processes:
                             try:
@@ -1290,11 +1290,11 @@ def dictionaryAttack(attack_dict):
 
     if foundHash and len(hash_regexes) == 0:
         warnMsg = "unknown hash format"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
     if len(results) == 0:
         warnMsg = "no clear password(s) found"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
     return results
 

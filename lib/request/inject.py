@@ -270,7 +270,7 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
                         warnMsg += "of entries for the SQL query provided. "
                         warnMsg += "sqlmap will assume that it returns only "
                         warnMsg += "one entry"
-                        logger.warn(warnMsg)
+                        logger.warning(warnMsg)
 
                         stopLimit = 1
 
@@ -278,7 +278,7 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
                         if not count:
                             warnMsg = "the SQL query provided does not "
                             warnMsg += "return any output"
-                            logger.warn(warnMsg)
+                            logger.warning(warnMsg)
 
                         return None
 
@@ -298,7 +298,7 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
                 except KeyboardInterrupt:
                     print()
                     warnMsg = "user aborted during dumping phase"
-                    logger.warn(warnMsg)
+                    logger.warning(warnMsg)
 
                 return outputs
 

@@ -12,4 +12,4 @@ from plugins.generic.enumeration import Enumeration as GenericEnumeration
 class Enumeration(GenericEnumeration):
     def getHostname(self):
         warnMsg = "on PostgreSQL it is not possible to enumerate the hostname"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)

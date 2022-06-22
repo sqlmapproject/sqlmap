@@ -475,7 +475,7 @@ def _setBulkMultipleTargets():
 
     if not found and not conf.forms and not conf.crawlDepth:
         warnMsg = "no usable links found (with GET parameters)"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
 def _findPageForms():
     if not conf.forms or conf.crawlDepth:
@@ -523,7 +523,7 @@ def _findPageForms():
 
     if not found:
         warnMsg = "no forms found"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
 def _setDBMSAuthentication():
     """
@@ -607,16 +607,16 @@ def _setMetasploit():
             warnMsg += "or more of the needed Metasploit executables "
             warnMsg += "within msfcli, msfconsole, msfencode and "
             warnMsg += "msfpayload do not exist"
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
     else:
         warnMsg = "you did not provide the local path where Metasploit "
         warnMsg += "Framework is installed"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
     if not msfEnvPathExists:
         warnMsg = "sqlmap is going to look for Metasploit Framework "
         warnMsg += "installation inside the environment path(s)"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
         envPaths = os.environ.get("PATH", "").split(";" if IS_WIN else ":")
 
@@ -1202,10 +1202,10 @@ def _setHTTPHandlers():
 
             if conf.proxy:
                 warnMsg += "with HTTP(s) proxy"
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
             elif conf.authType:
                 warnMsg += "with authentication methods"
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
             else:
                 handlers.append(keepAliveHandler)
 
@@ -1547,7 +1547,7 @@ def _setHTTPTimeout():
         if conf.timeout < 3.0:
             warnMsg = "the minimum HTTP timeout is 3 seconds, sqlmap "
             warnMsg += "will going to reset it"
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
             conf.timeout = 3.0
     else:
@@ -1586,13 +1586,13 @@ def _createHomeDirectories():
 
             if conf.get("outputDir") and context == "output":
                 warnMsg = "using '%s' as the %s directory" % (directory, context)
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
         except (OSError, IOError) as ex:
             tempDir = tempfile.mkdtemp(prefix="sqlmap%s" % context)
             warnMsg = "unable to %s %s directory " % ("create" if not os.path.isdir(directory) else "write to the", context)
             warnMsg += "'%s' (%s). " % (directory, getUnicode(ex))
             warnMsg += "Using temporary directory '%s' instead" % getUnicode(tempDir)
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
             paths["SQLMAP_%s_PATH" % context.upper()] = tempDir
 
@@ -1617,7 +1617,7 @@ def _createTemporaryDirectory():
             tempfile.tempdir = conf.tmpDir
 
             warnMsg = "using '%s' as the temporary directory" % conf.tmpDir
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
         except (OSError, IOError) as ex:
             errMsg = "there has been a problem while accessing "
             errMsg += "temporary directory location(s) ('%s')" % getSafeExString(ex)
@@ -1632,7 +1632,7 @@ def _createTemporaryDirectory():
             warnMsg += "make sure that there is enough disk space left. If problem persists, "
             warnMsg += "try to set environment variable 'TEMP' to a location "
             warnMsg += "writeable by the current user"
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
     if "sqlmap" not in (tempfile.tempdir or "") or conf.tmpDir and tempfile.tempdir == conf.tmpDir:
         try:
@@ -1832,7 +1832,7 @@ def _cleanupOptions():
             warnMsg = "increasing default value for "
             warnMsg += "option '--time-sec' to %d because " % conf.timeSec
             warnMsg += "switch '--tor' was provided"
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
     else:
         kb.adjustTimeDelay = ADJUST_TIME_DELAY.DISABLE
 
@@ -2217,7 +2217,7 @@ def _useWizardInterface():
         if not conf.crawlDepth and not conf.forms:
             warnMsg += "Will search for forms"
             conf.forms = True
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
     choice = None
 
@@ -2473,7 +2473,7 @@ def _setTorHttpProxySettings():
         warnMsg += "Tor anonymizing network because of "
         warnMsg += "known issues with default settings of various 'bundles' "
         warnMsg += "(e.g. Vidalia)"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
 def _setTorSocksProxySettings():
     infoMsg = "setting Tor SOCKS proxy settings"
@@ -2553,7 +2553,7 @@ def _basicOptionValidation():
     if isinstance(conf.limitStart, int) and conf.limitStart > 0 and \
        isinstance(conf.limitStop, int) and conf.limitStop < conf.limitStart:
         warnMsg = "usage of option '--start' (limitStart) which is bigger than value for --stop (limitStop) option is considered unstable"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
     if isinstance(conf.firstChar, int) and conf.firstChar > 0 and \
        isinstance(conf.lastChar, int) and conf.lastChar < conf.firstChar:
@@ -2563,7 +2563,7 @@ def _basicOptionValidation():
     if conf.proxyFile and not any((conf.randomAgent, conf.mobile, conf.agent, conf.requestFile)):
         warnMsg = "usage of switch '--random-agent' is strongly recommended when "
         warnMsg += "using option '--proxy-file'"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
     if conf.textOnly and conf.nullConnection:
         errMsg = "switch '--text-only' is incompatible with switch '--null-connection'"
@@ -2671,7 +2671,7 @@ def _basicOptionValidation():
             warnMsg = "increasing default value for "
             warnMsg += "option '--retries' to %d because " % conf.retries
             warnMsg += "option '--retry-on' was provided"
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
 
     if conf.cookieDel and len(conf.cookieDel):

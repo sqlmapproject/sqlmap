@@ -62,7 +62,7 @@ class Filesystem(object):
             localFileSize = os.path.getsize(localFile)
         except OSError:
             warnMsg = "file '%s' is missing" % localFile
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
             localFileSize = 0
 
         if fileRead and Backend.isDbms(DBMS.PGSQL):
@@ -95,7 +95,7 @@ class Filesystem(object):
                 warnMsg = "it looks like the file has not been written (usually "
                 warnMsg += "occurs if the DBMS process user has no write "
                 warnMsg += "privileges in the destination path)"
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
 
         return sameFile
 

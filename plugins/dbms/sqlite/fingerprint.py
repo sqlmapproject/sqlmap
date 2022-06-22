@@ -86,7 +86,7 @@ class Fingerprint(GenericFingerprint):
 
             if not result:
                 warnMsg = "the back-end DBMS is not %s" % DBMS.SQLITE
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
 
                 return False
             else:
@@ -104,7 +104,7 @@ class Fingerprint(GenericFingerprint):
             return True
         else:
             warnMsg = "the back-end DBMS is not %s" % DBMS.SQLITE
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
             return False
 

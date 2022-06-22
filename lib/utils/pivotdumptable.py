@@ -88,7 +88,7 @@ def pivotDumpTable(table, colList, count=None, blind=True, alias=None):
         if not validPivotValue:
             warnMsg = "column '%s' not " % conf.pivotColumn
             warnMsg += "found in table '%s'" % table
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
     if not validPivotValue:
         for column in colList:
@@ -120,7 +120,7 @@ def pivotDumpTable(table, colList, count=None, blind=True, alias=None):
         if not validPivotValue:
             warnMsg = "no proper pivot column provided (with unique values)."
             warnMsg += " It won't be possible to retrieve all rows"
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
     pivotValue = " "
     breakRetrieval = False
@@ -177,7 +177,7 @@ def pivotDumpTable(table, colList, count=None, blind=True, alias=None):
 
         warnMsg = "user aborted during enumeration. sqlmap "
         warnMsg += "will display partial output"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
     except SqlmapConnectionException as ex:
         errMsg = "connection exception detected ('%s'). sqlmap " % getSafeExString(ex)

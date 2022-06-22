@@ -270,7 +270,7 @@ class XP_cmdshell(object):
                         kb.xpCmdshellAvailable = True
 
                     else:
-                        logger.warn("xp_cmdshell re-enabling failed")
+                        logger.warning("xp_cmdshell re-enabling failed")
 
                         logger.info("creating xp_cmdshell with sp_OACreate")
                         self._xpCmdshellConfigure(0)
@@ -283,7 +283,7 @@ class XP_cmdshell(object):
                         else:
                             warnMsg = "xp_cmdshell creation failed, probably "
                             warnMsg += "because sp_OACreate is disabled"
-                            logger.warn(warnMsg)
+                            logger.warning(warnMsg)
 
             hashDBWrite(HASHDB_KEYS.KB_XP_CMDSHELL_AVAILABLE, kb.xpCmdshellAvailable)
 

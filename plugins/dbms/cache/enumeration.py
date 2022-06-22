@@ -15,34 +15,34 @@ class Enumeration(GenericEnumeration):
 
     def getUsers(self):
         warnMsg = "on Cache it is not possible to enumerate the users"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
         return []
 
     def getPasswordHashes(self):
         warnMsg = "on Cache it is not possible to enumerate password hashes"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
         return {}
 
     def getPrivileges(self, *args, **kwargs):
         warnMsg = "on Cache it is not possible to enumerate the user privileges"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
         return {}
 
     def getStatements(self):
         warnMsg = "on Cache it is not possible to enumerate the SQL statements"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
         return []
 
     def getRoles(self, *args, **kwargs):
         warnMsg = "on Cache it is not possible to enumerate the user roles"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
         return {}
 
     def getHostname(self):
         warnMsg = "on Cache it is not possible to enumerate the hostname"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)

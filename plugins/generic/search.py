@@ -119,7 +119,7 @@ class Search(object):
                     if dbConsider == "1":
                         warnMsg += "s LIKE"
                     warnMsg += " '%s' found" % unsafeSQLIdentificatorNaming(db)
-                    logger.warn(warnMsg)
+                    logger.warning(warnMsg)
 
                     continue
 
@@ -249,7 +249,7 @@ class Search(object):
                             if tblConsider == "1":
                                 warnMsg += "s LIKE"
                             warnMsg += " '%s'" % unsafeSQLIdentificatorNaming(tbl)
-                            logger.warn(warnMsg)
+                            logger.warning(warnMsg)
 
                             continue
 
@@ -302,7 +302,7 @@ class Search(object):
                             warnMsg += "s LIKE"
                         warnMsg += " '%s' " % unsafeSQLIdentificatorNaming(tbl)
                         warnMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(db)
-                        logger.warn(warnMsg)
+                        logger.warning(warnMsg)
 
                         continue
 
@@ -339,7 +339,7 @@ class Search(object):
 
         if not foundTbls:
             warnMsg = "no databases contain any of the provided tables"
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
             return
 
         conf.dumper.dbTables(foundTbls)
@@ -507,7 +507,7 @@ class Search(object):
                         if colConsider == "1":
                             warnMsg += "s LIKE"
                         warnMsg += " '%s'" % unsafeSQLIdentificatorNaming(column)
-                        logger.warn("%s%s" % (warnMsg, infoMsgTbl))
+                        logger.warning("%s%s" % (warnMsg, infoMsgTbl))
 
                         continue
 
@@ -566,7 +566,7 @@ class Search(object):
                                 warnMsg += "s LIKE"
                             warnMsg += " '%s' " % unsafeSQLIdentificatorNaming(column)
                             warnMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(db)
-                            logger.warn(warnMsg)
+                            logger.warning(warnMsg)
 
                             continue
 
@@ -620,7 +620,7 @@ class Search(object):
         else:
             warnMsg = "no databases have tables containing any of the "
             warnMsg += "provided columns"
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
     def search(self):
         if Backend.getIdentifiedDbms() in UPPER_CASE_DBMSES:

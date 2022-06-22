@@ -68,7 +68,7 @@ class Entries(object):
                 warnMsg = "missing database parameter. sqlmap is going "
                 warnMsg += "to use the current database to enumerate "
                 warnMsg += "table(s) entries"
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
 
             conf.db = self.getCurrentDb()
 
@@ -142,7 +142,7 @@ class Entries(object):
                     if METADB_SUFFIX not in conf.db:
                         warnMsg += " in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                     warnMsg += ", skipping" if len(tblList) > 1 else ""
-                    logger.warn(warnMsg)
+                    logger.warning(warnMsg)
 
                     continue
 
@@ -157,7 +157,7 @@ class Entries(object):
                     if METADB_SUFFIX not in conf.db:
                         warnMsg += " in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                     warnMsg += " (no usable column names)"
-                    logger.warn(warnMsg)
+                    logger.warning(warnMsg)
                     continue
 
                 kb.dumpColumns = [unsafeSQLIdentificatorNaming(_) for _ in colList]
@@ -222,7 +222,7 @@ class Entries(object):
                                         kb.dumpKeyboardInterrupt = True
                                         clearConsoleLine()
                                         warnMsg = "Ctrl+C detected in dumping phase"
-                                        logger.warn(warnMsg)
+                                        logger.warning(warnMsg)
 
                             if isNoneValue(entries) and not kb.dumpKeyboardInterrupt:
                                 try:
@@ -232,7 +232,7 @@ class Entries(object):
                                     kb.dumpKeyboardInterrupt = True
                                     clearConsoleLine()
                                     warnMsg = "Ctrl+C detected in dumping phase"
-                                    logger.warn(warnMsg)
+                                    logger.warning(warnMsg)
 
                                 if retVal:
                                     entries, _ = retVal
@@ -254,7 +254,7 @@ class Entries(object):
                             kb.dumpKeyboardInterrupt = True
                             clearConsoleLine()
                             warnMsg = "Ctrl+C detected in dumping phase"
-                            logger.warn(warnMsg)
+                            logger.warning(warnMsg)
 
                     if not isNoneValue(entries):
                         if isinstance(entries, six.string_types):
@@ -314,7 +314,7 @@ class Entries(object):
                         warnMsg = "table '%s' " % unsafeSQLIdentificatorNaming(tbl)
                         warnMsg += "in database '%s' " % unsafeSQLIdentificatorNaming(conf.db)
                         warnMsg += "appears to be empty"
-                        logger.warn(warnMsg)
+                        logger.warning(warnMsg)
 
                         for column in colList:
                             lengths[column] = len(column)
@@ -326,7 +326,7 @@ class Entries(object):
                             warnMsg += "column(s) '%s' " % colNames
                         warnMsg += "entries for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
                         warnMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
-                        logger.warn(warnMsg)
+                        logger.warning(warnMsg)
 
                         continue
 
@@ -366,7 +366,7 @@ class Entries(object):
                                 kb.dumpKeyboardInterrupt = True
                                 clearConsoleLine()
                                 warnMsg = "Ctrl+C detected in dumping phase"
-                                logger.warn(warnMsg)
+                                logger.warning(warnMsg)
 
                         if not entries and not kb.dumpKeyboardInterrupt:
                             try:
@@ -376,7 +376,7 @@ class Entries(object):
                                 kb.dumpKeyboardInterrupt = True
                                 clearConsoleLine()
                                 warnMsg = "Ctrl+C detected in dumping phase"
-                                logger.warn(warnMsg)
+                                logger.warning(warnMsg)
 
                             if retVal:
                                 entries, lengths = retVal
@@ -437,7 +437,7 @@ class Entries(object):
                             kb.dumpKeyboardInterrupt = True
                             clearConsoleLine()
                             warnMsg = "Ctrl+C detected in dumping phase"
-                            logger.warn(warnMsg)
+                            logger.warning(warnMsg)
 
                     for column, columnEntries in entries.items():
                         length = max(lengths[column], len(column))
@@ -452,7 +452,7 @@ class Entries(object):
                         warnMsg += "of columns '%s' " % colNames
                     warnMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
                     warnMsg += "in database '%s'%s" % (unsafeSQLIdentificatorNaming(conf.db), " (permission denied)" if kb.permissionFlag else "")
-                    logger.warn(warnMsg)
+                    logger.warning(warnMsg)
                 else:
                     kb.data.dumpedTable["__infos__"] = {"count": entriesCount,
                                                         "table": safeSQLIdentificatorNaming(tbl, True),

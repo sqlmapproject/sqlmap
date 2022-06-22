@@ -351,7 +351,7 @@ class Backend(object):
         elif kb.dbms is not None and kb.dbms != dbms:
             warnMsg = "there appears to be a high probability that "
             warnMsg += "this could be a false positive case"
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
             msg = "sqlmap previously fingerprinted back-end DBMS as "
             msg += "%s. However now it has been fingerprinted " % kb.dbms
@@ -371,7 +371,7 @@ class Backend(object):
                     break
                 else:
                     warnMsg = "invalid value"
-                    logger.warn(warnMsg)
+                    logger.warning(warnMsg)
 
         elif kb.dbms is None:
             kb.dbms = aliasToDbmsEnum(dbms)
@@ -429,7 +429,7 @@ class Backend(object):
                     break
                 else:
                     warnMsg = "invalid value"
-                    logger.warn(warnMsg)
+                    logger.warning(warnMsg)
 
         elif kb.os is None and isinstance(os, six.string_types):
             kb.os = os.capitalize()
@@ -466,7 +466,7 @@ class Backend(object):
                 break
             else:
                 warnMsg = "invalid value. Valid values are 1 and 2"
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
 
         return kb.arch
 
@@ -663,7 +663,7 @@ def paramToDict(place, parameters=None):
                         warnMsg += "chars/statements from manual SQL injection test(s). "
                         warnMsg += "Please, always use only valid parameter values "
                         warnMsg += "so sqlmap could be able to run properly"
-                        logger.warn(warnMsg)
+                        logger.warning(warnMsg)
 
                         message = "are you really sure that you want to continue (sqlmap could have problems)? [y/N] "
 
@@ -673,7 +673,7 @@ def paramToDict(place, parameters=None):
                         warnMsg = "provided value for parameter '%s' is empty. " % parameter
                         warnMsg += "Please, always use only valid parameter values "
                         warnMsg += "so sqlmap could be able to run properly"
-                        logger.warn(warnMsg)
+                        logger.warning(warnMsg)
 
                 if place in (PLACE.POST, PLACE.GET):
                     for regex in (r"\A((?:<[^>]+>)+\w+)((?:<[^>]+>)+)\Z", r"\A([^\w]+.*\w+)([^\w]+)\Z"):
@@ -738,7 +738,7 @@ def paramToDict(place, parameters=None):
             if len(conf.testParameter) > 1:
                 warnMsg = "provided parameters '%s' " % paramStr
                 warnMsg += "are not inside the %s" % place
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
             else:
                 parameter = conf.testParameter[0]
 
@@ -763,7 +763,7 @@ def paramToDict(place, parameters=None):
                         if len(decoded) > MIN_ENCODED_LEN_CHECK and all(_ in getBytes(string.printable) for _ in decoded):
                             warnMsg = "provided parameter '%s' " % parameter
                             warnMsg += "appears to be '%s' encoded" % encoding
-                            logger.warn(warnMsg)
+                            logger.warning(warnMsg)
                             break
                     except:
                         pass
@@ -814,7 +814,7 @@ def getManualDirectories():
     else:
         warnMsg = "unable to automatically retrieve the web server "
         warnMsg += "document root"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
         directories = []
 
@@ -900,7 +900,7 @@ def getAutoDirectories():
                 retVal.add(directory)
     else:
         warnMsg = "unable to automatically parse any web server path"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
     return list(retVal)
 
@@ -1637,7 +1637,7 @@ def parseTargetDirect():
                     if remote:
                         warnMsg = "direct connection over the network for "
                         warnMsg += "%s DBMS is not supported" % dbmsName
-                        logger.warn(warnMsg)
+                        logger.warning(warnMsg)
 
                         conf.hostname = "localhost"
                         conf.port = 0
@@ -1900,7 +1900,7 @@ def parseUnionPage(page):
     if re.search(r"(?si)\A%s.*%s\Z" % (kb.chars.start, kb.chars.stop), page):
         if len(page) > LARGE_OUTPUT_THRESHOLD:
             warnMsg = "large output detected. This might take a while"
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
         data = BigArray()
         keys = set()
@@ -2789,7 +2789,7 @@ def wasLastResponseDelayed():
         if len(kb.responseTimes[kb.responseTimeMode]) < MIN_TIME_RESPONSES:
             warnMsg = "time-based standard deviation method used on a model "
             warnMsg += "with less than %d response times" % MIN_TIME_RESPONSES
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
         lowerStdLimit = average(kb.responseTimes[kb.responseTimeMode]) + TIME_STDEV_COEFF * deviation
         retVal = (threadData.lastQueryDuration >= max(MIN_VALID_DELAYED_RESPONSE, lowerStdLimit))
@@ -3593,7 +3593,7 @@ def initTechnique(technique=None):
         else:
             warnMsg = "there is no injection data available for technique "
             warnMsg += "'%s'" % enumValueToNameLookup(PAYLOAD.TECHNIQUE, technique)
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
     except SqlmapDataException:
         errMsg = "missing data in old session file(s). "
@@ -3744,7 +3744,7 @@ def showHttpErrorCodes():
     if kb.httpErrorCodes:
         warnMsg = "HTTP error codes detected during run:\n"
         warnMsg += ", ".join("%d (%s) - %d times" % (code, _http_client.responses[code] if code in _http_client.responses else '?', count) for code, count in kb.httpErrorCodes.items())
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
         if any((str(_).startswith('4') or str(_).startswith('5')) and _ != _http_client.INTERNAL_SERVER_ERROR and _ != kb.originalCode for _ in kb.httpErrorCodes):
             msg = "too many 4xx and/or 5xx HTTP error codes "
             msg += "could mean that some kind of protection is involved (e.g. WAF)"
@@ -3972,7 +3972,7 @@ def createGithubIssue(errMsg, excMsg):
                 if closed:
                     warnMsg += " and resolved. Please update to the latest "
                     warnMsg += "development version from official GitHub repository at '%s'" % GIT_PAGE
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
                 return
         except:
             pass
@@ -4002,7 +4002,7 @@ def createGithubIssue(errMsg, excMsg):
                 warnMsg += " ('%s')" % _excMsg
             if "Unauthorized" in warnMsg:
                 warnMsg += ". Please update to the latest revision"
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
 def maskSensitiveData(msg):
     """
@@ -4395,7 +4395,7 @@ def expandMnemonics(mnemonics, parser, args):
 
             if not options:
                 warnMsg = "mnemonic '%s' can't be resolved" % name
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
             elif name in options:
                 found = name
                 debugMsg = "mnemonic '%s' resolved to %s). " % (name, found)
@@ -4404,7 +4404,7 @@ def expandMnemonics(mnemonics, parser, args):
                 found = sorted(options.keys(), key=len)[0]
                 warnMsg = "detected ambiguity (mnemonic '%s' can be resolved to any of: %s). " % (name, ", ".join("'%s'" % key for key in options))
                 warnMsg += "Resolved to shortest of those ('%s')" % found
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
 
             if found:
                 found = options[found]
@@ -4810,7 +4810,7 @@ def checkOldOptions(args):
             warnMsg = "switch/option '%s' is deprecated" % _
             if DEPRECATED_OPTIONS[_]:
                 warnMsg += " (hint: %s)" % DEPRECATED_OPTIONS[_]
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
 def checkSystemEncoding():
     """
@@ -4828,7 +4828,7 @@ def checkSystemEncoding():
             logger.critical(errMsg)
 
             warnMsg = "temporary switching to charset 'cp1256'"
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
             _reload_module(sys)
             sys.setdefaultencoding("cp1256")

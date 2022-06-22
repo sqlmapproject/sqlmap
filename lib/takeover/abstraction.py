@@ -211,7 +211,7 @@ class Abstraction(Web, UDF, XP_cmdshell):
                     warnMsg += "were able to extract and crack a DBA "
                     warnMsg += "password by any mean"
 
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
 
             if any((conf.osCmd, conf.osShell)) and Backend.isDbms(DBMS.PGSQL) and self.checkCopyExec():
                 success = True

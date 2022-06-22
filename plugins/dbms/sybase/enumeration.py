@@ -59,7 +59,7 @@ class Enumeration(GenericEnumeration):
         warnMsg = "on Sybase it is not possible to fetch "
         warnMsg += "database users privileges, sqlmap will check whether "
         warnMsg += "or not the database users are database administrators"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
         users = []
         areAdmins = set()
@@ -169,7 +169,7 @@ class Enumeration(GenericEnumeration):
                 warnMsg = "missing database parameter. sqlmap is going "
                 warnMsg += "to use the current database to enumerate "
                 warnMsg += "table(s) columns"
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
 
             conf.db = self.getCurrentDb()
 
@@ -295,32 +295,32 @@ class Enumeration(GenericEnumeration):
 
     def searchDb(self):
         warnMsg = "on Sybase searching of databases is not implemented"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
         return []
 
     def searchTable(self):
         warnMsg = "on Sybase searching of tables is not implemented"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
         return []
 
     def searchColumn(self):
         warnMsg = "on Sybase searching of columns is not implemented"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
         return []
 
     def search(self):
         warnMsg = "on Sybase search option is not available"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
     def getHostname(self):
         warnMsg = "on Sybase it is not possible to enumerate the hostname"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
     def getStatements(self):
         warnMsg = "on Sybase it is not possible to enumerate the SQL statements"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
         return []

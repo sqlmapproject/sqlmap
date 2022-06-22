@@ -51,6 +51,6 @@ def parseSitemap(url, retVal=None):
         abortedFlag = True
         warnMsg = "user aborted during sitemap parsing. sqlmap "
         warnMsg += "will use partial list"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
     return retVal

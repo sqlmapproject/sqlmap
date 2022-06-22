@@ -122,7 +122,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
 
                 else:
                     warnMsg = "invalid value, valid values are '1' and '2'"
-                    logger.warn(warnMsg)
+                    logger.warning(warnMsg)
         else:
             tunnel = 1
 
@@ -193,7 +193,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
 
                         else:
                             warnMsg = "invalid value, valid values are '1' and '2'"
-                            logger.warn(warnMsg)
+                            logger.warning(warnMsg)
 
                     if choice == 1:
                         goUdf = True
@@ -251,7 +251,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
                     warnMsg = "sqlmap does not implement any operating system "
                     warnMsg += "user privilege escalation technique when the "
                     warnMsg += "back-end DBMS underlying system is not Windows"
-                    logger.warn(warnMsg)
+                    logger.warning(warnMsg)
 
                 if tunnel == 1:
                     self.createMsfShellcode(exitfunc="process", format="raw", extra="BufferRegister=EAX", encode="x86/alpha_mixed")
@@ -326,7 +326,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
             printWarn = False
 
         if printWarn:
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
         self.smb()
 

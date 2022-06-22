@@ -169,7 +169,7 @@ class Connect(object):
 
         if conf.proxyList and threadData.retriesCount >= conf.retries and not kb.locks.handlers.locked():
             warnMsg = "changing proxy"
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
             conf.proxy = None
             threadData.retriesCount = 0
@@ -312,7 +312,7 @@ class Connect(object):
                     conf.proxy = None
 
                     warnMsg = "changing proxy"
-                    logger.warn(warnMsg)
+                    logger.warning(warnMsg)
 
                     setHTTPHandlers()
 
@@ -703,7 +703,7 @@ class Connect(object):
                     conn.close()
                 except Exception as ex:
                     warnMsg = "problem occurred during connection closing ('%s')" % getSafeExString(ex)
-                    logger.warn(warnMsg)
+                    logger.warning(warnMsg)
 
         except SqlmapConnectionException as ex:
             if conf.proxyList and not kb.threadException:
@@ -730,7 +730,7 @@ class Connect(object):
             except socket.timeout:
                 warnMsg = "connection timed out while trying "
                 warnMsg += "to get error page information (%d)" % ex.code
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
                 return None, None, None
             except KeyboardInterrupt:
                 raise
@@ -927,7 +927,7 @@ class Connect(object):
             if conf.retryOn and re.search(conf.retryOn, page, re.I):
                 if threadData.retriesCount < conf.retries:
                     warnMsg = "forced retry of the request because of undesired page content"
-                    logger.warn(warnMsg)
+                    logger.warning(warnMsg)
                     return Connect._retryProxy(**kwargs)
 
         processResponse(page, responseHeaders, code, status)
@@ -1174,7 +1174,7 @@ class Connect(object):
                 if attempt > 0:
                     warnMsg = "unable to find anti-CSRF token '%s' at '%s'" % (conf.csrfToken._original, conf.csrfUrl or conf.url)
                     warnMsg += ". sqlmap is going to retry the request"
-                    logger.warn(warnMsg)
+                    logger.warning(warnMsg)
 
                 page, headers, code = Connect.getPage(url=conf.csrfUrl or conf.url, data=conf.data if conf.csrfUrl == conf.url else None, method=conf.csrfMethod or (conf.method if conf.csrfUrl == conf.url else None), cookie=conf.parameters.get(PLACE.COOKIE), direct=True, silent=True, ua=conf.parameters.get(PLACE.USER_AGENT), referer=conf.parameters.get(PLACE.REFERER), host=conf.parameters.get(PLACE.HOST))
                 page = urldecode(page)  # for anti-CSRF tokens with special characters in their name (e.g. 'foo:bar=...')

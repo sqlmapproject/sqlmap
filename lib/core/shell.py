@@ -79,7 +79,7 @@ def saveHistory(completion=None):
             readline.write_history_file(historyPath)
         except IOError as ex:
             warnMsg = "there was a problem writing the history file '%s' (%s)" % (historyPath, getSafeExString(ex))
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
     except KeyboardInterrupt:
         pass
 
@@ -103,12 +103,12 @@ def loadHistory(completion=None):
             readline.read_history_file(historyPath)
         except IOError as ex:
             warnMsg = "there was a problem loading the history file '%s' (%s)" % (historyPath, getSafeExString(ex))
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
         except UnicodeError:
             if IS_WIN:
                 warnMsg = "there was a problem loading the history file '%s'. " % historyPath
                 warnMsg += "More info can be found at 'https://github.com/pyreadline/pyreadline/issues/30'"
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
 
 def autoCompletion(completion=None, os=None, commands=None):
     if not readlineAvailable():

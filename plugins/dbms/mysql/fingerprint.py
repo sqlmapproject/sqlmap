@@ -37,7 +37,7 @@ class Fingerprint(GenericFingerprint):
 
         if not result:
             warnMsg = "unable to perform %s comment injection" % DBMS.MYSQL
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
             return None
 
@@ -192,7 +192,7 @@ class Fingerprint(GenericFingerprint):
 
             if not result:
                 warnMsg = "the back-end DBMS is not %s" % DBMS.MYSQL
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
 
                 return False
 
@@ -297,7 +297,7 @@ class Fingerprint(GenericFingerprint):
             return True
         else:
             warnMsg = "the back-end DBMS is not %s" % DBMS.MYSQL
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
             return False
 

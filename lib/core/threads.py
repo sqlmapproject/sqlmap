@@ -154,7 +154,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
 
             if numThreads == 1:
                 warnMsg = "running in a single-thread mode. This could take a while"
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
 
         if numThreads > 1:
             if startThreadMsg:

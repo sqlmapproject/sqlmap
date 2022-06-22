@@ -116,7 +116,7 @@ class HashDB(object):
                 retVal = None
                 warnMsg = "error occurred while unserializing value for session key '%s'. " % key
                 warnMsg += "If the problem persists please rerun with '--flush-session'"
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
 
         return retVal
 
@@ -163,7 +163,7 @@ class HashDB(object):
                         if retries == 0:
                             warnMsg = "there has been a problem while writing to "
                             warnMsg += "the session file ('%s')" % getSafeExString(ex)
-                            logger.warn(warnMsg)
+                            logger.warning(warnMsg)
 
                         if retries >= HASHDB_FLUSH_RETRIES:
                             return

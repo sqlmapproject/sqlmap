@@ -167,7 +167,7 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
                 warnMsg = "possible server trimmed output detected "
                 warnMsg += "(probably due to its length and/or content): "
                 warnMsg += safecharencode(trimmed)
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
 
             elif re.search(r"ORDER BY [^ ]+\Z", expression):
                 debugMsg = "retrying failed SQL query without the ORDER BY clause"
@@ -304,7 +304,7 @@ def unionUse(expression, unpack=True, dump=False):
                 warnMsg += "of entries for the SQL query provided. "
                 warnMsg += "sqlmap will assume that it returns only "
                 warnMsg += "one entry"
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
 
                 stopLimit = 1
 
@@ -312,7 +312,7 @@ def unionUse(expression, unpack=True, dump=False):
                 if not count:
                     warnMsg = "the SQL query provided does not "
                     warnMsg += "return any output"
-                    logger.warn(warnMsg)
+                    logger.warning(warnMsg)
                 else:
                     value = []  # for empty tables
                 return value
@@ -429,7 +429,7 @@ def unionUse(expression, unpack=True, dump=False):
 
                     warnMsg = "user aborted during enumeration. sqlmap "
                     warnMsg += "will display partial output"
-                    logger.warn(warnMsg)
+                    logger.warning(warnMsg)
 
                 finally:
                     for _ in sorted(threadData.shared.buffered):

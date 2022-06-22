@@ -37,7 +37,7 @@ class Enumeration(GenericEnumeration):
 
     def getPasswordHashes(self):
         warnMsg = "on SAP MaxDB it is not possible to enumerate the user password hashes"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
         return {}
 
@@ -108,7 +108,7 @@ class Enumeration(GenericEnumeration):
                 warnMsg = "missing database parameter. sqlmap is going "
                 warnMsg += "to use the current database to enumerate "
                 warnMsg += "table(s) columns"
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
 
             conf.db = self.getCurrentDb()
 
@@ -226,20 +226,20 @@ class Enumeration(GenericEnumeration):
 
     def getPrivileges(self, *args, **kwargs):
         warnMsg = "on SAP MaxDB it is not possible to enumerate the user privileges"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
         return {}
 
     def search(self):
         warnMsg = "on SAP MaxDB search option is not available"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
     def getHostname(self):
         warnMsg = "on SAP MaxDB it is not possible to enumerate the hostname"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
     def getStatements(self):
         warnMsg = "on SAP MaxDB it is not possible to enumerate the SQL statements"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
         return []

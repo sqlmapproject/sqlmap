@@ -36,6 +36,7 @@ try:
         warnings.filterwarnings(action="ignore", category=DeprecationWarning)
     else:
         warnings.resetwarnings()
+        warnings.simplefilter("ignore", category=ResourceWarning, append=1)
 
     warnings.filterwarnings(action="ignore", message="Python 2 is no longer supported")
     warnings.filterwarnings(action="ignore", message=".*was already imported", category=UserWarning)
@@ -533,7 +534,7 @@ def main():
 
         if getDaysFromLastUpdate() > LAST_UPDATE_NAGGING_DAYS:
             warnMsg = "your sqlmap version is outdated"
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
         if conf.get("showTime"):
             dataToStdout("\n[*] ending @ %s\n\n" % time.strftime("%X /%Y-%m-%d/"), forceOutput=True)

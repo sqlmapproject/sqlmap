@@ -183,7 +183,7 @@ class Miscellaneous(object):
 
             warnMsg += "saved on the file system can only be deleted "
             warnMsg += "manually"
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
     def likeOrExact(self, what):
         message = "do you want sqlmap to consider provided %s(s):\n" % what

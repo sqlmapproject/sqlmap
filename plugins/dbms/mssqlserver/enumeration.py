@@ -39,7 +39,7 @@ class Enumeration(GenericEnumeration):
         warnMsg = "on Microsoft SQL Server it is not possible to fetch "
         warnMsg += "database users privileges, sqlmap will check whether "
         warnMsg += "or not the database users are database administrators"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
         users = []
         areAdmins = set()
@@ -140,7 +140,7 @@ class Enumeration(GenericEnumeration):
                     if count != 0:
                         warnMsg = "unable to retrieve the number of "
                         warnMsg += "tables for database '%s'" % db
-                        logger.warn(warnMsg)
+                        logger.warning(warnMsg)
                     continue
 
                 tables = []
@@ -159,7 +159,7 @@ class Enumeration(GenericEnumeration):
                 else:
                     warnMsg = "unable to retrieve the tables "
                     warnMsg += "for database '%s'" % db
-                    logger.warn(warnMsg)
+                    logger.warning(warnMsg)
 
         if not kb.data.cachedTables and not conf.search:
             errMsg = "unable to retrieve the tables for any database"
@@ -248,7 +248,7 @@ class Enumeration(GenericEnumeration):
                             warnMsg += "s LIKE"
                         warnMsg += " '%s' " % unsafeSQLIdentificatorNaming(tbl)
                         warnMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(db)
-                        logger.warn(warnMsg)
+                        logger.warning(warnMsg)
 
                         continue
 
@@ -269,7 +269,7 @@ class Enumeration(GenericEnumeration):
 
         if not foundTbls:
             warnMsg = "no databases contain any of the provided tables"
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
             return
 
         conf.dumper.dbTables(foundTbls)
@@ -407,7 +407,7 @@ class Enumeration(GenericEnumeration):
                             warnMsg += "s LIKE"
                         warnMsg += " '%s' " % column
                         warnMsg += "in database '%s'" % db
-                        logger.warn(warnMsg)
+                        logger.warning(warnMsg)
 
                         continue
 

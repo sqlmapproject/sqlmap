@@ -162,7 +162,7 @@ def crawl(target, post=None, cookie=None):
             except SqlmapConnectionException as ex:
                 if "page not found" in getSafeExString(ex):
                     found = False
-                    logger.warn("'sitemap.xml' not found")
+                    logger.warning("'sitemap.xml' not found")
             except:
                 pass
             finally:
@@ -198,7 +198,7 @@ def crawl(target, post=None, cookie=None):
     except KeyboardInterrupt:
         warnMsg = "user aborted during crawling. sqlmap "
         warnMsg += "will use partial list"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
     finally:
         clearConsoleLine(True)
@@ -208,7 +208,7 @@ def crawl(target, post=None, cookie=None):
                 warnMsg = "no usable links found (with GET parameters)"
                 if conf.forms:
                     warnMsg += " or forms"
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
         else:
             for url in threadData.shared.value:
                 kb.targets.add((urldecode(url, kb.pageEncoding), None, None, None, None))

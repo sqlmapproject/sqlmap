@@ -26,7 +26,7 @@ def checkDependencies():
                     warnMsg = "'%s' third-party library must be " % data[1]
                     warnMsg += "version >= 1.0.2 to work properly. "
                     warnMsg += "Download from '%s'" % data[2]
-                    logger.warn(warnMsg)
+                    logger.warning(warnMsg)
             elif dbmsName == DBMS.MYSQL:
                 __import__("pymysql")
             elif dbmsName in (DBMS.PGSQL, DBMS.CRATEDB):
@@ -62,7 +62,7 @@ def checkDependencies():
             warnMsg = "sqlmap requires '%s' third-party library " % data[1]
             warnMsg += "in order to directly connect to the DBMS "
             warnMsg += "'%s'. Download from '%s'" % (dbmsName, data[2])
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
             missing_libraries.add(data[1])
 
             continue
@@ -78,7 +78,7 @@ def checkDependencies():
         warnMsg = "sqlmap requires 'python-impacket' third-party library for "
         warnMsg += "out-of-band takeover feature. Download from "
         warnMsg += "'https://github.com/coresecurity/impacket'"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
         missing_libraries.add('python-impacket')
 
     try:
@@ -89,7 +89,7 @@ def checkDependencies():
         warnMsg = "sqlmap requires 'python-ntlm' third-party library "
         warnMsg += "if you plan to attack a web application behind NTLM "
         warnMsg += "authentication. Download from 'https://github.com/mullender/python-ntlm'"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
         missing_libraries.add('python-ntlm')
 
     try:
@@ -100,7 +100,7 @@ def checkDependencies():
         warnMsg = "sqlmap requires 'websocket-client' third-party library "
         warnMsg += "if you plan to attack a web application using WebSocket. "
         warnMsg += "Download from 'https://pypi.python.org/pypi/websocket-client/'"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
         missing_libraries.add('websocket-client')
 
     try:
@@ -110,7 +110,7 @@ def checkDependencies():
     except ImportError:
         warnMsg = "sqlmap requires 'tkinter' library "
         warnMsg += "if you plan to run a GUI"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
         missing_libraries.add('tkinter')
 
     try:
@@ -120,7 +120,7 @@ def checkDependencies():
     except ImportError:
         warnMsg = "sqlmap requires 'tkinter.ttk' library "
         warnMsg += "if you plan to run a GUI"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
         missing_libraries.add('tkinter.ttk')
 
     if IS_WIN:
@@ -134,7 +134,7 @@ def checkDependencies():
             warnMsg += "completion and history support features in the SQL "
             warnMsg += "shell and OS shell. Download from "
             warnMsg += "'https://pypi.org/project/pyreadline/'"
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
             missing_libraries.add('python-pyreadline')
 
     if len(missing_libraries) == 0:

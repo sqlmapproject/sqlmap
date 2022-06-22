@@ -97,7 +97,7 @@ class Fingerprint(GenericFingerprint):
 
             if not result:
                 warnMsg = "the back-end DBMS is not %s" % DBMS.H2
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
 
                 return False
             else:
@@ -108,10 +108,10 @@ class Fingerprint(GenericFingerprint):
                 return True
         else:
             warnMsg = "the back-end DBMS is not %s" % DBMS.H2
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
             return False
 
     def getHostname(self):
         warnMsg = "on H2 it is not possible to enumerate the hostname"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)

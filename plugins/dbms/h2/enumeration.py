@@ -31,25 +31,25 @@ class Enumeration(GenericEnumeration):
 
     def getPrivileges(self, *args, **kwargs):
         warnMsg = "on H2 it is not possible to enumerate the user privileges"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
         return {}
 
     def getHostname(self):
         warnMsg = "on H2 it is not possible to enumerate the hostname"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
     def getCurrentDb(self):
         return H2_DEFAULT_SCHEMA
 
     def getPasswordHashes(self):
         warnMsg = "on H2 it is not possible to enumerate password hashes"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
         return {}
 
     def getStatements(self):
         warnMsg = "on H2 it is not possible to enumerate the SQL statements"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
         return []

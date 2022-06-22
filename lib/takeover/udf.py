@@ -198,7 +198,7 @@ class UDF(object):
         if not self.isDba():
             warnMsg = "functionality requested probably does not work because "
             warnMsg += "the current session user is not a database administrator"
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
         if not conf.shLib:
             msg = "what is the local path of the shared library? "
@@ -209,7 +209,7 @@ class UDF(object):
                 if self.udfLocalFile:
                     break
                 else:
-                    logger.warn("you need to specify the local path of the shared library")
+                    logger.warning("you need to specify the local path of the shared library")
         else:
             self.udfLocalFile = conf.shLib
 
@@ -249,7 +249,7 @@ class UDF(object):
                 else:
                     break
             else:
-                logger.warn("invalid value, only digits are allowed")
+                logger.warning("invalid value, only digits are allowed")
 
         for x in xrange(0, udfCount):
             while True:
@@ -260,7 +260,7 @@ class UDF(object):
                     self.udfs[udfName] = {}
                     break
                 else:
-                    logger.warn("you need to specify the name of the UDF")
+                    logger.warning("you need to specify the name of the UDF")
 
             if Backend.isDbms(DBMS.MYSQL):
                 defaultType = "string"
@@ -280,7 +280,7 @@ class UDF(object):
                     break
 
                 else:
-                    logger.warn("invalid value, only digits >= 0 are allowed")
+                    logger.warning("invalid value, only digits >= 0 are allowed")
 
             for y in xrange(0, parCount):
                 msg = "what is the data-type of input parameter "
@@ -290,7 +290,7 @@ class UDF(object):
                     parType = readInput(msg, default=defaultType).strip()
 
                     if parType.isdigit():
-                        logger.warn("you need to specify the data-type of the parameter")
+                        logger.warning("you need to specify the data-type of the parameter")
 
                     else:
                         self.udfs[udfName]["input"].append(parType)
@@ -303,7 +303,7 @@ class UDF(object):
                 retType = readInput(msg, default=defaultType)
 
                 if hasattr(retType, "isdigit") and retType.isdigit():
-                    logger.warn("you need to specify the data-type of the return value")
+                    logger.warning("you need to specify the data-type of the return value")
                 else:
                     self.udfs[udfName]["return"] = retType
                     break
@@ -346,7 +346,7 @@ class UDF(object):
                 else:
                     warnMsg = "invalid value, only digits >= 1 and "
                     warnMsg += "<= %d are allowed" % len(udfList)
-                    logger.warn(warnMsg)
+                    logger.warning(warnMsg)
 
             if not isinstance(choice, int):
                 break
@@ -370,7 +370,7 @@ class UDF(object):
 
                         break
                     else:
-                        logger.warn("you need to specify the value of the parameter")
+                        logger.warning("you need to specify the value of the parameter")
 
                 count += 1
 

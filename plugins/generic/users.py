@@ -301,7 +301,7 @@ class Users(object):
                         if not isNumPosStrValue(count):
                             warnMsg = "unable to retrieve the number of password "
                             warnMsg += "hashes for user '%s'" % user
-                            logger.warn(warnMsg)
+                            logger.warning(warnMsg)
                             continue
 
                     infoMsg = "fetching password hashes for user '%s'" % user
@@ -345,7 +345,7 @@ class Users(object):
                     else:
                         warnMsg = "unable to retrieve the password "
                         warnMsg += "hashes for user '%s'" % user
-                        logger.warn(warnMsg)
+                        logger.warning(warnMsg)
 
                     retrievedUsers.add(user)
 
@@ -547,7 +547,7 @@ class Users(object):
 
                         warnMsg = "unable to retrieve the number of "
                         warnMsg += "privileges for user '%s'" % outuser
-                        logger.warn(warnMsg)
+                        logger.warning(warnMsg)
                         continue
 
                 infoMsg = "fetching privileges for user '%s'" % outuser
@@ -650,7 +650,7 @@ class Users(object):
                 else:
                     warnMsg = "unable to retrieve the privileges "
                     warnMsg += "for user '%s'" % outuser
-                    logger.warn(warnMsg)
+                    logger.warning(warnMsg)
 
                 retrievedUsers.add(user)
 
@@ -668,6 +668,6 @@ class Users(object):
     def getRoles(self, query2=False):
         warnMsg = "on %s the concept of roles does not " % Backend.getIdentifiedDbms()
         warnMsg += "exist. sqlmap will enumerate privileges instead"
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
 
         return self.getPrivileges(query2)

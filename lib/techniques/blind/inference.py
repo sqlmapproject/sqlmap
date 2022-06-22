@@ -423,7 +423,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                             if kb.adjustTimeDelay is not ADJUST_TIME_DELAY.DISABLE:
                                                 conf.timeSec += 1
                                                 warnMsg = "increasing time delay to %d second%s" % (conf.timeSec, 's' if conf.timeSec > 1 else '')
-                                                logger.warn(warnMsg)
+                                                logger.warning(warnMsg)
 
                                             if kb.adjustTimeDelay is ADJUST_TIME_DELAY.YES:
                                                 dbgMsg = "turning off time auto-adjustment mechanism"

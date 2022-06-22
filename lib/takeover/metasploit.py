@@ -206,7 +206,7 @@ class Metasploit(object):
                 warnMsg = "by default PostgreSQL on Windows runs as "
                 warnMsg += "postgres user, it is unlikely that the VNC "
                 warnMsg += "injection will be successful"
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
 
             elif Backend.isDbms(DBMS.MSSQL) and Backend.isVersionWithin(("2005", "2008")):
                 choose = True
@@ -215,7 +215,7 @@ class Metasploit(object):
                 warnMsg += "successful because usually Microsoft SQL Server "
                 warnMsg += "%s runs as Network Service " % Backend.getVersion()
                 warnMsg += "or the Administrator is not logged in"
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
 
             if choose:
                 message = "what do you want to do?\n"
@@ -236,23 +236,23 @@ class Metasploit(object):
 
                     elif choice == "1":
                         if Backend.isDbms(DBMS.PGSQL):
-                            logger.warn("beware that the VNC injection might not work")
+                            logger.warning("beware that the VNC injection might not work")
                             break
 
                         elif Backend.isDbms(DBMS.MSSQL) and Backend.isVersionWithin(("2005", "2008")):
                             break
 
                     elif not isDigit(choice):
-                        logger.warn("invalid value, only digits are allowed")
+                        logger.warning("invalid value, only digits are allowed")
 
                     elif int(choice) < 1 or int(choice) > 2:
-                        logger.warn("invalid value, it must be 1 or 2")
+                        logger.warning("invalid value, it must be 1 or 2")
 
         if self.connectionStr.startswith("reverse_http") and _payloadStr != "windows/meterpreter":
             warnMsg = "Reverse HTTP%s connection is only supported " % ("S" if self.connectionStr.endswith("s") else "")
             warnMsg += "with the Meterpreter payload. Falling back to "
             warnMsg += "reverse TCP"
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
             self.connectionStr = "reverse_tcp"
 

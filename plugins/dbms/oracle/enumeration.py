@@ -124,7 +124,7 @@ class Enumeration(GenericEnumeration):
 
                     warnMsg = "unable to retrieve the number of "
                     warnMsg += "roles for user '%s'" % user
-                    logger.warn(warnMsg)
+                    logger.warning(warnMsg)
                     continue
 
                 infoMsg = "fetching roles for user '%s'" % user
@@ -149,7 +149,7 @@ class Enumeration(GenericEnumeration):
                 else:
                     warnMsg = "unable to retrieve the roles "
                     warnMsg += "for user '%s'" % user
-                    logger.warn(warnMsg)
+                    logger.warning(warnMsg)
 
                 retrievedUsers.add(user)
 

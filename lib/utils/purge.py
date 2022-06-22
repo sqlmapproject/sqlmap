@@ -26,7 +26,7 @@ def purge(directory):
 
     if not os.path.isdir(directory):
         warnMsg = "skipping purging of directory '%s' as it does not exist" % directory
-        logger.warn(warnMsg)
+        logger.warning(warnMsg)
         return
 
     infoMsg = "purging content of directory '%s'..." % directory

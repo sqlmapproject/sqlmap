@@ -196,7 +196,7 @@ def search(dork):
             logger.critical(getSafeExString(ex))
 
             warnMsg = "changing proxy"
-            logger.warn(warnMsg)
+            logger.warning(warnMsg)
 
             conf.proxy = None
 

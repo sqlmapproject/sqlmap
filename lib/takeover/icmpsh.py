@@ -72,7 +72,7 @@ class ICMPsh(object):
                 raise SqlmapDataException("local host address is missing")
             elif address and not valid:
                 warnMsg = "invalid local host address"
-                logger.warn(warnMsg)
+                logger.warning(warnMsg)
 
         return address
 

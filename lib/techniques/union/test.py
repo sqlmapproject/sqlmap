@@ -275,7 +275,7 @@ def _unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYLO
                         content = ("%s%s" % (removeReflectiveValues(page, payload) or "", removeReflectiveValues(listToStrValue(headers.headers if headers else None), payload, True) or "")).lower()
                         if content.count(phrase) > 0 and content.count(phrase) < LIMITED_ROWS_TEST_NUMBER:
                             warnMsg = "output with limited number of rows detected. Switching to partial mode"
-                            logger.warn(warnMsg)
+                            logger.warning(warnMsg)
                             vector = (position, count, comment, prefix, suffix, kb.uChar, where, kb.unionDuplicates, True, kb.tableFrom, kb.unionTemplate)
 
                 unionErrorCase = kb.errorIsNone and wasLastResponseDBMSError()
@@ -284,7 +284,7 @@ def _unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYLO
                     warnMsg = "combined UNION/error-based SQL injection case found on "
                     warnMsg += "column %d. sqlmap will try to find another " % (position + 1)
                     warnMsg += "column with better characteristics"
-                    logger.warn(warnMsg)
+                    logger.warning(warnMsg)
                 else:
                     break
 
