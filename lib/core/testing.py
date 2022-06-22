@@ -39,7 +39,7 @@ def vulnTest():
 
     TESTS = (
         ("-h", ("to see full list of options run with '-hh'",)),
-        ("--dependencies --deprecations", ("sqlmap requires", "third-party library", "~DeprecationWarning:")),
+        ("--dependencies", ("sqlmap requires", "third-party library")),
         ("-u <url> --data=\"reflect=1\" --flush-session --wizard --disable-coloring", ("Please choose:", "back-end DBMS: SQLite", "current user is DBA: True", "banner: '3.")),
         ("-u <url> --data=\"code=1\" --code=200 --technique=B --banner --no-cast --flush-session", ("back-end DBMS: SQLite", "banner: '3.", "~COALESCE(CAST(")),
         (u"-c <config> --flush-session --output-dir=\"<tmpdir>\" --smart --roles --statements --hostname --privileges --sql-query=\"SELECT '\u0161u\u0107uraj'\" --technique=U", (u": '\u0161u\u0107uraj'", "on SQLite it is not possible", "as the output directory")),
