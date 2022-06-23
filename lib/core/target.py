@@ -305,6 +305,9 @@ def _setRequestParams():
                         testableParameters = True
 
             else:
+                if place == PLACE.URI:
+                    value = conf.url = conf.url.replace('+', "%20")  # NOTE: https://github.com/sqlmapproject/sqlmap/issues/5123
+
                 conf.parameters[place] = value
                 conf.paramDict[place] = OrderedDict()
 
