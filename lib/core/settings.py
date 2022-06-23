@@ -845,7 +845,7 @@ JSON_LIKE_RECOGNITION_REGEX = r"(?s)\A(\s*\[)*\s*\{.*('[^']+'|\"[^\"]+\"|\w+)\s*
 MULTIPART_RECOGNITION_REGEX = r"(?i)Content-Disposition:[^;]+;\s*name="
 
 # Regular expression used for detecting Array-like POST data
-ARRAY_LIKE_RECOGNITION_REGEX = r"(\A|%s)(\w+)\[\]=.+%s\2\[\]=" % (DEFAULT_GET_POST_DELIMITER, DEFAULT_GET_POST_DELIMITER)
+ARRAY_LIKE_RECOGNITION_REGEX = r"(\A|%s)(\w+)\[\d*\]=.+%s\2\[\d*\]=" % (DEFAULT_GET_POST_DELIMITER, DEFAULT_GET_POST_DELIMITER)
 
 # Default POST data content-type
 DEFAULT_CONTENT_TYPE = "application/x-www-form-urlencoded; charset=utf-8"
