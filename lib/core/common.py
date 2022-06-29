@@ -590,7 +590,7 @@ class Backend(object):
     def isVersionGreaterOrEqualThan(version):
         retVal = False
 
-        if Backend.getVersion() is not None and version is not None:
+        if all(_ not in (None, UNKNOWN_DBMS_VERSION) for _ in (Backend.getVersion(), version)):
             _version = unArrayizeValue(Backend.getVersion())
             _version = re.sub(r"[<>= ]", "", _version)
 
