@@ -2206,7 +2206,7 @@ def _useWizardInterface():
 
     while not conf.url:
         message = "Please enter full target URL (-u): "
-        conf.url = readInput(message, default=None)
+        conf.url = readInput(message, default=None, checkBatch=False)
 
     message = "%s data (--data) [Enter for None]: " % ((conf.method if conf.method != HTTPMETHOD.GET else None) or HTTPMETHOD.POST)
     conf.data = readInput(message, default=None)
