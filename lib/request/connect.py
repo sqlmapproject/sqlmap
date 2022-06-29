@@ -154,7 +154,7 @@ class Connect(object):
             if (len(inspect.stack()) > sys.getrecursionlimit() // 2):   # Note: https://github.com/sqlmapproject/sqlmap/issues/4525
                 warnMsg = "unable to connect to the target URL"
                 raise SqlmapConnectionException(warnMsg)
-        except TypeError:
+        except (TypeError, UnicodeError):
             pass
 
         try:
@@ -805,7 +805,7 @@ class Connect(object):
                     debugMsg = "got HTTP error code: %d ('%s')" % (code, status)
                     logger.debug(debugMsg)
 
-        except (_urllib.error.URLError, socket.error, socket.timeout, _http_client.HTTPException, struct.error, binascii.Error, ProxyError, SqlmapCompressionException, WebSocketException, TypeError, ValueError, OverflowError, AttributeError):
+        except (_urllib.error.URLError, socket.error, socket.timeout, _http_client.HTTPException, struct.error, binascii.Error, ProxyError, SqlmapCompressionException, WebSocketException, TypeError, ValueError, OverflowError, AttributeError, OSError):
             tbMsg = traceback.format_exc()
 
             if conf.debug:
@@ -821,7 +821,7 @@ class Connect(object):
             elif "no host given" in tbMsg:
                 warnMsg = "invalid URL address used (%s)" % repr(url)
                 raise SqlmapSyntaxException(warnMsg)
-            elif "forcibly closed" in tbMsg or "Connection is already closed" in tbMsg:
+            elif any(_ in tbMsg for _ in ("forcibly closed", "Connection is already closed", "ConnectionAbortedError")):
                 warnMsg = "connection was forcibly closed by the target URL"
             elif "timed out" in tbMsg:
                 if kb.testMode and kb.testType not in (None, PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED):
