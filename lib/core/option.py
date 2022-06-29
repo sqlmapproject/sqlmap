@@ -2839,10 +2839,13 @@ def _basicOptionValidation():
         else:
             conf.encoding = _
 
-    if conf.loadCookies:
-        if not os.path.exists(conf.loadCookies):
-            errMsg = "cookies file '%s' does not exist" % conf.loadCookies
-            raise SqlmapFilePathException(errMsg)
+    if conf.fileWrite and not os.path.isfile(conf.fileWrite):
+        errMsg = "file '%s' does not exist" % os.path.abspath(conf.fileWrite)
+        raise SqlmapFilePathException(errMsg)
+
+    if conf.loadCookies and not os.path.exists(conf.loadCookies):
+        errMsg = "cookies file '%s' does not exist" % os.path.abspath(conf.loadCookies)
+        raise SqlmapFilePathException(errMsg)
 
 def initOptions(inputOptions=AttribDict(), overrideOptions=False):
     _setConfAttributes()
