@@ -68,7 +68,7 @@ __all__ = ['crypt']
 # ----- BEGIN fcrypt.c LICENSE -----
 #
 # This library is free for commercial and non-commercial use as long as
-# the following conditions are aheared to.  The following conditions
+# the following conditions are adhered to.  The following conditions
 # apply to all code found in this distribution, be it the RC4, RSA,
 # lhash, DES, etc., code; not just the SSL code.  The SSL documentation
 # included with this distribution is covered by the same copyright terms

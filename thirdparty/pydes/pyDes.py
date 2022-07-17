@@ -245,7 +245,7 @@ class _baseDes(object):
 # 				    DES					    #
 #############################################################################
 class des(_baseDes):
-	"""DES encryption/decrytpion class
+	"""DES encryption/decryption class
 
 	Supports ECB (Electronic Code Book) and CBC (Cypher Block Chaining) modes.
 
@@ -685,7 +685,7 @@ class des(_baseDes):
 # 				Triple DES				    #
 #############################################################################
 class triple_des(_baseDes):
-	"""Triple DES encryption/decrytpion class
+	"""Triple DES encryption/decryption class
 
 	This algorithm uses the DES-EDE3 (when a 24 byte key is supplied) or
 	the DES-EDE2 (when a 16 byte key is supplied) encryption methods.
