@@ -196,9 +196,9 @@ class Agent(object):
         if place in (PLACE.URI, PLACE.CUSTOM_POST, PLACE.CUSTOM_HEADER):
             _ = "%s%s" % (origValue, kb.customInjectionMark)
 
-            if kb.postHint == POST_HINT.JSON and not isNumber(newValue) and '"%s"' % _ not in paramString:
+            if kb.postHint == POST_HINT.JSON and isNumber(origValue) and not isNumber(newValue) and '"%s"' % _ not in paramString:
                 newValue = '"%s"' % self.addPayloadDelimiters(newValue)
-            elif kb.postHint == POST_HINT.JSON_LIKE and not isNumber(newValue) and re.search(r"['\"]%s['\"]" % re.escape(_), paramString) is None:
+            elif kb.postHint == POST_HINT.JSON_LIKE and isNumber(origValue) and not isNumber(newValue) and re.search(r"['\"]%s['\"]" % re.escape(_), paramString) is None:
                 newValue = "'%s'" % self.addPayloadDelimiters(newValue)
             else:
                 newValue = self.addPayloadDelimiters(newValue)
