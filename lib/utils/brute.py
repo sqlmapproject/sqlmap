@@ -89,10 +89,11 @@ def tableExists(tableFile, regex=None):
 
     message = "which common tables (wordlist) file do you want to use?\n"
     message += "[1] default '%s' (press Enter)\n" % tableFile
-    message += "[2] custom"
+    message += "[2] custom with the support of website words"
+    message += "[3] custom"
     choice = readInput(message, default='1')
 
-    if choice == '2':
+    if choice == '2' or choice == '3' :
         message = "what's the custom common tables file location?\n"
         tableFile = readInput(message) or tableFile
 
@@ -100,7 +101,8 @@ def tableExists(tableFile, regex=None):
     logger.info(infoMsg)
 
     tables = getFileItems(tableFile, lowercase=Backend.getIdentifiedDbms() in (DBMS.ACCESS,), unique=True)
-    tables.extend(_addPageTextWords())
+    if choice == '1' or choice == '2' : 
+        tables.extend(_addPageTextWords())
     tables = filterListValue(tables, regex)
 
     for conf.db in (conf.db.split(',') if conf.db else [conf.db]):
@@ -215,10 +217,11 @@ def columnExists(columnFile, regex=None):
 
     message = "which common columns (wordlist) file do you want to use?\n"
     message += "[1] default '%s' (press Enter)\n" % columnFile
-    message += "[2] custom"
+    message += "[2] custom with the support of website words"
+    message += "[3] custom"
     choice = readInput(message, default='1')
 
-    if choice == '2':
+    if choice == '2' or choice == '3' :
         message = "what's the custom common columns file location?\n"
         columnFile = readInput(message) or columnFile
 
@@ -226,7 +229,8 @@ def columnExists(columnFile, regex=None):
     logger.info(infoMsg)
 
     columns = getFileItems(columnFile, unique=True)
-    columns.extend(_addPageTextWords())
+    if choice == '1' or choice == '2' : 
+        columns.extend(_addPageTextWords())
     columns = filterListValue(columns, regex)
 
     table = safeSQLIdentificatorNaming(conf.tbl, True)
