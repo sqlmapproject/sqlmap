@@ -1544,7 +1544,10 @@ class Connect(object):
                         if payload is None:
                             value = value.replace(kb.customInjectionMark, "")
                         else:
-                            value = re.sub(r"\w*%s" % re.escape(kb.customInjectionMark), payload, value)
+                            try:
+                                value = re.sub(r"\w*%s" % re.escape(kb.customInjectionMark), payload, value)
+                            except re.error:
+                                value = re.sub(r"\w*%s" % re.escape(kb.customInjectionMark), re.escape(payload), value)
                     return value
                 page, headers, code = Connect.getPage(url=_(kb.secondReq[0]), post=_(kb.secondReq[2]), method=kb.secondReq[1], cookie=kb.secondReq[3], silent=silent, auxHeaders=dict(auxHeaders, **dict(kb.secondReq[4])), response=response, raise404=False, ignoreTimeout=timeBasedCompare, refreshing=True)
 
