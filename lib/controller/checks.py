@@ -271,15 +271,18 @@ def checkSqlInjection(place, parameter, value):
                     logger.debug(debugMsg)
                     continue
 
-                if kb.dbmsFilter and not intersect(payloadDbms, kb.dbmsFilter, True):
+                elif kb.dbmsFilter and not intersect(payloadDbms, kb.dbmsFilter, True):
                     debugMsg = "skipping test '%s' because " % title
                     debugMsg += "its declared DBMS is different than provided"
                     logger.debug(debugMsg)
                     continue
 
+                elif kb.reduceTests == False:
+                    pass
+
                 # Skip DBMS-specific test if it does not match the
                 # previously identified DBMS (via DBMS-specific payload)
-                if injection.dbms and not intersect(payloadDbms, injection.dbms, True):
+                elif injection.dbms and not intersect(payloadDbms, injection.dbms, True):
                     debugMsg = "skipping test '%s' because " % title
                     debugMsg += "its declared DBMS is different than identified"
                     logger.debug(debugMsg)
@@ -287,7 +290,7 @@ def checkSqlInjection(place, parameter, value):
 
                 # Skip DBMS-specific test if it does not match the
                 # previously identified DBMS (via DBMS-specific error message)
-                if kb.reduceTests and not intersect(payloadDbms, kb.reduceTests, True):
+                elif kb.reduceTests and not intersect(payloadDbms, kb.reduceTests, True):
                     debugMsg = "skipping test '%s' because the heuristic " % title
                     debugMsg += "tests showed that the back-end DBMS "
                     debugMsg += "could be '%s'" % unArrayizeValue(kb.reduceTests)
