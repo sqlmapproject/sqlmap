@@ -4693,7 +4693,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
         else:
             url = urldecode(request.get_full_url(), kb.pageEncoding)
             method = request.get_method()
-            data = request.data
+            data = unArrayizeValue(request.data)
             data = urldecode(data, kb.pageEncoding, spaceplus=False)
 
             if not data and method and method.upper() == HTTPMETHOD.POST:
