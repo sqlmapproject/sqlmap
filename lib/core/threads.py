@@ -161,8 +161,12 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
                 infoMsg = "starting %d threads" % numThreads
                 logger.info(infoMsg)
         else:
-            _threadFunction()
-            return
+            try:
+                _threadFunction()
+            except (SqlmapUserQuitException, SqlmapSkipTargetException):
+                pass
+            finally:
+                return
 
         kb.multiThreadMode = True
 
