@@ -213,6 +213,7 @@ optDict = {
         "cleanup": "boolean",
         "crawlDepth": "integer",
         "crawlExclude": "string",
+        "urlTamper": "string",
         "csvDel": "string",
         "dumpFormat": "string",
         "encoding": "string",

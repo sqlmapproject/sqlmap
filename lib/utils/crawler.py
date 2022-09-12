@@ -58,6 +58,20 @@ def crawl(target, post=None, cookie=None):
                 with kb.locks.limit:
                     if threadData.shared.unprocessed:
                         current = threadData.shared.unprocessed.pop()
+                        if kb.urlTamperFunctions:
+                            for function in kb.urlTamperFunctions:
+                                hints = {}
+                                try:
+                                    current = function(url=current, hints=hints)
+                                except Exception as ex:
+                                    errMsg = "error occurred while running URL tamper "
+                                    errMsg += "function '%s' ('%s')" % (function.__name__, getSafeExString(ex))
+                                    logger.critical(errMsg)
+
+                                if not isinstance(current, six.string_types):
+                                    errMsg = "URL tamper function '%s' returns " % function.__name__
+                                    errMsg += "invalid payload type ('%s')" % type(payload)
+                                    logger.critical(errMsg)
                         if current in visited:
                             continue
                         elif conf.crawlExclude and re.search(conf.crawlExclude, current):

@@ -755,6 +755,103 @@ def _listTamperingFunctions():
                 comment = match.group(1).strip()
                 dataToStdout("* %s - %s\n" % (setColor(os.path.basename(script), "yellow"), re.sub(r" *\n *", " ", comment.split("\n\n")[0].strip())))
 
+def _setURLTamperingFunctions():
+    """
+    Loads tampering functions from given script(s)
+    """
+    if conf.urlTamper:
+        last_priority = PRIORITY.HIGHEST
+        check_priority = True
+        resolve_priorities = False
+        priorities = []
+
+        for script in re.split(PARAMETER_SPLITTING_REGEX, conf.urlTamper):
+            found = False
+
+            path = safeFilepathEncode(paths.SQLMAP_TAMPER_PATH)
+            script = safeFilepathEncode(script.strip())
+
+            try:
+                if not script:
+                    continue
+
+                elif not os.path.exists(script):
+                    errMsg = "URL tamper script '%s' does not exist" % script
+                    raise SqlmapFilePathException(errMsg)
+
+                elif not script.endswith(".py"):
+                    errMsg = "URL tamper script '%s' should have an extension '.py'" % script
+                    raise SqlmapSyntaxException(errMsg)
+            except UnicodeDecodeError:
+                errMsg = "invalid character provided in option '--url-tamper'"
+                raise SqlmapSyntaxException(errMsg)
+
+            dirname, filename = os.path.split(script)
+            dirname = os.path.abspath(dirname)
+
+            infoMsg = "loading URL tamper module '%s'" % filename[:-3]
+            logger.info(infoMsg)
+
+            if not os.path.exists(os.path.join(dirname, "__init__.py")):
+                errMsg = "make sure that there is an empty file '__init__.py' "
+                errMsg += "inside of URL tamper scripts directory '%s'" % dirname
+                raise SqlmapGenericException(errMsg)
+
+            if dirname not in sys.path:
+                sys.path.insert(0, dirname)
+
+            try:
+                module = __import__(safeFilepathEncode(filename[:-3]))
+            except Exception as ex:
+                raise SqlmapSyntaxException("cannot import URL tamper module '%s' (%s)" % (getUnicode(filename[:-3]), getSafeExString(ex)))
+
+            priority = PRIORITY.NORMAL if not hasattr(module, "__priority__") else module.__priority__
+
+            for name, function in inspect.getmembers(module, inspect.isfunction):
+                if name == "tamper" and (hasattr(inspect, "signature") and all(_ in inspect.signature(function).parameters for _ in ("url", "kwargs"))): 
+                    found = True
+                    kb.urlTamperFunctions.append(function)
+                    function.__name__ = module.__name__
+
+                    if check_priority and priority > last_priority:
+                        message = "it appears that you might have mixed "
+                        message += "the order of URL tamper scripts. "
+                        message += "Do you want to auto resolve this? [Y/n/q] "
+                        choice = readInput(message, default='Y').upper()
+
+                        if choice == 'N':
+                            resolve_priorities = False
+                        elif choice == 'Q':
+                            raise SqlmapUserQuitException
+                        else:
+                            resolve_priorities = True
+
+                        check_priority = False
+
+                    priorities.append((priority, function))
+                    last_priority = priority
+
+                    break
+                elif name == "dependencies":
+                    try:
+                        function()
+                    except Exception as ex:
+                        errMsg = "error occurred while checking dependencies "
+                        errMsg += "for URL tamper module '%s' ('%s')" % (getUnicode(filename[:-3]), getSafeExString(ex))
+                        raise SqlmapGenericException(errMsg)
+
+            if not found:
+                errMsg = "missing function 'tamper(url, **kwargs)' "
+                errMsg += "in URL tamper script '%s'" % script
+                raise SqlmapGenericException(errMsg)
+
+        if resolve_priorities and priorities:
+            priorities.sort(key=functools.cmp_to_key(lambda a, b: cmp(a[0], b[0])), reverse=True)
+            kb.urlTamperFunctions = []
+
+            for _, function in priorities:
+                kb.urlTamperFunctions.append(function)
+
 def _setTamperingFunctions():
     """
     Loads tampering functions from given script(s)
@@ -2187,6 +2284,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
         kb.skipVulnHost = None
         kb.storeCrawlingChoice = None
         kb.tamperFunctions = []
+        kb.urlTamperFunctions = []
         kb.targets = OrderedSet()
         kb.testedParams = set()
         kb.userAgents = None
@@ -2877,6 +2975,7 @@ def init():
     _setMultipleTargets()
     _listTamperingFunctions()
     _setTamperingFunctions()
+    _setURLTamperingFunctions()
     _setPreprocessFunctions()
     _setPostprocessFunctions()
     _setTrafficOutputFP()

@@ -652,6 +652,9 @@ def cmdLineParser(argv=None):
         general.add_argument("--crawl-exclude", dest="crawlExclude",
             help="Regexp to exclude pages from crawling (e.g. \"logout\")")
 
+        injection.add_argument("--url-tamper", dest="urlTamper",
+            help="Use given script(s) for tampering URLs during crawling.")
+
         general.add_argument("--csv-del", dest="csvDel",
             help="Delimiting character used in CSV output (default \"%s\")" % defaults.csvDel)
 
