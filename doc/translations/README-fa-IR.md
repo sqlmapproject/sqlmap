@@ -7,10 +7,10 @@
 
 
 
-برنامه `sqlmap`، برنامه‌ی منبع باز هست که برای تست نفوذ پذیزی دربرابر حمله‌های احتمالی `sql injection` (جلوگیری از لو رفتن پایگاه داده) جلو گیری می‌کند. این برنامه مجهز به مکانیزیم تشخیص قدرتمندی می‌باشد. همچنین داری طیف گسترده‌ای از اسکریپت ها می‌باشد که برای متخصص تست نفوذ کار کردن با بانک اطلاعاتی را راحتر می‌کند. از جمع اوری اطلاعات درباره بانک داده تا دسترسی به داده های سیستم و اجرا دستورات از طریق `via out-of-band` درسیستم عامل را امکان پذیر می‌کند.
+برنامه `sqlmap`، یک برنامه‌ی تست نفوذ منبع باز است که فرآیند تشخیص و اکسپلویت پایگاه های داده با مشکل امنیتی SQL Injection را بطور خودکار انجام می دهد. این برنامه مجهز به موتور تشخیص قدرتمندی می‌باشد. همچنین داری طیف گسترده‌ای از اسکریپت ها می‌باشد که برای متخصصان تست نفوذ کار کردن با بانک اطلاعاتی را راحتر می‌کند. از جمع اوری اطلاعات درباره بانک داده تا دسترسی به داده های سیستم و اجرا دستورات از طریق ارتباط Out Of Band درسیستم عامل را امکان پذیر می‌کند.
 
 
-عکس
+تصویر محیط ابزار
 ----
 
 
@@ -23,7 +23,7 @@
 
 <div dir=rtl>
 
-برای دیدن کردن از [مجموعه‌ی از اسکریپت‌ها](https://github.com/sqlmapproject/sqlmap/wiki/Screenshots) می‌توانید از ویکی دیدن کنید.
+برای نمایش [مجموعه ای از اسکریپت‌ها](https://github.com/sqlmapproject/sqlmap/wiki/Screenshots) می‌توانید از دانشنامه دیدن کنید.
 
 
 نصب
@@ -32,11 +32,11 @@
 برای دانلود اخرین نسخه tarball، با کلیک در [اینجا](https://github.com/sqlmapproject/sqlmap/tarball/master) یا دانلود اخرین نسخه zipball با کلیک در [اینجا](https://github.com/sqlmapproject/sqlmap/zipball/master) میتوانید این کار را انجام دهید.
 
 
-طرز استفاده
+نحوه استفاده
 ----
 
 
-برای گرفتن لیست ارگومان‌های اساسی می‌توانید از دستور زیر استفاده کنید:
+برای دریافت لیست ارگومان‌های اساسی می‌توانید از دستور زیر استفاده کنید:
 
 
 
@@ -53,7 +53,7 @@
 <div dir=rtl>
     
     
-برای گرفتن لیست تمامی ارگومان‌های می‌توانید از دستور زیر استفاده کنید:
+برای دریافت لیست تمامی ارگومان‌ها می‌توانید از دستور زیر استفاده کنید:
 
 <div dir=ltr>
 
@@ -66,7 +66,7 @@
 <div dir=rtl>
     
 
-برای اطلاعات بیشتر برای اجرا از [اینجا](https://asciinema.org/a/46601) می‌توانید استفاده کنید. برای گرفتن اطلاعات بیشتر توسعه می‌شود به [راهنمای](https://github.com/sqlmapproject/sqlmap/wiki/Usage) `sqlmap` سر بزنید.
+برای اجرای سریع و ساده ابزار می توانید از [اینجا](https://asciinema.org/a/46601) استفاده کنید. برای دریافت اطلاعات بیشتر در رابطه با قابلیت ها ، امکانات قابل پشتیبانی و لیست کامل امکانات و دستورات همراه با مثال می‌ توانید به [راهنمای](https://github.com/sqlmapproject/sqlmap/wiki/Usage) `sqlmap` سر بزنید.
 
 
 لینک‌ها
@@ -74,11 +74,11 @@
 
 
 * خانه: https://sqlmap.org
-* دانلود: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) or [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
-* کایمت و نظرات: https://github.com/sqlmapproject/sqlmap/commits/master.atom
-* پیگری مشکلات: https://github.com/sqlmapproject/sqlmap/issues
+* دانلود: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) یا [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
+* نظرات: https://github.com/sqlmapproject/sqlmap/commits/master.atom
+* پیگیری مشکلات: https://github.com/sqlmapproject/sqlmap/issues
 * راهنمای کاربران: https://github.com/sqlmapproject/sqlmap/wiki
 * سوالات متداول: https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* تویتر: [@sqlmap](https://twitter.com/sqlmap)
+* توییتر: [@sqlmap](https://twitter.com/sqlmap)
 * رسانه: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
-* عکس‌ها: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
+* تصاویر: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
