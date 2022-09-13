@@ -274,9 +274,11 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             originalTbl = type(charTbl)(charTbl)
 
-            if continuousOrder and shiftTable is None:
+            if kb.disableShiftTable:
+                shiftTable = None
+            elif continuousOrder and shiftTable is None:
                 # Used for gradual expanding into unicode charspace
-                shiftTable = [2, 2, 3, 3, 5, 4]
+                shiftTable = [2, 2, 3, 3, 3]
 
             if "'%s'" % CHAR_INFERENCE_MARK in payload:
                 for char in ('\n', '\r'):
@@ -358,6 +360,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             kb.responseTimePayload = None
 
                     result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
+
                     incrementCounter(getTechnique())
 
                     if not timeBasedCompare and getTechniqueData() is not None:
@@ -405,6 +408,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                 maxChar = maxValue = charTbl[-1]
                                 minValue = charTbl[0]
                             else:
+                                kb.disableShiftTable = True
                                 return None
                         else:
                             retVal = minValue + 1
