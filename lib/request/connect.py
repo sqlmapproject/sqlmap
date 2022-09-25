@@ -1011,9 +1011,10 @@ class Connect(object):
 
             if (kb.postHint or conf.skipUrlEncode) and postUrlEncode:
                 postUrlEncode = False
-                conf.httpHeaders = [_ for _ in conf.httpHeaders if _[1] != contentType]
-                contentType = POST_HINT_CONTENT_TYPES.get(kb.postHint, PLAIN_TEXT_CONTENT_TYPE)
-                conf.httpHeaders.append((HTTP_HEADER.CONTENT_TYPE, contentType))
+                if not (conf.skipUrlEncode and contentType):    # NOTE: https://github.com/sqlmapproject/sqlmap/issues/5092
+                    conf.httpHeaders = [_ for _ in conf.httpHeaders if _[1] != contentType]
+                    contentType = POST_HINT_CONTENT_TYPES.get(kb.postHint, PLAIN_TEXT_CONTENT_TYPE)
+                    conf.httpHeaders.append((HTTP_HEADER.CONTENT_TYPE, contentType))
 
         if payload:
             delimiter = conf.paramDel or (DEFAULT_GET_POST_DELIMITER if place != PLACE.COOKIE else DEFAULT_COOKIE_DELIMITER)
