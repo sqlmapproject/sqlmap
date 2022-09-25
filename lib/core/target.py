@@ -120,7 +120,10 @@ def _setRequestParams():
                 while True:
                     _ = re.search(r"\\g<([^>]+)>", retVal)
                     if _:
-                        retVal = retVal.replace(_.group(0), match.group(int(_.group(1)) if _.group(1).isdigit() else _.group(1)))
+                        try:
+                            retVal = retVal.replace(_.group(0), match.group(int(_.group(1)) if _.group(1).isdigit() else _.group(1)))
+                        except IndexError:
+                            break
                     else:
                         break
                 if kb.customInjectionMark in retVal:
