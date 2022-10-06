@@ -587,8 +587,14 @@ class Connect(object):
 
                 if not getRequestHeader(req, HTTP_HEADER.COOKIE) and conf.cj:
                     conf.cj._policy._now = conf.cj._now = int(time.time())
-                    cookies = conf.cj._cookies_for_request(req)
-                    requestHeaders += "\r\n%s" % ("Cookie: %s" % ";".join("%s=%s" % (getUnicode(cookie.name), getUnicode(cookie.value)) for cookie in cookies))
+                    while True:
+                        try:
+                            cookies = conf.cj._cookies_for_request(req)
+                        except RuntimeError:    # NOTE: https://github.com/sqlmapproject/sqlmap/issues/5187
+                            time.sleep(1)
+                        else:
+                            requestHeaders += "\r\n%s" % ("Cookie: %s" % ";".join("%s=%s" % (getUnicode(cookie.name), getUnicode(cookie.value)) for cookie in cookies))
+                            break
 
                 if post is not None:
                     if not getRequestHeader(req, HTTP_HEADER.CONTENT_LENGTH) and not chunked:
