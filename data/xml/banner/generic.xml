@@ -34,7 +34,7 @@
     <!-- Reference: https://msdn.microsoft.com/en-us/library/windows/desktop/ms724832%28v=vs.85%29.aspx -->
 
     <regexp value="Windows.*\b10\.0">
-        <info type="Windows" distrib="2016|2019|10|11"/>
+        <info type="Windows" distrib="2016|2019|2022|10|11"/>
     </regexp>
 
     <regexp value="Windows.*\b6\.3">
