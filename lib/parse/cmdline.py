@@ -986,7 +986,7 @@ def cmdLineParser(argv=None):
                 argv[i] = argv[i].replace("--auth-creds", "--auth-cred", 1)
             elif argv[i].startswith("--drop-cookie"):
                 argv[i] = argv[i].replace("--drop-cookie", "--drop-set-cookie", 1)
-            elif any(argv[i].startswith(_) for _ in ("--tamper", "--ignore-code", "--skip")):
+            elif re.search(r"\A(--(tamper|ignore-code|skip))(?!-)", argv[i]):
                 key = re.search(r"\-?\-(\w+)\b", argv[i]).group(1)
                 index = auxIndexes.get(key, None)
                 if index is None:
