@@ -581,7 +581,7 @@ class Agent(object):
         """
 
         prefixRegex = r"(?:\s+(?:FIRST|SKIP|LIMIT(?: \d+)?)\s+\d+)*"
-        fieldsSelectTop = re.search(r"\ASELECT\s+TOP(\s+[\d]|\s*\([^)]+\))\s+(.+?)\s+FROM", query, re.I)
+        fieldsSelectTop = re.search(r"\ASELECT\s+TOP(\s+\d+|\s*\([^)]+\))\s+(.+?)\s+FROM", query, re.I)
         fieldsSelectRownum = re.search(r"\ASELECT\s+([^()]+?),\s*ROWNUM AS LIMIT FROM", query, re.I)
         fieldsSelectDistinct = re.search(r"\ASELECT%s\s+DISTINCT\((.+?)\)\s+FROM" % prefixRegex, query, re.I)
         fieldsSelectCase = re.search(r"\ASELECT%s\s+(\(CASE WHEN\s+.+\s+END\))" % prefixRegex, query, re.I)
@@ -729,7 +729,7 @@ class Agent(object):
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'+" % kb.chars.start, 1)
                 concatenatedQuery += "+'%s'" % kb.chars.stop
             elif fieldsSelectTop:
-                topNum = re.search(r"\ASELECT\s+TOP(\s+[\d]|\s*\([^)]+\))\s+", concatenatedQuery, re.I).group(1)
+                topNum = re.search(r"\ASELECT\s+TOP(\s+\d+|\s*\([^)]+\))\s+", concatenatedQuery, re.I).group(1)
                 concatenatedQuery = concatenatedQuery.replace("SELECT TOP%s " % topNum, "TOP%s '%s'+" % (topNum, kb.chars.start), 1)
                 concatenatedQuery = concatenatedQuery.replace(" FROM ", "+'%s' FROM " % kb.chars.stop, 1)
             elif fieldsSelectCase:
