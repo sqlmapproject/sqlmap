@@ -4269,7 +4269,7 @@ def safeSQLIdentificatorNaming(name, isTable=False):
                             retVal = "[%s]" % retVal
 
         if _ and DEFAULT_MSSQL_SCHEMA not in retVal and '.' not in re.sub(r"\[[^]]+\]", "", retVal):
-            if conf.db.lower() != "information_schema":     # NOTE: https://github.com/sqlmapproject/sqlmap/issues/5192
+            if (conf.db or "").lower() != "information_schema":     # NOTE: https://github.com/sqlmapproject/sqlmap/issues/5192
                 retVal = "%s.%s" % (DEFAULT_MSSQL_SCHEMA, retVal)
 
     return retVal
