@@ -2675,7 +2675,7 @@ def _basicOptionValidation():
             logger.warning(warnMsg)
 
 
-    if conf.cookieDel and len(conf.cookieDel):
+    if conf.cookieDel and len(conf.cookieDel) != 1:
         errMsg = "option '--cookie-del' should contain a single character (e.g. ';')"
         raise SqlmapSyntaxException(errMsg)
 
