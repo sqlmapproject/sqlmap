@@ -276,6 +276,9 @@ def cmdLineParser(argv=None):
         request.add_argument("--csrf-method", dest="csrfMethod",
             help="HTTP method to use during anti-CSRF token page visit")
 
+        request.add_argument("--csrf-data", dest="csrfData",
+            help="POST data to send during anti-CSRF token page visit")
+
         request.add_argument("--csrf-retries", dest="csrfRetries", type=int,
             help="Retries for anti-CSRF token retrieval (default %d)" % defaults.csrfRetries)
 
