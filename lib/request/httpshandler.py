@@ -63,19 +63,21 @@ class HTTPSConnection(_http_client.HTTPSConnection):
 
         # Reference(s): https://docs.python.org/2/library/ssl.html#ssl.SSLContext
         #               https://www.mnot.net/blog/2014/12/27/python_2_and_tls_sni
-        if re.search(r"\A[\d.]+\Z", self.host or "") is None and kb.tlsSNI.get(self.host) is not False and hasattr(ssl, "SSLContext"):
+        if hasattr(ssl, "SSLContext"):
             for protocol in (_ for _ in _protocols if _ >= ssl.PROTOCOL_TLSv1):
                 try:
                     sock = create_sock()
                     if protocol not in _contexts:
                         _contexts[protocol] = ssl.SSLContext(protocol)
+                        if self.cert_file and self.key_file:
+                            _contexts[protocol].load_cert_chain(certfile=self.cert_file, keyfile=self.key_file)
                         try:
                             # Reference(s): https://askubuntu.com/a/1263098
                             #               https://askubuntu.com/a/1250807
                             _contexts[protocol].set_ciphers("DEFAULT@SECLEVEL=1")
                         except ssl.SSLError:
                             pass
-                    result = _contexts[protocol].wrap_socket(sock, do_handshake_on_connect=True, server_hostname=self.host)
+                    result = _contexts[protocol].wrap_socket(sock, do_handshake_on_connect=True, server_hostname=self.host if re.search(r"\A[\d.]+\Z", self.host or "") is None else None)
                     if result:
                         success = True
                         self.sock = result
@@ -88,14 +90,11 @@ class HTTPSConnection(_http_client.HTTPSConnection):
                     self._tunnel_host = None
                     logger.debug("SSL connection error occurred for '%s' ('%s')" % (_lut[protocol], getSafeExString(ex)))
 
-            if kb.tlsSNI.get(self.host) is None:
-                kb.tlsSNI[self.host] = success
-
-        if not success:
+        elif hasattr(ssl, "wrap_socket"):
             for protocol in _protocols:
                 try:
                     sock = create_sock()
-                    _ = ssl.wrap_socket(sock, self.key_file, self.cert_file, ssl_version=protocol)
+                    _ = ssl.wrap_socket(sock, keyfile=self.key_file, certfile=self.cert_file, ssl_version=protocol)
                     if _:
                         success = True
                         self.sock = _
