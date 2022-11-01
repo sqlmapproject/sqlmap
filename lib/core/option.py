@@ -2166,7 +2166,6 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.testType = None
     kb.threadContinue = True
     kb.threadException = False
-    kb.tlsSNI = {}
     kb.uChar = NULL
     kb.udfFail = False
     kb.unionDuplicates = False

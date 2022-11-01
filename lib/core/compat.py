@@ -278,6 +278,7 @@ else:
     buffer = buffer
 
 try:
-    from pkg_resources import parse_version as LooseVersion
+    from packaging import version
+    LooseVersion = version.parse
 except ImportError:
     from distutils.version import LooseVersion
