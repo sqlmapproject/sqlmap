@@ -275,6 +275,8 @@ def decodePage(page, contentEncoding, contentType, percentDecode=True):
 
     >>> getText(decodePage(b"<html>foo&amp;bar</html>", None, "text/html; charset=utf-8"))
     '<html>foo&bar</html>'
+    >>> getText(decodePage(b"&#x9;", None, "text/html; charset=utf-8"))
+    '\\t'
     """
 
     if not page or (conf.nullConnection and len(page) < 2):
@@ -339,7 +341,7 @@ def decodePage(page, contentEncoding, contentType, percentDecode=True):
         if not kb.disableHtmlDecoding:
             # e.g. &#x9;&#195;&#235;&#224;&#226;&#224;
             if b"&#" in page:
-                page = re.sub(b"&#x([0-9a-f]{1,2});", lambda _: decodeHex(_.group(1) if len(_.group(1)) == 2 else "0%s" % _.group(1)), page)
+                page = re.sub(b"&#x([0-9a-f]{1,2});", lambda _: decodeHex(_.group(1) if len(_.group(1)) == 2 else b"0%s" % _.group(1)), page)
                 page = re.sub(b"&#(\\d{1,3});", lambda _: six.int2byte(int(_.group(1))) if int(_.group(1)) < 256 else _.group(0), page)
 
             # e.g. %20%28%29
