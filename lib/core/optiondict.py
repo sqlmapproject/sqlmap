@@ -215,6 +215,7 @@ optDict = {
         "crawlDepth": "integer",
         "crawlExclude": "string",
         "csvDel": "string",
+        "dumpFile": "string",
         "dumpFormat": "string",
         "encoding": "string",
         "eta": "boolean",

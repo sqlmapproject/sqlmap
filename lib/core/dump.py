@@ -449,7 +449,7 @@ class Dump(object):
 
                             dumpDbPath = tempDir
 
-            dumpFileName = os.path.join(dumpDbPath, re.sub(r'[\\/]', UNSAFE_DUMP_FILEPATH_REPLACEMENT, "%s.%s" % (unsafeSQLIdentificatorNaming(table), conf.dumpFormat.lower())))
+            dumpFileName = conf.dumpFile or os.path.join(dumpDbPath, re.sub(r'[\\/]', UNSAFE_DUMP_FILEPATH_REPLACEMENT, "%s.%s" % (unsafeSQLIdentificatorNaming(table), conf.dumpFormat.lower())))
             if not checkFile(dumpFileName, False):
                 try:
                     openFile(dumpFileName, "w+b").close()
