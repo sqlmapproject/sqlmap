@@ -69,7 +69,7 @@ class HTTPSConnection(_http_client.HTTPSConnection):
                     sock = create_sock()
                     if protocol not in _contexts:
                         _contexts[protocol] = ssl.SSLContext(protocol)
-                        if self.cert_file and self.key_file:
+                        if getattr(self, "cert_file") and getattr(self, "key_file"):
                             _contexts[protocol].load_cert_chain(certfile=self.cert_file, keyfile=self.key_file)
                         try:
                             # Reference(s): https://askubuntu.com/a/1263098
@@ -94,7 +94,7 @@ class HTTPSConnection(_http_client.HTTPSConnection):
             for protocol in _protocols:
                 try:
                     sock = create_sock()
-                    _ = ssl.wrap_socket(sock, keyfile=self.key_file, certfile=self.cert_file, ssl_version=protocol)
+                    _ = ssl.wrap_socket(sock, keyfile=getattr(self, "key_file"), certfile=getattr(self, "cert_file"), ssl_version=protocol)
                     if _:
                         success = True
                         self.sock = _
