@@ -839,6 +839,9 @@ def cmdLineParser(argv=None):
         parser.add_argument("--vuln-test", dest="vulnTest", action="store_true",
             help=SUPPRESS)
 
+        parser.add_argument("--disable-json", dest="disableJson", action="store_true",
+            help=SUPPRESS)
+
         # API options
         parser.add_argument("--api", dest="api", action="store_true",
             help=SUPPRESS)
