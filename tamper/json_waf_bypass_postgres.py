@@ -140,6 +140,10 @@ def generate_random_payload():
 
 def tamper(payload, **kwargs):
     """
+    This SQLMap tamper script was written by Noam Moshe of Claroty Team82. To read more about this novel
+    WAF bypass, read our blog:
+        https://claroty.com/team82/research/js-on-security-off-abusing-json-based-sql-to-bypass-waf
+        
     Bypasses generic WAFs using JSON SQL Syntax. For more details, see our talk in BH EU 2022
     https://www.blackhat.com/eu-22/briefings/schedule/#js-on-security-off-abusing-json-based-sql-queries-28774
 
