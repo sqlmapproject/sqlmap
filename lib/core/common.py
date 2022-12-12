@@ -1034,7 +1034,10 @@ def dataToStdout(data, forceOutput=False, bold=False, contentType=None, status=C
             except UnicodeEncodeError:
                 sys.stdout.write(re.sub(r"[^ -~]", '?', clearColors(data)))
             finally:
-                sys.stdout.flush()
+                try:
+                    sys.stdout.flush()
+                except IOError:
+                    raise SystemExit
 
             if multiThreadMode:
                 logging._releaseLock()

@@ -250,7 +250,10 @@ def main():
         raise SystemExit
 
     except KeyboardInterrupt:
-        print()
+        try:
+            print()
+        except IOError:
+            pass
 
     except EOFError:
         print()
