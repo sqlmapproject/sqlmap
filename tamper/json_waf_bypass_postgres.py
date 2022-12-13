@@ -140,12 +140,8 @@ def generate_random_payload():
 
 def tamper(payload, **kwargs):
     """
-    This SQLMap tamper script was written by Noam Moshe of Claroty Team82. To read more about this novel
-    WAF bypass, read our blog:
-        https://claroty.com/team82/research/js-on-security-off-abusing-json-based-sql-to-bypass-waf
-        
-    Bypasses generic WAFs using JSON SQL Syntax. For more details, see our talk in BH EU 2022
-    https://www.blackhat.com/eu-22/briefings/schedule/#js-on-security-off-abusing-json-based-sql-queries-28774
+    
+    Bypasses generic WAFs using JSON SQL Syntax.
 
     For more details about JSON in PostgreSQL - https://www.postgresql.org/docs/9.3/functions-json.html
 
@@ -156,6 +152,10 @@ def tamper(payload, **kwargs):
         python3 sqlmap.py <TARGET> --tamper json_waf_bypass_postgres.py
 
     Notes:
+
+        * References: 
+            * https://claroty.com/team82/research/js-on-security-off-abusing-json-based-sql-to-bypass-waf 
+            * https://www.blackhat.com/eu-22/briefings/schedule/#js-on-security-off-abusing-json-based-sql-queries-28774
         * Usefull for bypassing any JSON-unaware WAFs with minor-to-no adjusments
         * JSON techniques were tested againts the following WAF vendors:
             * Amazon AWS ELB
