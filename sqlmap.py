@@ -498,6 +498,11 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
+        elif "database disk image is malformed" in excMsg:
+            errMsg = "local session file seems to be malformed. Please rerun with '--flush-session'"
+            logger.critical(errMsg)
+            raise SystemExit
+
         elif "AttributeError: 'module' object has no attribute 'F_GETFD'" in excMsg:
             errMsg = "invalid runtime (\"%s\") " % excMsg.split("Error: ")[-1].strip()
             errMsg += "(Reference: 'https://stackoverflow.com/a/38841364' & 'https://bugs.python.org/issue24944#msg249231')"
