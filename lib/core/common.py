@@ -4033,7 +4033,7 @@ def maskSensitiveData(msg):
 
     >>> maskSensitiveData('python sqlmap.py -u "http://www.test.com/vuln.php?id=1" --banner') == 'python sqlmap.py -u *********************************** --banner'
     True
-    >>> maskSensitiveData('sqlmap.py -u test.com/index.go?id=index') == 'sqlmap.py -u **************************'
+    >>> maskSensitiveData('sqlmap.py -u test.com/index.go?id=index --auth-type=basic --auth-creds=foo:bar\\ndummy line') == 'sqlmap.py -u ************************** --auth-type=***** --auth-creds=*******\\ndummy line'
     True
     """
 
@@ -4049,7 +4049,7 @@ def maskSensitiveData(msg):
             retVal = retVal.replace(value, '*' * len(value))
 
     # Just in case (for problematic parameters regarding user encoding)
-    for match in re.finditer(r"(?i)[ -]-(u|url|data|cookie|auth-\w+|proxy|host|referer|headers?|H)( |=)(.*?)(?= -?-[a-z]|\Z)", retVal):
+    for match in re.finditer(r"(?im)[ -]-(u|url|data|cookie|auth-\w+|proxy|host|referer|headers?|H)( |=)(.*?)(?= -?-[a-z]|$)", retVal):
         retVal = retVal.replace(match.group(3), '*' * len(match.group(3)))
 
     # Fail-safe substitutions
