@@ -789,6 +789,9 @@ x, <deep_freeze(at)mail.ru>
 zhouhx, <zhouhx(at)knownsec.com>
 * for contributing a minor patch
 
+Noam Moshe Claroty Team82
+* for contributing WAF scripts json_waf_bypass_postgres.py, json_waf_bypass_sqlite.py, json_waf_bypass_mysql.py
+
 # Organizations
 
 Black Hat team, <info(at)blackhat.com>
