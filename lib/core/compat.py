@@ -12,6 +12,7 @@ import functools
 import math
 import os
 import random
+import re
 import sys
 import time
 import uuid
@@ -277,8 +278,37 @@ else:
     xrange = xrange
     buffer = buffer
 
-try:
-    from packaging import version
-    LooseVersion = version.parse
-except ImportError:
-    from distutils.version import LooseVersion
+def LooseVersion(version):
+    """
+    >>> LooseVersion("1.0") == LooseVersion("1.0")
+    True
+    >>> LooseVersion("1.0.1") > LooseVersion("1.0")
+    True
+    >>> LooseVersion("1.0.1-") == LooseVersion("1.0.1")
+    True
+    >>> LooseVersion("1.0.11") < LooseVersion("1.0.111")
+    True
+    >>> LooseVersion("foobar") > LooseVersion("1.0")
+    False
+    >>> LooseVersion("1.0") > LooseVersion("foobar")
+    False
+    >>> LooseVersion("3.22-mysql") == LooseVersion("3.22-mysql-ubuntu0.3")
+    True
+    >>> LooseVersion("8.0.22-0ubuntu0.20.04.2")
+    8.000022
+    """
+
+    match = re.search(r"\A(\d[\d.]*)", version or "")
+
+    if match:
+        result = 0
+        value = match.group(1)
+        weight = 1.0
+        for part in value.strip('.').split('.'):
+            if part.isdigit():
+                result += int(part) * weight
+            weight *= 1e-3
+    else:
+        result = float("NaN")
+
+    return result
