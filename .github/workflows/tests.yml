@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: [ '2.x', '3.10', 'pypy-2.7', 'pypy-3.7' ]
+        python-version: [ '2.x', '3.11', 'pypy-2.7', 'pypy-3.7' ]
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
