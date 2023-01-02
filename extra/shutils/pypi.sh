@@ -16,7 +16,7 @@ cat > $TMP_DIR/setup.py << EOF
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2022 sqlmap developers (https://sqlmap.org/)
+Copyright (c) 2006-2023 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -67,7 +67,7 @@ cat > sqlmap/__init__.py << EOF
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2022 sqlmap developers (https://sqlmap.org/)
+Copyright (c) 2006-2023 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
