@@ -2656,7 +2656,7 @@ def _basicOptionValidation():
 
     if conf.paramExclude:
         if re.search(r"\A\w+,", conf.paramExclude):
-            conf.paramExclude = r"\A(%s)\Z" % ('|'.join(re.escape(_) for _ in conf.paramExclude.split(',')))
+            conf.paramExclude = r"\A(%s)\Z" % ('|'.join(re.escape(_).strip() for _ in conf.paramExclude.split(',')))
 
         try:
             re.compile(conf.paramExclude)
