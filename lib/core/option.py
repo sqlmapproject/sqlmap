@@ -2655,6 +2655,9 @@ def _basicOptionValidation():
             raise SqlmapSyntaxException(errMsg)
 
     if conf.paramExclude:
+        if re.search(r"\A\w+,", conf.paramExclude):
+            conf.paramExclude = r"\A(%s)\Z" % ('|'.join(re.escape(_) for _ in conf.paramExclude.split(',')))
+
         try:
             re.compile(conf.paramExclude)
         except Exception as ex:
