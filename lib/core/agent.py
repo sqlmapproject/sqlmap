@@ -625,7 +625,9 @@ class Agent(object):
         fieldsToCastStr = fieldsToCastStr or ""
 
         # Function
-        if re.search(r"\A\w+\(.*\)", fieldsToCastStr, re.I) or (fieldsSelectCase and "WHEN use" not in query) or fieldsSubstr:
+        if re.search(r"\A\w+\(.*\),", fieldsToCastStr, re.I) or (fieldsSelectCase and "WHEN use" not in query) or fieldsSubstr:
+            fieldsToCastList = splitFields(fieldsToCastStr)
+        elif re.search(r"\A\w+\(.*\)", fieldsToCastStr, re.I) or (fieldsSelectCase and "WHEN use" not in query) or fieldsSubstr:
             fieldsToCastList = [fieldsToCastStr]
         else:
             fieldsToCastList = splitFields(fieldsToCastStr)
