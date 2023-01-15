@@ -596,6 +596,9 @@ class Agent(object):
         if not _:
             fieldsSelectFrom = None
 
+        if re.search(r"\bWHERE\b.+(MIN|MAX)", query, re.I):
+            fieldsMinMaxstr = None
+
         fieldsToCastStr = fieldsNoSelect
 
         if fieldsSubstr:
