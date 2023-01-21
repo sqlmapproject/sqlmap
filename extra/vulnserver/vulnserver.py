@@ -44,7 +44,8 @@ SCHEMA = """
     CREATE TABLE users (
         id INTEGER,
         name TEXT,
-        surname TEXT
+        surname TEXT,
+        PRIMARY KEY (id)
     );
     INSERT INTO users (id, name, surname) VALUES (1, 'luther', 'blisset');
     INSERT INTO users (id, name, surname) VALUES (2, 'fluffy', 'bunny');

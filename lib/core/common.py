@@ -1034,7 +1034,10 @@ def dataToStdout(data, forceOutput=False, bold=False, contentType=None, status=C
             except UnicodeEncodeError:
                 sys.stdout.write(re.sub(r"[^ -~]", '?', clearColors(data)))
             finally:
-                sys.stdout.flush()
+                try:
+                    sys.stdout.flush()
+                except IOError:
+                    raise SystemExit
 
             if multiThreadMode:
                 logging._releaseLock()
@@ -1819,7 +1822,7 @@ def expandAsteriskForColumns(expression):
     the SQL query string (expression)
     """
 
-    match = re.search(r"(?i)\ASELECT(\s+TOP\s+[\d]+)?\s+\*\s+FROM\s+((`[^`]+`|[^\s]+)+)", expression)
+    match = re.search(r"(?i)\ASELECT(\s+TOP\s+[\d]+)?\s+\*\s+FROM\s+(([`'\"][^`'\"]+[`'\"]|[\w.]+)+)(\s|\Z)", expression)
 
     if match:
         infoMsg = "you did not provide the fields in your query. "
@@ -3399,19 +3402,39 @@ def parseSqliteTableSchema(value):
     >>> kb.data.cachedColumns = {}
     >>> parseSqliteTableSchema("CREATE TABLE users(\\n\\t\\tid INTEGER,\\n\\t\\tname TEXT\\n);")
     True
-    >>> repr(kb.data.cachedColumns).count(',') == 1
+    >>> tuple(kb.data.cachedColumns[conf.db][conf.tbl].items()) == (('id', 'INTEGER'), ('name', 'TEXT'))
+    True
+    >>> parseSqliteTableSchema("CREATE TABLE dummy(`foo bar` BIGINT, \\"foo\\" VARCHAR, 'bar' TEXT)");
+    True
+    >>> tuple(kb.data.cachedColumns[conf.db][conf.tbl].items()) == (('foo bar', 'BIGINT'), ('foo', 'VARCHAR'), ('bar', 'TEXT'))
+    True
+    >>> parseSqliteTableSchema("CREATE TABLE suppliers(\\n\\tsupplier_id INTEGER PRIMARY KEY DESC,\\n\\tname TEXT NOT NULL\\n);");
+    True
+    >>> tuple(kb.data.cachedColumns[conf.db][conf.tbl].items()) == (('supplier_id', 'INTEGER'), ('name', 'TEXT'))
+    True
+    >>> parseSqliteTableSchema("CREATE TABLE country_languages (\\n\\tcountry_id INTEGER NOT NULL,\\n\\tlanguage_id INTEGER NOT NULL,\\n\\tPRIMARY KEY (country_id, language_id),\\n\\tFOREIGN KEY (country_id) REFERENCES countries (country_id) ON DELETE CASCADE ON UPDATE NO ACTION,\\tFOREIGN KEY (language_id) REFERENCES languages (language_id) ON DELETE CASCADE ON UPDATE NO ACTION);");
+    True
+    >>> tuple(kb.data.cachedColumns[conf.db][conf.tbl].items()) == (('country_id', 'INTEGER'), ('language_id', 'INTEGER'))
     True
     """
 
     retVal = False
 
+    value = extractRegexResult(r"(?s)\((?P<result>.+)\)", value)
+
     if value:
         table = {}
-        columns = {}
+        columns = OrderedDict()
 
-        for match in re.finditer(r"[(,]\s*[\"'`]?(\w+)[\"'`]?(?:\s+(INT|INTEGER|TINYINT|SMALLINT|MEDIUMINT|BIGINT|UNSIGNED BIG INT|INT2|INT8|INTEGER|CHARACTER|VARCHAR|VARYING CHARACTER|NCHAR|NATIVE CHARACTER|NVARCHAR|TEXT|CLOB|LONGTEXT|BLOB|NONE|REAL|DOUBLE|DOUBLE PRECISION|FLOAT|REAL|NUMERIC|DECIMAL|BOOLEAN|DATE|DATETIME|NUMERIC)\b)?", decodeStringEscape(value), re.I):
+        value = re.sub(r"\(.+?\)", "", value).strip()
+
+        for match in re.finditer(r"(?:\A|,)\s*(([\"'`]).+?\2|\w+)(?:\s+(INT|INTEGER|TINYINT|SMALLINT|MEDIUMINT|BIGINT|UNSIGNED BIG INT|INT2|INT8|INTEGER|CHARACTER|VARCHAR|VARYING CHARACTER|NCHAR|NATIVE CHARACTER|NVARCHAR|TEXT|CLOB|LONGTEXT|BLOB|NONE|REAL|DOUBLE|DOUBLE PRECISION|FLOAT|REAL|NUMERIC|DECIMAL|BOOLEAN|DATE|DATETIME|NUMERIC)\b)?", decodeStringEscape(value), re.I):
+            column = match.group(1).strip(match.group(2) or "")
+            if re.search(r"(?i)\A(CONSTRAINT|PRIMARY|UNIQUE|CHECK|FOREIGN)\b", column.strip()):
+                continue
             retVal = True
-            columns[match.group(1)] = match.group(2) or "TEXT"
+
+            columns[column] = match.group(3) or "TEXT"
 
         table[safeSQLIdentificatorNaming(conf.tbl, True)] = columns
         kb.data.cachedColumns[conf.db] = table
@@ -4010,7 +4033,7 @@ def maskSensitiveData(msg):
 
     >>> maskSensitiveData('python sqlmap.py -u "http://www.test.com/vuln.php?id=1" --banner') == 'python sqlmap.py -u *********************************** --banner'
     True
-    >>> maskSensitiveData('sqlmap.py -u test.com/index.go?id=index') == 'sqlmap.py -u **************************'
+    >>> maskSensitiveData('sqlmap.py -u test.com/index.go?id=index --auth-type=basic --auth-creds=foo:bar\\ndummy line') == 'sqlmap.py -u ************************** --auth-type=***** --auth-creds=*******\\ndummy line'
     True
     """
 
@@ -4026,7 +4049,7 @@ def maskSensitiveData(msg):
             retVal = retVal.replace(value, '*' * len(value))
 
     # Just in case (for problematic parameters regarding user encoding)
-    for match in re.finditer(r"(?i)[ -]-(u|url|data|cookie|auth-\w+|proxy|host|referer|headers?|H)( |=)(.*?)(?= -?-[a-z]|\Z)", retVal):
+    for match in re.finditer(r"(?im)[ -]-(u|url|data|cookie|auth-\w+|proxy|host|referer|headers?|H)( |=)(.*?)(?= -?-[a-z]|$)", retVal):
         retVal = retVal.replace(match.group(3), '*' * len(match.group(3)))
 
     # Fail-safe substitutions

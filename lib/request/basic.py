@@ -108,7 +108,7 @@ def forgeHeaders(items=None, base=None):
     if conf.cj:
         if HTTP_HEADER.COOKIE in headers:
             for cookie in conf.cj:
-                if cookie.domain_specified and not (conf.hostname or "").endswith(cookie.domain):
+                if cookie is None or cookie.domain_specified and not (conf.hostname or "").endswith(cookie.domain):
                     continue
 
                 if ("%s=" % getUnicode(cookie.name)) in getUnicode(headers[HTTP_HEADER.COOKIE]):
@@ -401,13 +401,14 @@ def processResponse(page, responseHeaders, code=None, status=None):
     if not conf.skipWaf and kb.processResponseCounter < IDENTYWAF_PARSE_LIMIT:
         rawResponse = "%s %s %s\n%s\n%s" % (_http_client.HTTPConnection._http_vsn_str, code or "", status or "", "".join(getUnicode(responseHeaders.headers if responseHeaders else [])), page[:HEURISTIC_PAGE_SIZE_THRESHOLD])
 
-        identYwaf.non_blind.clear()
-        if identYwaf.non_blind_check(rawResponse, silent=True):
-            for waf in identYwaf.non_blind:
-                if waf not in kb.identifiedWafs:
-                    kb.identifiedWafs.add(waf)
-                    errMsg = "WAF/IPS identified as '%s'" % identYwaf.format_name(waf)
-                    singleTimeLogMessage(errMsg, logging.CRITICAL)
+        with kb.locks.identYwaf:
+            identYwaf.non_blind.clear()
+            if identYwaf.non_blind_check(rawResponse, silent=True):
+                for waf in set(identYwaf.non_blind):
+                    if waf not in kb.identifiedWafs:
+                        kb.identifiedWafs.add(waf)
+                        errMsg = "WAF/IPS identified as '%s'" % identYwaf.format_name(waf)
+                        singleTimeLogMessage(errMsg, logging.CRITICAL)
 
     if kb.originalPage is None:
         for regex in (EVENTVALIDATION_REGEX, VIEWSTATE_REGEX):

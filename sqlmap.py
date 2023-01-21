@@ -250,7 +250,10 @@ def main():
         raise SystemExit
 
     except KeyboardInterrupt:
-        print()
+        try:
+            print()
+        except IOError:
+            pass
 
     except EOFError:
         print()
@@ -492,6 +495,11 @@ def main():
             errMsg = "there has been a problem in enumeration. "
             errMsg += "Because of a considerable chance of false-positive case "
             errMsg += "you are advised to rerun with switch '--flush-session'"
+            logger.critical(errMsg)
+            raise SystemExit
+
+        elif "database disk image is malformed" in excMsg:
+            errMsg = "local session file seems to be malformed. Please rerun with '--flush-session'"
             logger.critical(errMsg)
             raise SystemExit
 

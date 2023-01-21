@@ -17,6 +17,7 @@ import socket
 import sqlite3
 import sys
 import tempfile
+import threading
 import time
 
 from lib.core.common import dataToStdout
@@ -88,6 +89,7 @@ class Database(object):
     def connect(self, who="server"):
         self.connection = sqlite3.connect(self.database, timeout=3, isolation_level=None, check_same_thread=False)
         self.cursor = self.connection.cursor()
+        self.lock = threading.Lock()
         logger.debug("REST-JSON API %s connected to IPC database" % who)
 
     def disconnect(self):
@@ -101,17 +103,20 @@ class Database(object):
         self.connection.commit()
 
     def execute(self, statement, arguments=None):
-        while True:
-            try:
-                if arguments:
-                    self.cursor.execute(statement, arguments)
+        with self.lock:
+            while True:
+                try:
+                    if arguments:
+                        self.cursor.execute(statement, arguments)
+                    else:
+                        self.cursor.execute(statement)
+                except sqlite3.OperationalError as ex:
+                    if "locked" not in getSafeExString(ex):
+                        raise
+                    else:
+                        time.sleep(1)
                 else:
-                    self.cursor.execute(statement)
-            except sqlite3.OperationalError as ex:
-                if "locked" not in getSafeExString(ex):
-                    raise
-            else:
-                break
+                    break
 
         if statement.lstrip().upper().startswith("SELECT"):
             return self.cursor.fetchall()
