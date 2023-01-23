@@ -204,6 +204,7 @@ optDict = {
 
     "General": {
         "trafficFile": "string",
+        "abortOnEmpty": "boolean",
         "answers": "string",
         "batch": "boolean",
         "base64Parameter": "string",

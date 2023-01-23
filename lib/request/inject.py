@@ -501,10 +501,15 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
     kb.safeCharEncode = False
 
     if not any((kb.testMode, conf.dummy, conf.offline, conf.noCast, conf.hexConvert)) and value is None and Backend.getDbms() and conf.dbmsHandler and kb.fingerprinted:
-        warnMsg = "in case of continuous data retrieval problems you are advised to try "
-        warnMsg += "a switch '--no-cast' "
-        warnMsg += "or switch '--hex'" if hasattr(queries[Backend.getIdentifiedDbms()], "hex") else ""
-        singleTimeWarnMessage(warnMsg)
+        if conf.abortOnEmpty:
+            errMsg = "aborting due to empty data retrieval"
+            logger.critical(errMsg)
+            raise SystemExit
+        else:
+            warnMsg = "in case of continuous data retrieval problems you are advised to try "
+            warnMsg += "a switch '--no-cast' "
+            warnMsg += "or switch '--hex'" if hasattr(queries[Backend.getIdentifiedDbms()], "hex") else ""
+            singleTimeWarnMessage(warnMsg)
 
     # Dirty patch (MSSQL --binary-fields with 0x31003200...)
     if Backend.isDbms(DBMS.MSSQL) and conf.binaryFields:

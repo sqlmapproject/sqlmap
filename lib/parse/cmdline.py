@@ -628,6 +628,9 @@ def cmdLineParser(argv=None):
         general.add_argument("-t", dest="trafficFile",
             help="Log all HTTP traffic into a textual file")
 
+        general.add_argument("--abort-on-empty", dest="abortOnEmpty", action="store_true",
+            help="Abort data retrieval on empty results")
+
         general.add_argument("--answers", dest="answers",
             help="Set predefined answers (e.g. \"quit=N,follow=N\")")
 
