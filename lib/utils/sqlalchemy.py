@@ -39,6 +39,7 @@ from lib.core.exception import SqlmapFilePathException
 from lib.core.exception import SqlmapMissingDependence
 from plugins.generic.connector import Connector as GenericConnector
 from thirdparty import six
+from thirdparty.six.moves import urllib as _urllib
 
 def getSafeExString(ex, encoding=None):  # Cross-referenced function
     raise NotImplementedError
@@ -49,6 +50,12 @@ class SQLAlchemy(GenericConnector):
 
         self.dialect = dialect
         self.address = conf.direct
+
+        if conf.dbmsUser:
+            self.address = self.address.replace("%s:" % conf.dbmsUser, "%s:" % _urllib.parse.quote(conf.dbmsUser))
+
+        if conf.dbmsPass:
+            self.address = self.address.replace(":%s@" % conf.dbmsPass, ":%s@" % _urllib.parse.quote(conf.dbmsPass))
 
         if self.dialect:
             self.address = re.sub(r"\A.+://", "%s://" % self.dialect, self.address)
