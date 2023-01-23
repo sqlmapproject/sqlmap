@@ -21,7 +21,7 @@ try:
     if hasattr(module, "dialects"):
         _sqlalchemy = module
         warnings.simplefilter(action="ignore", category=_sqlalchemy.exc.SAWarning)
-except ImportError:
+except:
     pass
 finally:
     sys.path = _path
