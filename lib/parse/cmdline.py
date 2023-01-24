@@ -201,8 +201,11 @@ def cmdLineParser(argv=None):
         request.add_argument("--auth-file", dest="authFile",
             help="HTTP authentication PEM cert/private key file")
 
+        request.add_argument("--abort-code", dest="abortCode",
+            help="Abort on (problematic) HTTP error code(s) (e.g. 401)")
+
         request.add_argument("--ignore-code", dest="ignoreCode",
-            help="Ignore (problematic) HTTP error code (e.g. 401)")
+            help="Ignore (problematic) HTTP error code(s) (e.g. 401)")
 
         request.add_argument("--ignore-proxy", dest="ignoreProxy", action="store_true",
             help="Ignore system default proxy settings")

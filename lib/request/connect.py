@@ -767,6 +767,11 @@ class Connect(object):
             if not multipart:
                 logger.log(CUSTOM_LOGGING.TRAFFIC_IN, responseMsg)
 
+            if code in conf.abortCode:
+                errMsg = "aborting due to detected HTTP code '%d'" % code
+                singleTimeLogMessage(errMsg, logging.CRITICAL)
+                raise SystemExit
+
             if ex.code not in (conf.ignoreCode or []):
                 if ex.code == _http_client.UNAUTHORIZED:
                     errMsg = "not authorized, try to provide right HTTP "
@@ -920,6 +925,11 @@ class Connect(object):
                     errMsg = "error occurred while running postprocess "
                     errMsg += "function '%s' ('%s')" % (function.__name__, getSafeExString(ex))
                     raise SqlmapGenericException(errMsg)
+
+            if code in conf.abortCode:
+                errMsg = "aborting due to detected HTTP code '%d'" % code
+                singleTimeLogMessage(errMsg, logging.CRITICAL)
+                raise SystemExit
 
             threadData.lastPage = page
             threadData.lastCode = code

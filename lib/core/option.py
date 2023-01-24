@@ -1696,10 +1696,19 @@ def _cleanupOptions():
             try:
                 conf.ignoreCode = [int(_) for _ in re.split(PARAMETER_SPLITTING_REGEX, conf.ignoreCode)]
             except ValueError:
-                errMsg = "options '--ignore-code' should contain a list of integer values or a wildcard value '%s'" % IGNORE_CODE_WILDCARD
+                errMsg = "option '--ignore-code' should contain a list of integer values or a wildcard value '%s'" % IGNORE_CODE_WILDCARD
                 raise SqlmapSyntaxException(errMsg)
     else:
         conf.ignoreCode = []
+
+    if conf.abortCode:
+        try:
+            conf.abortCode = [int(_) for _ in re.split(PARAMETER_SPLITTING_REGEX, conf.abortCode)]
+        except ValueError:
+            errMsg = "option '--abort-code' should contain a list of integer values"
+            raise SqlmapSyntaxException(errMsg)
+    else:
+        conf.abortCode = []
 
     if conf.paramFilter:
         conf.paramFilter = [_.strip() for _ in re.split(PARAMETER_SPLITTING_REGEX, conf.paramFilter.upper())]
