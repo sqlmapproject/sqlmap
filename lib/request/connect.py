@@ -926,10 +926,11 @@ class Connect(object):
                     errMsg += "function '%s' ('%s')" % (function.__name__, getSafeExString(ex))
                     raise SqlmapGenericException(errMsg)
 
-            if code in conf.abortCode:
-                errMsg = "aborting due to detected HTTP code '%d'" % code
-                singleTimeLogMessage(errMsg, logging.CRITICAL)
-                raise SystemExit
+            for _ in (getattr(conn, "redcode", None), code):
+                if _ is not None and _ in conf.abortCode:
+                    errMsg = "aborting due to detected HTTP code '%d'" % _
+                    singleTimeLogMessage(errMsg, logging.CRITICAL)
+                    raise SystemExit
 
             threadData.lastPage = page
             threadData.lastCode = code
