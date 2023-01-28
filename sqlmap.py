@@ -64,7 +64,6 @@ try:
     from lib.core.common import setPaths
     from lib.core.common import weAreFrozen
     from lib.core.convert import getUnicode
-    from lib.core.common import MKSTEMP_PREFIX
     from lib.core.common import setColor
     from lib.core.common import unhandledExceptionMessage
     from lib.core.compat import LooseVersion
@@ -73,6 +72,7 @@ try:
     from lib.core.data import conf
     from lib.core.data import kb
     from lib.core.datatype import OrderedSet
+    from lib.core.enums import MKSTEMP_PREFIX
     from lib.core.exception import SqlmapBaseException
     from lib.core.exception import SqlmapShellQuitException
     from lib.core.exception import SqlmapSilentQuitException
