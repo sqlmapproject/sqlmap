@@ -399,6 +399,7 @@ XDBWEBSERVICES
 
 # MySQL
 information_schema
+performance_schema
 mysql
 phpmyadmin
 
