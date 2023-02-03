@@ -239,7 +239,7 @@ class Entries(object):
                                     entries = BigArray(_zip(*[entries[colName] for colName in colList]))
                         else:
                             query = rootQuery.inband.query % (colString, conf.db, tbl)
-                    elif Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2, DBMS.VERTICA, DBMS.PRESTO, DBMS.CRATEDB, DBMS.CACHE, DBMS.VIRTUOSO):
+                    elif Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2, DBMS.VERTICA, DBMS.PRESTO, DBMS.CRATEDB, DBMS.CACHE, DBMS.VIRTUOSO, DBMS.CLICKHOUSE):
                         query = rootQuery.inband.query % (colString, conf.db, tbl, prioritySortColumns(colList)[0])
                     else:
                         query = rootQuery.inband.query % (colString, conf.db, tbl)

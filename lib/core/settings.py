@@ -20,7 +20,7 @@ from thirdparty import six
 from thirdparty.six import unichr as _unichr
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.7.2.4"
+VERSION = "1.7.2.5"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -283,7 +283,7 @@ PRESTO_SYSTEM_DBS = ("information_schema",)
 ALTIBASE_SYSTEM_DBS = ("SYSTEM_",)
 MIMERSQL_SYSTEM_DBS = ("information_schema", "SYSTEM",)
 CRATEDB_SYSTEM_DBS = ("information_schema", "pg_catalog", "sys")
-CLICKHOUSE_SYSTEM_DBS = ("information_schema", "system")
+CLICKHOUSE_SYSTEM_DBS = ("information_schema", "INFORMATION_SCHEMA", "system")
 CUBRID_SYSTEM_DBS = ("DBA",)
 CACHE_SYSTEM_DBS = ("%Dictionary", "INFORMATION_SCHEMA", "%SYS")
 EXTREMEDB_SYSTEM_DBS = ("",)
@@ -415,6 +415,7 @@ ERROR_PARSING_REGEXES = (
     r"(?P<result>[^\n>]{0,100}SQL Syntax[^\n<]+)",
     r"(?s)<li>Error Type:<br>(?P<result>.+?)</li>",
     r"CDbCommand (?P<result>[^<>\n]*SQL[^<>\n]+)",
+    r"Code: \d+. DB::Exception: (?P<result>[^<>\n]*)",
     r"error '[0-9a-f]{8}'((<[^>]+>)|\s)+(?P<result>[^<>]+)",
     r"\[[^\n\]]{1,100}(ODBC|JDBC)[^\n\]]+\](\[[^\]]+\])?(?P<result>[^\n]+(in query expression|\(SQL| at /[^ ]+pdo)[^\n<]+)",
     r"(?P<result>query error: SELECT[^<>]+)"
