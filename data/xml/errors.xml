@@ -211,8 +211,9 @@
         <error regexp="Syntax error,[^\n]+assumed to mean"/>
     </dbms>
 
-    <dbms value="Clickhouse">
-        <error regexp="DB::Exception: Syntax error:"/>
+    <dbms value="ClickHouse">
+        <error regexp="Code: \d+. DB::Exception:"/>
+        <error regexp="Syntax error: failed at position \d+"/>
     </dbms>
 
     <dbms value="CrateDB">

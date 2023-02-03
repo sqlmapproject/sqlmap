@@ -1319,7 +1319,7 @@
         </search_column>
     </dbms>
 
-    <dbms value="Clickhouse">
+    <dbms value="ClickHouse">
         <cast query="CAST(%s AS String)"/>
         <length query="length(%s)"/>
         <isnull query="ifNull(%s, '')"/>
@@ -1331,7 +1331,7 @@
         <limitstring query=" LIMIT "/>
         <order query="ORDER BY %s ASC"/>
         <count query="COUNT(%s)"/>
-        <comment query="--" query2="/*"/>
+        <comment query="--" query2="//"/>
         <substring query="substring(%s,%d,%d)"/>
         <concatenate query="%s||%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>

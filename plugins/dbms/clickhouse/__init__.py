@@ -16,7 +16,7 @@ from plugins.dbms.clickhouse.syntax import Syntax
 from plugins.dbms.clickhouse.takeover import Takeover
 from plugins.generic.misc import Miscellaneous
 
-class ClickhouseMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
+class ClickHouseMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
     This class defines ClickHouse methods
     """

