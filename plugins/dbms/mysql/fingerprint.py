@@ -175,7 +175,7 @@ class Fingerprint(GenericFingerprint):
         infoMsg = "testing %s" % DBMS.MYSQL
         logger.info(infoMsg)
 
-        result = inject.checkBooleanExpression("QUARTER(NULL) IS NULL")
+        result = inject.checkBooleanExpression("QUARTER(NULL XOR NULL) IS NULL")
 
         if result:
             infoMsg = "confirming %s" % DBMS.MYSQL

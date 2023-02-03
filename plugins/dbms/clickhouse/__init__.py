@@ -18,7 +18,7 @@ from plugins.generic.misc import Miscellaneous
 
 class ClickhouseMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
-    This class defines Clickhouse methods
+    This class defines ClickHouse methods
     """
 
     def __init__(self):

@@ -52,7 +52,7 @@ class DBMS(object):
     PRESTO = "Presto"
     ALTIBASE = "Altibase"
     MIMERSQL = "MimerSQL"
-    CLICKHOUSE = "Clickhouse"
+    CLICKHOUSE = "ClickHouse"
     CRATEDB = "CrateDB"
     CUBRID = "Cubrid"
     CACHE = "InterSystems Cache"
