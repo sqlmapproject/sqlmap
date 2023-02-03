@@ -58,6 +58,8 @@ def checkDependencies():
                 __import__("mimerpy")
             elif dbmsName == DBMS.CUBRID:
                 __import__("CUBRIDdb")
+            elif dbmsName == DBMS.CLICKHOUSE:
+                __import__("clickhouse_connect")       
         except:
             warnMsg = "sqlmap requires '%s' third-party library " % data[1]
             warnMsg += "in order to directly connect to the DBMS "
