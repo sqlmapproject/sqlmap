@@ -512,6 +512,23 @@ def start():
                         testSqlInj = True
                         paramKey = (conf.hostname, conf.path, place, parameter)
 
+                        if kb.processUserMarks:
+                            if testSqlInj and place not in (PLACE.CUSTOM_POST, PLACE.CUSTOM_HEADER):
+                                if kb.processNonCustom is None:
+                                    message = "other non-custom parameters found. "
+                                    message += "Do you want to process them too? [Y/n/q] "
+                                    choice = readInput(message, default='Y').upper()
+
+                                    if choice == 'Q':
+                                        raise SqlmapUserQuitException
+                                    else:
+                                        kb.processNonCustom = choice == 'Y'
+
+                                if not kb.processNonCustom:
+                                    infoMsg = "skipping %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
+                                    logger.info(infoMsg)
+                                    continue
+
                         if paramKey in kb.testedParams:
                             testSqlInj = False
 
@@ -567,24 +584,6 @@ def start():
                             else:
                                 infoMsg = "%sparameter '%s' appears to be dynamic" % ("%s " % paramType if paramType != parameter else "", parameter)
                                 logger.info(infoMsg)
-
-                        if kb.processUserMarks:
-                            if testSqlInj and place not in (PLACE.CUSTOM_POST, PLACE.CUSTOM_HEADER):
-                                if kb.processNonCustom is None:
-                                    message = "other non-custom parameters found. "
-                                    message += "Do you want to process them too? [Y/n/q] "
-                                    choice = readInput(message, default='Y').upper()
-
-                                    if choice == 'Q':
-                                        raise SqlmapUserQuitException
-                                    else:
-                                        kb.processNonCustom = choice == 'Y'
-
-                                if not kb.processNonCustom:
-                                    infoMsg = "skipping %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
-                                    logger.info(infoMsg)
-
-                                    testSqlInj = False
 
                         kb.testedParams.add(paramKey)
 
