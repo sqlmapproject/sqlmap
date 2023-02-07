@@ -2145,6 +2145,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.prependFlag = False
     kb.processResponseCounter = 0
     kb.previousMethod = None
+    kb.processNonCustom = None
     kb.processUserMarks = None
     kb.proxyAuthHeader = None
     kb.queryCounter = 0
