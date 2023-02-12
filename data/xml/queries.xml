@@ -938,8 +938,8 @@
         <length query="LENGTH(RTRIM(CAST(%s AS CHAR(254))))"/>
         <isnull query="COALESCE(%s,' ')"/>
         <delimiter query="||"/>
-        <limit query="{LIMIT %d OFFSET %d}"/>
-        <limitregexp query="{LIMIT\s+([\d]+)\s+OFFSET\s+([\d]+)}"/>
+        <limit query="OFFSET %d ROWS FETCH FIRST %d ROWS ONLY"/>
+        <limitregexp query="OFFSET\s+([\d]+)\s+ROWS\s+FETCH\s+FIRST\s+([\d]+)\s+ROWS\s+ONLY"/>
         <limitgroupstart query="2"/>
         <limitgroupstop query="1"/>
         <limitstring/>
@@ -962,11 +962,11 @@
         <is_dba query="(SELECT COUNT(*) FROM SYS.SYSUSERS)>=0"/>
         <dbs>
             <inband query="SELECT SCHEMANAME FROM SYS.SYSSCHEMAS"/>
-            <blind query="SELECT SCHEMANAME FROM SYS.SYSSCHEMAS {LIMIT 1 OFFSET %d}" count="SELECT COUNT(SCHEMANAME) FROM SYS.SYSSCHEMAS"/>
+            <blind query="SELECT SCHEMANAME FROM SYS.SYSSCHEMAS OFFSET %d ROWS FETCH FIRST 1 ROW ONLY" count="SELECT COUNT(SCHEMANAME) FROM SYS.SYSSCHEMAS"/>
         </dbs>
         <tables>
             <inband query="SELECT SCHEMANAME,TABLENAME FROM SYS.SYSTABLES JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID" condition="SCHEMANAME"/>
-            <blind query="SELECT TABLENAME FROM SYS.SYSTABLES JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID WHERE SCHEMANAME='%s' {LIMIT 1 OFFSET %d}" count="SELECT COUNT(TABLENAME) FROM SYS.SYSTABLES JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID WHERE SCHEMANAME='%s'"/>
+            <blind query="SELECT TABLENAME FROM SYS.SYSTABLES JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID WHERE SCHEMANAME='%s' OFFSET %d ROWS FETCH FIRST 1 ROW ONLY" count="SELECT COUNT(TABLENAME) FROM SYS.SYSTABLES JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID WHERE SCHEMANAME='%s'"/>
         </tables>
         <columns>
             <!-- NOTE: COLUMNDATATYPE without CAST() causes problems during enumeration -->
@@ -975,11 +975,11 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s"/>
-            <blind query="SELECT %s FROM %s {LIMIT 1 OFFSET %d}" count="SELECT COUNT(*) FROM %s"/>
+            <blind query="SELECT %s FROM %s OFFSET %d ROWS FETCH FIRST 1 ROW ONLY" count="SELECT COUNT(*) FROM %s"/>
         </dump_table>
         <users>
             <inband query="SELECT USERNAME FROM SYS.SYSUSERS"/>
-            <blind query="SELECT USERNAME FROM SYS.SYSUSERS {LIMIT 1 OFFSET %d}" count="SELECT COUNT(USERNAME) FROM SYS.SYSUSERS"/>
+            <blind query="SELECT USERNAME FROM SYS.SYSUSERS OFFSET %d ROWS FETCH FIRST 1 ROW ONLY" count="SELECT COUNT(USERNAME) FROM SYS.SYSUSERS"/>
         </users>
         <!-- NOTE: No one can view the 'SYSUSERS'.'PASSWORD' column -->
         <passwords/>
