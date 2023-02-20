@@ -8,6 +8,7 @@ See the file 'LICENSE' for copying permission
 from __future__ import print_function
 
 import difflib
+import sqlite3
 import threading
 import time
 import traceback
@@ -227,16 +228,19 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
         if conf.get("verbose") > 1 and isinstance(ex, SqlmapValueException):
             traceback.print_exc()
 
-    except:
+    except Exception as ex:
         print()
 
         if not kb.multipleCtrlC:
-            from lib.core.common import unhandledExceptionMessage
+            if isinstance(ex, sqlite3.Error):
+                raise
+            else:
+                from lib.core.common import unhandledExceptionMessage
 
-            kb.threadException = True
-            errMsg = unhandledExceptionMessage()
-            logger.error("thread %s: %s" % (threading.currentThread().getName(), errMsg))
-            traceback.print_exc()
+                kb.threadException = True
+                errMsg = unhandledExceptionMessage()
+                logger.error("thread %s: %s" % (threading.currentThread().getName(), errMsg))
+                traceback.print_exc()
 
     finally:
         kb.multiThreadMode = False
