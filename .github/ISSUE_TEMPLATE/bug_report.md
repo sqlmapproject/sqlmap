@@ -21,10 +21,10 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Running environment:**
- - sqlmap version [e.g. 1.3.5.93#dev]
- - Installation method [e.g. git]
- - Operating system: [e.g. Microsoft Windows 10]
- - Python version [e.g. 3.5.2]
+ - sqlmap version [e.g. 1.7.2.12#dev]
+ - Installation method [e.g. pip]
+ - Operating system: [e.g. Microsoft Windows 11]
+ - Python version [e.g. 3.11.2]
 
 **Target details:**
  - DBMS [e.g. Microsoft SQL Server]
