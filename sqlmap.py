@@ -436,6 +436,11 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
+        elif any(_ in errMsg for _ in (": 9.9.9#",)):
+            errMsg = "LOL :)"
+            logger.critical(errMsg)
+            raise SystemExit
+
         elif kb.get("dumpKeyboardInterrupt"):
             raise SystemExit
 
