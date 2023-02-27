@@ -5394,6 +5394,7 @@ def parseRequestFile(reqFile, checkParams=True):
                     # headers and consider the following lines as
                     # POSTed data
                     if key.upper() == HTTP_HEADER.CONTENT_LENGTH.upper():
+                        data = ""
                         params = True
 
                     # Avoid proxy and connection type related headers
