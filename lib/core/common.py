@@ -42,166 +42,166 @@ from optparse import OptionValueError
 from xml.sax import parse
 from xml.sax import SAXParseException
 
-from extra.beep.beep import beep
-from extra.cloak.cloak import decloak
-from lib.core.bigarray import BigArray
-from lib.core.compat import cmp
-from lib.core.compat import LooseVersion
-from lib.core.compat import round
-from lib.core.compat import xrange
-from lib.core.convert import base64pickle
-from lib.core.convert import base64unpickle
-from lib.core.convert import decodeBase64
-from lib.core.convert import decodeHex
-from lib.core.convert import getBytes
-from lib.core.convert import getText
-from lib.core.convert import getUnicode
-from lib.core.convert import htmlUnescape
-from lib.core.convert import stdoutEncode
-from lib.core.data import cmdLineOptions
-from lib.core.data import conf
-from lib.core.data import kb
-from lib.core.data import logger
-from lib.core.data import paths
-from lib.core.datatype import OrderedSet
-from lib.core.decorators import cachedmethod
-from lib.core.defaults import defaults
-from lib.core.dicts import DBMS_DICT
-from lib.core.dicts import DEFAULT_DOC_ROOTS
-from lib.core.dicts import DEPRECATED_OPTIONS
-from lib.core.dicts import OBSOLETE_OPTIONS
-from lib.core.dicts import SQL_STATEMENTS
-from lib.core.enums import ADJUST_TIME_DELAY
-from lib.core.enums import CHARSET_TYPE
-from lib.core.enums import CONTENT_STATUS
-from lib.core.enums import DBMS
-from lib.core.enums import EXPECTED
-from lib.core.enums import HASHDB_KEYS
-from lib.core.enums import HEURISTIC_TEST
-from lib.core.enums import HTTP_HEADER
-from lib.core.enums import HTTPMETHOD
-from lib.core.enums import LOGGING_LEVELS
-from lib.core.enums import MKSTEMP_PREFIX
-from lib.core.enums import OPTION_TYPE
-from lib.core.enums import OS
-from lib.core.enums import PAYLOAD
-from lib.core.enums import PLACE
-from lib.core.enums import POST_HINT
-from lib.core.enums import REFLECTIVE_COUNTER
-from lib.core.enums import SORT_ORDER
-from lib.core.exception import SqlmapBaseException
-from lib.core.exception import SqlmapDataException
-from lib.core.exception import SqlmapGenericException
-from lib.core.exception import SqlmapInstallationException
-from lib.core.exception import SqlmapMissingDependence
-from lib.core.exception import SqlmapNoneDataException
-from lib.core.exception import SqlmapSilentQuitException
-from lib.core.exception import SqlmapSyntaxException
-from lib.core.exception import SqlmapSystemException
-from lib.core.exception import SqlmapUserQuitException
-from lib.core.exception import SqlmapValueException
-from lib.core.log import LOGGER_HANDLER
-from lib.core.optiondict import optDict
-from lib.core.settings import BANNER
-from lib.core.settings import BOLD_PATTERNS
-from lib.core.settings import BOUNDARY_BACKSLASH_MARKER
-from lib.core.settings import BOUNDED_INJECTION_MARKER
-from lib.core.settings import BRUTE_DOC_ROOT_PREFIXES
-from lib.core.settings import BRUTE_DOC_ROOT_SUFFIXES
-from lib.core.settings import BRUTE_DOC_ROOT_TARGET_MARK
-from lib.core.settings import BURP_REQUEST_REGEX
-from lib.core.settings import BURP_XML_HISTORY_REGEX
-from lib.core.settings import CRAWL_EXCLUDE_EXTENSIONS
-from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
-from lib.core.settings import DBMS_DIRECTORY_DICT
-from lib.core.settings import DEFAULT_COOKIE_DELIMITER
-from lib.core.settings import DEFAULT_GET_POST_DELIMITER
-from lib.core.settings import DEFAULT_MSSQL_SCHEMA
-from lib.core.settings import DEV_EMAIL_ADDRESS
-from lib.core.settings import DOLLAR_MARKER
-from lib.core.settings import DUMMY_USER_INJECTION
-from lib.core.settings import DYNAMICITY_BOUNDARY_LENGTH
-from lib.core.settings import ERROR_PARSING_REGEXES
-from lib.core.settings import EVALCODE_ENCODED_PREFIX
-from lib.core.settings import FILE_PATH_REGEXES
-from lib.core.settings import FORCE_COOKIE_EXPIRATION_TIME
-from lib.core.settings import FORM_SEARCH_REGEX
-from lib.core.settings import GENERIC_DOC_ROOT_DIRECTORY_NAMES
-from lib.core.settings import GIT_PAGE
-from lib.core.settings import GITHUB_REPORT_OAUTH_TOKEN
-from lib.core.settings import GOOGLE_ANALYTICS_COOKIE_PREFIX
-from lib.core.settings import HASHDB_MILESTONE_VALUE
-from lib.core.settings import HOST_ALIASES
-from lib.core.settings import HTTP_CHUNKED_SPLIT_KEYWORDS
-from lib.core.settings import IGNORE_PARAMETERS
-from lib.core.settings import IGNORE_SAVE_OPTIONS
-from lib.core.settings import INFERENCE_UNKNOWN_CHAR
-from lib.core.settings import IP_ADDRESS_REGEX
-from lib.core.settings import ISSUES_PAGE
-from lib.core.settings import IS_TTY
-from lib.core.settings import IS_WIN
-from lib.core.settings import LARGE_OUTPUT_THRESHOLD
-from lib.core.settings import LOCALHOST
-from lib.core.settings import MAX_INT
-from lib.core.settings import MIN_ENCODED_LEN_CHECK
-from lib.core.settings import MIN_ERROR_PARSING_NON_WRITING_RATIO
-from lib.core.settings import MIN_TIME_RESPONSES
-from lib.core.settings import MIN_VALID_DELAYED_RESPONSE
-from lib.core.settings import NETSCAPE_FORMAT_HEADER_COOKIES
-from lib.core.settings import NULL
-from lib.core.settings import PARAMETER_AMP_MARKER
-from lib.core.settings import PARAMETER_SEMICOLON_MARKER
-from lib.core.settings import PARAMETER_PERCENTAGE_MARKER
-from lib.core.settings import PARTIAL_HEX_VALUE_MARKER
-from lib.core.settings import PARTIAL_VALUE_MARKER
-from lib.core.settings import PAYLOAD_DELIMITER
-from lib.core.settings import PLATFORM
-from lib.core.settings import PRINTABLE_CHAR_REGEX
-from lib.core.settings import PROBLEMATIC_CUSTOM_INJECTION_PATTERNS
-from lib.core.settings import PUSH_VALUE_EXCEPTION_RETRY_COUNT
-from lib.core.settings import PYVERSION
-from lib.core.settings import RANDOMIZATION_TLDS
-from lib.core.settings import REFERER_ALIASES
-from lib.core.settings import REFLECTED_BORDER_REGEX
-from lib.core.settings import REFLECTED_MAX_REGEX_PARTS
-from lib.core.settings import REFLECTED_REPLACEMENT_REGEX
-from lib.core.settings import REFLECTED_REPLACEMENT_TIMEOUT
-from lib.core.settings import REFLECTED_VALUE_MARKER
-from lib.core.settings import REFLECTIVE_MISS_THRESHOLD
-from lib.core.settings import SENSITIVE_DATA_REGEX
-from lib.core.settings import SENSITIVE_OPTIONS
-from lib.core.settings import STDIN_PIPE_DASH
-from lib.core.settings import SUPPORTED_DBMS
-from lib.core.settings import TEXT_TAG_REGEX
-from lib.core.settings import TIME_STDEV_COEFF
-from lib.core.settings import UNICODE_ENCODING
-from lib.core.settings import UNKNOWN_DBMS_VERSION
-from lib.core.settings import URI_QUESTION_MARKER
-from lib.core.settings import URLENCODE_CHAR_LIMIT
-from lib.core.settings import URLENCODE_FAILSAFE_CHARS
-from lib.core.settings import USER_AGENT_ALIASES
-from lib.core.settings import VERSION_COMPARISON_CORRECTION
-from lib.core.settings import VERSION_STRING
-from lib.core.settings import ZIP_HEADER
-from lib.core.settings import WEBSCARAB_SPLITTER
-from lib.core.threads import getCurrentThreadData
-from lib.utils.safe2bin import safecharencode
-from lib.utils.sqlalchemy import _sqlalchemy
-from thirdparty import six
-from thirdparty.clientform.clientform import ParseResponse
-from thirdparty.clientform.clientform import ParseError
-from thirdparty.colorama.initialise import init as coloramainit
-from thirdparty.magic import magic
-from thirdparty.odict import OrderedDict
-from thirdparty.six import unichr as _unichr
-from thirdparty.six.moves import collections_abc as _collections
-from thirdparty.six.moves import configparser as _configparser
-from thirdparty.six.moves import http_client as _http_client
-from thirdparty.six.moves import input as _input
-from thirdparty.six.moves import reload_module as _reload_module
-from thirdparty.six.moves import urllib as _urllib
-from thirdparty.six.moves import zip as _zip
-from thirdparty.termcolor.termcolor import colored
+from sqlmap.extra.beep import beep
+# from sqlmap.extra.cloak import cloak # module not used?
+from bigarray import BigArray
+from compat import cmp
+from compat import LooseVersion
+from compat import round
+from compat import xrange
+from convert import base64pickle
+from convert import base64unpickle
+from convert import decodeBase64
+from convert import decodeHex
+from convert import getBytes
+from convert import getText
+from convert import getUnicode
+from convert import htmlUnescape
+from convert import stdoutEncode
+from data import cmdLineOptions
+from data import conf
+from data import kb
+from data import logger
+from data import paths
+from datatype import OrderedSet
+from decorators import cachedmethod
+from defaults import defaults
+from dicts import DBMS_DICT
+from dicts import DEFAULT_DOC_ROOTS
+from dicts import DEPRECATED_OPTIONS
+from dicts import OBSOLETE_OPTIONS
+from dicts import SQL_STATEMENTS
+from enums import ADJUST_TIME_DELAY
+from enums import CHARSET_TYPE
+from enums import CONTENT_STATUS
+from enums import DBMS
+from enums import EXPECTED
+from enums import HASHDB_KEYS
+from enums import HEURISTIC_TEST
+from enums import HTTP_HEADER
+from enums import HTTPMETHOD
+from enums import LOGGING_LEVELS
+from enums import MKSTEMP_PREFIX
+from enums import OPTION_TYPE
+from enums import OS
+from enums import PAYLOAD
+from enums import PLACE
+from enums import POST_HINT
+from enums import REFLECTIVE_COUNTER
+from enums import SORT_ORDER
+from exception import SqlmapBaseException
+from exception import SqlmapDataException
+from exception import SqlmapGenericException
+from exception import SqlmapInstallationException
+from exception import SqlmapMissingDependence
+from exception import SqlmapNoneDataException
+from exception import SqlmapSilentQuitException
+from exception import SqlmapSyntaxException
+from exception import SqlmapSystemException
+from exception import SqlmapUserQuitException
+from exception import SqlmapValueException
+from log import LOGGER_HANDLER
+from optiondict import optDict
+from settings import BANNER
+from settings import BOLD_PATTERNS
+from settings import BOUNDARY_BACKSLASH_MARKER
+from settings import BOUNDED_INJECTION_MARKER
+from settings import BRUTE_DOC_ROOT_PREFIXES
+from settings import BRUTE_DOC_ROOT_SUFFIXES
+from settings import BRUTE_DOC_ROOT_TARGET_MARK
+from settings import BURP_REQUEST_REGEX
+from settings import BURP_XML_HISTORY_REGEX
+from settings import CRAWL_EXCLUDE_EXTENSIONS
+from settings import CUSTOM_INJECTION_MARK_CHAR
+from settings import DBMS_DIRECTORY_DICT
+from settings import DEFAULT_COOKIE_DELIMITER
+from settings import DEFAULT_GET_POST_DELIMITER
+from settings import DEFAULT_MSSQL_SCHEMA
+from settings import DEV_EMAIL_ADDRESS
+from settings import DOLLAR_MARKER
+from settings import DUMMY_USER_INJECTION
+from settings import DYNAMICITY_BOUNDARY_LENGTH
+from settings import ERROR_PARSING_REGEXES
+from settings import EVALCODE_ENCODED_PREFIX
+from settings import FILE_PATH_REGEXES
+from settings import FORCE_COOKIE_EXPIRATION_TIME
+from settings import FORM_SEARCH_REGEX
+from settings import GENERIC_DOC_ROOT_DIRECTORY_NAMES
+from settings import GIT_PAGE
+from settings import GITHUB_REPORT_OAUTH_TOKEN
+from settings import GOOGLE_ANALYTICS_COOKIE_PREFIX
+from settings import HASHDB_MILESTONE_VALUE
+from settings import HOST_ALIASES
+from settings import HTTP_CHUNKED_SPLIT_KEYWORDS
+from settings import IGNORE_PARAMETERS
+from settings import IGNORE_SAVE_OPTIONS
+from settings import INFERENCE_UNKNOWN_CHAR
+from settings import IP_ADDRESS_REGEX
+from settings import ISSUES_PAGE
+from settings import IS_TTY
+from settings import IS_WIN
+from settings import LARGE_OUTPUT_THRESHOLD
+from settings import LOCALHOST
+from settings import MAX_INT
+from settings import MIN_ENCODED_LEN_CHECK
+from settings import MIN_ERROR_PARSING_NON_WRITING_RATIO
+from settings import MIN_TIME_RESPONSES
+from settings import MIN_VALID_DELAYED_RESPONSE
+from settings import NETSCAPE_FORMAT_HEADER_COOKIES
+from settings import NULL
+from settings import PARAMETER_AMP_MARKER
+from settings import PARAMETER_SEMICOLON_MARKER
+from settings import PARAMETER_PERCENTAGE_MARKER
+from settings import PARTIAL_HEX_VALUE_MARKER
+from settings import PARTIAL_VALUE_MARKER
+from settings import PAYLOAD_DELIMITER
+from settings import PLATFORM
+from settings import PRINTABLE_CHAR_REGEX
+from settings import PROBLEMATIC_CUSTOM_INJECTION_PATTERNS
+from settings import PUSH_VALUE_EXCEPTION_RETRY_COUNT
+from settings import PYVERSION
+from settings import RANDOMIZATION_TLDS
+from settings import REFERER_ALIASES
+from settings import REFLECTED_BORDER_REGEX
+from settings import REFLECTED_MAX_REGEX_PARTS
+from settings import REFLECTED_REPLACEMENT_REGEX
+from settings import REFLECTED_REPLACEMENT_TIMEOUT
+from settings import REFLECTED_VALUE_MARKER
+from settings import REFLECTIVE_MISS_THRESHOLD
+from settings import SENSITIVE_DATA_REGEX
+from settings import SENSITIVE_OPTIONS
+from settings import STDIN_PIPE_DASH
+from settings import SUPPORTED_DBMS
+from settings import TEXT_TAG_REGEX
+from settings import TIME_STDEV_COEFF
+from settings import UNICODE_ENCODING
+from settings import UNKNOWN_DBMS_VERSION
+from settings import URI_QUESTION_MARKER
+from settings import URLENCODE_CHAR_LIMIT
+from settings import URLENCODE_FAILSAFE_CHARS
+from settings import USER_AGENT_ALIASES
+from settings import VERSION_COMPARISON_CORRECTION
+from settings import VERSION_STRING
+from settings import ZIP_HEADER
+from settings import WEBSCARAB_SPLITTER
+from threads import getCurrentThreadData
+from sqlmap.lib.utils.safe2bin import safecharencode
+from sqlmap.lib.utils.sqlalchemy import _sqlalchemy
+from sqlmap.thirdparty import six
+from sqlmap.thirdparty.clientform.clientform import ParseResponse
+from sqlmap.thirdparty.clientform.clientform import ParseError
+from sqlmap.thirdparty.colorama.initialise import init as coloramainit
+from sqlmap.thirdparty.magic import magic
+from sqlmap.thirdparty.odict import OrderedDict
+from sqlmap.thirdparty.six import unichr as _unichr
+from sqlmap.thirdparty.six import collections_abc as _collections
+from sqlmap.thirdparty.six.moves import configparser as _configparser
+from sqlmap.thirdparty.six.moves import http_client as _http_client
+from sqlmap.thirdparty.six.moves import input as _input
+from sqlmap.thirdparty.six.moves import reload_module as _reload_module
+from sqlmap.thirdparty.six.moves import urllib as _urllib
+from sqlmap.thirdparty.six.moves import zip as _zip
+from sqlmap.thirdparty.termcolor.termcolor import colored
 
 class UnicodeRawConfigParser(_configparser.RawConfigParser):
     """
@@ -3915,7 +3915,7 @@ def getLatestRevision():
     """
 
     retVal = None
-    req = _urllib.request.Request(url="https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/lib/core/settings.py", headers={HTTP_HEADER.USER_AGENT: fetchRandomAgent()})
+    req = _urllib.request.Request(url="https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/ settings.py", headers={HTTP_HEADER.USER_AGENT: fetchRandomAgent()})
 
     try:
         content = getUnicode(_urllib.request.urlopen(req).read())
