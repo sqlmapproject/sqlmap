@@ -9,6 +9,7 @@ from __future__ import division
 
 import binascii
 import functools
+import inspect
 import math
 import os
 import random
@@ -312,3 +313,20 @@ def LooseVersion(version):
         result = float("NaN")
 
     return result
+
+# Reference: https://github.com/bottlepy/bottle/blob/df67999584a0e51ec5b691146c7fa4f3c87f5aac/bottle.py
+if not hasattr(inspect, "getargspec") and hasattr(inspect, "getfullargspec"):
+    from inspect import getfullargspec
+
+    def makelist(data):
+        if isinstance(data, (tuple, list, set, dict)):
+            return list(data)
+        elif data:
+            return [data]
+        else:
+            return []
+
+    def getargspec(func):
+        spec = getfullargspec(func)
+        kwargs = makelist(spec[0]) + makelist(spec.kwonlyargs)
+        return kwargs, spec[1], spec[2], spec[3]
