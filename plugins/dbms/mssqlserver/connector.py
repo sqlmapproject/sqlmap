@@ -20,6 +20,7 @@ from lib.core.data import logger
 from lib.core.exception import SqlmapConnectionException
 from plugins.generic.connector import Connector as GenericConnector
 
+
 class Connector(GenericConnector):
     """
     Homepage: http://www.pymssql.org/en/stable/
@@ -38,7 +39,9 @@ class Connector(GenericConnector):
         self.initConnection()
 
         try:
-            self.connector = pymssql.connect(host="%s:%d" % (self.hostname, self.port), user=self.user, password=self.password, database=self.db, login_timeout=conf.timeout, timeout=conf.timeout)
+            self.connector = pymssql.connect(host="%s:%d" % (self.hostname, self.port), user=self.user,
+                                             password=self.password, database=self.db, login_timeout=conf.timeout,
+                                             timeout=conf.timeout)
         except (pymssql.Error, _mssql.MssqlDatabaseException) as ex:
             raise SqlmapConnectionException(getSafeExString(ex))
         except ValueError:
@@ -51,7 +54,8 @@ class Connector(GenericConnector):
         try:
             return self.cursor.fetchall()
         except (pymssql.Error, _mssql.MssqlDatabaseException) as ex:
-            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) '%s'" % getSafeExString(ex).replace("\n", " "))
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG,
+                       "(remote) '%s'" % getSafeExString(ex).replace("\n", " "))
             return None
 
     def execute(self, query):
@@ -61,7 +65,8 @@ class Connector(GenericConnector):
             self.cursor.execute(getText(query))
             retVal = True
         except (pymssql.OperationalError, pymssql.ProgrammingError) as ex:
-            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) '%s'" % getSafeExString(ex).replace("\n", " "))
+            logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG,
+                       "(remote) '%s'" % getSafeExString(ex).replace("\n", " "))
         except pymssql.InternalError as ex:
             raise SqlmapConnectionException(getSafeExString(ex))
 

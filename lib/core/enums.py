@@ -5,6 +5,7 @@ Copyright (c) 2006-2023 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+
 class PRIORITY(object):
     LOWEST = -100
     LOWER = -50
@@ -14,6 +15,7 @@ class PRIORITY(object):
     HIGHER = 50
     HIGHEST = 100
 
+
 class SORT_ORDER(object):
     FIRST = 0
     SECOND = 1
@@ -21,6 +23,7 @@ class SORT_ORDER(object):
     FOURTH = 3
     FIFTH = 4
     LAST = 100
+
 
 # Reference: https://docs.python.org/2/library/logging.html#logging-levels
 class LOGGING_LEVELS(object):
@@ -30,6 +33,7 @@ class LOGGING_LEVELS(object):
     WARNING = 30
     ERROR = 40
     CRITICAL = 50
+
 
 class DBMS(object):
     ACCESS = "Microsoft Access"
@@ -60,6 +64,7 @@ class DBMS(object):
     RAIMA = "Raima Database Manager"
     VIRTUOSO = "Virtuoso"
 
+
 class DBMS_DIRECTORY_NAME(object):
     ACCESS = "access"
     DB2 = "db2"
@@ -89,6 +94,7 @@ class DBMS_DIRECTORY_NAME(object):
     RAIMA = "raima"
     VIRTUOSO = "virtuoso"
 
+
 class FORK(object):
     MARIADB = "MariaDB"
     MEMSQL = "MemSQL"
@@ -105,14 +111,17 @@ class FORK(object):
     IRIS = "Iris"
     YUGABYTEDB = "YugabyteDB"
 
+
 class CUSTOM_LOGGING(object):
     PAYLOAD = 9
     TRAFFIC_OUT = 8
     TRAFFIC_IN = 7
 
+
 class OS(object):
     LINUX = "Linux"
     WINDOWS = "Windows"
+
 
 class PLACE(object):
     GET = "GET"
@@ -125,6 +134,7 @@ class PLACE(object):
     CUSTOM_POST = "(custom) POST"
     CUSTOM_HEADER = "(custom) HEADER"
 
+
 class POST_HINT(object):
     SOAP = "SOAP"
     JSON = "JSON"
@@ -132,6 +142,7 @@ class POST_HINT(object):
     MULTIPART = "MULTIPART"
     XML = "XML (generic)"
     ARRAY_LIKE = "Array-like"
+
 
 class HTTPMETHOD(object):
     GET = "GET"
@@ -144,14 +155,17 @@ class HTTPMETHOD(object):
     CONNECT = "CONNECT"
     PATCH = "PATCH"
 
+
 class NULLCONNECTION(object):
     HEAD = "HEAD"
     RANGE = "Range"
     SKIP_READ = "skip-read"
 
+
 class REFLECTIVE_COUNTER(object):
     MISS = "MISS"
     HIT = "HIT"
+
 
 class CHARSET_TYPE(object):
     BINARY = 1
@@ -160,10 +174,12 @@ class CHARSET_TYPE(object):
     ALPHA = 4
     ALPHANUM = 5
 
+
 class HEURISTIC_TEST(object):
     CASTED = 1
     NEGATIVE = 2
     POSITIVE = 3
+
 
 class HASH(object):
     MYSQL = r'(?i)\A\*[0-9a-f]{40}\Z'
@@ -198,19 +214,31 @@ class HASH(object):
     SHA256_BASE64 = r'\A[a-zA-Z0-9+/]{43}=\Z'
     SHA512_BASE64 = r'\A[a-zA-Z0-9+/]{86}==\Z'
 
+
 # Reference: http://www.zytrax.com/tech/web/mobile_ids.html
 class MOBILES(object):
-    BLACKBERRY = ("BlackBerry Z10", "Mozilla/5.0 (BB10; Kbd) AppleWebKit/537.35+ (KHTML, like Gecko) Version/10.3.3.2205 Mobile Safari/537.35+")
-    GALAXY = ("Samsung Galaxy S8", "Mozilla/5.0 (Linux; Android 8.0.0; SM-G955U Build/R16NW; en-us) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.136 Mobile Safari/537.36 Puffin/9.0.0.50263AP")
+    BLACKBERRY = ("BlackBerry Z10",
+                  "Mozilla/5.0 (BB10; Kbd) AppleWebKit/537.35+ (KHTML, like Gecko) Version/10.3.3.2205 Mobile Safari/537.35+")
+    GALAXY = ("Samsung Galaxy S8",
+              "Mozilla/5.0 (Linux; Android 8.0.0; SM-G955U Build/R16NW; en-us) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.136 Mobile Safari/537.36 Puffin/9.0.0.50263AP")
     HP = ("HP iPAQ 6365", "Mozilla/4.0 (compatible; MSIE 4.01; Windows CE; PPC; 240x320; HP iPAQ h6300)")
-    HTC = ("HTC 10", "Mozilla/5.0 (Linux; Android 8.0.0; HTC 10 Build/OPR1.170623.027) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Mobile Safari/537.36")
-    HUAWEI = ("Huawei P8", "Mozilla/5.0 (Linux; Android 4.4.4; HUAWEI H891L Build/HuaweiH891L) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Mobile Safari/537.36")
-    IPHONE = ("Apple iPhone 8", "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1")
-    LUMIA = ("Microsoft Lumia 950", "Mozilla/5.0 (Windows Phone 10.0; Android 6.0.1; Microsoft; Lumia 950) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Mobile Safari/537.36 Edge/15.15063")
-    NEXUS = ("Google Nexus 7", "Mozilla/5.0 (Linux; Android 4.1.1; Nexus 7 Build/JRO03D) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Safari/535.19")
-    NOKIA = ("Nokia N97", "Mozilla/5.0 (SymbianOS/9.4; Series60/5.0 NokiaN97-1/10.0.012; Profile/MIDP-2.1 Configuration/CLDC-1.1; en-us) AppleWebKit/525 (KHTML, like Gecko) WicKed/7.1.12344")
-    PIXEL = ("Google Pixel", "Mozilla/5.0 (Linux; Android 10; Pixel) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.117 Mobile Safari/537.36")
-    XIAOMI = ("Xiaomi Mi 8 Pro", "Mozilla/5.0 (Linux; Android 9; MI 8 Pro Build/PKQ1.180729.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/87.0.4280.66 Mobile Safari/537.36")
+    HTC = ("HTC 10",
+           "Mozilla/5.0 (Linux; Android 8.0.0; HTC 10 Build/OPR1.170623.027) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Mobile Safari/537.36")
+    HUAWEI = ("Huawei P8",
+              "Mozilla/5.0 (Linux; Android 4.4.4; HUAWEI H891L Build/HuaweiH891L) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Mobile Safari/537.36")
+    IPHONE = ("Apple iPhone 8",
+              "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1")
+    LUMIA = ("Microsoft Lumia 950",
+             "Mozilla/5.0 (Windows Phone 10.0; Android 6.0.1; Microsoft; Lumia 950) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Mobile Safari/537.36 Edge/15.15063")
+    NEXUS = ("Google Nexus 7",
+             "Mozilla/5.0 (Linux; Android 4.1.1; Nexus 7 Build/JRO03D) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Safari/535.19")
+    NOKIA = ("Nokia N97",
+             "Mozilla/5.0 (SymbianOS/9.4; Series60/5.0 NokiaN97-1/10.0.012; Profile/MIDP-2.1 Configuration/CLDC-1.1; en-us) AppleWebKit/525 (KHTML, like Gecko) WicKed/7.1.12344")
+    PIXEL = ("Google Pixel",
+             "Mozilla/5.0 (Linux; Android 10; Pixel) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.117 Mobile Safari/537.36")
+    XIAOMI = ("Xiaomi Mi 8 Pro",
+              "Mozilla/5.0 (Linux; Android 9; MI 8 Pro Build/PKQ1.180729.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/87.0.4280.66 Mobile Safari/537.36")
+
 
 class PROXY_TYPE(object):
     HTTP = "HTTP"
@@ -218,15 +246,18 @@ class PROXY_TYPE(object):
     SOCKS4 = "SOCKS4"
     SOCKS5 = "SOCKS5"
 
+
 class REGISTRY_OPERATION(object):
     READ = "read"
     ADD = "add"
     DELETE = "delete"
 
+
 class DUMP_FORMAT(object):
     CSV = "CSV"
     HTML = "HTML"
     SQLITE = "SQLITE"
+
 
 class HTTP_HEADER(object):
     ACCEPT = "Accept"
@@ -262,15 +293,18 @@ class HTTP_HEADER(object):
     X_POWERED_BY = "X-Powered-By"
     X_DATA_ORIGIN = "X-Data-Origin"
 
+
 class EXPECTED(object):
     BOOL = "bool"
     INT = "int"
+
 
 class OPTION_TYPE(object):
     BOOLEAN = "boolean"
     INTEGER = "integer"
     FLOAT = "float"
     STRING = "string"
+
 
 class HASHDB_KEYS(object):
     DBMS = "DBMS"
@@ -288,9 +322,11 @@ class HASHDB_KEYS(object):
     KB_XP_CMDSHELL_AVAILABLE = "KB_XP_CMDSHELL_AVAILABLE"
     OS = "OS"
 
+
 class REDIRECTION(object):
     YES = 'Y'
     NO = 'N'
+
 
 class PAYLOAD(object):
     SQLINJECTION = {
@@ -350,21 +386,28 @@ class PAYLOAD(object):
         NEGATIVE = 2
         REPLACE = 3
 
+
 class WIZARD(object):
     BASIC = ("getBanner", "getCurrentUser", "getCurrentDb", "isDba")
-    INTERMEDIATE = ("getBanner", "getCurrentUser", "getCurrentDb", "isDba", "getUsers", "getDbs", "getTables", "getSchema", "excludeSysDbs")
-    ALL = ("getBanner", "getCurrentUser", "getCurrentDb", "isDba", "getHostname", "getUsers", "getPasswordHashes", "getPrivileges", "getRoles", "dumpAll")
+    INTERMEDIATE = (
+    "getBanner", "getCurrentUser", "getCurrentDb", "isDba", "getUsers", "getDbs", "getTables", "getSchema",
+    "excludeSysDbs")
+    ALL = ("getBanner", "getCurrentUser", "getCurrentDb", "isDba", "getHostname", "getUsers", "getPasswordHashes",
+           "getPrivileges", "getRoles", "dumpAll")
+
 
 class ADJUST_TIME_DELAY(object):
     DISABLE = -1
     NO = 0
     YES = 1
 
+
 class WEB_PLATFORM(object):
     PHP = "php"
     ASP = "asp"
     ASPX = "aspx"
     JSP = "jsp"
+
 
 class CONTENT_TYPE(object):
     TARGET = 0
@@ -395,9 +438,11 @@ class CONTENT_TYPE(object):
     REG_READ = 25
     STATEMENTS = 26
 
+
 class CONTENT_STATUS(object):
     IN_PROGRESS = 0
     COMPLETE = 1
+
 
 class AUTH_TYPE(object):
     BASIC = "basic"
@@ -406,14 +451,17 @@ class AUTH_TYPE(object):
     NTLM = "ntlm"
     PKI = "pki"
 
+
 class AUTOCOMPLETE_TYPE(object):
     SQL = 0
     OS = 1
     SQLMAP = 2
     API = 3
 
+
 class NOTE(object):
     FALSE_POSITIVE_OR_UNEXPLOITABLE = "false positive or unexploitable"
+
 
 class MKSTEMP_PREFIX(object):
     HASHES = "sqlmaphashes-"
@@ -427,19 +475,23 @@ class MKSTEMP_PREFIX(object):
     SPECIFIC_RESPONSE = "sqlmapresponse-"
     PREPROCESS = "sqlmappreprocess-"
 
+
 class TIMEOUT_STATE(object):
     NORMAL = 0
     EXCEPTION = 1
     TIMEOUT = 2
 
+
 class HINT(object):
     PREPEND = 0
     APPEND = 1
+
 
 class FUZZ_UNION_COLUMN:
     STRING = "<string>"
     INTEGER = "<integer>"
     NULL = "NULL"
+
 
 class COLOR:
     BLUE = "\033[34m"
@@ -476,6 +528,7 @@ class COLOR:
     BOLD_BLACK = "\033[30;1m"
     RED = "\033[31m"
     UNDERLINE = "\033[4m"
+
 
 class BACKGROUND:
     BLUE = "\033[44m"

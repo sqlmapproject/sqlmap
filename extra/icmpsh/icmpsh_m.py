@@ -24,6 +24,7 @@ import select
 import socket
 import sys
 
+
 def setNonBlocking(fd):
     """
     Make a file descriptor non-blocking
@@ -34,6 +35,7 @@ def setNonBlocking(fd):
     flags = fcntl.fcntl(fd, fcntl.F_GETFL)
     flags = flags | os.O_NONBLOCK
     fcntl.fcntl(fd, fcntl.F_SETFL, flags)
+
 
 def main(src, dst):
     if sys.platform == "nt":
@@ -133,6 +135,7 @@ def main(src, dst):
                         sys.stderr.flush()
         except:
             break
+
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:

@@ -306,6 +306,6 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # Public domain
 
 * The `PyDes` library located under `thirdparty/pydes/`.
-   Copyleft 2009, Todd Whiteman.
+  Copyleft 2009, Todd Whiteman.
 * The `win_inet_pton` library located under `thirdparty/wininetpton/`.
-   Copyleft 2014, Ryan Vennell.
+  Copyleft 2014, Ryan Vennell.

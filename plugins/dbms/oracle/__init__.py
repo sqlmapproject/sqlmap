@@ -15,6 +15,7 @@ from plugins.dbms.oracle.syntax import Syntax
 from plugins.dbms.oracle.takeover import Takeover
 from plugins.generic.misc import Miscellaneous
 
+
 class OracleMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
     This class defines Oracle methods

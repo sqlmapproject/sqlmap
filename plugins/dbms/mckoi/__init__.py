@@ -15,6 +15,7 @@ from plugins.dbms.mckoi.syntax import Syntax
 from plugins.dbms.mckoi.takeover import Takeover
 from plugins.generic.misc import Miscellaneous
 
+
 class MckoiMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
     This class defines Mckoi methods

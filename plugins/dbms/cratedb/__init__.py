@@ -16,6 +16,7 @@ from plugins.dbms.cratedb.syntax import Syntax
 from plugins.dbms.cratedb.takeover import Takeover
 from plugins.generic.misc import Miscellaneous
 
+
 class CrateDBMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
     This class defines CrateDB methods

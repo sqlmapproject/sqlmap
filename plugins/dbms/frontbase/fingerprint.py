@@ -16,6 +16,7 @@ from lib.core.settings import FRONTBASE_ALIASES
 from lib.request import inject
 from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 
+
 class Fingerprint(GenericFingerprint):
     def __init__(self):
         GenericFingerprint.__init__(self, DBMS.FRONTBASE)
@@ -71,7 +72,8 @@ class Fingerprint(GenericFingerprint):
             infoMsg = "confirming %s" % DBMS.FRONTBASE
             logger.info(infoMsg)
 
-            result = inject.checkBooleanExpression("(SELECT TOP (0,1) file_version FROM INFORMATION_SCHEMA.FRAGMENTATION)>=0")
+            result = inject.checkBooleanExpression(
+                "(SELECT TOP (0,1) file_version FROM INFORMATION_SCHEMA.FRAGMENTATION)>=0")
 
             if not result:
                 warnMsg = "the back-end DBMS is not %s" % DBMS.FRONTBASE

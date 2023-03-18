@@ -15,6 +15,7 @@ import struct
 import threading
 import time
 
+
 class DNSQuery(object):
     """
     >>> DNSQuery(b'|K\\x01 \\x00\\x01\\x00\\x00\\x00\\x00\\x00\\x01\\x03www\\x06google\\x03com\\x00\\x00\\x01\\x00\\x01\\x00\\x00)\\x10\\x00\\x00\\x00\\x00\\x00\\x00\\x0c\\x00\\n\\x00\\x08O4|Np!\\x1d\\xb3')._query == b"www.google.com."
@@ -28,9 +29,9 @@ class DNSQuery(object):
         self._query = b""
 
         try:
-            type_ = (ord(raw[2:3]) >> 3) & 15                   # Opcode bits
+            type_ = (ord(raw[2:3]) >> 3) & 15  # Opcode bits
 
-            if type_ == 0:                                      # Standard query
+            if type_ == 0:  # Standard query
                 i = 12
                 j = ord(raw[i:i + 1])
 
@@ -49,18 +50,19 @@ class DNSQuery(object):
         retVal = b""
 
         if self._query:
-            retVal += self._raw[:2]                                                         # Transaction ID
-            retVal += b"\x85\x80"                                                           # Flags (Standard query response, No error)
-            retVal += self._raw[4:6] + self._raw[4:6] + b"\x00\x00\x00\x00"                 # Questions and Answers Counts
-            retVal += self._raw[12:(12 + self._raw[12:].find(b"\x00") + 5)]                 # Original Domain Name Query
-            retVal += b"\xc0\x0c"                                                           # Pointer to domain name
-            retVal += b"\x00\x01"                                                           # Type A
-            retVal += b"\x00\x01"                                                           # Class IN
-            retVal += b"\x00\x00\x00\x20"                                                   # TTL (32 seconds)
-            retVal += b"\x00\x04"                                                           # Data length
-            retVal += b"".join(struct.pack('B', int(_)) for _ in resolution.split('.'))     # 4 bytes of IP
+            retVal += self._raw[:2]  # Transaction ID
+            retVal += b"\x85\x80"  # Flags (Standard query response, No error)
+            retVal += self._raw[4:6] + self._raw[4:6] + b"\x00\x00\x00\x00"  # Questions and Answers Counts
+            retVal += self._raw[12:(12 + self._raw[12:].find(b"\x00") + 5)]  # Original Domain Name Query
+            retVal += b"\xc0\x0c"  # Pointer to domain name
+            retVal += b"\x00\x01"  # Type A
+            retVal += b"\x00\x01"  # Class IN
+            retVal += b"\x00\x00\x00\x20"  # TTL (32 seconds)
+            retVal += b"\x00\x04"  # Data length
+            retVal += b"".join(struct.pack('B', int(_)) for _ in resolution.split('.'))  # 4 bytes of IP
 
         return retVal
+
 
 class DNSServer(object):
     """
@@ -93,7 +95,8 @@ class DNSServer(object):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             s.connect(("", 53))
-            s.send(binascii.unhexlify("6509012000010000000000010377777706676f6f676c6503636f6d00000100010000291000000000000000"))  # A www.google.com
+            s.send(binascii.unhexlify(
+                "6509012000010000000000010377777706676f6f676c6503636f6d00000100010000291000000000000000"))  # A www.google.com
             response = s.recv(512)
         except:
             pass
@@ -151,6 +154,7 @@ class DNSServer(object):
         thread = threading.Thread(target=_)
         thread.daemon = True
         thread.start()
+
 
 if __name__ == "__main__":
     server = None

@@ -15,7 +15,8 @@ try:
     try:
         __import__("lib.utils.versioncheck")  # this has to be the first non-standard import
     except ImportError:
-        sys.exit("[!] wrong installation detected (missing modules). Visit 'https://github.com/sqlmapproject/sqlmap/#installation' for further details")
+        sys.exit(
+            "[!] wrong installation detected (missing modules). Visit 'https://github.com/sqlmapproject/sqlmap/#installation' for further details")
 
     import bdb
     import glob
@@ -98,7 +99,9 @@ except KeyboardInterrupt:
         raise SystemExit
     else:
         import time
+
         sys.exit("\r[%s] [CRITICAL] %s" % (time.strftime("%X"), errMsg))
+
 
 def modulePath():
     """
@@ -112,6 +115,7 @@ def modulePath():
         _ = inspect.getsourcefile(modulePath)
 
     return getUnicode(os.path.dirname(os.path.realpath(_)), encoding=sys.getfilesystemencoding() or UNICODE_ENCODING)
+
 
 def checkEnvironment():
     try:
@@ -135,8 +139,10 @@ def checkEnvironment():
         for _ in ("cmdLineOptions", "conf", "kb"):
             globals()[_] = getattr(sys.modules["lib.core.data"], _)
 
-        for _ in ("SqlmapBaseException", "SqlmapShellQuitException", "SqlmapSilentQuitException", "SqlmapUserQuitException"):
+        for _ in (
+        "SqlmapBaseException", "SqlmapShellQuitException", "SqlmapSilentQuitException", "SqlmapUserQuitException"):
             globals()[_] = getattr(sys.modules["lib.core.exception"], _)
+
 
 def main():
     """
@@ -205,13 +211,15 @@ def main():
                                     if not re.search(r"(?i)\Ahttp[s]*://", target):
                                         target = "http://%s" % target
 
-                                    infoMsg = "starting crawler for target URL '%s' (%d/%d)" % (target, i + 1, len(targets))
+                                    infoMsg = "starting crawler for target URL '%s' (%d/%d)" % (
+                                    target, i + 1, len(targets))
                                     logger.info(infoMsg)
 
                                     crawl(target)
                                 except Exception as ex:
                                     if target and not isinstance(ex, SqlmapUserQuitException):
-                                        Quit_errMsg = "problem occurred while crawling '%s' ('%s')" % (target, getSafeExString(ex))
+                                        Quit_errMsg = "problem occurred while crawling '%s' ('%s')" % (
+                                        target, getSafeExString(ex))
                                         logger.error(Quit_errMsg)
                                     else:
                                         raise
@@ -347,7 +355,8 @@ def main():
             logger.critical(update_errMsg)
             raise SystemExit
 
-        elif "invalid maximum character passed to PyUnicode_New" in excMsg and re.search(r"\A3\.[34]", sys.version) is not None:
+        elif "invalid maximum character passed to PyUnicode_New" in excMsg and re.search(r"\A3\.[34]",
+                                                                                         sys.version) is not None:
             py_version_errMsg = '''please upgrade the Python version (>= 3.5) \n
                                 (Reference: 'https://bugs.python.org/issue18183')'''
             logger.critical(py_version_errMsg)
@@ -367,7 +376,8 @@ def main():
             raise SystemExit
 
         elif all(_ in excMsg for _ in ("OSError: [Errno 22] Invalid argument: '", "importlib")):
-            importlib_errMsg = "unable to read file '%s'" % extractRegexResult(r"OSError: \[Errno 22\] Invalid argument: '(?P<result>[^']+)", excMsg)
+            importlib_errMsg = "unable to read file '%s'" % extractRegexResult(
+                r"OSError: \[Errno 22\] Invalid argument: '(?P<result>[^']+)", excMsg)
             logger.critical(importlib_errMsg)
             raise SystemExit
 
@@ -459,7 +469,10 @@ def main():
             dataToStdout(excMsg)
             raise SystemExit
 
-        elif any(_ in excMsg for _ in ("ImportError", "ModuleNotFoundError", "<frozen", "Can't find file for module", "SAXReaderNotAvailable", "source code string cannot contain null bytes", "No module named", "tp_name field", "module 'sqlite3' has no attribute 'OperationalError'")):
+        elif any(_ in excMsg for _ in (
+        "ImportError", "ModuleNotFoundError", "<frozen", "Can't find file for module", "SAXReaderNotAvailable",
+        "source code string cannot contain null bytes", "No module named", "tp_name field",
+        "module 'sqlite3' has no attribute 'OperationalError'")):
             module_bad_runtime_errMsg = "invalid runtime environment ('%s')" % excMsg.split("Error: ")[-1].strip()
             logger.critical(module_bad_runtime_errMsg)
             raise SystemExit
@@ -494,7 +507,8 @@ def main():
             logger.critical(HTTPNtlmAuthHandler_errMsg)
             raise SystemExit
 
-        elif "'DictObject' object has no attribute '" in excMsg and all(_ in Exception_errmsg for _ in ("(fingerprinted)", "(identified)")):
+        elif "'DictObject' object has no attribute '" in excMsg and all(
+                _ in Exception_errmsg for _ in ("(fingerprinted)", "(identified)")):
             dictobject_errMsg = '''there has been a problem in enumeration. \n
                         Because of a considerable chance of false-positive case \n
                         you are advised to rerun with switch '--flush-session' '''
@@ -507,7 +521,7 @@ def main():
             raise SystemExit
 
         elif "AttributeError: 'module' object has no attribute 'F_GETFD'" in excMsg:
-            F_GETFD_errMsg = f'''invalid runtime {'%s'  % excMsg.split("Error: ")[-1].strip()} \n
+            F_GETFD_errMsg = f'''invalid runtime {'%s' % excMsg.split("Error: ")[-1].strip()} \n
                                 (Reference: \n
                                 'https://stackoverflow.com/a/38841364' &\n
                                 'https://bugs.python.org/issue24944#msg249231')'''
@@ -558,14 +572,16 @@ def main():
         kb.threadException = True
 
         if kb.get("tempDir"):
-            for prefix in (MKSTEMP_PREFIX.IPC, MKSTEMP_PREFIX.TESTING, MKSTEMP_PREFIX.COOKIE_JAR, MKSTEMP_PREFIX.BIG_ARRAY):
+            for prefix in (
+            MKSTEMP_PREFIX.IPC, MKSTEMP_PREFIX.TESTING, MKSTEMP_PREFIX.COOKIE_JAR, MKSTEMP_PREFIX.BIG_ARRAY):
                 for filepath in glob.glob(os.path.join(kb.tempDir, "%s*" % prefix)):
                     try:
                         os.remove(filepath)
                     except OSError:
                         pass
 
-            if not filterNone(filepath for filepath in glob.glob(os.path.join(kb.tempDir, '*')) if not any(filepath.endswith(_) for _ in (".lock", ".exe", ".so", '_'))):  # ignore junk files
+            if not filterNone(filepath for filepath in glob.glob(os.path.join(kb.tempDir, '*')) if not any(
+                    filepath.endswith(_) for _ in (".lock", ".exe", ".so", '_'))):  # ignore junk files
                 try:
                     shutil.rmtree(kb.tempDir, ignore_errors=True)
                 except OSError:
@@ -573,7 +589,7 @@ def main():
 
         if conf.get("hashDB"):
             conf.hashDB.flush(True)
-            conf.hashDB.close()         # NOTE: because of PyPy
+            conf.hashDB.close()  # NOTE: because of PyPy
 
         if conf.get("harFile"):
             try:
@@ -600,6 +616,7 @@ def main():
             kb.clear()
             conf.disableBanner = True
             main()
+
 
 if __name__ == "__main__":
     try:

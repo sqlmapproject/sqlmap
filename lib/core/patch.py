@@ -42,6 +42,7 @@ from thirdparty.six.moves import http_client as _http_client
 
 _rand = 0
 
+
 def dirtyPatches():
     """
     Place for "dirty" Python related patches
@@ -93,6 +94,7 @@ def dirtyPatches():
         else:
             os.urandom = lambda size: "".join(chr(random.randint(0, 255)) for _ in xrange(size))
 
+
 def resolveCrossReferences():
     """
     Place for cross-reference resolution
@@ -112,6 +114,7 @@ def resolveCrossReferences():
     lib.utils.sqlalchemy.getSafeExString = getSafeExString
     thirdparty.ansistrm.ansistrm.stdoutEncode = stdoutEncode
 
+
 def pympTempLeakPatch(tempDir):
     """
     Patch for "pymp" leaking directories inside Python3
@@ -122,6 +125,7 @@ def pympTempLeakPatch(tempDir):
         multiprocessing.util.get_temp_dir = lambda: tempDir
     except:
         pass
+
 
 def unisonRandom():
     """

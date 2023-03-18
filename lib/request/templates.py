@@ -8,6 +8,7 @@ See the file 'LICENSE' for copying permission
 from lib.core.data import kb
 from lib.request.connect import Connect as Request
 
+
 def getPageTemplate(payload, place):
     retVal = (kb.originalPage, kb.errorIsNone)
 

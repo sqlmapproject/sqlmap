@@ -18,6 +18,7 @@ from lib.core.settings import VERSION
 from thirdparty.six.moves import BaseHTTPServer as _BaseHTTPServer
 from thirdparty.six.moves import http_client as _http_client
 
+
 # Reference: https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/HAR/Overview.html
 #            http://www.softwareishard.com/har/viewer/
 
@@ -27,6 +28,7 @@ class HTTPCollectorFactory(object):
 
     def create(self):
         return HTTPCollector()
+
 
 class HTTPCollector(object):
     def __init__(self):
@@ -48,6 +50,7 @@ class HTTPCollector(object):
             "entries": [pair.toEntry().toDict() for pair in self.messages],
         }}
 
+
 class RawPair(object):
     def __init__(self, request, response, startTime=None, endTime=None, extendedArguments=None):
         self.request = getBytes(request)
@@ -60,6 +63,7 @@ class RawPair(object):
         return Entry(request=Request.parse(self.request), response=Response.parse(self.response),
                      startTime=self.startTime, endTime=self.endTime,
                      extendedArguments=self.extendedArguments)
+
 
 class Entry(object):
     def __init__(self, request, response, startTime, endTime, extendedArguments):
@@ -80,10 +84,12 @@ class Entry(object):
                 "receive": -1,
             },
             "time": int(1000 * (self.endTime - self.startTime)),
-            "startedDateTime": "%s%s" % (datetime.datetime.fromtimestamp(self.startTime).isoformat(), time.strftime("%z")) if self.startTime else None
+            "startedDateTime": "%s%s" % (datetime.datetime.fromtimestamp(self.startTime).isoformat(),
+                                         time.strftime("%z")) if self.startTime else None
         }
         out.update(self.extendedArguments)
         return out
+
 
 class Request(object):
     def __init__(self, method, path, httpVersion, headers, postBody=None, raw=None, comment=None):
@@ -132,6 +138,7 @@ class Request(object):
             }
 
         return out
+
 
 class Response(object):
     extract_status = re.compile(b'\\((\\d{3}) (.*)\\)')
@@ -193,7 +200,8 @@ class Response(object):
             "httpVersion": self.httpVersion,
             "status": self.status,
             "statusText": self.statusText,
-            "headers": [dict(name=key.capitalize(), value=value) for key, value in self.headers.items() if key.lower() != "uri"],
+            "headers": [dict(name=key.capitalize(), value=value) for key, value in self.headers.items() if
+                        key.lower() != "uri"],
             "cookies": [],
             "content": content,
             "headersSize": -1,
@@ -201,6 +209,7 @@ class Response(object):
             "redirectURL": "",
             "comment": getText(self.comment),
         }
+
 
 class FakeSocket(object):
     # Original source:
@@ -211,6 +220,7 @@ class FakeSocket(object):
 
     def makefile(self, *args, **kwargs):
         return self._file
+
 
 class HTTPRequest(_BaseHTTPServer.BaseHTTPRequestHandler):
     # Original source:

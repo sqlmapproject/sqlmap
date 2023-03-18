@@ -16,6 +16,7 @@ from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import OS
 from lib.core.settings import SUPPORTED_DBMS
 
+
 def setDbms(dbms):
     """
     @param dbms: database management system to be set into the knowledge
@@ -36,6 +37,7 @@ def setDbms(dbms):
         hashDBWrite(HASHDB_KEYS.DBMS, kb.resolutionDbms)
 
     logger.info("the back-end DBMS is %s" % Backend.getDbms())
+
 
 def setOs():
     """

@@ -15,6 +15,7 @@ from plugins.dbms.virtuoso.syntax import Syntax
 from plugins.dbms.virtuoso.takeover import Takeover
 from plugins.generic.misc import Miscellaneous
 
+
 class VirtuosoMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
     This class defines Virtuoso methods

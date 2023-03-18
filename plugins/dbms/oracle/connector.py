@@ -23,6 +23,7 @@ from plugins.generic.connector import Connector as GenericConnector
 
 os.environ["NLS_LANG"] = ".AL32UTF8"
 
+
 class Connector(GenericConnector):
     """
     Homepage: https://oracle.github.io/python-cx_Oracle/
@@ -39,7 +40,8 @@ class Connector(GenericConnector):
         self.password = getText(self.password)
 
         try:
-            self.connector = cx_Oracle.connect(dsn=self.__dsn, user=self.user, password=self.password, mode=cx_Oracle.SYSDBA)
+            self.connector = cx_Oracle.connect(dsn=self.__dsn, user=self.user, password=self.password,
+                                               mode=cx_Oracle.SYSDBA)
             logger.info("successfully connected as SYSDBA")
         except (cx_Oracle.OperationalError, cx_Oracle.DatabaseError, cx_Oracle.InterfaceError) as ex:
             if "Oracle Client library" in getSafeExString(ex):

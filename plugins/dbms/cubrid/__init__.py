@@ -16,6 +16,7 @@ from plugins.dbms.cubrid.syntax import Syntax
 from plugins.dbms.cubrid.takeover import Takeover
 from plugins.generic.misc import Miscellaneous
 
+
 class CubridMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
     This class defines Cubrid methods

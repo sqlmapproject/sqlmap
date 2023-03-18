@@ -21,6 +21,7 @@ LOGGER_HANDLER = None
 try:
     from thirdparty.ansistrm.ansistrm import ColorizingStreamHandler
 
+
     class _ColorizingStreamHandler(ColorizingStreamHandler):
         def colorize(self, message, levelno, force=False):
             if levelno in self.level_map and (self.is_tty or force):
@@ -55,33 +56,40 @@ try:
                         match = re.search(r"\A\s*\[([\d:]+)\]", message)  # time
                         if match:
                             time = match.group(1)
-                            message = message.replace(time, ''.join((self.csi, str(self.color_map["cyan"] + 30), 'm', time, self._reset(message))), 1)
+                            message = message.replace(time, ''.join(
+                                (self.csi, str(self.color_map["cyan"] + 30), 'm', time, self._reset(message))), 1)
 
                         match = re.search(r"\[(#\d+)\]", message)  # counter
                         if match:
                             counter = match.group(1)
-                            message = message.replace(counter, ''.join((self.csi, str(self.color_map["yellow"] + 30), 'm', counter, self._reset(message))), 1)
+                            message = message.replace(counter, ''.join(
+                                (self.csi, str(self.color_map["yellow"] + 30), 'm', counter, self._reset(message))), 1)
 
                         if level != "PAYLOAD":
                             if any(_ in message for _ in ("parsed DBMS error message",)):
                                 match = re.search(r": '(.+)'", message)
                                 if match:
                                     string = match.group(1)
-                                    message = message.replace("'%s'" % string, "'%s'" % ''.join((self.csi, str(self.color_map["white"] + 30), 'm', string, self._reset(message))), 1)
+                                    message = message.replace("'%s'" % string, "'%s'" % ''.join((self.csi, str(
+                                        self.color_map["white"] + 30), 'm', string, self._reset(message))), 1)
                             else:
                                 match = re.search(r"\bresumed: '(.+\.\.\.)", message)
                                 if match:
                                     string = match.group(1)
-                                    message = message.replace("'%s" % string, "'%s" % ''.join((self.csi, str(self.color_map["white"] + 30), 'm', string, self._reset(message))), 1)
+                                    message = message.replace("'%s" % string, "'%s" % ''.join((self.csi, str(
+                                        self.color_map["white"] + 30), 'm', string, self._reset(message))), 1)
                                 else:
-                                    match = re.search(r" \('(.+)'\)\Z", message) or re.search(r"output: '(.+)'\Z", message)
+                                    match = re.search(r" \('(.+)'\)\Z", message) or re.search(r"output: '(.+)'\Z",
+                                                                                              message)
                                     if match:
                                         string = match.group(1)
-                                        message = message.replace("'%s'" % string, "'%s'" % ''.join((self.csi, str(self.color_map["white"] + 30), 'm', string, self._reset(message))), 1)
+                                        message = message.replace("'%s'" % string, "'%s'" % ''.join((self.csi, str(
+                                            self.color_map["white"] + 30), 'm', string, self._reset(message))), 1)
                                     else:
                                         for match in re.finditer(r"[^\w]'([^']+)'", message):  # single-quoted
                                             string = match.group(1)
-                                            message = message.replace("'%s'" % string, "'%s'" % ''.join((self.csi, str(self.color_map["white"] + 30), 'm', string, self._reset(message))), 1)
+                                            message = message.replace("'%s'" % string, "'%s'" % ''.join((self.csi, str(
+                                                self.color_map["white"] + 30), 'm', string, self._reset(message))), 1)
                     else:
                         message = ''.join((self.csi, ';'.join(params), 'm', message, self.reset))
 
@@ -91,6 +99,7 @@ try:
                     message = message.replace("%s]" % self.bold, "]%s" % self.bold)  # dirty patch
 
             return message
+
 
     disableColor = False
 

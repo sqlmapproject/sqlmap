@@ -16,6 +16,7 @@ from plugins.dbms.mimersql.syntax import Syntax
 from plugins.dbms.mimersql.takeover import Takeover
 from plugins.generic.misc import Miscellaneous
 
+
 class MimerSQLMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
     This class defines MimerSQL methods

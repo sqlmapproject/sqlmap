@@ -11,6 +11,7 @@ from xml.sax.handler import ContentHandler
 
 from lib.core.common import sanitizeStr
 
+
 class FingerprintHandler(ContentHandler):
     """
     This class defines methods to parse and extract information from
@@ -66,7 +67,8 @@ class FingerprintHandler(ContentHandler):
                 self._feedInfo("dbmsVersion", self._match.group(int(self._dbmsVersion)))
 
             if self._techVersion and self._techVersion.isdigit():
-                self._feedInfo("technology", "%s %s" % (attrs.get("technology"), self._match.group(int(self._techVersion))))
+                self._feedInfo("technology",
+                               "%s %s" % (attrs.get("technology"), self._match.group(int(self._techVersion))))
             else:
                 self._feedInfo("technology", attrs.get("technology"))
 

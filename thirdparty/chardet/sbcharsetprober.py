@@ -32,7 +32,7 @@ from .enums import CharacterCategory, ProbingState, SequenceLikelihood
 
 class SingleByteCharSetProber(CharSetProber):
     SAMPLE_SIZE = 64
-    SB_ENOUGH_REL_THRESHOLD = 1024  #  0.25 * SAMPLE_SIZE^2
+    SB_ENOUGH_REL_THRESHOLD = 1024  # 0.25 * SAMPLE_SIZE^2
     POSITIVE_SHORTCUT_THRESHOLD = 0.95
     NEGATIVE_SHORTCUT_THRESHOLD = 0.05
 

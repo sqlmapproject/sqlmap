@@ -14,8 +14,11 @@ from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.HIGH
 
+
 def dependencies():
-    singleTimeWarnMessage("tamper script '%s' is only meant to be run against %s" % (os.path.basename(__file__).split(".")[0], DBMS.MYSQL))
+    singleTimeWarnMessage("tamper script '%s' is only meant to be run against %s" % (
+    os.path.basename(__file__).split(".")[0], DBMS.MYSQL))
+
 
 def tamper(payload, **kwargs):
     """
@@ -39,6 +42,7 @@ def tamper(payload, **kwargs):
 
     match = re.search(r"(?i)MID\((.+?)\s*,\s*(\d+)\s*\,\s*(\d+)\s*\)", payload or "")
     if match:
-        retVal = retVal.replace(match.group(0), "MID(%s FROM %s FOR %s)" % (match.group(1), match.group(2), match.group(3)))
+        retVal = retVal.replace(match.group(0),
+                                "MID(%s FROM %s FOR %s)" % (match.group(1), match.group(2), match.group(3)))
 
     return retVal

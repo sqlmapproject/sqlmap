@@ -11,6 +11,7 @@ import types
 from thirdparty.odict import OrderedDict
 from thirdparty.six.moves import collections_abc as _collections
 
+
 class AttribDict(dict):
     """
     This class defines the dictionary with added capability to access members as attributes
@@ -87,6 +88,7 @@ class AttribDict(dict):
 
         return retVal
 
+
 class InjectionDict(AttribDict):
     def __init__(self):
         AttribDict.__init__(self)
@@ -110,6 +112,7 @@ class InjectionDict(AttribDict):
         self.dbms = None
         self.dbms_version = None
         self.os = None
+
 
 # Reference: https://www.kunxi.org/2014/05/lru-cache-in-python
 class LRUDict(object):
@@ -158,6 +161,7 @@ class LRUDict(object):
     def keys(self):
         return self.cache.keys()
 
+
 # Reference: https://code.activestate.com/recipes/576694/
 class OrderedSet(_collections.MutableSet):
     """
@@ -177,8 +181,8 @@ class OrderedSet(_collections.MutableSet):
 
     def __init__(self, iterable=None):
         self.end = end = []
-        end += [None, end, end]         # sentinel node for doubly linked list
-        self.map = {}                   # key --> [key, prev, next]
+        end += [None, end, end]  # sentinel node for doubly linked list
+        self.map = {}  # key --> [key, prev, next]
         if iterable is not None:
             self |= iterable
 

@@ -14,8 +14,11 @@ from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.HIGHER
 
+
 def dependencies():
-    singleTimeWarnMessage("tamper script '%s' is only meant to be run against %s" % (os.path.basename(__file__).split(".")[0], DBMS.MYSQL))
+    singleTimeWarnMessage("tamper script '%s' is only meant to be run against %s" % (
+    os.path.basename(__file__).split(".")[0], DBMS.MYSQL))
+
 
 def tamper(payload, **kwargs):
     """
@@ -46,6 +49,7 @@ def tamper(payload, **kwargs):
                 payload = payload[:payload.find(comment)]
                 break
         if ' ' in payload:
-            retVal = "%s /*!30%s%s*/%s" % (payload[:payload.find(' ')], randomInt(3), payload[payload.find(' ') + 1:], postfix)
+            retVal = "%s /*!30%s%s*/%s" % (
+            payload[:payload.find(' ')], randomInt(3), payload[payload.find(' ') + 1:], postfix)
 
     return retVal

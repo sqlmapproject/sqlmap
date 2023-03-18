@@ -19,6 +19,7 @@ from lib.core.exception import SqlmapConnectionException
 from lib.core.settings import UNICODE_ENCODING
 from plugins.generic.connector import Connector as GenericConnector
 
+
 class Connector(GenericConnector):
     """
     Homepage: http://kinterbasdb.sourceforge.net/
@@ -38,7 +39,10 @@ class Connector(GenericConnector):
 
         try:
             # Reference: http://www.daniweb.com/forums/thread248499.html
-            self.connector = kinterbasdb.connect(host=self.hostname.encode(UNICODE_ENCODING), database=self.db.encode(UNICODE_ENCODING), user=self.user.encode(UNICODE_ENCODING), password=self.password.encode(UNICODE_ENCODING), charset="UTF8")
+            self.connector = kinterbasdb.connect(host=self.hostname.encode(UNICODE_ENCODING),
+                                                 database=self.db.encode(UNICODE_ENCODING),
+                                                 user=self.user.encode(UNICODE_ENCODING),
+                                                 password=self.password.encode(UNICODE_ENCODING), charset="UTF8")
         except kinterbasdb.OperationalError as ex:
             raise SqlmapConnectionException(getSafeExString(ex))
 

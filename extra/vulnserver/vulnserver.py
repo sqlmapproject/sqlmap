@@ -63,6 +63,7 @@ _lock = None
 _server = None
 _alive = False
 
+
 def init(quiet=False):
     global _conn
     global _cursor
@@ -82,6 +83,7 @@ def init(quiet=False):
 
         print = _
 
+
 class ThreadingServer(ThreadingMixIn, HTTPServer):
     def finish_request(self, *args, **kwargs):
         try:
@@ -89,6 +91,7 @@ class ThreadingServer(ThreadingMixIn, HTTPServer):
         except Exception:
             if DEBUG:
                 traceback.print_exc()
+
 
 class ReqHandler(BaseHTTPRequestHandler):
     def do_REQUEST(self):
@@ -110,9 +113,13 @@ class ReqHandler(BaseHTTPRequestHandler):
             if self.data.startswith('{') and self.data.endswith('}'):
                 params.update(json.loads(self.data))
             elif self.data.startswith('<') and self.data.endswith('>'):
-                params.update(dict((_[0], _[1].replace("&apos;", "'").replace("&quot;", '"').replace("&lt;", '<').replace("&gt;", '>').replace("&amp;", '&')) for _ in re.findall(r'name="([^"]+)" value="([^"]*)"', self.data)))
+                params.update(dict((_[0],
+                                    _[1].replace("&apos;", "'").replace("&quot;", '"').replace("&lt;", '<').replace(
+                                        "&gt;", '>').replace("&amp;", '&')) for _ in
+                                   re.findall(r'name="([^"]+)" value="([^"]*)"', self.data)))
             else:
-                self.data = self.data.replace(';', '&')     # Note: seems that Python3 started ignoring parameter splitting with ';'
+                self.data = self.data.replace(';',
+                                              '&')  # Note: seems that Python3 started ignoring parameter splitting with ';'
                 params.update(parse_qs(self.data))
 
         for name in self.headers:
@@ -137,7 +144,8 @@ class ReqHandler(BaseHTTPRequestHandler):
                 self.send_header("Content-type", "text/html; charset=%s" % UNICODE_ENCODING)
                 self.send_header("Connection", "close")
                 self.end_headers()
-                self.wfile.write(b"<!DOCTYPE html><html><head><title>vulnserver</title></head><body><h3>GET:</h3><a href='/?id=1'>link</a><hr><h3>POST:</h3><form method='post'>ID: <input type='text' name='id'><input type='submit' value='Submit'></form></body></html>")
+                self.wfile.write(
+                    b"<!DOCTYPE html><html><head><title>vulnserver</title></head><body><h3>GET:</h3><a href='/?id=1'>link</a><hr><h3>POST:</h3><form method='post'>ID: <input type='text' name='id'><input type='submit' value='Submit'></form></body></html>")
             else:
                 code, output = OK, ""
 
@@ -153,7 +161,8 @@ class ReqHandler(BaseHTTPRequestHandler):
                             _cursor.execute(self.params["query"])
                         elif "id" in self.params:
                             if "base64" in self.params:
-                                _cursor.execute("SELECT * FROM users WHERE id=%s LIMIT 0, 1" % base64.b64decode("%s===" % self.params["id"], altchars=self.params.get("altchars")).decode())
+                                _cursor.execute("SELECT * FROM users WHERE id=%s LIMIT 0, 1" % base64.b64decode(
+                                    "%s===" % self.params["id"], altchars=self.params.get("altchars")).decode())
                             else:
                                 _cursor.execute("SELECT * FROM users WHERE id=%s LIMIT 0, 1" % self.params["id"])
                         results = _cursor.fetchall()
@@ -237,6 +246,7 @@ class ReqHandler(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
         return
 
+
 def run(address=LISTEN_ADDRESS, port=LISTEN_PORT):
     global _alive
     global _server
@@ -251,9 +261,11 @@ def run(address=LISTEN_ADDRESS, port=LISTEN_PORT):
     finally:
         _alive = False
 
+
 if __name__ == "__main__":
     try:
         init()
-        run(sys.argv[1] if len(sys.argv) > 1 else LISTEN_ADDRESS, int(sys.argv[2] if len(sys.argv) > 2 else LISTEN_PORT))
+        run(sys.argv[1] if len(sys.argv) > 1 else LISTEN_ADDRESS,
+            int(sys.argv[2] if len(sys.argv) > 2 else LISTEN_PORT))
     except KeyboardInterrupt:
         print("\r[x] Ctrl-C received")

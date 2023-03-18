@@ -26,58 +26,55 @@
 from __future__ import print_function
 import os
 
-
-__ALL__ = [ 'colored', 'cprint' ]
+__ALL__ = ['colored', 'cprint']
 
 VERSION = (1, 1, 0)
 
 ATTRIBUTES = dict(
-        list(zip([
-            'bold',
-            'dark',
-            '',
-            'underline',
-            'blink',
-            '',
-            'reverse',
-            'concealed'
-            ],
-            list(range(1, 9))
-            ))
-        )
+    list(zip([
+        'bold',
+        'dark',
+        '',
+        'underline',
+        'blink',
+        '',
+        'reverse',
+        'concealed'
+    ],
+        list(range(1, 9))
+    ))
+)
 del ATTRIBUTES['']
 
-
 HIGHLIGHTS = dict(
-        list(zip([
-            'on_grey',
-            'on_red',
-            'on_green',
-            'on_yellow',
-            'on_blue',
-            'on_magenta',
-            'on_cyan',
-            'on_white'
-            ],
-            list(range(40, 48))
-            ))
-        )
-
+    list(zip([
+        'on_grey',
+        'on_red',
+        'on_green',
+        'on_yellow',
+        'on_blue',
+        'on_magenta',
+        'on_cyan',
+        'on_white'
+    ],
+        list(range(40, 48))
+    ))
+)
 
 COLORS = dict(
-        list(zip([
-            'grey',
-            'red',
-            'green',
-            'yellow',
-            'blue',
-            'magenta',
-            'cyan',
-            'white',
-            ],
-            list(range(30, 38))
-            ))
-        )
+    list(zip([
+        'grey',
+        'red',
+        'green',
+        'yellow',
+        'blue',
+        'magenta',
+        'cyan',
+        'white',
+    ],
+        list(range(30, 38))
+    ))
+)
 
 COLORS.update(dict(("light%s" % color, COLORS[color] + 60) for color in COLORS))
 
@@ -161,13 +158,12 @@ if __name__ == '__main__':
     cprint('Reversed blue color', 'blue', attrs=['reverse'])
     cprint('Concealed Magenta color', 'magenta', attrs=['concealed'])
     cprint('Bold underline reverse cyan color', 'cyan',
-            attrs=['bold', 'underline', 'reverse'])
+           attrs=['bold', 'underline', 'reverse'])
     cprint('Dark blink concealed white color', 'white',
-            attrs=['dark', 'blink', 'concealed'])
+           attrs=['dark', 'blink', 'concealed'])
     print(('-' * 78))
 
     print('Test mixing:')
     cprint('Underline red on grey color', 'red', 'on_grey',
-            ['underline'])
+           ['underline'])
     cprint('Reversed green on red color', 'green', 'on_red', ['reverse'])
-

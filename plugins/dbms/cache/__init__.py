@@ -16,6 +16,7 @@ from plugins.dbms.cache.syntax import Syntax
 from plugins.dbms.cache.takeover import Takeover
 from plugins.generic.misc import Miscellaneous
 
+
 class CacheMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
     This class defines Cache methods

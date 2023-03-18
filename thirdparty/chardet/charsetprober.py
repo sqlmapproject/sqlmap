@@ -33,7 +33,6 @@ from .enums import ProbingState
 
 
 class CharSetProber(object):
-
     SHORTCUT_THRESHOLD = 0.95
 
     def __init__(self, lang_filter=None):

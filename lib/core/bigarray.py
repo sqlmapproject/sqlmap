@@ -27,6 +27,7 @@ try:
 except TypeError:
     DEFAULT_SIZE_OF = 16
 
+
 def _size_of(instance):
     """
     Returns total size of a given instance / object (in bytes)
@@ -41,6 +42,7 @@ def _size_of(instance):
 
     return retval
 
+
 class Cache(object):
     """
     Auxiliary class used for storing cached chunks
@@ -50,6 +52,7 @@ class Cache(object):
         self.index = index
         self.data = data
         self.dirty = dirty
+
 
 class BigArray(list):
     """
@@ -201,4 +204,5 @@ class BigArray(list):
             yield self[i]
 
     def __len__(self):
-        return len(self.chunks[-1]) if len(self.chunks) == 1 else (len(self.chunks) - 1) * self.chunk_length + len(self.chunks[-1])
+        return len(self.chunks[-1]) if len(self.chunks) == 1 else (len(self.chunks) - 1) * self.chunk_length + len(
+            self.chunks[-1])

@@ -19,6 +19,7 @@ from lib.core.data import logger
 from lib.core.exception import SqlmapConnectionException
 from plugins.generic.connector import Connector as GenericConnector
 
+
 class Connector(GenericConnector):
     """
     Homepage: https://github.com/PyMySQL/PyMySQL
@@ -33,7 +34,8 @@ class Connector(GenericConnector):
         self.initConnection()
 
         try:
-            self.connector = pymysql.connect(host=self.hostname, user=self.user, passwd=self.password, db=self.db, port=self.port, connect_timeout=conf.timeout, use_unicode=True)
+            self.connector = pymysql.connect(host=self.hostname, user=self.user, passwd=self.password, db=self.db,
+                                             port=self.port, connect_timeout=conf.timeout, use_unicode=True)
         except (pymysql.OperationalError, pymysql.InternalError, pymysql.ProgrammingError, struct.error) as ex:
             raise SqlmapConnectionException(getSafeExString(ex))
 

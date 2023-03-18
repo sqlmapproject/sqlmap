@@ -52,6 +52,7 @@ class CodingStateMachine(object):
                  negative answer for this encoding. Detector will exclude this
                  encoding from consideration from here on.
     """
+
     def __init__(self, sm):
         self._model = sm
         self._curr_byte_pos = 0

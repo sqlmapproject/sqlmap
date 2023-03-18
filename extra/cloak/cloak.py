@@ -23,8 +23,10 @@ if sys.version_info >= (3, 0):
 
 KEY = b"ENWsCymUeJcXqSbD"
 
+
 def xor(message, key):
     return b"".join(struct.pack('B', ord(message[i]) ^ ord(key[i % len(key)])) for i in range(len(message)))
+
 
 def cloak(inputFile=None, data=None):
     if data is None:
@@ -32,6 +34,7 @@ def cloak(inputFile=None, data=None):
             data = f.read()
 
     return xor(zlib.compress(data), KEY)
+
 
 def decloak(inputFile=None, data=None):
     if data is None:
@@ -47,6 +50,7 @@ def decloak(inputFile=None, data=None):
         f.close()
 
     return data
+
 
 def main():
     usage = '%s [-d] -i <input file> [-o <output file>]' % sys.argv[0]
@@ -83,6 +87,7 @@ def main():
     f = open(args.outputFile, 'wb')
     f.write(data)
     f.close()
+
 
 if __name__ == '__main__':
     main()

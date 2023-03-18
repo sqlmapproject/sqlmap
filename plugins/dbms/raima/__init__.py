@@ -15,6 +15,7 @@ from plugins.dbms.raima.syntax import Syntax
 from plugins.dbms.raima.takeover import Takeover
 from plugins.generic.misc import Miscellaneous
 
+
 class RaimaMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
     This class defines Raima methods

@@ -21,6 +21,7 @@ from lib.core.optiondict import optDict
 
 config = None
 
+
 def configFileProxy(section, option, datatype):
     """
     Parse configuration file and save settings into the configuration
@@ -51,6 +52,7 @@ def configFileProxy(section, option, datatype):
         debugMsg += "'%s') into the configuration file, " % section
         debugMsg += "ignoring. Skipping to next."
         logger.debug(debugMsg)
+
 
 def configFileParser(configFile):
     """

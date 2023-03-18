@@ -22,6 +22,7 @@ from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.exception import SqlmapDataException
 
+
 class ICMPsh(object):
     """
     This class defines methods to call icmpsh for plugins.
@@ -107,7 +108,8 @@ class ICMPsh(object):
         logger.info("uploading icmpsh slave to '%s'" % self._icmpslaveRemote)
 
         if web:
-            written = self.webUpload(self._icmpslaveRemote, os.path.split(self._icmpslaveRemote)[0], filepath=self._icmpslave)
+            written = self.webUpload(self._icmpslaveRemote, os.path.split(self._icmpslaveRemote)[0],
+                                     filepath=self._icmpslave)
         else:
             written = self.writeFile(self._icmpslave, self._icmpslaveRemote, "binary", forceCheck=True)
 

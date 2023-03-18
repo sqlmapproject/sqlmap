@@ -40,6 +40,7 @@ from lib.utils.brute import columnExists
 from lib.utils.brute import tableExists
 from thirdparty import six
 
+
 class Search(object):
     """
     This class defines search functionalities for plugins.
@@ -74,8 +75,10 @@ class Search(object):
             logger.info(infoMsg)
 
             if conf.excludeSysDbs:
-                exclDbsQuery = "".join(" AND '%s' != %s" % (unsafeSQLIdentificatorNaming(db), dbCond) for db in self.excludeDbsList)
-                infoMsg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
+                exclDbsQuery = "".join(
+                    " AND '%s' != %s" % (unsafeSQLIdentificatorNaming(db), dbCond) for db in self.excludeDbsList)
+                infoMsg = "skipping system database%s '%s'" % (
+                "s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
                 logger.info(infoMsg)
             else:
                 exclDbsQuery = ""
@@ -83,7 +86,8 @@ class Search(object):
             dbQuery = "%s%s" % (dbCond, dbCondParam)
             dbQuery = dbQuery % unsafeSQLIdentificatorNaming(db)
 
-            if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
+            if any(isTechniqueAvailable(_) for _ in
+                   (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
                 if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
                     query = rootQuery.inband.query2
                 else:
@@ -112,7 +116,8 @@ class Search(object):
                     query = rootQuery.blind.count
 
                 query = query % (dbQuery + exclDbsQuery)
-                count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT,
+                                        charsetType=CHARSET_TYPE.DIGITS)
 
                 if not isNumPosStrValue(count):
                     warnMsg = "no database"
@@ -149,7 +154,8 @@ class Search(object):
             bruteForce = True
 
         if bruteForce:
-            message = "do you want to use common table existence check? %s" % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB) else "[y/N/q]")
+            message = "do you want to use common table existence check? %s" % (
+                "[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB) else "[y/N/q]")
             choice = readInput(message, default='Y' if 'Y' in message else 'N').upper()
 
             if choice == 'N':
@@ -185,11 +191,14 @@ class Search(object):
 
             if dbCond and conf.db:
                 _ = conf.db.split(',')
-                whereDbsQuery = " AND (" + " OR ".join("%s = '%s'" % (dbCond, unsafeSQLIdentificatorNaming(db)) for db in _) + ")"
+                whereDbsQuery = " AND (" + " OR ".join(
+                    "%s = '%s'" % (dbCond, unsafeSQLIdentificatorNaming(db)) for db in _) + ")"
                 infoMsg += " for database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(db for db in _))
             elif conf.excludeSysDbs:
-                whereDbsQuery = "".join(" AND '%s' != %s" % (unsafeSQLIdentificatorNaming(db), dbCond) for db in self.excludeDbsList)
-                msg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
+                whereDbsQuery = "".join(
+                    " AND '%s' != %s" % (unsafeSQLIdentificatorNaming(db), dbCond) for db in self.excludeDbsList)
+                msg = "skipping system database%s '%s'" % (
+                "s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
                 logger.info(msg)
             else:
                 whereDbsQuery = ""
@@ -202,7 +211,8 @@ class Search(object):
             tblQuery = "%s%s" % (tblCond, tblCondParam)
             tblQuery = tblQuery % unsafeSQLIdentificatorNaming(tbl)
 
-            if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
+            if any(isTechniqueAvailable(_) for _ in
+                   (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
                 query = rootQuery.inband.query
 
                 query = query % (tblQuery + whereDbsQuery)
@@ -242,7 +252,8 @@ class Search(object):
 
                         query = rootQuery.blind.count
                         query = query % (tblQuery + whereDbsQuery)
-                        count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                        count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT,
+                                                charsetType=CHARSET_TYPE.DIGITS)
 
                         if not isNumPosStrValue(count):
                             warnMsg = "no databases have table"
@@ -286,7 +297,8 @@ class Search(object):
                     infoMsg = "fetching number of table"
                     if tblConsider == "1":
                         infoMsg += "s LIKE"
-                    infoMsg += " '%s' in database '%s'" % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(db))
+                    infoMsg += " '%s' in database '%s'" % (
+                    unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(db))
                     logger.info(infoMsg)
 
                     query = rootQuery.blind.count2
@@ -294,7 +306,8 @@ class Search(object):
                         query = query % unsafeSQLIdentificatorNaming(db)
                     query += " AND %s" % tblQuery
 
-                    count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                    count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT,
+                                            charsetType=CHARSET_TYPE.DIGITS)
 
                     if not isNumPosStrValue(count):
                         warnMsg = "no table"
@@ -356,7 +369,8 @@ class Search(object):
             bruteForce = True
 
         if bruteForce:
-            message = "do you want to use common column existence check? %s" % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB) else "[y/N/q]")
+            message = "do you want to use common column existence check? %s" % (
+                "[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB) else "[y/N/q]")
             choice = readInput(message, default='Y' if 'Y' in message else 'N').upper()
 
             if choice == 'N':
@@ -416,8 +430,10 @@ class Search(object):
                     tbls = conf.tbl.split(',')
                     if conf.exclude:
                         tbls = [_ for _ in tbls if re.search(conf.exclude, _, re.I) is None]
-                    whereTblsQuery = " AND (" + " OR ".join("%s = '%s'" % (tblCond, unsafeSQLIdentificatorNaming(tbl)) for tbl in tbls) + ")"
-                    infoMsgTbl = " for table%s '%s'" % ("s" if len(tbls) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(tbl) for tbl in tbls))
+                    whereTblsQuery = " AND (" + " OR ".join(
+                        "%s = '%s'" % (tblCond, unsafeSQLIdentificatorNaming(tbl)) for tbl in tbls) + ")"
+                    infoMsgTbl = " for table%s '%s'" % (
+                    "s" if len(tbls) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(tbl) for tbl in tbls))
 
             if conf.db == CURRENT_DB:
                 conf.db = self.getCurrentDb()
@@ -425,11 +441,15 @@ class Search(object):
             if dbCond:
                 if conf.db:
                     _ = conf.db.split(',')
-                    whereDbsQuery = " AND (" + " OR ".join("%s = '%s'" % (dbCond, unsafeSQLIdentificatorNaming(db)) for db in _) + ")"
-                    infoMsgDb = " in database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(db) for db in _))
+                    whereDbsQuery = " AND (" + " OR ".join(
+                        "%s = '%s'" % (dbCond, unsafeSQLIdentificatorNaming(db)) for db in _) + ")"
+                    infoMsgDb = " in database%s '%s'" % (
+                    "s" if len(_) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(db) for db in _))
                 elif conf.excludeSysDbs:
-                    whereDbsQuery = "".join(" AND %s != '%s'" % (dbCond, unsafeSQLIdentificatorNaming(db)) for db in self.excludeDbsList)
-                    msg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(db) for db in self.excludeDbsList))
+                    whereDbsQuery = "".join(
+                        " AND %s != '%s'" % (dbCond, unsafeSQLIdentificatorNaming(db)) for db in self.excludeDbsList)
+                    msg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(
+                        unsafeSQLIdentificatorNaming(db) for db in self.excludeDbsList))
                     logger.info(msg)
                 else:
                     infoMsgDb = " across all databases"
@@ -442,7 +462,8 @@ class Search(object):
             colQuery = "%s%s" % (colCond, colCondParam)
             colQuery = colQuery % unsafeSQLIdentificatorNaming(column)
 
-            if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
+            if any(isTechniqueAvailable(_) for _ in
+                   (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
                 if not all((conf.db, conf.tbl)):
                     # Enumerate tables containing the column provided if
                     # either of database(s) or table(s) is not provided
@@ -500,7 +521,8 @@ class Search(object):
 
                     query = rootQuery.blind.count
                     query = query % (colQuery + whereDbsQuery + whereTblsQuery)
-                    count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                    count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT,
+                                            charsetType=CHARSET_TYPE.DIGITS)
 
                     if not isNumPosStrValue(count):
                         warnMsg = "no databases have tables containing column"
@@ -546,7 +568,8 @@ class Search(object):
                         infoMsg = "fetching number of tables containing column"
                         if colConsider == "1":
                             infoMsg += "s LIKE"
-                        infoMsg += " '%s' in database '%s'" % (unsafeSQLIdentificatorNaming(column), unsafeSQLIdentificatorNaming(db))
+                        infoMsg += " '%s' in database '%s'" % (
+                        unsafeSQLIdentificatorNaming(column), unsafeSQLIdentificatorNaming(db))
                         logger.info(infoMsg)
 
                         query = rootQuery.blind.count2
@@ -558,7 +581,8 @@ class Search(object):
 
                         query += whereTblsQuery
 
-                        count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                        count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT,
+                                                charsetType=CHARSET_TYPE.DIGITS)
 
                         if not isNumPosStrValue(count):
                             warnMsg = "no tables contain column"

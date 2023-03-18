@@ -34,6 +34,7 @@ from lib.request import inject
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
 from thirdparty import six
 
+
 class Enumeration(GenericEnumeration):
     def getPrivileges(self, *args, **kwargs):
         warnMsg = "on Microsoft SQL Server it is not possible to fetch "
@@ -86,12 +87,14 @@ class Enumeration(GenericEnumeration):
         dbs = [_ for _ in dbs if _]
 
         infoMsg = "fetching tables for database"
-        infoMsg += "%s: %s" % ("s" if len(dbs) > 1 else "", ", ".join(db if isinstance(db, six.string_types) else db[0] for db in sorted(dbs)))
+        infoMsg += "%s: %s" % (
+        "s" if len(dbs) > 1 else "", ", ".join(db if isinstance(db, six.string_types) else db[0] for db in sorted(dbs)))
         logger.info(infoMsg)
 
         rootQuery = queries[DBMS.MSSQL].tables
 
-        if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
+        if any(isTechniqueAvailable(_) for _ in
+               (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
             for db in dbs:
                 if conf.excludeSysDbs and db in self.excludeDbsList:
                     infoMsg = "skipping system database '%s'" % db
@@ -132,7 +135,8 @@ class Enumeration(GenericEnumeration):
 
                 for query in (rootQuery.blind.count, rootQuery.blind.count2, rootQuery.blind.count3):
                     _ = query.replace("%s", db)
-                    count = inject.getValue(_, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                    count = inject.getValue(_, union=False, error=False, expected=EXPECTED.INT,
+                                            charsetType=CHARSET_TYPE.DIGITS)
                     if not isNoneValue(count):
                         break
 
@@ -146,7 +150,9 @@ class Enumeration(GenericEnumeration):
                 tables = []
 
                 for index in xrange(int(count)):
-                    _ = safeStringFormat((rootQuery.blind.query if query == rootQuery.blind.count else rootQuery.blind.query2 if query == rootQuery.blind.count2 else rootQuery.blind.query3).replace("%s", db), index)
+                    _ = safeStringFormat((
+                                             rootQuery.blind.query if query == rootQuery.blind.count else rootQuery.blind.query2 if query == rootQuery.blind.count2 else rootQuery.blind.query3).replace(
+                        "%s", db), index)
 
                     table = inject.getValue(_, union=False, error=False)
                     if not isNoneValue(table):
@@ -216,7 +222,8 @@ class Enumeration(GenericEnumeration):
                     singleTimeLogMessage(infoMsg)
                     continue
 
-                if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
+                if any(isTechniqueAvailable(_) for _ in
+                       (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
                     query = rootQuery.inband.query.replace("%s", db)
                     query += tblQuery
                     values = inject.getValue(query, blind=False, time=False)
@@ -234,13 +241,15 @@ class Enumeration(GenericEnumeration):
                     infoMsg = "fetching number of table"
                     if tblConsider == "1":
                         infoMsg += "s LIKE"
-                    infoMsg += " '%s' in database '%s'" % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(db))
+                    infoMsg += " '%s' in database '%s'" % (
+                    unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(db))
                     logger.info(infoMsg)
 
                     query = rootQuery.blind.count
                     query = query.replace("%s", db)
                     query += " AND %s" % tblQuery
-                    count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                    count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT,
+                                            charsetType=CHARSET_TYPE.DIGITS)
 
                     if not isNumPosStrValue(count):
                         warnMsg = "no table"
@@ -321,7 +330,8 @@ class Enumeration(GenericEnumeration):
 
             if conf.tbl:
                 _ = conf.tbl.split(',')
-                whereTblsQuery = " AND (" + " OR ".join("%s = '%s'" % (tblCond, unsafeSQLIdentificatorNaming(tbl)) for tbl in _) + ")"
+                whereTblsQuery = " AND (" + " OR ".join(
+                    "%s = '%s'" % (tblCond, unsafeSQLIdentificatorNaming(tbl)) for tbl in _) + ")"
                 infoMsgTbl = " for table%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(tbl for tbl in _))
 
             if conf.db == CURRENT_DB:
@@ -331,7 +341,8 @@ class Enumeration(GenericEnumeration):
                 _ = conf.db.split(',')
                 infoMsgDb = " in database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(db for db in _))
             elif conf.excludeSysDbs:
-                infoMsgDb = " not in system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
+                infoMsgDb = " not in system database%s '%s'" % (
+                "s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
             else:
                 infoMsgDb = " across all databases"
 
@@ -349,7 +360,8 @@ class Enumeration(GenericEnumeration):
                 if conf.exclude and re.search(conf.exclude, db, re.I) is not None:
                     continue
 
-                if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
+                if any(isTechniqueAvailable(_) for _ in
+                       (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
                     query = rootQuery.inband.query % (db, db, db, db, db, db)
                     query += " AND %s" % colQuery.replace("[DB]", db)
                     query += whereTblsQuery.replace("[DB]", db)
@@ -373,9 +385,11 @@ class Enumeration(GenericEnumeration):
                                 conf.tbl = foundTbl
                                 conf.col = column
 
-                                self.getColumns(onlyColNames=True, colTuple=(colConsider, colCondParam), bruteForce=False)
+                                self.getColumns(onlyColNames=True, colTuple=(colConsider, colCondParam),
+                                                bruteForce=False)
 
-                                if db in kb.data.cachedColumns and foundTbl in kb.data.cachedColumns[db] and not isNoneValue(kb.data.cachedColumns[db][foundTbl]):
+                                if db in kb.data.cachedColumns and foundTbl in kb.data.cachedColumns[
+                                    db] and not isNoneValue(kb.data.cachedColumns[db][foundTbl]):
                                     dbs[db][foundTbl].update(kb.data.cachedColumns[db][foundTbl])
 
                                 kb.data.cachedColumns = {}
@@ -399,7 +413,8 @@ class Enumeration(GenericEnumeration):
                     query = query % (db, db, db, db, db, db)
                     query += " AND %s" % colQuery.replace("[DB]", db)
                     query += whereTblsQuery.replace("[DB]", db)
-                    count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                    count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT,
+                                            charsetType=CHARSET_TYPE.DIGITS)
 
                     if not isNumPosStrValue(count):
                         warnMsg = "no tables contain column"

@@ -14,8 +14,10 @@ from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.NORMAL
 
+
 def dependencies():
     pass
+
 
 def tamper(payload, **kwargs):
     """
@@ -51,7 +53,8 @@ def tamper(payload, **kwargs):
         for match in re.finditer(r"\b[A-Za-z_]{2,}\b", retVal):
             word = match.group()
 
-            if (word.upper() in kb.keywords and re.search(r"(?i)[`\"'\[]%s[`\"'\]]" % word, retVal) is None) or ("%s(" % word) in payload:
+            if (word.upper() in kb.keywords and re.search(r"(?i)[`\"'\[]%s[`\"'\]]" % word, retVal) is None) or (
+                    "%s(" % word) in payload:
                 while True:
                     _ = ""
 

@@ -34,9 +34,11 @@ from lib.core.settings import URI_HTTP_HEADER
 from lib.core.threads import getCurrentThreadData
 from thirdparty import six
 
+
 def comparison(page, headers, code=None, getRatioValue=False, pageLength=None):
     _ = _adjust(_comparison(page, headers, code, getRatioValue, pageLength), getRatioValue)
     return _
+
 
 def _adjust(condition, getRatioValue):
     if not any((conf.string, conf.notString, conf.regexp, conf.code)):
@@ -50,11 +52,13 @@ def _adjust(condition, getRatioValue):
 
     return retVal
 
+
 def _comparison(page, headers, code, getRatioValue, pageLength):
     threadData = getCurrentThreadData()
 
     if kb.testMode:
-        threadData.lastComparisonHeaders = listToStrValue(_ for _ in headers.headers if not _.startswith("%s:" % URI_HTTP_HEADER)) if headers else ""
+        threadData.lastComparisonHeaders = listToStrValue(
+            _ for _ in headers.headers if not _.startswith("%s:" % URI_HTTP_HEADER)) if headers else ""
         threadData.lastComparisonPage = page
         threadData.lastComparisonCode = code
 
@@ -62,7 +66,9 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
         return None
 
     if any((conf.string, conf.notString, conf.regexp)):
-        rawResponse = "%s%s" % (listToStrValue(_ for _ in headers.headers if not _.startswith("%s:" % URI_HTTP_HEADER)) if headers else "", page)
+        rawResponse = "%s%s" % (
+        listToStrValue(_ for _ in headers.headers if not _.startswith("%s:" % URI_HTTP_HEADER)) if headers else "",
+        page)
 
         # String to match in page when the query is True
         if conf.string:
@@ -126,7 +132,8 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
             return None
         elif seqMatcher.a and page and seqMatcher.a == page:
             ratio = 1.
-        elif kb.skipSeqMatcher or seqMatcher.a and page and any(len(_) > MAX_DIFFLIB_SEQUENCE_LENGTH for _ in (seqMatcher.a, page)):
+        elif kb.skipSeqMatcher or seqMatcher.a and page and any(
+                len(_) > MAX_DIFFLIB_SEQUENCE_LENGTH for _ in (seqMatcher.a, page)):
             if not page or not seqMatcher.a:
                 return float(seqMatcher.a == page)
             else:

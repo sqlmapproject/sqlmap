@@ -11,6 +11,7 @@ from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.NORMAL
 
+
 def tamper(payload, **kwargs):
     """
     Add an inline comment (/**/) to the end of all occurrences of (MySQL) "information_schema" identifier

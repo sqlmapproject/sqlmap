@@ -34,6 +34,7 @@ from lib.request.basic import parseResponse
 from thirdparty import six
 from thirdparty.six.moves import urllib as _urllib
 
+
 class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
     def _get_header_redirect(self, headers):
         retVal = None
@@ -66,7 +67,8 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
                 self.redirect_request = self._redirect_request
 
     def _redirect_request(self, req, fp, code, msg, headers, newurl):
-        return _urllib.request.Request(newurl.replace(' ', '%20'), data=req.data, headers=req.headers, origin_req_host=req.get_origin_req_host())
+        return _urllib.request.Request(newurl.replace(' ', '%20'), data=req.data, headers=req.headers,
+                                       origin_req_host=req.get_origin_req_host())
 
     def http_error_302(self, req, fp, code, msg, headers):
         start = time.time()
@@ -94,7 +96,9 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
         redirectMsg += "[#%d] (%d %s):\r\n" % (threadData.lastRequestUID, code, getUnicode(msg))
 
         if headers:
-            logHeaders = "\r\n".join("%s: %s" % (getUnicode(key.capitalize() if hasattr(key, "capitalize") else key), getUnicode(value)) for (key, value) in headers.items())
+            logHeaders = "\r\n".join(
+                "%s: %s" % (getUnicode(key.capitalize() if hasattr(key, "capitalize") else key), getUnicode(value)) for
+                (key, value) in headers.items())
         else:
             logHeaders = ""
 
@@ -125,7 +129,8 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
                 delimiter = conf.cookieDel or DEFAULT_COOKIE_DELIMITER
                 last = None
 
-                for part in getUnicode(req.headers.get(HTTP_HEADER.COOKIE, "")).split(delimiter) + ([headers[HTTP_HEADER.SET_COOKIE]] if HTTP_HEADER.SET_COOKIE in headers else []):
+                for part in getUnicode(req.headers.get(HTTP_HEADER.COOKIE, "")).split(delimiter) + (
+                [headers[HTTP_HEADER.SET_COOKIE]] if HTTP_HEADER.SET_COOKIE in headers else []):
                     if '=' in part:
                         part = part.strip()
                         key, value = part.split('=', 1)
@@ -147,6 +152,7 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
                 except KeyError:
                     class _(object):
                         pass
+
                     result = _()
 
                 # Dirty hack for http://bugs.python.org/issue15701
@@ -161,7 +167,8 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
                 if not hasattr(result, "read"):
                     def _(self, length=None):
                         try:
-                            retVal = getSafeExString(ex)        # Note: pyflakes mistakenly marks 'ex' as undefined (NOTE: tested in both Python2 and Python3)
+                            retVal = getSafeExString(
+                                ex)  # Note: pyflakes mistakenly marks 'ex' as undefined (NOTE: tested in both Python2 and Python3)
                         except:
                             retVal = ""
                         return getBytes(retVal)
@@ -189,7 +196,9 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
     http_error_301 = http_error_303 = http_error_307 = http_error_302
 
     def _infinite_loop_check(self, req):
-        if hasattr(req, 'redirect_dict') and (req.redirect_dict.get(req.get_full_url(), 0) >= MAX_SINGLE_URL_REDIRECTIONS or len(req.redirect_dict) >= MAX_TOTAL_REDIRECTIONS):
+        if hasattr(req, 'redirect_dict') and (
+                req.redirect_dict.get(req.get_full_url(), 0) >= MAX_SINGLE_URL_REDIRECTIONS or len(
+                req.redirect_dict) >= MAX_TOTAL_REDIRECTIONS):
             errMsg = "infinite redirect loop detected (%s). " % ", ".join(item for item in req.redirect_dict.keys())
             errMsg += "Please check all provided parameters and/or provide missing ones"
             raise SqlmapConnectionException(errMsg)

@@ -13,6 +13,7 @@ from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapInstallationException
 from thirdparty import six
 
+
 class Wordlist(six.Iterator):
     """
     Iterator for looping over a large dictionaries

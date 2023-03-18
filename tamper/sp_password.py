@@ -9,6 +9,7 @@ from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.HIGH
 
+
 def tamper(payload, **kwargs):
     """
     Appends (MsSQL) function 'sp_password' to the end of the payload for automatic obfuscation from DBMS logs
@@ -27,6 +28,7 @@ def tamper(payload, **kwargs):
     retVal = ""
 
     if payload:
-        retVal = "%s%ssp_password" % (payload, "-- " if not any(_ if _ in payload else None for _ in ('#', "-- ")) else "")
+        retVal = "%s%ssp_password" % (
+        payload, "-- " if not any(_ if _ in payload else None for _ in ('#', "-- ")) else "")
 
     return retVal

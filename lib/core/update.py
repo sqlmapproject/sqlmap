@@ -32,6 +32,7 @@ from lib.core.settings import TYPE
 from lib.core.settings import ZIPBALL_PAGE
 from thirdparty.six.moves import urllib as _urllib
 
+
 def update():
     if not conf.updateAll:
         return
@@ -50,7 +51,8 @@ def update():
 
         output = ""
         try:
-            process = subprocess.Popen("pip install -U sqlmap", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=paths.SQLMAP_ROOT_PATH)
+            process = subprocess.Popen("pip install -U sqlmap", shell=True, stdout=subprocess.PIPE,
+                                       stderr=subprocess.STDOUT, cwd=paths.SQLMAP_ROOT_PATH)
             pollProcess(process, True)
             output, _ = process.communicate()
             success = not process.returncode
@@ -61,7 +63,10 @@ def update():
             output = getText(output)
 
         if success:
-            logger.info("%s the latest revision '%s'" % ("already at" if "already up-to-date" in output else "updated to", extractRegexResult(r"\binstalled sqlmap-(?P<result>\d+\.\d+\.\d+)", output) or extractRegexResult(r"\((?P<result>\d+\.\d+\.\d+)\)", output)))
+            logger.info("%s the latest revision '%s'" % (
+            "already at" if "already up-to-date" in output else "updated to",
+            extractRegexResult(r"\binstalled sqlmap-(?P<result>\d+\.\d+\.\d+)", output) or extractRegexResult(
+                r"\((?P<result>\d+\.\d+\.\d+)\)", output)))
         else:
             logger.error("update could not be completed ('%s')" % re.sub(r"[^a-z0-9:/\\]+", " ", output).strip())
 
@@ -123,7 +128,8 @@ def update():
                             try:
                                 os.chmod(os.path.join(directory, "sqlmap.py"), attrs)
                             except OSError:
-                                logger.warning("could not set the file attributes of '%s'" % os.path.join(directory, "sqlmap.py"))
+                                logger.warning(
+                                    "could not set the file attributes of '%s'" % os.path.join(directory, "sqlmap.py"))
 
     else:
         infoMsg = "updating sqlmap to the latest development revision from the "
@@ -137,7 +143,8 @@ def update():
 
         output = ""
         try:
-            process = subprocess.Popen("git checkout . && git pull %s HEAD" % GIT_REPOSITORY, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=paths.SQLMAP_ROOT_PATH)
+            process = subprocess.Popen("git checkout . && git pull %s HEAD" % GIT_REPOSITORY, shell=True,
+                                       stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=paths.SQLMAP_ROOT_PATH)
             pollProcess(process, True)
             output, _ = process.communicate()
             success = not process.returncode
@@ -148,7 +155,8 @@ def update():
             output = getText(output)
 
         if success:
-            logger.info("%s the latest revision '%s'" % ("already at" if "Already" in output else "updated to", getRevisionNumber()))
+            logger.info("%s the latest revision '%s'" % (
+            "already at" if "Already" in output else "updated to", getRevisionNumber()))
         else:
             if "Not a git repository" in output:
                 errMsg = "not a valid git repository. Please checkout the 'sqlmapproject/sqlmap' repository "

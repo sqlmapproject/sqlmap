@@ -46,6 +46,7 @@ from lib.core.threads import getCurrentThreadData
 from lib.core.threads import runThreads
 from lib.request import inject
 
+
 def _addPageTextWords():
     wordsList = []
 
@@ -61,10 +62,13 @@ def _addPageTextWords():
 
     return wordsList
 
+
 @stackedmethod
 def tableExists(tableFile, regex=None):
-    if kb.choices.tableExists is None and not any(_ for _ in kb.injection.data if _ not in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED)) and not conf.direct:
-        warnMsg = "it's not recommended to use '%s' and/or '%s' " % (PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.TIME], PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.STACKED])
+    if kb.choices.tableExists is None and not any(_ for _ in kb.injection.data if _ not in (
+    PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED)) and not conf.direct:
+        warnMsg = "it's not recommended to use '%s' and/or '%s' " % (
+        PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.TIME], PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.STACKED])
         warnMsg += "for common table existence check"
         logger.warning(warnMsg)
 
@@ -74,7 +78,8 @@ def tableExists(tableFile, regex=None):
         if not kb.choices.tableExists:
             return None
 
-    result = inject.checkBooleanExpression("%s" % safeStringFormat(BRUTE_TABLE_EXISTS_TEMPLATE, (randomInt(1), randomStr())))
+    result = inject.checkBooleanExpression(
+        "%s" % safeStringFormat(BRUTE_TABLE_EXISTS_TEMPLATE, (randomInt(1), randomStr())))
 
     if result:
         errMsg = "can't use table existence check because of detected invalid results "
@@ -127,16 +132,19 @@ def tableExists(tableFile, regex=None):
                     kb.locks.count.release()
                     break
 
-                if conf.db and METADB_SUFFIX not in conf.db and Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD):
+                if conf.db and METADB_SUFFIX not in conf.db and Backend.getIdentifiedDbms() not in (
+                DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD):
                     fullTableName = "%s.%s" % (conf.db, table)
                 else:
                     fullTableName = table
 
                 if Backend.isDbms(DBMS.MCKOI):
                     _ = randomInt(1)
-                    result = inject.checkBooleanExpression("%s" % safeStringFormat("%d=(SELECT %d FROM %s)", (_, _, fullTableName)))
+                    result = inject.checkBooleanExpression(
+                        "%s" % safeStringFormat("%d=(SELECT %d FROM %s)", (_, _, fullTableName)))
                 else:
-                    result = inject.checkBooleanExpression("%s" % safeStringFormat(BRUTE_TABLE_EXISTS_TEMPLATE, (randomInt(1), fullTableName)))
+                    result = inject.checkBooleanExpression(
+                        "%s" % safeStringFormat(BRUTE_TABLE_EXISTS_TEMPLATE, (randomInt(1), fullTableName)))
 
                 kb.locks.io.acquire()
 
@@ -146,11 +154,13 @@ def tableExists(tableFile, regex=None):
 
                     if conf.verbose in (1, 2) and not conf.api:
                         clearConsoleLine(True)
-                        infoMsg = "[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), unsafeSQLIdentificatorNaming(table))
+                        infoMsg = "[%s] [INFO] retrieved: %s\n" % (
+                        time.strftime("%X"), unsafeSQLIdentificatorNaming(table))
                         dataToStdout(infoMsg, True)
 
                 if conf.verbose in (1, 2):
-                    status = '%d/%d items (%d%%)' % (threadData.shared.count, threadData.shared.limit, round(100.0 * threadData.shared.count / threadData.shared.limit))
+                    status = '%d/%d items (%d%%)' % (threadData.shared.count, threadData.shared.limit,
+                                                     round(100.0 * threadData.shared.count / threadData.shared.limit))
                     dataToStdout("\r[%s] [INFO] tried %s" % (time.strftime("%X"), status), True)
 
                 kb.locks.io.release()
@@ -186,9 +196,12 @@ def tableExists(tableFile, regex=None):
 
     return kb.data.cachedTables
 
+
 def columnExists(columnFile, regex=None):
-    if kb.choices.columnExists is None and not any(_ for _ in kb.injection.data if _ not in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED)) and not conf.direct:
-        warnMsg = "it's not recommended to use '%s' and/or '%s' " % (PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.TIME], PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.STACKED])
+    if kb.choices.columnExists is None and not any(_ for _ in kb.injection.data if _ not in (
+    PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED)) and not conf.direct:
+        warnMsg = "it's not recommended to use '%s' and/or '%s' " % (
+        PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.TIME], PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.STACKED])
         warnMsg += "for common column existence check"
         logger.warning(warnMsg)
 
@@ -231,7 +244,8 @@ def columnExists(columnFile, regex=None):
 
     table = safeSQLIdentificatorNaming(conf.tbl, True)
 
-    if conf.db and METADB_SUFFIX not in conf.db and Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD):
+    if conf.db and METADB_SUFFIX not in conf.db and Backend.getIdentifiedDbms() not in (
+    DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD):
         table = "%s.%s" % (safeSQLIdentificatorNaming(conf.db), table)
 
     kb.threadContinue = True
@@ -256,7 +270,8 @@ def columnExists(columnFile, regex=None):
                 break
 
             if Backend.isDbms(DBMS.MCKOI):
-                result = inject.checkBooleanExpression(safeStringFormat("0<(SELECT COUNT(%s) FROM %s)", (column, table)))
+                result = inject.checkBooleanExpression(
+                    safeStringFormat("0<(SELECT COUNT(%s) FROM %s)", (column, table)))
             else:
                 result = inject.checkBooleanExpression(safeStringFormat(BRUTE_COLUMN_EXISTS_TEMPLATE, (column, table)))
 
@@ -267,11 +282,13 @@ def columnExists(columnFile, regex=None):
 
                 if conf.verbose in (1, 2) and not conf.api:
                     clearConsoleLine(True)
-                    infoMsg = "[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), unsafeSQLIdentificatorNaming(column))
+                    infoMsg = "[%s] [INFO] retrieved: %s\n" % (
+                    time.strftime("%X"), unsafeSQLIdentificatorNaming(column))
                     dataToStdout(infoMsg, True)
 
             if conf.verbose in (1, 2):
-                status = "%d/%d items (%d%%)" % (threadData.shared.count, threadData.shared.limit, round(100.0 * threadData.shared.count / threadData.shared.limit))
+                status = "%d/%d items (%d%%)" % (threadData.shared.count, threadData.shared.limit,
+                                                 round(100.0 * threadData.shared.count / threadData.shared.limit))
                 dataToStdout("\r[%s] [INFO] tried %s" % (time.strftime("%X"), status), True)
 
             kb.locks.io.release()
@@ -296,13 +313,20 @@ def columnExists(columnFile, regex=None):
 
         for column in threadData.shared.files:
             if Backend.getIdentifiedDbms() in (DBMS.MYSQL,):
-                result = not inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE %s REGEXP '[^0-9]')", (column, table, column)))
+                result = not inject.checkBooleanExpression(
+                    "%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE %s REGEXP '[^0-9]')",
+                                            (column, table, column)))
             elif Backend.getIdentifiedDbms() in (DBMS.SQLITE,):
-                result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE %s NOT GLOB '*[^0-9]*')", (column, table, column)))
+                result = inject.checkBooleanExpression(
+                    "%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE %s NOT GLOB '*[^0-9]*')",
+                                            (column, table, column)))
             elif Backend.getIdentifiedDbms() in (DBMS.MCKOI,):
-                result = inject.checkBooleanExpression("%s" % safeStringFormat("0=(SELECT MAX(%s)-MAX(%s) FROM %s)", (column, column, table)))
+                result = inject.checkBooleanExpression(
+                    "%s" % safeStringFormat("0=(SELECT MAX(%s)-MAX(%s) FROM %s)", (column, column, table)))
             else:
-                result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE ROUND(%s)=ROUND(%s))", (column, table, column, column)))
+                result = inject.checkBooleanExpression(
+                    "%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE ROUND(%s)=ROUND(%s))",
+                                            (column, table, column, column)))
 
             if result:
                 columns[column] = "numeric"
@@ -318,6 +342,7 @@ def columnExists(columnFile, regex=None):
         hashDBWrite(HASHDB_KEYS.KB_BRUTE_COLUMNS, kb.brute.columns, True)
 
     return kb.data.cachedColumns
+
 
 @stackedmethod
 def fileExists(pathFile):
@@ -381,7 +406,8 @@ def fileExists(pathFile):
                     dataToStdout(infoMsg, True)
 
             if conf.verbose in (1, 2):
-                status = '%d/%d items (%d%%)' % (threadData.shared.count, threadData.shared.limit, round(100.0 * threadData.shared.count / threadData.shared.limit))
+                status = '%d/%d items (%d%%)' % (threadData.shared.count, threadData.shared.limit,
+                                                 round(100.0 * threadData.shared.count / threadData.shared.limit))
                 dataToStdout("\r[%s] [INFO] tried %s" % (time.strftime("%X"), status), True)
 
             kb.locks.io.release()

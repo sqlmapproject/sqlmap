@@ -8,6 +8,7 @@ See the file 'LICENSE' for copying permission
 from lib.core.exception import SqlmapConnectionException
 from thirdparty.six.moves import urllib as _urllib
 
+
 class HTTPRangeHandler(_urllib.request.BaseHandler):
     """
     Handler that enables HTTP Range headers.

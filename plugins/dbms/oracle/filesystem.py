@@ -19,6 +19,7 @@ from lib.request import inject
 from lib.request.connect import Connect as Request
 from plugins.generic.filesystem import Filesystem as GenericFilesystem
 
+
 class Filesystem(GenericFilesystem):
     def readFile(self, remoteFile):
         localFilePaths = []
@@ -37,7 +38,8 @@ class Filesystem(GenericFilesystem):
                 logger.info(infoMsg)
 
             kb.fileReadMode = True
-            fileContent = inject.getValue("SELECT RAWTOHEX(OSREADFILE('%s')) FROM DUAL" % remoteFile, charsetType=CHARSET_TYPE.HEXADECIMAL)
+            fileContent = inject.getValue("SELECT RAWTOHEX(OSREADFILE('%s')) FROM DUAL" % remoteFile,
+                                          charsetType=CHARSET_TYPE.HEXADECIMAL)
             kb.fileReadMode = False
 
             if not isNoneValue(fileContent):

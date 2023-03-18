@@ -41,6 +41,7 @@ from thirdparty.beautifulsoup.beautifulsoup import BeautifulSoup
 from thirdparty.six.moves import http_client as _http_client
 from thirdparty.six.moves import urllib as _urllib
 
+
 def crawl(target, post=None, cookie=None):
     if not target:
         return
@@ -104,7 +105,8 @@ def crawl(target, post=None, cookie=None):
                             href = tag.get("href") if hasattr(tag, "get") else tag.group("href")
 
                             if href:
-                                if threadData.lastRedirectURL and threadData.lastRedirectURL[0] == threadData.lastRequestUID:
+                                if threadData.lastRedirectURL and threadData.lastRedirectURL[
+                                    0] == threadData.lastRequestUID:
                                     current = threadData.lastRedirectURL[1]
                                 url = _urllib.parse.urljoin(current, htmlUnescape(href))
 
@@ -117,16 +119,19 @@ def crawl(target, post=None, cookie=None):
                                 elif not _:
                                     continue
 
-                                if (extractRegexResult(r"\A[^?]+\.(?P<result>\w+)(\?|\Z)", url) or "").lower() not in CRAWL_EXCLUDE_EXTENSIONS:
+                                if (extractRegexResult(r"\A[^?]+\.(?P<result>\w+)(\?|\Z)",
+                                                       url) or "").lower() not in CRAWL_EXCLUDE_EXTENSIONS:
                                     with kb.locks.value:
                                         threadData.shared.deeper.add(url)
-                                        if re.search(r"(.*?)\?(.+)", url) and not re.search(r"\?(v=)?\d+\Z", url) and not re.search(r"(?i)\.(js|css)(\?|\Z)", url):
+                                        if re.search(r"(.*?)\?(.+)", url) and not re.search(r"\?(v=)?\d+\Z",
+                                                                                            url) and not re.search(
+                                                r"(?i)\.(js|css)(\?|\Z)", url):
                                             threadData.shared.value.add(url)
                     except UnicodeEncodeError:  # for non-HTML files
                         pass
-                    except ValueError:          # for non-valid links
+                    except ValueError:  # for non-valid links
                         pass
-                    except AssertionError:      # for invalid HTML
+                    except AssertionError:  # for invalid HTML
                         pass
                     finally:
                         if conf.forms:
@@ -134,7 +139,8 @@ def crawl(target, post=None, cookie=None):
 
                 if conf.verbose in (1, 2):
                     threadData.shared.count += 1
-                    status = '%d/%d links visited (%d%%)' % (threadData.shared.count, threadData.shared.length, round(100.0 * threadData.shared.count / threadData.shared.length))
+                    status = '%d/%d links visited (%d%%)' % (threadData.shared.count, threadData.shared.length, round(
+                        100.0 * threadData.shared.count / threadData.shared.length))
                     dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status), True)
 
         threadData.shared.deeper = set()
@@ -236,6 +242,7 @@ def crawl(target, post=None, cookie=None):
                 kb.targets = results
 
             storeResultsToFile(kb.targets)
+
 
 def storeResultsToFile(results):
     if not results:

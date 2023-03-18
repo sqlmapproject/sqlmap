@@ -31,6 +31,7 @@ from lib.takeover.xp_cmdshell import XP_cmdshell
 from lib.utils.safe2bin import safechardecode
 from thirdparty.six.moves import input as _input
 
+
 class Abstraction(Web, UDF, XP_cmdshell):
     """
     This class defines an abstraction layer for OS takeover functionalities

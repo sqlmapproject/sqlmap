@@ -16,6 +16,7 @@ from plugins.dbms.monetdb.syntax import Syntax
 from plugins.dbms.monetdb.takeover import Takeover
 from plugins.generic.misc import Miscellaneous
 
+
 class MonetDBMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
     This class defines MonetDB methods

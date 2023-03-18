@@ -15,6 +15,7 @@ from plugins.dbms.frontbase.syntax import Syntax
 from plugins.dbms.frontbase.takeover import Takeover
 from plugins.generic.misc import Miscellaneous
 
+
 class FrontBaseMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
     This class defines FrontBase methods

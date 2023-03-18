@@ -18,6 +18,7 @@ _cache = {}
 _cache_lock = threading.Lock()
 _method_locks = {}
 
+
 def cachedmethod(f):
     """
     Method with a cached content
@@ -42,7 +43,8 @@ def cachedmethod(f):
     @functools.wraps(f)
     def _f(*args, **kwargs):
         try:
-            key = int(hashlib.md5("|".join(str(_) for _ in (f, args, kwargs)).encode(UNICODE_ENCODING)).hexdigest(), 16) & 0x7fffffffffffffff
+            key = int(hashlib.md5("|".join(str(_) for _ in (f, args, kwargs)).encode(UNICODE_ENCODING)).hexdigest(),
+                      16) & 0x7fffffffffffffff
         except ValueError:  # https://github.com/sqlmapproject/sqlmap/issues/4281 (NOTE: non-standard Python behavior where hexdigest returns binary value)
             result = f(*args, **kwargs)
         else:
@@ -58,6 +60,7 @@ def cachedmethod(f):
         return result
 
     return _f
+
 
 def stackedmethod(f):
     """
@@ -85,6 +88,7 @@ def stackedmethod(f):
         return result
 
     return _
+
 
 def lockedmethod(f):
     @functools.wraps(f)

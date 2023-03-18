@@ -49,6 +49,7 @@ from lib.utils.hash import storeHashesToFile
 from lib.utils.pivotdumptable import pivotDumpTable
 from thirdparty.six.moves import zip as _zip
 
+
 class Users(object):
     """
     This class defines users' enumeration functionalities for plugins.
@@ -105,7 +106,8 @@ class Users(object):
         condition = (Backend.isDbms(DBMS.MSSQL) and Backend.isVersionWithin(("2005", "2008")))
         condition |= (Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema)
 
-        if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
+        if any(isTechniqueAvailable(_) for _ in
+               (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
             if Backend.isDbms(DBMS.MYSQL) and Backend.isFork(FORK.DRIZZLE):
                 query = rootQuery.inband.query3
             elif condition:
@@ -133,7 +135,8 @@ class Users(object):
             else:
                 query = rootQuery.blind.count
 
-            count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+            count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT,
+                                    charsetType=CHARSET_TYPE.DIGITS)
 
             if count == 0:
                 return kb.data.cachedUsers
@@ -193,7 +196,8 @@ class Users(object):
 
         users = [_ for _ in users if _]
 
-        if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
+        if any(isTechniqueAvailable(_) for _ in
+               (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
             if Backend.isDbms(DBMS.MSSQL) and Backend.isVersionWithin(("2005", "2008")):
                 query = rootQuery.inband.query2
             else:
@@ -208,10 +212,12 @@ class Users(object):
             if Backend.isDbms(DBMS.SYBASE):
                 getCurrentThreadData().disableStdOut = True
 
-                retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.name' % kb.aliasName, '%s.password' % kb.aliasName], blind=False)
+                retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName),
+                                        ['%s.name' % kb.aliasName, '%s.password' % kb.aliasName], blind=False)
 
                 if retVal:
-                    for user, password in filterPairValues(_zip(retVal[0]["%s.name" % kb.aliasName], retVal[0]["%s.password" % kb.aliasName])):
+                    for user, password in filterPairValues(
+                            _zip(retVal[0]["%s.name" % kb.aliasName], retVal[0]["%s.password" % kb.aliasName])):
                         if user not in kb.data.cachedUsersPasswords:
                             kb.data.cachedUsersPasswords[user] = [password]
                         else:
@@ -222,9 +228,12 @@ class Users(object):
                 values = inject.getValue(query, blind=False, time=False)
 
                 if Backend.isDbms(DBMS.MSSQL) and isNoneValue(values):
-                    values = inject.getValue(query.replace("master.dbo.fn_varbintohexstr", "sys.fn_sqlvarbasetostr"), blind=False, time=False)
-                elif Backend.isDbms(DBMS.MYSQL) and (isNoneValue(values) or all(len(value) == 2 and (isNullValue(value[1]) or isNoneValue(value[1])) for value in values)):
-                    values = inject.getValue(query.replace("authentication_string", "password"), blind=False, time=False)
+                    values = inject.getValue(query.replace("master.dbo.fn_varbintohexstr", "sys.fn_sqlvarbasetostr"),
+                                             blind=False, time=False)
+                elif Backend.isDbms(DBMS.MYSQL) and (isNoneValue(values) or all(
+                        len(value) == 2 and (isNullValue(value[1]) or isNoneValue(value[1])) for value in values)):
+                    values = inject.getValue(query.replace("authentication_string", "password"), blind=False,
+                                             time=False)
 
                 for user, password in filterPairValues(values):
                     if not user or user == " ":
@@ -255,10 +264,12 @@ class Users(object):
 
                 query = rootQuery.inband.query
 
-                retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.name' % kb.aliasName, '%s.password' % kb.aliasName], blind=True)
+                retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName),
+                                        ['%s.name' % kb.aliasName, '%s.password' % kb.aliasName], blind=True)
 
                 if retVal:
-                    for user, password in filterPairValues(_zip(retVal[0]["%s.name" % kb.aliasName], retVal[0]["%s.password" % kb.aliasName])):
+                    for user, password in filterPairValues(
+                            _zip(retVal[0]["%s.name" % kb.aliasName], retVal[0]["%s.password" % kb.aliasName])):
                         password = "0x%s" % encodeHex(password, binary=False).upper()
 
                         if user not in kb.data.cachedUsersPasswords:
@@ -288,15 +299,20 @@ class Users(object):
                         else:
                             query = rootQuery.blind.count % user
 
-                        count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                        count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT,
+                                                charsetType=CHARSET_TYPE.DIGITS)
 
                         if not isNumPosStrValue(count):
                             if Backend.isDbms(DBMS.MSSQL):
                                 fallback = True
-                                count = inject.getValue(query.replace("master.dbo.fn_varbintohexstr", "sys.fn_sqlvarbasetostr"), union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                                count = inject.getValue(
+                                    query.replace("master.dbo.fn_varbintohexstr", "sys.fn_sqlvarbasetostr"),
+                                    union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
                             elif Backend.isDbms(DBMS.MYSQL):
                                 fallback = True
-                                count = inject.getValue(query.replace("authentication_string", "password"), union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                                count = inject.getValue(query.replace("authentication_string", "password"), union=False,
+                                                        error=False, expected=EXPECTED.INT,
+                                                        charsetType=CHARSET_TYPE.DIGITS)
 
                         if not isNumPosStrValue(count):
                             warnMsg = "unable to retrieve the number of password "
@@ -403,7 +419,8 @@ class Users(object):
         # Set containing the list of DBMS administrators
         areAdmins = set()
 
-        if not kb.data.cachedUsersPrivileges and any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
+        if not kb.data.cachedUsersPrivileges and any(isTechniqueAvailable(_) for _ in (
+        PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
             if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
                 query = rootQuery.inband.query2
                 condition = rootQuery.inband.condition2
@@ -455,7 +472,9 @@ class Users(object):
 
                             # In MySQL >= 5.0 and Oracle we get the list
                             # of privileges as string
-                            elif Backend.isDbms(DBMS.ORACLE) or (Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema) or Backend.getIdentifiedDbms() in (DBMS.VERTICA, DBMS.MIMERSQL, DBMS.CUBRID):
+                            elif Backend.isDbms(DBMS.ORACLE) or (Backend.isDbms(
+                                    DBMS.MYSQL) and kb.data.has_information_schema) or Backend.getIdentifiedDbms() in (
+                            DBMS.VERTICA, DBMS.MIMERSQL, DBMS.CUBRID):
                                 privileges.add(privilege)
 
                             # In MySQL < 5.0 we get Y if the privilege is
@@ -490,7 +509,8 @@ class Users(object):
                                 privileges.add(privilege)
 
                     if user in kb.data.cachedUsersPrivileges:
-                        kb.data.cachedUsersPrivileges[user] = list(privileges.union(kb.data.cachedUsersPrivileges[user]))
+                        kb.data.cachedUsersPrivileges[user] = list(
+                            privileges.union(kb.data.cachedUsersPrivileges[user]))
                     else:
                         kb.data.cachedUsersPrivileges[user] = list(privileges)
 
@@ -536,7 +556,8 @@ class Users(object):
                     else:
                         query = rootQuery.blind.count % user
 
-                    count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                    count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT,
+                                            charsetType=CHARSET_TYPE.DIGITS)
 
                     if not isNumPosStrValue(count):
                         if not retrievedUsers and Backend.isDbms(DBMS.ORACLE) and not query2:
@@ -592,7 +613,9 @@ class Users(object):
 
                     # In MySQL >= 5.0 and Oracle we get the list
                     # of privileges as string
-                    elif Backend.isDbms(DBMS.ORACLE) or (Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema) or Backend.getIdentifiedDbms() in (DBMS.VERTICA, DBMS.MIMERSQL, DBMS.CUBRID):
+                    elif Backend.isDbms(DBMS.ORACLE) or (Backend.isDbms(
+                            DBMS.MYSQL) and kb.data.has_information_schema) or Backend.getIdentifiedDbms() in (
+                    DBMS.VERTICA, DBMS.MIMERSQL, DBMS.CUBRID):
                         privileges.add(privilege)
 
                     # In MySQL < 5.0 we get Y if the privilege is

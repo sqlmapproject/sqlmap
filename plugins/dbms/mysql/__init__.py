@@ -15,6 +15,7 @@ from plugins.dbms.mysql.syntax import Syntax
 from plugins.dbms.mysql.takeover import Takeover
 from plugins.generic.misc import Miscellaneous
 
+
 class MySQLMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
     This class defines MySQL methods

@@ -28,6 +28,7 @@
 from .charsetprober import CharSetProber
 from .enums import ProbingState
 
+
 # This prober doesn't actually recognize a language or a charset.
 # It is a helper prober for the use of the Hebrew model probers
 
@@ -287,6 +288,6 @@ class HebrewProber(CharSetProber):
     def state(self):
         # Remain active as long as any of the model probers are active.
         if (self._logical_prober.state == ProbingState.NOT_ME) and \
-           (self._visual_prober.state == ProbingState.NOT_ME):
+                (self._visual_prober.state == ProbingState.NOT_ME):
             return ProbingState.NOT_ME
         return ProbingState.DETECTING

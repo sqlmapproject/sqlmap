@@ -15,6 +15,7 @@ from plugins.dbms.h2.syntax import Syntax
 from plugins.dbms.h2.takeover import Takeover
 from plugins.generic.misc import Miscellaneous
 
+
 class H2Map(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
     This class defines H2 methods

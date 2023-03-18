@@ -5,11 +5,13 @@ Copyright (c) 2006-2023 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
+
 class _Getch(object):
     """
     Gets a single character from standard input.  Does not echo to
     the screen (reference: http://code.activestate.com/recipes/134892/)
     """
+
     def __init__(self):
         try:
             self.impl = _GetchWindows()
@@ -21,6 +23,7 @@ class _Getch(object):
 
     def __call__(self):
         return self.impl()
+
 
 class _GetchUnix(object):
     def __init__(self):
@@ -40,6 +43,7 @@ class _GetchUnix(object):
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         return ch
 
+
 class _GetchWindows(object):
     def __init__(self):
         __import__("msvcrt")
@@ -48,6 +52,7 @@ class _GetchWindows(object):
         import msvcrt
         return msvcrt.getch()
 
+
 class _GetchMacCarbon(object):
     """
     A function which returns the current ASCII key that is down;
@@ -55,6 +60,7 @@ class _GetchMacCarbon(object):
     page http://www.mactech.com/macintosh-c/chap02-1.html was
     very helpful in figuring out how to do this.
     """
+
     def __init__(self):
         import Carbon
 
@@ -77,5 +83,6 @@ class _GetchMacCarbon(object):
             #
             (what, msg, when, where, mod) = Carbon.Evt.GetNextEvent(0x0008)[1]
             return chr(msg & 0x000000FF)
+
 
 getch = _Getch()

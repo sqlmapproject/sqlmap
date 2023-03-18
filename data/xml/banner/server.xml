@@ -604,7 +604,7 @@
         <info type="Linux" distrib="Red Hat" release="7.3" codename="Valhalla"/>
     </regexp>
 
- 	<regexp value="Apache/1\.3\.27 \(Unix\)  \(Red-Hat/Linux\)">
+    <regexp value="Apache/1\.3\.27 \(Unix\)  \(Red-Hat/Linux\)">
         <info type="Linux" distrib="Red Hat" release="7.1|7.2|7.3" codename="Seawolf|Enigma|Valhalla" updated="True"/>
     </regexp>
 
@@ -834,7 +834,8 @@
     </regexp>
 
     <regexp value="Apache/2\.2\.22 \(Ubuntu\)">
-        <info type="Linux" distrib="Ubuntu" release="12.04|12.10|13.04" codename="Precise Pangolin|Quantal Quetzal|Raring Ringtail"/>
+        <info type="Linux" distrib="Ubuntu" release="12.04|12.10|13.04"
+              codename="Precise Pangolin|Quantal Quetzal|Raring Ringtail"/>
     </regexp>
 
     <regexp value="Apache/2\.4\.6 \(Ubuntu\)">

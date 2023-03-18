@@ -8,6 +8,7 @@ See the file 'LICENSE' for copying permission
 from lib.core.data import logger
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
+
 class Enumeration(GenericEnumeration):
     def getBanner(self):
         warnMsg = "on Mckoi it is not possible to get the banner"

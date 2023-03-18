@@ -29,6 +29,7 @@ from lib.core.settings import UNICODE_ENCODING
 from lib.utils.safe2bin import safecharencode
 from lib.utils.timeout import timeout
 
+
 def direct(query, content=True):
     select = True
     query = agent.payloadDirect(query)

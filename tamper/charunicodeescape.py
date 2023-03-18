@@ -11,6 +11,7 @@ from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.NORMAL
 
+
 def tamper(payload, **kwargs):
     """
     Unicode-escapes non-encoded characters in a given payload (not processing already encoded) (e.g. SELECT -> \u0053\u0045\u004C\u0045\u0043\u0054)
@@ -29,7 +30,8 @@ def tamper(payload, **kwargs):
         i = 0
 
         while i < len(payload):
-            if payload[i] == '%' and (i < len(payload) - 2) and payload[i + 1:i + 2] in string.hexdigits and payload[i + 2:i + 3] in string.hexdigits:
+            if payload[i] == '%' and (i < len(payload) - 2) and payload[i + 1:i + 2] in string.hexdigits and payload[
+                                                                                                             i + 2:i + 3] in string.hexdigits:
                 retVal += "\\u00%s" % payload[i + 1:i + 3]
                 i += 3
             else:

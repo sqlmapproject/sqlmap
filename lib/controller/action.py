@@ -20,6 +20,7 @@ from lib.utils.brute import columnExists
 from lib.utils.brute import fileExists
 from lib.utils.brute import tableExists
 
+
 def action():
     """
     This function exploit the SQL injection on the affected
@@ -80,7 +81,8 @@ def action():
 
     if conf.getPasswordHashes:
         try:
-            conf.dumper.userSettings("database management system users password hashes", conf.dbmsHandler.getPasswordHashes(), "password hash", CONTENT_TYPE.PASSWORDS)
+            conf.dumper.userSettings("database management system users password hashes",
+                                     conf.dbmsHandler.getPasswordHashes(), "password hash", CONTENT_TYPE.PASSWORDS)
         except SqlmapNoneDataException as ex:
             logger.critical(ex)
         except:
@@ -88,7 +90,8 @@ def action():
 
     if conf.getPrivileges:
         try:
-            conf.dumper.userSettings("database management system users privileges", conf.dbmsHandler.getPrivileges(), "privilege", CONTENT_TYPE.PRIVILEGES)
+            conf.dumper.userSettings("database management system users privileges", conf.dbmsHandler.getPrivileges(),
+                                     "privilege", CONTENT_TYPE.PRIVILEGES)
         except SqlmapNoneDataException as ex:
             logger.critical(ex)
         except:
@@ -96,7 +99,8 @@ def action():
 
     if conf.getRoles:
         try:
-            conf.dumper.userSettings("database management system users roles", conf.dbmsHandler.getRoles(), "role", CONTENT_TYPE.ROLES)
+            conf.dumper.userSettings("database management system users roles", conf.dbmsHandler.getRoles(), "role",
+                                     CONTENT_TYPE.ROLES)
         except SqlmapNoneDataException as ex:
             logger.critical(ex)
         except:

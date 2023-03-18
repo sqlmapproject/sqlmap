@@ -31,7 +31,6 @@ from .codingstatemachine import CodingStateMachine
 from .mbcssm import UTF8_SM_MODEL
 
 
-
 class UTF8Prober(CharSetProber):
     ONE_CHAR_PROB = 0.5
 

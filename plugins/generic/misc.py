@@ -27,6 +27,7 @@ from lib.core.enums import OS
 from lib.core.exception import SqlmapNoneDataException
 from lib.request import inject
 
+
 class Miscellaneous(object):
     """
     This class defines miscellaneous functionalities for plugins.

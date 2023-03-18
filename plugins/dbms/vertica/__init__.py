@@ -16,6 +16,7 @@ from plugins.dbms.vertica.syntax import Syntax
 from plugins.dbms.vertica.takeover import Takeover
 from plugins.generic.misc import Miscellaneous
 
+
 class VerticaMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
     This class defines Vertica methods

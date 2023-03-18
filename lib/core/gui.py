@@ -35,6 +35,7 @@ line = ""
 process = None
 queue = None
 
+
 def runGui(parser):
     try:
         from thirdparty.six.moves import tkinter as _tkinter
@@ -83,7 +84,9 @@ def runGui(parser):
 
     # Reference: https://www.holadevs.com/pregunta/64750/change-selected-tab-color-in-ttknotebook
     style = _tkinter_ttk.Style()
-    settings = {"TNotebook.Tab": {"configure": {"padding": [5, 1], "background": "#fdd57e"}, "map": {"background": [("selected", "#C70039"), ("active", "#fc9292")], "foreground": [("selected", "#ffffff"), ("active", "#000000")]}}}
+    settings = {"TNotebook.Tab": {"configure": {"padding": [5, 1], "background": "#fdd57e"},
+                                  "map": {"background": [("selected", "#C70039"), ("active", "#fc9292")],
+                                          "foreground": [("selected", "#ffffff"), ("active", "#000000")]}}}
     style.theme_create("custom", parent="alt", settings=settings)
     style.theme_use("custom")
 
@@ -173,7 +176,10 @@ def runGui(parser):
 
         alive = True
 
-        process = subprocess.Popen([sys.executable or "python", os.path.join(paths.SQLMAP_ROOT_PATH, "sqlmap.py"), "-c", configFile], shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE, bufsize=1, close_fds=not IS_WIN)
+        process = subprocess.Popen(
+            [sys.executable or "python", os.path.join(paths.SQLMAP_ROOT_PATH, "sqlmap.py"), "-c", configFile],
+            shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE, bufsize=1,
+            close_fds=not IS_WIN)
 
         # Reference: https://stackoverflow.com/a/4896288
         queue = _queue.Queue()
@@ -223,7 +229,8 @@ def runGui(parser):
     helpmenu.add_command(label="Wiki pages", command=lambda: webbrowser.open(WIKI_PAGE))
     helpmenu.add_command(label="Report issue", command=lambda: webbrowser.open(ISSUES_PAGE))
     helpmenu.add_separator()
-    helpmenu.add_command(label="About", command=lambda: _tkinter_messagebox.showinfo("About", "Copyright (c) 2006-2023\n\n    (%s)" % DEV_EMAIL_ADDRESS))
+    helpmenu.add_command(label="About", command=lambda: _tkinter_messagebox.showinfo("About",
+                                                                                     "Copyright (c) 2006-2023\n\n    (%s)" % DEV_EMAIL_ADDRESS))
     menubar.add_cascade(label="Help", menu=helpmenu)
 
     window.config(menu=menubar)
@@ -242,12 +249,14 @@ def runGui(parser):
 
         row = 1
         if group.get_description():
-            _tkinter.Label(frame, text="%s:" % group.get_description()).grid(column=0, row=1, columnspan=3, sticky=_tkinter.W)
+            _tkinter.Label(frame, text="%s:" % group.get_description()).grid(column=0, row=1, columnspan=3,
+                                                                             sticky=_tkinter.W)
             _tkinter.Label(frame).grid(column=0, row=2, sticky=_tkinter.W)
             row += 2
 
         for option in group.option_list:
-            _tkinter.Label(frame, text="%s " % parser.formatter._format_option_strings(option)).grid(column=0, row=row, sticky=_tkinter.W)
+            _tkinter.Label(frame, text="%s " % parser.formatter._format_option_strings(option)).grid(column=0, row=row,
+                                                                                                     sticky=_tkinter.W)
 
             if option.type == "string":
                 widget = _tkinter.Entry(frame)

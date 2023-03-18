@@ -15,6 +15,7 @@ from plugins.dbms.maxdb.syntax import Syntax
 from plugins.dbms.maxdb.takeover import Takeover
 from plugins.generic.misc import Miscellaneous
 
+
 class MaxDBMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
     This class defines SAP MaxDB methods

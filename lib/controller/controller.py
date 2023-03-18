@@ -79,6 +79,7 @@ from lib.core.target import initTargetEnv
 from lib.core.target import setupTargetEnv
 from lib.utils.hash import crackHashFile
 
+
 def _selectInjection():
     """
     Selection function for injection place, parameters and type.
@@ -141,6 +142,7 @@ def _selectInjection():
 
         kb.injection = kb.injections[index]
 
+
 def _formatInjection(inj):
     paramType = conf.method if conf.method not in (None, HTTPMETHOD.GET, HTTPMETHOD.POST) else inj.place
     data = "Parameter: %s (%s)\n" % (inj.parameter, paramType)
@@ -162,10 +164,12 @@ def _formatInjection(inj):
             vector = "%s%s" % (vector, comment)
         data += "    Type: %s\n" % PAYLOAD.SQLINJECTION[stype]
         data += "    Title: %s\n" % title
-        data += "    Payload: %s\n" % urldecode(payload, unsafe="&", spaceplus=(inj.place != PLACE.GET and kb.postSpaceToPlus))
+        data += "    Payload: %s\n" % urldecode(payload, unsafe="&",
+                                                spaceplus=(inj.place != PLACE.GET and kb.postSpaceToPlus))
         data += "    Vector: %s\n\n" % vector if conf.verbose > 1 else "\n"
 
     return data
+
 
 def _showInjections():
     if conf.wizard and kb.wizardMode:
@@ -178,7 +182,8 @@ def _showInjections():
         header = "sqlmap resumed the following injection point(s) from stored session"
 
     if conf.api:
-        conf.dumper.string("", {"url": conf.url, "query": conf.parameters.get(PLACE.GET), "data": conf.parameters.get(PLACE.POST)}, content_type=CONTENT_TYPE.TARGET)
+        conf.dumper.string("", {"url": conf.url, "query": conf.parameters.get(PLACE.GET),
+                                "data": conf.parameters.get(PLACE.POST)}, content_type=CONTENT_TYPE.TARGET)
         conf.dumper.string("", kb.injections, content_type=CONTENT_TYPE.TECHNIQUES)
     else:
         data = "".join(set(_formatInjection(_) for _ in kb.injections)).rstrip("\n")
@@ -193,6 +198,7 @@ def _showInjections():
         warnMsg = "changes made by HTTP parameter pollution are not "
         warnMsg += "included in shown payload content(s)"
         logger.warning(warnMsg)
+
 
 def _randomFillBlankFields(value):
     retVal = value
@@ -211,6 +217,7 @@ def _randomFillBlankFields(value):
                         retVal = retVal.replace(item, "%s%s" % (item, newValue))
 
     return retVal
+
 
 def _saveToHashDB():
     injections = hashDBRetrieve(HASHDB_KEYS.KB_INJECTIONS, True)
@@ -236,6 +243,7 @@ def _saveToHashDB():
     if not hashDBRetrieve(HASHDB_KEYS.KB_DYNAMIC_MARKINGS):
         hashDBWrite(HASHDB_KEYS.KB_DYNAMIC_MARKINGS, kb.dynamicMarkings, True)
 
+
 def _saveToResultsFile():
     if not conf.resultsFP:
         return
@@ -256,13 +264,15 @@ def _saveToResultsFile():
     try:
         for key, value in results.items():
             place, parameter, notes = key
-            line = "%s,%s,%s,%s,%s%s" % (safeCSValue(kb.originalUrls.get(conf.url) or conf.url), place, parameter, "".join(techniques[_][0].upper() for _ in sorted(value)), notes, os.linesep)
+            line = "%s,%s,%s,%s,%s%s" % (safeCSValue(kb.originalUrls.get(conf.url) or conf.url), place, parameter,
+                                         "".join(techniques[_][0].upper() for _ in sorted(value)), notes, os.linesep)
             conf.resultsFP.write(line)
 
         conf.resultsFP.flush()
     except IOError as ex:
         errMsg = "unable to write to the results file '%s' ('%s'). " % (conf.resultsFile, getSafeExString(ex))
         raise SqlmapSystemException(errMsg)
+
 
 @stackedmethod
 def start():
@@ -339,9 +349,13 @@ def start():
 
             if conf.data:
                 # Note: explicitly URL encode __ ASP(.NET) parameters (e.g. to avoid problems with Base64 encoded '+' character) - standard procedure in web browsers
-                conf.data = re.sub(r"\b(__\w+)=([^&]+)", lambda match: "%s=%s" % (match.group(1), urlencode(match.group(2), safe='%')), conf.data)
+                conf.data = re.sub(r"\b(__\w+)=([^&]+)",
+                                   lambda match: "%s=%s" % (match.group(1), urlencode(match.group(2), safe='%')),
+                                   conf.data)
 
-            conf.httpHeaders = [conf.httpHeaders[i] for i in xrange(len(conf.httpHeaders)) if conf.httpHeaders[i][0].upper() not in (__[0].upper() for __ in conf.httpHeaders[i + 1:])]
+            conf.httpHeaders = [conf.httpHeaders[i] for i in xrange(len(conf.httpHeaders)) if
+                                conf.httpHeaders[i][0].upper() not in (__[0].upper() for __ in
+                                                                       conf.httpHeaders[i + 1:])]
 
             initTargetEnv()
             parseTargetUrl()
@@ -349,7 +363,9 @@ def start():
             testSqlInj = False
 
             if PLACE.GET in conf.parameters and not any((conf.data, conf.testParameter)):
-                for parameter in re.findall(r"([^=]+)=([^%s]+%s?|\Z)" % (re.escape(conf.paramDel or "") or DEFAULT_GET_POST_DELIMITER, re.escape(conf.paramDel or "") or DEFAULT_GET_POST_DELIMITER), conf.parameters[PLACE.GET]):
+                for parameter in re.findall(r"([^=]+)=([^%s]+%s?|\Z)" % (
+                re.escape(conf.paramDel or "") or DEFAULT_GET_POST_DELIMITER,
+                re.escape(conf.paramDel or "") or DEFAULT_GET_POST_DELIMITER), conf.parameters[PLACE.GET]):
                     paramKey = (conf.hostname, conf.path, PLACE.GET, parameter[0])
 
                     if paramKey not in kb.testedParams:
@@ -377,15 +393,19 @@ def start():
 
             if conf.multipleTargets:
                 if conf.forms and conf.method:
-                    message = "[%d/%s] Form:\n%s %s" % (targetCount, len(kb.targets) if isListLike(kb.targets) else '?', conf.method, targetUrl)
+                    message = "[%d/%s] Form:\n%s %s" % (
+                    targetCount, len(kb.targets) if isListLike(kb.targets) else '?', conf.method, targetUrl)
                 else:
-                    message = "[%d/%s] URL:\n%s %s" % (targetCount, len(kb.targets) if isListLike(kb.targets) else '?', HTTPMETHOD.GET, targetUrl)
+                    message = "[%d/%s] URL:\n%s %s" % (
+                    targetCount, len(kb.targets) if isListLike(kb.targets) else '?', HTTPMETHOD.GET, targetUrl)
 
                 if conf.cookie:
                     message += "\nCookie: %s" % conf.cookie
 
                 if conf.data is not None:
-                    message += "\n%s data: %s" % ((conf.method if conf.method != HTTPMETHOD.GET else None) or HTTPMETHOD.POST, urlencode(conf.data or "") if re.search(r"\A\s*[<{]", conf.data or "") is None else conf.data)
+                    message += "\n%s data: %s" % (
+                    (conf.method if conf.method != HTTPMETHOD.GET else None) or HTTPMETHOD.POST,
+                    urlencode(conf.data or "") if re.search(r"\A\s*[<{]", conf.data or "") is None else conf.data)
 
                 if conf.forms and conf.method:
                     if conf.method == HTTPMETHOD.GET and targetUrl.find("?") == -1:
@@ -400,10 +420,17 @@ def start():
                         break
                     else:
                         if conf.method != HTTPMETHOD.GET:
-                            message = "Edit %s data [default: %s]%s: " % (conf.method, urlencode(conf.data or "") if re.search(r"\A\s*[<{]", conf.data or "None") is None else conf.data, " (Warning: blank fields detected)" if conf.data and extractRegexResult(EMPTY_FORM_FIELDS_REGEX, conf.data) else "")
+                            message = "Edit %s data [default: %s]%s: " % (conf.method,
+                                                                          urlencode(conf.data or "") if re.search(
+                                                                              r"\A\s*[<{]",
+                                                                              conf.data or "None") is None else conf.data,
+                                                                          " (Warning: blank fields detected)" if conf.data and extractRegexResult(
+                                                                              EMPTY_FORM_FIELDS_REGEX,
+                                                                              conf.data) else "")
                             conf.data = readInput(message, default=conf.data)
                             conf.data = _randomFillBlankFields(conf.data)
-                            conf.data = urldecode(conf.data) if conf.data and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in conf.data else conf.data
+                            conf.data = urldecode(conf.data) if conf.data and urlencode(DEFAULT_GET_POST_DELIMITER,
+                                                                                        None) not in conf.data else conf.data
 
                         else:
                             if '?' in targetUrl:
@@ -439,7 +466,8 @@ def start():
             if conf.rParam and kb.originalPage:
                 kb.randomPool = dict([_ for _ in kb.randomPool.items() if isinstance(_[1], list)])
 
-                for match in re.finditer(r"(?si)<select[^>]+\bname\s*=\s*[\"']([^\"']+)(.+?)</select>", kb.originalPage):
+                for match in re.finditer(r"(?si)<select[^>]+\bname\s*=\s*[\"']([^\"']+)(.+?)</select>",
+                                         kb.originalPage):
                     name, _ = match.groups()
                     options = tuple(re.findall(r"<option[^>]+\bvalue\s*=\s*[\"']([^\"']+)", _))
                     if options:
@@ -450,7 +478,8 @@ def start():
             if conf.nullConnection:
                 checkNullConnection()
 
-            if (len(kb.injections) == 0 or (len(kb.injections) == 1 and kb.injections[0].place is None)) and (kb.injection.place is None or kb.injection.parameter is None):
+            if (len(kb.injections) == 0 or (len(kb.injections) == 1 and kb.injections[0].place is None)) and (
+                    kb.injection.place is None or kb.injection.parameter is None):
                 if not any((conf.string, conf.notString, conf.regexp)) and PAYLOAD.TECHNIQUE.BOOLEAN in conf.technique:
                     # NOTE: this is not needed anymore, leaving only to display
                     # a warning message to the user in case the page is not stable
@@ -484,7 +513,8 @@ def start():
                     # Test Cookie header only if --level >= 2
                     skip |= (place == PLACE.COOKIE and (kb.testOnlyCustom or conf.level < 2))
 
-                    skip |= (place == PLACE.USER_AGENT and intersect(USER_AGENT_ALIASES, conf.skip, True) not in ([], None))
+                    skip |= (place == PLACE.USER_AGENT and intersect(USER_AGENT_ALIASES, conf.skip, True) not in (
+                    [], None))
                     skip |= (place == PLACE.REFERER and intersect(REFERER_ALIASES, conf.skip, True) not in ([], None))
                     skip |= (place == PLACE.COOKIE and intersect(PLACE.COOKIE, conf.skip, True) not in ([], None))
                     skip |= (place == PLACE.HOST and intersect(PLACE.HOST, conf.skip, True) not in ([], None))
@@ -515,7 +545,8 @@ def start():
                         if paramKey in kb.testedParams:
                             testSqlInj = False
 
-                            infoMsg = "skipping previously processed %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
+                            infoMsg = "skipping previously processed %sparameter '%s'" % (
+                            "%s " % paramType if paramType != parameter else "", parameter)
                             logger.info(infoMsg)
 
                         elif any(_ in conf.testParameter for _ in (parameter, removePostHintPrefix(parameter))):
@@ -524,19 +555,24 @@ def start():
                         elif parameter in conf.rParam:
                             testSqlInj = False
 
-                            infoMsg = "skipping randomizing %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
+                            infoMsg = "skipping randomizing %sparameter '%s'" % (
+                            "%s " % paramType if paramType != parameter else "", parameter)
                             logger.info(infoMsg)
 
                         elif parameter in conf.skip or kb.postHint and parameter.split(' ')[-1] in conf.skip:
                             testSqlInj = False
 
-                            infoMsg = "skipping %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
+                            infoMsg = "skipping %sparameter '%s'" % (
+                            "%s " % paramType if paramType != parameter else "", parameter)
                             logger.info(infoMsg)
 
-                        elif conf.paramExclude and (re.search(conf.paramExclude, parameter, re.I) or kb.postHint and re.search(conf.paramExclude, parameter.split(' ')[-1], re.I)):
+                        elif conf.paramExclude and (
+                                re.search(conf.paramExclude, parameter, re.I) or kb.postHint and re.search(
+                                conf.paramExclude, parameter.split(' ')[-1], re.I)):
                             testSqlInj = False
 
-                            infoMsg = "skipping %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
+                            infoMsg = "skipping %sparameter '%s'" % (
+                            "%s " % paramType if paramType != parameter else "", parameter)
                             logger.info(infoMsg)
 
                         elif conf.csrfToken and re.search(conf.csrfToken, parameter, re.I):
@@ -546,26 +582,33 @@ def start():
                             logger.info(infoMsg)
 
                         # Ignore session-like parameters for --level < 4
-                        elif conf.level < 4 and (parameter.upper() in IGNORE_PARAMETERS or any(_ in parameter.lower() for _ in CSRF_TOKEN_PARAMETER_INFIXES) or parameter.upper().startswith(GOOGLE_ANALYTICS_COOKIE_PREFIX)):
+                        elif conf.level < 4 and (parameter.upper() in IGNORE_PARAMETERS or any(
+                                _ in parameter.lower() for _ in
+                                CSRF_TOKEN_PARAMETER_INFIXES) or parameter.upper().startswith(
+                                GOOGLE_ANALYTICS_COOKIE_PREFIX)):
                             testSqlInj = False
 
-                            infoMsg = "ignoring %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
+                            infoMsg = "ignoring %sparameter '%s'" % (
+                            "%s " % paramType if paramType != parameter else "", parameter)
                             logger.info(infoMsg)
 
                         elif PAYLOAD.TECHNIQUE.BOOLEAN in conf.technique or conf.skipStatic:
                             check = checkDynParam(place, parameter, value)
 
                             if not check:
-                                warnMsg = "%sparameter '%s' does not appear to be dynamic" % ("%s " % paramType if paramType != parameter else "", parameter)
+                                warnMsg = "%sparameter '%s' does not appear to be dynamic" % (
+                                "%s " % paramType if paramType != parameter else "", parameter)
                                 logger.warning(warnMsg)
 
                                 if conf.skipStatic:
-                                    infoMsg = "skipping static %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
+                                    infoMsg = "skipping static %sparameter '%s'" % (
+                                    "%s " % paramType if paramType != parameter else "", parameter)
                                     logger.info(infoMsg)
 
                                     testSqlInj = False
                             else:
-                                infoMsg = "%sparameter '%s' appears to be dynamic" % ("%s " % paramType if paramType != parameter else "", parameter)
+                                infoMsg = "%sparameter '%s' appears to be dynamic" % (
+                                "%s " % paramType if paramType != parameter else "", parameter)
                                 logger.info(infoMsg)
 
                         kb.testedParams.add(paramKey)
@@ -580,11 +623,13 @@ def start():
 
                                 if check != HEURISTIC_TEST.POSITIVE:
                                     if conf.smart or (kb.ignoreCasted and check == HEURISTIC_TEST.CASTED):
-                                        infoMsg = "skipping %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
+                                        infoMsg = "skipping %sparameter '%s'" % (
+                                        "%s " % paramType if paramType != parameter else "", parameter)
                                         logger.info(infoMsg)
                                         continue
 
-                                infoMsg = "testing for SQL injection on %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
+                                infoMsg = "testing for SQL injection on %sparameter '%s'" % (
+                                "%s " % paramType if paramType != parameter else "", parameter)
                                 logger.info(infoMsg)
 
                                 injection = checkSqlInjection(place, parameter, value)
@@ -607,7 +652,8 @@ def start():
                                                     process = subprocess.Popen(conf.alert, shell=True)
                                                     process.wait()
                                                 except Exception as ex:
-                                                    errMsg = "error occurred while executing '%s' ('%s')" % (conf.alert, getSafeExString(ex))
+                                                    errMsg = "error occurred while executing '%s' ('%s')" % (
+                                                    conf.alert, getSafeExString(ex))
                                                     logger.error(errMsg)
 
                                             kb.alerted = True
@@ -616,7 +662,9 @@ def start():
                                         if not proceed:
                                             break
 
-                                        msg = "%sparameter '%s' " % ("%s " % injection.place if injection.place != injection.parameter else "", injection.parameter)
+                                        msg = "%sparameter '%s' " % (
+                                        "%s " % injection.place if injection.place != injection.parameter else "",
+                                        injection.parameter)
                                         msg += "is vulnerable. Do you want to keep testing the others (if any)? [y/N] "
 
                                         if not readInput(msg, default='N', boolean=True):
@@ -625,7 +673,8 @@ def start():
                                             kb.testedParams.add(paramKey)
 
                                 if not injectable:
-                                    warnMsg = "%sparameter '%s' does not seem to be injectable" % ("%s " % paramType if paramType != parameter else "", parameter)
+                                    warnMsg = "%sparameter '%s' does not seem to be injectable" % (
+                                    "%s " % paramType if paramType != parameter else "", parameter)
                                     logger.warning(warnMsg)
 
                             finally:

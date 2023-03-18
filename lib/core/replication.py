@@ -16,6 +16,7 @@ from lib.core.exception import SqlmapValueException
 from lib.core.settings import UNICODE_ENCODING
 from lib.utils.safe2bin import safechardecode
 
+
 class Replication(object):
     """
     This class holds all methods/classes used for database
@@ -61,11 +62,15 @@ class Replication(object):
                 try:
                     self.execute('DROP TABLE IF EXISTS "%s"' % self.name)
                     if not typeless:
-                        self.execute('CREATE TABLE "%s" (%s)' % (self.name, ','.join('"%s" %s' % (unsafeSQLIdentificatorNaming(colname), coltype) for colname, coltype in self.columns)))
+                        self.execute('CREATE TABLE "%s" (%s)' % (self.name, ','.join(
+                            '"%s" %s' % (unsafeSQLIdentificatorNaming(colname), coltype) for colname, coltype in
+                            self.columns)))
                     else:
-                        self.execute('CREATE TABLE "%s" (%s)' % (self.name, ','.join('"%s"' % unsafeSQLIdentificatorNaming(colname) for colname in self.columns)))
+                        self.execute('CREATE TABLE "%s" (%s)' % (self.name, ','.join(
+                            '"%s"' % unsafeSQLIdentificatorNaming(colname) for colname in self.columns)))
                 except Exception as ex:
-                    errMsg = "problem occurred ('%s') while initializing the sqlite database " % getSafeExString(ex, UNICODE_ENCODING)
+                    errMsg = "problem occurred ('%s') while initializing the sqlite database " % getSafeExString(ex,
+                                                                                                                 UNICODE_ENCODING)
                     errMsg += "located at '%s'" % self.parent.dbpath
                     raise SqlmapGenericException(errMsg)
 
@@ -75,7 +80,8 @@ class Replication(object):
             """
 
             if len(values) == len(self.columns):
-                self.execute('INSERT INTO "%s" VALUES (%s)' % (self.name, ','.join(['?'] * len(values))), safechardecode(values))
+                self.execute('INSERT INTO "%s" VALUES (%s)' % (self.name, ','.join(['?'] * len(values))),
+                             safechardecode(values))
             else:
                 errMsg = "wrong number of columns used in replicating insert"
                 raise SqlmapValueException(errMsg)
@@ -87,7 +93,8 @@ class Replication(object):
                 except UnicodeError:
                     self.parent.cursor.execute(sql, cleanReplaceUnicode(parameters or []))
             except sqlite3.OperationalError as ex:
-                errMsg = "problem occurred ('%s') while accessing sqlite database " % getSafeExString(ex, UNICODE_ENCODING)
+                errMsg = "problem occurred ('%s') while accessing sqlite database " % getSafeExString(ex,
+                                                                                                      UNICODE_ENCODING)
                 errMsg += "located at '%s'. Please make sure that " % self.parent.dbpath
                 errMsg += "it's not used by some other program"
                 raise SqlmapGenericException(errMsg)

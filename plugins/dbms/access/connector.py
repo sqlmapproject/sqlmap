@@ -20,6 +20,7 @@ from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.core.settings import IS_WIN
 from plugins.generic.connector import Connector as GenericConnector
 
+
 class Connector(GenericConnector):
     """
     Homepage: https://github.com/mkleehammer/pyodbc

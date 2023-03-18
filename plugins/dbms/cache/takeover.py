@@ -8,6 +8,7 @@ See the file 'LICENSE' for copying permission
 from lib.core.exception import SqlmapUnsupportedFeatureException
 from plugins.generic.takeover import Takeover as GenericTakeover
 
+
 class Takeover(GenericTakeover):
     def osCmd(self):
         errMsg = "on Cache it is not possible to execute commands"

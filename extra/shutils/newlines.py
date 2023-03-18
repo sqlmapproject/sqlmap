@@ -5,6 +5,7 @@ from __future__ import print_function
 import os
 import sys
 
+
 def check(filepath):
     if filepath.endswith(".py"):
         content = open(filepath, "rb").read()
@@ -13,6 +14,7 @@ def check(filepath):
         if pattern in content:
             index = content.find(pattern)
             print(filepath, repr(content[index - 30:index + 30]))
+
 
 if __name__ == "__main__":
     try:

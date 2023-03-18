@@ -23,6 +23,7 @@ from lib.core.settings import METADB_SUFFIX
 from lib.request import inject
 from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 
+
 class Fingerprint(GenericFingerprint):
     def __init__(self):
         GenericFingerprint.__init__(self, DBMS.FIREBIRD)
@@ -75,14 +76,18 @@ class Fingerprint(GenericFingerprint):
             ("1.5", ("NULLIF(%d,%d) IS NULL", "EXISTS(SELECT CURRENT_TRANSACTION FROM RDB$DATABASE)")),
             ("2.0", ("EXISTS(SELECT CURRENT_TIME(0) FROM RDB$DATABASE)", "BIT_LENGTH(%d)>0", "CHAR_LENGTH(%d)>0")),
             ("2.1", ("BIN_XOR(%d,%d)=0", "PI()>0.%d", "RAND()<1.%d", "FLOOR(1.%d)>=0")),
-            ("2.5", ("'%s' SIMILAR TO '%s'",)),  # Reference: https://firebirdsql.org/refdocs/langrefupd25-similar-to.html
-            ("3.0", ("FALSE IS FALSE",)),  # https://www.firebirdsql.org/file/community/conference-2014/pdf/02_fb.2014.whatsnew.30.en.pdf
+            ("2.5", ("'%s' SIMILAR TO '%s'",)),
+            # Reference: https://firebirdsql.org/refdocs/langrefupd25-similar-to.html
+            ("3.0", ("FALSE IS FALSE",)),
+        # https://www.firebirdsql.org/file/community/conference-2014/pdf/02_fb.2014.whatsnew.30.en.pdf
         )
 
         for i in xrange(len(table)):
             version, checks = table[i]
             failed = False
-            check = checks[randomRange(0, len(checks) - 1)].replace("%d", getUnicode(randomRange(1, 100))).replace("%s", getUnicode(randomStr()))
+            check = checks[randomRange(0, len(checks) - 1)].replace("%d", getUnicode(randomRange(1, 100))).replace("%s",
+                                                                                                                   getUnicode(
+                                                                                                                       randomStr()))
             result = inject.checkBooleanExpression(check)
 
             if result:

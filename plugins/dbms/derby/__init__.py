@@ -16,6 +16,7 @@ from plugins.dbms.derby.syntax import Syntax
 from plugins.dbms.derby.takeover import Takeover
 from plugins.generic.misc import Miscellaneous
 
+
 class DerbyMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
     This class defines Apache Derby methods

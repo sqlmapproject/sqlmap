@@ -17,6 +17,7 @@ from lib.core.data import paths
 from lib.core.enums import DBMS
 from lib.parse.handler import FingerprintHandler
 
+
 class MSSQLBannerHandler(ContentHandler):
     """
     This class defines methods to parse and extract information from the
@@ -82,6 +83,7 @@ class MSSQLBannerHandler(ContentHandler):
         elif name == "servicepack":
             self._inServicePack = False
             self._servicePack = self._servicePack.replace(" ", "")
+
 
 def bannerParser(banner):
     """

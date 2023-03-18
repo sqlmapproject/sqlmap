@@ -38,7 +38,7 @@ doseq = 1
 
 
 class MultipartPostHandler(_urllib.request.BaseHandler):
-    handler_order = _urllib.request.HTTPHandler.handler_order - 10 # needs to run first
+    handler_order = _urllib.request.HTTPHandler.handler_order - 10  # needs to run first
 
     def http_request(self, request):
         data = request.data
@@ -48,7 +48,7 @@ class MultipartPostHandler(_urllib.request.BaseHandler):
             v_vars = []
 
             try:
-                for(key, value) in data.items():
+                for (key, value) in data.items():
                     if hasattr(value, "fileno") or hasattr(value, "file") or isinstance(value, io.IOBase):
                         v_files.append((key, value))
                     else:
@@ -62,7 +62,7 @@ class MultipartPostHandler(_urllib.request.BaseHandler):
             else:
                 boundary, data = self.multipart_encode(v_vars, v_files)
                 contenttype = "multipart/form-data; boundary=%s" % boundary
-                #if (request.has_header("Content-Type") and request.get_header("Content-Type").find("multipart/form-data") != 0):
+                # if (request.has_header("Content-Type") and request.get_header("Content-Type").find("multipart/form-data") != 0):
                 #    print "Replacing %s with %s" % (request.get_header("content-type"), "multipart/form-data")
                 request.add_unredirected_header("Content-Type", contenttype)
 
@@ -70,7 +70,8 @@ class MultipartPostHandler(_urllib.request.BaseHandler):
 
         # NOTE: https://github.com/sqlmapproject/sqlmap/issues/4235
         if request.data:
-            for match in re.finditer(b"(?i)\\s*-{20,}\\w+(\\s+Content-Disposition[^\\n]+\\s+|\\-\\-\\s*)", request.data):
+            for match in re.finditer(b"(?i)\\s*-{20,}\\w+(\\s+Content-Disposition[^\\n]+\\s+|\\-\\-\\s*)",
+                                     request.data):
                 part = match.group(0)
                 if b'\r' not in part:
                     request.data = request.data.replace(part, part.replace(b'\n', b"\r\n"))
@@ -99,7 +100,8 @@ class MultipartPostHandler(_urllib.request.BaseHandler):
                 # Reference: http://bugs.python.org/issue9291
                 contenttype = b"application/octet-stream"
             buf += b"--%s\r\n" % getBytes(boundary)
-            buf += b"Content-Disposition: form-data; name=\"%s\"; filename=\"%s\"\r\n" % (getBytes(key), getBytes(filename))
+            buf += b"Content-Disposition: form-data; name=\"%s\"; filename=\"%s\"\r\n" % (
+            getBytes(key), getBytes(filename))
             buf += b"Content-Type: %s\r\n" % getBytes(contenttype)
             # buf += b"Content-Length: %s\r\n" % file_size
             fd.seek(0)

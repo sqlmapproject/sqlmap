@@ -11,6 +11,7 @@ import os
 from lib.core.data import logger
 from lib.core.data import paths
 
+
 def profile(profileOutputFile=None):
     """
     This will run the program and present profiling data in a nice looking graph
@@ -25,5 +26,6 @@ def profile(profileOutputFile=None):
     # Start sqlmap main function and generate a raw profile file
     cProfile.run("start()", profileOutputFile)
 
-    infoMsg = "execution profiled and stored into file '%s' (e.g. 'gprof2dot -f pstats %s | dot -Tpng -o /tmp/sqlmap_profile.png')" % (profileOutputFile, profileOutputFile)
+    infoMsg = "execution profiled and stored into file '%s' (e.g. 'gprof2dot -f pstats %s | dot -Tpng -o /tmp/sqlmap_profile.png')" % (
+    profileOutputFile, profileOutputFile)
     logger.info(infoMsg)

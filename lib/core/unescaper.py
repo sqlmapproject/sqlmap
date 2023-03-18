@@ -9,6 +9,7 @@ from lib.core.common import Backend
 from lib.core.datatype import AttribDict
 from lib.core.settings import EXCLUDE_UNESCAPE
 
+
 class Unescaper(AttribDict):
     def escape(self, expression, quote=True, dbms=None):
         if expression is None:
@@ -31,5 +32,6 @@ class Unescaper(AttribDict):
         retVal = retVal.replace("'''", "''''")
 
         return retVal
+
 
 unescaper = Unescaper()

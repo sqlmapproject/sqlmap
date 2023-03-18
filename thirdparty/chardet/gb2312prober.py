@@ -30,6 +30,7 @@ from .codingstatemachine import CodingStateMachine
 from .chardistribution import GB2312DistributionAnalysis
 from .mbcssm import GB2312_SM_MODEL
 
+
 class GB2312Prober(MultiByteCharSetProber):
     def __init__(self):
         super(GB2312Prober, self).__init__()

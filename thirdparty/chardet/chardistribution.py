@@ -90,7 +90,7 @@ class CharDistributionAnalysis(object):
 
         if self._total_chars != self._freq_chars:
             r = (self._freq_chars / ((self._total_chars - self._freq_chars)
-                 * self.typical_distribution_ratio))
+                                     * self.typical_distribution_ratio))
             if r < self.SURE_YES:
                 return r
 

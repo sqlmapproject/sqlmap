@@ -15,13 +15,15 @@ wikiに載っているいくつかの機能のデモをスクリーンショッ�
 インストール
 ----
 
-最新のtarballを [こちら](https://github.com/sqlmapproject/sqlmap/tarball/master) から、最新のzipballを [こちら](https://github.com/sqlmapproject/sqlmap/zipball/master) からダウンロードできます。
+最新のtarballを [こちら](https://github.com/sqlmapproject/sqlmap/tarball/master)
+から、最新のzipballを [こちら](https://github.com/sqlmapproject/sqlmap/zipball/master) からダウンロードできます。
 
 [Git](https://github.com/sqlmapproject/sqlmap) レポジトリをクローンして、sqlmapをダウンロードすることも可能です。:
 
     git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
-sqlmapは、 [Python](https://www.python.org/download/) バージョン **2.6**, **2.7** または **3.x** がインストールされていれば、全てのプラットフォームですぐに使用できます。
+sqlmapは、 [Python](https://www.python.org/download/) バージョン **2.6**, **2.7** または **3.x**
+がインストールされていれば、全てのプラットフォームですぐに使用できます。
 
 使用方法
 ----
@@ -35,13 +37,15 @@ sqlmapは、 [Python](https://www.python.org/download/) バージョン **2.6**,
     python sqlmap.py -hh
 
 実行例を [こちら](https://asciinema.org/a/46601) で見ることができます。
-sqlmapの概要、機能の一覧、全てのオプションやスイッチの使用方法を例とともに、 [ユーザーマニュアル](https://github.com/sqlmapproject/sqlmap/wiki/Usage) で確認することができます。
+sqlmapの概要、機能の一覧、全てのオプションやスイッチの使用方法を例とともに、 [ユーザーマニュアル](https://github.com/sqlmapproject/sqlmap/wiki/Usage)
+で確認することができます。
 
 リンク
 ----
 
 * ホームページ: https://sqlmap.org
-* ダウンロード: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) or [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
+* ダウンロード: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master)
+  or [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
 * コミットのRSSフィード: https://github.com/sqlmapproject/sqlmap/commits/master.atom
 * 課題管理: https://github.com/sqlmapproject/sqlmap/issues
 * ユーザーマニュアル: https://github.com/sqlmapproject/sqlmap/wiki

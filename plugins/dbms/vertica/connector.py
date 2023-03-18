@@ -18,6 +18,7 @@ from lib.core.data import logger
 from lib.core.exception import SqlmapConnectionException
 from plugins.generic.connector import Connector as GenericConnector
 
+
 class Connector(GenericConnector):
     """
     Homepage: https://github.com/vertica/vertica-python
@@ -30,7 +31,8 @@ class Connector(GenericConnector):
         self.initConnection()
 
         try:
-            self.connector = vertica_python.connect(host=self.hostname, user=self.user, password=self.password, database=self.db, port=self.port, connection_timeout=conf.timeout)
+            self.connector = vertica_python.connect(host=self.hostname, user=self.user, password=self.password,
+                                                    database=self.db, port=self.port, connection_timeout=conf.timeout)
         except vertica_python.OperationalError as ex:
             raise SqlmapConnectionException(getSafeExString(ex))
 

@@ -19,8 +19,10 @@ if IS_WIN:
     ctypes.windll.kernel32.SetConsoleTextAttribute.argtypes = [ctypes.wintypes.HANDLE, ctypes.wintypes.WORD]
     ctypes.windll.kernel32.SetConsoleTextAttribute.restype = ctypes.wintypes.BOOL
 
+
 def stdoutEncode(data):  # Cross-referenced function
     return data
+
 
 class ColorizingStreamHandler(logging.StreamHandler):
     # color names to indices
@@ -81,14 +83,14 @@ class ColorizingStreamHandler(logging.StreamHandler):
         ansi_esc = re.compile(r'\x1b\[((?:\d+)(?:;(?:\d+))*)m')
 
         nt_color_map = {
-            0: 0x00,    # black
-            1: 0x04,    # red
-            2: 0x02,    # green
-            3: 0x06,    # yellow
-            4: 0x01,    # blue
-            5: 0x05,    # magenta
-            6: 0x03,    # cyan
-            7: 0x07,    # white
+            0: 0x00,  # black
+            1: 0x04,  # red
+            2: 0x02,  # green
+            3: 0x06,  # yellow
+            4: 0x01,  # blue
+            5: 0x05,  # magenta
+            6: 0x03,  # cyan
+            7: 0x07,  # white
         }
 
         def output_colorized(self, message):
@@ -99,7 +101,7 @@ class ColorizingStreamHandler(logging.StreamHandler):
             if fd is not None:
                 fd = fd()
 
-                if fd in (1, 2): # stdout or stderr
+                if fd in (1, 2):  # stdout or stderr
                     h = ctypes.windll.kernel32.GetStdHandle(-10 - fd)
 
             while parts:
@@ -122,11 +124,11 @@ class ColorizingStreamHandler(logging.StreamHandler):
                             elif 30 <= p <= 37:
                                 color |= self.nt_color_map[p - 30]
                             elif p == 1:
-                                color |= 0x08 # foreground intensity on
-                            elif p == 0: # reset to default color
+                                color |= 0x08  # foreground intensity on
+                            elif p == 0:  # reset to default color
                                 color = 0x07
                             else:
-                                pass # error condition ignored
+                                pass  # error condition ignored
 
                         ctypes.windll.kernel32.SetConsoleTextAttribute(h, color)
 
@@ -162,7 +164,7 @@ class ColorizingStreamHandler(logging.StreamHandler):
                     prefix = ""
 
                 message = "%s%s" % (prefix, ''.join((self.csi, ';'.join(params),
-                                   'm', message, self.reset)))
+                                                     'm', message, self.reset)))
 
         return message
 

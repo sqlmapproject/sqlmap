@@ -73,7 +73,11 @@ l    j|   \    /  _]|    \ |      T`|  |  |`|  T__T  T /    T|   __|
 RAW, TEXT, HTTPCODE, SERVER, TITLE, HTML, URL = xrange(7)
 COOKIE, UA, REFERER = "Cookie", "User-Agent", "Referer"
 GET, POST = "GET", "POST"
-GENERIC_PROTECTION_KEYWORDS = ("rejected", "forbidden", "suspicious", "malicious", "captcha", "invalid", "your ip", "please contact", "terminated", "protected", "unauthorized", "blocked", "protection", "incident", "denied", "detected", "dangerous", "firewall", "fw_block", "unusual activity", "bad request", "request id", "injection", "permission", "not acceptable", "security policy", "security reasons")
+GENERIC_PROTECTION_KEYWORDS = (
+"rejected", "forbidden", "suspicious", "malicious", "captcha", "invalid", "your ip", "please contact", "terminated",
+"protected", "unauthorized", "blocked", "protection", "incident", "denied", "detected", "dangerous", "firewall",
+"fw_block", "unusual activity", "bad request", "request id", "injection", "permission", "not acceptable",
+"security policy", "security reasons")
 GENERIC_PROTECTION_REGEX = r"(?i)\b(%s)\b"
 GENERIC_ERROR_MESSAGE_REGEX = r"\b[A-Z][\w, '-]*(protected by|security|unauthorized|detected|attack|error|rejected|allowed|suspicious|automated|blocked|invalid|denied|permission)[\w, '!-]*"
 WAF_RECOGNITION_REGEX = None
@@ -86,7 +90,8 @@ MAX_HELP_OPTION_LENGTH = 18
 IS_TTY = sys.stdout.isatty()
 IS_WIN = os.name == "nt"
 COLORIZE = not IS_WIN and IS_TTY
-LEVEL_COLORS = {"o": "\033[00;94m", "x": "\033[00;91m", "!": "\033[00;93m", "i": "\033[00;95m", "=": "\033[00;93m", "+": "\033[00;92m", "-": "\033[00;91m"}
+LEVEL_COLORS = {"o": "\033[00;94m", "x": "\033[00;91m", "!": "\033[00;93m", "i": "\033[00;95m", "=": "\033[00;93m",
+                "+": "\033[00;92m", "-": "\033[00;91m"}
 VERIFY_OK_INTERVAL = 5
 VERIFY_RETRY_TIMES = 3
 MIN_MATCH_PARTIAL = 5
@@ -94,7 +99,11 @@ DEFAULTS = {"timeout": 10}
 MAX_MATCHES = 5
 QUICK_RATIO_THRESHOLD = 0.2
 MAX_JS_CHALLENGE_SNAPLEN = 120
-ENCODING_TRANSLATIONS = {"windows-874": "iso-8859-11", "utf-8859-1": "utf8", "en_us": "utf8", "macintosh": "iso-8859-1", "euc_tw": "big5_tw", "th": "tis-620", "unicode": "utf8", "utc8": "utf8", "ebcdic": "ebcdic-cp-be", "iso-8859": "iso8859-1", "iso-8859-0": "iso8859-1", "ansi": "ascii", "gbk2312": "gbk", "windows-31j": "cp932", "en": "us"}  # Reference: https://github.com/sqlmapproject/sqlmap/blob/master/lib/request/basic.py
+ENCODING_TRANSLATIONS = {"windows-874": "iso-8859-11", "utf-8859-1": "utf8", "en_us": "utf8", "macintosh": "iso-8859-1",
+                         "euc_tw": "big5_tw", "th": "tis-620", "unicode": "utf8", "utc8": "utf8",
+                         "ebcdic": "ebcdic-cp-be", "iso-8859": "iso8859-1", "iso-8859-0": "iso8859-1", "ansi": "ascii",
+                         "gbk2312": "gbk", "windows-31j": "cp932",
+                         "en": "us"}  # Reference: https://github.com/sqlmapproject/sqlmap/blob/master/lib/request/basic.py
 PROXY_TESTING_PAGE = "https://myexternalip.com/raw"
 
 if COLORIZE:
@@ -108,7 +117,9 @@ else:
 
 _ = random.randint(20, 64)
 DEFAULT_USER_AGENT = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; %s; rv:%d.0) Gecko/20100101 Firefox/%d.0" % (NAME, _, _)
-HEADERS = {"User-Agent": DEFAULT_USER_AGENT, "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "Accept-Language": "en-US,en;q=0.5", "Accept-Encoding": "identity", "Cache-Control": "max-age=0"}
+HEADERS = {"User-Agent": DEFAULT_USER_AGENT,
+           "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+           "Accept-Language": "en-US,en;q=0.5", "Accept-Encoding": "identity", "Cache-Control": "max-age=0"}
 
 original = None
 options = None
@@ -127,10 +138,12 @@ proxies_index = 0
 
 _exit = sys.exit
 
+
 def exit(message=None):
     if message:
         print("%s%s" % (message, ' ' * 20))
     _exit(1)
+
 
 def retrieve(url, data=None):
     global proxies_index
@@ -152,12 +165,14 @@ def retrieve(url, data=None):
                 break
 
     try:
-        req = Request("".join(url[_].replace(' ', "%20") if _ > url.find('?') else url[_] for _ in xrange(len(url))), data, HEADERS)
+        req = Request("".join(url[_].replace(' ', "%20") if _ > url.find('?') else url[_] for _ in xrange(len(url))),
+                      data, HEADERS)
         resp = urlopen(req, timeout=options.timeout)
         retval[URL] = resp.url
         retval[HTML] = resp.read()
         retval[HTTPCODE] = resp.code
-        retval[RAW] = "%s %d %s\n%s\n%s" % (httplib.HTTPConnection._http_vsn_str, retval[HTTPCODE], resp.msg, str(resp.headers), retval[HTML])
+        retval[RAW] = "%s %d %s\n%s\n%s" % (
+        httplib.HTTPConnection._http_vsn_str, retval[HTTPCODE], resp.msg, str(resp.headers), retval[HTML])
     except Exception as ex:
         retval[URL] = getattr(ex, "url", url)
         retval[HTTPCODE] = getattr(ex, "code", None)
@@ -165,7 +180,9 @@ def retrieve(url, data=None):
             retval[HTML] = ex.read() if hasattr(ex, "read") else getattr(ex, "msg", str(ex))
         except:
             retval[HTML] = ""
-        retval[RAW] = "%s %s %s\n%s\n%s" % (httplib.HTTPConnection._http_vsn_str, retval[HTTPCODE] or "", getattr(ex, "msg", ""), str(ex.headers) if hasattr(ex, "headers") else "", retval[HTML])
+        retval[RAW] = "%s %s %s\n%s\n%s" % (
+        httplib.HTTPConnection._http_vsn_str, retval[HTTPCODE] or "", getattr(ex, "msg", ""),
+        str(ex.headers) if hasattr(ex, "headers") else "", retval[HTML])
 
     for encoding in re.findall(r"charset=[\s\"']?([\w-]+)", retval[RAW])[::-1] + ["utf8"]:
         encoding = ENCODING_TRANSLATIONS.get(encoding, encoding)
@@ -182,6 +199,7 @@ def retrieve(url, data=None):
     retval[SERVER] = match.group(1).strip() if match else ""
     return retval
 
+
 def calc_hash(value, binary=True):
     value = value.encode("utf8") if not isinstance(value, bytes) else value
     result = zlib.crc32(value) & 0xffff
@@ -189,10 +207,12 @@ def calc_hash(value, binary=True):
         result = struct.pack(">H", result)
     return result
 
+
 def single_print(message):
     if message not in seen:
         print(message)
         seen.add(message)
+
 
 def check_payload(payload, protection_regex=GENERIC_PROTECTION_REGEX % '|'.join(GENERIC_PROTECTION_KEYWORDS)):
     global chained
@@ -206,12 +226,16 @@ def check_payload(payload, protection_regex=GENERIC_PROTECTION_REGEX % '|'.join(
         _ = "%s=%s" % ("".join(random.sample(string.ascii_letters, 3)), quote(payload))
         intrusive = retrieve(options.url, _)
     else:
-        _ = "%s%s%s=%s" % (options.url, '?' if '?' not in options.url else '&', "".join(random.sample(string.ascii_letters, 3)), quote(payload))
+        _ = "%s%s%s=%s" % (
+        options.url, '?' if '?' not in options.url else '&', "".join(random.sample(string.ascii_letters, 3)),
+        quote(payload))
         intrusive = retrieve(_)
 
     if options.lock and not payload.isdigit():
         if payload == HEURISTIC_PAYLOAD:
-            match = re.search(re.sub(r"Server:|Protected by", "".join(random.sample(string.ascii_letters, 6)), WAF_RECOGNITION_REGEX, flags=re.I), intrusive[RAW] or "")
+            match = re.search(
+                re.sub(r"Server:|Protected by", "".join(random.sample(string.ascii_letters, 6)), WAF_RECOGNITION_REGEX,
+                       flags=re.I), intrusive[RAW] or "")
             if match:
                 result = True
 
@@ -233,7 +257,13 @@ def check_payload(payload, protection_regex=GENERIC_PROTECTION_REGEX % '|'.join(
     elif options.code:
         result = options.code == intrusive[HTTPCODE]
     else:
-        result = intrusive[HTTPCODE] != original[HTTPCODE] or (intrusive[HTTPCODE] != 200 and intrusive[TITLE] != original[TITLE]) or (re.search(protection_regex, intrusive[HTML]) is not None and re.search(protection_regex, original[HTML]) is None) or (difflib.SequenceMatcher(a=original[HTML] or "", b=intrusive[HTML] or "").quick_ratio() < QUICK_RATIO_THRESHOLD)
+        result = intrusive[HTTPCODE] != original[HTTPCODE] or (
+                    intrusive[HTTPCODE] != 200 and intrusive[TITLE] != original[TITLE]) or (
+                             re.search(protection_regex, intrusive[HTML]) is not None and re.search(protection_regex,
+                                                                                                    original[
+                                                                                                        HTML]) is None) or (
+                             difflib.SequenceMatcher(a=original[HTML] or "",
+                                                     b=intrusive[HTML] or "").quick_ratio() < QUICK_RATIO_THRESHOLD)
 
     if not payload.isdigit():
         if result:
@@ -247,15 +277,20 @@ def check_payload(payload, protection_regex=GENERIC_PROTECTION_REGEX % '|'.join(
                 servers.add(re.sub(r"\s*\(.+\)\Z", "", intrusive[SERVER]))
                 if len(servers) > 1:
                     chained = True
-                    single_print(colorize("[!] multiple (reactive) rejection HTTP 'Server' headers detected (%s)" % ', '.join("'%s'" % _ for _ in sorted(servers))))
+                    single_print(colorize(
+                        "[!] multiple (reactive) rejection HTTP 'Server' headers detected (%s)" % ', '.join(
+                            "'%s'" % _ for _ in sorted(servers))))
 
             if intrusive[HTTPCODE]:
                 codes.add(intrusive[HTTPCODE])
                 if len(codes) > 1:
                     chained = True
-                    single_print(colorize("[!] multiple (reactive) rejection HTTP codes detected (%s)" % ', '.join("%s" % _ for _ in sorted(codes))))
+                    single_print(colorize("[!] multiple (reactive) rejection HTTP codes detected (%s)" % ', '.join(
+                        "%s" % _ for _ in sorted(codes))))
 
-            if heuristic and heuristic[HTML] and intrusive[HTML] and difflib.SequenceMatcher(a=heuristic[HTML] or "", b=intrusive[HTML] or "").quick_ratio() < QUICK_RATIO_THRESHOLD:
+            if heuristic and heuristic[HTML] and intrusive[HTML] and difflib.SequenceMatcher(a=heuristic[HTML] or "",
+                                                                                             b=intrusive[
+                                                                                                   HTML] or "").quick_ratio() < QUICK_RATIO_THRESHOLD:
                 chained = True
                 single_print(colorize("[!] multiple (reactive) rejection HTML responses detected"))
 
@@ -264,9 +299,11 @@ def check_payload(payload, protection_regex=GENERIC_PROTECTION_REGEX % '|'.join(
 
     return result
 
+
 def colorize(message):
     if COLORIZE:
-        message = re.sub(r"\[(.)\]", lambda match: "[%s%s\033[00;49m]" % (LEVEL_COLORS[match.group(1)], match.group(1)), message)
+        message = re.sub(r"\[(.)\]", lambda match: "[%s%s\033[00;49m]" % (LEVEL_COLORS[match.group(1)], match.group(1)),
+                         message)
 
         if any(_ in message for _ in ("rejected summary", "challenge detected")):
             for match in re.finditer(r"[^\w]'([^)]+)'" if "rejected summary" in message else r"\('(.+)'\)", message):
@@ -277,13 +314,16 @@ def colorize(message):
 
         if "blind match" in message:
             for match in re.finditer(r"\(((\d+)%)\)", message):
-                message = message.replace(match.group(1), "\033[%dm%s\033[00;49m" % (92 if int(match.group(2)) >= 95 else (93 if int(match.group(2)) > 80 else 90), match.group(1)))
+                message = message.replace(match.group(1), "\033[%dm%s\033[00;49m" % (
+                92 if int(match.group(2)) >= 95 else (93 if int(match.group(2)) > 80 else 90), match.group(1)))
 
         if "hardness" in message:
             for match in re.finditer(r"\(((\d+)%)\)", message):
-                message = message.replace(match.group(1), "\033[%dm%s\033[00;49m" % (95 if " insane " in message else (91 if " hard " in message else (93 if " moderate " in message else 92)), match.group(1)))
+                message = message.replace(match.group(1), "\033[%dm%s\033[00;49m" % (95 if " insane " in message else (
+                    91 if " hard " in message else (93 if " moderate " in message else 92)), match.group(1)))
 
     return message
+
 
 def parse_args():
     global options
@@ -293,7 +333,8 @@ def parse_args():
     parser.add_option("--timeout", dest="timeout", type=int, help="Response timeout (sec) (default: 10)")
     parser.add_option("--proxy", dest="proxy", help="HTTP proxy address (e.g. \"http://127.0.0.1:8080\")")
     parser.add_option("--proxy-file", dest="proxy_file", help="Load (rotating) HTTP(s) proxy list from a file")
-    parser.add_option("--random-agent", dest="random_agent", action="store_true", help="Use random HTTP User-Agent header value")
+    parser.add_option("--random-agent", dest="random_agent", action="store_true",
+                      help="Use random HTTP User-Agent header value")
     parser.add_option("--code", dest="code", type=int, help="Expected HTTP code in rejected responses")
     parser.add_option("--string", dest="string", help="Expected string in rejected responses")
     parser.add_option("--post", dest="post", action="store_true", help="Use POST body for sending payloads")
@@ -334,6 +375,7 @@ def parse_args():
         if getattr(options, key, None) is None:
             setattr(options, key, DEFAULTS[key])
 
+
 def load_data():
     global WAF_RECOGNITION_REGEX
 
@@ -350,9 +392,11 @@ def load_data():
         WAF_RECOGNITION_REGEX = WAF_RECOGNITION_REGEX.strip('|')
 
         flags = "".join(set(_ for _ in "".join(re.findall(r"\(\?(\w+)\)", WAF_RECOGNITION_REGEX))))
-        WAF_RECOGNITION_REGEX = "(?%s)%s" % (flags, re.sub(r"\(\?\w+\)", "", WAF_RECOGNITION_REGEX))  # patch for "DeprecationWarning: Flags not at the start of the expression" in Python3.7
+        WAF_RECOGNITION_REGEX = "(?%s)%s" % (flags, re.sub(r"\(\?\w+\)", "",
+                                                           WAF_RECOGNITION_REGEX))  # patch for "DeprecationWarning: Flags not at the start of the expression" in Python3.7
     else:
         exit(colorize("[x] file '%s' is missing" % DATA_JSON_FILE))
+
 
 def init():
     os.chdir(os.path.abspath(os.path.dirname(__file__)))
@@ -372,11 +416,11 @@ def init():
             print(colorize("[o] loading proxy list..."))
 
             with codecs.open(options.proxy_file, "rb", encoding="utf8") as f:
-                proxies.extend(re.sub(r"\s.*", "", _.strip()) for _ in f.read().strip().split('\n') if _.startswith("http"))
+                proxies.extend(
+                    re.sub(r"\s.*", "", _.strip()) for _ in f.read().strip().split('\n') if _.startswith("http"))
                 random.shuffle(proxies)
         else:
             exit(colorize("[x] file '%s' does not exist" % options.proxy_file))
-
 
     cookie_jar = CookieJar()
     opener = build_opener(HTTPCookieProcessor(cookie_jar))
@@ -388,12 +432,21 @@ def init():
 
     if options.random_agent:
         revision = random.randint(20, 64)
-        platform = random.sample(("X11; %s %s" % (random.sample(("Linux", "Ubuntu; Linux", "U; Linux", "U; OpenBSD", "U; FreeBSD"), 1)[0], random.sample(("amd64", "i586", "i686", "amd64"), 1)[0]), "Windows NT %s%s" % (random.sample(("5.0", "5.1", "5.2", "6.0", "6.1", "6.2", "6.3", "10.0"), 1)[0], random.sample(("", "; Win64", "; WOW64"), 1)[0]), "Macintosh; Intel Mac OS X 10.%s" % random.randint(1, 11)), 1)[0]
+        platform = random.sample(("X11; %s %s" % (
+        random.sample(("Linux", "Ubuntu; Linux", "U; Linux", "U; OpenBSD", "U; FreeBSD"), 1)[0],
+        random.sample(("amd64", "i586", "i686", "amd64"), 1)[0]), "Windows NT %s%s" % (
+                                  random.sample(("5.0", "5.1", "5.2", "6.0", "6.1", "6.2", "6.3", "10.0"), 1)[0],
+                                  random.sample(("", "; Win64", "; WOW64"), 1)[0]),
+                                  "Macintosh; Intel Mac OS X 10.%s" % random.randint(1, 11)), 1)[0]
         user_agent = "Mozilla/5.0 (%s; rv:%d.0) Gecko/20100101 Firefox/%d.0" % (platform, revision, revision)
         HEADERS["User-Agent"] = user_agent
 
+
 def format_name(waf):
-    return "%s%s" % (DATA_JSON["wafs"][waf]["name"], (" (%s)" % DATA_JSON["wafs"][waf]["company"]) if DATA_JSON["wafs"][waf]["name"] != DATA_JSON["wafs"][waf]["company"] else "")
+    return "%s%s" % (DATA_JSON["wafs"][waf]["name"],
+                     (" (%s)" % DATA_JSON["wafs"][waf]["company"]) if DATA_JSON["wafs"][waf]["name"] !=
+                                                                      DATA_JSON["wafs"][waf]["company"] else "")
+
 
 def non_blind_check(raw, silent=False):
     retval = False
@@ -407,6 +460,7 @@ def non_blind_check(raw, silent=False):
                 if not silent:
                     single_print(colorize("[+] non-blind match: '%s'%s" % (format_name(waf), 20 * ' ')))
     return retval
+
 
 def run():
     global original
@@ -439,17 +493,21 @@ def run():
             print("\r---%s" % (40 * ' '))
             print(original[HTTPCODE], original[RAW])
             print("---")
-        exit(colorize("[x] access to host '%s' seems to be restricted%s" % (hostname, (" (%d: '<title>%s</title>')" % (original[HTTPCODE], original[TITLE].strip())) if original[TITLE] else "")))
+        exit(colorize("[x] access to host '%s' seems to be restricted%s" % (hostname, (
+                    " (%d: '<title>%s</title>')" % (original[HTTPCODE], original[TITLE].strip())) if original[
+            TITLE] else "")))
 
     challenge = None
     if all(_ in original[HTML].lower() for _ in ("eval", "<script")):
         match = re.search(r"(?is)<body[^>]*>(.*)</body>", re.sub(r"(?is)<script.+?</script>", "", original[HTML]))
         if re.search(r"(?i)<(body|div)", original[HTML]) is None or (match and len(match.group(1)) == 0):
             challenge = re.search(r"(?is)<script.+</script>", original[HTML]).group(0).replace("\n", "\\n")
-            print(colorize("[x] anti-robot JS challenge detected ('%s%s')" % (challenge[:MAX_JS_CHALLENGE_SNAPLEN], "..." if len(challenge) > MAX_JS_CHALLENGE_SNAPLEN else "")))
+            print(colorize("[x] anti-robot JS challenge detected ('%s%s')" % (
+            challenge[:MAX_JS_CHALLENGE_SNAPLEN], "..." if len(challenge) > MAX_JS_CHALLENGE_SNAPLEN else "")))
 
     protection_keywords = GENERIC_PROTECTION_KEYWORDS
-    protection_regex = GENERIC_PROTECTION_REGEX % '|'.join(keyword for keyword in protection_keywords if keyword not in original[HTML].lower())
+    protection_regex = GENERIC_PROTECTION_REGEX % '|'.join(
+        keyword for keyword in protection_keywords if keyword not in original[HTML].lower())
 
     print(colorize("[i] running basic heuristic test..."))
     if not check_payload(HEURISTIC_PAYLOAD):
@@ -459,7 +517,8 @@ def run():
             check = check_payload(HEURISTIC_PAYLOAD)
         if not check:
             if non_blind_check(intrusive[RAW]):
-                exit(colorize("[x] unable to continue due to static responses%s" % (" (captcha)" if re.search(r"(?i)captcha", intrusive[RAW]) is not None else "")))
+                exit(colorize("[x] unable to continue due to static responses%s" % (
+                    " (captcha)" if re.search(r"(?i)captcha", intrusive[RAW]) is not None else "")))
             elif challenge is None:
                 exit(colorize("[x] host '%s' does not seem to be protected" % hostname))
             else:
@@ -471,8 +530,12 @@ def run():
     if not intrusive[HTTPCODE]:
         print(colorize("[i] rejected summary: RST|DROP"))
     else:
-        _ = "...".join(match.group(0) for match in re.finditer(GENERIC_ERROR_MESSAGE_REGEX, intrusive[HTML])).strip().replace("  ", " ")
-        print(colorize(("[i] rejected summary: %d ('%s%s')" % (intrusive[HTTPCODE], ("<title>%s</title>" % intrusive[TITLE]) if intrusive[TITLE] else "", "" if not _ or intrusive[HTTPCODE] < 400 else ("...%s" % _))).replace(" ('')", "")))
+        _ = "...".join(
+            match.group(0) for match in re.finditer(GENERIC_ERROR_MESSAGE_REGEX, intrusive[HTML])).strip().replace("  ",
+                                                                                                                   " ")
+        print(colorize(("[i] rejected summary: %d ('%s%s')" % (
+        intrusive[HTTPCODE], ("<title>%s</title>" % intrusive[TITLE]) if intrusive[TITLE] else "",
+        "" if not _ or intrusive[HTTPCODE] < 400 else ("...%s" % _))).replace(" ('')", "")))
 
     found = non_blind_check(intrusive[RAW] if intrusive[HTTPCODE] is not None else original[RAW])
 
@@ -484,7 +547,8 @@ def run():
         counter += 1
 
         if IS_TTY:
-            sys.stdout.write(colorize("\r[i] running payload tests... (%d/%d)\r" % (counter, len(DATA_JSON["payloads"]))))
+            sys.stdout.write(
+                colorize("\r[i] running payload tests... (%d/%d)\r" % (counter, len(DATA_JSON["payloads"]))))
             sys.stdout.flush()
 
         if counter % VERIFY_OK_INTERVAL == 0:
@@ -492,7 +556,15 @@ def run():
                 if not check_payload(str(random.randint(1, 9)), protection_regex):
                     break
                 elif i == VERIFY_RETRY_TIMES - 1:
-                    exit(colorize("[x] host '%s' seems to be misconfigured or rejecting benign requests%s" % (hostname, (" (%d: '<title>%s</title>')" % (intrusive[HTTPCODE], intrusive[TITLE].strip())) if intrusive[TITLE] else "")))
+                    exit(colorize("[x] host '%s' seems to be misconfigured or rejecting benign requests%s" % (hostname,
+                                                                                                              (
+                                                                                                                          " (%d: '<title>%s</title>')" % (
+                                                                                                                  intrusive[
+                                                                                                                      HTTPCODE],
+                                                                                                                  intrusive[
+                                                                                                                      TITLE].strip())) if
+                                                                                                              intrusive[
+                                                                                                                  TITLE] else "")))
                 else:
                     time.sleep(5)
 
@@ -505,12 +577,15 @@ def run():
             blocked.append(info)
 
     _ = calc_hash(signature)
-    signature = "%s:%s" % (_.encode("hex") if not hasattr(_, "hex") else _.hex(), base64.b64encode(signature).decode("ascii"))
+    signature = "%s:%s" % (
+    _.encode("hex") if not hasattr(_, "hex") else _.hex(), base64.b64encode(signature).decode("ascii"))
 
     print(colorize("%s[=] results: '%s'" % ("\n" if IS_TTY else "", results)))
 
     hardness = 100 * results.count('x') // len(results)
-    print(colorize("[=] hardness: %s (%d%%)" % ("insane" if hardness >= 80 else ("hard" if hardness >= 50 else ("moderate" if hardness >= 30 else "easy")), hardness)))
+    print(colorize("[=] hardness: %s (%d%%)" % (
+    "insane" if hardness >= 80 else ("hard" if hardness >= 50 else ("moderate" if hardness >= 30 else "easy")),
+    hardness)))
 
     if blocked:
         print(colorize("[=] blocked categories: %s" % ", ".join(blocked)))
@@ -564,9 +639,12 @@ def run():
                 matches = [(_[1], _[0]) for _ in matches.items()]
                 matches.sort(reverse=True)
 
-                print(colorize("[+] blind match: %s" % ", ".join("'%s' (%d%%)" % (format_name(matches[i][1]), matches[i][0]) for i in xrange(min(len(matches), MAX_MATCHES) if matches[0][0] != 100 else 1))))
+                print(colorize("[+] blind match: %s" % ", ".join(
+                    "'%s' (%d%%)" % (format_name(matches[i][1]), matches[i][0]) for i in
+                    xrange(min(len(matches), MAX_MATCHES) if matches[0][0] != 100 else 1))))
 
     print()
+
 
 def main():
     if "--version" not in sys.argv:
@@ -575,6 +653,7 @@ def main():
     parse_args()
     init()
     run()
+
 
 load_data()
 

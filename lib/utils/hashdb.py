@@ -28,6 +28,7 @@ from lib.core.threads import getCurrentThreadData
 from lib.core.threads import getCurrentThreadName
 from thirdparty import six
 
+
 class HashDB(object):
     def __init__(self, filepath):
         self.filepath = filepath
@@ -43,7 +44,8 @@ class HashDB(object):
                 connection = sqlite3.connect(self.filepath, timeout=3, isolation_level=None)
                 self._connections.append(connection)
                 threadData.hashDBCursor = connection.cursor()
-                threadData.hashDBCursor.execute("CREATE TABLE IF NOT EXISTS storage (id INTEGER PRIMARY KEY, value TEXT)")
+                threadData.hashDBCursor.execute(
+                    "CREATE TABLE IF NOT EXISTS storage (id INTEGER PRIMARY KEY, value TEXT)")
                 connection.commit()
             except Exception as ex:
                 errMsg = "error occurred while opening a session "
@@ -80,7 +82,8 @@ class HashDB(object):
     @staticmethod
     def hashKey(key):
         key = getBytes(key if isinstance(key, six.text_type) else repr(key), errors="xmlcharrefreplace")
-        retVal = int(hashlib.md5(key).hexdigest(), 16) & 0x7fffffffffffffff  # Reference: http://stackoverflow.com/a/4448400
+        retVal = int(hashlib.md5(key).hexdigest(),
+                     16) & 0x7fffffffffffffff  # Reference: http://stackoverflow.com/a/4448400
         return retVal
 
     def retrieve(self, key, unserialize=False):
@@ -96,12 +99,14 @@ class HashDB(object):
                             retVal = row[0]
                     except (sqlite3.OperationalError, sqlite3.DatabaseError) as ex:
                         if any(_ in getSafeExString(ex) for _ in ("locked", "no such table")):
-                            warnMsg = "problem occurred while accessing session file '%s' ('%s')" % (self.filepath, getSafeExString(ex))
+                            warnMsg = "problem occurred while accessing session file '%s' ('%s')" % (
+                            self.filepath, getSafeExString(ex))
                             singleTimeWarnMessage(warnMsg)
                         elif "Could not decode" in getSafeExString(ex):
                             break
                         else:
-                            errMsg = "error occurred while accessing session file '%s' ('%s'). " % (self.filepath, getSafeExString(ex))
+                            errMsg = "error occurred while accessing session file '%s' ('%s'). " % (
+                            self.filepath, getSafeExString(ex))
                             errMsg += "If the problem persists please rerun with '--flush-session'"
                             raise SqlmapConnectionException(errMsg)
                     else:

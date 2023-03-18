@@ -15,8 +15,11 @@ from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.LOW
 
+
 def dependencies():
-    singleTimeWarnMessage("tamper script '%s' is only meant to be run against %s" % (os.path.basename(__file__).split(".")[0], DBMS.MSSQL))
+    singleTimeWarnMessage("tamper script '%s' is only meant to be run against %s" % (
+    os.path.basename(__file__).split(".")[0], DBMS.MSSQL))
+
 
 def tamper(payload, **kwargs):
     """

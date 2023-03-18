@@ -15,6 +15,7 @@ from plugins.dbms.mssqlserver.syntax import Syntax
 from plugins.dbms.mssqlserver.takeover import Takeover
 from plugins.generic.misc import Miscellaneous
 
+
 class MSSQLServerMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
     This class defines Microsoft SQL Server methods

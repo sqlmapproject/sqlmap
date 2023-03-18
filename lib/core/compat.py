@@ -17,12 +17,13 @@ import sys
 import time
 import uuid
 
+
 class WichmannHill(random.Random):
     """
     Reference: https://svn.python.org/projects/python/trunk/Lib/random.py
     """
 
-    VERSION = 1     # used by getstate/setstate
+    VERSION = 1  # used by getstate/setstate
 
     def seed(self, a=None):
         """Initialize internal state from hashable object.
@@ -166,6 +167,7 @@ class WichmannHill(random.Random):
         z = (z + a) % 256 or 1
         self.__whseed(x, y, z)
 
+
 def patchHeaders(headers):
     if headers is not None and not hasattr(headers, "headers"):
         if isinstance(headers, dict):
@@ -189,6 +191,7 @@ def patchHeaders(headers):
 
     return headers
 
+
 def cmp(a, b):
     """
     >>> cmp("a", "b")
@@ -203,6 +206,7 @@ def cmp(a, b):
         return 1
     else:
         return 0
+
 
 # Reference: https://github.com/urllib3/urllib3/blob/master/src/urllib3/filepost.py
 def choose_boundary():
@@ -220,6 +224,7 @@ def choose_boundary():
 
     return retval
 
+
 # Reference: http://python3porting.com/differences.html
 def round(x, d=0):
     """
@@ -235,9 +240,11 @@ def round(x, d=0):
     else:
         return float(math.ceil((x * p) - 0.5)) / p
 
+
 # Reference: https://code.activestate.com/recipes/576653-convert-a-cmp-function-to-a-key-function/
 def cmp_to_key(mycmp):
     """Convert a cmp= function into a key= function"""
+
     class K(object):
         __slots__ = ['obj']
 
@@ -267,6 +274,7 @@ def cmp_to_key(mycmp):
 
     return K
 
+
 # Note: patch for Python 2.6
 if not hasattr(functools, "cmp_to_key"):
     functools.cmp_to_key = cmp_to_key
@@ -277,6 +285,7 @@ if sys.version_info >= (3, 0):
 else:
     xrange = xrange
     buffer = buffer
+
 
 def LooseVersion(version):
     """

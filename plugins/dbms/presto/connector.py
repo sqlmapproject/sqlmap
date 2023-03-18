@@ -19,6 +19,7 @@ from lib.core.data import logger
 from lib.core.exception import SqlmapConnectionException
 from plugins.generic.connector import Connector as GenericConnector
 
+
 class Connector(GenericConnector):
     """
     Homepage: https://github.com/prestodb/presto-python-client
@@ -32,8 +33,11 @@ class Connector(GenericConnector):
         self.initConnection()
 
         try:
-            self.connector = prestodb.dbapi.connect(host=self.hostname, user=self.user, catalog=self.db, port=self.port, request_timeout=conf.timeout)
-        except (prestodb.exceptions.OperationalError, prestodb.exceptions.InternalError, prestodb.exceptions.ProgrammingError, struct.error) as ex:
+            self.connector = prestodb.dbapi.connect(host=self.hostname, user=self.user, catalog=self.db, port=self.port,
+                                                    request_timeout=conf.timeout)
+        except (
+        prestodb.exceptions.OperationalError, prestodb.exceptions.InternalError, prestodb.exceptions.ProgrammingError,
+        struct.error) as ex:
             raise SqlmapConnectionException(getSafeExString(ex))
 
         self.initCursor()

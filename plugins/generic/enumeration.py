@@ -21,6 +21,7 @@ from plugins.generic.entries import Entries
 from plugins.generic.search import Search
 from plugins.generic.users import Users
 
+
 class Enumeration(Custom, Databases, Entries, Search, Users):
     """
     This class defines generic enumeration functionalities for plugins.

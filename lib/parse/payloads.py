@@ -18,9 +18,12 @@ from lib.core.datatype import AttribDict
 from lib.core.exception import SqlmapInstallationException
 from lib.core.settings import PAYLOAD_XML_FILES
 
+
 def cleanupVals(text, tag):
     if tag == "clause" and '-' in text:
-        text = re.sub(r"(\d+)-(\d+)", lambda match: ','.join(str(_) for _ in xrange(int(match.group(1)), int(match.group(2)) + 1)), text)
+        text = re.sub(r"(\d+)-(\d+)",
+                      lambda match: ','.join(str(_) for _ in xrange(int(match.group(1)), int(match.group(2)) + 1)),
+                      text)
 
     if tag in ("clause", "where"):
         text = text.split(',')
@@ -39,6 +42,7 @@ def cleanupVals(text, tag):
             text = text[0]
 
     return text
+
 
 def parseXmlNode(node):
     for element in node.findall("boundary"):
@@ -76,6 +80,7 @@ def parseXmlNode(node):
 
         conf.tests.append(test)
 
+
 def loadBoundaries():
     """
     Loads boundaries from XML
@@ -96,6 +101,7 @@ def loadBoundaries():
 
     root = doc.getroot()
     parseXmlNode(root)
+
 
 def loadPayloads():
     """

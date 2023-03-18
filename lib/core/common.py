@@ -203,6 +203,7 @@ from sqlmap.thirdparty.six.moves import urllib as _urllib
 from sqlmap.thirdparty.six.moves import zip as _zip
 from sqlmap.thirdparty.termcolor.termcolor import colored
 
+
 class UnicodeRawConfigParser(_configparser.RawConfigParser):
     """
     RawConfigParser with unicode writing support
@@ -233,6 +234,7 @@ class UnicodeRawConfigParser(_configparser.RawConfigParser):
 
             fp.write("\n")
 
+
 class Format(object):
     @staticmethod
     def humanize(values, chain=" or "):
@@ -252,7 +254,8 @@ class Format(object):
         if versions is None and Backend.getVersionList():
             versions = Backend.getVersionList()
 
-        return Backend.getDbms() if versions is None else "%s %s" % (Backend.getDbms(), " and ".join(filterNone(versions)))
+        return Backend.getDbms() if versions is None else "%s %s" % (
+        Backend.getDbms(), " and ".join(filterNone(versions)))
 
     @staticmethod
     def getErrorParsedDBMSes():
@@ -338,6 +341,7 @@ class Format(object):
             return infoApi
         else:
             return infoStr.lstrip()
+
 
 class Backend(object):
     @staticmethod
@@ -524,7 +528,8 @@ class Backend(object):
 
     @staticmethod
     def getVersion():
-        versions = filterNone(flattenValue(kb.dbmsVersion)) if not isinstance(kb.dbmsVersion, six.string_types) else [kb.dbmsVersion]
+        versions = filterNone(flattenValue(kb.dbmsVersion)) if not isinstance(kb.dbmsVersion, six.string_types) else [
+            kb.dbmsVersion]
         if not isNoneValue(versions):
             return versions[0]
         else:
@@ -532,7 +537,8 @@ class Backend(object):
 
     @staticmethod
     def getVersionList():
-        versions = filterNone(flattenValue(kb.dbmsVersion)) if not isinstance(kb.dbmsVersion, six.string_types) else [kb.dbmsVersion]
+        versions = filterNone(flattenValue(kb.dbmsVersion)) if not isinstance(kb.dbmsVersion, six.string_types) else [
+            kb.dbmsVersion]
         if not isNoneValue(versions):
             return versions
         else:
@@ -559,8 +565,11 @@ class Backend(object):
     # Comparison methods
     @staticmethod
     def isDbms(dbms):
-        if not kb.get("testMode") and all((Backend.getDbms(), Backend.getIdentifiedDbms())) and Backend.getDbms() != Backend.getIdentifiedDbms():
-            singleTimeWarnMessage("identified ('%s') and fingerprinted ('%s') DBMSes differ. If you experience problems in enumeration phase please rerun with '--flush-session'" % (Backend.getIdentifiedDbms(), Backend.getDbms()))
+        if not kb.get("testMode") and all(
+                (Backend.getDbms(), Backend.getIdentifiedDbms())) and Backend.getDbms() != Backend.getIdentifiedDbms():
+            singleTimeWarnMessage(
+                "identified ('%s') and fingerprinted ('%s') DBMSes differ. If you experience problems in enumeration phase please rerun with '--flush-session'" % (
+                Backend.getIdentifiedDbms(), Backend.getDbms()))
         return Backend.getIdentifiedDbms() == aliasToDbmsEnum(dbms)
 
     @staticmethod
@@ -604,6 +613,7 @@ class Backend(object):
     @staticmethod
     def isOs(os):
         return Backend.getOs() is not None and Backend.getOs().lower() == os.lower()
+
 
 def paramToDict(place, parameters=None):
     """
@@ -657,7 +667,10 @@ def paramToDict(place, parameters=None):
 
                 if not conf.multipleTargets and not (conf.csrfToken and re.search(conf.csrfToken, parameter, re.I)):
                     _ = urldecode(testableParameters[parameter], convall=True)
-                    if (_.endswith("'") and _.count("'") == 1 or re.search(r'\A9{3,}', _) or re.search(r'\A-\d+\Z', _) or re.search(DUMMY_USER_INJECTION, _)) and not parameter.upper().startswith(GOOGLE_ANALYTICS_COOKIE_PREFIX):
+                    if (_.endswith("'") and _.count("'") == 1 or re.search(r'\A9{3,}', _) or re.search(r'\A-\d+\Z',
+                                                                                                       _) or re.search(
+                            DUMMY_USER_INJECTION, _)) and not parameter.upper().startswith(
+                            GOOGLE_ANALYTICS_COOKIE_PREFIX):
                         warnMsg = "it appears that you have provided tainted parameter values "
                         warnMsg += "('%s') with most likely leftover " % element
                         warnMsg += "chars/statements from manual SQL injection test(s). "
@@ -691,17 +704,27 @@ def paramToDict(place, parameters=None):
                                     elif isinstance(current, dict):
                                         for key in current.keys():
                                             value = current[key]
-                                            if isinstance(value, (bool, int, float, six.string_types)) or value in (None, []):
+                                            if isinstance(value, (bool, int, float, six.string_types)) or value in (
+                                            None, []):
                                                 original = current[key]
                                                 if isinstance(value, bool):
-                                                    current[key] = "%s%s" % (getUnicode(value).lower(), BOUNDED_INJECTION_MARKER)
+                                                    current[key] = "%s%s" % (
+                                                    getUnicode(value).lower(), BOUNDED_INJECTION_MARKER)
                                                 elif value is None:
                                                     current[key] = "%s%s" % (randomInt(), BOUNDED_INJECTION_MARKER)
                                                 elif value == []:
                                                     current[key] = ["%s%s" % (randomInt(), BOUNDED_INJECTION_MARKER)]
                                                 else:
                                                     current[key] = "%s%s" % (value, BOUNDED_INJECTION_MARKER)
-                                                candidates["%s (%s)" % (parameter, key)] = re.sub(r"\b(%s\s*=\s*)%s" % (re.escape(parameter), re.escape(testableParameters[parameter])), r"\g<1>%s" % json.dumps(deserialized, separators=(',', ':') if ", " not in testableParameters[parameter] else None), parameters)
+                                                candidates["%s (%s)" % (parameter, key)] = re.sub(r"\b(%s\s*=\s*)%s" % (
+                                                re.escape(parameter), re.escape(testableParameters[parameter])),
+                                                                                                  r"\g<1>%s" % json.dumps(
+                                                                                                      deserialized,
+                                                                                                      separators=(',',
+                                                                                                                  ':') if ", " not in
+                                                                                                                          testableParameters[
+                                                                                                                              parameter] else None),
+                                                                                                  parameters)
                                                 current[key] = original
                                             elif isinstance(value, (list, tuple, set, dict)):
                                                 if value:
@@ -711,7 +734,8 @@ def paramToDict(place, parameters=None):
                                 walk(deserialized)
 
                                 if candidates:
-                                    message = "it appears that provided value for %sparameter '%s' " % ("%s " % place if place != parameter else "", parameter)
+                                    message = "it appears that provided value for %sparameter '%s' " % (
+                                    "%s " % place if place != parameter else "", parameter)
                                     message += "is JSON deserializable. Do you want to inject inside? [y/N] "
 
                                     if readInput(message, default='N', boolean=True):
@@ -723,12 +747,22 @@ def paramToDict(place, parameters=None):
                             except Exception:
                                 pass
 
-                            _ = re.sub(regex, r"\g<1>%s\g<%d>" % (kb.customInjectionMark, len(match.groups())), testableParameters[parameter])
-                            message = "it appears that provided value for %sparameter '%s' " % ("%s " % place if place != parameter else "", parameter)
+                            _ = re.sub(regex, r"\g<1>%s\g<%d>" % (kb.customInjectionMark, len(match.groups())),
+                                       testableParameters[parameter])
+                            message = "it appears that provided value for %sparameter '%s' " % (
+                            "%s " % place if place != parameter else "", parameter)
                             message += "has boundaries. Do you want to inject inside? ('%s') [y/N] " % getUnicode(_)
 
                             if readInput(message, default='N', boolean=True):
-                                testableParameters[parameter] = re.sub(r"\b(%s\s*=\s*)%s" % (re.escape(parameter), re.escape(testableParameters[parameter])), (r"\g<1>%s" % re.sub(regex, r"\g<1>%s\g<2>" % BOUNDED_INJECTION_MARKER, testableParameters[parameter].replace("\\", r"\\"))), parameters)
+                                testableParameters[parameter] = re.sub(r"\b(%s\s*=\s*)%s" % (
+                                re.escape(parameter), re.escape(testableParameters[parameter])), (
+                                                                                   r"\g<1>%s" % re.sub(regex,
+                                                                                                       r"\g<1>%s\g<2>" % BOUNDED_INJECTION_MARKER,
+                                                                                                       testableParameters[
+                                                                                                           parameter].replace(
+                                                                                                           "\\",
+                                                                                                           r"\\"))),
+                                                                       parameters)
                             break
 
     if conf.testParameter:
@@ -760,7 +794,8 @@ def paramToDict(place, parameters=None):
                 for encoding in ("hex", "base64"):
                     try:
                         decoded = codecs.decode(value, encoding)
-                        if len(decoded) > MIN_ENCODED_LEN_CHECK and all(_ in getBytes(string.printable) for _ in decoded):
+                        if len(decoded) > MIN_ENCODED_LEN_CHECK and all(
+                                _ in getBytes(string.printable) for _ in decoded):
                             warnMsg = "provided parameter '%s' " % parameter
                             warnMsg += "appears to be '%s' encoded" % encoding
                             logger.warning(warnMsg)
@@ -769,6 +804,7 @@ def paramToDict(place, parameters=None):
                         pass
 
     return testableParameters
+
 
 def getManualDirectories():
     directories = None
@@ -877,6 +913,7 @@ def getManualDirectories():
 
     return directories
 
+
 def getAutoDirectories():
     """
     >>> pushValue(kb.absFilePaths)
@@ -904,6 +941,7 @@ def getAutoDirectories():
 
     return list(retVal)
 
+
 def filePathToSafeString(filePath):
     """
     Returns string representation of a given filepath safe for a single filename usage
@@ -917,11 +955,14 @@ def filePathToSafeString(filePath):
 
     return retVal
 
+
 def singleTimeDebugMessage(message):
     singleTimeLogMessage(message, logging.DEBUG)
 
+
 def singleTimeWarnMessage(message):
     singleTimeLogMessage(message, logging.WARN)
+
 
 def singleTimeLogMessage(message, level=logging.INFO, flag=None):
     if flag is None:
@@ -930,6 +971,7 @@ def singleTimeLogMessage(message, level=logging.INFO, flag=None):
     if not conf.smokeTest and flag not in kb.singleLogFlags:
         kb.singleLogFlags.add(flag)
         logger.log(level, message)
+
 
 def boldifyMessage(message, istty=None):
     """
@@ -949,6 +991,7 @@ def boldifyMessage(message, istty=None):
 
     return retVal
 
+
 def setColor(message, color=None, bold=False, level=None, istty=None):
     """
     Sets ANSI color codes
@@ -966,7 +1009,8 @@ def setColor(message, color=None, bold=False, level=None, istty=None):
     if message:
         if (IS_TTY or istty) and not conf.get("disableColoring"):  # colorizing handler
             if level is None:
-                levels = re.findall(r"\[(?P<result>%s)\]" % '|'.join(_[0] for _ in getPublicTypeMembers(LOGGING_LEVELS)), message)
+                levels = re.findall(
+                    r"\[(?P<result>%s)\]" % '|'.join(_[0] for _ in getPublicTypeMembers(LOGGING_LEVELS)), message)
 
                 if len(levels) == 1:
                     level = levels[0]
@@ -985,12 +1029,15 @@ def setColor(message, color=None, bold=False, level=None, istty=None):
                     retVal = retVal.replace(match.group(1), colored(match.group(1), color="lightgrey"))
 
                 if not any(_ in message for _ in ("Payload: ",)):
-                    for match in re.finditer(r"([^\w])'([^\n']+)'", message):  # single-quoted (Note: watch-out for the banner)
-                        retVal = retVal.replace(match.group(0), "%s'%s'" % (match.group(1), colored(match.group(2), color="lightgrey")))
+                    for match in re.finditer(r"([^\w])'([^\n']+)'",
+                                             message):  # single-quoted (Note: watch-out for the banner)
+                        retVal = retVal.replace(match.group(0),
+                                                "%s'%s'" % (match.group(1), colored(match.group(2), color="lightgrey")))
 
         message = message.strip()
 
     return retVal
+
 
 def clearColors(message):
     """
@@ -1007,7 +1054,9 @@ def clearColors(message):
 
     return retVal
 
-def dataToStdout(data, forceOutput=False, bold=False, contentType=None, status=CONTENT_STATUS.IN_PROGRESS, coloring=True):
+
+def dataToStdout(data, forceOutput=False, bold=False, contentType=None, status=CONTENT_STATUS.IN_PROGRESS,
+                 coloring=True):
     """
     Writes text to the stdout (console) stream
     """
@@ -1042,7 +1091,10 @@ def dataToStdout(data, forceOutput=False, bold=False, contentType=None, status=C
             if multiThreadMode:
                 logging._releaseLock()
 
-            kb.prependFlag = isinstance(data, six.string_types) and (len(data) == 1 and data not in ('\n', '\r') or len(data) > 2 and data[0] == '\r' and data[-1] != '\n')
+            kb.prependFlag = isinstance(data, six.string_types) and (
+                        len(data) == 1 and data not in ('\n', '\r') or len(data) > 2 and data[0] == '\r' and data[
+                    -1] != '\n')
+
 
 def dataToTrafficFile(data):
     if not conf.trafficFile:
@@ -1055,6 +1107,7 @@ def dataToTrafficFile(data):
         errMsg = "something went wrong while trying "
         errMsg += "to write to the traffic file '%s' ('%s')" % (conf.trafficFile, getSafeExString(ex))
         raise SqlmapSystemException(errMsg)
+
 
 def dataToDumpFile(dumpFile, data):
     try:
@@ -1070,6 +1123,7 @@ def dataToDumpFile(dumpFile, data):
         else:
             errMsg = "error occurred when writing dump data to file ('%s')" % getUnicode(ex)
             logger.error(errMsg)
+
 
 def dataToOutFile(filename, data):
     """
@@ -1107,6 +1161,7 @@ def dataToOutFile(filename, data):
                 break
 
     return retVal
+
 
 def readInput(message, default=None, checkBatch=True, boolean=False):
     """
@@ -1199,6 +1254,7 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
 
     return retVal
 
+
 def setTechnique(technique):
     """
     Thread-safe setting of currently used technique (Note: dealing with cases of per-thread technique switching)
@@ -1206,12 +1262,14 @@ def setTechnique(technique):
 
     getCurrentThreadData().technique = technique
 
+
 def getTechnique():
     """
     Thread-safe getting of currently used technique
     """
 
     return getCurrentThreadData().technique or kb.get("technique")
+
 
 def randomRange(start=0, stop=1000, seed=None):
     """
@@ -1231,6 +1289,7 @@ def randomRange(start=0, stop=1000, seed=None):
 
     return int(randint(start, stop))
 
+
 def randomInt(length=4, seed=None):
     """
     Returns random integer value with provided number of digits
@@ -1248,6 +1307,7 @@ def randomInt(length=4, seed=None):
         choice = random.choice
 
     return int("".join(choice(string.digits if _ != 0 else string.digits.replace('0', '')) for _ in xrange(0, length)))
+
 
 def randomStr(length=4, lowercase=False, alphabet=None, seed=None):
     """
@@ -1274,6 +1334,7 @@ def randomStr(length=4, lowercase=False, alphabet=None, seed=None):
 
     return retVal
 
+
 def sanitizeStr(value):
     """
     Sanitizes string value in respect to newline and line-feed characters
@@ -1285,6 +1346,7 @@ def sanitizeStr(value):
     """
 
     return getUnicode(value).replace("\n", " ").replace("\r", "")
+
 
 def getHeader(headers, key):
     """
@@ -1303,6 +1365,7 @@ def getHeader(headers, key):
 
     return retVal
 
+
 def checkPipedInput():
     """
     Checks whether input to program has been provided via standard input (e.g. cat /tmp/req.txt | python sqlmap.py -r -)
@@ -1310,6 +1373,7 @@ def checkPipedInput():
     """
 
     return hasattr(sys.stdin, "fileno") and not os.isatty(sys.stdin.fileno())
+
 
 def isZipFile(filename):
     """
@@ -1322,6 +1386,7 @@ def isZipFile(filename):
     checkFile(filename)
 
     return openFile(filename, "rb", encoding=None).read(len(ZIP_HEADER)) == ZIP_HEADER
+
 
 def isDigit(value):
     """
@@ -1338,6 +1403,7 @@ def isDigit(value):
     """
 
     return re.search(r"\A[0-9]+\Z", value or "") is not None
+
 
 def checkFile(filename, raiseOnError=True):
     """
@@ -1373,6 +1439,7 @@ def checkFile(filename, raiseOnError=True):
 
     return valid
 
+
 def banner():
     """
     This function prints sqlmap banner with its version
@@ -1387,6 +1454,7 @@ def banner():
             coloramainit()
 
         dataToStdout(result, forceOutput=True)
+
 
 def parseJson(content):
     """
@@ -1420,6 +1488,7 @@ def parseJson(content):
 
     return retVal
 
+
 def parsePasswordHash(password):
     """
     In case of Microsoft SQL Server password hash value is expanded to its components
@@ -1449,6 +1518,7 @@ def parsePasswordHash(password):
 
     return retVal
 
+
 def cleanQuery(query):
     """
     Switch all SQL statement (alike) keywords to upper case
@@ -1469,6 +1539,7 @@ def cleanQuery(query):
 
     return retVal
 
+
 def cleanReplaceUnicode(value):
     """
     Cleans unicode for proper encode/decode
@@ -1478,9 +1549,11 @@ def cleanReplaceUnicode(value):
     """
 
     def clean(value):
-        return value.encode(UNICODE_ENCODING, errors="replace").decode(UNICODE_ENCODING) if isinstance(value, six.text_type) else value
+        return value.encode(UNICODE_ENCODING, errors="replace").decode(UNICODE_ENCODING) if isinstance(value,
+                                                                                                       six.text_type) else value
 
     return applyFunctionRecursively(value, clean)
+
 
 def setPaths(rootPath):
     """
@@ -1540,19 +1613,24 @@ def setPaths(rootPath):
             if "XDG_DATA_HOME" in os.environ:
                 paths.SQLMAP_HOME_PATH = os.path.join(os.environ["XDG_DATA_HOME"], "sqlmap")
             else:
-                paths.SQLMAP_HOME_PATH = os.path.join(os.path.expandvars(os.path.expanduser("~")), ".local", "share", "sqlmap")
+                paths.SQLMAP_HOME_PATH = os.path.join(os.path.expandvars(os.path.expanduser("~")), ".local", "share",
+                                                      "sqlmap")
 
-    paths.SQLMAP_OUTPUT_PATH = getUnicode(paths.get("SQLMAP_OUTPUT_PATH", os.path.join(paths.SQLMAP_HOME_PATH, "output")), encoding=sys.getfilesystemencoding() or UNICODE_ENCODING)
+    paths.SQLMAP_OUTPUT_PATH = getUnicode(
+        paths.get("SQLMAP_OUTPUT_PATH", os.path.join(paths.SQLMAP_HOME_PATH, "output")),
+        encoding=sys.getfilesystemencoding() or UNICODE_ENCODING)
     paths.SQLMAP_DUMP_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "dump")
     paths.SQLMAP_FILES_PATH = os.path.join(paths.SQLMAP_OUTPUT_PATH, "%s", "files")
 
     # History files
-    paths.SQLMAP_HISTORY_PATH = getUnicode(os.path.join(paths.SQLMAP_HOME_PATH, "history"), encoding=sys.getfilesystemencoding() or UNICODE_ENCODING)
+    paths.SQLMAP_HISTORY_PATH = getUnicode(os.path.join(paths.SQLMAP_HOME_PATH, "history"),
+                                           encoding=sys.getfilesystemencoding() or UNICODE_ENCODING)
     paths.API_SHELL_HISTORY = os.path.join(paths.SQLMAP_HISTORY_PATH, "api.hst")
     paths.OS_SHELL_HISTORY = os.path.join(paths.SQLMAP_HISTORY_PATH, "os.hst")
     paths.SQL_SHELL_HISTORY = os.path.join(paths.SQLMAP_HISTORY_PATH, "sql.hst")
     paths.SQLMAP_SHELL_HISTORY = os.path.join(paths.SQLMAP_HISTORY_PATH, "sqlmap.hst")
     paths.GITHUB_HISTORY = os.path.join(paths.SQLMAP_HISTORY_PATH, "github.hst")
+
 
 def weAreFrozen():
     """
@@ -1563,6 +1641,7 @@ def weAreFrozen():
     """
 
     return hasattr(sys, "frozen")
+
 
 def parseTargetDirect():
     """
@@ -1591,7 +1670,9 @@ def parseTargetDirect():
     remote = False
 
     for dbms in SUPPORTED_DBMS:
-        details = re.search(r"^(?P<dbms>%s)://(?P<credentials>(?P<user>.*?)\:(?P<pass>.*)\@)?(?P<remote>(?P<hostname>[\w.-]+?)\:(?P<port>[\d]+)\/)?(?P<db>[\w\d\ \:\.\_~\-\/\\]*)$" % dbms, conf.direct, re.I)
+        details = re.search(
+            r"^(?P<dbms>%s)://(?P<credentials>(?P<user>.*?)\:(?P<pass>.*)\@)?(?P<remote>(?P<hostname>[\w.-]+?)\:(?P<port>[\d]+)\/)?(?P<db>[\w\d\ \:\.\_~\-\/\\]*)$" % dbms,
+            conf.direct, re.I)
 
         if details:
             conf.dbms = details.group("dbms")
@@ -1679,7 +1760,8 @@ def parseTargetDirect():
             except (SqlmapSyntaxException, SqlmapMissingDependence):
                 raise
             except:
-                if _sqlalchemy and data[3] and any(_ in _sqlalchemy.dialects.__all__ for _ in (data[3], data[3].split('+')[0])):
+                if _sqlalchemy and data[3] and any(
+                        _ in _sqlalchemy.dialects.__all__ for _ in (data[3], data[3].split('+')[0])):
                     pass
                 else:
                     errMsg = "sqlmap requires '%s' third-party library " % data[1]
@@ -1688,6 +1770,7 @@ def parseTargetDirect():
                     errMsg += ". Alternative is to use a package 'python-sqlalchemy' "
                     errMsg += "with support for dialect '%s' installed" % data[3]
                     raise SqlmapMissingDependence(errMsg)
+
 
 def parseTargetUrl():
     """
@@ -1730,7 +1813,8 @@ def parseTargetUrl():
         errMsg += "in the hostname part"
         raise SqlmapGenericException(errMsg)
 
-    hostnamePort = urlSplit.netloc.split(":") if not re.search(r"\[.+\]", urlSplit.netloc) else filterNone((re.search(r"\[.+\]", urlSplit.netloc).group(0), re.search(r"\](:(?P<port>\d+))?", urlSplit.netloc).group("port")))
+    hostnamePort = urlSplit.netloc.split(":") if not re.search(r"\[.+\]", urlSplit.netloc) else filterNone((re.search(
+        r"\[.+\]", urlSplit.netloc).group(0), re.search(r"\](:(?P<port>\d+))?", urlSplit.netloc).group("port")))
 
     conf.scheme = (urlSplit.scheme.strip().lower() or "http")
     conf.path = urlSplit.path.strip()
@@ -1750,7 +1834,8 @@ def parseTargetUrl():
     else:
         invalid = False
 
-    if any((invalid, re.search(r"\s", conf.hostname), '..' in conf.hostname, conf.hostname.startswith('.'), '\n' in originalUrl)):
+    if any((invalid, re.search(r"\s", conf.hostname), '..' in conf.hostname, conf.hostname.startswith('.'),
+            '\n' in originalUrl)):
         errMsg = "invalid target URL ('%s')" % originalUrl
         raise SqlmapSyntaxException(errMsg)
 
@@ -1769,22 +1854,27 @@ def parseTargetUrl():
         errMsg = "invalid target URL port (%d)" % conf.port
         raise SqlmapSyntaxException(errMsg)
 
-    conf.url = getUnicode("%s://%s:%d%s" % (conf.scheme, ("[%s]" % conf.hostname) if conf.ipv6 else conf.hostname, conf.port, conf.path))
+    conf.url = getUnicode(
+        "%s://%s:%d%s" % (conf.scheme, ("[%s]" % conf.hostname) if conf.ipv6 else conf.hostname, conf.port, conf.path))
     conf.url = conf.url.replace(URI_QUESTION_MARKER, '?')
 
     if urlSplit.query:
         if '=' not in urlSplit.query:
             conf.url = "%s?%s" % (conf.url, getUnicode(urlSplit.query))
         else:
-            conf.parameters[PLACE.GET] = urldecode(urlSplit.query, spaceplus=not conf.base64Parameter) if urlSplit.query and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in urlSplit.query else urlSplit.query
+            conf.parameters[PLACE.GET] = urldecode(urlSplit.query,
+                                                   spaceplus=not conf.base64Parameter) if urlSplit.query and urlencode(
+                DEFAULT_GET_POST_DELIMITER, None) not in urlSplit.query else urlSplit.query
 
-    if (intersect(REFERER_ALIASES, conf.testParameter, True) or conf.level >= 3) and not any(_[0].upper() == HTTP_HEADER.REFERER.upper() for _ in conf.httpHeaders):
+    if (intersect(REFERER_ALIASES, conf.testParameter, True) or conf.level >= 3) and not any(
+            _[0].upper() == HTTP_HEADER.REFERER.upper() for _ in conf.httpHeaders):
         debugMsg = "setting the HTTP Referer header to the target URL"
         logger.debug(debugMsg)
         conf.httpHeaders = [_ for _ in conf.httpHeaders if _[0] != HTTP_HEADER.REFERER]
         conf.httpHeaders.append((HTTP_HEADER.REFERER, conf.url.replace(kb.customInjectionMark, "")))
 
-    if (intersect(HOST_ALIASES, conf.testParameter, True) or conf.level >= 5) and not any(_[0].upper() == HTTP_HEADER.HOST.upper() for _ in conf.httpHeaders):
+    if (intersect(HOST_ALIASES, conf.testParameter, True) or conf.level >= 5) and not any(
+            _[0].upper() == HTTP_HEADER.HOST.upper() for _ in conf.httpHeaders):
         debugMsg = "setting the HTTP Host header to the target URL"
         logger.debug(debugMsg)
         conf.httpHeaders = [_ for _ in conf.httpHeaders if _[0] != HTTP_HEADER.HOST]
@@ -1792,6 +1882,7 @@ def parseTargetUrl():
 
     if conf.url != originalUrl:
         kb.originalUrls[conf.url] = originalUrl
+
 
 def escapeJsonValue(value):
     """
@@ -1815,6 +1906,7 @@ def escapeJsonValue(value):
 
     return retVal
 
+
 def expandAsteriskForColumns(expression):
     """
     If the user provided an asterisk rather than the column(s)
@@ -1822,7 +1914,8 @@ def expandAsteriskForColumns(expression):
     the SQL query string (expression)
     """
 
-    match = re.search(r"(?i)\ASELECT(\s+TOP\s+[\d]+)?\s+\*\s+FROM\s+(([`'\"][^`'\"]+[`'\"]|[\w.]+)+)(\s|\Z)", expression)
+    match = re.search(r"(?i)\ASELECT(\s+TOP\s+[\d]+)?\s+\*\s+FROM\s+(([`'\"][^`'\"]+[`'\"]|[\w.]+)+)(\s|\Z)",
+                      expression)
 
     if match:
         infoMsg = "you did not provide the fields in your query. "
@@ -1857,6 +1950,7 @@ def expandAsteriskForColumns(expression):
 
     return expression
 
+
 def getLimitRange(count, plusOne=False):
     """
     Returns range of values used in limit/offset constructs
@@ -1888,6 +1982,7 @@ def getLimitRange(count, plusOne=False):
         retVal = xrange(retVal[-1], retVal[0] - 1, -1)
 
     return retVal
+
 
 def parseUnionPage(page):
     """
@@ -1938,6 +2033,7 @@ def parseUnionPage(page):
 
     return data
 
+
 def parseFilePaths(page):
     """
     Detects (possible) absolute system paths inside the provided page content
@@ -1958,6 +2054,7 @@ def parseFilePaths(page):
                 if absFilePath not in kb.absFilePaths:
                     kb.absFilePaths.add(absFilePath)
 
+
 def getLocalIP():
     """
     Get local IP address (exposed to the remote/target)
@@ -1976,6 +2073,7 @@ def getLocalIP():
         logger.debug(debugMsg)
 
     return retVal
+
 
 def getRemoteIP():
     """
@@ -1998,6 +2096,7 @@ def getRemoteIP():
         singleTimeLogMessage(errMsg, logging.ERROR)
 
     return retVal
+
 
 def getFileType(filePath):
     """
@@ -2027,6 +2126,7 @@ def getFileType(filePath):
             desc = "ascii"
 
     return "text" if any(_ in desc.lower() for _ in ("ascii", "text")) else "binary"
+
 
 def getCharset(charsetType=None):
     """
@@ -2076,6 +2176,7 @@ def getCharset(charsetType=None):
 
     return asciiTbl
 
+
 def directoryPath(filepath):
     """
     Returns directory path for a given filepath
@@ -2093,6 +2194,7 @@ def directoryPath(filepath):
 
     return retVal
 
+
 def normalizePath(filepath):
     """
     Returns normalized string representation of a given filepath
@@ -2105,9 +2207,11 @@ def normalizePath(filepath):
 
     if retVal:
         retVal = retVal.strip("\r\n")
-        retVal = ntpath.normpath(retVal) if isWindowsDriveLetterPath(retVal) else re.sub(r"\A/{2,}", "/", posixpath.normpath(retVal))
+        retVal = ntpath.normpath(retVal) if isWindowsDriveLetterPath(retVal) else re.sub(r"\A/{2,}", "/",
+                                                                                         posixpath.normpath(retVal))
 
     return retVal
+
 
 def safeFilepathEncode(filepath):
     """
@@ -2143,6 +2247,7 @@ def safeExpandUser(filepath):
         retVal = getUnicode(os.path.expanduser(filepath.encode(encoding)), encoding=encoding)
 
     return retVal
+
 
 def safeStringFormat(format_, params):
     """
@@ -2192,11 +2297,13 @@ def safeStringFormat(format_, params):
                 if match:
                     if count >= len(params):
                         warnMsg = "wrong number of parameters during string formatting. "
-                        warnMsg += "Please report by e-mail content \"%r | %r | %r\" to '%s'" % (format_, params, retVal, DEV_EMAIL_ADDRESS)
+                        warnMsg += "Please report by e-mail content \"%r | %r | %r\" to '%s'" % (
+                        format_, params, retVal, DEV_EMAIL_ADDRESS)
                         raise SqlmapValueException(warnMsg)
                     else:
                         try:
-                            retVal = re.sub(r"(\A|[^A-Za-z0-9])(%s)([^A-Za-z0-9]|\Z)", r"\g<1>%s\g<3>" % params[count], retVal, 1)
+                            retVal = re.sub(r"(\A|[^A-Za-z0-9])(%s)([^A-Za-z0-9]|\Z)", r"\g<1>%s\g<3>" % params[count],
+                                            retVal, 1)
                         except re.error:
                             retVal = retVal.replace(match.group(0), match.group(0) % params[count], 1)
                         count += 1
@@ -2206,6 +2313,7 @@ def safeStringFormat(format_, params):
     retVal = getText(retVal).replace(PARAMETER_PERCENTAGE_MARKER, '%')
 
     return retVal
+
 
 def getFilteredPageContent(page, onlyText=True, split=" "):
     """
@@ -2220,11 +2328,14 @@ def getFilteredPageContent(page, onlyText=True, split=" "):
 
     # only if the page's charset has been successfully identified
     if isinstance(page, six.text_type):
-        retVal = re.sub(r"(?si)<script.+?</script>|<!--.+?-->|<style.+?</style>%s" % (r"|<[^>]+>|\t|\n|\r" if onlyText else ""), split, page)
+        retVal = re.sub(
+            r"(?si)<script.+?</script>|<!--.+?-->|<style.+?</style>%s" % (r"|<[^>]+>|\t|\n|\r" if onlyText else ""),
+            split, page)
         retVal = re.sub(r"%s{2,}" % split, split, retVal)
         retVal = htmlUnescape(retVal.strip().strip(split))
 
     return retVal
+
 
 def getPageWordSet(page):
     """
@@ -2241,6 +2352,7 @@ def getPageWordSet(page):
         retVal = set(_.group(0) for _ in re.finditer(r"\w+", getFilteredPageContent(page)))
 
     return retVal
+
 
 def showStaticWords(firstPage, secondPage, minLength=3):
     """
@@ -2280,6 +2392,7 @@ def showStaticWords(firstPage, secondPage, minLength=3):
 
     return commonWords
 
+
 def isWindowsDriveLetterPath(filepath):
     """
     Returns True if given filepath starts with a Windows drive letter
@@ -2292,6 +2405,7 @@ def isWindowsDriveLetterPath(filepath):
 
     return re.search(r"\A[\w]\:", filepath) is not None
 
+
 def posixToNtSlashes(filepath):
     """
     Replaces all occurrences of Posix slashes in provided
@@ -2302,6 +2416,7 @@ def posixToNtSlashes(filepath):
     """
 
     return filepath.replace('/', '\\') if filepath else filepath
+
 
 def ntToPosixSlashes(filepath):
     """
@@ -2314,6 +2429,7 @@ def ntToPosixSlashes(filepath):
 
     return filepath.replace('\\', '/') if filepath else filepath
 
+
 def isHexEncodedString(subject):
     """
     Checks if the provided string is hex encoded
@@ -2325,6 +2441,7 @@ def isHexEncodedString(subject):
     """
 
     return re.match(r"\A[0-9a-fA-Fx]+\Z", subject) is not None
+
 
 @cachedmethod
 def getConsoleWidth(default=80):
@@ -2361,6 +2478,7 @@ def getConsoleWidth(default=80):
 
     return width or default
 
+
 def shellExec(cmd):
     """
     Executes arbitrary shell command
@@ -2372,13 +2490,15 @@ def shellExec(cmd):
     retVal = ""
 
     try:
-        retVal = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT).communicate()[0] or ""
+        retVal = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT).communicate()[
+                     0] or ""
     except Exception as ex:
         retVal = getSafeExString(ex)
     finally:
         retVal = getText(retVal)
 
     return retVal
+
 
 def clearConsoleLine(forceOutput=False):
     """
@@ -2389,6 +2509,7 @@ def clearConsoleLine(forceOutput=False):
         dataToStdout("\r%s\r" % (" " * (getConsoleWidth() - 1)), forceOutput)
 
     kb.prependFlag = False
+
 
 def parseXmlFile(xmlFile, handler):
     """
@@ -2404,6 +2525,7 @@ def parseXmlFile(xmlFile, handler):
         errMsg += "sure that you haven't made any changes to it"
         raise SqlmapInstallationException(errMsg)
 
+
 def getSQLSnippet(dbms, sfile, **variables):
     """
     Returns content of SQL snippet located inside 'procs/' directory
@@ -2417,7 +2539,8 @@ def getSQLSnippet(dbms, sfile, **variables):
     elif not sfile.endswith('.sql') and os.path.exists("%s.sql" % sfile):
         filename = "%s.sql" % sfile
     else:
-        filename = os.path.join(paths.SQLMAP_PROCS_PATH, DBMS_DIRECTORY_DICT[dbms], sfile if sfile.endswith('.sql') else "%s.sql" % sfile)
+        filename = os.path.join(paths.SQLMAP_PROCS_PATH, DBMS_DIRECTORY_DICT[dbms],
+                                sfile if sfile.endswith('.sql') else "%s.sql" % sfile)
         checkFile(filename)
 
     retVal = readCachedFileContent(filename)
@@ -2436,7 +2559,8 @@ def getSQLSnippet(dbms, sfile, **variables):
     variables = re.findall(r"(?<!\bLIKE ')%(\w+)%", retVal, re.I)
 
     if variables:
-        errMsg = "unresolved variable%s '%s' in SQL file '%s'" % ("s" if len(variables) > 1 else "", ", ".join(variables), sfile)
+        errMsg = "unresolved variable%s '%s' in SQL file '%s'" % (
+        "s" if len(variables) > 1 else "", ", ".join(variables), sfile)
         logger.error(errMsg)
 
         msg = "do you want to provide the substitution values? [y/N] "
@@ -2448,6 +2572,7 @@ def getSQLSnippet(dbms, sfile, **variables):
                 retVal = retVal.replace(r"%%%s%%" % var, val)
 
     return retVal
+
 
 def readCachedFileContent(filename, mode="rb"):
     """
@@ -2471,6 +2596,7 @@ def readCachedFileContent(filename, mode="rb"):
 
     return kb.cache.content[filename]
 
+
 def average(values):
     """
     Computes the arithmetic mean of a list of numbers.
@@ -2480,6 +2606,7 @@ def average(values):
     """
 
     return (1.0 * sum(values) / len(values)) if values else None
+
 
 @cachedmethod
 def stdev(values):
@@ -2499,6 +2626,7 @@ def stdev(values):
         _ = 1.0 * sum(pow((_ or 0) - avg, 2) for _ in values)
         return sqrt(_ / (len(values) - 1))
 
+
 def calculateDeltaSeconds(start):
     """
     Returns elapsed time from start till now
@@ -2508,6 +2636,7 @@ def calculateDeltaSeconds(start):
     """
 
     return time.time() - start
+
 
 def initCommonOutputs():
     """
@@ -2535,6 +2664,7 @@ def initCommonOutputs():
 
                 if line not in kb.commonOutputs[key]:
                     kb.commonOutputs[key].add(line)
+
 
 def getFileItems(filename, commentPrefix='#', unicoded=True, lowercase=False, unique=False):
     """
@@ -2577,6 +2707,7 @@ def getFileItems(filename, commentPrefix='#', unicoded=True, lowercase=False, un
         raise SqlmapSystemException(errMsg)
 
     return retVal if not unique else list(retVal.keys())
+
 
 def goGoodSamaritan(prevValue, originalCharset):
     """
@@ -2646,6 +2777,7 @@ def goGoodSamaritan(prevValue, originalCharset):
     else:
         return None, None, None, originalCharset
 
+
 def getPartRun(alias=True):
     """
     Goes through call stack and finds constructs matching
@@ -2683,6 +2815,7 @@ def getPartRun(alias=True):
     else:
         return retVal
 
+
 def longestCommonPrefix(*sequences):
     """
     Returns longest common prefix occuring in given sequences
@@ -2710,6 +2843,7 @@ def longestCommonPrefix(*sequences):
 
     return sequences[0]
 
+
 def commonFinderOnly(initial, sequence):
     """
     Returns parts of sequence which start with the given initial string
@@ -2719,6 +2853,7 @@ def commonFinderOnly(initial, sequence):
     """
 
     return longestCommonPrefix(*[_ for _ in sequence if _.startswith(initial)])
+
 
 def pushValue(value):
     """
@@ -2742,6 +2877,7 @@ def pushValue(value):
         if exception:
             raise exception
 
+
 def popValue():
     """
     Pop value from the stack (thread dependent)
@@ -2760,6 +2896,7 @@ def popValue():
 
     return retVal
 
+
 def wasLastResponseDBMSError():
     """
     Returns True if the last web request resulted in a (recognized) DBMS error page
@@ -2768,6 +2905,7 @@ def wasLastResponseDBMSError():
     threadData = getCurrentThreadData()
     return threadData.lastErrorPage and threadData.lastErrorPage[0] == threadData.lastRequestUID
 
+
 def wasLastResponseHTTPError():
     """
     Returns True if the last web request resulted in an erroneous HTTP code (like 500)
@@ -2775,6 +2913,7 @@ def wasLastResponseHTTPError():
 
     threadData = getCurrentThreadData()
     return threadData.lastHTTPError and threadData.lastHTTPError[0] == threadData.lastRequestUID
+
 
 def wasLastResponseDelayed():
     """
@@ -2802,7 +2941,8 @@ def wasLastResponseDelayed():
                 msg = "do you want sqlmap to try to optimize value(s) "
                 msg += "for DBMS delay responses (option '--time-sec')? [Y/n] "
 
-                kb.adjustTimeDelay = ADJUST_TIME_DELAY.DISABLE if not readInput(msg, default='Y', boolean=True) else ADJUST_TIME_DELAY.YES
+                kb.adjustTimeDelay = ADJUST_TIME_DELAY.DISABLE if not readInput(msg, default='Y',
+                                                                                boolean=True) else ADJUST_TIME_DELAY.YES
             if kb.adjustTimeDelay is ADJUST_TIME_DELAY.YES:
                 adjustTimeDelay(threadData.lastQueryDuration, lowerStdLimit)
 
@@ -2812,6 +2952,7 @@ def wasLastResponseDelayed():
         if Backend.getIdentifiedDbms() in (DBMS.MYSQL,):  # MySQL's SLEEP(X) lasts 0.05 seconds shorter on average
             delta += 0.05
         return delta >= 0
+
 
 def adjustTimeDelay(lastQueryDuration, lowerStdLimit):
     """
@@ -2823,12 +2964,14 @@ def adjustTimeDelay(lastQueryDuration, lowerStdLimit):
     kb.delayCandidates = [candidate] + kb.delayCandidates[:-1]
 
     if all((_ == candidate for _ in kb.delayCandidates)) and candidate < conf.timeSec:
-        if lastQueryDuration / (1.0 * conf.timeSec / candidate) > MIN_VALID_DELAYED_RESPONSE:  # Note: to prevent problems with fast responses for heavy-queries like RANDOMBLOB
+        if lastQueryDuration / (
+                1.0 * conf.timeSec / candidate) > MIN_VALID_DELAYED_RESPONSE:  # Note: to prevent problems with fast responses for heavy-queries like RANDOMBLOB
             conf.timeSec = candidate
 
             infoMsg = "adjusting time delay to "
             infoMsg += "%d second%s due to good response times" % (conf.timeSec, 's' if conf.timeSec > 1 else '')
             logger.info(infoMsg)
+
 
 def getLastRequestHTTPError():
     """
@@ -2837,6 +2980,7 @@ def getLastRequestHTTPError():
 
     threadData = getCurrentThreadData()
     return threadData.lastHTTPError[1] if threadData.lastHTTPError else None
+
 
 def extractErrorMessage(page):
     """
@@ -2859,7 +3003,8 @@ def extractErrorMessage(page):
 
             if match:
                 candidate = htmlUnescape(match.group("result")).replace("<br>", "\n").strip()
-                if candidate and (1.0 * len(re.findall(r"[^A-Za-z,. ]", candidate)) / len(candidate) > MIN_ERROR_PARSING_NON_WRITING_RATIO):
+                if candidate and (1.0 * len(re.findall(r"[^A-Za-z,. ]", candidate)) / len(
+                        candidate) > MIN_ERROR_PARSING_NON_WRITING_RATIO):
                     retVal = candidate
                     break
 
@@ -2870,6 +3015,7 @@ def extractErrorMessage(page):
                 retVal = match.group(0)
 
     return retVal
+
 
 def findLocalPort(ports):
     """
@@ -2896,6 +3042,7 @@ def findLocalPort(ports):
                 pass
 
     return retVal
+
 
 def findMultipartPostBoundary(post):
     """
@@ -2925,6 +3072,7 @@ def findMultipartPostBoundary(post):
 
     return retVal
 
+
 def urldecode(value, encoding=None, unsafe="%%?&=;+%s" % CUSTOM_INJECTION_MARK_CHAR, convall=False, spaceplus=True):
     """
     URL decodes given value
@@ -2953,13 +3101,15 @@ def urldecode(value, encoding=None, unsafe="%%?&=;+%s" % CUSTOM_INJECTION_MARK_C
                 return char if char in charset else match.group(0)
 
             if spaceplus:
-                result = result.replace('+', ' ')  # plus sign has a special meaning in URL encoded data (hence the usage of _urllib.parse.unquote_plus in convall case)
+                result = result.replace('+',
+                                        ' ')  # plus sign has a special meaning in URL encoded data (hence the usage of _urllib.parse.unquote_plus in convall case)
 
             result = re.sub(r"%([0-9a-fA-F]{2})", _, result or "")
 
         result = getUnicode(result, encoding or UNICODE_ENCODING)
 
     return result
+
 
 def urlencode(value, safe="%&=-_", convall=False, limit=False, spaceplus=False):
     """
@@ -3022,6 +3172,7 @@ def urlencode(value, safe="%&=-_", convall=False, limit=False, spaceplus=False):
 
     return result
 
+
 def runningAsAdmin():
     """
     Returns True if the current process is run under admin privileges
@@ -3051,6 +3202,7 @@ def runningAsAdmin():
 
     return isAdmin
 
+
 def logHTTPTraffic(requestLogMsg, responseLogMsg, startTime=None, endTime=None):
     """
     Logs HTTP traffic to the output file
@@ -3065,8 +3217,10 @@ def logHTTPTraffic(requestLogMsg, responseLogMsg, startTime=None, endTime=None):
             dataToTrafficFile("%s%s" % (responseLogMsg, os.linesep))
             dataToTrafficFile("%s%s%s%s" % (os.linesep, 76 * '#', os.linesep, os.linesep))
 
+
 def getPageTemplate(payload, place):  # Cross-referenced function
     raise NotImplementedError
+
 
 @cachedmethod
 def getPublicTypeMembers(type_, onlyValues=False):
@@ -3090,6 +3244,7 @@ def getPublicTypeMembers(type_, onlyValues=False):
 
     return retVal
 
+
 def enumValueToNameLookup(type_, value_):
     """
     Returns name of a enum member with a given value
@@ -3106,6 +3261,7 @@ def enumValueToNameLookup(type_, value_):
             break
 
     return retVal
+
 
 @cachedmethod
 def extractRegexResult(regex, content, flags=0):
@@ -3132,6 +3288,7 @@ def extractRegexResult(regex, content, flags=0):
 
     return retVal
 
+
 def extractTextTagContent(page):
     """
     Returns list containing content from "textual" tags
@@ -3150,6 +3307,7 @@ def extractTextTagContent(page):
 
     return filterNone(_.group("result").strip() for _ in re.finditer(TEXT_TAG_REGEX, page))
 
+
 def trimAlphaNum(value):
     """
     Trims alpha numeric characters from start and ending of a given value
@@ -3165,6 +3323,7 @@ def trimAlphaNum(value):
         value = value[1:]
 
     return value
+
 
 def isNumPosStrValue(value):
     """
@@ -3182,7 +3341,9 @@ def isNumPosStrValue(value):
     False
     """
 
-    return ((hasattr(value, "isdigit") and value.isdigit() and int(value) > 0) or (isinstance(value, int) and value > 0)) and int(value) < MAX_INT
+    return ((hasattr(value, "isdigit") and value.isdigit() and int(value) > 0) or (
+                isinstance(value, int) and value > 0)) and int(value) < MAX_INT
+
 
 @cachedmethod
 def aliasToDbmsEnum(dbms):
@@ -3202,6 +3363,7 @@ def aliasToDbmsEnum(dbms):
                 break
 
     return retVal
+
 
 def findDynamicContent(firstPage, secondPage):
     """
@@ -3261,8 +3423,10 @@ def findDynamicContent(firstPage, secondPage):
             kb.dynamicMarkings.append((prefix if prefix else None, suffix if suffix else None))
 
     if len(kb.dynamicMarkings) > 0:
-        infoMsg = "dynamic content marked for removal (%d region%s)" % (len(kb.dynamicMarkings), 's' if len(kb.dynamicMarkings) > 1 else '')
+        infoMsg = "dynamic content marked for removal (%d region%s)" % (
+        len(kb.dynamicMarkings), 's' if len(kb.dynamicMarkings) > 1 else '')
         singleTimeLogMessage(infoMsg)
+
 
 def removeDynamicContent(page):
     """
@@ -3281,9 +3445,11 @@ def removeDynamicContent(page):
             elif suffix is None:
                 page = re.sub(r"(?s)%s.+$" % re.escape(prefix), prefix.replace('\\', r'\\'), page)
             else:
-                page = re.sub(r"(?s)%s.+%s" % (re.escape(prefix), re.escape(suffix)), "%s%s" % (prefix.replace('\\', r'\\'), suffix.replace('\\', r'\\')), page)
+                page = re.sub(r"(?s)%s.+%s" % (re.escape(prefix), re.escape(suffix)),
+                              "%s%s" % (prefix.replace('\\', r'\\'), suffix.replace('\\', r'\\')), page)
 
     return page
+
 
 def filterStringValue(value, charRegex, replacement=""):
     """
@@ -3297,9 +3463,11 @@ def filterStringValue(value, charRegex, replacement=""):
     retVal = value
 
     if value:
-        retVal = re.sub(charRegex.replace("[", "[^") if "[^" not in charRegex else charRegex.replace("[^", "["), replacement, value)
+        retVal = re.sub(charRegex.replace("[", "[^") if "[^" not in charRegex else charRegex.replace("[^", "["),
+                        replacement, value)
 
     return retVal
+
 
 def filterControlChars(value, replacement=' '):
     """
@@ -3310,6 +3478,7 @@ def filterControlChars(value, replacement=' '):
     """
 
     return filterStringValue(value, PRINTABLE_CHAR_REGEX, replacement)
+
 
 def filterNone(values):
     """
@@ -3325,6 +3494,7 @@ def filterNone(values):
         retVal = [_ for _ in values if _]
 
     return retVal
+
 
 def isDBMSVersionAtLeast(minimum):
     """
@@ -3353,7 +3523,8 @@ def isDBMSVersionAtLeast(minimum):
 
     retVal = None
 
-    if not any(isNoneValue(_) for _ in (Backend.getVersion(), minimum)) and Backend.getVersion() != UNKNOWN_DBMS_VERSION:
+    if not any(
+            isNoneValue(_) for _ in (Backend.getVersion(), minimum)) and Backend.getVersion() != UNKNOWN_DBMS_VERSION:
         version = Backend.getVersion().replace(" ", "").rstrip('.')
 
         correction = 0.0
@@ -3395,6 +3566,7 @@ def isDBMSVersionAtLeast(minimum):
 
     return retVal
 
+
 def parseSqliteTableSchema(value):
     """
     Parses table column names and types from specified SQLite table schema
@@ -3428,7 +3600,9 @@ def parseSqliteTableSchema(value):
 
         value = re.sub(r"\(.+?\)", "", value).strip()
 
-        for match in re.finditer(r"(?:\A|,)\s*(([\"'`]).+?\2|\w+)(?:\s+(INT|INTEGER|TINYINT|SMALLINT|MEDIUMINT|BIGINT|UNSIGNED BIG INT|INT2|INT8|INTEGER|CHARACTER|VARCHAR|VARYING CHARACTER|NCHAR|NATIVE CHARACTER|NVARCHAR|TEXT|CLOB|LONGTEXT|BLOB|NONE|REAL|DOUBLE|DOUBLE PRECISION|FLOAT|REAL|NUMERIC|DECIMAL|BOOLEAN|DATE|DATETIME|NUMERIC)\b)?", decodeStringEscape(value), re.I):
+        for match in re.finditer(
+                r"(?:\A|,)\s*(([\"'`]).+?\2|\w+)(?:\s+(INT|INTEGER|TINYINT|SMALLINT|MEDIUMINT|BIGINT|UNSIGNED BIG INT|INT2|INT8|INTEGER|CHARACTER|VARCHAR|VARYING CHARACTER|NCHAR|NATIVE CHARACTER|NVARCHAR|TEXT|CLOB|LONGTEXT|BLOB|NONE|REAL|DOUBLE|DOUBLE PRECISION|FLOAT|REAL|NUMERIC|DECIMAL|BOOLEAN|DATE|DATETIME|NUMERIC)\b)?",
+                decodeStringEscape(value), re.I):
             column = match.group(1).strip(match.group(2) or "")
             if re.search(r"(?i)\A(CONSTRAINT|PRIMARY|UNIQUE|CHECK|FOREIGN)\b", column.strip()):
                 continue
@@ -3441,12 +3615,14 @@ def parseSqliteTableSchema(value):
 
     return retVal
 
+
 def getTechniqueData(technique=None):
     """
     Returns injection data for technique specified
     """
 
     return kb.injection.data.get(technique if technique is not None else getTechnique())
+
 
 def isTechniqueAvailable(technique):
     """
@@ -3463,6 +3639,7 @@ def isTechniqueAvailable(technique):
         return False
     else:
         return getTechniqueData(technique) is not None
+
 
 def isHeavyQueryBased(technique=None):
     """
@@ -3486,6 +3663,7 @@ def isHeavyQueryBased(technique=None):
             retVal = True
 
     return retVal
+
 
 def isStackingAvailable():
     """
@@ -3511,6 +3689,7 @@ def isStackingAvailable():
 
     return retVal
 
+
 def isInferenceAvailable():
     """
     Returns True whether techniques using inference technique are available
@@ -3522,7 +3701,9 @@ def isInferenceAvailable():
     >>> kb.injection.data = popValue()
     """
 
-    return any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.BOOLEAN, PAYLOAD.TECHNIQUE.STACKED, PAYLOAD.TECHNIQUE.TIME))
+    return any(
+        isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.BOOLEAN, PAYLOAD.TECHNIQUE.STACKED, PAYLOAD.TECHNIQUE.TIME))
+
 
 def setOptimize():
     """
@@ -3532,11 +3713,13 @@ def setOptimize():
     # conf.predictOutput = True
     conf.keepAlive = True
     conf.threads = 3 if conf.threads < 3 and cmdLineOptions.threads is None else conf.threads
-    conf.nullConnection = not any((conf.data, conf.textOnly, conf.titles, conf.string, conf.notString, conf.regexp, conf.tor))
+    conf.nullConnection = not any(
+        (conf.data, conf.textOnly, conf.titles, conf.string, conf.notString, conf.regexp, conf.tor))
 
     if not conf.nullConnection:
         debugMsg = "turning off switch '--null-connection' used indirectly by switch '-o'"
         logger.debug(debugMsg)
+
 
 def saveConfig(conf, filename):
     """
@@ -3590,6 +3773,7 @@ def saveConfig(conf, filename):
             errMsg += "to write to the configuration file '%s' ('%s')" % (filename, getSafeExString(ex))
             raise SqlmapSystemException(errMsg)
 
+
 def initTechnique(technique=None):
     """
     Prepares data for technique specified
@@ -3608,7 +3792,8 @@ def initTechnique(technique=None):
             for key, value in kb.injection.conf.items():
                 if value and (not hasattr(conf, key) or (hasattr(conf, key) and not getattr(conf, key))):
                     setattr(conf, key, value)
-                    debugMsg = "resuming configuration option '%s' (%s)" % (key, ("'%s'" % value) if isinstance(value, six.string_types) else value)
+                    debugMsg = "resuming configuration option '%s' (%s)" % (
+                    key, ("'%s'" % value) if isinstance(value, six.string_types) else value)
                     logger.debug(debugMsg)
 
                     if value and key == "optimize":
@@ -3624,6 +3809,7 @@ def initTechnique(technique=None):
         errMsg += "with this error"
         raise SqlmapNoneDataException(errMsg)
 
+
 def arrayizeValue(value):
     """
     Makes a list out of value if it is not already a list or tuple itself
@@ -3638,6 +3824,7 @@ def arrayizeValue(value):
         value = [value]
 
     return value
+
 
 def unArrayizeValue(value):
     """
@@ -3668,6 +3855,7 @@ def unArrayizeValue(value):
 
     return value
 
+
 def flattenValue(value):
     """
     Returns an iterator representing flat representation of a given value
@@ -3682,6 +3870,7 @@ def flattenValue(value):
                 yield j
         else:
             yield i
+
 
 def joinValue(value, delimiter=','):
     """
@@ -3700,6 +3889,7 @@ def joinValue(value, delimiter=','):
 
     return retVal
 
+
 def isListLike(value):
     """
     Returns True if the given value is a list-like instance
@@ -3711,6 +3901,7 @@ def isListLike(value):
     """
 
     return isinstance(value, (list, tuple, set, OrderedSet, BigArray))
+
 
 def getSortedInjectionTests():
     """
@@ -3744,6 +3935,7 @@ def getSortedInjectionTests():
 
     return retVal
 
+
 def filterListValue(value, regex):
     """
     Returns list with items that have parts satisfying given regular expression
@@ -3759,6 +3951,7 @@ def filterListValue(value, regex):
 
     return retVal
 
+
 def showHttpErrorCodes():
     """
     Shows all HTTP error codes raised till now
@@ -3766,14 +3959,19 @@ def showHttpErrorCodes():
 
     if kb.httpErrorCodes:
         warnMsg = "HTTP error codes detected during run:\n"
-        warnMsg += ", ".join("%d (%s) - %d times" % (code, _http_client.responses[code] if code in _http_client.responses else '?', count) for code, count in kb.httpErrorCodes.items())
+        warnMsg += ", ".join("%d (%s) - %d times" % (
+        code, _http_client.responses[code] if code in _http_client.responses else '?', count) for code, count in
+                             kb.httpErrorCodes.items())
         logger.warning(warnMsg)
-        if any((str(_).startswith('4') or str(_).startswith('5')) and _ != _http_client.INTERNAL_SERVER_ERROR and _ != kb.originalCode for _ in kb.httpErrorCodes):
+        if any((str(_).startswith('4') or str(_).startswith(
+                '5')) and _ != _http_client.INTERNAL_SERVER_ERROR and _ != kb.originalCode for _ in kb.httpErrorCodes):
             msg = "too many 4xx and/or 5xx HTTP error codes "
             msg += "could mean that some kind of protection is involved (e.g. WAF)"
             logger.debug(msg)
 
-def openFile(filename, mode='r', encoding=UNICODE_ENCODING, errors="reversible", buffering=1):  # "buffering=1" means line buffered (Reference: http://stackoverflow.com/a/3168436)
+
+def openFile(filename, mode='r', encoding=UNICODE_ENCODING, errors="reversible",
+             buffering=1):  # "buffering=1" means line buffered (Reference: http://stackoverflow.com/a/3168436)
     """
     Returns file handle of a given filename
 
@@ -3797,9 +3995,11 @@ def openFile(filename, mode='r', encoding=UNICODE_ENCODING, errors="reversible",
             return codecs.open(filename, mode, encoding, errors, buffering)
         except IOError:
             errMsg = "there has been a file opening error for filename '%s'. " % filename
-            errMsg += "Please check %s permissions on a file " % ("write" if mode and ('w' in mode or 'a' in mode or '+' in mode) else "read")
+            errMsg += "Please check %s permissions on a file " % (
+                "write" if mode and ('w' in mode or 'a' in mode or '+' in mode) else "read")
             errMsg += "and that it's not locked by another process"
             raise SqlmapSystemException(errMsg)
+
 
 def decodeIntToUnicode(value):
     """
@@ -3829,7 +4029,8 @@ def decodeIntToUnicode(value):
                 elif Backend.isDbms(DBMS.MSSQL):
                     # Reference: https://docs.microsoft.com/en-us/sql/relational-databases/collations/collation-and-unicode-support?view=sql-server-2017 and https://stackoverflow.com/a/14488478
                     retVal = getUnicode(raw, "UTF-16-BE")
-                elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE):     # Note: cases with Unicode code points (e.g. http://www.postgresqltutorial.com/postgresql-ascii/)
+                elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE,
+                                                     DBMS.SQLITE):  # Note: cases with Unicode code points (e.g. http://www.postgresqltutorial.com/postgresql-ascii/)
                     retVal = _unichr(value)
                 else:
                     retVal = getUnicode(raw, conf.encoding)
@@ -3839,6 +4040,7 @@ def decodeIntToUnicode(value):
             retVal = INFERENCE_UNKNOWN_CHAR
 
     return retVal
+
 
 def checkIntegrity():
     """
@@ -3863,6 +4065,7 @@ def checkIntegrity():
 
     return retVal
 
+
 def getDaysFromLastUpdate():
     """
     Get total number of days from last update
@@ -3875,6 +4078,7 @@ def getDaysFromLastUpdate():
         return
 
     return int(time.time() - os.path.getmtime(paths.SQLMAP_SETTINGS_PATH)) // (3600 * 24)
+
 
 def unhandledExceptionMessage():
     """
@@ -3894,14 +4098,20 @@ def unhandledExceptionMessage():
     errMsg += "Running version: %s\n" % VERSION_STRING[VERSION_STRING.find('/') + 1:]
     errMsg += "Python version: %s\n" % PYVERSION
     errMsg += "Operating system: %s\n" % platform.platform()
-    errMsg += "Command line: %s\n" % re.sub(r".+?\bsqlmap\.py\b", "sqlmap.py", getUnicode(" ".join(sys.argv), encoding=getattr(sys.stdin, "encoding", None)))
-    errMsg += "Technique: %s\n" % (enumValueToNameLookup(PAYLOAD.TECHNIQUE, getTechnique()) if getTechnique() is not None else ("DIRECT" if conf.get("direct") else None))
+    errMsg += "Command line: %s\n" % re.sub(r".+?\bsqlmap\.py\b", "sqlmap.py", getUnicode(" ".join(sys.argv),
+                                                                                          encoding=getattr(sys.stdin,
+                                                                                                           "encoding",
+                                                                                                           None)))
+    errMsg += "Technique: %s\n" % (
+        enumValueToNameLookup(PAYLOAD.TECHNIQUE, getTechnique()) if getTechnique() is not None else (
+            "DIRECT" if conf.get("direct") else None))
     errMsg += "Back-end DBMS:"
 
     if Backend.getDbms() is not None:
         errMsg += " %s (fingerprinted)" % Backend.getDbms()
 
-    if Backend.getIdentifiedDbms() is not None and (Backend.getDbms() is None or Backend.getIdentifiedDbms() != Backend.getDbms()):
+    if Backend.getIdentifiedDbms() is not None and (
+            Backend.getDbms() is None or Backend.getIdentifiedDbms() != Backend.getDbms()):
         errMsg += " %s (identified)" % Backend.getIdentifiedDbms()
 
     if not errMsg.endswith(')'):
@@ -3909,13 +4119,15 @@ def unhandledExceptionMessage():
 
     return errMsg
 
+
 def getLatestRevision():
     """
     Retrieves latest revision from the offical repository
     """
 
     retVal = None
-    req = _urllib.request.Request(url="https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/ settings.py", headers={HTTP_HEADER.USER_AGENT: fetchRandomAgent()})
+    req = _urllib.request.Request(url="https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/ settings.py",
+                                  headers={HTTP_HEADER.USER_AGENT: fetchRandomAgent()})
 
     try:
         content = getUnicode(_urllib.request.urlopen(req).read())
@@ -3924,6 +4136,7 @@ def getLatestRevision():
         pass
 
     return retVal
+
 
 def fetchRandomAgent():
     """
@@ -3946,6 +4159,7 @@ def fetchRandomAgent():
             raise SqlmapSystemException(errMsg)
 
     return random.sample(kb.userAgents, 1)[0]
+
 
 def createGithubIssue(errMsg, excMsg):
     """
@@ -3983,7 +4197,9 @@ def createGithubIssue(errMsg, excMsg):
         _excMsg = None
         errMsg = errMsg[errMsg.find("\n"):]
 
-        req = _urllib.request.Request(url="https://api.github.com/search/issues?q=%s" % _urllib.parse.quote("repo:sqlmapproject/sqlmap Unhandled exception (#%s)" % key), headers={HTTP_HEADER.USER_AGENT: fetchRandomAgent()})
+        req = _urllib.request.Request(url="https://api.github.com/search/issues?q=%s" % _urllib.parse.quote(
+            "repo:sqlmapproject/sqlmap Unhandled exception (#%s)" % key),
+                                      headers={HTTP_HEADER.USER_AGENT: fetchRandomAgent()})
 
         try:
             content = _urllib.request.urlopen(req).read()
@@ -4001,7 +4217,10 @@ def createGithubIssue(errMsg, excMsg):
             pass
 
         data = {"title": "Unhandled exception (#%s)" % key, "body": "```%s\n```\n```\n%s```" % (errMsg, excMsg)}
-        req = _urllib.request.Request(url="https://api.github.com/repos/sqlmapproject/sqlmap/issues", data=getBytes(json.dumps(data)), headers={HTTP_HEADER.AUTHORIZATION: "token %s" % decodeBase64(GITHUB_REPORT_OAUTH_TOKEN, binary=False), HTTP_HEADER.USER_AGENT: fetchRandomAgent()})
+        req = _urllib.request.Request(url="https://api.github.com/repos/sqlmapproject/sqlmap/issues",
+                                      data=getBytes(json.dumps(data)), headers={
+                HTTP_HEADER.AUTHORIZATION: "token %s" % decodeBase64(GITHUB_REPORT_OAUTH_TOKEN, binary=False),
+                HTTP_HEADER.USER_AGENT: fetchRandomAgent()})
 
         try:
             content = getText(_urllib.request.urlopen(req).read())
@@ -4027,6 +4246,7 @@ def createGithubIssue(errMsg, excMsg):
                 warnMsg += ". Please update to the latest revision"
             logger.warning(warnMsg)
 
+
 def maskSensitiveData(msg):
     """
     Masks sensitive data in the supplied message
@@ -4049,17 +4269,21 @@ def maskSensitiveData(msg):
             retVal = retVal.replace(value, '*' * len(value))
 
     # Just in case (for problematic parameters regarding user encoding)
-    for match in re.finditer(r"(?im)[ -]-(u|url|data|cookie|auth-\w+|proxy|host|referer|headers?|H)( |=)(.*?)(?= -?-[a-z]|$)", retVal):
+    for match in re.finditer(
+            r"(?im)[ -]-(u|url|data|cookie|auth-\w+|proxy|host|referer|headers?|H)( |=)(.*?)(?= -?-[a-z]|$)", retVal):
         retVal = retVal.replace(match.group(3), '*' * len(match.group(3)))
 
     # Fail-safe substitutions
-    retVal = re.sub(r"(?i)(Command line:.+)\b(https?://[^ ]+)", lambda match: "%s%s" % (match.group(1), '*' * len(match.group(2))), retVal)
-    retVal = re.sub(r"(?i)(\b\w:[\\/]+Users[\\/]+|[\\/]+home[\\/]+)([^\\/]+)", lambda match: "%s%s" % (match.group(1), '*' * len(match.group(2))), retVal)
+    retVal = re.sub(r"(?i)(Command line:.+)\b(https?://[^ ]+)",
+                    lambda match: "%s%s" % (match.group(1), '*' * len(match.group(2))), retVal)
+    retVal = re.sub(r"(?i)(\b\w:[\\/]+Users[\\/]+|[\\/]+home[\\/]+)([^\\/]+)",
+                    lambda match: "%s%s" % (match.group(1), '*' * len(match.group(2))), retVal)
 
     if getpass.getuser():
         retVal = re.sub(r"(?i)\b%s\b" % re.escape(getpass.getuser()), '*' * len(getpass.getuser()), retVal)
 
     return retVal
+
 
 def listToStrValue(value):
     """
@@ -4078,6 +4302,7 @@ def listToStrValue(value):
         retVal = value
 
     return retVal
+
 
 def intersect(containerA, containerB, lowerCase=False):
     """
@@ -4101,6 +4326,7 @@ def intersect(containerA, containerB, lowerCase=False):
 
     return retVal
 
+
 def decodeStringEscape(value):
     """
     Decodes escaped string values (e.g. "\\t" -> "\t")
@@ -4114,6 +4340,7 @@ def decodeStringEscape(value):
             retVal = retVal.replace(repr(_).strip("'"), _)
 
     return retVal
+
 
 def encodeStringEscape(value):
     """
@@ -4129,6 +4356,7 @@ def encodeStringEscape(value):
 
     return retVal
 
+
 def removeReflectiveValues(content, payload, suppressWarning=False):
     """
     Neutralizes reflective values in a given content based on a payload
@@ -4138,7 +4366,8 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
     retVal = content
 
     try:
-        if all((content, payload)) and isinstance(content, six.text_type) and kb.reflectiveMechanism and not kb.heuristicMode:
+        if all((content, payload)) and isinstance(content,
+                                                  six.text_type) and kb.reflectiveMechanism and not kb.heuristicMode:
             def _(value):
                 while 2 * REFLECTED_REPLACEMENT_REGEX in value:
                     value = value.replace(2 * REFLECTED_REPLACEMENT_REGEX, REFLECTED_REPLACEMENT_REGEX)
@@ -4148,7 +4377,8 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
             regex = _(filterStringValue(payload, r"[A-Za-z0-9]", encodeStringEscape(REFLECTED_REPLACEMENT_REGEX)))
 
             if regex != payload:
-                if all(part.lower() in content.lower() for part in filterNone(regex.split(REFLECTED_REPLACEMENT_REGEX))[1:]):  # fast optimization check
+                if all(part.lower() in content.lower() for part in
+                       filterNone(regex.split(REFLECTED_REPLACEMENT_REGEX))[1:]):  # fast optimization check
                     parts = regex.split(REFLECTED_REPLACEMENT_REGEX)
 
                     # Note: naive approach
@@ -4156,7 +4386,9 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
                     retVal = retVal.replace(re.sub(r"\A\w+", "", payload), REFLECTED_VALUE_MARKER)
 
                     if len(parts) > REFLECTED_MAX_REGEX_PARTS:  # preventing CPU hogs
-                        regex = _("%s%s%s" % (REFLECTED_REPLACEMENT_REGEX.join(parts[:REFLECTED_MAX_REGEX_PARTS // 2]), REFLECTED_REPLACEMENT_REGEX, REFLECTED_REPLACEMENT_REGEX.join(parts[-REFLECTED_MAX_REGEX_PARTS // 2:])))
+                        regex = _("%s%s%s" % (REFLECTED_REPLACEMENT_REGEX.join(parts[:REFLECTED_MAX_REGEX_PARTS // 2]),
+                                              REFLECTED_REPLACEMENT_REGEX, REFLECTED_REPLACEMENT_REGEX.join(
+                            parts[-REFLECTED_MAX_REGEX_PARTS // 2:])))
 
                     parts = filterNone(regex.split(REFLECTED_REPLACEMENT_REGEX))
 
@@ -4225,6 +4457,7 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
 
     return retVal
 
+
 def normalizeUnicode(value, charset=string.printable[:string.printable.find(' ') + 1]):
     """
     Does an ASCII normalization of unicode strings
@@ -4244,6 +4477,7 @@ def normalizeUnicode(value, charset=string.printable[:string.printable.find(' ')
         retVal = "".join(_ for _ in retVal if _ in charset)
 
     return retVal
+
 
 def safeSQLIdentificatorNaming(name, isTable=False):
     """
@@ -4270,13 +4504,18 @@ def safeSQLIdentificatorNaming(name, isTable=False):
             retVal = re.sub(r"(?i)\A\[?%s\]?\." % DEFAULT_MSSQL_SCHEMA, "%s." % DEFAULT_MSSQL_SCHEMA, retVal)
 
         # Note: SQL 92 has restrictions for identifiers starting with underscore (e.g. http://www.frontbase.com/documentation/FBUsers_4.pdf)
-        if retVal.upper() in kb.keywords or (not isTable and (retVal or " ")[0] == '_') or (retVal or " ")[0].isdigit() or not re.match(r"\A[A-Za-z0-9_@%s\$]+\Z" % ('.' if _ else ""), retVal):  # MsSQL is the only DBMS where we automatically prepend schema to table name (dot is normal)
+        if retVal.upper() in kb.keywords or (not isTable and (retVal or " ")[0] == '_') or (retVal or " ")[
+            0].isdigit() or not re.match(r"\A[A-Za-z0-9_@%s\$]+\Z" % ('.' if _ else ""),
+                                         retVal):  # MsSQL is the only DBMS where we automatically prepend schema to table name (dot is normal)
             if not conf.noEscape:
                 retVal = unsafeSQLIdentificatorNaming(retVal)
 
-                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS, DBMS.CUBRID, DBMS.SQLITE):  # Note: in SQLite double-quotes are treated as string if column/identifier is non-existent (e.g. SELECT "foobar" FROM users)
+                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS, DBMS.CUBRID,
+                                                   DBMS.SQLITE):  # Note: in SQLite double-quotes are treated as string if column/identifier is non-existent (e.g. SELECT "foobar" FROM users)
                     retVal = "`%s`" % retVal
-                elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2, DBMS.HSQLDB, DBMS.H2, DBMS.INFORMIX, DBMS.MONETDB, DBMS.VERTICA, DBMS.MCKOI, DBMS.PRESTO, DBMS.CRATEDB, DBMS.CACHE, DBMS.EXTREMEDB, DBMS.FRONTBASE, DBMS.RAIMA, DBMS.VIRTUOSO):
+                elif Backend.getIdentifiedDbms() in (
+                DBMS.PGSQL, DBMS.DB2, DBMS.HSQLDB, DBMS.H2, DBMS.INFORMIX, DBMS.MONETDB, DBMS.VERTICA, DBMS.MCKOI,
+                DBMS.PRESTO, DBMS.CRATEDB, DBMS.CACHE, DBMS.EXTREMEDB, DBMS.FRONTBASE, DBMS.RAIMA, DBMS.VIRTUOSO):
                     retVal = "\"%s\"" % retVal
                 elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.ALTIBASE, DBMS.MIMERSQL):
                     retVal = "\"%s\"" % retVal.upper()
@@ -4284,7 +4523,8 @@ def safeSQLIdentificatorNaming(name, isTable=False):
                     if isTable:
                         parts = retVal.split('.', 1)
                         for i in xrange(len(parts)):
-                            if parts[i] and (re.search(r"\A\d|[^\w]", parts[i], re.U) or parts[i].upper() in kb.keywords):
+                            if parts[i] and (
+                                    re.search(r"\A\d|[^\w]", parts[i], re.U) or parts[i].upper() in kb.keywords):
                                 parts[i] = "[%s]" % parts[i]
                         retVal = '.'.join(parts)
                     else:
@@ -4292,10 +4532,12 @@ def safeSQLIdentificatorNaming(name, isTable=False):
                             retVal = "[%s]" % retVal
 
         if _ and DEFAULT_MSSQL_SCHEMA not in retVal and '.' not in re.sub(r"\[[^]]+\]", "", retVal):
-            if (conf.db or "").lower() != "information_schema":     # NOTE: https://github.com/sqlmapproject/sqlmap/issues/5192
+            if (
+                    conf.db or "").lower() != "information_schema":  # NOTE: https://github.com/sqlmapproject/sqlmap/issues/5192
                 retVal = "%s.%s" % (DEFAULT_MSSQL_SCHEMA, retVal)
 
     return retVal
+
 
 def unsafeSQLIdentificatorNaming(name):
     """
@@ -4315,7 +4557,9 @@ def unsafeSQLIdentificatorNaming(name):
     if isinstance(name, six.string_types):
         if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS, DBMS.CUBRID, DBMS.SQLITE):
             retVal = name.replace("`", "")
-        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2, DBMS.HSQLDB, DBMS.H2, DBMS.INFORMIX, DBMS.MONETDB, DBMS.VERTICA, DBMS.MCKOI, DBMS.PRESTO, DBMS.CRATEDB, DBMS.CACHE, DBMS.EXTREMEDB, DBMS.FRONTBASE, DBMS.RAIMA, DBMS.VIRTUOSO):
+        elif Backend.getIdentifiedDbms() in (
+        DBMS.PGSQL, DBMS.DB2, DBMS.HSQLDB, DBMS.H2, DBMS.INFORMIX, DBMS.MONETDB, DBMS.VERTICA, DBMS.MCKOI, DBMS.PRESTO,
+        DBMS.CRATEDB, DBMS.CACHE, DBMS.EXTREMEDB, DBMS.FRONTBASE, DBMS.RAIMA, DBMS.VIRTUOSO):
             retVal = name.replace("\"", "")
         elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.ALTIBASE, DBMS.MIMERSQL):
             retVal = name.replace("\"", "").upper()
@@ -4326,6 +4570,7 @@ def unsafeSQLIdentificatorNaming(name):
             retVal = re.sub(r"(?i)\A\[?%s\]?\." % DEFAULT_MSSQL_SCHEMA, "", retVal)
 
     return retVal
+
 
 def isNoneValue(value):
     """
@@ -4352,6 +4597,7 @@ def isNoneValue(value):
     else:
         return value is None
 
+
 def isNullValue(value):
     """
     Returns whether the value contains explicit 'NULL' value
@@ -4363,6 +4609,7 @@ def isNullValue(value):
     """
 
     return hasattr(value, "upper") and value.upper() == NULL
+
 
 def expandMnemonics(mnemonics, parser, args):
     """
@@ -4426,7 +4673,8 @@ def expandMnemonics(mnemonics, parser, args):
                 logger.debug(debugMsg)
             else:
                 found = sorted(options.keys(), key=len)[0]
-                warnMsg = "detected ambiguity (mnemonic '%s' can be resolved to any of: %s). " % (name, ", ".join("'%s'" % key for key in options))
+                warnMsg = "detected ambiguity (mnemonic '%s' can be resolved to any of: %s). " % (
+                name, ", ".join("'%s'" % key for key in options))
                 warnMsg += "Resolved to shortest of those ('%s')" % found
                 logger.warning(warnMsg)
 
@@ -4451,6 +4699,7 @@ def expandMnemonics(mnemonics, parser, args):
                 errMsg = "mnemonic '%s' requires value of type '%s'" % (name, found.type)
                 raise SqlmapSyntaxException(errMsg)
 
+
 def safeCSValue(value):
     """
     Returns value safe for CSV dumping
@@ -4472,6 +4721,7 @@ def safeCSValue(value):
 
     return retVal
 
+
 def filterPairValues(values):
     """
     Returns only list-like values with length 2
@@ -4486,6 +4736,7 @@ def filterPairValues(values):
         retVal = [value for value in values if isinstance(value, (tuple, list, set)) and len(value) == 2]
 
     return retVal
+
 
 def randomizeParameterValue(value):
     """
@@ -4538,6 +4789,7 @@ def randomizeParameterValue(value):
         retVal = randomStr(lowercase=True)
 
     return retVal
+
 
 @cachedmethod
 def asciifyUrl(url, forceQuote=False):
@@ -4614,6 +4866,7 @@ def asciifyUrl(url, forceQuote=False):
 
     return getText(_urllib.parse.urlunsplit([parts.scheme, netloc, path, query, parts.fragment]) or url)
 
+
 def isAdminFromPrivileges(privileges):
     """
     Inspects privileges to see if those are coming from an admin user
@@ -4639,9 +4892,11 @@ def isAdminFromPrivileges(privileges):
 
     # In Firebird there is no specific privilege that means
     # that the user is DBA
-    retVal |= (Backend.isDbms(DBMS.FIREBIRD) and all(_ in privileges for _ in ("SELECT", "INSERT", "UPDATE", "DELETE", "REFERENCES", "EXECUTE")))
+    retVal |= (Backend.isDbms(DBMS.FIREBIRD) and all(
+        _ in privileges for _ in ("SELECT", "INSERT", "UPDATE", "DELETE", "REFERENCES", "EXECUTE")))
 
     return retVal
+
 
 def findPageForms(content, url, raise_=False, addToTargets=False):
     """
@@ -4751,7 +5006,8 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
         data = data.rstrip(DEFAULT_GET_POST_DELIMITER)
         retVal.add((url, HTTPMETHOD.POST, data, conf.cookie, None))
 
-    for match in re.finditer(r"(?s)(\w+)\.open\(['\"]POST['\"],\s*['\"]([^'\"]+)['\"]\).*?\1\.send\(([^)]+)\)", content):
+    for match in re.finditer(r"(?s)(\w+)\.open\(['\"]POST['\"],\s*['\"]([^'\"]+)['\"]\).*?\1\.send\(([^)]+)\)",
+                             content):
         url = _urllib.parse.urljoin(url, htmlUnescape(match.group(2)))
         data = match.group(3)
 
@@ -4773,6 +5029,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
 
     return retVal
 
+
 def checkSameHost(*urls):
     """
     Returns True if all provided urls share that same host
@@ -4793,7 +5050,9 @@ def checkSameHost(*urls):
                 value = "http://%s" % value
             return value
 
-        return all(re.sub(r"(?i)\Awww\.", "", _urllib.parse.urlparse(_(url) or "").netloc.split(':')[0]) == re.sub(r"(?i)\Awww\.", "", _urllib.parse.urlparse(_(urls[0]) or "").netloc.split(':')[0]) for url in urls[1:])
+        return all(re.sub(r"(?i)\Awww\.", "", _urllib.parse.urlparse(_(url) or "").netloc.split(':')[0]) == re.sub(
+            r"(?i)\Awww\.", "", _urllib.parse.urlparse(_(urls[0]) or "").netloc.split(':')[0]) for url in urls[1:])
+
 
 def getHostHeader(url):
     """
@@ -4818,6 +5077,7 @@ def getHostHeader(url):
 
     return retVal
 
+
 def checkOldOptions(args):
     """
     Checks for obsolete/deprecated options
@@ -4835,6 +5095,7 @@ def checkOldOptions(args):
             if DEPRECATED_OPTIONS[_]:
                 warnMsg += " (hint: %s)" % DEPRECATED_OPTIONS[_]
             logger.warning(warnMsg)
+
 
 def checkSystemEncoding():
     """
@@ -4857,6 +5118,7 @@ def checkSystemEncoding():
             _reload_module(sys)
             sys.setdefaultencoding("cp1256")
 
+
 def evaluateCode(code, variables=None):
     """
     Executes given python code given in a string form
@@ -4873,6 +5135,7 @@ def evaluateCode(code, variables=None):
         errMsg = "an error occurred while evaluating provided code ('%s') " % getSafeExString(ex)
         raise SqlmapGenericException(errMsg)
 
+
 def serializeObject(object_):
     """
     Serializes given object
@@ -4882,6 +5145,7 @@ def serializeObject(object_):
     """
 
     return base64pickle(object_)
+
 
 def unserializeObject(value):
     """
@@ -4895,6 +5159,7 @@ def unserializeObject(value):
 
     return base64unpickle(value) if value else None
 
+
 def resetCounter(technique):
     """
     Resets query counter for a given technique
@@ -4902,12 +5167,14 @@ def resetCounter(technique):
 
     kb.counters[technique] = 0
 
+
 def incrementCounter(technique):
     """
     Increments query counter for a given technique
     """
 
     kb.counters[technique] = getCounter(technique) + 1
+
 
 def getCounter(technique):
     """
@@ -4918,6 +5185,7 @@ def getCounter(technique):
     """
 
     return kb.counters.get(technique, 0)
+
 
 def applyFunctionRecursively(value, function):
     """
@@ -4933,6 +5201,7 @@ def applyFunctionRecursively(value, function):
         retVal = function(value)
 
     return retVal
+
 
 def decodeDbmsHexValue(value, raw=False):
     """
@@ -4987,6 +5256,7 @@ def decodeDbmsHexValue(value, raw=False):
 
     return retVal
 
+
 def extractExpectedValue(value, expected):
     """
     Extracts and returns expected value by a given type
@@ -5027,14 +5297,17 @@ def extractExpectedValue(value, expected):
 
     return value
 
+
 def hashDBWrite(key, value, serialize=False):
     """
     Helper function for writing session data to HashDB
     """
 
     if conf.hashDB:
-        _ = '|'.join((str(_) if not isinstance(_, six.string_types) else _) for _ in (conf.hostname, conf.path.strip('/') if conf.path is not None else conf.port, key, HASHDB_MILESTONE_VALUE))
+        _ = '|'.join((str(_) if not isinstance(_, six.string_types) else _) for _ in (
+        conf.hostname, conf.path.strip('/') if conf.path is not None else conf.port, key, HASHDB_MILESTONE_VALUE))
         conf.hashDB.write(_, value, serialize)
+
 
 def hashDBRetrieve(key, unserialize=False, checkConf=False):
     """
@@ -5044,13 +5317,17 @@ def hashDBRetrieve(key, unserialize=False, checkConf=False):
     retVal = None
 
     if conf.hashDB:
-        _ = '|'.join((str(_) if not isinstance(_, six.string_types) else _) for _ in (conf.hostname, conf.path.strip('/') if conf.path is not None else conf.port, key, HASHDB_MILESTONE_VALUE))
-        retVal = conf.hashDB.retrieve(_, unserialize) if kb.resumeValues and not (checkConf and any((conf.flushSession, conf.freshQueries))) else None
+        _ = '|'.join((str(_) if not isinstance(_, six.string_types) else _) for _ in (
+        conf.hostname, conf.path.strip('/') if conf.path is not None else conf.port, key, HASHDB_MILESTONE_VALUE))
+        retVal = conf.hashDB.retrieve(_, unserialize) if kb.resumeValues and not (
+                    checkConf and any((conf.flushSession, conf.freshQueries))) else None
 
-        if not kb.inferenceMode and not kb.fileReadMode and isinstance(retVal, six.string_types) and any(_ in retVal for _ in (PARTIAL_VALUE_MARKER, PARTIAL_HEX_VALUE_MARKER)):
+        if not kb.inferenceMode and not kb.fileReadMode and isinstance(retVal, six.string_types) and any(
+                _ in retVal for _ in (PARTIAL_VALUE_MARKER, PARTIAL_HEX_VALUE_MARKER)):
             retVal = None
 
     return retVal
+
 
 def resetCookieJar(cookieJar):
     """
@@ -5099,6 +5376,7 @@ def resetCookieJar(cookieJar):
             errMsg += "cookies file ('%s')" % re.sub(r"(cookies) file '[^']+'", r"\g<1>", getSafeExString(ex))
             raise SqlmapGenericException(errMsg)
 
+
 def decloakToTemp(filename):
     """
     Decloaks content of a given file to a temporary file with similar name and extension
@@ -5125,6 +5403,7 @@ def decloakToTemp(filename):
 
     return filename
 
+
 def prioritySortColumns(columns):
     """
     Sorts given column names by length in ascending order while those containing
@@ -5137,7 +5416,9 @@ def prioritySortColumns(columns):
     def _(column):
         return column and re.search(r"^id|id$", column, re.I) is not None
 
-    return sorted(sorted(columns, key=len), key=functools.cmp_to_key(lambda x, y: -1 if _(x) and not _(y) else 1 if not _(x) and _(y) else 0))
+    return sorted(sorted(columns, key=len),
+                  key=functools.cmp_to_key(lambda x, y: -1 if _(x) and not _(y) else 1 if not _(x) and _(y) else 0))
+
 
 def getRequestHeader(request, name):
     """
@@ -5160,6 +5441,7 @@ def getRequestHeader(request, name):
 
     return retVal
 
+
 def isNumber(value):
     """
     Returns True if the given value is a number-like object
@@ -5178,6 +5460,7 @@ def isNumber(value):
         return False
     else:
         return True
+
 
 def zeroDepthSearch(expression, value):
     """
@@ -5207,6 +5490,7 @@ def zeroDepthSearch(expression, value):
 
     return retVal
 
+
 def splitFields(fields, delimiter=','):
     """
     Returns list of (0-depth) fields splitted by delimiter
@@ -5221,6 +5505,7 @@ def splitFields(fields, delimiter=','):
     commas = sorted(commas)
 
     return [fields[x + 1:y] for (x, y) in _zip(commas, commas[1:])]
+
 
 def pollProcess(process, suppress_errors=False):
     """
@@ -5243,6 +5528,7 @@ def pollProcess(process, suppress_errors=False):
                     dataToStdout(" quit unexpectedly with return code %d\n" % returncode)
 
             break
+
 
 def parseRequestFile(reqFile, checkParams=True):
     """
@@ -5279,7 +5565,7 @@ def parseRequestFile(reqFile, checkParams=True):
                 logger.warning(warnMsg)
                 continue
 
-            if not(conf.scope and not re.search(conf.scope, url, re.I)):
+            if not (conf.scope and not re.search(conf.scope, url, re.I)):
                 yield (url, method, None, cookie, tuple())
 
     def _parseBurpLog(content):
@@ -5322,7 +5608,8 @@ def parseRequestFile(reqFile, checkParams=True):
             if "HTTP/" not in request:
                 continue
 
-            if re.search(r"^[\n]*%s[^?]*?\.(%s)\sHTTP\/" % (HTTPMETHOD.GET, "|".join(CRAWL_EXCLUDE_EXTENSIONS)), request, re.I | re.M):
+            if re.search(r"^[\n]*%s[^?]*?\.(%s)\sHTTP\/" % (HTTPMETHOD.GET, "|".join(CRAWL_EXCLUDE_EXTENSIONS)),
+                         request, re.I | re.M):
                 if not re.search(r"^[\n]*%s[^\n]*\*[^\n]*\sHTTP\/" % HTTPMETHOD.GET, request, re.I | re.M):
                     continue
 
@@ -5397,7 +5684,9 @@ def parseRequestFile(reqFile, checkParams=True):
                         params = True
 
                     # Avoid proxy and connection type related headers
-                    elif key not in (HTTP_HEADER.PROXY_CONNECTION, HTTP_HEADER.CONNECTION, HTTP_HEADER.IF_MODIFIED_SINCE, HTTP_HEADER.IF_NONE_MATCH):
+                    elif key not in (
+                    HTTP_HEADER.PROXY_CONNECTION, HTTP_HEADER.CONNECTION, HTTP_HEADER.IF_MODIFIED_SINCE,
+                    HTTP_HEADER.IF_NONE_MATCH):
                         headers.append((getUnicode(key), getUnicode(value)))
 
                     if kb.customInjectionMark in re.sub(PROBLEMATIC_CUSTOM_INJECTION_PATTERNS, "", value or ""):
@@ -5424,7 +5713,7 @@ def parseRequestFile(reqFile, checkParams=True):
                     scheme = None
                     port = None
 
-                if not(conf.scope and not re.search(conf.scope, url, re.I)):
+                if not (conf.scope and not re.search(conf.scope, url, re.I)):
                     yield (url, conf.method or method, data, cookie, tuple(headers))
 
     content = readCachedFileContent(reqFile)
@@ -5443,6 +5732,7 @@ def parseRequestFile(reqFile, checkParams=True):
 
     for target in _parseWebScarabLog(content):
         yield target
+
 
 def getSafeExString(ex, encoding=None):
     """
@@ -5473,6 +5763,7 @@ def getSafeExString(ex, encoding=None):
 
     return getUnicode(retVal or "", encoding=encoding).strip()
 
+
 def safeVariableNaming(value):
     """
     Returns escaped safe-representation of a given variable name that can be used in Python evaluated code
@@ -5486,6 +5777,7 @@ def safeVariableNaming(value):
 
     return value
 
+
 def unsafeVariableNaming(value):
     """
     Returns unescaped safe-representation of a given variable name
@@ -5498,6 +5790,7 @@ def unsafeVariableNaming(value):
         value = decodeHex(value[len(EVALCODE_ENCODED_PREFIX):], binary=False)
 
     return value
+
 
 def firstNotNone(*args):
     """
@@ -5516,6 +5809,7 @@ def firstNotNone(*args):
 
     return retVal
 
+
 def removePostHintPrefix(value):
     """
     Remove POST hint prefix from a given value (name)
@@ -5526,7 +5820,9 @@ def removePostHintPrefix(value):
     'id'
     """
 
-    return re.sub(r"\A(%s) " % '|'.join(re.escape(__) for __ in getPublicTypeMembers(POST_HINT, onlyValues=True)), "", value)
+    return re.sub(r"\A(%s) " % '|'.join(re.escape(__) for __ in getPublicTypeMembers(POST_HINT, onlyValues=True)), "",
+                  value)
+
 
 def chunkSplitPostData(data):
     """

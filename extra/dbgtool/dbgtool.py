@@ -15,6 +15,7 @@ import sys
 from optparse import OptionError
 from optparse import OptionParser
 
+
 def convert(inputFile):
     fileStat = os.stat(inputFile)
     fileSize = fileStat.st_size
@@ -58,6 +59,7 @@ def convert(inputFile):
 
     return script
 
+
 def main(inputFile, outputFile):
     if not os.path.isfile(inputFile):
         print("ERROR: the provided input file '%s' is not a regular file" % inputFile)
@@ -72,6 +74,7 @@ def main(inputFile, outputFile):
         sys.stdout.close()
     else:
         print(script)
+
 
 if __name__ == "__main__":
     usage = "%s -i <input file> [-o <output file>]" % sys.argv[0]

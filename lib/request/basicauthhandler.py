@@ -7,6 +7,7 @@ See the file 'LICENSE' for copying permission
 
 from thirdparty.six.moves import urllib as _urllib
 
+
 class SmartHTTPBasicAuthHandler(_urllib.request.HTTPBasicAuthHandler):
     """
     Reference: http://selenic.com/hg/rev/6c51a5056020

@@ -16,6 +16,7 @@ from lib.core.settings import INFORMIX_ALIASES
 from lib.request import inject
 from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 
+
 class Fingerprint(GenericFingerprint):
     def __init__(self):
         GenericFingerprint.__init__(self, DBMS.INFORMIX)
@@ -97,7 +98,8 @@ class Fingerprint(GenericFingerprint):
             logger.info(infoMsg)
 
             for version in ("14.1", "12.1", "11.7", "11.5", "10.0"):
-                output = inject.checkBooleanExpression("EXISTS(SELECT 1 FROM SYSMASTER:SYSDUAL WHERE DBINFO('VERSION,'FULL') LIKE '%%%s%%')" % version)
+                output = inject.checkBooleanExpression(
+                    "EXISTS(SELECT 1 FROM SYSMASTER:SYSDUAL WHERE DBINFO('VERSION,'FULL') LIKE '%%%s%%')" % version)
 
                 if output:
                     Backend.setVersion(version)

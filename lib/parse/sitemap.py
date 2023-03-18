@@ -17,6 +17,7 @@ from thirdparty.six.moves import http_client as _http_client
 
 abortedFlag = None
 
+
 def parseSitemap(url, retVal=None):
     global abortedFlag
 

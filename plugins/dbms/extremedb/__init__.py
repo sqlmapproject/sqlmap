@@ -15,6 +15,7 @@ from plugins.dbms.extremedb.syntax import Syntax
 from plugins.dbms.extremedb.takeover import Takeover
 from plugins.generic.misc import Miscellaneous
 
+
 class ExtremeDBMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
     This class defines eXtremeDB methods

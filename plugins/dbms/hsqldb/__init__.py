@@ -15,6 +15,7 @@ from plugins.dbms.hsqldb.syntax import Syntax
 from plugins.dbms.hsqldb.takeover import Takeover
 from plugins.generic.misc import Miscellaneous
 
+
 class HSQLDBMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
     This class defines HSQLDB methods

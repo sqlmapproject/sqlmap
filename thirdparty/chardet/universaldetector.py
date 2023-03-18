@@ -35,7 +35,6 @@ class a user of ``chardet`` should use.
 :author: Ian Cordasco
 """
 
-
 import codecs
 import logging
 import re
@@ -188,11 +187,11 @@ class UniversalDetector(object):
                 self._esc_charset_prober = EscCharSetProber(self.lang_filter)
             if self._esc_charset_prober.feed(byte_str) == ProbingState.FOUND_IT:
                 self.result = {'encoding':
-                               self._esc_charset_prober.charset_name,
+                                   self._esc_charset_prober.charset_name,
                                'confidence':
-                               self._esc_charset_prober.get_confidence(),
+                                   self._esc_charset_prober.get_confidence(),
                                'language':
-                               self._esc_charset_prober.language}
+                                   self._esc_charset_prober.language}
                 self.done = True
         # If we've seen high bytes (i.e., those with values greater than 127),
         # we need to do more complicated checks using all our multi-byte and

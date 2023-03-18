@@ -17,6 +17,7 @@ from lib.core.settings import METADB_SUFFIX
 from lib.request import inject
 from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 
+
 class Fingerprint(GenericFingerprint):
     def __init__(self):
         GenericFingerprint.__init__(self, DBMS.EXTREMEDB)

@@ -33,6 +33,7 @@ DEBUG = True
 HTML_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "data", "html"))
 DISABLED_CONTENT_EXTENSIONS = (".py", ".pyc", ".md", ".txt", ".bak", ".conf", ".zip", "~")
 
+
 class ThreadingServer(_socketserver.ThreadingMixIn, _BaseHTTPServer.HTTPServer):
     def finish_request(self, *args, **kwargs):
         try:
@@ -40,6 +41,7 @@ class ThreadingServer(_socketserver.ThreadingMixIn, _BaseHTTPServer.HTTPServer):
         except Exception:
             if DEBUG:
                 traceback.print_exc()
+
 
 class ReqHandler(_BaseHTTPServer.BaseHTTPRequestHandler):
     def do_GET(self):
@@ -67,13 +69,16 @@ class ReqHandler(_BaseHTTPServer.BaseHTTPRequestHandler):
         if not os.path.isfile(path) and os.path.isfile("%s.html" % path):
             path = "%s.html" % path
 
-        if ".." not in os.path.relpath(path, HTML_DIR) and os.path.isfile(path) and not path.endswith(DISABLED_CONTENT_EXTENSIONS):
+        if ".." not in os.path.relpath(path, HTML_DIR) and os.path.isfile(path) and not path.endswith(
+                DISABLED_CONTENT_EXTENSIONS):
             content = open(path, "rb").read()
             self.send_response(_http_client.OK)
             self.send_header(HTTP_HEADER.CONNECTION, "close")
             self.send_header(HTTP_HEADER.CONTENT_TYPE, mimetypes.guess_type(path)[0] or "application/octet-stream")
         else:
-            content = ("<!DOCTYPE html><html lang=\"en\"><head><title>404 Not Found</title></head><body><h1>Not Found</h1><p>The requested URL %s was not found on this server.</p></body></html>" % self.path.split('?')[0]).encode(UNICODE_ENCODING)
+            content = (
+                        "<!DOCTYPE html><html lang=\"en\"><head><title>404 Not Found</title></head><body><h1>Not Found</h1><p>The requested URL %s was not found on this server.</p></body></html>" %
+                        self.path.split('?')[0]).encode(UNICODE_ENCODING)
             self.send_response(_http_client.NOT_FOUND)
             self.send_header(HTTP_HEADER.CONNECTION, "close")
 
@@ -123,6 +128,7 @@ class ReqHandler(_BaseHTTPServer.BaseHTTPRequestHandler):
             if DEBUG:
                 traceback.print_exc()
 
+
 def start_httpd():
     server = ThreadingServer((HTTP_ADDRESS, HTTP_PORT), ReqHandler)
     thread = threading.Thread(target=server.serve_forever)
@@ -130,6 +136,7 @@ def start_httpd():
     thread.start()
 
     print("[i] running HTTP server at '%s:%d'" % (HTTP_ADDRESS, HTTP_PORT))
+
 
 if __name__ == "__main__":
     try:

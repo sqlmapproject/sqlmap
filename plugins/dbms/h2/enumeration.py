@@ -15,6 +15,7 @@ from lib.core.settings import H2_DEFAULT_SCHEMA
 from lib.request import inject
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
+
 class Enumeration(GenericEnumeration):
     def getBanner(self):
         if not conf.getBanner:

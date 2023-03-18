@@ -36,6 +36,7 @@ from lib.request import inject
 from lib.utils.safe2bin import safechardecode
 from thirdparty.six import unichr as _unichr
 
+
 def pivotDumpTable(table, colList, count=None, blind=True, alias=None):
     lengths = {}
     entries = {}
@@ -48,7 +49,10 @@ def pivotDumpTable(table, colList, count=None, blind=True, alias=None):
     if count is None:
         query = dumpNode.count % table
         query = agent.whereQuery(query)
-        count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS) if blind else inject.getValue(query, blind=False, time=False, expected=EXPECTED.INT)
+        count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT,
+                                charsetType=CHARSET_TYPE.DIGITS) if blind else inject.getValue(query, blind=False,
+                                                                                               time=False,
+                                                                                               expected=EXPECTED.INT)
 
     if hasattr(count, "isdigit") and count.isdigit():
         count = int(count)
@@ -98,7 +102,8 @@ def pivotDumpTable(table, colList, count=None, blind=True, alias=None):
 
             query = dumpNode.count2 % (column, table)
             query = agent.whereQuery(query)
-            value = inject.getValue(query, blind=blind, union=not blind, error=not blind, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+            value = inject.getValue(query, blind=blind, union=not blind, error=not blind, expected=EXPECTED.INT,
+                                    charsetType=CHARSET_TYPE.DIGITS)
 
             if isNumPosStrValue(value):
                 validColumnList = True
@@ -127,9 +132,15 @@ def pivotDumpTable(table, colList, count=None, blind=True, alias=None):
 
     def _(column, pivotValue):
         if column == colList[0]:
-            query = dumpNode.query.replace("'%s'" if unescaper.escape(pivotValue, False) != pivotValue else "%s", "%s") % (agent.preprocessField(table, column), table, agent.preprocessField(table, column), unescaper.escape(pivotValue, False))
+            query = dumpNode.query.replace("'%s'" if unescaper.escape(pivotValue, False) != pivotValue else "%s",
+                                           "%s") % (
+                    agent.preprocessField(table, column), table, agent.preprocessField(table, column),
+                    unescaper.escape(pivotValue, False))
         else:
-            query = dumpNode.query2.replace("'%s'" if unescaper.escape(pivotValue, False) != pivotValue else "%s", "%s") % (agent.preprocessField(table, column), table, agent.preprocessField(table, colList[0]), unescaper.escape(pivotValue, False) if SINGLE_QUOTE_MARKER not in dumpNode.query2 else pivotValue)
+            query = dumpNode.query2.replace("'%s'" if unescaper.escape(pivotValue, False) != pivotValue else "%s",
+                                            "%s") % (
+                    agent.preprocessField(table, column), table, agent.preprocessField(table, colList[0]),
+                    unescaper.escape(pivotValue, False) if SINGLE_QUOTE_MARKER not in dumpNode.query2 else pivotValue)
 
         query = agent.whereQuery(query)
         return unArrayizeValue(inject.getValue(query, blind=blind, time=blind, union=not blind, error=not blind))
@@ -144,7 +155,9 @@ def pivotDumpTable(table, colList, count=None, blind=True, alias=None):
                 if column == colList[0]:
                     if isNoneValue(value):
                         try:
-                            for pivotValue in filterNone(("  " if pivotValue == " " else None, "%s%s" % (pivotValue[0], _unichr(ord(pivotValue[1]) + 1)) if len(pivotValue) > 1 else None, _unichr(ord(pivotValue[0]) + 1))):
+                            for pivotValue in filterNone(("  " if pivotValue == " " else None, "%s%s" % (
+                            pivotValue[0], _unichr(ord(pivotValue[1]) + 1)) if len(pivotValue) > 1 else None,
+                                                          _unichr(ord(pivotValue[0]) + 1))):
                                 value = _(column, pivotValue)
                                 if not isNoneValue(value):
                                     break

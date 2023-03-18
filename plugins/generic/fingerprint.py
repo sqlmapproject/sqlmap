@@ -11,6 +11,7 @@ from lib.core.data import logger
 from lib.core.enums import OS
 from lib.core.exception import SqlmapUndefinedMethod
 
+
 class Fingerprint(object):
     """
     This class defines generic fingerprint functionalities for plugins.

@@ -18,6 +18,7 @@ from lib.core.settings import ORACLE_ALIASES
 from lib.request import inject
 from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 
+
 class Fingerprint(GenericFingerprint):
     def __init__(self):
         GenericFingerprint.__init__(self, DBMS.ORACLE)
@@ -107,7 +108,9 @@ class Fingerprint(GenericFingerprint):
             # Reference: https://en.wikipedia.org/wiki/Oracle_Database
             for version in ("21c", "19c", "18c", "12c", "11g", "10g", "9i", "8i", "7"):
                 number = int(re.search(r"([\d]+)", version).group(1))
-                output = inject.checkBooleanExpression("%d=(SELECT SUBSTR((VERSION),1,%d) FROM SYS.PRODUCT_COMPONENT_VERSION WHERE ROWNUM=1)" % (number, 1 if number < 10 else 2))
+                output = inject.checkBooleanExpression(
+                    "%d=(SELECT SUBSTR((VERSION),1,%d) FROM SYS.PRODUCT_COMPONENT_VERSION WHERE ROWNUM=1)" % (
+                    number, 1 if number < 10 else 2))
 
                 if output:
                     Backend.setVersion(version)

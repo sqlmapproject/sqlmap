@@ -8,6 +8,7 @@ See the file 'LICENSE' for copying permission
 from lib.core.data import logger
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
+
 class Enumeration(GenericEnumeration):
     def searchDb(self):
         warnMsg = "on Informix searching of databases is not implemented"

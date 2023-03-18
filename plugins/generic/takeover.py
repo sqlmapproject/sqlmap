@@ -32,6 +32,7 @@ from lib.takeover.icmpsh import ICMPsh
 from lib.takeover.metasploit import Metasploit
 from lib.takeover.registry import Registry
 
+
 class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
     """
     This class defines generic OS takeover functionalities for plugins.
@@ -204,7 +205,8 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
                 else:
                     exitfunc = "process"
 
-                self.createMsfShellcode(exitfunc=exitfunc, format="raw", extra="BufferRegister=EAX", encode="x86/alpha_mixed")
+                self.createMsfShellcode(exitfunc=exitfunc, format="raw", extra="BufferRegister=EAX",
+                                        encode="x86/alpha_mixed")
 
                 if not goUdf:
                     setupSuccess = self.uploadShellcodeexec(web=web)
@@ -231,7 +233,8 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
                         msg = "unable to mount the operating system takeover"
                         raise SqlmapFilePathException(msg)
 
-        if not setupSuccess and Backend.isDbms(DBMS.MYSQL) and not conf.direct and (not isStackingAvailable() or fallbackToWeb):
+        if not setupSuccess and Backend.isDbms(DBMS.MYSQL) and not conf.direct and (
+                not isStackingAvailable() or fallbackToWeb):
             web = True
 
             if fallbackToWeb:
@@ -254,7 +257,8 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
                     logger.warning(warnMsg)
 
                 if tunnel == 1:
-                    self.createMsfShellcode(exitfunc="process", format="raw", extra="BufferRegister=EAX", encode="x86/alpha_mixed")
+                    self.createMsfShellcode(exitfunc="process", format="raw", extra="BufferRegister=EAX",
+                                            encode="x86/alpha_mixed")
                     setupSuccess = self.uploadShellcodeexec(web=web)
 
                     if setupSuccess is not True:

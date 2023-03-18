@@ -25,6 +25,7 @@ from lib.request import inject
 from lib.request.connect import Connect as Request
 from plugins.generic.takeover import Takeover as GenericTakeover
 
+
 class Takeover(GenericTakeover):
     def __init__(self):
         self.__basedir = None
@@ -103,7 +104,8 @@ class Takeover(GenericTakeover):
 
             # Reference: http://dev.mysql.com/doc/refman/5.1/en/create-function-udf.html
             inject.goStacked("DROP FUNCTION %s" % udf)
-            inject.goStacked("CREATE FUNCTION %s RETURNS %s SONAME '%s.%s'" % (udf, ret, self.udfSharedLibName, self.udfSharedLibExt))
+            inject.goStacked("CREATE FUNCTION %s RETURNS %s SONAME '%s.%s'" % (
+            udf, ret, self.udfSharedLibName, self.udfSharedLibExt))
 
             self.createdUdf.add(udf)
         else:

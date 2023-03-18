@@ -9,6 +9,7 @@ from lib.core.common import singleTimeWarnMessage
 from lib.core.data import logger
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
+
 class Enumeration(GenericEnumeration):
     def getPasswordHashes(self):
         warnMsg = "on Apache Derby it is not possible to enumerate password hashes"

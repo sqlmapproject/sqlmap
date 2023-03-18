@@ -28,6 +28,7 @@ from lib.core.shell import autoCompletion
 from lib.request import inject
 from thirdparty.six.moves import input as _input
 
+
 class Custom(object):
     """
     This class defines custom enumeration functionalities for plugins.
@@ -55,7 +56,8 @@ class Custom(object):
                 if Backend.isDbms(DBMS.MSSQL):
                     match = re.search(r"(\bFROM\s+)([^\s]+)", query, re.I)
                     if match and match.group(2).count('.') == 1:
-                        query = query.replace(match.group(0), "%s%s" % (match.group(1), match.group(2).replace('.', ".dbo.")))
+                        query = query.replace(match.group(0),
+                                              "%s%s" % (match.group(1), match.group(2).replace('.', ".dbo.")))
 
                 query = re.sub(r"(?i)\w+%s\.?" % METADB_SUFFIX, "", query)
 
@@ -137,7 +139,8 @@ class Custom(object):
 
             snippet = getSQLSnippet(Backend.getDbms(), filename)
 
-            if snippet and all(query.strip().upper().startswith("SELECT") for query in (_ for _ in snippet.split(';' if ';' in snippet else '\n') if _)):
+            if snippet and all(query.strip().upper().startswith("SELECT") for query in
+                               (_ for _ in snippet.split(';' if ';' in snippet else '\n') if _)):
                 for query in (_ for _ in snippet.split(';' if ';' in snippet else '\n') if _):
                     query = query.strip()
                     if query:

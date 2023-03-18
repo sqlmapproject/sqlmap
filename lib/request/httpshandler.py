@@ -23,13 +23,16 @@ from thirdparty.six.moves import urllib as _urllib
 ssl = None
 try:
     import ssl as _ssl
+
     ssl = _ssl
 except ImportError:
     pass
 
-_protocols = filterNone(getattr(ssl, _, None) for _ in ("PROTOCOL_TLSv1_2", "PROTOCOL_TLSv1_1", "PROTOCOL_TLSv1", "PROTOCOL_SSLv3", "PROTOCOL_SSLv23", "PROTOCOL_SSLv2"))
+_protocols = filterNone(getattr(ssl, _, None) for _ in (
+"PROTOCOL_TLSv1_2", "PROTOCOL_TLSv1_1", "PROTOCOL_TLSv1", "PROTOCOL_SSLv3", "PROTOCOL_SSLv23", "PROTOCOL_SSLv2"))
 _lut = dict((getattr(ssl, _), _) for _ in dir(ssl) if _.startswith("PROTOCOL_"))
 _contexts = {}
+
 
 class HTTPSConnection(_http_client.HTTPSConnection):
     """
@@ -77,7 +80,9 @@ class HTTPSConnection(_http_client.HTTPSConnection):
                             _contexts[protocol].set_ciphers("DEFAULT@SECLEVEL=1")
                         except ssl.SSLError:
                             pass
-                    result = _contexts[protocol].wrap_socket(sock, do_handshake_on_connect=True, server_hostname=self.host if re.search(r"\A[\d.]+\Z", self.host or "") is None else None)
+                    result = _contexts[protocol].wrap_socket(sock, do_handshake_on_connect=True,
+                                                             server_hostname=self.host if re.search(r"\A[\d.]+\Z",
+                                                                                                    self.host or "") is None else None)
                     if result:
                         success = True
                         self.sock = result
@@ -88,13 +93,15 @@ class HTTPSConnection(_http_client.HTTPSConnection):
                         sock.close()
                 except (ssl.SSLError, socket.error, _http_client.BadStatusLine) as ex:
                     self._tunnel_host = None
-                    logger.debug("SSL connection error occurred for '%s' ('%s')" % (_lut[protocol], getSafeExString(ex)))
+                    logger.debug(
+                        "SSL connection error occurred for '%s' ('%s')" % (_lut[protocol], getSafeExString(ex)))
 
         elif hasattr(ssl, "wrap_socket"):
             for protocol in _protocols:
                 try:
                     sock = create_sock()
-                    _ = ssl.wrap_socket(sock, keyfile=getattr(self, "key_file"), certfile=getattr(self, "cert_file"), ssl_version=protocol)
+                    _ = ssl.wrap_socket(sock, keyfile=getattr(self, "key_file"), certfile=getattr(self, "cert_file"),
+                                        ssl_version=protocol)
                     if _:
                         success = True
                         self.sock = _
@@ -105,7 +112,8 @@ class HTTPSConnection(_http_client.HTTPSConnection):
                         sock.close()
                 except (ssl.SSLError, socket.error, _http_client.BadStatusLine) as ex:
                     self._tunnel_host = None
-                    logger.debug("SSL connection error occurred for '%s' ('%s')" % (_lut[protocol], getSafeExString(ex)))
+                    logger.debug(
+                        "SSL connection error occurred for '%s' ('%s')" % (_lut[protocol], getSafeExString(ex)))
 
         if not success:
             errMsg = "can't establish SSL connection"
@@ -127,6 +135,7 @@ class HTTPSConnection(_http_client.HTTPSConnection):
             raise SqlmapConnectionException(errMsg)
         else:
             kb.sslSuccess = True
+
 
 class HTTPSHandler(_urllib.request.HTTPSHandler):
     def https_open(self, req):

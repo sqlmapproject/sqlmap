@@ -27,6 +27,7 @@ else:
     import select
     import fcntl
 
+
 def blockingReadFromFD(fd):
     # Quick twist around original Twisted function
     # Blocking read from a non-blocking file descriptor
@@ -50,6 +51,7 @@ def blockingReadFromFD(fd):
 
     return output
 
+
 def blockingWriteToFD(fd, data):
     # Another quick twist
     while True:
@@ -66,6 +68,7 @@ def blockingWriteToFD(fd, data):
             blockingWriteToFD(fd, data[wrote_data:])
 
         break
+
 
 # the following code is taken from http://code.activestate.com/recipes/440554-module-to-allow-asynchronous-subprocess-use-on-win/
 class Popen(subprocess.Popen):
@@ -169,6 +172,7 @@ class Popen(subprocess.Popen):
                 if not conn.closed:
                     fcntl.fcntl(conn, fcntl.F_SETFL, flags)
 
+
 def recv_some(p, t=.1, e=1, tr=5, stderr=0):
     if tr < 1:
         tr = 1
@@ -188,6 +192,7 @@ def recv_some(p, t=.1, e=1, tr=5, stderr=0):
         else:
             time.sleep(max((x - time.time()) / tr, 0))
     return b''.join(y)
+
 
 def send_all(p, data):
     if not data:

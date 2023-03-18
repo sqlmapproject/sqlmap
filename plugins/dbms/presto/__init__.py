@@ -16,6 +16,7 @@ from plugins.dbms.presto.syntax import Syntax
 from plugins.dbms.presto.takeover import Takeover
 from plugins.generic.misc import Miscellaneous
 
+
 class PrestoMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
     This class defines Presto methods

@@ -16,6 +16,7 @@ from plugins.dbms.altibase.syntax import Syntax
 from plugins.dbms.altibase.takeover import Takeover
 from plugins.generic.misc import Miscellaneous
 
+
 class AltibaseMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
     This class defines Altibase methods

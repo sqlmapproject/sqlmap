@@ -52,6 +52,7 @@ from lib.utils.pivotdumptable import pivotDumpTable
 from thirdparty import six
 from thirdparty.six.moves import zip as _zip
 
+
 class Entries(object):
     """
     This class defines entries' enumeration functionalities for plugins.
@@ -137,7 +138,10 @@ class Entries(object):
                 else:
                     kb.dumpTable = "%s.%s" % (conf.db, tbl)
 
-                if safeSQLIdentificatorNaming(conf.db) not in kb.data.cachedColumns or safeSQLIdentificatorNaming(tbl, True) not in kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] or not kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)]:
+                if safeSQLIdentificatorNaming(conf.db) not in kb.data.cachedColumns or safeSQLIdentificatorNaming(tbl,
+                                                                                                                  True) not in \
+                        kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] or not \
+                kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)]:
                     warnMsg = "unable to enumerate the columns for table '%s'" % unsafeSQLIdentificatorNaming(tbl)
                     if METADB_SUFFIX not in conf.db:
                         warnMsg += " in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
@@ -146,7 +150,8 @@ class Entries(object):
 
                     continue
 
-                columns = kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)]
+                columns = kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][
+                    safeSQLIdentificatorNaming(tbl, True)]
                 colList = sorted(column for column in columns if column)
 
                 if conf.exclude:
@@ -179,17 +184,21 @@ class Entries(object):
 
                 entriesCount = 0
 
-                if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
+                if any(isTechniqueAvailable(_) for _ in
+                       (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
                     entries = []
                     query = None
 
                     if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE, DBMS.MIMERSQL):
-                        query = rootQuery.inband.query % (colString, tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())))
-                    elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD, DBMS.MAXDB, DBMS.MCKOI, DBMS.EXTREMEDB, DBMS.RAIMA):
+                        query = rootQuery.inband.query % (
+                        colString, tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())))
+                    elif Backend.getIdentifiedDbms() in (
+                    DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD, DBMS.MAXDB, DBMS.MCKOI, DBMS.EXTREMEDB, DBMS.RAIMA):
                         query = rootQuery.inband.query % (colString, tbl)
                     elif Backend.getIdentifiedDbms() in (DBMS.SYBASE, DBMS.MSSQL):
                         # Partial inband and error
-                        if not (isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) and kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.ORIGINAL):
+                        if not (isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) and kb.injection.data[
+                            PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.ORIGINAL):
                             table = "%s.%s" % (conf.db, tbl) if conf.db else tbl
 
                             if Backend.isDbms(DBMS.MSSQL) and not conf.forcePivoting:
@@ -200,7 +209,8 @@ class Entries(object):
                                 query = rootQuery.blind.count % table
                                 query = agent.whereQuery(query)
 
-                                count = inject.getValue(query, blind=False, time=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                                count = inject.getValue(query, blind=False, time=False, expected=EXPECTED.INT,
+                                                        charsetType=CHARSET_TYPE.DIGITS)
                                 if isNumPosStrValue(count):
                                     try:
                                         indexRange = getLimitRange(count, plusOne=True)
@@ -239,7 +249,9 @@ class Entries(object):
                                     entries = BigArray(_zip(*[entries[colName] for colName in colList]))
                         else:
                             query = rootQuery.inband.query % (colString, conf.db, tbl)
-                    elif Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2, DBMS.VERTICA, DBMS.PRESTO, DBMS.CRATEDB, DBMS.CACHE, DBMS.VIRTUOSO):
+                    elif Backend.getIdentifiedDbms() in (
+                    DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2, DBMS.VERTICA, DBMS.PRESTO, DBMS.CRATEDB, DBMS.CACHE,
+                    DBMS.VIRTUOSO):
                         query = rootQuery.inband.query % (colString, conf.db, tbl, prioritySortColumns(colList)[0])
                     else:
                         query = rootQuery.inband.query % (colString, conf.db, tbl)
@@ -277,7 +289,8 @@ class Entries(object):
                                 else:
                                     colEntry = unArrayizeValue(entry[index]) if index < len(entry) else u''
 
-                                maxLen = max(getConsoleLength(column), getConsoleLength(DUMP_REPLACEMENTS.get(getUnicode(colEntry), getUnicode(colEntry))))
+                                maxLen = max(getConsoleLength(column), getConsoleLength(
+                                    DUMP_REPLACEMENTS.get(getUnicode(colEntry), getUnicode(colEntry))))
 
                                 if maxLen > kb.data.dumpedTable[column]["length"]:
                                     kb.data.dumpedTable[column]["length"] = maxLen
@@ -293,8 +306,10 @@ class Entries(object):
                     logger.info(infoMsg)
 
                     if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE, DBMS.MIMERSQL):
-                        query = rootQuery.blind.count % (tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())))
-                    elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.MAXDB, DBMS.ACCESS, DBMS.FIREBIRD, DBMS.MCKOI, DBMS.EXTREMEDB, DBMS.RAIMA):
+                        query = rootQuery.blind.count % (
+                            tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())))
+                    elif Backend.getIdentifiedDbms() in (
+                    DBMS.SQLITE, DBMS.MAXDB, DBMS.ACCESS, DBMS.FIREBIRD, DBMS.MCKOI, DBMS.EXTREMEDB, DBMS.RAIMA):
                         query = rootQuery.blind.count % tbl
                     elif Backend.getIdentifiedDbms() in (DBMS.SYBASE, DBMS.MSSQL):
                         query = rootQuery.blind.count % ("%s.%s" % (conf.db, tbl)) if conf.db else tbl
@@ -305,7 +320,8 @@ class Entries(object):
 
                     query = agent.whereQuery(query)
 
-                    count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                    count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT,
+                                            charsetType=CHARSET_TYPE.DIGITS)
 
                     lengths = {}
                     entries = {}
@@ -330,7 +346,8 @@ class Entries(object):
 
                         continue
 
-                    elif Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.SYBASE, DBMS.MAXDB, DBMS.MSSQL, DBMS.INFORMIX, DBMS.MCKOI, DBMS.RAIMA):
+                    elif Backend.getIdentifiedDbms() in (
+                    DBMS.ACCESS, DBMS.SYBASE, DBMS.MAXDB, DBMS.MSSQL, DBMS.INFORMIX, DBMS.MCKOI, DBMS.RAIMA):
                         if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.RAIMA):
                             table = tbl
                         elif Backend.getIdentifiedDbms() in (DBMS.SYBASE, DBMS.MSSQL, DBMS.MAXDB):
@@ -359,7 +376,9 @@ class Entries(object):
                                         if column not in entries:
                                             entries[column] = BigArray()
 
-                                        lengths[column] = max(lengths[column], len(DUMP_REPLACEMENTS.get(getUnicode(value), getUnicode(value))))
+                                        lengths[column] = max(lengths[column],
+                                                              len(DUMP_REPLACEMENTS.get(getUnicode(value),
+                                                                                        getUnicode(value))))
                                         entries[column].append(value)
 
                             except KeyboardInterrupt:
@@ -391,7 +410,8 @@ class Entries(object):
                             logger.debug(infoMsg)
 
                             for column in colList:
-                                if not inject.checkBooleanExpression("(SELECT COUNT(%s) FROM %s)>0" % (column, kb.dumpTable)):
+                                if not inject.checkBooleanExpression(
+                                        "(SELECT COUNT(%s) FROM %s)>0" % (column, kb.dumpTable)):
                                     emptyColumns.append(column)
                                     debugMsg = "column '%s' of table '%s' will not be " % (column, kb.dumpTable)
                                     debugMsg += "dumped as it appears to be empty"
@@ -408,29 +428,46 @@ class Entries(object):
                                     if column not in entries:
                                         entries[column] = BigArray()
 
-                                    if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2, DBMS.VERTICA, DBMS.PRESTO, DBMS.CRATEDB, DBMS.CACHE):
-                                        query = rootQuery.blind.query % (agent.preprocessField(tbl, column), conf.db, conf.tbl, sorted(colList, key=len)[0], index)
-                                    elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE,):
-                                        query = rootQuery.blind.query % (agent.preprocessField(tbl, column), tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())), index)
+                                    if Backend.getIdentifiedDbms() in (
+                                    DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2, DBMS.VERTICA, DBMS.PRESTO,
+                                    DBMS.CRATEDB, DBMS.CACHE):
+                                        query = rootQuery.blind.query % (
+                                        agent.preprocessField(tbl, column), conf.db, conf.tbl,
+                                        sorted(colList, key=len)[0], index)
+                                    elif Backend.getIdentifiedDbms() in (
+                                    DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE,):
+                                        query = rootQuery.blind.query % (agent.preprocessField(tbl, column),
+                                                                         tbl.upper() if not conf.db else ("%s.%s" % (
+                                                                         conf.db.upper(), tbl.upper())), index)
                                     elif Backend.getIdentifiedDbms() in (DBMS.MIMERSQL,):
-                                        query = rootQuery.blind.query % (agent.preprocessField(tbl, column), tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())), sorted(colList, key=len)[0], index)
+                                        query = rootQuery.blind.query % (agent.preprocessField(tbl, column),
+                                                                         tbl.upper() if not conf.db else ("%s.%s" % (
+                                                                         conf.db.upper(), tbl.upper())),
+                                                                         sorted(colList, key=len)[0], index)
                                     elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.EXTREMEDB):
                                         query = rootQuery.blind.query % (agent.preprocessField(tbl, column), tbl, index)
                                     elif Backend.isDbms(DBMS.FIREBIRD):
                                         query = rootQuery.blind.query % (index, agent.preprocessField(tbl, column), tbl)
                                     elif Backend.getIdentifiedDbms() in (DBMS.INFORMIX, DBMS.VIRTUOSO):
-                                        query = rootQuery.blind.query % (index, agent.preprocessField(tbl, column), conf.db, tbl, sorted(colList, key=len)[0])
+                                        query = rootQuery.blind.query % (
+                                        index, agent.preprocessField(tbl, column), conf.db, tbl,
+                                        sorted(colList, key=len)[0])
                                     elif Backend.isDbms(DBMS.FRONTBASE):
-                                        query = rootQuery.blind.query % (index, agent.preprocessField(tbl, column), conf.db, tbl)
+                                        query = rootQuery.blind.query % (
+                                        index, agent.preprocessField(tbl, column), conf.db, tbl)
                                     else:
-                                        query = rootQuery.blind.query % (agent.preprocessField(tbl, column), conf.db, tbl, index)
+                                        query = rootQuery.blind.query % (
+                                        agent.preprocessField(tbl, column), conf.db, tbl, index)
 
                                     query = agent.whereQuery(query)
 
-                                    value = NULL if column in emptyColumns else inject.getValue(query, union=False, error=False, dump=True)
+                                    value = NULL if column in emptyColumns else inject.getValue(query, union=False,
+                                                                                                error=False, dump=True)
                                     value = '' if value is None else value
 
-                                    lengths[column] = max(lengths[column], len(DUMP_REPLACEMENTS.get(getUnicode(value), getUnicode(value))))
+                                    lengths[column] = max(lengths[column], len(DUMP_REPLACEMENTS.get(getUnicode(value),
+                                                                                                     getUnicode(
+                                                                                                         value))))
                                     entries[column].append(value)
 
                         except KeyboardInterrupt:
@@ -451,7 +488,8 @@ class Entries(object):
                     if conf.col:
                         warnMsg += "of columns '%s' " % colNames
                     warnMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
-                    warnMsg += "in database '%s'%s" % (unsafeSQLIdentificatorNaming(conf.db), " (permission denied)" if kb.permissionFlag else "")
+                    warnMsg += "in database '%s'%s" % (
+                    unsafeSQLIdentificatorNaming(conf.db), " (permission denied)" if kb.permissionFlag else "")
                     logger.warning(warnMsg)
                 else:
                     kb.data.dumpedTable["__infos__"] = {"count": entriesCount,

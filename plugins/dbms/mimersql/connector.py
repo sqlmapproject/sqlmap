@@ -18,6 +18,7 @@ from lib.core.data import logger
 from lib.core.exception import SqlmapConnectionException
 from plugins.generic.connector import Connector as GenericConnector
 
+
 class Connector(GenericConnector):
     """
     Homepage: https://github.com/mimersql/MimerPy
@@ -30,7 +31,8 @@ class Connector(GenericConnector):
         self.initConnection()
 
         try:
-            self.connector = mimerpy.connect(hostname=self.hostname, username=self.user, password=self.password, database=self.db, port=self.port, connect_timeout=conf.timeout)
+            self.connector = mimerpy.connect(hostname=self.hostname, username=self.user, password=self.password,
+                                             database=self.db, port=self.port, connect_timeout=conf.timeout)
         except mimerpy.OperationalError as ex:
             raise SqlmapConnectionException(getSafeExString(ex))
 

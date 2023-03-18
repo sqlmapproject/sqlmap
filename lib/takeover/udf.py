@@ -30,6 +30,7 @@ from lib.core.exception import SqlmapUserQuitException
 from lib.core.unescaper import unescaper
 from lib.request import inject
 
+
 class UDF(object):
     """
     This class defines methods to deal with User-Defined Functions for
@@ -104,13 +105,17 @@ class UDF(object):
             cmd = unescaper.escape(self.udfForgeCmd(cmd))
 
             inject.goStacked("INSERT INTO %s(%s) VALUES (%s(%s))" % (self.cmdTblName, self.tblField, udfName, cmd))
-            output = unArrayizeValue(inject.getValue("SELECT %s FROM %s" % (self.tblField, self.cmdTblName), resumeValue=False, firstChar=first, lastChar=last, safeCharEncode=False))
+            output = unArrayizeValue(
+                inject.getValue("SELECT %s FROM %s" % (self.tblField, self.cmdTblName), resumeValue=False,
+                                firstChar=first, lastChar=last, safeCharEncode=False))
             inject.goStacked("DELETE FROM %s" % self.cmdTblName)
 
         return output
 
     def udfCheckNeeded(self):
-        if (not any((conf.fileRead, conf.commonFiles)) or (any((conf.fileRead, conf.commonFiles)) and not Backend.isDbms(DBMS.PGSQL))) and "sys_fileread" in self.sysUdfs:
+        if (not any((conf.fileRead, conf.commonFiles)) or (
+                any((conf.fileRead, conf.commonFiles)) and not Backend.isDbms(
+                DBMS.PGSQL))) and "sys_fileread" in self.sysUdfs:
             self.sysUdfs.pop("sys_fileread")
 
         if not conf.osPwn:

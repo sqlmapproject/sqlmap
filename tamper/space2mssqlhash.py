@@ -10,6 +10,7 @@ from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.LOW
 
+
 def tamper(payload, **kwargs):
     """
     Replaces space character (' ') with a pound character ('#') followed by a new line ('\n')

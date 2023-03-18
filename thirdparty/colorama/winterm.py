@@ -4,20 +4,22 @@ from . import win32
 
 # from wincon.h
 class WinColor(object):
-    BLACK   = 0
-    BLUE    = 1
-    GREEN   = 2
-    CYAN    = 3
-    RED     = 4
+    BLACK = 0
+    BLUE = 1
+    GREEN = 2
+    CYAN = 3
+    RED = 4
     MAGENTA = 5
-    YELLOW  = 6
-    GREY    = 7
+    YELLOW = 6
+    GREY = 7
+
 
 # from wincon.h
 class WinStyle(object):
-    NORMAL              = 0x00 # dim text, dim background
-    BRIGHT              = 0x08 # bright text, dim background
-    BRIGHT_BACKGROUND   = 0x80 # dim text, bright background
+    NORMAL = 0x00  # dim text, dim background
+    BRIGHT = 0x08  # bright text, dim background
+    BRIGHT_BACKGROUND = 0x80  # dim text, bright background
+
 
 class WinTerm(object):
 

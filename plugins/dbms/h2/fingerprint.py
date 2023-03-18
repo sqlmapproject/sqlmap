@@ -20,6 +20,7 @@ from lib.core.settings import H2_ALIASES
 from lib.request import inject
 from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 
+
 class Fingerprint(GenericFingerprint):
     def __init__(self):
         GenericFingerprint.__init__(self, DBMS.H2)
@@ -28,7 +29,8 @@ class Fingerprint(GenericFingerprint):
         fork = hashDBRetrieve(HASHDB_KEYS.DBMS_FORK)
 
         if fork is None:
-            if inject.checkBooleanExpression("EXISTS(SELECT * FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='IGNITE')"):
+            if inject.checkBooleanExpression(
+                    "EXISTS(SELECT * FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='IGNITE')"):
                 fork = FORK.IGNITE
             else:
                 fork = ""

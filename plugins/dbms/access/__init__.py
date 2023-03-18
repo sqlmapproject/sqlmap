@@ -15,6 +15,7 @@ from plugins.dbms.access.syntax import Syntax
 from plugins.dbms.access.takeover import Takeover
 from plugins.generic.misc import Miscellaneous
 
+
 class AccessMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
     This class defines Microsoft Access methods

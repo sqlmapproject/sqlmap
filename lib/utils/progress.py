@@ -14,6 +14,7 @@ from lib.core.convert import getUnicode
 from lib.core.data import conf
 from lib.core.data import kb
 
+
 class ProgressBar(object):
     """
     This class defines methods to update and draw a progress bar
@@ -91,7 +92,8 @@ class ProgressBar(object):
         This method draws the progress bar if it has changed
         """
 
-        dataToStdout("\r%s %d/%d%s" % (self._progBar, self._amount, self._max, ("  (ETA %s)" % (self._convertSeconds(int(eta)) if eta is not None else "??:??"))))
+        dataToStdout("\r%s %d/%d%s" % (self._progBar, self._amount, self._max, (
+                    "  (ETA %s)" % (self._convertSeconds(int(eta)) if eta is not None else "??:??"))))
         if self._amount >= self._max:
             dataToStdout("\r%s\r" % (" " * self._width))
             kb.prependFlag = False

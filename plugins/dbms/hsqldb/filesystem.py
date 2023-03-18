@@ -14,6 +14,7 @@ from lib.request import inject
 from lib.core.exception import SqlmapUnsupportedFeatureException
 from plugins.generic.filesystem import Filesystem as GenericFilesystem
 
+
 class Filesystem(GenericFilesystem):
     def readFile(self, remoteFile):
         errMsg = "on HSQLDB it is not possible to read files"
@@ -27,7 +28,8 @@ class Filesystem(GenericFilesystem):
         debugMsg = "creating JLP procedure '%s'" % funcName
         logger.debug(debugMsg)
 
-        addFuncQuery = "CREATE PROCEDURE %s (IN paramString VARCHAR, IN paramArrayOfByte VARBINARY(%s)) " % (funcName, max_bytes)
+        addFuncQuery = "CREATE PROCEDURE %s (IN paramString VARCHAR, IN paramArrayOfByte VARBINARY(%s)) " % (
+        funcName, max_bytes)
         addFuncQuery += "LANGUAGE JAVA DETERMINISTIC NO SQL "
         addFuncQuery += "EXTERNAL NAME 'CLASSPATH:com.sun.org.apache.xml.internal.security.utils.JavaUtils.writeBytesToFilename'"
         inject.goStacked(addFuncQuery)

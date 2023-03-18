@@ -52,6 +52,7 @@ from lib.core.unescaper import unescaper
 from lib.request.comparison import comparison
 from lib.request.connect import Connect as Request
 
+
 def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=PAYLOAD.WHERE.ORIGINAL):
     """
     Finds number of columns affected by UNION based injection
@@ -65,9 +66,13 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
             query = agent.suffixQuery(query, suffix=suffix, comment=comment)
             payload = agent.payload(newValue=query, place=place, parameter=parameter, where=where)
             page, headers, code = Request.queryPage(payload, place=place, content=True, raise404=False)
-            return not any(re.search(_, page or "", re.I) and not re.search(_, kb.pageTemplate or "", re.I) for _ in ("(warning|error):", "order (by|clause)", "unknown column", "failed")) and not kb.heavilyDynamic and comparison(page, headers, code) or re.search(r"data types cannot be compared or sorted", page or "", re.I) is not None
+            return not any(re.search(_, page or "", re.I) and not re.search(_, kb.pageTemplate or "", re.I) for _ in (
+            "(warning|error):", "order (by|clause)", "unknown column",
+            "failed")) and not kb.heavilyDynamic and comparison(page, headers, code) or re.search(
+                r"data types cannot be compared or sorted", page or "", re.I) is not None
 
-        if _orderByTest(1 if lowerCount is None else lowerCount) and not _orderByTest(randomInt() if upperCount is None else upperCount + 1):
+        if _orderByTest(1 if lowerCount is None else lowerCount) and not _orderByTest(
+                randomInt() if upperCount is None else upperCount + 1):
             infoMsg = "'ORDER BY' technique appears to be usable. "
             infoMsg += "This should reduce the time needed "
             infoMsg += "to find the right number "
@@ -134,7 +139,8 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
 
         if not isNullValue(kb.uChar):
             for regex in (kb.uChar.strip("'"), r'>\s*%s\s*<' % kb.uChar.strip("'")):
-                contains = [count for count, content in pages.items() if re.search(regex, content or "", re.IGNORECASE) is not None]
+                contains = [count for count, content in pages.items() if
+                            re.search(regex, content or "", re.IGNORECASE) is not None]
                 if len(contains) == 1:
                     retVal = contains[0]
                     break
@@ -163,7 +169,8 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
                 deviation = stdev(ratios)
 
                 if deviation is not None:
-                    lower, upper = average(ratios) - UNION_STDEV_COEFF * deviation, average(ratios) + UNION_STDEV_COEFF * deviation
+                    lower, upper = average(ratios) - UNION_STDEV_COEFF * deviation, average(
+                        ratios) + UNION_STDEV_COEFF * deviation
 
                     if min_ < lower:
                         retVal = minItem[0]
@@ -180,10 +187,12 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
 
     return retVal
 
+
 def _fuzzUnionCols(place, parameter, prefix, suffix):
     retVal = None
 
-    if Backend.getIdentifiedDbms() and not re.search(FUZZ_UNION_ERROR_REGEX, kb.pageTemplate or "") and kb.orderByColumns:
+    if Backend.getIdentifiedDbms() and not re.search(FUZZ_UNION_ERROR_REGEX,
+                                                     kb.pageTemplate or "") and kb.orderByColumns:
         comment = queries[Backend.getIdentifiedDbms()].comment.query
 
         choices = getPublicTypeMembers(FUZZ_UNION_COLUMN, True)
@@ -195,9 +204,13 @@ def _fuzzUnionCols(place, parameter, prefix, suffix):
             elif FUZZ_UNION_COLUMN.STRING not in candidate:
                 continue
             else:
-                candidate = [_.replace(FUZZ_UNION_COLUMN.INTEGER, str(randomInt())).replace(FUZZ_UNION_COLUMN.STRING, "'%s'" % randomStr(20)) for _ in candidate]
+                candidate = [_.replace(FUZZ_UNION_COLUMN.INTEGER, str(randomInt())).replace(FUZZ_UNION_COLUMN.STRING,
+                                                                                            "'%s'" % randomStr(20)) for
+                             _ in candidate]
 
-            query = agent.prefixQuery("UNION ALL SELECT %s%s" % (','.join(candidate), FROM_DUMMY_TABLE.get(Backend.getIdentifiedDbms(), "")), prefix=prefix)
+            query = agent.prefixQuery(
+                "UNION ALL SELECT %s%s" % (','.join(candidate), FROM_DUMMY_TABLE.get(Backend.getIdentifiedDbms(), "")),
+                prefix=prefix)
             query = agent.suffixQuery(query, suffix=suffix, comment=comment)
             payload = agent.payload(newValue=query, place=place, parameter=parameter, where=PAYLOAD.WHERE.NEGATIVE)
             page, headers, code = Request.queryPage(payload, place=place, content=True, raise404=False)
@@ -209,6 +222,7 @@ def _fuzzUnionCols(place, parameter, prefix, suffix):
                         break
 
     return retVal
+
 
 def _unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYLOAD.WHERE.ORIGINAL):
     validPayload = None
@@ -239,12 +253,16 @@ def _unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYLO
 
             # Perform the request
             page, headers, _ = Request.queryPage(payload, place=place, content=True, raise404=False)
-            content = ("%s%s" % (removeReflectiveValues(page, payload) or "", removeReflectiveValues(listToStrValue(headers.headers if headers else None), payload, True) or "")).lower()
+            content = ("%s%s" % (removeReflectiveValues(page, payload) or "",
+                                 removeReflectiveValues(listToStrValue(headers.headers if headers else None), payload,
+                                                        True) or "")).lower()
 
             if content and phrase in content:
                 validPayload = payload
                 kb.unionDuplicates = len(re.findall(phrase, content, re.I)) > 1
-                vector = (position, count, comment, prefix, suffix, kb.uChar, where, kb.unionDuplicates, conf.forcePartial, kb.tableFrom, kb.unionTemplate)
+                vector = (
+                position, count, comment, prefix, suffix, kb.uChar, where, kb.unionDuplicates, conf.forcePartial,
+                kb.tableFrom, kb.unionTemplate)
 
                 if where == PAYLOAD.WHERE.ORIGINAL:
                     # Prepare expression with delimiters
@@ -254,29 +272,39 @@ def _unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYLO
                     randQueryUnescaped2 = unescaper.escape(randQueryProcessed2)
 
                     # Confirm that it is a full union SQL injection
-                    query = agent.forgeUnionQuery(randQueryUnescaped, position, count, comment, prefix, suffix, kb.uChar, where, multipleUnions=randQueryUnescaped2)
+                    query = agent.forgeUnionQuery(randQueryUnescaped, position, count, comment, prefix, suffix,
+                                                  kb.uChar, where, multipleUnions=randQueryUnescaped2)
                     payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
 
                     # Perform the request
                     page, headers, _ = Request.queryPage(payload, place=place, content=True, raise404=False)
-                    content = ("%s%s" % (page or "", listToStrValue(headers.headers if headers else None) or "")).lower()
+                    content = ("%s%s" % (
+                    page or "", listToStrValue(headers.headers if headers else None) or "")).lower()
 
                     if not all(_ in content for _ in (phrase, phrase2)):
-                        vector = (position, count, comment, prefix, suffix, kb.uChar, where, kb.unionDuplicates, True, kb.tableFrom, kb.unionTemplate)
+                        vector = (position, count, comment, prefix, suffix, kb.uChar, where, kb.unionDuplicates, True,
+                                  kb.tableFrom, kb.unionTemplate)
                     elif not kb.unionDuplicates:
-                        fromTable = " FROM (%s) AS %s" % (" UNION ".join("SELECT %d%s%s" % (_, FROM_DUMMY_TABLE.get(Backend.getIdentifiedDbms(), ""), " AS %s" % randomStr() if _ == 0 else "") for _ in xrange(LIMITED_ROWS_TEST_NUMBER)), randomStr())
+                        fromTable = " FROM (%s) AS %s" % (" UNION ".join("SELECT %d%s%s" % (
+                        _, FROM_DUMMY_TABLE.get(Backend.getIdentifiedDbms(), ""),
+                        " AS %s" % randomStr() if _ == 0 else "") for _ in xrange(LIMITED_ROWS_TEST_NUMBER)),
+                                                          randomStr())
 
                         # Check for limited row output
-                        query = agent.forgeUnionQuery(randQueryUnescaped, position, count, comment, prefix, suffix, kb.uChar, where, fromTable=fromTable)
+                        query = agent.forgeUnionQuery(randQueryUnescaped, position, count, comment, prefix, suffix,
+                                                      kb.uChar, where, fromTable=fromTable)
                         payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
 
                         # Perform the request
                         page, headers, _ = Request.queryPage(payload, place=place, content=True, raise404=False)
-                        content = ("%s%s" % (removeReflectiveValues(page, payload) or "", removeReflectiveValues(listToStrValue(headers.headers if headers else None), payload, True) or "")).lower()
+                        content = ("%s%s" % (removeReflectiveValues(page, payload) or "", removeReflectiveValues(
+                            listToStrValue(headers.headers if headers else None), payload, True) or "")).lower()
                         if content.count(phrase) > 0 and content.count(phrase) < LIMITED_ROWS_TEST_NUMBER:
                             warnMsg = "output with limited number of rows detected. Switching to partial mode"
                             logger.warning(warnMsg)
-                            vector = (position, count, comment, prefix, suffix, kb.uChar, where, kb.unionDuplicates, True, kb.tableFrom, kb.unionTemplate)
+                            vector = (
+                            position, count, comment, prefix, suffix, kb.uChar, where, kb.unionDuplicates, True,
+                            kb.tableFrom, kb.unionTemplate)
 
                 unionErrorCase = kb.errorIsNone and wasLastResponseDBMSError()
 
@@ -290,6 +318,7 @@ def _unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYLO
 
     return validPayload, vector
 
+
 def _unionConfirm(comment, place, parameter, prefix, suffix, count):
     validPayload = None
     vector = None
@@ -301,9 +330,11 @@ def _unionConfirm(comment, place, parameter, prefix, suffix, count):
     # Assure that the above function found the exploitable full union
     # SQL injection position
     if not validPayload:
-        validPayload, vector = _unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYLOAD.WHERE.NEGATIVE)
+        validPayload, vector = _unionPosition(comment, place, parameter, prefix, suffix, count,
+                                              where=PAYLOAD.WHERE.NEGATIVE)
 
     return validPayload, vector
+
 
 def _unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix):
     """
@@ -360,11 +391,13 @@ def _unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix)
             if not all((validPayload, vector)) and not warnMsg.endswith("consider "):
                 singleTimeWarnMessage(warnMsg)
 
-        if orderBy is None and kb.orderByColumns is not None and not all((validPayload, vector)):  # discard ORDER BY results (not usable - e.g. maybe invalid altogether)
+        if orderBy is None and kb.orderByColumns is not None and not all(
+                (validPayload, vector)):  # discard ORDER BY results (not usable - e.g. maybe invalid altogether)
             conf.uChar, kb.uChar = uChars
             validPayload, vector = _unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix)
 
     return validPayload, vector
+
 
 @stackedmethod
 def unionTest(comment, place, parameter, value, prefix, suffix):

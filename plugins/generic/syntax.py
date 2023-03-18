@@ -13,6 +13,7 @@ from lib.core.data import conf
 from lib.core.enums import DBMS
 from lib.core.exception import SqlmapUndefinedMethod
 
+
 class Syntax(object):
     """
     This class defines generic syntax functionalities for plugins.
@@ -36,7 +37,9 @@ class Syntax(object):
 
                         if replacement != original:
                             retVal = retVal.replace(item, replacement)
-                        elif len(original) != len(getBytes(original)) and "n'%s'" % original not in retVal and Backend.getDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.ORACLE, DBMS.MSSQL):
+                        elif len(original) != len(
+                                getBytes(original)) and "n'%s'" % original not in retVal and Backend.getDbms() in (
+                        DBMS.MYSQL, DBMS.PGSQL, DBMS.ORACLE, DBMS.MSSQL):
                             retVal = retVal.replace("'%s'" % original, "n'%s'" % original)
         else:
             retVal = escaper(expression)

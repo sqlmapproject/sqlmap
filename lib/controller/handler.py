@@ -95,6 +95,7 @@ from plugins.dbms.vertica import VerticaMap
 from plugins.dbms.virtuoso.connector import Connector as VirtuosoConn
 from plugins.dbms.virtuoso import VirtuosoMap
 
+
 def setHandler():
     """
     Detect which is the target web application back-end database
@@ -131,7 +132,9 @@ def setHandler():
         (DBMS.VIRTUOSO, VIRTUOSO_ALIASES, VirtuosoMap, VirtuosoConn),
     ]
 
-    _ = max(_ if (conf.get("dbms") or Backend.getIdentifiedDbms() or kb.heuristicExtendedDbms or "").lower() in _[1] else () for _ in items)
+    _ = max(
+        _ if (conf.get("dbms") or Backend.getIdentifiedDbms() or kb.heuristicExtendedDbms or "").lower() in _[1] else ()
+        for _ in items)
     if _:
         items.remove(_)
         items.insert(0, _)

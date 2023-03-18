@@ -7,6 +7,7 @@ See the file 'LICENSE' for copying permission
 
 import numbers
 
+
 class xrange(object):
     """
     Advanced (re)implementation of xrange (supports slice/copy/etc.)

@@ -120,19 +120,24 @@ import threading
 DEBUG = None
 
 import sys
-if sys.version_info < (2, 4): HANDLE_ERRORS = 1
-else: HANDLE_ERRORS = 0
+
+if sys.version_info < (2, 4):
+    HANDLE_ERRORS = 1
+else:
+    HANDLE_ERRORS = 0
+
 
 class ConnectionManager:
     """
     The connection manager must be able to:
       * keep track of all existing
       """
+
     def __init__(self):
         self._lock = threading.Lock()
-        self._hostmap = {} # map hosts to a list of connections
-        self._connmap = {} # map connections to host
-        self._readymap = {} # map connection to ready state
+        self._hostmap = {}  # map hosts to a list of connections
+        self._connmap = {}  # map connections to host
+        self._readymap = {}  # map connection to ready state
 
     def add(self, host, connection, ready):
         self._lock.acquire()
@@ -160,8 +165,10 @@ class ConnectionManager:
             self._lock.release()
 
     def set_ready(self, connection, ready):
-        try: self._readymap[connection] = ready
-        except KeyError: pass
+        try:
+            self._readymap[connection] = ready
+        except KeyError:
+            pass
 
     def get_ready_conn(self, host):
         conn = None
@@ -182,6 +189,7 @@ class ConnectionManager:
             return list(self._hostmap.get(host, []))
         else:
             return dict(self._hostmap)
+
 
 class KeepAliveHandler:
     def __init__(self):
@@ -317,9 +325,11 @@ class KeepAliveHandler:
             if req.data:
                 data = req.data
                 if hasattr(req, 'selector'):
-                    h.putrequest(req.get_method() or 'POST', req.selector, skip_host=req.has_header("Host"), skip_accept_encoding=req.has_header("Accept-encoding"))
+                    h.putrequest(req.get_method() or 'POST', req.selector, skip_host=req.has_header("Host"),
+                                 skip_accept_encoding=req.has_header("Accept-encoding"))
                 else:
-                    h.putrequest(req.get_method() or 'POST', req.get_selector(), skip_host=req.has_header("Host"), skip_accept_encoding=req.has_header("Accept-encoding"))
+                    h.putrequest(req.get_method() or 'POST', req.get_selector(), skip_host=req.has_header("Host"),
+                                 skip_accept_encoding=req.has_header("Accept-encoding"))
                 if 'Content-type' not in req.headers:
                     h.putheader('Content-type',
                                 'application/x-www-form-urlencoded')
@@ -327,9 +337,11 @@ class KeepAliveHandler:
                     h.putheader('Content-length', '%d' % len(data))
             else:
                 if hasattr(req, 'selector'):
-                    h.putrequest(req.get_method() or 'GET', req.selector, skip_host=req.has_header("Host"), skip_accept_encoding=req.has_header("Accept-encoding"))
+                    h.putrequest(req.get_method() or 'GET', req.selector, skip_host=req.has_header("Host"),
+                                 skip_accept_encoding=req.has_header("Accept-encoding"))
                 else:
-                    h.putrequest(req.get_method() or 'GET', req.get_selector(), skip_host=req.has_header("Host"), skip_accept_encoding=req.has_header("Accept-encoding"))
+                    h.putrequest(req.get_method() or 'GET', req.get_selector(), skip_host=req.has_header("Host"),
+                                 skip_accept_encoding=req.has_header("Accept-encoding"))
         except (socket.error, _http_client.HTTPException) as err:
             raise _urllib.error.URLError(err)
 
@@ -348,6 +360,7 @@ class KeepAliveHandler:
     def _get_connection(self, host):
         return NotImplementedError
 
+
 class HTTPHandler(KeepAliveHandler, _urllib.request.HTTPHandler):
     def __init__(self):
         KeepAliveHandler.__init__(self)
@@ -357,6 +370,7 @@ class HTTPHandler(KeepAliveHandler, _urllib.request.HTTPHandler):
 
     def _get_connection(self, host):
         return HTTPConnection(host)
+
 
 class HTTPSHandler(KeepAliveHandler, _urllib.request.HTTPSHandler):
     def __init__(self, ssl_factory=None):
@@ -373,8 +387,11 @@ class HTTPSHandler(KeepAliveHandler, _urllib.request.HTTPSHandler):
         return self.do_open(req)
 
     def _get_connection(self, host):
-        try: return self._ssl_factory.get_https_connection(host)
-        except AttributeError: return HTTPSConnection(host)
+        try:
+            return self._ssl_factory.get_https_connection(host)
+        except AttributeError:
+            return HTTPSConnection(host)
+
 
 class HTTPResponse(_http_client.HTTPResponse):
     # we need to subclass HTTPResponse in order to
@@ -395,21 +412,20 @@ class HTTPResponse(_http_client.HTTPResponse):
     # Both readline and readlines have been stolen with almost no
     # modification from socket.py
 
-
     def __init__(self, sock, debuglevel=0, strict=0, method=None):
-        if method: # the httplib in python 2.3 uses the method arg
+        if method:  # the httplib in python 2.3 uses the method arg
             _http_client.HTTPResponse.__init__(self, sock, debuglevel, method)
-        else: # 2.2 doesn't
+        else:  # 2.2 doesn't
             _http_client.HTTPResponse.__init__(self, sock, debuglevel)
         self.fileno = sock.fileno
         self.code = None
         self._method = method
         self._rbuf = b""
         self._rbufsize = 8096
-        self._handler = None # inserted by the handler later
-        self._host = None    # (same)
-        self._url = None     # (same)
-        self._connection = None # (same)
+        self._handler = None  # inserted by the handler later
+        self._host = None  # (same)
+        self._url = None  # (same)
+        self._connection = None  # (same)
 
     _raw_read = _http_client.HTTPResponse.read
 
@@ -460,13 +476,15 @@ class HTTPResponse(_http_client.HTTPResponse):
             i = new.find('\n')
             if i >= 0: i = i + len(self._rbuf)
             self._rbuf = self._rbuf + new
-        if i < 0: i = len(self._rbuf)
-        else: i = i+1
+        if i < 0:
+            i = len(self._rbuf)
+        else:
+            i = i + 1
         if 0 <= limit < len(self._rbuf): i = limit
         data, self._rbuf = self._rbuf[:i], self._rbuf[i:]
         return data
 
-    def readlines(self, sizehint = 0):
+    def readlines(self, sizehint=0):
         total = 0
         list = []
         while 1:
@@ -483,8 +501,10 @@ class HTTPConnection(_http_client.HTTPConnection):
     # use the modified response class
     response_class = HTTPResponse
 
+
 class HTTPSConnection(_http_client.HTTPSConnection):
     response_class = HTTPResponse
+
 
 #########################################################################
 #####   TEST FUNCTIONS
@@ -504,8 +524,10 @@ def error_handler(url):
             fo = _urllib.request.urlopen(url)
             foo = fo.read()
             fo.close()
-            try: status, reason = fo.status, fo.reason
-            except AttributeError: status, reason = None, None
+            try:
+                status, reason = fo.status, fo.reason
+            except AttributeError:
+                status, reason = None, None
         except IOError as e:
             print("  EXCEPTION: %s" % e)
             raise
@@ -515,6 +537,7 @@ def error_handler(url):
     hosts = keepalive_handler.open_connections()
     print("open connections:", hosts)
     keepalive_handler.close_all()
+
 
 def continuity(url):
     from hashlib import md5
@@ -543,11 +566,14 @@ def continuity(url):
     foo = ''
     while 1:
         f = fo.readline()
-        if f: foo = foo + f
-        else: break
+        if f:
+            foo = foo + f
+        else:
+            break
     fo.close()
     m = md5(foo)
     print(format % ('keepalive readline', m.hexdigest()))
+
 
 def comp(N, url):
     print('  making %i connections to:\n  %s' % (N, url))
@@ -565,7 +591,8 @@ def comp(N, url):
     _urllib.request.install_opener(opener)
     t2 = fetch(N, url)
     print('  TIME: %.3f s' % t2)
-    print('  improvement factor: %.2f' % (t1/t2, ))
+    print('  improvement factor: %.2f' % (t1 / t2,))
+
 
 def fetch(N, url, delay=0):
     import time
@@ -587,12 +614,16 @@ def fetch(N, url, delay=0):
 
     return diff
 
+
 def test_timeout(url):
     global DEBUG
     dbbackup = DEBUG
+
     class FakeLogger:
         def debug(self, msg, *args): print(msg % args)
+
         info = warning = error = debug
+
     DEBUG = FakeLogger()
     print("  fetching the file to establish a connection")
     fo = _urllib.request.urlopen(url)
@@ -623,7 +654,8 @@ def test_timeout(url):
 
 def test(url, N=10):
     print("checking error hander (do this on a non-200)")
-    try: error_handler(url)
+    try:
+        error_handler(url)
     except IOError as e:
         print("exiting - exception will prevent further tests")
         sys.exit()
@@ -637,9 +669,11 @@ def test(url, N=10):
     print("performing dropped-connection check")
     test_timeout(url)
 
+
 if __name__ == '__main__':
     import time
     import sys
+
     try:
         N = int(sys.argv[1])
         url = sys.argv[2]

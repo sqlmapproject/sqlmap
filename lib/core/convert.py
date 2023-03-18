@@ -37,6 +37,7 @@ try:
 except ImportError:
     from cgi import escape as htmlEscape
 
+
 def base64pickle(value):
     """
     Serializes (with pickle) and encodes to Base64 format supplied (binary) value
@@ -61,6 +62,7 @@ def base64pickle(value):
 
     return retVal
 
+
 def base64unpickle(value):
     """
     Decodes value from Base64 to plain format and deserializes (with pickle) its content
@@ -77,6 +79,7 @@ def base64unpickle(value):
         retVal = pickle.loads(decodeBase64(bytes(value)))
 
     return retVal
+
 
 def htmlUnescape(value):
     """
@@ -100,19 +103,24 @@ def htmlUnescape(value):
 
     return retVal
 
+
 def singleTimeWarnMessage(message):  # Cross-referenced function
     sys.stdout.write(message)
     sys.stdout.write("\n")
     sys.stdout.flush()
 
+
 def filterNone(values):  # Cross-referenced function
     return [_ for _ in values if _] if isinstance(values, _collections.Iterable) else values
+
 
 def isListLike(value):  # Cross-referenced function
     return isinstance(value, (list, tuple, set, BigArray))
 
+
 def shellExec(cmd):  # Cross-referenced function
     raise NotImplementedError
+
 
 def jsonize(data):
     """
@@ -124,6 +132,7 @@ def jsonize(data):
 
     return json.dumps(data, sort_keys=False, indent=4)
 
+
 def dejsonize(data):
     """
     Returns JSON deserialized data
@@ -133,6 +142,7 @@ def dejsonize(data):
     """
 
     return json.loads(data)
+
 
 def decodeHex(value, binary=True):
     """
@@ -162,6 +172,7 @@ def decodeHex(value, binary=True):
 
     return retVal
 
+
 def encodeHex(value, binary=True):
     """
     Returns a encoded representation of provided string value
@@ -189,6 +200,7 @@ def encodeHex(value, binary=True):
         retVal = getText(retVal)
 
     return retVal
+
 
 def decodeBase64(value, binary=True, encoding=None):
     """
@@ -231,6 +243,7 @@ def decodeBase64(value, binary=True, encoding=None):
 
     return retVal
 
+
 def encodeBase64(value, binary=True, encoding=None, padding=True, safe=False):
     """
     Returns a decoded representation of provided Base64 value
@@ -271,6 +284,7 @@ def encodeBase64(value, binary=True, encoding=None, padding=True, safe=False):
 
     return retVal
 
+
 def getBytes(value, encoding=None, errors="strict", unsafe=True):
     """
     Returns byte representation of provided Unicode value
@@ -310,6 +324,7 @@ def getBytes(value, encoding=None, errors="strict", unsafe=True):
 
     return retVal
 
+
 def getOrds(value):
     """
     Returns ORD(...) representation of provided string value
@@ -321,6 +336,7 @@ def getOrds(value):
     """
 
     return [_ if isinstance(_, int) else ord(_) for _ in value]
+
 
 def getUnicode(value, encoding=None, noneToNull=False):
     """
@@ -341,13 +357,18 @@ def getUnicode(value, encoding=None, noneToNull=False):
         return value
     elif isinstance(value, six.binary_type):
         # Heuristics (if encoding not explicitly specified)
-        candidates = filterNone((encoding, kb.get("pageEncoding") if kb.get("originalPage") else None, conf.get("encoding"), UNICODE_ENCODING, sys.getfilesystemencoding()))
+        candidates = filterNone((encoding, kb.get("pageEncoding") if kb.get("originalPage") else None,
+                                 conf.get("encoding"), UNICODE_ENCODING, sys.getfilesystemencoding()))
         if all(_ in value for _ in (b'<', b'>')):
             pass
         elif any(_ in value for _ in (b":\\", b'/', b'.')) and b'\n' not in value:
-            candidates = filterNone((encoding, sys.getfilesystemencoding(), kb.get("pageEncoding") if kb.get("originalPage") else None, UNICODE_ENCODING, conf.get("encoding")))
+            candidates = filterNone((encoding, sys.getfilesystemencoding(),
+                                     kb.get("pageEncoding") if kb.get("originalPage") else None, UNICODE_ENCODING,
+                                     conf.get("encoding")))
         elif conf.get("encoding") and b'\n' not in value:
-            candidates = filterNone((encoding, conf.get("encoding"), kb.get("pageEncoding") if kb.get("originalPage") else None, sys.getfilesystemencoding(), UNICODE_ENCODING))
+            candidates = filterNone((encoding, conf.get("encoding"),
+                                     kb.get("pageEncoding") if kb.get("originalPage") else None,
+                                     sys.getfilesystemencoding(), UNICODE_ENCODING))
 
         for candidate in candidates:
             try:
@@ -356,7 +377,8 @@ def getUnicode(value, encoding=None, noneToNull=False):
                 pass
 
         try:
-            return six.text_type(value, encoding or (kb.get("pageEncoding") if kb.get("originalPage") else None) or UNICODE_ENCODING)
+            return six.text_type(value, encoding or (
+                kb.get("pageEncoding") if kb.get("originalPage") else None) or UNICODE_ENCODING)
         except UnicodeDecodeError:
             return six.text_type(value, UNICODE_ENCODING, errors="reversible")
     elif isListLike(value):
@@ -367,6 +389,7 @@ def getUnicode(value, encoding=None, noneToNull=False):
             return six.text_type(value)
         except UnicodeDecodeError:
             return six.text_type(str(value), errors="ignore")  # encoding ignored for non-basestring instances
+
 
 def getText(value, encoding=None):
     """
@@ -390,6 +413,7 @@ def getText(value, encoding=None):
             pass
 
     return retVal
+
 
 def stdoutEncode(value):
     """
@@ -438,6 +462,7 @@ def stdoutEncode(value):
         retVal = value
 
     return retVal
+
 
 def getConsoleLength(value):
     """

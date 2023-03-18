@@ -14,11 +14,14 @@ from lib.core.dicts import FROM_DUMMY_TABLE
 from lib.core.exception import SqlmapNotVulnerableException
 from lib.techniques.dns.use import dnsUse
 
+
 def dnsTest(payload):
     logger.info("testing for data retrieval through DNS channel")
 
     randInt = randomInt()
-    kb.dnsTest = dnsUse(payload, "SELECT %d%s" % (randInt, FROM_DUMMY_TABLE.get(Backend.getIdentifiedDbms(), ""))) == str(randInt)
+    kb.dnsTest = dnsUse(payload,
+                        "SELECT %d%s" % (randInt, FROM_DUMMY_TABLE.get(Backend.getIdentifiedDbms(), ""))) == str(
+        randInt)
 
     if not kb.dnsTest:
         errMsg = "data retrieval through DNS channel failed"

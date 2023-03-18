@@ -32,6 +32,7 @@ from plugins.generic.enumeration import Enumeration as GenericEnumeration
 from thirdparty import six
 from thirdparty.six.moves import zip as _zip
 
+
 class Enumeration(GenericEnumeration):
     def getUsers(self):
         infoMsg = "fetching database users"
@@ -41,13 +42,15 @@ class Enumeration(GenericEnumeration):
 
         query = rootQuery.inband.query
 
-        if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
+        if any(isTechniqueAvailable(_) for _ in
+               (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
             blinds = (False, True)
         else:
             blinds = (True,)
 
         for blind in blinds:
-            retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.name' % kb.aliasName], blind=blind, alias=kb.aliasName)
+            retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.name' % kb.aliasName], blind=blind,
+                                    alias=kb.aliasName)
 
             if retVal:
                 kb.data.cachedUsers = list(retVal[0].values())[0]
@@ -96,13 +99,15 @@ class Enumeration(GenericEnumeration):
         rootQuery = queries[DBMS.SYBASE].dbs
         query = rootQuery.inband.query
 
-        if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
+        if any(isTechniqueAvailable(_) for _ in
+               (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
             blinds = [False, True]
         else:
             blinds = [True]
 
         for blind in blinds:
-            retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.name' % kb.aliasName], blind=blind, alias=kb.aliasName)
+            retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.name' % kb.aliasName], blind=blind,
+                                    alias=kb.aliasName)
 
             if retVal:
                 kb.data.cachedDbs = next(six.itervalues(retVal[0]))
@@ -133,10 +138,12 @@ class Enumeration(GenericEnumeration):
         dbs = [_ for _ in dbs if _]
 
         infoMsg = "fetching tables for database"
-        infoMsg += "%s: %s" % ("s" if len(dbs) > 1 else "", ", ".join(db if isinstance(db, six.string_types) else db[0] for db in sorted(dbs)))
+        infoMsg += "%s: %s" % (
+        "s" if len(dbs) > 1 else "", ", ".join(db if isinstance(db, six.string_types) else db[0] for db in sorted(dbs)))
         logger.info(infoMsg)
 
-        if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
+        if any(isTechniqueAvailable(_) for _ in
+               (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
             blinds = [False, True]
         else:
             blinds = [True]
@@ -146,7 +153,8 @@ class Enumeration(GenericEnumeration):
         for db in dbs:
             for blind in blinds:
                 query = rootQuery.inband.query % db
-                retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.name' % kb.aliasName], blind=blind, alias=kb.aliasName)
+                retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.name' % kb.aliasName], blind=blind,
+                                        alias=kb.aliasName)
 
                 if retVal:
                     for table in next(six.itervalues(retVal[0])):
@@ -231,9 +239,11 @@ class Enumeration(GenericEnumeration):
                             columns[colName] = colType
 
                     if conf.db in kb.data.cachedColumns:
-                        kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)] = columns
+                        kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][
+                            safeSQLIdentificatorNaming(tbl, True)] = columns
                     else:
-                        kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] = {safeSQLIdentificatorNaming(tbl, True): columns}
+                        kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] = {
+                            safeSQLIdentificatorNaming(tbl, True): columns}
 
                 return kb.data.cachedColumns
 
@@ -249,15 +259,16 @@ class Enumeration(GenericEnumeration):
 
         rootQuery = queries[DBMS.SYBASE].columns
 
-        if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
+        if any(isTechniqueAvailable(_) for _ in
+               (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
             blinds = [False, True]
         else:
             blinds = [True]
 
         for tbl in tblList:
             if conf.db is not None and len(kb.data.cachedColumns) > 0 \
-               and conf.db in kb.data.cachedColumns and tbl in \
-               kb.data.cachedColumns[conf.db]:
+                    and conf.db in kb.data.cachedColumns and tbl in \
+                    kb.data.cachedColumns[conf.db]:
                 infoMsg = "fetched tables' columns on "
                 infoMsg += "database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 logger.info(infoMsg)
@@ -276,15 +287,20 @@ class Enumeration(GenericEnumeration):
             logger.info(infoMsg)
 
             for blind in blinds:
-                query = rootQuery.inband.query % (conf.db, conf.db, conf.db, conf.db, conf.db, conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl))
-                retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.name' % kb.aliasName, '%s.usertype' % kb.aliasName], blind=blind, alias=kb.aliasName)
+                query = rootQuery.inband.query % (
+                conf.db, conf.db, conf.db, conf.db, conf.db, conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl))
+                retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName),
+                                        ['%s.name' % kb.aliasName, '%s.usertype' % kb.aliasName], blind=blind,
+                                        alias=kb.aliasName)
 
                 if retVal:
                     table = {}
                     columns = {}
 
-                    for name, type_ in filterPairValues(_zip(retVal[0]["%s.name" % kb.aliasName], retVal[0]["%s.usertype" % kb.aliasName])):
-                        columns[name] = SYBASE_TYPES.get(int(type_) if hasattr(type_, "isdigit") and type_.isdigit() else type_, type_)
+                    for name, type_ in filterPairValues(
+                            _zip(retVal[0]["%s.name" % kb.aliasName], retVal[0]["%s.usertype" % kb.aliasName])):
+                        columns[name] = SYBASE_TYPES.get(
+                            int(type_) if hasattr(type_, "isdigit") and type_.isdigit() else type_, type_)
 
                     table[safeSQLIdentificatorNaming(tbl, True)] = columns
                     kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] = table

@@ -30,6 +30,7 @@ from lib.request import inject
 
 from plugins.generic.filesystem import Filesystem as GenericFilesystem
 
+
 class Filesystem(GenericFilesystem):
     def _dataToScr(self, fileContent, chunkName):
         fileLines = []
@@ -94,10 +95,12 @@ class Filesystem(GenericFilesystem):
 
         self.createSupportTbl(txtTbl, self.tblField, "text")
         inject.goStacked("DROP TABLE %s" % hexTbl)
-        inject.goStacked("CREATE TABLE %s(id INT IDENTITY(1, 1) PRIMARY KEY, %s %s)" % (hexTbl, self.tblField, "VARCHAR(4096)"))
+        inject.goStacked(
+            "CREATE TABLE %s(id INT IDENTITY(1, 1) PRIMARY KEY, %s %s)" % (hexTbl, self.tblField, "VARCHAR(4096)"))
 
         logger.debug("loading the content of file '%s' into support table" % remoteFile)
-        inject.goStacked("BULK INSERT %s FROM '%s' WITH (CODEPAGE='RAW', FIELDTERMINATOR='%s', ROWTERMINATOR='%s')" % (txtTbl, remoteFile, randomStr(10), randomStr(10)), silent=True)
+        inject.goStacked("BULK INSERT %s FROM '%s' WITH (CODEPAGE='RAW', FIELDTERMINATOR='%s', ROWTERMINATOR='%s')" % (
+        txtTbl, remoteFile, randomStr(10), randomStr(10)), silent=True)
 
         # Reference: https://web.archive.org/web/20120211184457/http://support.microsoft.com/kb/104829
         binToHexQuery = """DECLARE @charset VARCHAR(16)
@@ -142,11 +145,13 @@ class Filesystem(GenericFilesystem):
         inject.goStacked(binToHexQuery)
 
         if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION):
-            result = inject.getValue("SELECT %s FROM %s ORDER BY id ASC" % (self.tblField, hexTbl), resumeValue=False, blind=False, time=False, error=False)
+            result = inject.getValue("SELECT %s FROM %s ORDER BY id ASC" % (self.tblField, hexTbl), resumeValue=False,
+                                     blind=False, time=False, error=False)
 
         if not result:
             result = []
-            count = inject.getValue("SELECT COUNT(*) FROM %s" % (hexTbl), resumeValue=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+            count = inject.getValue("SELECT COUNT(*) FROM %s" % (hexTbl), resumeValue=False, expected=EXPECTED.INT,
+                                    charsetType=CHARSET_TYPE.DIGITS)
 
             if not isNumPosStrValue(count):
                 errMsg = "unable to retrieve the content of the "
@@ -156,7 +161,10 @@ class Filesystem(GenericFilesystem):
             indexRange = getLimitRange(count)
 
             for index in indexRange:
-                chunk = inject.getValue("SELECT TOP 1 %s FROM %s WHERE %s NOT IN (SELECT TOP %d %s FROM %s ORDER BY id ASC) ORDER BY id ASC" % (self.tblField, hexTbl, self.tblField, index, self.tblField, hexTbl), unpack=False, resumeValue=False, charsetType=CHARSET_TYPE.HEXADECIMAL)
+                chunk = inject.getValue(
+                    "SELECT TOP 1 %s FROM %s WHERE %s NOT IN (SELECT TOP %d %s FROM %s ORDER BY id ASC) ORDER BY id ASC" % (
+                    self.tblField, hexTbl, self.tblField, index, self.tblField, hexTbl), unpack=False,
+                    resumeValue=False, charsetType=CHARSET_TYPE.HEXADECIMAL)
                 result.append(chunk)
 
         inject.goStacked("DROP TABLE %s" % hexTbl)
@@ -364,7 +372,8 @@ class Filesystem(GenericFilesystem):
 
         encodedFileContent = encodeBase64(localFileContent, binary=False)
 
-        splittedEncodedFileContent = '\n'.join([encodedFileContent[i:i + chunkMaxSize] for i in xrange(0, len(encodedFileContent), chunkMaxSize)])
+        splittedEncodedFileContent = '\n'.join(
+            [encodedFileContent[i:i + chunkMaxSize] for i in xrange(0, len(encodedFileContent), chunkMaxSize)])
 
         logger.debug("uploading the file base64-encoded content to %s, please wait.." % randFilePath)
 

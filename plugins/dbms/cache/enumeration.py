@@ -9,6 +9,7 @@ from lib.core.data import logger
 from lib.core.settings import CACHE_DEFAULT_SCHEMA
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
+
 class Enumeration(GenericEnumeration):
     def getCurrentDb(self):
         return CACHE_DEFAULT_SCHEMA

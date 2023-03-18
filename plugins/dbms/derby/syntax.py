@@ -7,6 +7,7 @@ See the file 'LICENSE' for copying permission
 
 from plugins.generic.syntax import Syntax as GenericSyntax
 
+
 class Syntax(GenericSyntax):
     @staticmethod
     def escape(expression, quote=True):

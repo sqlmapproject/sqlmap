@@ -7,5 +7,6 @@ See the file 'LICENSE' for copying permission
 
 from plugins.generic.filesystem import Filesystem as GenericFilesystem
 
+
 class Filesystem(GenericFilesystem):
     pass

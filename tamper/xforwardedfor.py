@@ -12,8 +12,10 @@ from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.NORMAL
 
+
 def dependencies():
     pass
+
 
 def randomIP():
     octets = []
@@ -22,6 +24,7 @@ def randomIP():
         octets = random.sample(xrange(1, 255), 4)
 
     return '.'.join(str(_) for _ in octets)
+
 
 def tamper(payload, **kwargs):
     """
@@ -39,6 +42,7 @@ def tamper(payload, **kwargs):
     headers["Via"] = "1.1 Chrome-Compression-Proxy"
 
     # Reference: https://wordpress.org/support/topic/blocked-country-gaining-access-via-cloudflare/#post-9812007
-    headers["CF-IPCountry"] = random.sample(('GB', 'US', 'FR', 'AU', 'CA', 'NZ', 'BE', 'DK', 'FI', 'IE', 'AT', 'IT', 'LU', 'NL', 'NO', 'PT', 'SE', 'ES', 'CH'), 1)[0]
+    headers["CF-IPCountry"] = random.sample(('GB', 'US', 'FR', 'AU', 'CA', 'NZ', 'BE', 'DK', 'FI', 'IE', 'AT', 'IT',
+                                             'LU', 'NL', 'NO', 'PT', 'SE', 'ES', 'CH'), 1)[0]
 
     return payload

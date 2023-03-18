@@ -15,6 +15,7 @@ from plugins.dbms.sybase.syntax import Syntax
 from plugins.dbms.sybase.takeover import Takeover
 from plugins.generic.misc import Miscellaneous
 
+
 class SybaseMap(Syntax, Fingerprint, Enumeration, Filesystem, Miscellaneous, Takeover):
     """
     This class defines Sybase methods

@@ -39,6 +39,7 @@ HEX_ENCODED_PREFIX_MARKER = "__HEX_ENCODED_PREFIX__"
 # String used for temporary marking of slash characters
 SLASH_MARKER = "__SLASH__"
 
+
 def safecharencode(value):
     """
     Returns safe representation of a given basestring value
@@ -71,6 +72,7 @@ def safecharencode(value):
 
     return retVal
 
+
 def safechardecode(value, binary=False):
     """
     Reverse function to safecharencode
@@ -83,7 +85,8 @@ def safechardecode(value, binary=False):
         while True:
             match = re.search(HEX_ENCODED_CHAR_REGEX, retVal)
             if match:
-                retVal = retVal.replace(match.group("result"), unichr(ord(binascii.unhexlify(match.group("result").lstrip("\\x")))))
+                retVal = retVal.replace(match.group("result"),
+                                        unichr(ord(binascii.unhexlify(match.group("result").lstrip("\\x")))))
             else:
                 break
 

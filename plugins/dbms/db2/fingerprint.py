@@ -18,6 +18,7 @@ from lib.core.settings import DB2_ALIASES
 from lib.request import inject
 from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 
+
 class Fingerprint(GenericFingerprint):
     def __init__(self):
         GenericFingerprint.__init__(self, DBMS.DB2)
@@ -26,13 +27,17 @@ class Fingerprint(GenericFingerprint):
         minor, major = None, None
 
         for version in reversed(xrange(5, 15)):
-            result = inject.checkBooleanExpression("(SELECT COUNT(*) FROM sysibm.sysversions WHERE versionnumber BETWEEN %d000000 AND %d999999)>0" % (version, version))
+            result = inject.checkBooleanExpression(
+                "(SELECT COUNT(*) FROM sysibm.sysversions WHERE versionnumber BETWEEN %d000000 AND %d999999)>0" % (
+                version, version))
 
             if result:
                 major = version
 
                 for version in reversed(xrange(0, 20)):
-                    result = inject.checkBooleanExpression("(SELECT COUNT(*) FROM sysibm.sysversions WHERE versionnumber BETWEEN %d%02d0000 AND %d%02d9999)>0" % (major, version, major, version))
+                    result = inject.checkBooleanExpression(
+                        "(SELECT COUNT(*) FROM sysibm.sysversions WHERE versionnumber BETWEEN %d%02d0000 AND %d%02d9999)>0" % (
+                        major, version, major, version))
                     if result:
                         minor = version
                         version = "%s.%s" % (major, minor)
@@ -162,7 +167,8 @@ class Fingerprint(GenericFingerprint):
 
             # Get back-end DBMS underlying operating system service pack
             for sp in versions[Backend.getOsVersion()][1]:
-                query = "(SELECT LENGTH(OS_RELEASE) FROM SYSIBMADM.ENV_SYS_INFO WHERE OS_RELEASE LIKE '%Service Pack " + str(sp) + "%')>0"
+                query = "(SELECT LENGTH(OS_RELEASE) FROM SYSIBMADM.ENV_SYS_INFO WHERE OS_RELEASE LIKE '%Service Pack " + str(
+                    sp) + "%')>0"
                 result = inject.checkBooleanExpression(query)
 
                 if result:

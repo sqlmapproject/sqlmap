@@ -11,6 +11,7 @@ from lib.core.exception import SqlmapConnectionException
 from thirdparty.six.moves import http_client as _http_client
 from thirdparty.six.moves import urllib as _urllib
 
+
 class HTTPSPKIAuthHandler(_urllib.request.HTTPSHandler):
     def __init__(self, auth_file):
         _urllib.request.HTTPSHandler.__init__(self)
@@ -22,7 +23,8 @@ class HTTPSPKIAuthHandler(_urllib.request.HTTPSHandler):
     def getConnection(self, host, timeout=None):
         try:
             # Reference: https://docs.python.org/2/library/ssl.html#ssl.SSLContext.load_cert_chain
-            return _http_client.HTTPSConnection(host, cert_file=self.auth_file, key_file=self.auth_file, timeout=conf.timeout)
+            return _http_client.HTTPSConnection(host, cert_file=self.auth_file, key_file=self.auth_file,
+                                                timeout=conf.timeout)
         except IOError as ex:
             errMsg = "error occurred while using key "
             errMsg += "file '%s' ('%s')" % (self.auth_file, getSafeExString(ex))
