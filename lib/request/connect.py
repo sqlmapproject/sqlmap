@@ -1333,7 +1333,7 @@ class Connect(object):
                     compile(getBytes(re.sub(r"\s*;\s*", "\n", conf.evalCode)), "", "exec")
                 except SyntaxError as ex:
                     if ex.text:
-                        original = replacement = ex.text.strip()
+                        original = replacement = getUnicode(ex.text.strip())
 
                         if '=' in original:
                             name, value = original.split('=', 1)
