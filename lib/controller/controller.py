@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2022 sqlmap developers (https://sqlmap.org/)
+Copyright (c) 2006-2023 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -511,6 +511,23 @@ def start():
                         kb.vainRun = False
                         testSqlInj = True
                         paramKey = (conf.hostname, conf.path, place, parameter)
+
+                        if kb.processUserMarks:
+                            if testSqlInj and place not in (PLACE.CUSTOM_POST, PLACE.CUSTOM_HEADER):
+                                if kb.processNonCustom is None:
+                                    message = "other non-custom parameters found. "
+                                    message += "Do you want to process them too? [Y/n/q] "
+                                    choice = readInput(message, default='Y').upper()
+
+                                    if choice == 'Q':
+                                        raise SqlmapUserQuitException
+                                    else:
+                                        kb.processNonCustom = choice == 'Y'
+
+                                if not kb.processNonCustom:
+                                    infoMsg = "skipping %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
+                                    logger.info(infoMsg)
+                                    continue
 
                         if paramKey in kb.testedParams:
                             testSqlInj = False

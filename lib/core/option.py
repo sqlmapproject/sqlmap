@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2022 sqlmap developers (https://sqlmap.org/)
+Copyright (c) 2006-2023 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -815,7 +815,7 @@ def _setTamperingFunctions():
             priority = PRIORITY.NORMAL if not hasattr(module, "__priority__") else module.__priority__
 
             for name, function in inspect.getmembers(module, inspect.isfunction):
-                if name == "tamper" and (hasattr(inspect, "signature") and all(_ in inspect.signature(function).parameters for _ in ("payload", "kwargs")) or hasattr(inspect, "getargspec") and inspect.getargspec(function).args and inspect.getargspec(function).keywords == "kwargs"):
+                if name == "tamper" and (hasattr(inspect, "signature") and all(_ in inspect.signature(function).parameters for _ in ("payload", "kwargs")) or inspect.getargspec(function).args and inspect.getargspec(function).keywords == "kwargs"):
                     found = True
                     kb.tamperFunctions.append(function)
                     function.__name__ = module.__name__
@@ -1696,10 +1696,19 @@ def _cleanupOptions():
             try:
                 conf.ignoreCode = [int(_) for _ in re.split(PARAMETER_SPLITTING_REGEX, conf.ignoreCode)]
             except ValueError:
-                errMsg = "options '--ignore-code' should contain a list of integer values or a wildcard value '%s'" % IGNORE_CODE_WILDCARD
+                errMsg = "option '--ignore-code' should contain a list of integer values or a wildcard value '%s'" % IGNORE_CODE_WILDCARD
                 raise SqlmapSyntaxException(errMsg)
     else:
         conf.ignoreCode = []
+
+    if conf.abortCode:
+        try:
+            conf.abortCode = [int(_) for _ in re.split(PARAMETER_SPLITTING_REGEX, conf.abortCode)]
+        except ValueError:
+            errMsg = "option '--abort-code' should contain a list of integer values"
+            raise SqlmapSyntaxException(errMsg)
+    else:
+        conf.abortCode = []
 
     if conf.paramFilter:
         conf.paramFilter = [_.strip() for _ in re.split(PARAMETER_SPLITTING_REGEX, conf.paramFilter.upper())]
@@ -2136,6 +2145,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.prependFlag = False
     kb.processResponseCounter = 0
     kb.previousMethod = None
+    kb.processNonCustom = None
     kb.processUserMarks = None
     kb.proxyAuthHeader = None
     kb.queryCounter = 0
@@ -2655,6 +2665,9 @@ def _basicOptionValidation():
             raise SqlmapSyntaxException(errMsg)
 
     if conf.paramExclude:
+        if re.search(r"\A\w+,", conf.paramExclude):
+            conf.paramExclude = r"\A(%s)\Z" % ('|'.join(re.escape(_).strip() for _ in conf.paramExclude.split(',')))
+
         try:
             re.compile(conf.paramExclude)
         except Exception as ex:

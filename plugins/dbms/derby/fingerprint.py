@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2022 sqlmap developers (https://sqlmap.org/)
+Copyright (c) 2006-2023 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -68,7 +68,7 @@ class Fingerprint(GenericFingerprint):
         infoMsg = "testing %s" % DBMS.DERBY
         logger.info(infoMsg)
 
-        result = inject.checkBooleanExpression("[RANDNUM]=(SELECT [RANDNUM] FROM SYSIBM.SYSDUMMY1 {LIMIT 1 OFFSET 0})")
+        result = inject.checkBooleanExpression("[RANDNUM]=(SELECT [RANDNUM] FROM SYSIBM.SYSDUMMY1 OFFSET 0 ROWS FETCH FIRST 1 ROW ONLY)")
 
         if result:
             infoMsg = "confirming %s" % DBMS.DERBY

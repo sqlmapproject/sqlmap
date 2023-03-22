@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2022 sqlmap developers (https://sqlmap.org/)
+Copyright (c) 2006-2023 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -47,11 +47,11 @@ class Fingerprint(GenericFingerprint):
         versions = (
             (80000, 80029),  # MySQL 8.0
             (60000, 60014),  # MySQL 6.0
-            (50700, 50739),  # MySQL 5.7
+            (50700, 50741),  # MySQL 5.7
             (50600, 50652),  # MySQL 5.6
             (50500, 50563),  # MySQL 5.5
             (50400, 50404),  # MySQL 5.4
-            (50100, 50175),  # MySQL 5.1
+            (50100, 50174),  # MySQL 5.1
             (50000, 50097),  # MySQL 5.0
             (40100, 40131),  # MySQL 4.1
             (40000, 40032),  # MySQL 4.0
@@ -175,7 +175,7 @@ class Fingerprint(GenericFingerprint):
         infoMsg = "testing %s" % DBMS.MYSQL
         logger.info(infoMsg)
 
-        result = inject.checkBooleanExpression("QUARTER(NULL) IS NULL")
+        result = inject.checkBooleanExpression("QUARTER(NULL XOR NULL) IS NULL")
 
         if result:
             infoMsg = "confirming %s" % DBMS.MYSQL

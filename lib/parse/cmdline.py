@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2022 sqlmap developers (https://sqlmap.org/)
+Copyright (c) 2006-2023 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -201,8 +201,11 @@ def cmdLineParser(argv=None):
         request.add_argument("--auth-file", dest="authFile",
             help="HTTP authentication PEM cert/private key file")
 
+        request.add_argument("--abort-code", dest="abortCode",
+            help="Abort on (problematic) HTTP error code(s) (e.g. 401)")
+
         request.add_argument("--ignore-code", dest="ignoreCode",
-            help="Ignore (problematic) HTTP error code (e.g. 401)")
+            help="Ignore (problematic) HTTP error code(s) (e.g. 401)")
 
         request.add_argument("--ignore-proxy", dest="ignoreProxy", action="store_true",
             help="Ignore system default proxy settings")
@@ -627,6 +630,9 @@ def cmdLineParser(argv=None):
 
         general.add_argument("-t", dest="trafficFile",
             help="Log all HTTP traffic into a textual file")
+
+        general.add_argument("--abort-on-empty", dest="abortOnEmpty", action="store_true",
+            help="Abort data retrieval on empty results")
 
         general.add_argument("--answers", dest="answers",
             help="Set predefined answers (e.g. \"quit=N,follow=N\")")

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2022 sqlmap developers (https://sqlmap.org/)
+Copyright (c) 2006-2023 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -14,6 +14,7 @@ from lib.core.exception import SqlmapConnectionException
 from lib.core.settings import ACCESS_ALIASES
 from lib.core.settings import ALTIBASE_ALIASES
 from lib.core.settings import CACHE_ALIASES
+from lib.core.settings import CLICKHOUSE_ALIASES
 from lib.core.settings import CRATEDB_ALIASES
 from lib.core.settings import CUBRID_ALIASES
 from lib.core.settings import DB2_ALIASES
@@ -46,6 +47,8 @@ from plugins.dbms.altibase.connector import Connector as AltibaseConn
 from plugins.dbms.altibase import AltibaseMap
 from plugins.dbms.cache.connector import Connector as CacheConn
 from plugins.dbms.cache import CacheMap
+from plugins.dbms.clickhouse.connector import Connector as ClickHouseConn
+from plugins.dbms.clickhouse import ClickHouseMap
 from plugins.dbms.cratedb.connector import Connector as CrateDBConn
 from plugins.dbms.cratedb import CrateDBMap
 from plugins.dbms.cubrid.connector import Connector as CubridConn
@@ -122,6 +125,7 @@ def setHandler():
         (DBMS.PRESTO, PRESTO_ALIASES, PrestoMap, PrestoConn),
         (DBMS.ALTIBASE, ALTIBASE_ALIASES, AltibaseMap, AltibaseConn),
         (DBMS.MIMERSQL, MIMERSQL_ALIASES, MimerSQLMap, MimerSQLConn),
+        (DBMS.CLICKHOUSE, CLICKHOUSE_ALIASES, ClickHouseMap, ClickHouseConn),
         (DBMS.CRATEDB, CRATEDB_ALIASES, CrateDBMap, CrateDBConn),
         (DBMS.CUBRID, CUBRID_ALIASES, CubridMap, CubridConn),
         (DBMS.CACHE, CACHE_ALIASES, CacheMap, CacheConn),

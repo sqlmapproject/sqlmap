@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2022 sqlmap developers (https://sqlmap.org/)
+Copyright (c) 2006-2023 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -5327,6 +5327,7 @@ def parseRequestFile(reqFile, checkParams=True):
                     continue
 
             getPostReq = False
+            forceBody = False
             url = None
             host = None
             method = None
@@ -5347,7 +5348,7 @@ def parseRequestFile(reqFile, checkParams=True):
                 line = line.strip('\r')
                 match = re.search(r"\A([A-Z]+) (.+) HTTP/[\d.]+\Z", line) if not method else None
 
-                if len(line.strip()) == 0 and method and method != HTTPMETHOD.GET and data is None:
+                if len(line.strip()) == 0 and method and (method != HTTPMETHOD.GET or forceBody) and data is None:
                     data = ""
                     params = True
 
@@ -5394,6 +5395,7 @@ def parseRequestFile(reqFile, checkParams=True):
                     # headers and consider the following lines as
                     # POSTed data
                     if key.upper() == HTTP_HEADER.CONTENT_LENGTH.upper():
+                        forceBody = True
                         params = True
 
                     # Avoid proxy and connection type related headers

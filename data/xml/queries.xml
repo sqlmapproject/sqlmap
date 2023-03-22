@@ -938,8 +938,8 @@
         <length query="LENGTH(RTRIM(CAST(%s AS CHAR(254))))"/>
         <isnull query="COALESCE(%s,' ')"/>
         <delimiter query="||"/>
-        <limit query="{LIMIT %d OFFSET %d}"/>
-        <limitregexp query="{LIMIT\s+([\d]+)\s+OFFSET\s+([\d]+)}"/>
+        <limit query="OFFSET %d ROWS FETCH FIRST %d ROWS ONLY"/>
+        <limitregexp query="OFFSET\s+([\d]+)\s+ROWS\s+FETCH\s+FIRST\s+([\d]+)\s+ROWS\s+ONLY"/>
         <limitgroupstart query="2"/>
         <limitgroupstop query="1"/>
         <limitstring/>
@@ -962,11 +962,11 @@
         <is_dba query="(SELECT COUNT(*) FROM SYS.SYSUSERS)>=0"/>
         <dbs>
             <inband query="SELECT SCHEMANAME FROM SYS.SYSSCHEMAS"/>
-            <blind query="SELECT SCHEMANAME FROM SYS.SYSSCHEMAS {LIMIT 1 OFFSET %d}" count="SELECT COUNT(SCHEMANAME) FROM SYS.SYSSCHEMAS"/>
+            <blind query="SELECT SCHEMANAME FROM SYS.SYSSCHEMAS OFFSET %d ROWS FETCH FIRST 1 ROW ONLY" count="SELECT COUNT(SCHEMANAME) FROM SYS.SYSSCHEMAS"/>
         </dbs>
         <tables>
             <inband query="SELECT SCHEMANAME,TABLENAME FROM SYS.SYSTABLES JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID" condition="SCHEMANAME"/>
-            <blind query="SELECT TABLENAME FROM SYS.SYSTABLES JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID WHERE SCHEMANAME='%s' {LIMIT 1 OFFSET %d}" count="SELECT COUNT(TABLENAME) FROM SYS.SYSTABLES JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID WHERE SCHEMANAME='%s'"/>
+            <blind query="SELECT TABLENAME FROM SYS.SYSTABLES JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID WHERE SCHEMANAME='%s' OFFSET %d ROWS FETCH FIRST 1 ROW ONLY" count="SELECT COUNT(TABLENAME) FROM SYS.SYSTABLES JOIN SYS.SYSSCHEMAS ON SYS.SYSTABLES.SCHEMAID=SYS.SYSSCHEMAS.SCHEMAID WHERE SCHEMANAME='%s'"/>
         </tables>
         <columns>
             <!-- NOTE: COLUMNDATATYPE without CAST() causes problems during enumeration -->
@@ -975,11 +975,11 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s"/>
-            <blind query="SELECT %s FROM %s {LIMIT 1 OFFSET %d}" count="SELECT COUNT(*) FROM %s"/>
+            <blind query="SELECT %s FROM %s OFFSET %d ROWS FETCH FIRST 1 ROW ONLY" count="SELECT COUNT(*) FROM %s"/>
         </dump_table>
         <users>
             <inband query="SELECT USERNAME FROM SYS.SYSUSERS"/>
-            <blind query="SELECT USERNAME FROM SYS.SYSUSERS {LIMIT 1 OFFSET %d}" count="SELECT COUNT(USERNAME) FROM SYS.SYSUSERS"/>
+            <blind query="SELECT USERNAME FROM SYS.SYSUSERS OFFSET %d ROWS FETCH FIRST 1 ROW ONLY" count="SELECT COUNT(USERNAME) FROM SYS.SYSUSERS"/>
         </users>
         <!-- NOTE: No one can view the 'SYSUSERS'.'PASSWORD' column -->
         <passwords/>
@@ -1317,6 +1317,75 @@
             <inband query="SELECT table_schema,table_name FROM INFORMATION_SCHEMA.COLUMNS WHERE %s" condition="column_name" condition2="table_schema" condition3="table_name"/>
             <blind query="SELECT DISTINCT(table_schema) FROM INFORMATION_SCHEMA.COLUMNS WHERE %s ORDER BY table_schema" query2="SELECT DISTINCT(table_name) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema='%s' ORDER BY table_name" count="SELECT COUNT(DISTINCT(table_schema)) FROM INFORMATION_SCHEMA.COLUMNS WHERE %s" count2="SELECT COUNT(DISTINCT(table_name)) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema='%s'" condition="column_name" condition2="table_schema" condition3="table_name"/>
         </search_column>
+    </dbms>
+
+    <dbms value="ClickHouse">
+        <cast query="CAST(%s AS String)"/>
+        <length query="length(%s)"/>
+        <isnull query="ifNull(%s, '')"/>
+        <delimiter query="||"/>
+        <limit query="LIMIT %d OFFSET %d"/>
+        <limitregexp query="\s+LIMIT\s+([\d]+)\s+OFFSET\s+([\d]+)" query2="\s+LIMIT\s+([\d]+)"/>
+        <limitgroupstart query="2"/>
+        <limitgroupstop query="1"/>
+        <limitstring query=" LIMIT "/>
+        <order query="ORDER BY %s ASC"/>
+        <count query="COUNT(%s)"/>
+        <comment query="--" query2="//"/>
+        <substring query="substring(%s,%d,%d)"/>
+        <concatenate query="%s||%s"/>
+        <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
+        <inference query="substring((%s),%d,1)>'%c'" />
+        <banner query="select version()"/>
+        <current_user query="currentUser()"/>
+        <current_db query="currentDatabase()"/>
+        <hostname query="hostName()"/>
+        <table_comment/>
+        <column_comment/>
+        <is_dba query="(SELECT access_type FROM system.grants WHERE user_name=currentUser())='ALL'"/>
+        <check_udf/>
+        <users>
+            <inband query="SELECT name FROM system.users"/>
+            <blind query="SELECT name FROM system.users LIMIT %d,1" count="SELECT COUNT(name) FROM system.users"/>
+        </users>
+        <passwords/>
+        <privileges>
+            <inband query="SELECT DISTINCT user_name,access_type FROM system.grants" condition="user_name"/>
+            <blind query="SELECT DISTINCT(access_type) FROM system.grants WHERE user_name='%s' ORDER BY access_type LIMIT %d,1" count="SELECT COUNT(DISTINCT(access_type)) FROM system.grants WHERE user_name='%s'"/>
+        </privileges>
+        <roles>
+            <inband query="SELECT DISTINCT user_name,role_name FROM system.role_grants" condition="user_name"/>
+            <blind query="SELECT DISTINCT(role_name) FROM system.role_grants WHERE user_name='%s' ORDER BY role_name LIMIT %d,1" count="SELECT COUNT(DISTINCT(role_name)) FROM system.role_grants WHERE user_name='%s'"/>
+        </roles>
+        <statements/>
+        <dbs>
+            <inband query="SELECT schema_name FROM information_schema.schemata"/>
+            <blind query="SELECT schema_name FROM information_schema.schemata ORDER BY schema_name LIMIT 1 OFFSET %d" count="SELECT COUNT(schema_name) FROM information_schema.schemata"/>
+        </dbs>
+        <tables>
+            <inband query="SELECT table_schema,table_name FROM information_schema.tables" condition="table_schema"/>
+            <blind query="SELECT table_name FROM information_schema.tables WHERE table_schema='%s' LIMIT 1 OFFSET %d" count="SELECT COUNT(table_name) FROM information_schema.tables WHERE table_schema='%s'"/>
+        </tables>
+        <columns>
+            <inband query="SELECT column_name,column_type FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='%s' AND table_schema='%s'" condition="column_name"/>
+            <blind query="SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='%s' AND table_schema='%s' LIMIT %d,1" query2="SELECT column_type FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='%s' AND column_name='%s' AND table_schema='%s'" count="SELECT COUNT(column_name) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='%s' AND table_schema='%s'" condition="column_name"/>
+        </columns>
+        <dump_table>
+            <inband query="SELECT %s FROM %s.%s ORDER BY %s"/>
+            <blind query="SELECT %s FROM %s.%s ORDER BY %s LIMIT %d,1 " count="SELECT COUNT(*) FROM %s.%s"/>
+        </dump_table>
+        <search_table>
+            <inband query="SELECT table_schema,table_name FROM INFORMATION_SCHEMA.TABLES WHERE %s" condition="table_name" condition2="table_schema"/>
+            <blind query="SELECT DISTINCT(table_schema) FROM INFORMATION_SCHEMA.TABLES WHERE %s" query2="SELECT DISTINCT(table_name) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='%s'" count="SELECT COUNT(DISTINCT(table_schema)) FROM INFORMATION_SCHEMA.TABLES WHERE %s" count2="SELECT COUNT(DISTINCT(table_name)) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='%s'" condition="table_name" condition2="table_schema"/>
+        </search_table>
+        <search_column>
+            <inband query="SELECT table_schema,table_name FROM INFORMATION_SCHEMA.COLUMNS WHERE %s" condition="column_name" condition2="table_schema" condition3="table_name"/>
+            <blind query="SELECT DISTINCT(table_schema) FROM INFORMATION_SCHEMA.COLUMNS WHERE %s" query2="SELECT DISTINCT(table_name) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema='%s'" count="SELECT COUNT(DISTINCT(table_schema)) FROM INFORMATION_SCHEMA.COLUMNS WHERE %s" count2="SELECT COUNT(DISTINCT(table_name)) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema='%s'" condition="column_name" condition2="table_schema" condition3="table_name"/>
+        </search_column>
+        <search_db>
+            <inband query="SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA WHERE %s" condition="schema_name"/>
+            <blind query="SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA WHERE %s" count="SELECT COUNT(schema_name) FROM INFORMATION_SCHEMA.SCHEMATA WHERE %s" condition="schema_name"/>
+        </search_db>
     </dbms>
 
     <dbms value="CrateDB">

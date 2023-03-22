@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2022 sqlmap developers (https://sqlmap.org/)
+Copyright (c) 2006-2023 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -52,6 +52,7 @@ class DBMS(object):
     PRESTO = "Presto"
     ALTIBASE = "Altibase"
     MIMERSQL = "MimerSQL"
+    CLICKHOUSE = "ClickHouse"
     CRATEDB = "CrateDB"
     CUBRID = "Cubrid"
     CACHE = "InterSystems Cache"
@@ -81,6 +82,7 @@ class DBMS_DIRECTORY_NAME(object):
     PRESTO = "presto"
     ALTIBASE = "altibase"
     MIMERSQL = "mimersql"
+    CLICKHOUSE = "clickhouse"
     CRATEDB = "cratedb"
     CUBRID = "cubrid"
     CACHE = "cache"

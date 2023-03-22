@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2022 sqlmap developers (https://sqlmap.org/)
+Copyright (c) 2006-2023 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -38,6 +38,7 @@ from lib.core.settings import SQLITE_ALIASES
 from lib.core.settings import SYBASE_ALIASES
 from lib.core.settings import VERTICA_ALIASES
 from lib.core.settings import VIRTUOSO_ALIASES
+from lib.core.settings import CLICKHOUSE_ALIASES
 
 FIREBIRD_TYPES = {
     261: "BLOB",
@@ -241,6 +242,7 @@ DBMS_DICT = {
     DBMS.PRESTO: (PRESTO_ALIASES, "presto-python-client", "https://github.com/prestodb/presto-python-client", None),
     DBMS.ALTIBASE: (ALTIBASE_ALIASES, None, None, None),
     DBMS.MIMERSQL: (MIMERSQL_ALIASES, "mimerpy", "https://github.com/mimersql/MimerPy", None),
+    DBMS.CLICKHOUSE: (CLICKHOUSE_ALIASES, "clickhouse_connect", "https://github.com/ClickHouse/clickhouse-connect", None),
     DBMS.CRATEDB: (CRATEDB_ALIASES, "python-psycopg2", "https://github.com/psycopg/psycopg2", "postgresql"),
     DBMS.CUBRID: (CUBRID_ALIASES, "CUBRID-Python", "https://github.com/CUBRID/cubrid-python", None),
     DBMS.CACHE: (CACHE_ALIASES, "python jaydebeapi & python-jpype", "https://pypi.python.org/pypi/JayDeBeApi/ & https://github.com/jpype-project/jpype", None),
@@ -268,7 +270,7 @@ HEURISTIC_NULL_EVAL = {
     DBMS.ACCESS: "CVAR(NULL)",
     DBMS.MAXDB: "ALPHA(NULL)",
     DBMS.MSSQL: "DIFFERENCE(NULL,NULL)",
-    DBMS.MYSQL: "QUARTER(NULL)",
+    DBMS.MYSQL: "QUARTER(NULL XOR NULL)",
     DBMS.ORACLE: "INSTR2(NULL,NULL)",
     DBMS.PGSQL: "QUOTE_IDENT(NULL)",
     DBMS.SQLITE: "UNLIKELY(NULL)",
@@ -286,6 +288,7 @@ HEURISTIC_NULL_EVAL = {
     DBMS.EXTREMEDB: "NULLIFZERO(hashcode(NULL))",
     DBMS.RAIMA: "IF(ROWNUMBER()>0,CONVERT(NULL,TINYINT),NULL))",
     DBMS.VIRTUOSO: "__MAX_NOTNULL(NULL)",
+    DBMS.CLICKHOUSE: "halfMD5(NULL) IS NULL",
 }
 
 SQL_STATEMENTS = {
