@@ -994,7 +994,11 @@ def _setPostprocessFunctions():
                 raise SqlmapSyntaxException("cannot import postprocess module '%s' (%s)" % (getUnicode(filename[:-3]), getSafeExString(ex)))
 
             for name, function in inspect.getmembers(module, inspect.isfunction):
-                if name == "postprocess" and inspect.getargspec(function).args and all(_ in inspect.getargspec(function).args for _ in ("page", "headers", "code")):
+                try:
+                    argspec = inspect.getargspec(function).args
+                except: # `inspect.getargspec` was removed in PY 3.11
+                    argspec = inspect.getfullargspec(function).args
+                if name == "postprocess" and argspec and all(_ in inspect.getargspec(function).args for _ in ("page", "headers", "code")):
                     found = True
 
                     kb.postprocessFunctions.append(function)
