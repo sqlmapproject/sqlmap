@@ -996,7 +996,7 @@ def _setPostprocessFunctions():
             for name, function in inspect.getmembers(module, inspect.isfunction):
                 try:
                     argspec = inspect.getargspec(function).args
-                except: # `inspect.getargspec` was removed in PY 3.11
+                except AttributeError: # `inspect.getargspec` was removed in PY 3.11
                     argspec = inspect.getfullargspec(function).args
                 if name == "postprocess" and argspec and all(_ in inspect.getargspec(function).args for _ in ("page", "headers", "code")):
                     found = True
