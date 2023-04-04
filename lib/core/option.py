@@ -815,7 +815,11 @@ def _setTamperingFunctions():
             priority = PRIORITY.NORMAL if not hasattr(module, "__priority__") else module.__priority__
 
             for name, function in inspect.getmembers(module, inspect.isfunction):
-                if name == "tamper" and (hasattr(inspect, "signature") and all(_ in inspect.signature(function).parameters for _ in ("payload", "kwargs")) or inspect.getargspec(function).args and inspect.getargspec(function).keywords == "kwargs"):
+                try:
+                    argspec = inspect.getargspec(function)
+                except AttributeError: # `inspect.getargspec` was removed in Python 3.11
+                    argspec = inspect.getfullargspec(function)
+                if name == "tamper" and (hasattr(inspect, "signature") and all(_ in inspect.signature(function).parameters for _ in ("payload", "kwargs")) or argspec.args and argspec.keywords == "kwargs"):
                     found = True
                     kb.tamperFunctions.append(function)
                     function.__name__ = module.__name__
@@ -912,7 +916,11 @@ def _setPreprocessFunctions():
 
             for name, function in inspect.getmembers(module, inspect.isfunction):
                 try:
-                    if name == "preprocess" and inspect.getargspec(function).args and all(_ in inspect.getargspec(function).args for _ in ("req",)):
+                    try:
+                        argspec = inspect.getargspec(function)
+                    except AttributeError: # `inspct.getargspec` was removed in Python 3.11
+                        argspec = inspect.getfullargspec(function)
+                    if name == "preprocess" and argspec.args and all(_ in argspec.args for _ in ("req",)):
                         found = True
 
                         kb.preprocessFunctions.append(function)
@@ -994,7 +1002,11 @@ def _setPostprocessFunctions():
                 raise SqlmapSyntaxException("cannot import postprocess module '%s' (%s)" % (getUnicode(filename[:-3]), getSafeExString(ex)))
 
             for name, function in inspect.getmembers(module, inspect.isfunction):
-                if name == "postprocess" and inspect.getargspec(function).args and all(_ in inspect.getargspec(function).args for _ in ("page", "headers", "code")):
+                try:
+                    argspec = inspect.getargspec(function)
+                except AttributeError: # `inspect.getargspec` was removed in Python 3.11
+                    argspec = inspect.getfullargspec(function)
+                if name == "postprocess" and argspec.args and all(_ in argspec.args for _ in ("page", "headers", "code")):
                     found = True
 
                     kb.postprocessFunctions.append(function)
