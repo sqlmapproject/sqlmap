@@ -71,7 +71,7 @@ def update():
         logger.warning(warnMsg)
 
         if VERSION == getLatestRevision():
-            logger.info("already at the latest revision '%s'" % getRevisionNumber())
+            logger.info("already at the latest revision '%s'" % (getRevisionNumber() or VERSION))
             return
 
         message = "do you want to try to fetch the latest 'zipball' from repository and extract it (experimental) ? [y/N]"
