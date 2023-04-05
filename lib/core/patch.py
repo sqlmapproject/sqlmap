@@ -6,6 +6,7 @@ See the file 'LICENSE' for copying permission
 """
 
 import codecs
+import collections
 import inspect
 import os
 import random
@@ -95,8 +96,9 @@ def dirtyPatches():
             os.urandom = lambda size: "".join(chr(random.randint(0, 255)) for _ in xrange(size))
 
     # Reference: https://github.com/bottlepy/bottle/blob/df67999584a0e51ec5b691146c7fa4f3c87f5aac/bottle.py
+    # Reference: https://python.readthedocs.io/en/v2.7.2/library/inspect.html#inspect.getargspec
     if not hasattr(inspect, "getargspec") and hasattr(inspect, "getfullargspec"):
-        from inspect import getfullargspec
+        ArgSpec = collections.namedtuple("ArgSpec", ("args", "varargs", "keywords", "defaults"))
 
         def makelist(data):
             if isinstance(data, (tuple, list, set, dict)):
@@ -107,9 +109,9 @@ def dirtyPatches():
                 return []
 
         def getargspec(func):
-            spec = getfullargspec(func)
+            spec = inspect.getfullargspec(func)
             kwargs = makelist(spec[0]) + makelist(spec.kwonlyargs)
-            return kwargs, spec[1], spec[2], spec[3]
+            return ArgSpec(kwargs, spec[1], spec[2], spec[3])
 
         inspect.getargspec = getargspec
 
