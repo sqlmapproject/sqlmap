@@ -6,6 +6,7 @@ See the file 'LICENSE' for copying permission
 """
 
 import codecs
+import inspect
 import os
 import random
 import re
@@ -92,6 +93,25 @@ def dirtyPatches():
             os.urandom = lambda size: bytes(random.randint(0, 255) for _ in range(size))
         else:
             os.urandom = lambda size: "".join(chr(random.randint(0, 255)) for _ in xrange(size))
+
+    # Reference: https://github.com/bottlepy/bottle/blob/df67999584a0e51ec5b691146c7fa4f3c87f5aac/bottle.py
+    if not hasattr(inspect, "getargspec") and hasattr(inspect, "getfullargspec"):
+        from inspect import getfullargspec
+
+        def makelist(data):
+            if isinstance(data, (tuple, list, set, dict)):
+                return list(data)
+            elif data:
+                return [data]
+            else:
+                return []
+
+        def getargspec(func):
+            spec = getfullargspec(func)
+            kwargs = makelist(spec[0]) + makelist(spec.kwonlyargs)
+            return kwargs, spec[1], spec[2], spec[3]
+
+        inspect.getargspec = getargspec
 
 def resolveCrossReferences():
     """
