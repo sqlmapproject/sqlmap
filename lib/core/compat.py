@@ -330,3 +330,5 @@ if not hasattr(inspect, "getargspec") and hasattr(inspect, "getfullargspec"):
         spec = getfullargspec(func)
         kwargs = makelist(spec[0]) + makelist(spec.kwonlyargs)
         return kwargs, spec[1], spec[2], spec[3]
+
+    inspect.getargspec = getargspec
