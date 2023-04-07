@@ -5385,11 +5385,12 @@ def parseRequestFile(reqFile, checkParams=True):
                     elif key.upper() == HTTP_HEADER.HOST.upper():
                         if '://' in value:
                             scheme, value = value.split('://')[:2]
-                        splitValue = value.split(":")
-                        host = splitValue[0]
 
-                        if len(splitValue) > 1:
-                            port = filterStringValue(splitValue[1], "[0-9]")
+                        port = extractRegexResult(r":(?P<result>\d+)\Z", value)
+                        if port:
+                            value = value[:-(1 + len(port))]
+
+                        host = value
 
                     # Avoid to add a static content length header to
                     # headers and consider the following lines as
