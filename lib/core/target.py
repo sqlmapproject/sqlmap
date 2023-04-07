@@ -157,6 +157,7 @@ def _setRequestParams():
                     conf.data = getattr(conf.data, UNENCODED_ORIGINAL_VALUE, conf.data)
                     conf.data = conf.data.replace(kb.customInjectionMark, ASTERISK_MARKER)
                     conf.data = re.sub(r'("(?P<name>[^"]+)"\s*:\s*".*?)"(?<!\\")', functools.partial(process, repl=r'\g<1>%s"' % kb.customInjectionMark), conf.data)
+                    conf.data = re.sub(r'("(?P<name>[^"]+)"\s*:\s*")"', functools.partial(process, repl=r'\g<1>%s"' % kb.customInjectionMark), conf.data)
                     conf.data = re.sub(r'("(?P<name>[^"]+)"\s*:\s*)(-?\d[\d\.]*)\b', functools.partial(process, repl=r'\g<1>\g<3>%s' % kb.customInjectionMark), conf.data)
                     conf.data = re.sub(r'("(?P<name>[^"]+)"\s*:\s*)((true|false|null))\b', functools.partial(process, repl=r'\g<1>\g<3>%s' % kb.customInjectionMark), conf.data)
                     for match in re.finditer(r'(?P<name>[^"]+)"\s*:\s*\[([^\]]+)\]', conf.data):
