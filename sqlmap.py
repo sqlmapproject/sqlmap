@@ -548,7 +548,7 @@ def main():
     finally:
         kb.threadContinue = False
 
-        if getDaysFromLastUpdate() > LAST_UPDATE_NAGGING_DAYS:
+        if (getDaysFromLastUpdate() or 0) > LAST_UPDATE_NAGGING_DAYS:
             warnMsg = "your sqlmap version is outdated"
             logger.warning(warnMsg)
 

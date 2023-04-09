@@ -1769,7 +1769,7 @@ def parseTargetUrl():
         errMsg = "invalid target URL port (%d)" % conf.port
         raise SqlmapSyntaxException(errMsg)
 
-    conf.url = getUnicode("%s://%s:%d%s" % (conf.scheme, ("[%s]" % conf.hostname) if conf.ipv6 else conf.hostname, conf.port, conf.path))
+    conf.url = getUnicode("%s://%s%s%s" % (conf.scheme, ("[%s]" % conf.hostname) if conf.ipv6 else conf.hostname, (":%d" % conf.port) if not (conf.port == 80 and conf.scheme == "http" or conf.port == 443 and conf.scheme == "https") else "", conf.path))
     conf.url = conf.url.replace(URI_QUESTION_MARKER, '?')
 
     if urlSplit.query:
@@ -5385,11 +5385,12 @@ def parseRequestFile(reqFile, checkParams=True):
                     elif key.upper() == HTTP_HEADER.HOST.upper():
                         if '://' in value:
                             scheme, value = value.split('://')[:2]
-                        splitValue = value.split(":")
-                        host = splitValue[0]
 
-                        if len(splitValue) > 1:
-                            port = filterStringValue(splitValue[1], "[0-9]")
+                        port = extractRegexResult(r":(?P<result>\d+)\Z", value)
+                        if port:
+                            value = value[:-(1 + len(port))]
+
+                        host = value
 
                     # Avoid to add a static content length header to
                     # headers and consider the following lines as
