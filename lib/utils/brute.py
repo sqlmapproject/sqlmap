@@ -7,7 +7,6 @@ See the file 'LICENSE' for copying permission
 
 from __future__ import division
 
-import logging
 import time
 
 from lib.core.common import Backend
@@ -387,9 +386,6 @@ def fileExists(pathFile):
             kb.locks.io.release()
 
     try:
-        pushValue(logger.getEffectiveLevel())
-        logger.setLevel(logging.CRITICAL)
-
         runThreads(conf.threads, fileExistsThread, threadChoice=True)
     except KeyboardInterrupt:
         warnMsg = "user aborted during file existence "
@@ -397,7 +393,6 @@ def fileExists(pathFile):
         logger.warning(warnMsg)
     finally:
         kb.bruteMode = False
-        logger.setLevel(popValue())
 
     clearConsoleLine(True)
     dataToStdout("\n")
