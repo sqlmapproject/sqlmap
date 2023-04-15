@@ -23,7 +23,7 @@ Veya tercihen, [Git](https://github.com/sqlmapproject/sqlmap) reposunu klonlayar
 
     git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
-sqlmap [Python](https://www.python.org/download/) sitesinde bulunan **2.6**, **2.7** and **3.x** versiyonları ile bütün platformlarda çalışabilmektedir.
+sqlmap [Python](https://www.python.org/download/) sitesinde bulunan **2.6**, **2.7** ve **3.x** versiyonları ile bütün platformlarda çalışabilmektedir.
 
 Kullanım
 ----
