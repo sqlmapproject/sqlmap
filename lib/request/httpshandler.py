@@ -69,6 +69,11 @@ class HTTPSConnection(_http_client.HTTPSConnection):
                     sock = create_sock()
                     if protocol not in _contexts:
                         _contexts[protocol] = ssl.SSLContext(protocol)
+
+                        # Disable certificate and hostname validation enabled by default with PROTOCOL_TLS_CLIENT
+                        _contexts[protocol].check_hostname = False
+                        _contexts[protocol].verify_mode = ssl.CERT_NONE
+
                         if getattr(self, "cert_file", None) and getattr(self, "key_file", None):
                             _contexts[protocol].load_cert_chain(certfile=self.cert_file, keyfile=self.key_file)
                         try:
