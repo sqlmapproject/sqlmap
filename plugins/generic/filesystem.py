@@ -222,13 +222,13 @@ class Filesystem(object):
 
             if conf.direct or isStackingAvailable():
                 if isStackingAvailable():
-                    debugMsg = "going to read the file with stacked query SQL "
+                    debugMsg = "going to try to read the file with stacked query SQL "
                     debugMsg += "injection technique"
                     logger.debug(debugMsg)
 
                 fileContent = self.stackedReadFile(remoteFile)
             elif Backend.isDbms(DBMS.MYSQL):
-                debugMsg = "going to read the file with a non-stacked query "
+                debugMsg = "going to try to read the file with non-stacked query "
                 debugMsg += "SQL injection technique"
                 logger.debug(debugMsg)
 
