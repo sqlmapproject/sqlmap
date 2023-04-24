@@ -472,6 +472,11 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
+        elif all(_ in excMsg for _ in ("FileNotFoundError: [Errno 2] No such file or directory", "cwd = os.getcwd()")):
+            errMsg = "invalid runtime environment ('%s')" % excMsg.split("Error: ")[-1].strip()
+            logger.critical(errMsg)
+            raise SystemExit
+
         elif all(_ in excMsg for _ in ("PermissionError: [WinError 5]", "multiprocessing")):
             errMsg = "there is a permission problem in running multiprocessing on this system. "
             errMsg += "Please rerun with '--disable-multi'"
