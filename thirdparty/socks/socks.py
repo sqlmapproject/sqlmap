@@ -195,7 +195,7 @@ class socksocket(socket.socket):
         elif chosenauth[1:2] == chr(0x02).encode():
             # Okay, we need to perform a basic username/password
             # authentication.
-            self.sendall(chr(0x01).encode() + chr(len(self.__proxy[4])) + self.__proxy[4] + chr(len(self.__proxy[5])) + self.__proxy[5])
+            self.sendall(chr(0x01).encode() + chr(len(self.__proxy[4])).encode() + self.__proxy[4].encode() + chr(len(self.__proxy[5])).encode() + self.__proxy[5].encode())
             authstat = self.__recvall(2)
             if authstat[0:1] != chr(0x01).encode():
                 # Bad response
