@@ -4940,6 +4940,12 @@ def decodeDbmsHexValue(value, raw=False):
 
     >>> decodeDbmsHexValue('3132332031') == u'123 1'
     True
+    >>> decodeDbmsHexValue('31003200330020003100') == u'123 1'
+    True
+    >>> decodeDbmsHexValue('00310032003300200031') == u'123 1'
+    True
+    >>> decodeDbmsHexValue('0x31003200330020003100') == u'123 1'
+    True
     >>> decodeDbmsHexValue('313233203') == u'123 ?'
     True
     >>> decodeDbmsHexValue(['0x31', '0x32']) == [u'1', u'2']
@@ -4977,6 +4983,9 @@ def decodeDbmsHexValue(value, raw=False):
 
                 if not isinstance(retVal, six.text_type):
                     retVal = getUnicode(retVal, conf.encoding or UNICODE_ENCODING)
+
+                if u"\x00" in retVal:
+                    retVal = retVal.replace(u"\x00", u"")
 
         return retVal
 
