@@ -814,7 +814,7 @@ class Connect(object):
                     debugMsg = "got HTTP error code: %d ('%s')" % (code, status)
                     logger.debug(debugMsg)
 
-        except (_urllib.error.URLError, socket.error, socket.timeout, _http_client.HTTPException, struct.error, binascii.Error, ProxyError, SqlmapCompressionException, WebSocketException, TypeError, ValueError, OverflowError, AttributeError, OSError, AssertionError):
+        except (_urllib.error.URLError, socket.error, socket.timeout, _http_client.HTTPException, struct.error, binascii.Error, ProxyError, SqlmapCompressionException, WebSocketException, TypeError, ValueError, OverflowError, AttributeError, OSError, AssertionError, KeyError):
             tbMsg = traceback.format_exc()
 
             if conf.debug:
@@ -822,6 +822,11 @@ class Connect(object):
 
             if checking:
                 return None, None, None
+            elif "KeyError:" in tbMsg:
+                if "content-length" in tbMsg:
+                    return None, None, None
+                else:
+                    raise
             elif "AttributeError:" in tbMsg:
                 if "WSAECONNREFUSED" in tbMsg:
                     return None, None, None
