@@ -87,7 +87,7 @@ class Fingerprint(GenericFingerprint):
         infoMsg = "testing %s" % DBMS.H2
         logger.info(infoMsg)
 
-        result = inject.checkBooleanExpression("ZERO() IS 0")
+        result = inject.checkBooleanExpression("ZERO()=0")
 
         if result:
             infoMsg = "confirming %s" % DBMS.H2
