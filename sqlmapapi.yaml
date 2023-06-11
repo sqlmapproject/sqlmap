@@ -1,5 +1,47 @@
 openapi: 3.0.1
-info:
+info:SparkLabs Forum
+
+https://www.sparklabs.com/forum/
+
+Password caching
+https://www.sparklabs.com/forum/viewtopic.php?t=3215
+
+Page 1 of 1
+Password caching
+Posted: Tue May 16, 2023 10:20 pm
+by Shabang
+I'm testing setting "defaults write com.viscosityvpn.Viscosity KeyChainSupport -bool false" for Viscosity and "auth-nocache" in the connection config.
+
+Then after waiting for the renegotiation to kick in, I'm seeing a credential prompt with the password field still filled in. Pressing enter is the only thing required to continue the connection.
+
+I would think most people setting those two options would want to require the user to actually enter the password again. Does it work like this intentionally, am I missing something?
+Re: Password caching
+Posted: Wed May 17, 2023 8:50 am
+by James
+Hi Shabang,
+
+Thanks for the report, it appears you've discovered a regression in a recent update. It appears that in some conditions Viscosity may still load existing saved login details from the Keychain even with the KeyChainSupport setting disabled. This should now be fixed in the latest beta version:
+https://www.sparklabs.com/support/kb/ar ... -versions/
+
+It likely hasn't been discovered until now as saving to the Keychain is still correctly disabled. So you'll only encounter it if the login details have already been saved to the Keychain prior to changing the setting.
+
+Cheers,
+James
+Re: Password caching
+Posted: Wed May 17, 2023 6:29 pm
+by Shabang
+Ok, thanks for confirming. Although looks like I didn't have any saved credentials in my keychain for Viscosity. I'm testing now with the new beta.
+
+I think it would also be a nice feature to have the ability to allow saving the p12 file password, but not the user credentials. That way an encrypted file could be distributed to the user, who then could save the file password in the keychain, but they would still be prevented saving their own username and password.
+Re: Password caching
+Posted: Wed May 17, 2023 6:46 pm
+by Shabang
+I confirmed it in Catalina and Ventura, I'm still seeing the password field filled even without previous credentials in the keychain.
+All times are UTC+10:00
+Page 1 of 1
+Powered by phpBB® Forum Software © phpBB Limited
+https://www.phpbb.com/
+
   title: sqlmapapi OpenAPI/Swagger specification
   version: '0.1'
 paths:
