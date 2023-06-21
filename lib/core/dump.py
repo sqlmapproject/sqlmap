@@ -58,6 +58,7 @@ from lib.core.settings import WINDOWS_RESERVED_NAMES
 from lib.utils.safe2bin import safechardecode
 from thirdparty import six
 from thirdparty.magic import magic
+from plugins.generic.entries import G_column_name_list
 
 class Dump(object):
     """
@@ -449,7 +450,7 @@ class Dump(object):
 
                             dumpDbPath = tempDir
 
-            dumpFileName = conf.dumpFile or os.path.join(dumpDbPath, re.sub(r'[\\/]', UNSAFE_DUMP_FILEPATH_REPLACEMENT, "%s.%s" % (unsafeSQLIdentificatorNaming(table), conf.dumpFormat.lower())))
+            dumpFileName = conf.dumpFile or os.path.join(dumpDbPath, re.sub(r'[\\/]', UNSAFE_DUMP_FILEPATH_REPLACEMENT, "%s-%s.%s" % (unsafeSQLIdentificatorNaming(table),G_column_name_list[0],conf.dumpFormat.lower())))
             if not checkFile(dumpFileName, False):
                 try:
                     openFile(dumpFileName, "w+b").close()
@@ -470,7 +471,7 @@ class Dump(object):
                 if not appendToFile:
                     count = 1
                     while True:
-                        candidate = "%s.%d" % (dumpFileName, count)
+                        candidate = "%s-%02d.csv" % (dumpFileName.split('.csv')[0], count)
                         if not checkFile(candidate, False):
                             try:
                                 shutil.copyfile(dumpFileName, candidate)
