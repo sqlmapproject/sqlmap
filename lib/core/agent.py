@@ -222,7 +222,8 @@ class Agent(object):
             def _(pattern, repl, string):
                 retVal = string
                 match = None
-                for match in re.finditer(pattern, string):
+
+                for match in re.finditer(pattern, string or ""):
                     pass
 
                 if match:
