@@ -441,7 +441,7 @@ class Connect(object):
             requestMsg += " %s" % _http_client.HTTPConnection._http_vsn_str
 
             # Prepare HTTP headers
-            headers = forgeHeaders({HTTP_HEADER.COOKIE: cookie, HTTP_HEADER.USER_AGENT: ua, HTTP_HEADER.REFERER: referer, HTTP_HEADER.HOST: getHostHeader(url)}, base=None if target else {})
+            headers = forgeHeaders({HTTP_HEADER.COOKIE: cookie, HTTP_HEADER.USER_AGENT: ua, HTTP_HEADER.REFERER: referer, HTTP_HEADER.HOST: getHeader(dict(conf.httpHeaders), HTTP_HEADER.HOST) or getHostHeader(url)}, base=None if target else {})
 
             if HTTP_HEADER.COOKIE in headers:
                 cookie = headers[HTTP_HEADER.COOKIE]
