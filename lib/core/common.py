@@ -3861,6 +3861,10 @@ def checkIntegrity():
                     logger.error("wrong modification time of '%s'" % filepath)
                     retVal = False
 
+    suffix = extractRegexResult(r"#(?P<result>\w+)", VERSION_STRING)
+    if suffix and suffix not in {"dev", "stable"}:
+        retVal = False
+
     return retVal
 
 def getDaysFromLastUpdate():
