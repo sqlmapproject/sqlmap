@@ -167,6 +167,38 @@ def _formatInjection(inj):
 
     return data
 
+def _formatDictInjection(inj):
+    paramType = conf.method if conf.method not in (None, HTTPMETHOD.GET, HTTPMETHOD.POST) else inj.place
+    data = {
+        "parameter": inj.parameter,
+        "paramtype": paramType,
+        "injection": []
+    }
+
+    for stype, sdata in inj.data.items():
+        title = sdata.title
+        vector = sdata.vector
+        comment = sdata.comment
+        payload = agent.adjustLateValues(sdata.payload)
+        if inj.place == PLACE.CUSTOM_HEADER:
+            payload = payload.split(',', 1)[1]
+        if stype == PAYLOAD.TECHNIQUE.UNION:
+            count = re.sub(r"(?i)(\(.+\))|(\blimit[^a-z]+)", "", sdata.payload).count(',') + 1
+            title = re.sub(r"\d+ to \d+", str(count), title)
+            vector = agent.forgeUnionQuery("[QUERY]", vector[0], vector[1], vector[2], None, None, vector[5], vector[6])
+            if count == 1:
+                title = title.replace("columns", "column")
+        elif comment:
+            vector = "%s%s" % (vector, comment)
+        injection = {
+            "type": PAYLOAD.SQLINJECTION[stype],
+            "payload": urldecode(payload, unsafe="&", spaceplus=(inj.place != PLACE.GET and kb.postSpaceToPlus)),
+            "vector": vector
+        }
+        data["injection"].append(injection)
+
+    return data
+
 def _showInjections():
     if conf.wizard and kb.wizardMode:
         kb.wizardMode = False
@@ -195,12 +227,14 @@ def _showInjections():
         logger.warning(warnMsg)
 
 def _saveInjections():
+    data = [_formatDictInjection(inj) for inj in kb.injections]
+
     if conf.jsonFile:
         data = {
             "url": conf.url,
             "query": conf.parameters.get(PLACE.GET),
             "data": conf.parameters.get(PLACE.POST),
-            "injections": kb.injections,
+            "injections": data,
         }
         conf.dumper.json(conf.jsonFile, data)
 
