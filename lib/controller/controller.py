@@ -177,15 +177,6 @@ def _showInjections():
     else:
         header = "sqlmap resumed the following injection point(s) from stored session"
 
-    if conf.jsonFile:
-        data = {
-            "url": conf.url,
-            "query": conf.parameters.get(PLACE.GET),
-            "data": conf.parameters.get(PLACE.POST),
-            "injections": kb.injections,
-        }
-        conf.dumper.json(conf.jsonFile, data)
-
     if conf.api:
         conf.dumper.string("", {"url": conf.url, "query": conf.parameters.get(PLACE.GET), "data": conf.parameters.get(PLACE.POST)}, content_type=CONTENT_TYPE.TARGET)
         conf.dumper.string("", kb.injections, content_type=CONTENT_TYPE.TECHNIQUES)
@@ -202,6 +193,16 @@ def _showInjections():
         warnMsg = "changes made by HTTP parameter pollution are not "
         warnMsg += "included in shown payload content(s)"
         logger.warning(warnMsg)
+
+def _saveInjections():
+    if conf.jsonFile:
+        data = {
+            "url": conf.url,
+            "query": conf.parameters.get(PLACE.GET),
+            "data": conf.parameters.get(PLACE.POST),
+            "injections": kb.injections,
+        }
+        conf.dumper.json(conf.jsonFile, data)
 
 def _randomFillBlankFields(value):
     retVal = value
@@ -658,6 +659,7 @@ def start():
                                 if place == PLACE.COOKIE:
                                     kb.mergeCookies = popValue()
 
+            _saveInjections()
             if len(kb.injections) == 0 or (len(kb.injections) == 1 and kb.injections[0].place is None):
                 if kb.vainRun and not conf.multipleTargets:
                     errMsg = "no parameter(s) found for testing in the provided data "

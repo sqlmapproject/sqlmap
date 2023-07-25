@@ -1072,9 +1072,6 @@ def dataToDumpFile(dumpFile, data):
             logger.error(errMsg)
 
 def dataToJsonFile(jsonFile, data):
-    print("***************")
-    print(jsonFile, data)
-    print("***************")
     with open(jsonFile, 'w') as f:
         f.write(json.dumps(data))
 
