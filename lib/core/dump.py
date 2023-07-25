@@ -15,6 +15,7 @@ import threading
 from lib.core.common import Backend
 from lib.core.common import checkFile
 from lib.core.common import dataToDumpFile
+from lib.core.common import dataToJsonFile
 from lib.core.common import dataToStdout
 from lib.core.common import filterNone
 from lib.core.common import getSafeExString
@@ -142,6 +143,9 @@ class Dump(object):
                 self._write("%s:\n---\n%s\n---" % (header, _))
             else:
                 self._write("%s: %s" % (header, ("'%s'" % _) if isinstance(data, six.string_types) else _))
+
+    def json(self, jsonFile, data):
+        dataToJsonFile(jsonFile, data)
 
     def lister(self, header, elements, content_type=None, sort=True):
         if elements and sort:
