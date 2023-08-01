@@ -106,7 +106,7 @@ def _search(dork):
 
     page = decodePage(page, responseHeaders.get(HTTP_HEADER.CONTENT_ENCODING), responseHeaders.get(HTTP_HEADER.CONTENT_TYPE))
 
-    page = getUnicode(page)  # Note: if upper function call fails (Issue #4202)
+    page = getUnicode(page)  # Note: if decodePage call fails (Issue #4202)
 
     retVal = [_urllib.parse.unquote(match.group(1) or match.group(2)) for match in re.finditer(GOOGLE_REGEX, page, re.I)]
 
@@ -170,6 +170,8 @@ def _search(dork):
         except:
             errMsg = "unable to connect"
             raise SqlmapConnectionException(errMsg)
+
+        page = getUnicode(page)  # Note: if decodePage call fails (Issue #4202)
 
         retVal = [_urllib.parse.unquote(match.group(1).replace("&amp;", "&")) for match in re.finditer(regex, page, re.I | re.S)]
 
