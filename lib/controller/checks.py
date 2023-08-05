@@ -217,6 +217,7 @@ def checkSqlInjection(place, parameter, value):
                         if _ > 1:
                             __ = 2 * (_ - 1) + 1 if _ == lower else 2 * _
                             unionExtended = True
+                            test.request._columns = test.request.columns
                             test.request.columns = re.sub(r"\b%d\b" % _, str(__), test.request.columns)
                             title = re.sub(r"\b%d\b" % _, str(__), title)
                             test.title = re.sub(r"\b%d\b" % _, str(__), test.title)
@@ -819,6 +820,9 @@ def checkSqlInjection(place, parameter, value):
                     choice = readInput(msg, default=str(conf.verbose), checkBatch=False)
                 conf.verbose = int(choice)
                 setVerbosity()
+                if hasattr(test.request, "columns") and hasattr(test.request, "_columns"):
+                    test.request.columns = test.request._columns
+                    delattr(test.request, "_columns")
                 tests.insert(0, test)
             elif choice == 'N':
                 return None
