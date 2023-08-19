@@ -185,6 +185,11 @@ class Agent(object):
                 newValue = newValue.replace(BOUNDARY_BACKSLASH_MARKER, '\\')
                 newValue = self.adjustLateValues(newValue)
 
+            # NOTE: https://github.com/sqlmapproject/sqlmap/issues/5488
+            if kb.customInjectionMark in origValue:
+                payload = newValue.replace(origValue, "")
+                newValue = origValue.replace(kb.customInjectionMark, payload)
+
             # TODO: support for POST_HINT
             newValue = "%s%s%s" % (BOUNDED_BASE64_MARKER, newValue, BOUNDED_BASE64_MARKER)
 
