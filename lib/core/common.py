@@ -5079,6 +5079,7 @@ def resetCookieJar(cookieJar):
                 logger.info(infoMsg)
 
                 content = readCachedFileContent(conf.loadCookies)
+                content = re.sub("(?im)^#httpOnly_", "", content)
                 lines = filterNone(line.strip() for line in content.split("\n") if not line.startswith('#'))
                 handle, filename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.COOKIE_JAR)
                 os.close(handle)
