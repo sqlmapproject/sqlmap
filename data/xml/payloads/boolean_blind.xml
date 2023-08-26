@@ -596,6 +596,26 @@ Tag: <test>
             <dbms>Oracle</dbms>
         </details>
     </test>
+
+    <test>
+        <title>SQLite AND boolean-based blind - WHERE, HAVING, GROUP BY or HAVING clause (json)</title>
+        <stype>1</stype>
+        <level>1</level>
+        <risk>1</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <vector>AND CASE WHEN [INFERENCE] THEN 1 ELSE json('') END </vector>
+        <request>
+            <payload>AND CASE WHEN [RANDNUM]=[RANDNUM] THEN 1 ELSE json('') END</payload>
+        </request>
+        <response>
+            <comparison>AND CASE WHEN [RANDNUM]=[RANDNUM1] THEN 1 ELSE json('') END</comparison>
+        </response>
+        <details>
+            <dbms>SQLite</dbms>
+        </details>
+    </test>
+
     <!-- End of boolean-based blind tests - WHERE or HAVING clause -->
 
     <!-- Boolean-based blind tests - Parameter replace -->
