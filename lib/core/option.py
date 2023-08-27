@@ -480,6 +480,31 @@ def _setBulkMultipleTargets():
         warnMsg = "no usable links found (with GET parameters)"
         logger.warning(warnMsg)
 
+def _setSwaggerMultipleTargets():
+    if not conf.swaggerFile:
+        return
+
+    infoMsg = "parsing multiple targets from swagger '%s'" % conf.swaggerFile
+    logger.info(infoMsg)
+
+    if not os.path.exists(conf.swaggerFile):
+        errMsg = "the specified list of targets does not exist"
+        raise SqlmapFilePathException(errMsg)
+
+    if checkFile(conf.swaggerFile, False):
+        debugMsg = "swagger file '%s' checks out" % conf.swaggerFile
+        logger.debug(debugMsg)
+
+        for target in parseRequestFile(conf.swaggerFile):
+            kb.targets.add(target)
+
+    else:
+        errMsg = "the specified list of targets is not a file "
+        errMsg += "nor a directory"
+        raise SqlmapFilePathException(errMsg)
+
+
+
 def _findPageForms():
     if not conf.forms or conf.crawlDepth:
         return
@@ -1780,7 +1805,7 @@ def _cleanupOptions():
     if conf.tmpPath:
         conf.tmpPath = ntToPosixSlashes(normalizePath(conf.tmpPath))
 
-    if any((conf.googleDork, conf.logFile, conf.bulkFile, conf.forms, conf.crawlDepth, conf.stdinPipe)):
+    if any((conf.googleDork, conf.logFile, conf.bulkFile, conf.forms, conf.crawlDepth, conf.stdinPipe, conf.swaggerFile)):
         conf.multipleTargets = True
 
     if conf.optimize:
@@ -1935,6 +1960,9 @@ def _cleanupOptions():
 
     if conf.dummy:
         conf.batch = True
+
+    if conf.swaggerTags:
+        conf.swaggerTags = [_.strip() for _ in re.split(PARAMETER_SPLITTING_REGEX, conf.swaggerTags)]
 
     threadData = getCurrentThreadData()
     threadData.reset()
@@ -2720,7 +2748,7 @@ def _basicOptionValidation():
         errMsg = "maximum number of used threads is %d avoiding potential connection issues" % MAX_NUMBER_OF_THREADS
         raise SqlmapSyntaxException(errMsg)
 
-    if conf.forms and not any((conf.url, conf.googleDork, conf.bulkFile)):
+    if conf.forms and not any((conf.url, conf.googleDork, conf.bulkFile, conf.swaggerFile)):
         errMsg = "switch '--forms' requires usage of option '-u' ('--url'), '-g' or '-m'"
         raise SqlmapSyntaxException(errMsg)
 
@@ -2834,7 +2862,7 @@ def _basicOptionValidation():
         errMsg = "value for option '--union-char' must be an alpha-numeric value (e.g. 1)"
         raise SqlmapSyntaxException(errMsg)
 
-    if conf.hashFile and any((conf.direct, conf.url, conf.logFile, conf.bulkFile, conf.googleDork, conf.configFile, conf.requestFile, conf.updateAll, conf.smokeTest, conf.wizard, conf.dependencies, conf.purge, conf.listTampers)):
+    if conf.hashFile and any((conf.direct, conf.url, conf.logFile, conf.bulkFile, conf.swaggerFile, conf.googleDork, conf.configFile, conf.requestFile, conf.updateAll, conf.smokeTest, conf.wizard, conf.dependencies, conf.purge, conf.listTampers)):
         errMsg = "option '--crack' should be used as a standalone"
         raise SqlmapSyntaxException(errMsg)
 
@@ -2905,7 +2933,7 @@ def init():
 
     parseTargetDirect()
 
-    if any((conf.url, conf.logFile, conf.bulkFile, conf.requestFile, conf.googleDork, conf.stdinPipe)):
+    if any((conf.url, conf.logFile, conf.bulkFile, conf.swaggerFile, conf.requestFile, conf.googleDork, conf.stdinPipe)):
         _setHostname()
         _setHTTPTimeout()
         _setHTTPExtraHeaders()
@@ -2921,6 +2949,7 @@ def init():
         _doSearch()
         _setStdinPipeTargets()
         _setBulkMultipleTargets()
+        _setSwaggerMultipleTargets()
         _checkTor()
         _setCrawler()
         _findPageForms()

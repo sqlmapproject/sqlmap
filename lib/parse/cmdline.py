@@ -141,6 +141,12 @@ def cmdLineParser(argv=None):
         target.add_argument("-g", dest="googleDork",
             help="Process Google dork results as target URLs")
 
+        target.add_argument("--swaggerFile", dest="swaggerFile",
+            help="Parse target(s) from a Swagger OpenAPI 3.x.x JSON file ")
+
+        target.add_argument("--swaggerTags", dest="swaggerTags",
+            help="Only process swagger operations that include one of these tags")
+
         target.add_argument("-c", dest="configFile",
             help="Load options from a configuration INI file")
 

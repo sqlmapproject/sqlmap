@@ -184,6 +184,7 @@ from lib.core.settings import VERSION_COMPARISON_CORRECTION
 from lib.core.settings import VERSION_STRING
 from lib.core.settings import ZIP_HEADER
 from lib.core.settings import WEBSCARAB_SPLITTER
+from lib.core.swagger import parse as _parseSwagger
 from lib.core.threads import getCurrentThreadData
 from lib.utils.safe2bin import safecharencode
 from lib.utils.sqlalchemy import _sqlalchemy
@@ -5460,6 +5461,10 @@ def parseRequestFile(reqFile, checkParams=True):
 
     for target in _parseWebScarabLog(content):
         yield target
+
+    if conf.swaggerFile:
+      for target in _parseSwagger(content, conf.swaggerTags):
+          yield target
 
 def getSafeExString(ex, encoding=None):
     """

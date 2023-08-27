@@ -18,6 +18,8 @@ optDict = {
         "requestFile": "string",
         "sessionFile": "string",
         "googleDork": "string",
+        "swaggerFile": "string",
+        "swaggerTags": "string",
         "configFile": "string",
     },
 
