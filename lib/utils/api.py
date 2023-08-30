@@ -111,6 +111,8 @@ class Database(object):
                     else:
                         self.cursor.execute(statement)
                 except sqlite3.OperationalError as ex:
+                    if "already exists" in getSafeExString(ex):
+                        break
                     if "locked" not in getSafeExString(ex):
                         raise
                     else:
@@ -680,7 +682,7 @@ def version(token=None):
     logger.debug("Fetched version (%s)" % ("admin" if is_admin(token) else request.remote_addr))
     return jsonize({"success": True, "version": VERSION_STRING.split('/')[-1]})
 
-def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=RESTAPI_DEFAULT_ADAPTER, username=None, password=None):
+def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=RESTAPI_DEFAULT_ADAPTER, username=None, password=None, dbpath=None):
     """
     REST-JSON API server
     """
@@ -689,8 +691,11 @@ def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=REST
     DataStore.username = username
     DataStore.password = password
 
-    _, Database.filepath = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.IPC, text=False)
-    os.close(_)
+    if dbpath:
+        Database.filepath = dbpath
+    else:
+        _, Database.filepath = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.IPC, text=False)
+        os.close(_)
 
     if port == 0:  # random
         with contextlib.closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:

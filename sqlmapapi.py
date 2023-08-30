@@ -60,11 +60,12 @@ def main():
     apiparser.add_option("--adapter", help="Server (bottle) adapter to use (default \"%s\")" % RESTAPI_DEFAULT_ADAPTER, default=RESTAPI_DEFAULT_ADAPTER, action="store")
     apiparser.add_option("--username", help="Basic authentication username (optional)", action="store")
     apiparser.add_option("--password", help="Basic authentication password (optional)", action="store")
+    apiparser.add_option("--database", help="Database file path (optional)", action="store")
     (args, _) = apiparser.parse_args()
 
     # Start the client or the server
     if args.server:
-        server(args.host, args.port, adapter=args.adapter, username=args.username, password=args.password)
+        server(args.host, args.port, adapter=args.adapter, username=args.username, password=args.password, dbpath=args.database)
     elif args.client:
         client(args.host, args.port, username=args.username, password=args.password)
     else:
