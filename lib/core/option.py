@@ -2830,10 +2830,6 @@ def _basicOptionValidation():
         errMsg = "value for option '--time-sec' must be a positive integer"
         raise SqlmapSyntaxException(errMsg)
 
-    if conf.uChar and not re.match(UNION_CHAR_REGEX, conf.uChar):
-        errMsg = "value for option '--union-char' must be an alpha-numeric value (e.g. 1)"
-        raise SqlmapSyntaxException(errMsg)
-
     if conf.hashFile and any((conf.direct, conf.url, conf.logFile, conf.bulkFile, conf.googleDork, conf.configFile, conf.requestFile, conf.updateAll, conf.smokeTest, conf.wizard, conf.dependencies, conf.purge, conf.listTampers)):
         errMsg = "option '--crack' should be used as a standalone"
         raise SqlmapSyntaxException(errMsg)
