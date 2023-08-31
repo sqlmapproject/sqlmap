@@ -3182,7 +3182,14 @@ def isNumPosStrValue(value):
     False
     """
 
-    return ((hasattr(value, "isdigit") and value.isdigit() and int(value) > 0) or (isinstance(value, int) and value > 0)) and int(value) < MAX_INT
+    retVal = False
+
+    try:
+        retVal = ((hasattr(value, "isdigit") and value.isdigit() and int(value) > 0) or (isinstance(value, int) and value > 0)) and int(value) < MAX_INT
+    except ValueError:
+        pass
+
+    return retVal
 
 @cachedmethod
 def aliasToDbmsEnum(dbms):
