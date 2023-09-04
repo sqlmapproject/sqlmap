@@ -1801,6 +1801,9 @@ def _cleanupOptions():
                     conf.dbms = dbms if conf.dbms and ',' not in conf.dbms else None
                     break
 
+    if conf.uValues:
+        conf.uCols = "%d-%d" % (1 + conf.uValues.count(','), 1 + conf.uValues.count(','))
+
     if conf.testFilter:
         conf.testFilter = conf.testFilter.strip('*+')
         conf.testFilter = re.sub(r"([^.])([*+])", r"\g<1>.\g<2>", conf.testFilter)
@@ -2582,6 +2585,10 @@ def _basicOptionValidation():
         errMsg = "switch '--text-only' is incompatible with switch '--null-connection'"
         raise SqlmapSyntaxException(errMsg)
 
+    if conf.uValues and conf.uChar:
+        errMsg = "option '--union-values' is incompatible with option '--union-char'"
+        raise SqlmapSyntaxException(errMsg)
+
     if conf.base64Parameter and conf.tamper:
         errMsg = "option '--base64' is incompatible with option '--tamper'"
         raise SqlmapSyntaxException(errMsg)
@@ -2802,6 +2809,11 @@ def _basicOptionValidation():
 
     if conf.dumpFormat not in getPublicTypeMembers(DUMP_FORMAT, True):
         errMsg = "option '--dump-format' accepts one of following values: %s" % ", ".join(getPublicTypeMembers(DUMP_FORMAT, True))
+        raise SqlmapSyntaxException(errMsg)
+
+    if conf.uValues and (not re.search(r"\A['\w\s.,()%s-]+\Z" % CUSTOM_INJECTION_MARK_CHAR, conf.uValues) or conf.uValues.count(CUSTOM_INJECTION_MARK_CHAR) != 1):
+        errMsg = "option '--union-values' must contain valid UNION column values, along with the injection position "
+        errMsg += "(e.g. 'NULL,1,%s,NULL')" % CUSTOM_INJECTION_MARK_CHAR
         raise SqlmapSyntaxException(errMsg)
 
     if conf.skip and conf.testParameter:

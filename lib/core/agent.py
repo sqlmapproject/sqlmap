@@ -45,6 +45,7 @@ from lib.core.exception import SqlmapNoneDataException
 from lib.core.settings import BOUNDED_BASE64_MARKER
 from lib.core.settings import BOUNDARY_BACKSLASH_MARKER
 from lib.core.settings import BOUNDED_INJECTION_MARKER
+from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import GENERIC_SQL_COMMENT
@@ -890,10 +891,15 @@ class Agent(object):
             if element > 0:
                 unionQuery += ','
 
-            if element == position:
+            if conf.uValues:
+                unionQuery += conf.uValues.split(',')[element]
+            elif element == position:
                 unionQuery += query
             else:
                 unionQuery += char
+
+        if conf.uValues:
+            unionQuery = unionQuery.replace(CUSTOM_INJECTION_MARK_CHAR, query)
 
         if fromTable and not unionQuery.endswith(fromTable):
             unionQuery += fromTable

@@ -414,6 +414,9 @@ def cmdLineParser(argv=None):
         techniques.add_argument("--union-from", dest="uFrom",
             help="Table to use in FROM part of UNION query SQL injection")
 
+        techniques.add_argument("--union-values", dest="uValues",
+            help="Column values to use for UNION query SQL injection")
+
         techniques.add_argument("--dns-domain", dest="dnsDomain",
             help="Domain name used for DNS exfiltration attack")
 
