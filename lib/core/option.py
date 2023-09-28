@@ -2171,6 +2171,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.smokeMode = False
     kb.reduceTests = None
     kb.sslSuccess = False
+    kb.startTime = time.time()
     kb.stickyDBMS = False
     kb.suppressResumeInfo = False
     kb.tableFrom = None

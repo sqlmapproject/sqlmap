@@ -239,6 +239,7 @@ optDict = {
         "skipWaf": "boolean",
         "testFilter": "string",
         "testSkip": "string",
+        "timeLimit": "float",
         "webRoot": "string",
     },
 

@@ -736,6 +736,9 @@ def cmdLineParser(argv=None):
         general.add_argument("--test-skip", dest="testSkip",
             help="Skip tests by payloads and/or titles (e.g. BENCHMARK)")
 
+        general.add_argument("--time-limit", dest="timeLimit", type=float,
+            help="Run with a time limit in seconds (e.g. 3600)")
+
         general.add_argument("--web-root", dest="webRoot",
             help="Web server document root directory (e.g. \"/var/www\")")
 

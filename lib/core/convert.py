@@ -16,6 +16,7 @@ import codecs
 import json
 import re
 import sys
+import time
 
 from lib.core.bigarray import BigArray
 from lib.core.compat import xrange
@@ -333,6 +334,10 @@ def getUnicode(value, encoding=None, noneToNull=False):
     >>> getUnicode(None) == 'None'
     True
     """
+
+    # Best position for --time-limit mechanism
+    if conf.get("timeLimit") and kb.get("startTime") and (time.time() - kb.startTime > conf.timeLimit):
+        raise SystemExit
 
     if noneToNull and value is None:
         return NULL
