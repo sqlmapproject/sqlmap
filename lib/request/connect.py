@@ -641,7 +641,7 @@ class Connect(object):
                     responseHeaders = conn.info()
                     responseHeaders[URI_HTTP_HEADER] = conn.geturl() if hasattr(conn, "geturl") else url
 
-                    if hasattr(conn, "redurl"):
+                    if getattr(conn, "redurl", None) is not None:
                         responseHeaders[HTTP_HEADER.LOCATION] = conn.redurl
 
                     responseHeaders = patchHeaders(responseHeaders)

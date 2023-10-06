@@ -6,6 +6,7 @@ See the file 'LICENSE' for copying permission
 """
 
 import io
+import re
 import time
 import types
 
@@ -71,6 +72,7 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
     def http_error_302(self, req, fp, code, msg, headers):
         start = time.time()
         content = None
+        forceRedirect = False
         redurl = self._get_header_redirect(headers) if not conf.ignoreRedirects else None
 
         try:
@@ -111,12 +113,18 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
                     redurl = _urllib.parse.urljoin(req.get_full_url(), redurl)
 
                 self._infinite_loop_check(req)
-                self._ask_redirect_choice(code, redurl, req.get_method())
+                if conf.scope:
+                    if not re.search(conf.scope, redurl, re.I):
+                        redurl = None
+                    else:
+                        forceRedirect = True
+                else:
+                    self._ask_redirect_choice(code, redurl, req.get_method())
             except ValueError:
                 redurl = None
                 result = fp
 
-        if redurl and kb.choices.redirect == REDIRECTION.YES:
+        if redurl and (kb.choices.redirect == REDIRECTION.YES or forceRedirect):
             parseResponse(content, headers)
 
             req.headers[HTTP_HEADER.HOST] = getHostHeader(redurl)
