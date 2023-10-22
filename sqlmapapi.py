@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 Copyright (c) 2006-2023 sqlmap developers (https://sqlmap.org/)
@@ -8,16 +8,6 @@ See the file 'LICENSE' for copying permission
 import sys
 
 sys.dont_write_bytecode = True
-
-__import__("lib.utils.versioncheck")  # this has to be the first non-standard import
-
-import logging
-import optparse
-import os
-import warnings
-
-warnings.filterwarnings(action="ignore", category=UserWarning)
-warnings.filterwarnings(action="ignore", category=DeprecationWarning)
 
 from lib.core.common import getUnicode
 from lib.core.common import setPaths
@@ -31,11 +21,19 @@ from lib.core.settings import UNICODE_ENCODING
 from lib.utils.api import client
 from lib.utils.api import server
 
+import logging
+import argparse
+import os
+import warnings
+
+warnings.filterwarnings("ignore", category=UserWarning)
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
 try:
     from sqlmap import modulePath
 except ImportError:
     def modulePath():
-        return getUnicode(os.path.dirname(os.path.realpath(__file__)), encoding=sys.getfilesystemencoding() or UNICODE_ENCODING)
+        return getUnicode(os.path.dirname(os.path.realpath(__file__))
 
 def main():
     """
@@ -52,15 +50,15 @@ def main():
     setPaths(modulePath())
 
     # Parse command line options
-    apiparser = optparse.OptionParser()
-    apiparser.add_option("-s", "--server", help="Run as a REST-JSON API server", action="store_true")
-    apiparser.add_option("-c", "--client", help="Run as a REST-JSON API client", action="store_true")
-    apiparser.add_option("-H", "--host", help="Host of the REST-JSON API server (default \"%s\")" % RESTAPI_DEFAULT_ADDRESS, default=RESTAPI_DEFAULT_ADDRESS, action="store")
-    apiparser.add_option("-p", "--port", help="Port of the the REST-JSON API server (default %d)" % RESTAPI_DEFAULT_PORT, default=RESTAPI_DEFAULT_PORT, type="int", action="store")
-    apiparser.add_option("--adapter", help="Server (bottle) adapter to use (default \"%s\")" % RESTAPI_DEFAULT_ADAPTER, default=RESTAPI_DEFAULT_ADAPTER, action="store")
-    apiparser.add_option("--username", help="Basic authentication username (optional)", action="store")
-    apiparser.add_option("--password", help="Basic authentication password (optional)", action="store")
-    (args, _) = apiparser.parse_args()
+    apiparser = argparse.ArgumentParser(description="REST-JSON API server and client")
+    apiparser.add_argument("-s", "--server", help="Run as a REST-JSON API server", action="store_true")
+    apiparser.add_argument("-c", "--client", help="Run as a REST-JSON API client", action="store_true")
+    apiparser.add_argument("-H", "--host", help="Host of the REST-JSON API server (default \"%s\")" % RESTAPI_DEFAULT_ADDRESS, default=RESTAPI_DEFAULT_ADDRESS)
+    apiparser.add_argument("-p", "--port", help="Port of the REST-JSON API server (default %d)" % RESTAPI_DEFAULT_PORT, default=RESTAPI_DEFAULT_PORT, type=int)
+    apiparser.add_argument("--adapter", help="Server (bottle) adapter to use (default \"%s\")" % RESTAPI_DEFAULT_ADAPTER, default=RESTAPI_DEFAULT_ADAPTER)
+    apiparser.add_argument("--username", help="Basic authentication username (optional)")
+    apiparser.add_argument("--password", help="Basic authentication password (optional)")
+    args = apiparser.parse_args()
 
     # Start the client or the server
     if args.server:
