@@ -513,7 +513,7 @@ def start():
                         paramKey = (conf.hostname, conf.path, place, parameter)
 
                         if kb.processUserMarks:
-                            if testSqlInj and place not in (PLACE.CUSTOM_POST, PLACE.CUSTOM_HEADER):
+                            if testSqlInj and place not in (PLACE.CUSTOM_POST, PLACE.CUSTOM_HEADER, PLACE.URI):
                                 if kb.processNonCustom is None:
                                     message = "other non-custom parameters found. "
                                     message += "Do you want to process them too? [Y/n/q] "
