@@ -929,7 +929,7 @@ def _setPreprocessFunctions():
             else:
                 try:
                     function(_urllib.request.Request("http://localhost"))
-                except:
+                except Exception as ex:
                     tbMsg = traceback.format_exc()
 
                     if conf.debug:
@@ -943,8 +943,8 @@ def _setPreprocessFunctions():
 
                     errMsg = "function 'preprocess(req)' "
                     errMsg += "in preprocess script '%s' " % script
-                    errMsg += "appears to be invalid "
-                    errMsg += "(Note: find template script at '%s')" % filename
+                    errMsg += "had issues in a test run ('%s'). " % getSafeExString(ex)
+                    errMsg += "You can find a template script at '%s'" % filename
                     raise SqlmapGenericException(errMsg)
 
 def _setPostprocessFunctions():
