@@ -3186,7 +3186,14 @@ def isNumPosStrValue(value):
     False
     """
 
-    return ((hasattr(value, "isdigit") and value.isdigit() and int(value) > 0) or (isinstance(value, int) and value > 0)) and int(value) < MAX_INT
+    retVal = False
+
+    try:
+        retVal = ((hasattr(value, "isdigit") and value.isdigit() and int(value) > 0) or (isinstance(value, int) and value > 0)) and int(value) < MAX_INT
+    except ValueError:
+        pass
+
+    return retVal
 
 @cachedmethod
 def aliasToDbmsEnum(dbms):
@@ -5083,6 +5090,7 @@ def resetCookieJar(cookieJar):
                 logger.info(infoMsg)
 
                 content = readCachedFileContent(conf.loadCookies)
+                content = re.sub("(?im)^#httpOnly_", "", content)
                 lines = filterNone(line.strip() for line in content.split("\n") if not line.startswith('#'))
                 handle, filename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.COOKIE_JAR)
                 os.close(handle)

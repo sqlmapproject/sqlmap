@@ -274,7 +274,7 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
 
                         stopLimit = 1
 
-                    elif (not count or int(count) == 0):
+                    elif not isNumPosStrValue(count):
                         if not count:
                             warnMsg = "the SQL query provided does not "
                             warnMsg += "return any output"

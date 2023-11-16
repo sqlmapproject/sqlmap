@@ -181,8 +181,11 @@ class HashDB(object):
             try:
                 self.cursor.execute("BEGIN TRANSACTION")
             except:
-                # Reference: http://stackoverflow.com/a/25245731
-                self.cursor.close()
+                try:
+                    # Reference: http://stackoverflow.com/a/25245731
+                    self.cursor.close()
+                except sqlite3.ProgrammingError:
+                    pass
                 threadData.hashDBCursor = None
                 self.cursor.execute("BEGIN TRANSACTION")
             finally:

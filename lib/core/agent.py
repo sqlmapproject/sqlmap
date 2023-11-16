@@ -45,6 +45,7 @@ from lib.core.exception import SqlmapNoneDataException
 from lib.core.settings import BOUNDED_BASE64_MARKER
 from lib.core.settings import BOUNDARY_BACKSLASH_MARKER
 from lib.core.settings import BOUNDED_INJECTION_MARKER
+from lib.core.settings import CUSTOM_INJECTION_MARK_CHAR
 from lib.core.settings import DEFAULT_COOKIE_DELIMITER
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import GENERIC_SQL_COMMENT
@@ -184,6 +185,11 @@ class Agent(object):
             if newValue:
                 newValue = newValue.replace(BOUNDARY_BACKSLASH_MARKER, '\\')
                 newValue = self.adjustLateValues(newValue)
+
+            # NOTE: https://github.com/sqlmapproject/sqlmap/issues/5488
+            if kb.customInjectionMark in origValue:
+                payload = newValue.replace(origValue, "")
+                newValue = origValue.replace(kb.customInjectionMark, payload)
 
             # TODO: support for POST_HINT
             newValue = "%s%s%s" % (BOUNDED_BASE64_MARKER, newValue, BOUNDED_BASE64_MARKER)
@@ -490,7 +496,7 @@ class Agent(object):
         if field and Backend.getIdentifiedDbms():
             rootQuery = queries[Backend.getIdentifiedDbms()]
 
-            if field.startswith("(CASE") or field.startswith("(IIF") or conf.noCast and not (field.startswith("COUNT(") and getTechnique() in (PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.UNION) and Backend.getIdentifiedDbms() == DBMS.MSSQL):
+            if field.startswith("(CASE") or field.startswith("(IIF") or conf.noCast and not (field.startswith("COUNT(") and Backend.getIdentifiedDbms() == DBMS.MSSQL):
                 nulledCastedField = field
             else:
                 if not (Backend.isDbms(DBMS.SQLITE) and not isDBMSVersionAtLeast('3')):
@@ -885,10 +891,15 @@ class Agent(object):
             if element > 0:
                 unionQuery += ','
 
-            if element == position:
+            if conf.uValues:
+                unionQuery += conf.uValues.split(',')[element]
+            elif element == position:
                 unionQuery += query
             else:
                 unionQuery += char
+
+        if conf.uValues:
+            unionQuery = unionQuery.replace(CUSTOM_INJECTION_MARK_CHAR, query)
 
         if fromTable and not unionQuery.endswith(fromTable):
             unionQuery += fromTable

@@ -118,6 +118,7 @@ optDict = {
         "uCols": "string",
         "uChar": "string",
         "uFrom": "string",
+        "uValues": "string",
         "dnsDomain": "string",
         "secondUrl": "string",
         "secondReq": "string",
@@ -239,6 +240,7 @@ optDict = {
         "skipWaf": "boolean",
         "testFilter": "string",
         "testSkip": "string",
+        "timeLimit": "float",
         "webRoot": "string",
     },
 

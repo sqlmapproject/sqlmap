@@ -133,7 +133,8 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
             items.append((count, ratio))
 
         if not isNullValue(kb.uChar):
-            for regex in (kb.uChar.strip("'"), r'>\s*%s\s*<' % kb.uChar.strip("'")):
+            value = re.escape(kb.uChar.strip("'"))
+            for regex in (value, r'>\s*%s\s*<' % value):
                 contains = [count for count, content in pages.items() if re.search(regex, content or "", re.IGNORECASE) is not None]
                 if len(contains) == 1:
                     retVal = contains[0]
@@ -340,7 +341,7 @@ def _unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix)
             warnMsg = "if UNION based SQL injection is not detected, "
             warnMsg += "please consider "
 
-            if not conf.uChar and count > 1 and kb.uChar == NULL:
+            if not conf.uChar and count > 1 and kb.uChar == NULL and conf.uValues is None:
                 message = "injection not exploitable with NULL values. Do you want to try with a random integer value for option '--union-char'? [Y/n] "
 
                 if not readInput(message, default='Y', boolean=True):

@@ -637,7 +637,7 @@ def _createDumpDir():
     if not os.path.isdir(conf.dumpPath):
         try:
             os.makedirs(conf.dumpPath)
-        except OSError as ex:
+        except Exception as ex:
             tempDir = tempfile.mkdtemp(prefix="sqlmapdump")
             warnMsg = "unable to create dump directory "
             warnMsg += "'%s' (%s). " % (conf.dumpPath, getUnicode(ex))

@@ -207,7 +207,7 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s.%s"/>
-            <blind query="SELECT MIN(%s) FROM %s WHERE CONVERT(NVARCHAR(4000),%s)>'%s'" query2="SELECT MAX(%s) FROM %s WHERE CONVERT(NVARCHAR(4000),%s) LIKE '%s'" query3="SELECT %s FROM (SELECT %s, ROW_NUMBER() OVER (ORDER BY (SELECT 1)) AS LIMIT FROM %s)x WHERE LIMIT=%d" count="SELECT LTRIM(STR(COUNT(*))) FROM %s" count2="SELECT LTRIM(STR(COUNT(DISTINCT(%s)))) FROM %s"/>
+            <blind query="SELECT MIN(%s) FROM %s WHERE CONVERT(NVARCHAR(4000),%s)>'%s'" query2="SELECT MAX(%s) FROM %s WHERE CONVERT(NVARCHAR(4000),%s) LIKE '%s'" query3="SELECT %s FROM (SELECT %s, ROW_NUMBER() OVER (ORDER BY (SELECT 1)) AS CAP FROM %s)x WHERE CAP=%d" count="SELECT LTRIM(STR(COUNT(*))) FROM %s" count2="SELECT LTRIM(STR(COUNT(DISTINCT(%s)))) FROM %s"/>
         </dump_table>
         <search_db>
             <inband query="SELECT name FROM master..sysdatabases WHERE %s" condition="name"/>
@@ -228,7 +228,7 @@
         <length query="LENGTH(%s)"/>
         <isnull query="NVL(%s,' ')"/>
         <delimiter query="||"/>
-        <limit query="ROWNUM AS LIMIT %s) WHERE LIMIT"/>
+        <limit query="ROWNUM AS CAP %s) WHERE CAP"/>
         <limitregexp query="ROWNUM\s+AS\s+.+?\s+FROM\s+.+?\)\s+WHERE\s+.+?\s*=\s*[\d]+|ROWNUM\s*=\s*[\d]+"/>
         <limitgroupstart/>
         <limitgroupstop/>
@@ -261,11 +261,11 @@
         <is_dba query="(SELECT GRANTED_ROLE FROM DBA_ROLE_PRIVS WHERE GRANTEE=USER AND GRANTED_ROLE='DBA')='DBA'"/>
         <users>
             <inband query="SELECT USERNAME FROM SYS.ALL_USERS"/>
-            <blind query="SELECT USERNAME FROM (SELECT USERNAME,ROWNUM AS LIMIT FROM SYS.ALL_USERS) WHERE LIMIT=%d" count="SELECT COUNT(USERNAME) FROM SYS.ALL_USERS"/>
+            <blind query="SELECT USERNAME FROM (SELECT USERNAME,ROWNUM AS CAP FROM SYS.ALL_USERS) WHERE CAP=%d" count="SELECT COUNT(USERNAME) FROM SYS.ALL_USERS"/>
         </users>
         <passwords>
             <inband query="SELECT NAME,PASSWORD FROM SYS.USER$" condition="NAME"/>
-            <blind query="SELECT PASSWORD FROM (SELECT PASSWORD,ROWNUM AS LIMIT FROM SYS.USER$ WHERE NAME='%s') WHERE LIMIT=%d" count="SELECT COUNT(PASSWORD) FROM SYS.USER$ WHERE NAME='%s'"/>
+            <blind query="SELECT PASSWORD FROM (SELECT PASSWORD,ROWNUM AS CAP FROM SYS.USER$ WHERE NAME='%s') WHERE CAP=%d" count="SELECT COUNT(PASSWORD) FROM SYS.USER$ WHERE NAME='%s'"/>
         </passwords>
         <!--
              NOTE: in Oracle to enumerate the privileges for the session user you can use:
@@ -273,7 +273,7 @@
         -->
         <privileges>
             <inband query="SELECT GRANTEE,PRIVILEGE FROM DBA_SYS_PRIVS" query2="SELECT USERNAME,PRIVILEGE FROM USER_SYS_PRIVS" condition="GRANTEE" condition2="USERNAME"/>
-            <blind query="SELECT PRIVILEGE FROM (SELECT PRIVILEGE,ROWNUM AS LIMIT FROM DBA_SYS_PRIVS WHERE GRANTEE='%s') WHERE LIMIT=%d" query2="SELECT PRIVILEGE FROM (SELECT PRIVILEGE,ROWNUM AS LIMIT FROM USER_SYS_PRIVS WHERE USERNAME='%s') WHERE LIMIT=%d" count="SELECT COUNT(PRIVILEGE) FROM DBA_SYS_PRIVS WHERE GRANTEE='%s'" count2="SELECT COUNT(PRIVILEGE) FROM USER_SYS_PRIVS WHERE USERNAME='%s'"/>
+            <blind query="SELECT PRIVILEGE FROM (SELECT PRIVILEGE,ROWNUM AS CAP FROM DBA_SYS_PRIVS WHERE GRANTEE='%s') WHERE CAP=%d" query2="SELECT PRIVILEGE FROM (SELECT PRIVILEGE,ROWNUM AS CAP FROM USER_SYS_PRIVS WHERE USERNAME='%s') WHERE CAP=%d" count="SELECT COUNT(PRIVILEGE) FROM DBA_SYS_PRIVS WHERE GRANTEE='%s'" count2="SELECT COUNT(PRIVILEGE) FROM USER_SYS_PRIVS WHERE USERNAME='%s'"/>
         </privileges>
         <!--
              NOTE: in Oracle to enumerate the roles for the session user you can use:
@@ -281,20 +281,20 @@
         -->
         <roles>
             <inband query="SELECT GRANTEE,GRANTED_ROLE FROM DBA_ROLE_PRIVS" query2="SELECT USERNAME,GRANTED_ROLE FROM USER_ROLE_PRIVS" condition="GRANTEE" condition2="USERNAME"/>
-            <blind query="SELECT GRANTED_ROLE FROM (SELECT GRANTED_ROLE,ROWNUM AS LIMIT FROM DBA_ROLE_PRIVS WHERE GRANTEE='%s') WHERE LIMIT=%d" query2="SELECT GRANTED_ROLE FROM (SELECT GRANTED_ROLE,ROWNUM AS LIMIT FROM USER_ROLE_PRIVS WHERE USERNAME='%s') WHERE LIMIT=%d" count="SELECT COUNT(GRANTED_ROLE) FROM DBA_ROLE_PRIVS WHERE GRANTEE='%s'" count2="SELECT COUNT(GRANTED_ROLE) FROM USER_ROLE_PRIVS WHERE USERNAME='%s'"/>
+            <blind query="SELECT GRANTED_ROLE FROM (SELECT GRANTED_ROLE,ROWNUM AS CAP FROM DBA_ROLE_PRIVS WHERE GRANTEE='%s') WHERE CAP=%d" query2="SELECT GRANTED_ROLE FROM (SELECT GRANTED_ROLE,ROWNUM AS CAP FROM USER_ROLE_PRIVS WHERE USERNAME='%s') WHERE CAP=%d" count="SELECT COUNT(GRANTED_ROLE) FROM DBA_ROLE_PRIVS WHERE GRANTEE='%s'" count2="SELECT COUNT(GRANTED_ROLE) FROM USER_ROLE_PRIVS WHERE USERNAME='%s'"/>
         </roles>
         <statements>
             <inband query="SELECT SQL_TEXT FROM V$SQL"/>
-            <blind query="SELECT SQL_TEXT FROM (SELECT SQL_TEXT,ROWNUM AS LIMIT FROM V$SQL WHERE SQL_TEXT NOT LIKE '%%SQL_TEXT%%') WHERE LIMIT=%d" count="SELECT COUNT(SQL_TEXT) FROM V$SQL WHERE SQL_TEXT NOT LIKE '%%SQL_TEXT%%'"/>
+            <blind query="SELECT SQL_TEXT FROM (SELECT SQL_TEXT,ROWNUM AS CAP FROM V$SQL WHERE SQL_TEXT NOT LIKE '%%SQL_TEXT%%') WHERE CAP=%d" count="SELECT COUNT(SQL_TEXT) FROM V$SQL WHERE SQL_TEXT NOT LIKE '%%SQL_TEXT%%'"/>
         </statements>
         <!-- NOTE: in Oracle schema names are the counterpart to database names on other DBMSes -->
         <dbs>
             <inband query="SELECT OWNER FROM (SELECT DISTINCT(OWNER) FROM SYS.ALL_TABLES)"/>
-            <blind query="SELECT OWNER FROM (SELECT OWNER,ROWNUM AS LIMIT FROM (SELECT DISTINCT(OWNER) FROM SYS.ALL_TABLES)) WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(OWNER)) FROM SYS.ALL_TABLES"/>
+            <blind query="SELECT OWNER FROM (SELECT OWNER,ROWNUM AS CAP FROM (SELECT DISTINCT(OWNER) FROM SYS.ALL_TABLES)) WHERE CAP=%d" count="SELECT COUNT(DISTINCT(OWNER)) FROM SYS.ALL_TABLES"/>
         </dbs>
         <tables>
             <inband query="SELECT OWNER,TABLE_NAME FROM SYS.ALL_TABLES" condition="OWNER"/>
-            <blind query="SELECT TABLE_NAME FROM (SELECT TABLE_NAME,ROWNUM AS LIMIT FROM SYS.ALL_TABLES WHERE OWNER='%s') WHERE LIMIT=%d" count="SELECT COUNT(TABLE_NAME) FROM SYS.ALL_TABLES WHERE OWNER='%s'"/>
+            <blind query="SELECT TABLE_NAME FROM (SELECT TABLE_NAME,ROWNUM AS CAP FROM SYS.ALL_TABLES WHERE OWNER='%s') WHERE CAP=%d" count="SELECT COUNT(TABLE_NAME) FROM SYS.ALL_TABLES WHERE OWNER='%s'"/>
         </tables>
         <columns>
             <inband query="SELECT COLUMN_NAME,DATA_TYPE FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='%s' AND OWNER='%s'" condition="COLUMN_NAME"/>
@@ -302,7 +302,7 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s ORDER BY ROWNUM"/>
-            <blind query="SELECT %s FROM (SELECT qq.*,ROWNUM AS LIMIT FROM %s qq ORDER BY ROWNUM) WHERE LIMIT=%d" count="SELECT COUNT(*) FROM %s"/>
+            <blind query="SELECT %s FROM (SELECT qq.*,ROWNUM AS CAP FROM %s qq ORDER BY ROWNUM) WHERE CAP=%d" count="SELECT COUNT(*) FROM %s"/>
         </dump_table>
         <!-- NOTE: in Oracle schema names are the counterpart to database names on other DBMSes -->
         <search_db>
@@ -606,7 +606,7 @@
         <length query="LENGTH(RTRIM(CAST(%s AS CHAR(254))))"/>
         <isnull query="COALESCE(%s,' ')"/>
         <delimiter query="||"/>
-        <limit query="ROW_NUMBER() OVER () AS LIMIT %s) AS qq WHERE LIMIT"/>
+        <limit query="ROW_NUMBER() OVER () AS CAP %s) AS qq WHERE CAP"/>
         <limitregexp query="ROW_NUMBER\(\)\s+OVER\s+\(\)\s+AS\s+.+?\s+FROM\s+.+?\)\s+WHERE\s+.+?\s*=\s*[\d]+"/>
         <limitgroupstart/>
         <limitgroupstop/>
@@ -621,7 +621,7 @@
         <hex query="HEX(%s)"/>
         <inference query="SUBSTR((%s),%d,1)>'%c'"/>
         <!-- NOTE: We have to use the complicated UDB OLAP functions in query2 because sqlmap injects isnull query inside MAX function, else we would use: SELECT MAX(versionnumber) FROM sysibm.sysversions -->
-        <banner query="SELECT service_level FROM TABLE(sysproc.env_get_inst_info())" query2="SELECT versionnumber FROM (SELECT ROW_NUMBER() OVER (ORDER BY versionnumber DESC) AS LIMIT,versionnumber FROM sysibm.sysversions) AS qq WHERE LIMIT=1"/>
+        <banner query="SELECT service_level FROM TABLE(sysproc.env_get_inst_info())" query2="SELECT versionnumber FROM (SELECT ROW_NUMBER() OVER (ORDER BY versionnumber DESC) AS CAP,versionnumber FROM sysibm.sysversions) AS qq WHERE CAP=1"/>
         <current_user query="SELECT user FROM SYSIBM.SYSDUMMY1"/>
         <!-- NOTE: On DB2 we use the current user as default schema (database) -->
         <current_db query="SELECT user FROM SYSIBM.SYSDUMMY1"/>
@@ -631,24 +631,24 @@
         <is_dba query="(SELECT dbadmauth FROM syscat.dbauth WHERE grantee=current user)='Y'"/>
         <users>
             <inband query="SELECT grantee FROM sysibm.sysdbauth WHERE grantee!='SYSTEM' AND grantee!='PUBLIC'"/>
-            <blind query="SELECT grantee FROM (SELECT ROW_NUMBER() OVER () AS LIMIT,grantee FROM sysibm.sysdbauth WHERE grantee!='SYSTEM' AND grantee!='PUBLIC') AS qq WHERE LIMIT=%d" count="SELECT COUNT(DISTINCT(grantee)) FROM sysibm.sysdbauth WHERE grantee!='SYSTEM' AND grantee!='PUBLIC'"/>
+            <blind query="SELECT grantee FROM (SELECT ROW_NUMBER() OVER () AS CAP,grantee FROM sysibm.sysdbauth WHERE grantee!='SYSTEM' AND grantee!='PUBLIC') AS qq WHERE CAP=%d" count="SELECT COUNT(DISTINCT(grantee)) FROM sysibm.sysdbauth WHERE grantee!='SYSTEM' AND grantee!='PUBLIC'"/>
         </users>
         <!-- NOTE: On DB2 it is not possible to list password hashes, since they are handled by the OS -->        
         <passwords/>
         <privileges>
             <inband query="SELECT grantee,RTRIM(tabschema)||'.'||tabname||','||controlauth||alterauth||deleteauth||indexauth||insertauth||refauth||selectauth||updateauth FROM syscat.tabauth" condition="grantee"/>
-            <blind query="SELECT tabschema||'.'||tabname||','||controlauth||alterauth||deleteauth||indexauth||insertauth||refauth||selectauth||updateauth FROM (SELECT ROW_NUMBER() OVER () AS LIMIT,syscat.tabauth.* FROM syscat.tabauth WHERE grantee='%s') AS qq WHERE LIMIT=%d" count="SELECT COUNT(*) FROM syscat.tabauth WHERE grantee='%s'"/>
+            <blind query="SELECT tabschema||'.'||tabname||','||controlauth||alterauth||deleteauth||indexauth||insertauth||refauth||selectauth||updateauth FROM (SELECT ROW_NUMBER() OVER () AS CAP,syscat.tabauth.* FROM syscat.tabauth WHERE grantee='%s') AS qq WHERE CAP=%d" count="SELECT COUNT(*) FROM syscat.tabauth WHERE grantee='%s'"/>
         </privileges>
         <roles/>
         <statements/>
         <!-- NOTE: in DB2 schema names are the counterpart to database names on other DBMSes -->
         <dbs>
             <inband query="SELECT schemaname FROM syscat.schemata"/>
-            <blind query="SELECT schemaname FROM (SELECT ROW_NUMBER() OVER () AS LIMIT,schemaname FROM syscat.schemata) AS qq WHERE LIMIT=%d" count="SELECT COUNT(schemaname) FROM syscat.schemata"/>
+            <blind query="SELECT schemaname FROM (SELECT ROW_NUMBER() OVER () AS CAP,schemaname FROM syscat.schemata) AS qq WHERE CAP=%d" count="SELECT COUNT(schemaname) FROM syscat.schemata"/>
         </dbs>
         <tables>
             <inband query="SELECT tabschema,tabname FROM sysstat.tables" condition="tabschema"/>
-            <blind query="SELECT tabname FROM (SELECT ROW_NUMBER() OVER () AS LIMIT,tabname FROM sysstat.tables WHERE tabschema='%s') AS qq WHERE LIMIT=INT('%d')" count="SELECT COUNT(*) FROM sysstat.tables WHERE tabschema='%s'"/>
+            <blind query="SELECT tabname FROM (SELECT ROW_NUMBER() OVER () AS CAP,tabname FROM sysstat.tables WHERE tabschema='%s') AS qq WHERE CAP=INT('%d')" count="SELECT COUNT(*) FROM sysstat.tables WHERE tabschema='%s'"/>
         </tables>
         <columns>
             <inband query="SELECT name,RTRIM(coltype)||'('||RTRIM(CAST(length AS CHAR(254)))||')' FROM sysibm.syscolumns WHERE tbname='%s' AND tbcreator='%s'" condition="name"/>
@@ -656,7 +656,7 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s"/>
-            <blind query="SELECT ENTRY_VALUE FROM (SELECT ROW_NUMBER() OVER () AS LIMIT,%s AS ENTRY_VALUE FROM %s) AS qq WHERE LIMIT=%d" count="SELECT COUNT(*) FROM %s"/>
+            <blind query="SELECT ENTRY_VALUE FROM (SELECT ROW_NUMBER() OVER () AS CAP,%s AS ENTRY_VALUE FROM %s) AS qq WHERE CAP=%d" count="SELECT COUNT(*) FROM %s"/>
         </dump_table>
         <search_db>
             <inband query="SELECT schemaname FROM syscat.schemata WHERE %s" condition="schemaname"/>

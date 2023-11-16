@@ -122,6 +122,7 @@ from lib.core.settings import PLAIN_TEXT_CONTENT_TYPE
 from lib.core.settings import RANDOM_INTEGER_MARKER
 from lib.core.settings import RANDOM_STRING_MARKER
 from lib.core.settings import REPLACEMENT_MARKER
+from lib.core.settings import SAFE_HEX_MARKER
 from lib.core.settings import TEXT_CONTENT_TYPE_REGEX
 from lib.core.settings import UNENCODED_ORIGINAL_VALUE
 from lib.core.settings import UNICODE_ENCODING
@@ -641,7 +642,7 @@ class Connect(object):
                     responseHeaders = conn.info()
                     responseHeaders[URI_HTTP_HEADER] = conn.geturl() if hasattr(conn, "geturl") else url
 
-                    if hasattr(conn, "redurl"):
+                    if getattr(conn, "redurl", None) is not None:
                         responseHeaders[HTTP_HEADER.LOCATION] = conn.redurl
 
                     responseHeaders = patchHeaders(responseHeaders)
@@ -1029,6 +1030,8 @@ class Connect(object):
                     conf.httpHeaders = [_ for _ in conf.httpHeaders if _[1] != contentType]
                     contentType = POST_HINT_CONTENT_TYPES.get(kb.postHint, PLAIN_TEXT_CONTENT_TYPE)
                     conf.httpHeaders.append((HTTP_HEADER.CONTENT_TYPE, contentType))
+                    if "urlencoded" in contentType:
+                        postUrlEncode = True
 
         if payload:
             delimiter = conf.paramDel or (DEFAULT_GET_POST_DELIMITER if place != PLACE.COOKIE else DEFAULT_COOKIE_DELIMITER)
@@ -1069,7 +1072,9 @@ class Connect(object):
                 if kb.postHint in (POST_HINT.SOAP, POST_HINT.XML):
                     # payloads in SOAP/XML should have chars > and < replaced
                     # with their HTML encoded counterparts
+                    payload = payload.replace("&#", SAFE_HEX_MARKER)
                     payload = payload.replace('&', "&amp;").replace('>', "&gt;").replace('<', "&lt;").replace('"', "&quot;").replace("'", "&apos;")  # Reference: https://stackoverflow.com/a/1091953
+                    payload = payload.replace(SAFE_HEX_MARKER, "&#")
                 elif kb.postHint == POST_HINT.JSON:
                     payload = escapeJsonValue(payload)
                 elif kb.postHint == POST_HINT.JSON_LIKE:

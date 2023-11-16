@@ -49,6 +49,19 @@ class AttribDict(dict):
             else:
                 return None
 
+    def __delattr__(self, item):
+        """
+        Deletes attributes
+        """
+
+        try:
+            return self.pop(item)
+        except KeyError:
+            if self.keycheck:
+                raise AttributeError("unable to access item '%s'" % item)
+            else:
+                return None
+
     def __setattr__(self, item, value):
         """
         Maps attributes to values
