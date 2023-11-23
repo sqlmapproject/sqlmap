@@ -80,7 +80,7 @@ We welcome contributions from the community to enhance the functionality and usa
 
 Translations
 ----
-* [Chinese](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-zh-CN.md)
+* [Chinese](https://github.com/GitHubNull/mySqlmap/blob/master/doc/translations/README-zh-CN.md)
 
 ## License
 
