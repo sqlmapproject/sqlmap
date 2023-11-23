@@ -1,77 +1,97 @@
-# sqlmap ![](https://i.imgur.com/fe85aVR.png)
+# mySqlmapp - base on sqlmap and scan task manager web ui Injection Scanner
 
-[![.github/workflows/tests.yml](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml/badge.svg)](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml) [![Python 2.6|2.7|3.x](https://img.shields.io/badge/python-2.6|2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![Twitter](https://img.shields.io/badge/twitter-@sqlmap-blue.svg)](https://twitter.com/sqlmap)
+mySqlmapp is a forked and modified version of sqlmap, a popular SQL injection scanner. This fork aims to enhance the functionality of sqlmap by adding web-based task management capabilities. It allows users to manage their scanning tasks directly through a web interface, providing features such as task activation, pausing, termination, and deletion. Additionally, users can view task logs, identify injection points, and easily access payload details.
 
-sqlmap is an open source penetration testing tool that automates the process of detecting and exploiting SQL injection flaws and taking over of database servers. It comes with a powerful detection engine, many niche features for the ultimate penetration tester, and a broad range of switches including database fingerprinting, over data fetching from the database, accessing the underlying file system, and executing commands on the operating system via out-of-band connections.
+We have also developed a Java-based Burp Suite client plugin that simplifies the process of submitting scanning tasks. This plugin seamlessly integrates with Burp Suite, enabling users to submit tasks directly from within the application.
 
-Screenshots
+## Features
+
+- Web-based task management: Easily manage SQL injection scanning tasks through a user-friendly web interface.
+- Task control: Start, pause, terminate, and delete scanning tasks as needed.
+- Task logs: View detailed logs for each scanning task, allowing for effective troubleshooting and analysis.
+- Injection point identification: Clearly identify injection points in the scanned application.
+- Payload details: Conveniently access and review payload details for each injection point.
+- Burp Suite integration: Utilize our Java-based Burp Suite client plugin to streamline the submission of scanning tasks.
+
+## Installation
+
+To get started with mySqlmap, follow these steps:
+
+### 1. Clone the mySqlmap repository from GitHub:
+```shell
+git clone https://github.com/yourusername/mySqlmap.git
+```
+### 2. Ensure that you have Python [3.7+] installed.
+
+### 3. Configuring the Web-Based Task Management Interface  
+
+#### 3.1. Open a command prompt or terminal and navigate to the root directory of the project. 
+
+#### 3.2. Execute the following command to start the mySqlmap API server:
+```shell
+python sqlmapapi.py -s
+```  
+![command line shotcut](images/mySqlmap-command-line.png)
+#### 3.3. Once the server is running, open a web browser (Google Chrome is recommended) and enter the following URL:[mySqlmap web ui： http://127.0.0.1:8775](http://127.0.0.1:8775)  
+
+#### 3.4. The web-based task management interface will be displayed in your browser. From there, you can manage and monitor your SQLMap tasks conveniently.
+
+
+> Please note that the SQLMap API server needs to be running in order to access the web-based management interface.   
+> Make sure to keep the server running while using the interface.
+![mySqlmap web ui](images/mySqlmap-web-ui.png)
+
+### 4. The Burp Suite client plugin.]
+#### 4.1. download the plugin from github repository: [mySqlmapClient](https://github.com/GitHubNull/mySqlmapClient)
+#### 4.2. install the plugin in Burp Suite:
+![mySqlmap web ui](images/mySqlmapClient-install.png)
+#### 4.3. configure the plugin:
+##### 4.3.1. open the plugin configuration page:
+![mySqlmapClient configuration ui](images/mySqlmapClient-setting-ui.png) 
+##### 4.3.2. enter the SQLMap API server address(or left default) and 
+##### 4.3.3. enter the SQLMap API server port(or left default)
+##### 4.3.4. enter the SQLMap API tmp request file dir(or left default)
+##### 4.3.5. click connect button to connect to mySqlmap api service
+##### 4.3.6. click save button to save the configuration
+
+![mySqlClient settng ui after connected to mySqlmap api](images/mySqlmapClient-setting-ui-after-connected.png) 
+
+#### 4.4. use plugin:
+![mySqlmap web ui](images/mySqlmapClient-shotcut.png)  
+
+
+Sub repository
 ----
+* [mySqlmapClient](https://github.com/GitHubNull/mySqlmapClient)
+* [mySqlmapWebTaskManager](https://github.com/GitHubNull/mySqlmapWebTaskManager)
 
-![Screenshot](https://raw.github.com/wiki/sqlmapproject/sqlmap/images/sqlmap_screenshot.png)
+## Contributing
 
-You can visit the [collection of screenshots](https://github.com/sqlmapproject/sqlmap/wiki/Screenshots) demonstrating some of the features on the wiki.
+We welcome contributions from the community to enhance the functionality and usability of mySqlmap. If you would like to contribute, please follow these guidelines:
 
-Installation
-----
+1. Fork the repository and create a new branch for your feature or bug fix.
 
-You can download the latest tarball by clicking [here](https://github.com/sqlmapproject/sqlmap/tarball/master) or latest zipball by clicking [here](https://github.com/sqlmapproject/sqlmap/zipball/master).
+2. Ensure that your code adheres to the existing coding style and conventions.
 
-Preferably, you can download sqlmap by cloning the [Git](https://github.com/sqlmapproject/sqlmap) repository:
+3. Test your changes thoroughly.
 
-    git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
+4. Submit a pull request, describing the purpose and changes introduced by your contribution.
 
-sqlmap works out of the box with [Python](https://www.python.org/download/) version **2.6**, **2.7** and **3.x** on any platform.
-
-Usage
-----
-
-To get a list of basic options and switches use:
-
-    python sqlmap.py -h
-
-To get a list of all options and switches use:
-
-    python sqlmap.py -hh
-
-You can find a sample run [here](https://asciinema.org/a/46601).
-To get an overview of sqlmap capabilities, a list of supported features, and a description of all options and switches, along with examples, you are advised to consult the [user's manual](https://github.com/sqlmapproject/sqlmap/wiki/Usage).
-
-Links
-----
-
-* Homepage: https://sqlmap.org
-* Download: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) or [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
-* Commits RSS feed: https://github.com/sqlmapproject/sqlmap/commits/master.atom
-* Issue tracker: https://github.com/sqlmapproject/sqlmap/issues
-* User's manual: https://github.com/sqlmapproject/sqlmap/wiki
-* Frequently Asked Questions (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* Twitter: [@sqlmap](https://twitter.com/sqlmap)
-* Demos: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
-* Screenshots: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
 
 Translations
 ----
-
-* [Bulgarian](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-bg-BG.md)
 * [Chinese](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-zh-CN.md)
-* [Croatian](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-hr-HR.md)
-* [Dutch](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-nl-NL.md)
-* [French](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-fr-FR.md)
-* [Georgian](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-ka-GE.md)
-* [German](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-de-DE.md)
-* [Greek](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-gr-GR.md)
-* [Hindi](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-in-HI.md)
-* [Indonesian](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-id-ID.md)
-* [Italian](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-it-IT.md)
-* [Japanese](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-ja-JP.md)
-* [Korean](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-ko-KR.md)
-* [Persian](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-fa-IR.md)
-* [Polish](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-pl-PL.md)
-* [Portuguese](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-pt-BR.md)
-* [Russian](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-ru-RU.md)
-* [Serbian](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-rs-RS.md)
-* [Slovak](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-sk-SK.md)
-* [Spanish](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-es-MX.md)
-* [Turkish](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-tr-TR.md)
-* [Ukrainian](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-uk-UA.md)
-* [Vietnamese](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-vi-VN.md)
+
+## License
+
+mySqlmap is released under the [license] license. Please review the [LICENSE](/LICENSE) file for more details.
+
+## Disclaimer
+
+mySqlmap is a tool designed for legitimate security testing purposes. However, it is essential to obtain proper authorization before scanning any system or application. The authors of mySqlmap are not responsible for any misuse or illegal activities conducted with this tool.
+
+## Contact
+
+If you have any questions, suggestions, or feedback, please contact [github address].
+
+Thank you for using mySqlmap! We hope it helps you in your SQL injection testing endeavors.
