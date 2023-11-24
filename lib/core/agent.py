@@ -891,7 +891,7 @@ class Agent(object):
             if element > 0:
                 unionQuery += ','
 
-            if conf.uValues:
+            if conf.uValues and conf.uValues.count(',') + 1 == count:
                 unionQuery += conf.uValues.split(',')[element]
             elif element == position:
                 unionQuery += query
