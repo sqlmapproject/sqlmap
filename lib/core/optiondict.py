@@ -219,6 +219,7 @@ optDict = {
         "crawlExclude": "string",
         "csvDel": "string",
         "dumpFile": "string",
+        "jsonFile": "string",
         "dumpFormat": "string",
         "encoding": "string",
         "eta": "boolean",

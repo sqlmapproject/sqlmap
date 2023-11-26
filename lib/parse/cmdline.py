@@ -673,6 +673,9 @@ def cmdLineParser(argv=None):
         general.add_argument("--dump-file", dest="dumpFile",
             help="Store dumped data to a custom file")
 
+        general.add_argument("--json-file", dest="jsonFile",
+            help="Store json data to a custom file")
+
         general.add_argument("--dump-format", dest="dumpFormat",
             help="Format of dumped data (CSV (default), HTML or SQLITE)")
 

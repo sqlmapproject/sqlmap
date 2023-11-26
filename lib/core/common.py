@@ -1071,6 +1071,10 @@ def dataToDumpFile(dumpFile, data):
             errMsg = "error occurred when writing dump data to file ('%s')" % getUnicode(ex)
             logger.error(errMsg)
 
+def dataToJsonFile(jsonFile, data):
+    with open(jsonFile, 'w') as f:
+        f.write(json.dumps(data))
+
 def dataToOutFile(filename, data):
     """
     Saves data to filename
