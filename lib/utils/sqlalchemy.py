@@ -116,6 +116,10 @@ class SQLAlchemy(GenericConnector):
     def execute(self, query):
         retVal = False
 
+        # Reference: https://stackoverflow.com/a/69491015
+        if hasattr(_sqlalchemy, "text"):
+            query = _sqlalchemy.text(query)
+
         try:
             self.cursor = self.connector.execute(query)
             retVal = True
