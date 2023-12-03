@@ -747,8 +747,8 @@
         <length query="CHAR_LENGTH(%s)"/>
         <isnull query="IFNULL(%s,' ')"/>
         <delimiter query="||"/>
-        <limit query="OFFSET %d LIMIT %d"/>
-        <limitregexp query="\s+OFFSET\s+([\d]+)\s+LIMIT\s+([\d]+)" query2="\s+LIMIT\s+([\d]+)"/>
+        <limit query="LIMIT %d OFFSET %d"/>
+        <limitregexp query="\s+LIMIT\s+([\d]+)\s+OFFSET\s+([\d]+)" query2="\s+LIMIT\s+([\d]+)"/>
         <limitgroupstart query="1"/>
         <limitgroupstop query="2"/>
         <limitstring query=" OFFSET "/>
@@ -770,7 +770,7 @@
         <check_udf/>
         <users>
             <inband query="SELECT NAME FROM INFORMATION_SCHEMA.USERS"/>
-            <blind query="SELECT NAME FROM INFORMATION_SCHEMA.USERS OFFSET %d LIMIT 1" count="SELECT COUNT(NAME) FROM INFORMATION_SCHEMA.USERS"/>
+            <blind query="SELECT NAME FROM INFORMATION_SCHEMA.USERS LIMIT 1 OFFSET %d" count="SELECT COUNT(NAME) FROM INFORMATION_SCHEMA.USERS"/>
         </users>
         <passwords/>
         <privileges/>
@@ -778,11 +778,11 @@
         <statements/>
         <dbs>
             <inband query="SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA"/>
-            <blind query="SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA OFFSET %d LIMIT 1" count="SELECT COUNT(SCHEMA_NAME) FROM INFORMATION_SCHEMA.SCHEMATA"/>
+            <blind query="SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA LIMIT 1 OFFSET %d" count="SELECT COUNT(SCHEMA_NAME) FROM INFORMATION_SCHEMA.SCHEMATA"/>
         </dbs>
         <tables>
             <inband query="SELECT TABLE_SCHEMA,TABLE_NAME FROM INFORMATION_SCHEMA.TABLES" condition="TABLE_SCHEMA"/>
-            <blind query="SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='%s' OFFSET %d LIMIT 1" count="SELECT COUNT(TABLE_NAME) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='%s'"/>
+            <blind query="SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='%s' LIMIT 1 OFFSET %d" count="SELECT COUNT(TABLE_NAME) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='%s'"/>
         </tables>
         <columns>
             <blind query="SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='%s' AND TABLE_SCHEMA='%s' ORDER BY COLUMN_NAME" query2="SELECT TYPE_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='%s' AND COLUMN_NAME='%s' AND TABLE_SCHEMA='%s'" count="SELECT COUNT(COLUMN_NAME) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='%s' AND TABLE_SCHEMA='%s'" condition="COLUMN_NAME"/>
