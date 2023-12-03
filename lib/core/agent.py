@@ -1031,20 +1031,16 @@ class Agent(object):
         fromFrom = limitedQuery[fromIndex + 1:]
         orderBy = None
 
-        if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE, DBMS.H2, DBMS.VERTICA, DBMS.PRESTO, DBMS.MIMERSQL, DBMS.CUBRID, DBMS.EXTREMEDB, DBMS.RAIMA):
+        if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE, DBMS.VERTICA, DBMS.PRESTO, DBMS.MIMERSQL, DBMS.CUBRID, DBMS.EXTREMEDB, DBMS.DERBY):
             limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (num, 1)
             limitedQuery += " %s" % limitStr
 
-        elif Backend.getIdentifiedDbms() in (DBMS.H2,):
+        elif Backend.getIdentifiedDbms() in (DBMS.H2, DBMS.CRATEDB, DBMS.CLICKHOUSE):
             limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (1, num)
             limitedQuery += " %s" % limitStr
 
         elif Backend.getIdentifiedDbms() in (DBMS.ALTIBASE,):
             limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (num + 1, 1)
-            limitedQuery += " %s" % limitStr
-
-        elif Backend.getIdentifiedDbms() in (DBMS.DERBY, DBMS.CRATEDB, DBMS.CLICKHOUSE):
-            limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (num, 1)
             limitedQuery += " %s" % limitStr
 
         elif Backend.getIdentifiedDbms() in (DBMS.FRONTBASE, DBMS.VIRTUOSO):

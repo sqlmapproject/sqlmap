@@ -749,8 +749,8 @@
         <delimiter query="||"/>
         <limit query="LIMIT %d OFFSET %d"/>
         <limitregexp query="\s+LIMIT\s+([\d]+)\s+OFFSET\s+([\d]+)" query2="\s+LIMIT\s+([\d]+)"/>
-        <limitgroupstart query="1"/>
-        <limitgroupstop query="2"/>
+        <limitgroupstart query="2"/>
+        <limitgroupstop query="1"/>
         <limitstring query=" OFFSET "/>
         <order query="ORDER BY %s ASC"/>
         <count query="COUNT(%s)"/>
