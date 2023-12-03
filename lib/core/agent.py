@@ -1035,6 +1035,10 @@ class Agent(object):
             limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (num, 1)
             limitedQuery += " %s" % limitStr
 
+        elif Backend.getIdentifiedDbms() in (DBMS.H2,):
+            limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (1, num)
+            limitedQuery += " %s" % limitStr
+
         elif Backend.getIdentifiedDbms() in (DBMS.ALTIBASE,):
             limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (num + 1, 1)
             limitedQuery += " %s" % limitStr
