@@ -679,8 +679,8 @@
         <delimiter query="||"/>
         <limit query="LIMIT %d %d" query2="LIMIT %d OFFSET %d"/>
         <limitregexp query="\s+LIMIT\s+([\d]+)\s*\,\s*([\d]+)" query2="\s+LIMIT\s+([\d]+)"/>
-        <limitgroupstart query="1"/>
-        <limitgroupstop query="2"/>
+        <limitgroupstart query="2"/>
+        <limitgroupstop query="1"/>
         <limitstring query=" LIMIT "/>
         <order query="ORDER BY %s ASC"/>
         <count query="COUNT(%s)"/>
@@ -875,8 +875,8 @@
         <delimiter query="||"/>
         <limit query="LIMIT %d OFFSET %d"/>
         <limitregexp query="\s+LIMIT\s+([\d]+)\s*OFFSET\s*([\d]+)" query2="\s+LIMIT\s+([\d]+)"/>
-        <limitgroupstart query="1"/>
-        <limitgroupstop query="2"/>
+        <limitgroupstart query="2"/>
+        <limitgroupstop query="1"/>
         <limitstring query=" LIMIT "/>
         <order query="ORDER BY %s ASC"/>
         <count query="COUNT(%s)"/>
@@ -940,8 +940,8 @@
         <delimiter query="||"/>
         <limit query="OFFSET %d ROWS FETCH FIRST %d ROWS ONLY"/>
         <limitregexp query="OFFSET\s+([\d]+)\s+ROWS\s+FETCH\s+FIRST\s+([\d]+)\s+ROWS\s+ONLY"/>
-        <limitgroupstart query="2"/>
-        <limitgroupstop query="1"/>
+        <limitgroupstart query="1"/>
+        <limitgroupstop query="2"/>
         <limitstring/>
         <order query="ORDER BY %s ASC"/>
         <count query="COUNT(%s)"/>
