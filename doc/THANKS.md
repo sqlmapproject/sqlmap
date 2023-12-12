@@ -109,6 +109,9 @@ Alessandro Curio, <alessandro.curio(at)gmail.com>
 Alessio Dalla Piazza, <alessio.dallapiazza(at)gmail.com>
 * for reporting a couple of bugs
 
+Alexis Danizan, <alexis.danizan(at)synacktiv.com>
+* for contributing support for ClickHouse
+
 Sherif El-Deeb, <archeldeeb(at)gmail.com>
 * for reporting a minor bug
 
