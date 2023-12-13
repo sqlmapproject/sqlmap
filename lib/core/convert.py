@@ -135,6 +135,23 @@ def dejsonize(data):
 
     return json.loads(data)
 
+def rot13(data):
+    """
+    Returns ROT13 encoded/decoded text
+
+    >>> rot13('foobar was here!!')
+    'sbbone jnf urer!!'
+    >>> rot13('sbbone jnf urer!!')
+    'foobar was here!!'
+    """
+
+    # Reference: https://stackoverflow.com/a/62662878
+    retVal = ""
+    alphabit = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    for char in data:
+        retVal += alphabit[alphabit.index(char) + 13] if char in alphabit else char
+    return retVal
+
 def decodeHex(value, binary=True):
     """
     Returns a decoded representation of provided hexadecimal value

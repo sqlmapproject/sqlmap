@@ -18,6 +18,7 @@ from lib.core.common import readInput
 from lib.core.compat import xrange
 from lib.core.convert import encodeBase64
 from lib.core.convert import encodeHex
+from lib.core.convert import rot13
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -278,60 +279,62 @@ class Filesystem(GenericFilesystem):
         randFile = "tmpf%s.txt" % randomStr(lowercase=True)
         randFilePath = "%s\\%s" % (tmpPath, randFile)
 
-        vbs = """Dim inputFilePath, outputFilePath
-        inputFilePath = "%s"
-        outputFilePath = "%s"
-        Set fs = CreateObject("Scripting.FileSystemObject")
-        Set file = fs.GetFile(inputFilePath)
-        If file.Size Then
-            Wscript.Echo "Loading from: " & inputFilePath
-            Wscript.Echo
-            Set fd = fs.OpenTextFile(inputFilePath, 1)
-            data = fd.ReadAll
-            fd.Close
-            data = Replace(data, " ", "")
-            data = Replace(data, vbCr, "")
-            data = Replace(data, vbLf, "")
-            Wscript.Echo "Fixed Input: "
-            Wscript.Echo data
-            Wscript.Echo
-            decodedData = base64_decode(data)
-            Wscript.Echo "Output: "
-            Wscript.Echo decodedData
-            Wscript.Echo
-            Wscript.Echo "Writing output in: " & outputFilePath
-            Wscript.Echo
-            Set ofs = CreateObject("Scripting.FileSystemObject").OpenTextFile(outputFilePath, 2, True)
-            ofs.Write decodedData
-            ofs.close
-        Else
-            Wscript.Echo "The file is empty."
-        End If
-        Function base64_decode(byVal strIn)
-            Dim w1, w2, w3, w4, n, strOut
-            For n = 1 To Len(strIn) Step 4
-                w1 = mimedecode(Mid(strIn, n, 1))
-                w2 = mimedecode(Mid(strIn, n + 1, 1))
-                w3 = mimedecode(Mid(strIn, n + 2, 1))
-                w4 = mimedecode(Mid(strIn, n + 3, 1))
-                If Not w2 Then _
-                strOut = strOut + Chr(((w1 * 4 + Int(w2 / 16)) And 255))
-                If  Not w3 Then _
-                strOut = strOut + Chr(((w2 * 16 + Int(w3 / 4)) And 255))
-                If Not w4 Then _
-                strOut = strOut + Chr(((w3 * 64 + w4) And 255))
-            Next
-            base64_decode = strOut
-            End Function
-        Function mimedecode(byVal strIn)
-            Base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-            If Len(strIn) = 0 Then
-                mimedecode = -1 : Exit Function
-            Else
-                mimedecode = InStr(Base64Chars, strIn) - 1
-            End If
-        End Function""" % (randFilePath, remoteFile)
+        vbs = """Qvz vachgSvyrCngu, bhgchgSvyrCngu
+        vachgSvyrCngu = "%f"
+        bhgchgSvyrCngu = "%f"
+        Frg sf = PerngrBowrpg("Fpevcgvat.SvyrFlfgrzBowrpg")
+        Frg svyr = sf.TrgSvyr(vachgSvyrCngu)
+        Vs svyr.Fvmr Gura
+            Jfpevcg.Rpub "Ybnqvat sebz: " & vachgSvyrCngu
+            Jfpevcg.Rpub
+            Frg sq = sf.BcraGrkgSvyr(vachgSvyrCngu, 1)
+            qngn = sq.ErnqNyy
+            sq.Pybfr
+            qngn = Ercynpr(qngn, " ", "")
+            qngn = Ercynpr(qngn, ioPe, "")
+            qngn = Ercynpr(qngn, ioYs, "")
+            Jfpevcg.Rpub "Svkrq Vachg: "
+            Jfpevcg.Rpub qngn
+            Jfpevcg.Rpub
+            qrpbqrqQngn = onfr64_qrpbqr(qngn)
+            Jfpevcg.Rpub "Bhgchg: "
+            Jfpevcg.Rpub qrpbqrqQngn
+            Jfpevcg.Rpub
+            Jfpevcg.Rpub "Jevgvat bhgchg va: " & bhgchgSvyrCngu
+            Jfpevcg.Rpub
+            Frg bsf = PerngrBowrpg("Fpevcgvat.SvyrFlfgrzBowrpg").BcraGrkgSvyr(bhgchgSvyrCngu, 2, Gehr)
+            bsf.Jevgr qrpbqrqQngn
+            bsf.pybfr
+        Ryfr
+            Jfpevcg.Rpub "Gur svyr vf rzcgl."
+        Raq Vs
+        Shapgvba onfr64_qrpbqr(olIny fgeVa)
+            Qvz j1, j2, j3, j4, a, fgeBhg
+            Sbe a = 1 Gb Yra(fgeVa) Fgrc 4
+                j1 = zvzrqrpbqr(Zvq(fgeVa, a, 1))
+                j2 = zvzrqrpbqr(Zvq(fgeVa, a + 1, 1))
+                j3 = zvzrqrpbqr(Zvq(fgeVa, a + 2, 1))
+                j4 = zvzrqrpbqr(Zvq(fgeVa, a + 3, 1))
+                Vs Abg j2 Gura _
+                fgeBhg = fgeBhg + Pue(((j1 * 4 + Vag(j2 / 16)) Naq 255))
+                Vs  Abg j3 Gura _
+                fgeBhg = fgeBhg + Pue(((j2 * 16 + Vag(j3 / 4)) Naq 255))
+                Vs Abg j4 Gura _
+                fgeBhg = fgeBhg + Pue(((j3 * 64 + j4) Naq 255))
+            Arkg
+            onfr64_qrpbqr = fgeBhg
+            Raq Shapgvba
+        Shapgvba zvzrqrpbqr(olIny fgeVa)
+            Onfr64Punef = "NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm0123456789+/"
+            Vs Yra(fgeVa) = 0 Gura
+                zvzrqrpbqr = -1 : Rkvg Shapgvba
+            Ryfr
+                zvzrqrpbqr = VaFge(Onfr64Punef, fgeVa) - 1
+            Raq Vs
+        Raq Shapgvba"""
 
+        # NOTE: https://github.com/sqlmapproject/sqlmap/issues/5581
+        vbs = rot13(vbs)
         vbs = vbs.replace("    ", "")
         encodedFileContent = encodeBase64(localFileContent, binary=False)
 
