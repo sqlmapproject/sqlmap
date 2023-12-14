@@ -736,7 +736,7 @@ def queryOutputLength(expression, payload):
     debugMsg = "performed %d quer%s in %.2f seconds" % (count, 'y' if count == 1 else "ies", calculateDeltaSeconds(start))
     logger.debug(debugMsg)
 
-    if length == " ":
+    if isinstance(length, six.string_types) and length.isspace():
         length = 0
 
     return length
