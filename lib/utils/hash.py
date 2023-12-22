@@ -848,7 +848,7 @@ def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc
 
                             clearConsoleLine()
 
-                            infoMsg = "\r[%s] [INFO] cracked password '%s'" % (time.strftime("%X"), word)
+                            infoMsg = "\r[%s] [INFO] cracked password '%s'" % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), word)
 
                             if user and not user.startswith(DUMMY_USER_PREFIX):
                                 infoMsg += " for user '%s'\n" % user
@@ -868,7 +868,7 @@ def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc
                     status = "current status: %s... %s" % (word.ljust(5)[:5], ROTATING_CHARS[rotator])
 
                     if not api:
-                        dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
+                        dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), status))
 
             except KeyboardInterrupt:
                 raise
@@ -924,7 +924,7 @@ def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found
 
                     clearConsoleLine()
 
-                    infoMsg = "\r[%s] [INFO] cracked password '%s'" % (time.strftime("%X"), word)
+                    infoMsg = "\r[%s] [INFO] cracked password '%s'" % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), word)
 
                     if user and not user.startswith(DUMMY_USER_PREFIX):
                         infoMsg += " for user '%s'\n" % user
@@ -947,7 +947,7 @@ def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found
                         status += " (user: %s)" % user
 
                     if not api:
-                        dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
+                        dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), status))
 
             except KeyboardInterrupt:
                 raise

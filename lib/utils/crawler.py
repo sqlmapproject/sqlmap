@@ -135,7 +135,7 @@ def crawl(target, post=None, cookie=None):
                 if conf.verbose in (1, 2):
                     threadData.shared.count += 1
                     status = '%d/%d links visited (%d%%)' % (threadData.shared.count, threadData.shared.length, round(100.0 * threadData.shared.count / threadData.shared.length))
-                    dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status), True)
+                    dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), status), True)
 
         threadData.shared.deeper = set()
         threadData.shared.unprocessed = set([target])

@@ -145,12 +145,12 @@ def tableExists(tableFile, regex=None):
 
                     if conf.verbose in (1, 2) and not conf.api:
                         clearConsoleLine(True)
-                        infoMsg = "[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), unsafeSQLIdentificatorNaming(table))
+                        infoMsg = "[%s] [INFO] retrieved: %s\n" % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), unsafeSQLIdentificatorNaming(table))
                         dataToStdout(infoMsg, True)
 
                 if conf.verbose in (1, 2):
                     status = '%d/%d items (%d%%)' % (threadData.shared.count, threadData.shared.limit, round(100.0 * threadData.shared.count / threadData.shared.limit))
-                    dataToStdout("\r[%s] [INFO] tried %s" % (time.strftime("%X"), status), True)
+                    dataToStdout("\r[%s] [INFO] tried %s" % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), status), True)
 
                 kb.locks.io.release()
 
@@ -266,12 +266,12 @@ def columnExists(columnFile, regex=None):
 
                 if conf.verbose in (1, 2) and not conf.api:
                     clearConsoleLine(True)
-                    infoMsg = "[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), unsafeSQLIdentificatorNaming(column))
+                    infoMsg = "[%s] [INFO] retrieved: %s\n" % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), unsafeSQLIdentificatorNaming(column))
                     dataToStdout(infoMsg, True)
 
             if conf.verbose in (1, 2):
                 status = "%d/%d items (%d%%)" % (threadData.shared.count, threadData.shared.limit, round(100.0 * threadData.shared.count / threadData.shared.limit))
-                dataToStdout("\r[%s] [INFO] tried %s" % (time.strftime("%X"), status), True)
+                dataToStdout("\r[%s] [INFO] tried %s" % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), status), True)
 
             kb.locks.io.release()
 
@@ -376,12 +376,12 @@ def fileExists(pathFile):
 
                 if not conf.api:
                     clearConsoleLine(True)
-                    infoMsg = "[%s] [INFO] retrieved: '%s'\n" % (time.strftime("%X"), path)
+                    infoMsg = "[%s] [INFO] retrieved: '%s'\n" % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), path)
                     dataToStdout(infoMsg, True)
 
             if conf.verbose in (1, 2):
                 status = '%d/%d items (%d%%)' % (threadData.shared.count, threadData.shared.limit, round(100.0 * threadData.shared.count / threadData.shared.limit))
-                dataToStdout("\r[%s] [INFO] tried %s" % (time.strftime("%X"), status), True)
+                dataToStdout("\r[%s] [INFO] tried %s" % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), status), True)
 
             kb.locks.io.release()
 

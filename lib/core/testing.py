@@ -174,7 +174,7 @@ def vulnTest():
 
     for options, checks in TESTS:
         status = '%d/%d (%d%%) ' % (count, len(TESTS), round(100.0 * count / len(TESTS)))
-        dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%X"), status))
+        dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), status))
 
         if IS_WIN and "uraj" in options:
             options = options.replace(u"\u0161u\u0107uraj", "sucuraj")
@@ -265,7 +265,7 @@ def smokeTest():
 
                 count += 1
                 status = '%d/%d (%d%%) ' % (count, length, round(100.0 * count / length))
-                dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%X"), status))
+                dataToStdout("\r[%s] [INFO] complete: %s" % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), status))
 
     def _(node):
         for __ in dir(node):

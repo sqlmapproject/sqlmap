@@ -331,7 +331,7 @@ class Connect(object):
         if conf.liveCookies:
             with kb.locks.liveCookies:
                 if not checkFile(conf.liveCookies, raiseOnError=False) or os.path.getsize(conf.liveCookies) == 0:
-                    warnMsg = "[%s] [WARNING] live cookies file '%s' is empty or non-existent. Waiting for timeout (%d seconds)" % (time.strftime("%X"), conf.liveCookies, LIVE_COOKIES_TIMEOUT)
+                    warnMsg = "[%s] [WARNING] live cookies file '%s' is empty or non-existent. Waiting for timeout (%d seconds)" % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), conf.liveCookies, LIVE_COOKIES_TIMEOUT)
                     dataToStdout(warnMsg)
 
                     valid = False
@@ -1478,7 +1478,7 @@ class Connect(object):
                     warnMsg += "time-based injections because of inherent high latency time"
                     singleTimeWarnMessage(warnMsg)
 
-                warnMsg = "[%s] [WARNING] %stime-based comparison requires " % (time.strftime("%X"), "(case) " if kb.responseTimeMode else "")
+                warnMsg = "[%s] [WARNING] %stime-based comparison requires " % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), "(case) " if kb.responseTimeMode else "")
                 warnMsg += "%s statistical model, please wait" % ("larger" if len(kb.responseTimes) == 1 else "reset of")
                 dataToStdout(warnMsg)
 

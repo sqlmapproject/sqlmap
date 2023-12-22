@@ -594,7 +594,7 @@ class Metasploit(object):
         logger.debug("executing local command: %s" % self._payloadCmd)
         process = execute(self._payloadCmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=False)
 
-        dataToStdout("\r[%s] [INFO] creation in progress " % time.strftime("%X"))
+        dataToStdout("\r[%s] [INFO] creation in progress " % time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
         pollProcess(process)
         payloadStderr = process.communicate()[1]
 
