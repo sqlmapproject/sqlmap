@@ -46,7 +46,7 @@ def update():
         debugMsg = "sqlmap will try to update itself using 'pip' command"
         logger.debug(debugMsg)
 
-        dataToStdout("\r[%s] [INFO] update in progress" % time.strftime("%X"))
+        dataToStdout("\r[%s] [INFO] update in progress" % time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 
         output = ""
         try:
@@ -133,7 +133,7 @@ def update():
         debugMsg = "sqlmap will try to update itself using 'git' command"
         logger.debug(debugMsg)
 
-        dataToStdout("\r[%s] [INFO] update in progress" % time.strftime("%X"))
+        dataToStdout("\r[%s] [INFO] update in progress" % time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 
         output = ""
         try:

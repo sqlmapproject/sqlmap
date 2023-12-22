@@ -203,10 +203,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
         if conf.verbose in (1, 2) and not any((showEta, conf.api, kb.bruteMode)):
             if isinstance(length, int) and numThreads > 1:
-                dataToStdout("[%s] [INFO] retrieved: %s" % (time.strftime("%X"), "_" * min(length, conf.progressWidth)))
-                dataToStdout("\r[%s] [INFO] retrieved: " % time.strftime("%X"))
+                dataToStdout("[%s] [INFO] retrieved: %s" % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), "_" * min(length, conf.progressWidth)))
+                dataToStdout("\r[%s] [INFO] retrieved: " % time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
             else:
-                dataToStdout("\r[%s] [INFO] retrieved: " % time.strftime("%X"))
+                dataToStdout("\r[%s] [INFO] retrieved: " % time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 
         def tryHint(idx):
             with kb.locks.hint:
@@ -561,7 +561,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                     status = ' %d/%d (%d%%)' % (_, length, int(100.0 * _ / length))
                                     output += status if _ != length else " " * len(status)
 
-                                    dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), output))
+                                    dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), output))
 
                 runThreads(numThreads, blindThread, startThreadMsg=False)
 
@@ -580,10 +580,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 partialValue = "".join(value[:value.index(None)])
 
                 if partialValue:
-                    infoMsg = "\r[%s] [INFO] partially retrieved: %s" % (time.strftime("%X"), filterControlChars(partialValue))
+                    infoMsg = "\r[%s] [INFO] partially retrieved: %s" % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), filterControlChars(partialValue))
             else:
                 finalValue = "".join(value)
-                infoMsg = "\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), filterControlChars(finalValue))
+                infoMsg = "\r[%s] [INFO] retrieved: %s" % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), filterControlChars(finalValue))
 
             if conf.verbose in (1, 2) and infoMsg and not any((showEta, conf.api, kb.bruteMode)):
                 dataToStdout(infoMsg)
@@ -700,7 +700,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             hashDBWrite(expression, "%s%s" % (PARTIAL_VALUE_MARKER if not conf.hexConvert else PARTIAL_HEX_VALUE_MARKER, partialValue))
 
     if conf.hexConvert and not any((abortedFlag, conf.api, kb.bruteMode)):
-        infoMsg = "\r[%s] [INFO] retrieved: %s  %s\n" % (time.strftime("%X"), filterControlChars(finalValue), " " * retrievedLength)
+        infoMsg = "\r[%s] [INFO] retrieved: %s  %s\n" % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), filterControlChars(finalValue), " " * retrievedLength)
         dataToStdout(infoMsg)
     else:
         if conf.verbose in (1, 2) and not any((showEta, conf.api, kb.bruteMode)):

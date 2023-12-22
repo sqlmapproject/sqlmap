@@ -98,7 +98,7 @@ except KeyboardInterrupt:
         raise SystemExit
     else:
         import time
-        sys.exit("\r[%s] [CRITICAL] %s" % (time.strftime("%X"), errMsg))
+        sys.exit("\r[%s] [CRITICAL] %s" % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), errMsg))
 
 def modulePath():
     """
@@ -172,7 +172,7 @@ def main():
 
         conf.showTime = True
         dataToStdout("[!] legal disclaimer: %s\n\n" % LEGAL_DISCLAIMER, forceOutput=True)
-        dataToStdout("[*] starting @ %s\n\n" % time.strftime("%X /%Y-%m-%d/"), forceOutput=True)
+        dataToStdout("[*] starting @ %s\n\n" % time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), forceOutput=True)
 
         init()
 
@@ -558,7 +558,7 @@ def main():
             logger.warning(warnMsg)
 
         if conf.get("showTime"):
-            dataToStdout("\n[*] ending @ %s\n\n" % time.strftime("%X /%Y-%m-%d/"), forceOutput=True)
+            dataToStdout("\n[*] ending @ %s\n\n" % time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), forceOutput=True)
 
         kb.threadException = True
 

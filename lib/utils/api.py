@@ -154,7 +154,7 @@ class Database(object):
 
     def init(self):
         self.execute(
-            "CREATE TABLE logs(id INTEGER PRIMARY KEY AUTOINCREMENT, taskid INTEGER, time TEXT, level TEXT, message TEXT)")
+            "CREATE TABLE logs(id INTEGER PRIMARY KEY AUTOINCREMENT, taskid INTEGER, datetime TEXT, level TEXT, message TEXT)")
         self.execute(
             "CREATE TABLE data(id INTEGER PRIMARY KEY AUTOINCREMENT, taskid INTEGER, status INTEGER, content_type INTEGER, value TEXT)")
         self.execute(
@@ -327,8 +327,8 @@ class LogRecorder(logging.StreamHandler):
         Record emitted events to IPC database for asynchronous I/O
         communication with the parent process
         """
-        conf.databaseCursor.execute("INSERT INTO logs VALUES(NULL, ?, ?, ?, ?)", (conf.taskid, time.strftime(
-            "%X"), record.levelname, record.msg % record.args if record.args else record.msg))
+        conf.databaseCursor.execute("INSERT INTO logs VALUES(NULL, ?, ?, ?, ?)", (conf.taskid, time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 
+            record.levelname, record.msg % record.args if record.args else record.msg))
 
 
 def setRestAPILog():
@@ -962,9 +962,9 @@ def scan_log_limited(taskid, start, end):
     end = max(1, int(end))
 
     # Read a subset of log messages from the IPC database
-    for time_, level, message in DataStore.current_db.execute("SELECT time, level, message FROM logs WHERE taskid = ? AND id >= ? AND id <= ? ORDER BY id ASC", (taskid, start, end)):
+    for datetime_, level, message in DataStore.current_db.execute("SELECT datetime, level, message FROM logs WHERE taskid = ? AND id >= ? AND id <= ? ORDER BY id ASC", (taskid, start, end)):
         json_log_messages.append(
-            {"time": time_, "level": level, "message": message})
+            {"datetime": datetime_, "level": level, "message": message})
 
     logger.debug("(%s) Retrieved scan log messages subset" % taskid)
     return jsonize({"success": True, "log": json_log_messages})
@@ -987,13 +987,13 @@ def scan_log_details(taskid):
     # Read all log messages from the IPC database
     logs = []
     result_cursor = DataStore.current_db.only_execute(
-        "SELECT time, level, message FROM logs WHERE taskid = ? ORDER BY id ASC", (taskid,))
+        "SELECT datetime, level, message FROM logs WHERE taskid = ? ORDER BY id ASC", (taskid,))
     query_result = result_cursor.fetchall()
 
     index = 0
-    for time_, level, message in query_result:
+    for datetime_, level, message in query_result:
         index += 1
-        logs.append({"index": index, "time": time_,
+        logs.append({"index": index, "datetime": datetime_,
                     "level": level, "message": message})
 
     logger.debug("(%s) Retrieved scan log messages" % taskid)
@@ -1013,9 +1013,9 @@ def scan_log(taskid):
         return jsonize({"success": False, "message": "Invalid task ID"})
 
     # Read all log messages from the IPC database
-    for time_, level, message in DataStore.current_db.execute("SELECT time, level, message FROM logs WHERE taskid = ? ORDER BY id ASC", (taskid,)):
+    for datetime_, level, message in DataStore.current_db.execute("SELECT datetime, level, message FROM logs WHERE taskid = ? ORDER BY id ASC", (taskid,)):
         json_log_messages.append(
-            {"time": time_, "level": level, "message": message})
+            {"datetime": datetime_, "level": level, "message": message})
 
     logger.debug("(%s) Retrieved scan log messages" % taskid)
     return jsonize({"success": True, "log": json_log_messages})

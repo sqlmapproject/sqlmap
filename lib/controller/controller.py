@@ -306,7 +306,7 @@ def start():
                 logger.info(infoMsg)
 
                 if not checkInternet():
-                    warnMsg = "[%s] [WARNING] no connection detected" % time.strftime("%X")
+                    warnMsg = "[%s] [WARNING] no connection detected" % time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                     dataToStdout(warnMsg)
 
                     valid = False

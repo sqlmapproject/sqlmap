@@ -517,7 +517,7 @@ def _findPageForms():
 
                 if conf.verbose in (1, 2):
                     status = '%d/%d links visited (%d%%)' % (i + 1, len(targets), round(100.0 * (i + 1) / len(targets)))
-                    dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status), True)
+                    dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), status), True)
             except KeyboardInterrupt:
                 break
             except Exception as ex:
