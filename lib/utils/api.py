@@ -568,7 +568,7 @@ def task_delete(taskid):
                 DataStore.tasks[taskid].engine_kill()
             DataStore.tasks.pop(taskid)
 
-            logger.debug("(%s) Deleted task" % taskid)
+            logger.debug("[%s] Deleted task" % taskid)
             return jsonize({"success": True})
         else:
             response.status = 404
@@ -697,7 +697,7 @@ def option_list(taskid):
             "[%s] Invalid task ID provided to option_list()" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
-    logger.debug("(%s) Listed task options" % taskid)
+    logger.debug("[%s] Listed task options" % taskid)
     return jsonize({"success": True, "options": DataStore.tasks[taskid].get_options()})
 
 
@@ -719,10 +719,10 @@ def option_get(taskid):
             results[option] = DataStore.tasks[taskid].options[option]
         else:
             logger.debug(
-                "(%s) Requested value for unknown option '%s'" % (taskid, option))
+                "[%s] Requested value for unknown option '%s'" % (taskid, option))
             return jsonize({"success": False, "message": "Unknown option '%s'" % option})
 
-    logger.debug("(%s) Retrieved values for option(s) '%s'" %
+    logger.debug("[%s] Retrieved values for option(s) '%s'" %
                  (taskid, ','.join(options)))
 
     return jsonize({"success": True, "options": results})
@@ -747,7 +747,7 @@ def option_set(taskid):
     for option, value in request.json.items():
         DataStore.tasks[taskid].set_option(option, value)
 
-    logger.debug("(%s) Requested to set options" % taskid)
+    logger.debug("[%s] Requested to set options" % taskid)
     return jsonize({"success": True})
 
 # Handle scans
@@ -780,7 +780,7 @@ def scan_start(taskid):
     with DataStore.tasks_lock:
         if DataStore.tasks[taskid].status == TaskStatus.Blocked:
             DataStore.tasks[taskid].status = TaskStatus.Runnable
-            logger.debug("(%s) Unblocked" % taskid)
+            logger.debug("[%s] Unblocked" % taskid)
             return jsonize({"success": True, "engineid": 0})
         
         for option, value in request.json.items():
@@ -789,7 +789,7 @@ def scan_start(taskid):
         # Launch sqlmap engine in a separate process
         DataStore.tasks[taskid].status = TaskStatus.Runnable
 
-        logger.debug("Add (%s) to scan list" % taskid)
+        logger.debug("Add [%s] to scan list" % taskid)
         return jsonize({"success": True, "engineid": 0})
 
 @get('/scan/startBlocked/<taskid>')
@@ -805,7 +805,7 @@ def scan_startBlocked(taskid):
 
         if DataStore.tasks[taskid].status == TaskStatus.Blocked:
             DataStore.tasks[taskid].status = TaskStatus.Runnable
-            logger.debug("(%s) Unblocked" % taskid)
+            logger.debug("[%s] Unblocked" % taskid)
             return jsonize({"success": True, "engineid": 0})
 
         else:
@@ -826,11 +826,11 @@ def scan_stop(taskid):
         if DataStore.tasks[taskid].status == TaskStatus.Running:
             DataStore.tasks[taskid].engine_stop()
             DataStore.tasks[taskid].status = TaskStatus.Blocked
-            logger.debug("(%s) Stopped scan" % taskid)
+            logger.debug("[%s] Stopped scan" % taskid)
             return jsonize({"success": True})
         elif DataStore.tasks[taskid].status in [TaskStatus.New, TaskStatus.Runnable]:
             DataStore.tasks[taskid].status = TaskStatus.Blocked
-            logger.debug("(%s) Stopped scan" % taskid)
+            logger.debug("[%s] Stopped scan" % taskid)
             return jsonize({"success": True})
         elif DataStore.tasks[taskid].status == TaskStatus.Blocked:
             logger.warning("[%s] task had blocked" % taskid)
@@ -855,7 +855,7 @@ def scan_kill(taskid):
         # del DataStore.tasks[taskid]
         DataStore.tasks[taskid].status = TaskStatus.Terminated
 
-        logger.debug("(%s) Killed scan" % taskid)
+        logger.debug("[%s] Killed scan" % taskid)
         return jsonize({"success": True})
 
 
@@ -877,7 +877,7 @@ def scan_status(taskid):
             status = "terminated" if DataStore.tasks[taskid].engine_has_terminated(
             ) is True else "running"
 
-        logger.debug("(%s) Retrieved scan status" % taskid)
+        logger.debug("[%s] Retrieved scan status" % taskid)
         return jsonize({
             "success": True,
             "status": status,
@@ -908,7 +908,7 @@ def scan_payload_details(taskid):
         payloads.append({"index": index, "status": status,
                         "payload_type": content_type, "payload_value": value})
 
-    logger.debug("(%s) Retrieved scan data and error messages" % taskid)
+    logger.debug("[%s] Retrieved scan data and error messages" % taskid)
     return jsonize({"success": True, "payloads": payloads})
 
 
@@ -934,7 +934,7 @@ def scan_data(taskid):
     for error in DataStore.current_db.execute("SELECT error FROM errors WHERE taskid = ? ORDER BY id ASC", (taskid,)):
         json_errors_message.append(error)
 
-    logger.debug("(%s) Retrieved scan data and error messages" % taskid)
+    logger.debug("[%s] Retrieved scan data and error messages" % taskid)
     return jsonize({"success": True, "data": json_data_message, "error": json_errors_message})
 
 # Functions to handle scans' logs
@@ -966,7 +966,7 @@ def scan_log_limited(taskid, start, end):
         json_log_messages.append(
             {"datetime": datetime_, "level": level, "message": message})
 
-    logger.debug("(%s) Retrieved scan log messages subset" % taskid)
+    logger.debug("[%s] Retrieved scan log messages subset" % taskid)
     return jsonize({"success": True, "log": json_log_messages})
 
 
@@ -996,7 +996,7 @@ def scan_log_details(taskid):
         logs.append({"index": index, "datetime": datetime_,
                     "level": level, "message": message})
 
-    logger.debug("(%s) Retrieved scan log messages" % taskid)
+    logger.debug("[%s] Retrieved scan log messages" % taskid)
     return jsonize({"success": True, "logs": logs})
 
 
@@ -1017,7 +1017,7 @@ def scan_log(taskid):
         json_log_messages.append(
             {"datetime": datetime_, "level": level, "message": message})
 
-    logger.debug("(%s) Retrieved scan log messages" % taskid)
+    logger.debug("[%s] Retrieved scan log messages" % taskid)
     return jsonize({"success": True, "log": json_log_messages})
 
 # Function to handle files inside the output directory
@@ -1037,11 +1037,11 @@ def download(taskid, target, filename):
         paths.SQLMAP_OUTPUT_PATH, target, filename))
     # Prevent file path traversal
     if not path.startswith(paths.SQLMAP_OUTPUT_PATH):
-        logger.warning("[%s] Forbidden path (%s)" % (taskid, target))
+        logger.warning("[%s] Forbidden path [%s]" % (taskid, target))
         return jsonize({"success": False, "message": "Forbidden path"})
 
     if os.path.isfile(path):
-        logger.debug("(%s) Retrieved content of file %s" % (taskid, target))
+        logger.debug("[%s] Retrieved content of file %s" % (taskid, target))
         content = openFile(path, "rb").read()
         return jsonize({"success": True, "file": encodeBase64(content, binary=False)})
     else:
@@ -1055,7 +1055,7 @@ def version(token=None):
     Fetch server version
     """
 
-    logger.debug("Fetched version (%s)" %
+    logger.debug("Fetched version [%s]" %
                  ("admin" if is_admin(token) else request.remote_addr))
     return jsonize({"success": True, "version": VERSION_STRING.split('/')[-1]})
 
