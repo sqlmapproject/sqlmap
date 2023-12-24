@@ -9,6 +9,7 @@ See the file 'LICENSE' for copying permission
 from __future__ import print_function
 
 import contextlib
+import datetime
 import logging
 import os
 import re
@@ -60,6 +61,7 @@ from lib.core.subprocessng import Popen
 from lib.parse.cmdline import cmdLineParser
 from thirdparty.bottle.bottle import error as return_error
 from thirdparty.bottle.bottle import get
+from thirdparty.bottle.bottle import route
 from thirdparty.bottle.bottle import hook
 from thirdparty.bottle.bottle import post
 from thirdparty.bottle.bottle import request
@@ -78,6 +80,7 @@ from lib.utils.task_status_enum import TaskStatus
 # Global data storage
 MAX_TASKS_NUMBER = multiprocessing.cpu_count() - 1
 ROOT_DIRECTORY = os.getcwd()
+datetime_format = "%Y-%m-%d %H:%M:%S"
 
 class DataStore(object):
     admin_token = ""
@@ -169,6 +172,7 @@ class Task(object):
         self.options = None
         self.status = TaskStatus.New
         self._original_options = None
+        self.start_datetime = None
         self.initialize_options(taskid)
 
     def initialize_options(self, taskid):
@@ -378,10 +382,20 @@ def perform_task():
         if running_task_count < MAX_TASKS_NUMBER:
             for task in runnable_list:
                 if running_task_count < MAX_TASKS_NUMBER:
-                    running_task_count += 1
-                    logger.info("run task %s" % task.options.taskid)
-                    task.engine_start()
-                    task.status = TaskStatus.Running
+                    if task.start_datetime is not None:
+                        if datetime.datetime.now() >= task.start_datetime:
+                            running_task_count += 1
+                            logger.info("run task %s" % task.options.taskid)
+                            task.engine_start()
+                            task.status = TaskStatus.Running
+                        else:
+                            continue
+                    else:
+                        running_task_count += 1
+                        logger.info("run task %s" % task.options.taskid)
+                        task.start_datetime = datetime.datetime.now()
+                        task.engine_start()
+                        task.status = TaskStatus.Running
 
 
 def run_task(interval):
@@ -441,6 +455,8 @@ def security_headers(json_header=True):
     response.headers["X-XSS-Protection"] = "1; mode=block"
     response.headers["Pragma"] = "no-cache"
     response['Access-Control-Allow-Origin'] = 'http://localhost:5173'
+    response.headers['Access-Control-Allow-Methods'] = 'PUT, GET, POST, DELETE, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token'
     response.headers["Cache-Control"] = "no-cache"
     response.headers["Expires"] = "0"
 
@@ -448,6 +464,11 @@ def security_headers(json_header=True):
     #     response.content_type = "application/json; charset=UTF-8"
     # else:
     # response.content_type = "text/html; charset=utf-8"
+
+# 处理 OPTIONS 请求
+@route('/<path:path>', method=['OPTIONS'])
+def options_handler(path):
+    return
 
 ##############################
 # HTTP Status Code functions #
@@ -568,7 +589,7 @@ def task_delete(taskid):
                 DataStore.tasks[taskid].engine_kill()
             DataStore.tasks.pop(taskid)
 
-            logger.debug("(%s) Deleted task" % taskid)
+            logger.debug("[%s] Deleted task" % taskid)
             return jsonize({"success": True})
         else:
             response.status = 404
@@ -648,6 +669,7 @@ def task_ls(token=None):
 
                 resul_task_item = {
                     "index": index,
+                    "start_datetime": None if task.start_datetime is None else task.start_datetime.strftime("%Y-%m-%d %H:%M:%S"),
                     "task_id": taskid,
                     "errors": errors_count,
                     "logs": logs_count,
@@ -697,7 +719,7 @@ def option_list(taskid):
             "[%s] Invalid task ID provided to option_list()" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
-    logger.debug("(%s) Listed task options" % taskid)
+    logger.debug("[%s] Listed task options" % taskid)
     return jsonize({"success": True, "options": DataStore.tasks[taskid].get_options()})
 
 
@@ -719,10 +741,10 @@ def option_get(taskid):
             results[option] = DataStore.tasks[taskid].options[option]
         else:
             logger.debug(
-                "(%s) Requested value for unknown option '%s'" % (taskid, option))
+                "[%s] Requested value for unknown option '%s'" % (taskid, option))
             return jsonize({"success": False, "message": "Unknown option '%s'" % option})
 
-    logger.debug("(%s) Retrieved values for option(s) '%s'" %
+    logger.debug("[%s] Retrieved values for option(s) '%s'" %
                  (taskid, ','.join(options)))
 
     return jsonize({"success": True, "options": results})
@@ -747,7 +769,7 @@ def option_set(taskid):
     for option, value in request.json.items():
         DataStore.tasks[taskid].set_option(option, value)
 
-    logger.debug("(%s) Requested to set options" % taskid)
+    logger.debug("[%s] Requested to set options" % taskid)
     return jsonize({"success": True})
 
 # Handle scans
@@ -780,7 +802,7 @@ def scan_start(taskid):
     with DataStore.tasks_lock:
         if DataStore.tasks[taskid].status == TaskStatus.Blocked:
             DataStore.tasks[taskid].status = TaskStatus.Runnable
-            logger.debug("(%s) Unblocked" % taskid)
+            logger.debug("[%s] Unblocked" % taskid)
             return jsonize({"success": True, "engineid": 0})
         
         for option, value in request.json.items():
@@ -789,9 +811,117 @@ def scan_start(taskid):
         # Launch sqlmap engine in a separate process
         DataStore.tasks[taskid].status = TaskStatus.Runnable
 
-        logger.debug("Add (%s) to scan list" % taskid)
+        logger.debug("Add [%s] to scan list" % taskid)
         return jsonize({"success": True, "engineid": 0})
 
+@post('/scan/start_at_datetime/<taskid>')
+def scan_start_at_datetime(taskid):
+    """
+    Start a scan at a specific datetime
+    """
+
+    with DataStore.tasks_lock:
+        if taskid not in DataStore.tasks:
+            logger.warning("[%s] Invalid task ID provided to scan_start()" % taskid)
+            return jsonize({"success": False, "message": "Invalid task ID"})
+        
+
+    if request.json is None:
+        return jsonize({"success": False, "message": "Invalid request"})
+    
+    params = request.params
+    
+    if 'start_datetime' not in params:
+        return jsonize({"success": False, "message": "Invalid start_datetime"})
+    
+    start_datetime = params['start_datetime']
+    
+    if not isinstance(start_datetime, str):
+        return jsonize({"success": False, "message": "Invalid start_datetime"})
+    
+    for key in request.json:
+        if key in RESTAPI_UNSUPPORTED_OPTIONS:
+            logger.warning(
+                "[%s] Unsupported option '%s' provided to scan_start()" % (taskid, key))
+            return jsonize({"success": False, "message": "Unsupported option '%s'" % key})
+        
+    with DataStore.tasks_lock:
+        if DataStore.tasks[taskid].status == TaskStatus.Blocked:
+            DataStore.tasks[taskid].status = TaskStatus.Runnable
+            logger.debug("(%s) Unblocked" % taskid)
+            return jsonize({"success": True, "engineid": 0})
+        
+        for option, value in request.json.items():
+            DataStore.tasks[taskid].set_option(option, value)
+
+        # Launch sqlmap engine in a separate process
+        DataStore.tasks[taskid].status = TaskStatus.Runnable
+        
+        DataStore.tasks[taskid].start_datetime = datetime.datetime.strptime(start_datetime, datetime_format)
+
+        logger.debug("Add (%s) to scan list" % taskid)
+        return jsonize({"success": True, "engineid": 0})        
+        
+@post('/scan/update_start_datetime/<taskid>')
+def scan_update_start_datetime(taskid):
+    """
+    Update the start datetime of a scan
+    """
+    
+    logger.debug("[%s] Updating start datetime" % taskid)
+
+    with DataStore.tasks_lock:
+        if taskid not in DataStore.tasks:
+            logger.warning("[%s] Invalid task ID provided to scan_update_start_datetime()" % taskid)
+            return jsonize({"success": False, "message": "Invalid task ID"})
+
+        start_datetime = request.json.get("start_datetime", None)
+        if start_datetime is None:
+            logger.warning("[%s] No start_datetime provided to scan_update_start_datetime()" % taskid)
+            return jsonize({"success": False, "message": "Invalid start datetime"})
+        
+        now = datetime.datetime.now()
+        time_five_seconds_later = now + datetime.timedelta(seconds=5)
+        start_datetime = datetime.datetime.strptime(start_datetime, datetime_format)
+        if DataStore.tasks[taskid].start_datetime is None:
+            if start_datetime > time_five_seconds_later:
+                DataStore.tasks[taskid].start_datetime = start_datetime
+                return jsonize({"success": True, "message": "update start da"})
+            else:
+                return jsonize({"success": False, "message": "start datetime is too early"})
+        else:
+            if DataStore.tasks[taskid].status in [TaskStatus.New, TaskStatus.Runnable]:
+                if start_datetime > now:
+                    DataStore.tasks[taskid].start_datetime = start_datetime
+                    return jsonize({"success": True, "message": "update start datetime success"})
+                else:
+                    return jsonize({"success": False, "message": "start datetime must be greater than now"})
+            elif DataStore.tasks[taskid].status == TaskStatus.Running:
+                # 检查你的datetime对象是否大于现在时间5秒
+                if start_datetime > time_five_seconds_later:
+                    DataStore.tasks[taskid].engine_stop()
+                    DataStore.tasks[taskid].start_datetime = start_datetime
+                    return jsonize({"success": True, "message": "Update start datetime success"})
+                else:
+                    return jsonize({"success": False, "message": "Invalid start datetime"})
+            elif DataStore.tasks[taskid].status == TaskStatus.Terminated:
+                if start_datetime > time_five_seconds_later:
+                    DataStore.tasks[taskid].start_datetime = start_datetime
+                    DataStore.tasks[taskid].status = TaskStatus.Runnable
+                    return jsonize({"success": True, "message": "Task resumed"})
+                else:
+                    return jsonize({"success": False, "message": "Invalid start datetime"})
+            elif DataStore.tasks[taskid].status == TaskStatus.Blocked:
+                if start_datetime > time_five_seconds_later:
+                    DataStore.tasks[taskid].start_datetime = start_datetime
+                    DataStore.tasks[taskid].status = TaskStatus.Runnable
+                    return jsonize({"success": True, "message": "Task resumed"})
+                else:
+                    return jsonize({"success": False, "message": "Invalid start datetime"})
+            else:
+                return jsonize({"success": False, "message": "Invalid task status"})
+        
+        
 @get('/scan/startBlocked/<taskid>')
 def scan_startBlocked(taskid):
     """
@@ -805,7 +935,7 @@ def scan_startBlocked(taskid):
 
         if DataStore.tasks[taskid].status == TaskStatus.Blocked:
             DataStore.tasks[taskid].status = TaskStatus.Runnable
-            logger.debug("(%s) Unblocked" % taskid)
+            logger.debug("[%s] Unblocked" % taskid)
             return jsonize({"success": True, "engineid": 0})
 
         else:
@@ -826,11 +956,11 @@ def scan_stop(taskid):
         if DataStore.tasks[taskid].status == TaskStatus.Running:
             DataStore.tasks[taskid].engine_stop()
             DataStore.tasks[taskid].status = TaskStatus.Blocked
-            logger.debug("(%s) Stopped scan" % taskid)
+            logger.debug("[%s] Stopped scan" % taskid)
             return jsonize({"success": True})
         elif DataStore.tasks[taskid].status in [TaskStatus.New, TaskStatus.Runnable]:
             DataStore.tasks[taskid].status = TaskStatus.Blocked
-            logger.debug("(%s) Stopped scan" % taskid)
+            logger.debug("[%s] Stopped scan" % taskid)
             return jsonize({"success": True})
         elif DataStore.tasks[taskid].status == TaskStatus.Blocked:
             logger.warning("[%s] task had blocked" % taskid)
@@ -855,7 +985,7 @@ def scan_kill(taskid):
         # del DataStore.tasks[taskid]
         DataStore.tasks[taskid].status = TaskStatus.Terminated
 
-        logger.debug("(%s) Killed scan" % taskid)
+        logger.debug("[%s] Killed scan" % taskid)
         return jsonize({"success": True})
 
 
@@ -877,7 +1007,7 @@ def scan_status(taskid):
             status = "terminated" if DataStore.tasks[taskid].engine_has_terminated(
             ) is True else "running"
 
-        logger.debug("(%s) Retrieved scan status" % taskid)
+        logger.debug("[%s] Retrieved scan status" % taskid)
         return jsonize({
             "success": True,
             "status": status,
@@ -908,7 +1038,7 @@ def scan_payload_details(taskid):
         payloads.append({"index": index, "status": status,
                         "payload_type": content_type, "payload_value": value})
 
-    logger.debug("(%s) Retrieved scan data and error messages" % taskid)
+    logger.debug("[%s] Retrieved scan data and error messages" % taskid)
     return jsonize({"success": True, "payloads": payloads})
 
 
@@ -934,7 +1064,7 @@ def scan_data(taskid):
     for error in DataStore.current_db.execute("SELECT error FROM errors WHERE taskid = ? ORDER BY id ASC", (taskid,)):
         json_errors_message.append(error)
 
-    logger.debug("(%s) Retrieved scan data and error messages" % taskid)
+    logger.debug("[%s] Retrieved scan data and error messages" % taskid)
     return jsonize({"success": True, "data": json_data_message, "error": json_errors_message})
 
 # Functions to handle scans' logs
@@ -966,7 +1096,7 @@ def scan_log_limited(taskid, start, end):
         json_log_messages.append(
             {"datetime": datetime_, "level": level, "message": message})
 
-    logger.debug("(%s) Retrieved scan log messages subset" % taskid)
+    logger.debug("[%s] Retrieved scan log messages subset" % taskid)
     return jsonize({"success": True, "log": json_log_messages})
 
 
@@ -996,7 +1126,7 @@ def scan_log_details(taskid):
         logs.append({"index": index, "datetime": datetime_,
                     "level": level, "message": message})
 
-    logger.debug("(%s) Retrieved scan log messages" % taskid)
+    logger.debug("[%s] Retrieved scan log messages" % taskid)
     return jsonize({"success": True, "logs": logs})
 
 
@@ -1017,7 +1147,7 @@ def scan_log(taskid):
         json_log_messages.append(
             {"datetime": datetime_, "level": level, "message": message})
 
-    logger.debug("(%s) Retrieved scan log messages" % taskid)
+    logger.debug("[%s] Retrieved scan log messages" % taskid)
     return jsonize({"success": True, "log": json_log_messages})
 
 # Function to handle files inside the output directory
@@ -1037,11 +1167,11 @@ def download(taskid, target, filename):
         paths.SQLMAP_OUTPUT_PATH, target, filename))
     # Prevent file path traversal
     if not path.startswith(paths.SQLMAP_OUTPUT_PATH):
-        logger.warning("[%s] Forbidden path (%s)" % (taskid, target))
+        logger.warning("[%s] Forbidden path [%s]" % (taskid, target))
         return jsonize({"success": False, "message": "Forbidden path"})
 
     if os.path.isfile(path):
-        logger.debug("(%s) Retrieved content of file %s" % (taskid, target))
+        logger.debug("[%s] Retrieved content of file %s" % (taskid, target))
         content = openFile(path, "rb").read()
         return jsonize({"success": True, "file": encodeBase64(content, binary=False)})
     else:
@@ -1055,7 +1185,7 @@ def version(token=None):
     Fetch server version
     """
 
-    logger.debug("Fetched version (%s)" %
+    logger.debug("Fetched version [%s]" %
                  ("admin" if is_admin(token) else request.remote_addr))
     return jsonize({"success": True, "version": VERSION_STRING.split('/')[-1]})
 
