@@ -12,7 +12,7 @@ sys.dont_write_bytecode = True
 __import__("lib.utils.versioncheck")  # this has to be the first non-standard import
 
 import logging
-import optparse
+import argparse
 import os
 import warnings
 
@@ -52,14 +52,14 @@ def main():
     setPaths(modulePath())
 
     # Parse command line options
-    apiparser = optparse.OptionParser()
-    apiparser.add_option("-s", "--server", help="Run as a REST-JSON API server", action="store_true")
-    apiparser.add_option("-c", "--client", help="Run as a REST-JSON API client", action="store_true")
-    apiparser.add_option("-H", "--host", help="Host of the REST-JSON API server (default \"%s\")" % RESTAPI_DEFAULT_ADDRESS, default=RESTAPI_DEFAULT_ADDRESS, action="store")
-    apiparser.add_option("-p", "--port", help="Port of the the REST-JSON API server (default %d)" % RESTAPI_DEFAULT_PORT, default=RESTAPI_DEFAULT_PORT, type="int", action="store")
-    apiparser.add_option("--adapter", help="Server (bottle) adapter to use (default \"%s\")" % RESTAPI_DEFAULT_ADAPTER, default=RESTAPI_DEFAULT_ADAPTER, action="store")
-    apiparser.add_option("--username", help="Basic authentication username (optional)", action="store")
-    apiparser.add_option("--password", help="Basic authentication password (optional)", action="store")
+    apiparser = argparse.ArgumentParser(description="SQLMap REST-JSON API Server/Client")
+    apiparser.add_argument("-s", "--server", help="Run as a REST-JSON API server", action="store_true")
+    apiparser.add_argument("-c", "--client", help="Run as a REST-JSON API client", action="store_true")
+    apiparser.add_argument("-H", "--host", help="Host of the REST-JSON API server (default \"%s\")" % RESTAPI_DEFAULT_ADDRESS, default=RESTAPI_DEFAULT_ADDRESS, action="store")
+    apiparser.add_argument("-p", "--port", help="Port of the the REST-JSON API server (default %d)" % RESTAPI_DEFAULT_PORT, default=RESTAPI_DEFAULT_PORT, type="int", action="store")
+    apiparser.add_argument("--adapter", help="Server (bottle) adapter to use (default \"%s\")" % RESTAPI_DEFAULT_ADAPTER, default=RESTAPI_DEFAULT_ADAPTER, action="store")
+    apiparser.add_argument("--username", help="Basic authentication username (optional)", action="store")
+    apiparser.add_argument("--password", help="Basic authentication password (optional)", action="store")
     (args, _) = apiparser.parse_args()
 
     # Start the client or the server
