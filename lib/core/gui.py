@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2023 sqlmap developers (https://sqlmap.org/)
+Copyright (c) 2006-2024 sqlmap developers (https://sqlmap.org/)
 See the file 'LICENSE' for copying permission
 """
 
@@ -223,7 +223,7 @@ def runGui(parser):
     helpmenu.add_command(label="Wiki pages", command=lambda: webbrowser.open(WIKI_PAGE))
     helpmenu.add_command(label="Report issue", command=lambda: webbrowser.open(ISSUES_PAGE))
     helpmenu.add_separator()
-    helpmenu.add_command(label="About", command=lambda: _tkinter_messagebox.showinfo("About", "Copyright (c) 2006-2023\n\n    (%s)" % DEV_EMAIL_ADDRESS))
+    helpmenu.add_command(label="About", command=lambda: _tkinter_messagebox.showinfo("About", "Copyright (c) 2006-2024\n\n    (%s)" % DEV_EMAIL_ADDRESS))
     menubar.add_cascade(label="Help", menu=helpmenu)
 
     window.config(menu=menubar)
