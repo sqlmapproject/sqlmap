@@ -60,11 +60,14 @@ def main():
     apiparser.add_option("--adapter", help="Server (bottle) adapter to use (default \"%s\")" % RESTAPI_DEFAULT_ADAPTER, default=RESTAPI_DEFAULT_ADAPTER, action="store")
     apiparser.add_option("--username", help="Basic authentication username (optional)", action="store")
     apiparser.add_option("--password", help="Basic authentication password (optional)", action="store")
+    
+    # Add an option to specify the number of CPU cores
+    apiparser.add_option("-n", "--num-cores", help="Number of CPU cores to use", type="int", action="store", default=0)
     (args, _) = apiparser.parse_args()
 
     # Start the client or the server
     if args.server:
-        server(args.host, args.port, adapter=args.adapter, username=args.username, password=args.password)
+        server(args.host, args.port, adapter=args.adapter, username=args.username, password=args.password, num_cores=args.num_cores)
     elif args.client:
         client(args.host, args.port, username=args.username, password=args.password)
     else:

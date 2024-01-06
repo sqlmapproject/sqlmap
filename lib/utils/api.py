@@ -355,8 +355,11 @@ def is_admin(token):
     return DataStore.admin_token == token
 
 
-def perform_task():
+def perform_task(num_cores=None):
     # logger.debug('perform_task...')
+    global MAX_TASKS_NUMBER
+    
+    local_max_tasks_number = MAX_TASKS_NUMBER if num_cores is None or num_cores == 0 else num_cores
 
     # 计算在扫描的任务的数量
     with DataStore.tasks_lock:
@@ -379,9 +382,9 @@ def perform_task():
                 else:
                     running_task_count += 1
 
-        if running_task_count < MAX_TASKS_NUMBER:
+        if running_task_count < local_max_tasks_number:
             for task in runnable_list:
-                if running_task_count < MAX_TASKS_NUMBER:
+                if running_task_count < local_max_tasks_number:
                     if task.start_datetime is not None:
                         if datetime.datetime.now() >= task.start_datetime:
                             running_task_count += 1
@@ -398,22 +401,22 @@ def perform_task():
                         task.status = TaskStatus.Running
 
 
-def run_task(interval):
+def run_task(interval, num_cores):
     logger.debug("run_task...")
     try:
         while True:
             # 执行定时任务
-            perform_task()
+            perform_task(num_cores)
             # 等待一定时间
             time.sleep(interval)
     except KeyboardInterrupt:
         print("定时任务已停止")
 
 
-def schedule_task(interval):
+def schedule_task(interval, num_cores):
     logger.debug("schedule_task...")
     # 创建后台线程
-    thread = threading.Thread(target=run_task, args=(interval,))
+    thread = threading.Thread(target=run_task, args=(interval, num_cores, ))
     # 设置线程为守护线程
     thread.setDaemon(True)
     # 启动线程
@@ -1190,7 +1193,7 @@ def version(token=None):
     return jsonize({"success": True, "version": VERSION_STRING.split('/')[-1]})
 
 
-def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=RESTAPI_DEFAULT_ADAPTER, username=None, password=None):
+def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=RESTAPI_DEFAULT_ADAPTER, username=None, password=None, num_cores=None):
     """
     REST-JSON API server
     """
@@ -1218,7 +1221,7 @@ def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=REST
     DataStore.current_db.init()
 
     # 开启定时任务
-    schedule_task(1)
+    schedule_task(1, num_cores)
 
     # Run RESTful API
     try:
