@@ -74,10 +74,6 @@ class MultipartPostHandler(_urllib.request.BaseHandler):
                 part = match.group(0)
                 if b'\r' not in part:
                     request.data = request.data.replace(part, part.replace(b'\n', b"\r\n"))
-            for match in re.finditer(b"(Content-Type[^\\n]+[\\n|\\r|\\r\\n]+)",request.data):
-                part = match.group(0)
-                if b'\r' not in part:
-                    request.data = request.data.replace(part, part.replace(b'\n', b"\r\n"))
 
         return request
 
