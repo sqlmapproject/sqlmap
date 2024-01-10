@@ -98,6 +98,10 @@ class Custom(object):
                 query = _input("sql-shell> ")
                 query = getUnicode(query, encoding=sys.stdin.encoding)
                 query = query.strip("; ")
+            except UnicodeDecodeError:
+                print()
+                errMsg = "invalid user input"
+                logger.error(errMsg)
             except KeyboardInterrupt:
                 print()
                 errMsg = "user aborted"
