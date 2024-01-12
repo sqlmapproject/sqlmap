@@ -111,7 +111,22 @@ XDB
 
 # Microsoft SQL Server
 sa
+BUILTIN\Users
+NT SERVICE\SQLWriter
+NT SERVICE\Winmgmt
+NT SERVICE\MSSQLSERVER
+NT Service\MSSQL$SQLEXPRESS
+NT SERVICE\SQLSERVERAGENT
+SQLTELEMETRY$SQLEXPRESS
 
+## https://learn.microsoft.com/en-us/sql/relational-databases/security/authentication-access/principals-database-engine?view=sql-server-ver16#certificate-based-sql-server-logins
+\##MS_SQLResourceSigningCertificate##
+\##MS_SQLReplicationSigningCertificate##
+\##MS_SQLAuthenticatorCertificate##
+\##MS_AgentSigningCertificate##
+\##MS_PolicyEventProcessingLogin##
+\##MS_PolicySigningCertificate##
+\##MS_PolicyTsqlExecutionLogin##
 
 [Passwords]
 
