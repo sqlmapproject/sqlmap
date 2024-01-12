@@ -36,6 +36,7 @@ import time
 import types
 import unicodedata
 
+from collections import defaultdict
 from difflib import SequenceMatcher
 from math import sqrt
 from optparse import OptionValueError
@@ -2517,11 +2518,15 @@ def initCommonOutputs():
     True
     """
 
-    kb.commonOutputs = {}
+    kb.commonOutputs = defaultdict(set)
     key = None
 
     for line in openFile(paths.COMMON_OUTPUTS, 'r'):
-        if line.find('#') != -1:
+        # "Escaped" lines are read in raw mode, this allows predicting
+        # outputs that contains "#", e.g: `\##MS_PolicyEventProcessingLogin##`
+        if line.startswith("\\"):
+            line = line[1:]
+        elif line.find('#') != -1:
             line = line[:line.find('#')]
 
         line = line.strip()
@@ -2530,11 +2535,7 @@ def initCommonOutputs():
             if line.startswith('[') and line.endswith(']'):
                 key = line[1:-1]
             elif key:
-                if key not in kb.commonOutputs:
-                    kb.commonOutputs[key] = set()
-
-                if line not in kb.commonOutputs[key]:
-                    kb.commonOutputs[key].add(line)
+                kb.commonOutputs[key].add(line)
 
 def getFileItems(filename, commentPrefix='#', unicoded=True, lowercase=False, unique=False):
     """
