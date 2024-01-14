@@ -12,12 +12,54 @@ sys.dont_write_bytecode = True
 __import__("lib.utils.versioncheck")  # this has to be the first non-standard import
 
 import logging
-import optparse
 import os
 import warnings
 
 warnings.filterwarnings(action="ignore", category=UserWarning)
 warnings.filterwarnings(action="ignore", category=DeprecationWarning)
+
+try:
+    from optparse import OptionGroup
+    from optparse import OptionParser as ArgumentParser
+
+    ArgumentParser.add_argument = ArgumentParser.add_option
+
+    def _add_argument(self, *args, **kwargs):
+        return self.add_option(*args, **kwargs)
+
+    OptionGroup.add_argument = _add_argument
+
+except ImportError:
+    from argparse import ArgumentParser
+
+finally:
+    def get_actions(instance):
+        for attr in ("option_list", "_group_actions", "_actions"):
+            if hasattr(instance, attr):
+                return getattr(instance, attr)
+
+    def get_groups(parser):
+        return getattr(parser, "option_groups", None) or getattr(parser, "_action_groups")
+
+    def get_all_options(parser):
+        retVal = set()
+
+        for option in get_actions(parser):
+            if hasattr(option, "option_strings"):
+                retVal.update(option.option_strings)
+            else:
+                retVal.update(option._long_opts)
+                retVal.update(option._short_opts)
+
+        for group in get_groups(parser):
+            for option in get_actions(group):
+                if hasattr(option, "option_strings"):
+                    retVal.update(option.option_strings)
+                else:
+                    retVal.update(option._long_opts)
+                    retVal.update(option._short_opts)
+
+        return retVal
 
 from lib.core.common import getUnicode
 from lib.core.common import setPaths
@@ -52,16 +94,17 @@ def main():
     setPaths(modulePath())
 
     # Parse command line options
-    apiparser = optparse.OptionParser()
-    apiparser.add_option("-s", "--server", help="Run as a REST-JSON API server", action="store_true")
-    apiparser.add_option("-c", "--client", help="Run as a REST-JSON API client", action="store_true")
-    apiparser.add_option("-H", "--host", help="Host of the REST-JSON API server (default \"%s\")" % RESTAPI_DEFAULT_ADDRESS, default=RESTAPI_DEFAULT_ADDRESS, action="store")
-    apiparser.add_option("-p", "--port", help="Port of the the REST-JSON API server (default %d)" % RESTAPI_DEFAULT_PORT, default=RESTAPI_DEFAULT_PORT, type="int", action="store")
-    apiparser.add_option("--adapter", help="Server (bottle) adapter to use (default \"%s\")" % RESTAPI_DEFAULT_ADAPTER, default=RESTAPI_DEFAULT_ADAPTER, action="store")
-    apiparser.add_option("--database", help="Set IPC database filepath (optional)")
-    apiparser.add_option("--username", help="Basic authentication username (optional)", action="store")
-    apiparser.add_option("--password", help="Basic authentication password (optional)", action="store")
-    (args, _) = apiparser.parse_args()
+    apiparser = ArgumentParser()
+    apiparser.add_argument("-s", "--server", help="Run as a REST-JSON API server", action="store_true")
+    apiparser.add_argument("-c", "--client", help="Run as a REST-JSON API client", action="store_true")
+    apiparser.add_argument("-H", "--host", help="Host of the REST-JSON API server (default \"%s\")" % RESTAPI_DEFAULT_ADDRESS, default=RESTAPI_DEFAULT_ADDRESS)
+    apiparser.add_argument("-p", "--port", help="Port of the the REST-JSON API server (default %d)" % RESTAPI_DEFAULT_PORT, default=RESTAPI_DEFAULT_PORT, type=int)
+    apiparser.add_argument("--adapter", help="Server (bottle) adapter to use (default \"%s\")" % RESTAPI_DEFAULT_ADAPTER, default=RESTAPI_DEFAULT_ADAPTER)
+    apiparser.add_argument("--database", help="Set IPC database filepath (optional)")
+    apiparser.add_argument("--username", help="Basic authentication username (optional)")
+    apiparser.add_argument("--password", help="Basic authentication password (optional)")
+    (args, _) = apiparser.parse_known_args() if hasattr(apiparser, "parse_known_args") else apiparser.parse_args()
+
 
     # Start the client or the server
     if args.server:
