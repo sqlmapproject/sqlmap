@@ -880,7 +880,7 @@ def getManualDirectories():
 def getAutoDirectories():
     """
     >>> pushValue(kb.absFilePaths)
-    >>> kb.absFilePaths = ["C:\\inetpub\\wwwroot\\index.asp", "/var/www/html"]
+    >>> kb.absFilePaths = [r"C:\\inetpub\\wwwroot\\index.asp", "/var/www/html"]
     >>> getAutoDirectories()
     ['C:/inetpub/wwwroot', '/var/www/html']
     >>> kb.absFilePaths = popValue()
@@ -2308,7 +2308,7 @@ def ntToPosixSlashes(filepath):
     Replaces all occurrences of NT backslashes in provided
     filepath with Posix slashes
 
-    >>> ntToPosixSlashes('C:\\Windows')
+    >>> ntToPosixSlashes(r'C:\\Windows')
     'C:/Windows'
     """
 
