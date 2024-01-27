@@ -9,7 +9,7 @@ def tamper(payload:str,**kwargs):
     """
     Replace payload space characters with horizontal space(%09)
     >>> tamper("SELECT id FROM users")
-    'SELECT%09id%09FROM%09users'
+    'SELECT%09id%09FROM%09users' 
     """
     retVal = payload
     place_space = "%9"
