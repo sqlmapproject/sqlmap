@@ -6,6 +6,7 @@ See the file 'LICENSE' for copying permission
 """
 
 import copy
+import threading
 import types
 
 from thirdparty.odict import OrderedDict
@@ -142,6 +143,7 @@ class LRUDict(object):
     def __init__(self, capacity):
         self.capacity = capacity
         self.cache = OrderedDict()
+        self.__lock = threading.Lock()
 
     def __len__(self):
         return len(self.cache)
@@ -158,11 +160,12 @@ class LRUDict(object):
         return self.__getitem__(key)
 
     def __setitem__(self, key, value):
-        try:
-            self.cache.pop(key)
-        except KeyError:
-            if len(self.cache) >= self.capacity:
-                self.cache.popitem(last=False)
+        with self.__lock:
+            try:
+                self.cache.pop(key)
+            except KeyError:
+                if len(self.cache) >= self.capacity:
+                    self.cache.popitem(last=False)
         self.cache[key] = value
 
     def set(self, key, value):
