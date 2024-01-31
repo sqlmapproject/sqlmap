@@ -1,4 +1,4 @@
-# sqlmap ![](https://i.imgur.com/fe85aVR.png)
+# SQLMAP ![](https://i.imgur.com/fe85aVR.png)
 
 [![.github/workflows/tests.yml](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml/badge.svg)](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml) [![Python 2.6|2.7|3.x](https://img.shields.io/badge/python-2.6|2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![Twitter](https://img.shields.io/badge/twitter-@sqlmap-blue.svg)](https://twitter.com/sqlmap)
 
@@ -48,6 +48,11 @@ Links
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
 * Demos: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * Screenshots: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
+
+Contribution
+----
+[@sahil singh](https://github.com/Sahil-Singh-312)
+please add further contribution to this awesome open source project in same format.
 
 Translations
 ----
