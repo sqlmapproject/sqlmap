@@ -46,6 +46,6 @@ sqlmapの概要、機能の一覧、全てのオプションやスイッチの�
 * 課題管理: https://github.com/sqlmapproject/sqlmap/issues
 * ユーザーマニュアル: https://github.com/sqlmapproject/sqlmap/wiki
 * よくある質問 (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* Twitter: [@sqlmap](https://twitter.com/sqlmap)
+* X: [@sqlmap](https://twitter.com/sqlmap)
 * デモ: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * スクリーンショット: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

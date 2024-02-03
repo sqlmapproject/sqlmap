@@ -45,6 +45,6 @@ Linky
 * Sledovač problémov: https://github.com/sqlmapproject/sqlmap/issues
 * Používateľská príručka: https://github.com/sqlmapproject/sqlmap/wiki
 * Často kladené otázky (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* Twitter: [@sqlmap](https://twitter.com/sqlmap)
+* X: [@sqlmap](https://twitter.com/sqlmap)
 * Demá: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * Snímky obrazovky: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

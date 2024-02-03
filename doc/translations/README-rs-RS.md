@@ -45,6 +45,6 @@ Linkovi
 * Prijava problema: https://github.com/sqlmapproject/sqlmap/issues
 * Korisnički priručnik: https://github.com/sqlmapproject/sqlmap/wiki
 * Najčešće postavljena pitanja (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* Twitter: [@sqlmap](https://twitter.com/sqlmap)
+* X: [@sqlmap](https://twitter.com/sqlmap)
 * Demo: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * Slike: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

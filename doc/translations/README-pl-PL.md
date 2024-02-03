@@ -45,6 +45,6 @@ Odnośniki
 * Zgłaszanie błędów: https://github.com/sqlmapproject/sqlmap/issues
 * Instrukcja użytkowania: https://github.com/sqlmapproject/sqlmap/wiki
 * Często zadawane pytania (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* Twitter: [@sqlmap](https://twitter.com/sqlmap)
+* X: [@sqlmap](https://twitter.com/sqlmap)
 * Dema: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * Zrzuty ekranu: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

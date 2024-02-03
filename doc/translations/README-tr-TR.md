@@ -48,6 +48,6 @@ Bağlantılar
 * Hata takip etme sistemi: https://github.com/sqlmapproject/sqlmap/issues
 * Kullanıcı Manueli: https://github.com/sqlmapproject/sqlmap/wiki
 * Sıkça Sorulan Sorular(SSS): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* Twitter: [@sqlmap](https://twitter.com/sqlmap)
+* X: [@sqlmap](https://twitter.com/sqlmap)
 * Demolar: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * Ekran görüntüleri: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
