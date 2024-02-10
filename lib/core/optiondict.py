@@ -240,6 +240,7 @@ optDict = {
         "testFilter": "string",
         "testSkip": "string",
         "timeLimit": "float",
+        "unsafeNaming": "boolean",
         "webRoot": "string",
     },
 

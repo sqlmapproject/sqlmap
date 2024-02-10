@@ -739,6 +739,9 @@ def cmdLineParser(argv=None):
         general.add_argument("--time-limit", dest="timeLimit", type=float,
             help="Run with a time limit in seconds (e.g. 3600)")
 
+        general.add_argument("--unsafe-naming", dest="unsafeNaming", action="store_true",
+            help="Disable escaping of DBMS identifiers (e.g. \"user\")")
+
         general.add_argument("--web-root", dest="webRoot",
             help="Web server document root directory (e.g. \"/var/www\")")
 

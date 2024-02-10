@@ -4273,6 +4273,9 @@ def safeSQLIdentificatorNaming(name, isTable=False):
 
     retVal = name
 
+    if conf.unsafeNaming:
+        return retVal
+
     if isinstance(name, six.string_types):
         retVal = getUnicode(name)
         _ = isTable and Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE)
