@@ -12,11 +12,13 @@ chmod +x .git/hooks/pre-commit
 
 PROJECT="../../"
 SETTINGS="../../lib/core/settings.py"
+DIGEST="../../sha256sums.txt"
 
 declare -x SCRIPTPATH="${0}"
 
 PROJECT_FULLPATH=${SCRIPTPATH%/*}/$PROJECT
 SETTINGS_FULLPATH=${SCRIPTPATH%/*}/$SETTINGS
+DIGEST_FULLPATH=${SCRIPTPATH%/*}/$DIGEST
 
 git diff $SETTINGS_FULLPATH | grep "VERSION =" > /dev/null && exit 0
 
@@ -35,3 +37,5 @@ then
     fi
     git add "$SETTINGS_FULLPATH"
 fi
+
+cd $PROJECT_FULLPATH && git ls-files | sort | uniq | grep -v sha256 | xargs sha256sum > $DIGEST_FULLPATH
