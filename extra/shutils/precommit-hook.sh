@@ -38,5 +38,5 @@ then
     git add "$SETTINGS_FULLPATH"
 fi
 
-cd $PROJECT_FULLPATH && git ls-files | sort | uniq | grep -Pv ' \.|sha256' | xargs sha256sum > $DIGEST_FULLPATH && cd -
+cd $PROJECT_FULLPATH && git ls-files | sort | uniq | grep -Pv '^\.|sha256' | xargs sha256sum > $DIGEST_FULLPATH && cd -
 git add "$DIGEST_FULLPATH"
