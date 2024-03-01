@@ -5583,6 +5583,7 @@ def checkSums():
                 filepath = os.path.join(paths.SQLMAP_ROOT_PATH, filename).replace('/', os.path.sep)
                 checkFile(filepath)
                 if not hashlib.sha256(open(filepath, "rb").read()).hexdigest() == expected:
+                    print(filepath, hashlib.sha256(open(filepath, "rb").read()).hexdigest(), expected)
                     retVal &= False
                     break
 
