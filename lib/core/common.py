@@ -1520,6 +1520,7 @@ def setPaths(rootPath):
     paths.MYSQL_XML = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "mysql.xml")
     paths.ORACLE_XML = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "oracle.xml")
     paths.PGSQL_XML = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "postgresql.xml")
+    paths.DIGEST_FILE = os.path.join(paths.SQLMAP_ROOT_PATH, "sha256sums.txt")
 
     for path in paths.values():
         if any(path.endswith(_) for _ in (".txt", ".xml", ".tx_")):
@@ -5589,5 +5590,24 @@ def chunkSplitPostData(data):
         retVal += "%s\r\n" % candidate
 
     retVal += "0\r\n\r\n"
+
+    return retVal
+
+def checkSums():
+    """
+    Validate the content of the digest file (i.e. sha256sums.txt)
+    """
+
+    retVal = True
+
+    for entry in getFileItems(paths.DIGEST_FILE):
+        match = re.search(r"([0-9a-f]+)\s+([^\s]+)", entry)
+        if match:
+            expected, filename = match.groups()
+            filepath = os.path.join(paths.SQLMAP_ROOT_PATH, filename)
+            checkFile(filepath)
+            if not hashlib.sha256(open(filepath, "rb").read()).hexdigest() == expected:
+                retVal &= False
+                break
 
     return retVal
