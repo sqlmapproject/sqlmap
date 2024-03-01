@@ -44,6 +44,6 @@ sqlmap ნებისმიერ პლატფორმაზე მუშ�
 * პრობლემებისათვის თვალყურის დევნება: https://github.com/sqlmapproject/sqlmap/issues
 * მომხმარებლის სახელმძღვანელო: https://github.com/sqlmapproject/sqlmap/wiki
 * ხშირად დასმული კითხვები (ხდკ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* Twitter: [@sqlmap](https://twitter.com/sqlmap)
+* X: [@sqlmap](https://twitter.com/sqlmap)
 * დემონსტრაციები: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * ეკრანის ანაბეჭდები: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

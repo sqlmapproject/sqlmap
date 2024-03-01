@@ -48,6 +48,6 @@ Tautan
 * Pelacak Masalah: https://github.com/sqlmapproject/sqlmap/issues
 * Wiki Manual Penggunaan: https://github.com/sqlmapproject/sqlmap/wiki
 * Pertanyaan Yang Sering Ditanyakan (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* Twitter: [@sqlmap](https://twitter.com/sqlmap)
+* X: [@sqlmap](https://twitter.com/sqlmap)
 * Video Demo [#1](https://www.youtube.com/user/inquisb/videos) dan [#2](https://www.youtube.com/user/stamparm/videos)
 * Tangkapan Layar: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

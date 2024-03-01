@@ -45,6 +45,6 @@ Link
 * Issue tracker: https://github.com/sqlmapproject/sqlmap/issues
 * Manuale dell'utente: https://github.com/sqlmapproject/sqlmap/wiki
 * Domande più frequenti (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* Twitter: [@sqlmap](https://twitter.com/sqlmap)
+* X: [@sqlmap](https://twitter.com/sqlmap)
 * Dimostrazioni: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * Screenshot: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

@@ -47,6 +47,6 @@ Liên kết
 * Theo dõi vấn đề: https://github.com/sqlmapproject/sqlmap/issues
 * Hướng dẫn sử dụng: https://github.com/sqlmapproject/sqlmap/wiki
 * Các câu hỏi thường gặp (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* Twitter: [@sqlmap](https://twitter.com/sqlmap)
+* X: [@sqlmap](https://twitter.com/sqlmap)
 * Demo: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * Ảnh chụp màn hình: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

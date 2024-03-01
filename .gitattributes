@@ -1,5 +1,6 @@
 *.conf text eol=lf
 *.json text eol=lf
+*.html text eol=lf
 *.md text eol=lf
 *.md5 text eol=lf
 *.pl text eol=lf
@@ -8,6 +9,7 @@
 *.sql text eol=lf
 *.txt text eol=lf
 *.xml text eol=lf
+*.yaml text eol=lf
 *.yml text eol=lf
 LICENSE text eol=lf
 COMMITMENT text eol=lf

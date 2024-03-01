@@ -45,6 +45,6 @@ sqlmap «працює з коробки» з [Python](https://www.python.org/dow
 * Відстеження проблем: https://github.com/sqlmapproject/sqlmap/issues
 * Інструкція користувача: https://github.com/sqlmapproject/sqlmap/wiki
 * Поширенні питання (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* Twitter: [@sqlmap](https://twitter.com/sqlmap)
+* X: [@sqlmap](https://twitter.com/sqlmap)
 * Демо: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * Скриншоти: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

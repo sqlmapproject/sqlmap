@@ -45,6 +45,6 @@
 * Προβλήματα: https://github.com/sqlmapproject/sqlmap/issues
 * Εγχειρίδιο Χρήστη: https://github.com/sqlmapproject/sqlmap/wiki
 * Συχνές Ερωτήσεις (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* Twitter: [@sqlmap](https://twitter.com/sqlmap)
+* X: [@sqlmap](https://twitter.com/sqlmap)
 * Demos: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * Εικόνες: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
