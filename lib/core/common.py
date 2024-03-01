@@ -5585,6 +5585,6 @@ def checkSums():
                 if not hashlib.sha256(open(filepath, "rb").read()).hexdigest() == expected:
                     print(filepath, hashlib.sha256(open(filepath, "rb").read()).hexdigest(), expected)
                     retVal &= False
-                    break
+                    # break
 
     return retVal
