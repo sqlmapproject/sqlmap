@@ -5569,6 +5569,8 @@ def chunkSplitPostData(data):
 def checkSums():
     """
     Validate the content of the digest file (i.e. sha256sums.txt)
+    >>> checkSums()
+    True
     """
 
     retVal = True
@@ -5578,7 +5580,7 @@ def checkSums():
             match = re.search(r"([0-9a-f]+)\s+([^\s]+)", entry)
             if match:
                 expected, filename = match.groups()
-                filepath = os.path.join(paths.SQLMAP_ROOT_PATH, filename)
+                filepath = os.path.join(paths.SQLMAP_ROOT_PATH, filename).replace('/', os.path.sep)
                 checkFile(filepath)
                 if not hashlib.sha256(open(filepath, "rb").read()).hexdigest() == expected:
                     retVal &= False
