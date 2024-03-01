@@ -12,7 +12,7 @@ chmod +x .git/hooks/pre-commit
 
 PROJECT="../../"
 SETTINGS="../../lib/core/settings.py"
-DIGEST="../../sha256sums.txt"
+DIGEST="../../data/txt/sha256sums.txt"
 
 declare -x SCRIPTPATH="${0}"
 

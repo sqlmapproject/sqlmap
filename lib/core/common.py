@@ -1508,6 +1508,7 @@ def setPaths(rootPath):
     paths.COMMON_FILES = os.path.join(paths.SQLMAP_TXT_PATH, "common-files.txt")
     paths.COMMON_TABLES = os.path.join(paths.SQLMAP_TXT_PATH, "common-tables.txt")
     paths.COMMON_OUTPUTS = os.path.join(paths.SQLMAP_TXT_PATH, 'common-outputs.txt')
+    paths.DIGEST_FILE = os.path.join(paths.SQLMAP_TXT_PATH, "sha256sums.txt")
     paths.SQL_KEYWORDS = os.path.join(paths.SQLMAP_TXT_PATH, "keywords.txt")
     paths.SMALL_DICT = os.path.join(paths.SQLMAP_TXT_PATH, "smalldict.txt")
     paths.USER_AGENTS = os.path.join(paths.SQLMAP_TXT_PATH, "user-agents.txt")
@@ -1520,7 +1521,6 @@ def setPaths(rootPath):
     paths.MYSQL_XML = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "mysql.xml")
     paths.ORACLE_XML = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "oracle.xml")
     paths.PGSQL_XML = os.path.join(paths.SQLMAP_XML_BANNER_PATH, "postgresql.xml")
-    paths.DIGEST_FILE = os.path.join(paths.SQLMAP_ROOT_PATH, "sha256sums.txt")
 
     for path in paths.values():
         if any(path.endswith(_) for _ in (".txt", ".xml", ".tx_")):
@@ -5583,8 +5583,7 @@ def checkSums():
                 filepath = os.path.join(paths.SQLMAP_ROOT_PATH, filename).replace('/', os.path.sep)
                 checkFile(filepath)
                 if not hashlib.sha256(open(filepath, "rb").read()).hexdigest() == expected:
-                    print(filepath, hashlib.sha256(open(filepath, "rb").read()).hexdigest(), expected)
                     retVal &= False
-                    # break
+                    break
 
     return retVal
