@@ -3848,33 +3848,6 @@ def decodeIntToUnicode(value):
 
     return retVal
 
-def checkIntegrity():
-    """
-    Checks integrity of code files during the unhandled exceptions
-    """
-
-    if not paths:
-        return
-
-    logger.debug("running code integrity check")
-
-    retVal = True
-
-    baseTime = os.path.getmtime(paths.SQLMAP_SETTINGS_PATH) + 3600  # First hour free parking :)
-    for root, _, filenames in os.walk(paths.SQLMAP_ROOT_PATH):
-        for filename in filenames:
-            if re.search(r"(\.py|\.xml|_)\Z", filename):
-                filepath = os.path.join(root, filename)
-                if os.path.getmtime(filepath) > baseTime:
-                    logger.error("wrong modification time of '%s'" % filepath)
-                    retVal = False
-
-    suffix = extractRegexResult(r"#(?P<result>\w+)", VERSION_STRING)
-    if suffix and suffix not in {"dev", "stable"}:
-        retVal = False
-
-    return retVal
-
 def getDaysFromLastUpdate():
     """
     Get total number of days from last update
@@ -5600,14 +5573,15 @@ def checkSums():
 
     retVal = True
 
-    for entry in getFileItems(paths.DIGEST_FILE):
-        match = re.search(r"([0-9a-f]+)\s+([^\s]+)", entry)
-        if match:
-            expected, filename = match.groups()
-            filepath = os.path.join(paths.SQLMAP_ROOT_PATH, filename)
-            checkFile(filepath)
-            if not hashlib.sha256(open(filepath, "rb").read()).hexdigest() == expected:
-                retVal &= False
-                break
+    if paths.get("DIGEST_FILE"):
+        for entry in getFileItems(paths.DIGEST_FILE):
+            match = re.search(r"([0-9a-f]+)\s+([^\s]+)", entry)
+            if match:
+                expected, filename = match.groups()
+                filepath = os.path.join(paths.SQLMAP_ROOT_PATH, filename)
+                checkFile(filepath)
+                if not hashlib.sha256(open(filepath, "rb").read()).hexdigest() == expected:
+                    retVal &= False
+                    break
 
     return retVal

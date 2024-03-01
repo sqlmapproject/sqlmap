@@ -50,8 +50,8 @@ try:
     from lib.core.data import logger
 
     from lib.core.common import banner
-    from lib.core.common import checkIntegrity
     from lib.core.common import checkPipedInput
+    from lib.core.common import checkSums
     from lib.core.common import createGithubIssue
     from lib.core.common import dataToStdout
     from lib.core.common import extractRegexResult
@@ -268,7 +268,7 @@ def main():
         print()
         errMsg = unhandledExceptionMessage()
         excMsg = traceback.format_exc()
-        valid = checkIntegrity()
+        valid = checkSums()
 
         os._exitcode = 255
 
@@ -448,7 +448,7 @@ def main():
             raise SystemExit
 
         elif valid is False:
-            errMsg = "code integrity check failed (turning off automatic issue creation). "
+            errMsg = "code checksum failed (turning off automatic issue creation). "
             errMsg += "You should retrieve the latest development version from official GitHub "
             errMsg += "repository at '%s'" % GIT_PAGE
             logger.critical(errMsg)
