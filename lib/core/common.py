@@ -252,6 +252,10 @@ class Format(object):
         if versions is None and Backend.getVersionList():
             versions = Backend.getVersionList()
 
+        # NOTE: preventing ugly (e.g.) "back-end DBMS: MySQL Unknown"
+        if isListLike(versions) and UNKNOWN_DBMS_VERSION in versions:
+            versions = None
+
         return Backend.getDbms() if versions is None else "%s %s" % (Backend.getDbms(), " and ".join(filterNone(versions)))
 
     @staticmethod
