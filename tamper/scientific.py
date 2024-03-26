@@ -6,6 +6,7 @@ See the file 'LICENSE' for copying permission
 """
 
 import re
+import random
 
 from lib.core.enums import PRIORITY
 
@@ -29,7 +30,9 @@ def tamper(payload, **kwargs):
     """
 
     if payload:
-        payload = re.sub(r"[),.*^/|&]", r" 1.e\g<0>", payload)
-        payload = re.sub(r"(\w+)\(", lambda match: "%s 1.e(" % match.group(1) if not re.search(r"(?i)\A(MID|CAST|FROM|COUNT)\Z", match.group(1)) else match.group(0), payload)     # NOTE: MID and CAST don't work for sure
+        num=random.randint(1,9999999)
+        payload = re.sub(r"[),.*^/|&]", r" {}.e\g<0>".format(num), payload)
+        num=random.randint(1,9999999)
+        payload = re.sub(r"(\w+)\(", lambda match: "%s %d.e(" %  (match.group(1),num) if not re.search(r"(?i)\A(MID|CAST|FROM|COUNT)\Z", match.group(1)) else match.group(0), payload)     # NOTE: MID and CAST don't work for sure
 
     return payload
