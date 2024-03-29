@@ -711,8 +711,16 @@ def paramToDict(place, parameters=None):
                                                 if value:
                                                     walk(head, value)
 
-                                deserialized = json.loads(testableParameters[parameter])
-                                walk(deserialized)
+                                # NOTE: for cases with custom injection marker(s) inside (e.g. https://github.com/sqlmapproject/sqlmap/issues/4137#issuecomment-2013783111) - p.s. doesn't care too much about the structure (e.g. injection into the flat array values)
+                                if CUSTOM_INJECTION_MARK_CHAR in testableParameters[parameter]:
+                                    for match in re.finditer(r'(\w+)[^\w]*"\s*:[^\w]*\w*%s' % re.escape(CUSTOM_INJECTION_MARK_CHAR), testableParameters[parameter]):
+                                        key = match.group(1)
+                                        value = testableParameters[parameter].replace(match.group(0), match.group(0).replace(CUSTOM_INJECTION_MARK_CHAR, BOUNDED_INJECTION_MARKER))
+                                        candidates["%s (%s)" % (parameter, key)] = re.sub(r"\b(%s\s*=\s*)%s" % (re.escape(parameter), re.escape(testableParameters[parameter])), r"\g<1>%s" % value, parameters)
+
+                                if not candidates:
+                                    deserialized = json.loads(testableParameters[parameter])
+                                    walk(deserialized)
 
                                 if candidates:
                                     message = "it appears that provided value for %sparameter '%s' " % ("%s " % place if place != parameter else "", parameter)
