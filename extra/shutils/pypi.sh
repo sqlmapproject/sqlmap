@@ -176,5 +176,7 @@ EOF
 sed -i "s/^VERSION =.*/VERSION = \"$VERSION\"/g" sqlmap/lib/core/settings.py
 sed -i "s/^TYPE =.*/TYPE = \"$TYPE\"/g" sqlmap/lib/core/settings.py
 for file in $(find sqlmap -type f | grep -v -E "\.(git|yml)"); do echo include $file >> MANIFEST.in; done
-python setup.py sdist upload
+python setup.py sdist bdist_wheel
+twine check dist/*
+twine upload --config-file=~/.pypirc dist/*
 rm -rf $TMP_DIR
