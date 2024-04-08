@@ -281,7 +281,6 @@ class Connect(object):
         cookie = kwargs.get("cookie", None)
         ua = kwargs.get("ua", None) or conf.agent
         referer = kwargs.get("referer", None) or conf.referer
-        host = kwargs.get("host", None) or conf.host
         direct_ = kwargs.get("direct", False)
         multipart = kwargs.get("multipart", None)
         silent = kwargs.get("silent", False)

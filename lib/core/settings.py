@@ -20,7 +20,7 @@ from thirdparty import six
 from thirdparty.six import unichr as _unichr
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.8.3.15"
+VERSION = "1.8.4.0"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -682,9 +682,6 @@ MAX_REVALIDATION_STEPS = 5
 
 # Characters that can be used to split parameter values in provided command line (e.g. in --tamper)
 PARAMETER_SPLITTING_REGEX = r"[,|;]"
-
-# Regular expression describing possible union char value (e.g. used in --union-char)
-UNION_CHAR_REGEX = r"\A\w+\Z"
 
 # Attribute used for storing original parameter value in special cases (e.g. POST)
 UNENCODED_ORIGINAL_VALUE = "original"
