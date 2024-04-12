@@ -162,7 +162,9 @@ def vulnTest():
     direct = "sqlite3://%s" % database
     tmpdir = tempfile.mkdtemp()
 
-    content = open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.conf"))).read().replace("url =", "url = %s" % url)
+    with open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.conf"))) as f:
+        content = f.read().replace("url =", "url = %s" % url)
+
     with open(config, "w+") as f:
         f.write(content)
         f.flush()
@@ -214,7 +216,9 @@ def smokeTest():
 
     unisonRandom()
 
-    content = open(paths.ERRORS_XML, "r").read()
+    with open(paths.ERRORS_XML, "r") as f:
+        content = f.read()
+
     for regex in re.findall(r'<error regexp="(.+?)"/>', content):
         try:
             re.compile(regex)
