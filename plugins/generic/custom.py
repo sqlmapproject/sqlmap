@@ -78,11 +78,13 @@ class Custom(object):
                 inject.goStacked(query)
 
                 output = NULL
-
+                
         except SqlmapNoneDataException as ex:
             logger.warning(ex)
+        
 
         return output
+    
 
     def sqlShell(self):
         infoMsg = "calling %s shell. To quit type " % Backend.getIdentifiedDbms()
