@@ -712,19 +712,18 @@ class Dump(object):
 
     def sqlQuery(self, query, queryRes):
         self.string(query, queryRes, content_type=CONTENT_TYPE.SQL_QUERY)
-        print ("mon output est ",queryRes)
 
         #code to extract columns from the request
         deb="SELECT"
         fin="FROM"
         temp1=(query.upper()).find(deb)
-        #print ("mon output est ",temp1)
+
         temp2=(query.upper()).find(fin)
-        #print ("mon output est ",temp2)
+
         T=len(deb)-temp1+1
         temp_res=query[T:temp2]
         temp_res=(temp_res.strip()).split(',')
-        print ("mon output est ",temp_res)
+
         #******************************************
         #dictionarie for every value in queryRes
         dt_save=[]
@@ -746,6 +745,7 @@ class Dump(object):
                 print("data saved in csv format under "+"'"+os.path.realpath("data_save.csv")+"'")
         else:
             print("data don't exist to create CSV file")
+            
             
     def rFile(self, fileData):
         self.lister("files saved to", fileData, sort=False, content_type=CONTENT_TYPE.FILE_READ)
