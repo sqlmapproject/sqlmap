@@ -68,7 +68,10 @@ def configFileParser(configFile):
 
     try:
         config = UnicodeRawConfigParser()
-        config.readfp(configFP)
+        if hasattr(config, "read_file"):
+            config.read_file(configFP)
+        else:
+            config.readfp(configFP)
     except Exception as ex:
         errMsg = "you have provided an invalid and/or unreadable configuration file ('%s')" % getSafeExString(ex)
         raise SqlmapSyntaxException(errMsg)
