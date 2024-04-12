@@ -733,7 +733,7 @@ class Dump(object):
             for j in range(len(temp_res)):
                 d.update({temp_res[j]:s[j]})
             dt_save.append(d)
-        print(dt_save)
+            
         #*******************************************
         file_csv="data_save.csv"
         if(len(queryRes)!=0):
