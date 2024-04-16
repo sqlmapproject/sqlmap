@@ -58,7 +58,7 @@ met:
     disclaimer in the documentation and/or other materials provided
     with the distribution.
 
-  * Neither the name of the the Beautiful Soup Consortium and All
+  * Neither the name of the Beautiful Soup Consortium and All
     Night Kosher Bakery nor the names of its contributors may be
     used to endorse or promote products derived from this software
     without specific prior written permission.
