@@ -404,6 +404,13 @@ def task_delete(taskid):
 # Admin functions #
 ###################
 
+@get("/admin/token")
+def get_token():
+    """
+    get admin_token for admin api
+    """
+    return jsonize({"success": True, "token": DataStore.admin_token})
+
 @get("/admin/list")
 @get("/admin/<token>/list")
 def task_list(token=None):
