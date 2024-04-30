@@ -1333,7 +1333,10 @@ def isZipFile(filename):
 
     checkFile(filename)
 
-    return openFile(filename, "rb", encoding=None).read(len(ZIP_HEADER)) == ZIP_HEADER
+    with openFile(filename, "rb", encoding=None) as f:
+        header = f.read(len(ZIP_HEADER))
+
+    return header == ZIP_HEADER
 
 def isDigit(value):
     """
@@ -2533,21 +2536,22 @@ def initCommonOutputs():
     kb.commonOutputs = {}
     key = None
 
-    for line in openFile(paths.COMMON_OUTPUTS, 'r'):
-        if line.find('#') != -1:
-            line = line[:line.find('#')]
+    with openFile(paths.COMMON_OUTPUTS, 'r') as f:
+        for line in f:
+            if line.find('#') != -1:
+                line = line[:line.find('#')]
 
-        line = line.strip()
+            line = line.strip()
 
-        if len(line) > 1:
-            if line.startswith('[') and line.endswith(']'):
-                key = line[1:-1]
-            elif key:
-                if key not in kb.commonOutputs:
-                    kb.commonOutputs[key] = set()
+            if len(line) > 1:
+                if line.startswith('[') and line.endswith(']'):
+                    key = line[1:-1]
+                elif key:
+                    if key not in kb.commonOutputs:
+                        kb.commonOutputs[key] = set()
 
-                if line not in kb.commonOutputs[key]:
-                    kb.commonOutputs[key].add(line)
+                    if line not in kb.commonOutputs[key]:
+                        kb.commonOutputs[key].add(line)
 
 def getFileItems(filename, commentPrefix='#', unicoded=True, lowercase=False, unique=False):
     """
@@ -5594,7 +5598,9 @@ def checkSums():
                 expected, filename = match.groups()
                 filepath = os.path.join(paths.SQLMAP_ROOT_PATH, filename).replace('/', os.path.sep)
                 checkFile(filepath)
-                if not hashlib.sha256(open(filepath, "rb").read()).hexdigest() == expected:
+                with open(filepath, "rb") as f:
+                    content = f.read()
+                if not hashlib.sha256(content).hexdigest() == expected:
                     retVal &= False
                     break
 

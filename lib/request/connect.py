@@ -281,7 +281,6 @@ class Connect(object):
         cookie = kwargs.get("cookie", None)
         ua = kwargs.get("ua", None) or conf.agent
         referer = kwargs.get("referer", None) or conf.referer
-        host = kwargs.get("host", None) or conf.host
         direct_ = kwargs.get("direct", False)
         multipart = kwargs.get("multipart", None)
         silent = kwargs.get("silent", False)
@@ -1184,7 +1183,7 @@ class Connect(object):
                 if match:
                     retVal = re.sub(r"(?i)%s" % re.escape(match.group(0)), ("%s=%s" % (parameter, newValue)).replace('\\', r'\\'), paramString)
                 else:
-                    match = re.search(r"(%s[\"']:[\"'])([^\"']+)" % re.escape(parameter), paramString, re.I)
+                    match = re.search(r"(%s[\"']\s*:\s*[\"'])([^\"']*)" % re.escape(parameter), paramString, re.I)
                     if match:
                         retVal = re.sub(r"(?i)%s" % re.escape(match.group(0)), "%s%s" % (match.group(1), newValue), paramString)
 
