@@ -914,12 +914,6 @@ class Connect(object):
                 raise SqlmapConnectionException(warnMsg)
 
         finally:
-            if isinstance(page, six.binary_type):
-                if HTTP_HEADER.CONTENT_TYPE in (responseHeaders or {}) and not re.search(TEXT_CONTENT_TYPE_REGEX, responseHeaders[HTTP_HEADER.CONTENT_TYPE]):
-                    page = six.text_type(page, errors="ignore")
-                else:
-                    page = getUnicode(page)
-
             for function in kb.postprocessFunctions:
                 try:
                     page, responseHeaders, code = function(page, responseHeaders, code)
@@ -927,6 +921,12 @@ class Connect(object):
                     errMsg = "error occurred while running postprocess "
                     errMsg += "function '%s' ('%s')" % (function.__name__, getSafeExString(ex))
                     raise SqlmapGenericException(errMsg)
+
+            if isinstance(page, six.binary_type):
+                if HTTP_HEADER.CONTENT_TYPE in (responseHeaders or {}) and not re.search(TEXT_CONTENT_TYPE_REGEX, responseHeaders[HTTP_HEADER.CONTENT_TYPE]):
+                    page = six.text_type(page, errors="ignore")
+                else:
+                    page = getUnicode(page)
 
             for _ in (getattr(conn, "redcode", None), code):
                 if _ is not None and _ in conf.abortCode:
