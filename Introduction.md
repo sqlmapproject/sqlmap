@@ -40,7 +40,7 @@ sqlmap can automate the process of identifying and exploiting this type of vulne
 
 ...and depending on supplied options, it will enumerate data or takeover the database server entirely.
 
-There exist many [resources](https://del.icio.us/inquis/sqlinjection) on the web explaining in depth how to detect, exploit and prevent SQL injection vulnerabilities in web applications. It is recommendeded that you read them before going much further with sqlmap.
+There exist many resources on the web explaining in depth how to detect, exploit and prevent SQL injection vulnerabilities in web applications. It is recommended that you read them before going much further with sqlmap.
 
 ## Direct connection to the database management system
 Up until sqlmap version **0.8**, the tool has been **yet another SQL injection tool**, used by web application penetration testers/newbies/curious teens/computer addicted/punks and so on. Things move on
