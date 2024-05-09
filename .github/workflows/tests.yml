@@ -11,6 +11,9 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [ 'pypy-2.7', '3.11' ]
+        exclude:
+          - os: macos-latest
+            python-version: 'pypy-2.7'
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
