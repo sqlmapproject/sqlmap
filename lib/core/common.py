@@ -5401,8 +5401,6 @@ def parseRequestFile(reqFile, checkParams=True):
                             scheme, value = value.split('://')[:2]
 
                         port = extractRegexResult(r":(?P<result>\d+)\Z", value)
-                        if port:
-                            value = value[:-(1 + len(port))]
 
                         host = value
 
