@@ -86,7 +86,7 @@ def dirtyPatches():
     if match and match.group(1).upper() != PLACE.POST:
         PLACE.CUSTOM_POST = PLACE.CUSTOM_POST.replace("POST", "%s (body)" % match.group(1))
 
-    # https://github.com/sqlmapproject/sqlmap/issues/4314
+    # Reference: https://github.com/sqlmapproject/sqlmap/issues/4314
     try:
         os.urandom(1)
     except NotImplementedError:
@@ -94,6 +94,14 @@ def dirtyPatches():
             os.urandom = lambda size: bytes(random.randint(0, 255) for _ in range(size))
         else:
             os.urandom = lambda size: "".join(chr(random.randint(0, 255)) for _ in xrange(size))
+
+    # Reference: https://github.com/sqlmapproject/sqlmap/issues/5727
+    # Reference: https://stackoverflow.com/a/14076841
+    try:
+        import pymysql
+        pymysql.install_as_MySQLdb()
+    except (ImportError, AttributeError):
+        pass
 
     # Reference: https://github.com/bottlepy/bottle/blob/df67999584a0e51ec5b691146c7fa4f3c87f5aac/bottle.py
     # Reference: https://python.readthedocs.io/en/v2.7.2/library/inspect.html#inspect.getargspec
