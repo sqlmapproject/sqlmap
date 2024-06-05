@@ -28,10 +28,6 @@ DNS exfiltration technique (option `--dns-domain`):
 
 ![DNS exfiltration technique](images/sqlmap_dns_exfiltration.png)
 
-Identify WAF/IDS/IPS protection (switch `--identify-waf`):
-
-![Identify WAF/IDS/IPS protection](images/sqlmap_identify_waf.png)
-
 HTTP parameter pollution (switch `--hpp`):
 
 ![HTTP parameter pollution](images/sqlmap_hpp.png)
