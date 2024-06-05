@@ -37,9 +37,12 @@ from lib.core.data import conf
 from lib.core.enums import PLACE
 from lib.core.option import _setHTTPHandlers
 from lib.core.option import setVerbosity
+from lib.core.settings import INVALID_UNICODE_PRIVATE_AREA
+from lib.core.settings import INVALID_UNICODE_CHAR_FORMAT
 from lib.core.settings import IS_WIN
 from lib.request.templates import getPageTemplate
 from thirdparty import six
+from thirdparty.six import unichr as _unichr
 from thirdparty.six.moves import http_client as _http_client
 
 _rand = 0
@@ -122,6 +125,15 @@ def dirtyPatches():
             return ArgSpec(kwargs, spec[1], spec[2], spec[3])
 
         inspect.getargspec = getargspec
+
+    # Installing "reversible" unicode (decoding) error handler
+    def _reversible(ex):
+        if INVALID_UNICODE_PRIVATE_AREA:
+            return (u"".join(_unichr(int('000f00%2x' % (_ if isinstance(_, int) else ord(_)), 16)) for _ in ex.object[ex.start:ex.end]), ex.end)
+        else:
+            return (u"".join(INVALID_UNICODE_CHAR_FORMAT % (_ if isinstance(_, int) else ord(_)) for _ in ex.object[ex.start:ex.end]), ex.end)
+
+    codecs.register_error("reversible", _reversible)
 
 def resolveCrossReferences():
     """
