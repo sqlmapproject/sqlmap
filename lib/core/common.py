@@ -136,6 +136,7 @@ from lib.core.settings import HTTP_CHUNKED_SPLIT_KEYWORDS
 from lib.core.settings import IGNORE_PARAMETERS
 from lib.core.settings import IGNORE_SAVE_OPTIONS
 from lib.core.settings import INFERENCE_UNKNOWN_CHAR
+from lib.core.settings import INJECT_HERE_REGEX
 from lib.core.settings import IP_ADDRESS_REGEX
 from lib.core.settings import ISSUES_PAGE
 from lib.core.settings import IS_TTY
@@ -5357,6 +5358,8 @@ def parseRequestFile(reqFile, checkParams=True):
 
                 if not line.strip() and index == len(lines) - 1:
                     break
+
+                line = re.sub(INJECT_HERE_REGEX, CUSTOM_INJECTION_MARK_CHAR, line)
 
                 newline = "\r\n" if line.endswith('\r') else '\n'
                 line = line.strip('\r')
