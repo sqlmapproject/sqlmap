@@ -281,7 +281,7 @@ Options:
 
 Option: `-v`
 
-This option can be used to set the verbosity level of output messages. There exist **seven** levels of verbosity. The default level is **1** in which information, warning, error, critical messages and Python tracebacks (if any occur) are displayed.
+This option can be used to set the verbosity level of output messages. There are **seven** levels of verbosity. The default level is **1** in which information, warning, error, critical messages and Python tracebacks (if any occur) are displayed.
 
 * **0**: Show only Python tracebacks, error and critical messages.
 * **1**: Show also information and warning messages.
@@ -291,12 +291,12 @@ This option can be used to set the verbosity level of output messages. There exi
 * **5**: Show also HTTP responses' headers.
 * **6**: Show also HTTP responses' page content.
 
-A reasonable level of verbosity to further understand what sqlmap does under the hood is level **2**, primarily for the detection phase and the take-over functionalities. Whereas if you want to see the SQL payloads the tools sends, level **3** is your best choice. This level is also recommended to be used when you feed the developers with a potential bug report, make sure you send along with the standard output the traffic log file generated with option `-t`.
-In order to further debug potential bugs or unexpected behaviours, we recommend you to set the verbosity to level **4** or above. It should be noted that there is also a possibility to set the verbosity by using the shorter version of this option where number of letters `v` inside the provided switch (instead of option) determines the verbosity level (e.g. `-v` instead of `-v 2`, `-vv` instead of `-v 3`, `-vvv` instead of `-v 4`, etc.)
+A reasonable level of verbosity to understand what sqlmap does under the hood is level **2**, primarily for the detection phase and the take-over functionalities. Whereas if you want to see the SQL payloads the tools sends, level **3** is your best choice. This level is also recommended to be used when you feed the developers with a potential bug report. Make sure you send along with the standard output the traffic log file generated with option `-t`.
+In order to further debug potential bugs or unexpected behaviours, we recommend you to set the verbosity to level **4** or above. It should be noted that it is possible to set the verbosity by using the shorter version of this option where number of letters `v` inside the provided switch (instead of option) determines the verbosity level (e.g. `-v` instead of `-v 2`, `-vv` instead of `-v 3`, `-vvv` instead of `-v 4`, etc.)
 
 ## Target
 
-At least one of these options has be provided to set the target(s).
+At least one of these options has to be provided to set the target(s).
 
 ### Direct connection to the database
 
@@ -334,7 +334,7 @@ $ python sqlmap.py -u "http://www.target.com/vuln.php?id=1" -f --banner --dbs -\
 Option: `-l`
 
 Rather than providing a single target URL, it is possible to test and inject against HTTP requests proxied through [Burp proxy](http://portswigger.net/suite/) or 
-[WebScarab proxy](http://www.owasp.org/index.php/Category:OWASP_WebScarab_Project). This option requires an argument which is the proxy's HTTP requests log file.
+[WebScarab proxy](http://www.owasp.org/index.php/Category:OWASP_WebScarab_Project). This option requires an argument, which is the proxy's HTTP requests log file.
 
 ### Scan multiple targets enlisted in a given textual file
 
@@ -353,7 +353,7 @@ Sample content of a bulk file provided as an argument to this option:
 
 Option: `-r`
 
-One of the possibilities of sqlmap is loading of raw HTTP request from a textual file. That way you can skip usage of a number of other options (e.g. setting of cookies, POSTed data, etc).
+One of the possibilities of sqlmap is loading of a raw HTTP request from a textual file. That way you can skip usage of a number of other options (e.g. setting of cookies, POSTed data, etc).
 
 Sample content of a HTTP request file provided as an argument to this option:
 
@@ -367,7 +367,7 @@ Note that if the request is over HTTPS, you can use this in conjunction with swi
 
 ### Parse target addresses from piped-input (i.e. `stdin`)
 
-Even though sqlmap already has capabilities for target crawling, in case that user has other preferences for such task, he can provide the target addresses as a piped-in input directly from some other tool of choice (e.g. [waybackurls](https://github.com/tomnomnom/waybackurls)). It should be noted that links will be automatically parsed from such content, thus there are no constraints for input format.
+Even though sqlmap already has capabilities for target crawling, in case the user has other preferences for such task, he can provide the target addresses as a piped-in input directly from some other tool of choice (e.g. [waybackurls](https://github.com/tomnomnom/waybackurls)). It should be noted that links will be automatically parsed from such content, thus there are no constraints for input format.
 
 For example:
 
@@ -2174,7 +2174,7 @@ ers (0x80040E14)
 
 Option `--preprocess`
 
-Using this option it is possible to use a preprocessing script for (HTTP) request data prior being sent to the target (e.g. to fine-tune the request). For example, preprocessing script that appends the dummy parameter value `&foo=bar` to POST body:
+Using this option it is possible to use a preprocessing script for (HTTP) request data prior being sent to the target (e.g. to fine-tune the request). For example, a preprocessing script that appends the dummy parameter value `&foo=bar` to POST body:
 
 ```
 #!/usr/bin/env python
