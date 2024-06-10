@@ -554,6 +554,15 @@ Formats:
     </boundary>
     <!-- End of escaped column name boundaries -->
 
+    <boundary>
+        <level>5</level>
+        <clause>7</clause>
+        <where>1</where>
+        <ptype>3</ptype>
+        <prefix> [RANDSTR1],</prefix>
+        <suffix> [RANDSTR2]</suffix>
+    </boundary>
+
     <!-- AGAINST boolean full-text search boundaries (http://dev.mysql.com/doc/refman/5.5/en/fulltext-boolean.html) -->
     <boundary>
         <level>4</level>
