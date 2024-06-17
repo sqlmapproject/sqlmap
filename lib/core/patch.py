@@ -8,6 +8,7 @@ See the file 'LICENSE' for copying permission
 import codecs
 import collections
 import inspect
+import logging
 import os
 import random
 import re
@@ -134,6 +135,21 @@ def dirtyPatches():
             return (u"".join(INVALID_UNICODE_CHAR_FORMAT % (_ if isinstance(_, int) else ord(_)) for _ in ex.object[ex.start:ex.end]), ex.end)
 
     codecs.register_error("reversible", _reversible)
+
+    # Reference: https://github.com/sqlmapproject/sqlmap/issues/5731
+    if not hasattr(logging, "_acquireLock"):
+        def _acquireLock():
+            if logging._lock:
+                logging._lock.acquire()
+
+        logging._acquireLock = _acquireLock
+
+    if not hasattr(logging, "_releaseLock"):
+        def _releaseLock():
+            if logging._lock:
+                logging._lock.release()
+
+        logging._releaseLock = _releaseLock
 
 def resolveCrossReferences():
     """
