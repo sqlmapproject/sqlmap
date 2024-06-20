@@ -4665,7 +4665,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
             return self._url
 
     if not content:
-        errMsg = "can't parse forms as the page content appears to be blank"
+        errMsg = "can't parse forms as the page content appears to be blank for '%s'" % url
         if raise_:
             raise SqlmapGenericException(errMsg)
         else:

@@ -153,7 +153,7 @@ class Connect(object):
     def _getPageProxy(**kwargs):
         try:
             if (len(inspect.stack()) > sys.getrecursionlimit() // 2):   # Note: https://github.com/sqlmapproject/sqlmap/issues/4525
-                warnMsg = "unable to connect to the target URL"
+                warnMsg = "unable to connect to the target URL '%s'" % url
                 raise SqlmapConnectionException(warnMsg)
         except (TypeError, UnicodeError):
             pass
@@ -797,7 +797,7 @@ class Connect(object):
                     if ignoreTimeout:
                         return None if not conf.ignoreTimeouts else "", None, None
                     else:
-                        warnMsg = "unable to connect to the target URL (%d - %s)" % (ex.code, _http_client.responses[ex.code])
+                        warnMsg = "unable to connect to the target URL '%s' (%d - %s)" % (url, ex.code, _http_client.responses[ex.code])
                         if threadData.retriesCount < conf.retries and not kb.threadException:
                             warnMsg += ". sqlmap is going to retry the request"
                             logger.critical(warnMsg)
@@ -808,7 +808,7 @@ class Connect(object):
                         else:
                             raise SqlmapConnectionException(warnMsg)
                 else:
-                    debugMsg = "got HTTP error code: %d ('%s')" % (code, status)
+                    debugMsg = "got HTTP error code: %d ('%s') on '%s'" % (code, status, url)
                     logger.debug(debugMsg)
 
         except (_urllib.error.URLError, socket.error, socket.timeout, _http_client.HTTPException, struct.error, binascii.Error, ProxyError, SqlmapCompressionException, WebSocketException, TypeError, ValueError, OverflowError, AttributeError, OSError, AssertionError, KeyError):
@@ -833,12 +833,12 @@ class Connect(object):
                 warnMsg = "invalid URL address used (%s)" % repr(url)
                 raise SqlmapSyntaxException(warnMsg)
             elif any(_ in tbMsg for _ in ("forcibly closed", "Connection is already closed", "ConnectionAbortedError")):
-                warnMsg = "connection was forcibly closed by the target URL"
+                warnMsg = "connection was forcibly closed by the target URL '%s'" % url
             elif "timed out" in tbMsg:
                 if kb.testMode and kb.testType not in (None, PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED):
                     singleTimeWarnMessage("there is a possibility that the target (or WAF/IPS) is dropping 'suspicious' requests")
                     kb.droppingRequests = True
-                warnMsg = "connection timed out to the target URL"
+                warnMsg = "connection timed out to the target URL '%s'" % url
             elif "Connection reset" in tbMsg:
                 if not conf.disablePrecon:
                     singleTimeWarnMessage("turning off pre-connect mechanism because of connection reset(s)")
@@ -847,9 +847,9 @@ class Connect(object):
                 if kb.testMode:
                     singleTimeWarnMessage("there is a possibility that the target (or WAF/IPS) is resetting 'suspicious' requests")
                     kb.droppingRequests = True
-                warnMsg = "connection reset to the target URL"
+                warnMsg = "connection reset to the target URL '%s'" % url
             elif "URLError" in tbMsg or "error" in tbMsg:
-                warnMsg = "unable to connect to the target URL"
+                warnMsg = "unable to connect to the target URL '%s'" % url
                 match = re.search(r"Errno \d+\] ([^>\n]+)", tbMsg)
                 if match:
                     warnMsg += " ('%s')" % match.group(1).strip()
@@ -865,7 +865,7 @@ class Connect(object):
                     warnMsg += "header with option '--user-agent' or switch '--random-agent'"
             elif "IncompleteRead" in tbMsg:
                 warnMsg = "there was an incomplete read error while retrieving data "
-                warnMsg += "from the target URL"
+                warnMsg += "from the target URL '%s'" % url
             elif "Handshake status" in tbMsg:
                 status = re.search(r"Handshake status ([\d]{3})", tbMsg)
                 errMsg = "websocket handshake status %s" % status.group(1) if status else "unknown"
@@ -874,7 +874,7 @@ class Connect(object):
                 warnMsg = "problems with response (de)compression"
                 retrying = True
             else:
-                warnMsg = "unable to connect to the target URL"
+                warnMsg = "unable to connect to the target URL '%s'" % url
 
             if "BadStatusLine" not in tbMsg and any((conf.proxy, conf.tor)):
                 warnMsg += " or proxy"

@@ -93,7 +93,7 @@ class HTTPSConnection(_http_client.HTTPSConnection):
                         sock.close()
                 except (ssl.SSLError, socket.error, _http_client.BadStatusLine) as ex:
                     self._tunnel_host = None
-                    logger.debug("SSL connection error occurred for '%s' ('%s')" % (_lut[protocol], getSafeExString(ex)))
+                    logger.debug("SSL connection error occurred for '%s' on '%s:%d' ('%s')" % (_lut[protocol], self.host, self.port, getSafeExString(ex)))
 
         elif hasattr(ssl, "wrap_socket"):
             for protocol in _protocols:
@@ -110,7 +110,7 @@ class HTTPSConnection(_http_client.HTTPSConnection):
                         sock.close()
                 except (ssl.SSLError, socket.error, _http_client.BadStatusLine) as ex:
                     self._tunnel_host = None
-                    logger.debug("SSL connection error occurred for '%s' ('%s')" % (_lut[protocol], getSafeExString(ex)))
+                    logger.debug("SSL connection error occurred for '%s' on '%s:%d' ('%s')" % (_lut[protocol], self.host, self.port, getSafeExString(ex)))
 
         if not success:
             errMsg = "can't establish SSL connection"
