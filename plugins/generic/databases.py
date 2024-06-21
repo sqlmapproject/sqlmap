@@ -321,7 +321,7 @@ class Databases(object):
                     values = [(dbs[0], _) for _ in values]
 
                 for db, table in filterPairValues(values):
-                    table = unArrayizeValue(table)
+                    table = unArrayizeValue(table).strip()
 
                     if not isNoneValue(table):
                         db = safeSQLIdentificatorNaming(db)

@@ -134,12 +134,14 @@ class Entries(object):
                     kb.dumpTable = "%s:%s" % (conf.db, tbl)
                 elif Backend.isDbms(DBMS.SQLITE):
                     kb.dumpTable = tbl
+                elif METADB_SUFFIX.upper() in conf.db.upper():
+                    kb.dumpTable = tbl
                 else:
                     kb.dumpTable = "%s.%s" % (conf.db, tbl)
 
                 if safeSQLIdentificatorNaming(conf.db) not in kb.data.cachedColumns or safeSQLIdentificatorNaming(tbl, True) not in kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] or not kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)]:
                     warnMsg = "unable to enumerate the columns for table '%s'" % unsafeSQLIdentificatorNaming(tbl)
-                    if METADB_SUFFIX not in conf.db:
+                    if METADB_SUFFIX.upper() not in conf.db.upper():
                         warnMsg += " in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                     warnMsg += ", skipping" if len(tblList) > 1 else ""
                     logger.warning(warnMsg)
@@ -154,7 +156,7 @@ class Entries(object):
 
                 if not colList:
                     warnMsg = "skipping table '%s'" % unsafeSQLIdentificatorNaming(tbl)
-                    if METADB_SUFFIX not in conf.db:
+                    if METADB_SUFFIX.upper() not in conf.db.upper():
                         warnMsg += " in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                     warnMsg += " (no usable column names)"
                     logger.warning(warnMsg)
@@ -168,7 +170,7 @@ class Entries(object):
                 if conf.col:
                     infoMsg += " of column(s) '%s'" % colNames
                 infoMsg += " for table '%s'" % unsafeSQLIdentificatorNaming(tbl)
-                if METADB_SUFFIX not in conf.db:
+                if METADB_SUFFIX.upper() not in conf.db.upper():
                     infoMsg += " in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 logger.info(infoMsg)
 
