@@ -1360,7 +1360,7 @@ def _setHTTPAuthentication():
             errMsg += "be in format 'DOMAIN\\username:password'"
         elif authType == AUTH_TYPE.PKI:
             errMsg = "HTTP PKI authentication require "
-            errMsg += "usage of option `--auth-pki`"
+            errMsg += "usage of option `--auth-file`"
             raise SqlmapSyntaxException(errMsg)
 
         aCredRegExp = re.search(regExp, conf.authCred)
