@@ -321,11 +321,11 @@ class Databases(object):
                     values = [(dbs[0], _) for _ in values]
 
                 for db, table in filterPairValues(values):
-                    table = unArrayizeValue(table).strip()
+                    table = unArrayizeValue(table)
 
                     if not isNoneValue(table):
                         db = safeSQLIdentificatorNaming(db)
-                        table = safeSQLIdentificatorNaming(table, True)
+                        table = safeSQLIdentificatorNaming(table, True).strip()
 
                         if conf.getComments:
                             _ = queries[Backend.getIdentifiedDbms()].table_comment
