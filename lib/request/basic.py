@@ -282,15 +282,8 @@ def decodePage(page, contentEncoding, contentType, percentDecode=True):
     if not page or (conf.nullConnection and len(page) < 2):
         return getUnicode(page)
 
-    if hasattr(contentEncoding, "lower"):
-        contentEncoding = contentEncoding.lower()
-    else:
-        contentEncoding = ""
-
-    if hasattr(contentType, "lower"):
-        contentType = contentType.lower()
-    else:
-        contentType = ""
+    contentEncoding = contentEncoding.lower() if hasattr(contentEncoding, "lower") else ""
+    contentType = contentType.lower() if hasattr(contentType, "lower") else ""
 
     if contentEncoding in ("gzip", "x-gzip", "deflate"):
         if not kb.pageCompress:
@@ -382,7 +375,6 @@ def decodePage(page, contentEncoding, contentType, percentDecode=True):
 
 def processResponse(page, responseHeaders, code=None, status=None):
     kb.processResponseCounter += 1
-
     page = page or ""
 
     parseResponse(page, responseHeaders if kb.processResponseCounter < PARSE_HEADERS_LIMIT else None, status)
