@@ -4648,7 +4648,7 @@ def isAdminFromPrivileges(privileges):
 
     return retVal
 
-def findPageForms(content, url, raise_=False, addToTargets=False):
+def findPageForms(content, url, raiseException=False, addToTargets=False):
     """
     Parses given page content for possible forms (Note: still not implemented for Python3)
 
@@ -4666,7 +4666,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
 
     if not content:
         errMsg = "can't parse forms as the page content appears to be blank"
-        if raise_:
+        if raiseException:
             raise SqlmapGenericException(errMsg)
         else:
             logger.debug(errMsg)
@@ -4688,7 +4688,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
                     forms = ParseResponse(filtered, backwards_compat=False)
                 except:
                     errMsg = "no success"
-                    if raise_:
+                    if raiseException:
                         raise SqlmapGenericException(errMsg)
                     else:
                         logger.debug(errMsg)
@@ -4715,7 +4715,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
         except (ValueError, TypeError) as ex:
             errMsg = "there has been a problem while "
             errMsg += "processing page forms ('%s')" % getSafeExString(ex)
-            if raise_:
+            if raiseException:
                 raise SqlmapGenericException(errMsg)
             else:
                 logger.debug(errMsg)
@@ -4767,7 +4767,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
 
     if not retVal and not conf.crawlDepth:
         errMsg = "there were no forms found at the given target URL"
-        if raise_:
+        if raiseException:
             raise SqlmapGenericException(errMsg)
         else:
             logger.debug(errMsg)
