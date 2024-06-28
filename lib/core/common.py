@@ -5408,9 +5408,9 @@ def parseRequestFile(reqFile, checkParams=True):
 
                         port = extractRegexResult(r":(?P<result>\d+)\Z", value)
                         if port:
-                            value = value[:-(1 + len(port))]
-
-                        host = value
+                            host = value[:-(1 + len(port))]
+                        else:
+                            host = value
 
                     # Avoid to add a static content length header to
                     # headers and consider the following lines as
