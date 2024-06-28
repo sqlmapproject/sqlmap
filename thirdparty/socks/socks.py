@@ -185,23 +185,23 @@ class socksocket(socket.socket):
         # We'll receive the server's response to determine which
         # method was selected
         chosenauth = self.__recvall(2)
-        if chosenauth[0:1] != chr(0x05).encode():
+        if chosenauth[0:1] != b'\x05':
             self.close()
             raise GeneralProxyError((1, _generalerrors[1]))
         # Check the chosen authentication method
-        if chosenauth[1:2] == chr(0x00).encode():
+        if chosenauth[1:2] == b'\x00':
             # No authentication is required
             pass
-        elif chosenauth[1:2] == chr(0x02).encode():
+        elif chosenauth[1:2] == b'\x02':
             # Okay, we need to perform a basic username/password
             # authentication.
-            self.sendall(chr(0x01).encode() + chr(len(self.__proxy[4])).encode() + self.__proxy[4].encode() + chr(len(self.__proxy[5])).encode() + self.__proxy[5].encode())
+            self.sendall(b'\x01' + chr(len(self.__proxy[4])).encode() + self.__proxy[4].encode() + chr(len(self.__proxy[5])).encode() + self.__proxy[5].encode())
             authstat = self.__recvall(2)
-            if authstat[0:1] != chr(0x01).encode():
+            if authstat[0:1] != b'\x01':
                 # Bad response
                 self.close()
                 raise GeneralProxyError((1, _generalerrors[1]))
-            if authstat[1:2] != chr(0x00).encode():
+            if authstat[1:2] != b'\x00':
                 # Authentication failed
                 self.close()
                 raise Socks5AuthError((3, _socks5autherrors[3]))
@@ -209,7 +209,7 @@ class socksocket(socket.socket):
         else:
             # Reaching here is always bad
             self.close()
-            if chosenauth[1] == chr(0xFF).encode():
+            if chosenauth[1:2] == b'\xff':
                 raise Socks5AuthError((2, _socks5autherrors[2]))
             else:
                 raise GeneralProxyError((1, _generalerrors[1]))
@@ -219,7 +219,7 @@ class socksocket(socket.socket):
         # use the IPv4 address request even if remote resolving was specified.
         try:
             ipaddr = socket.inet_aton(destaddr)
-            req = req + chr(0x01).encode() + ipaddr
+            req = req + b'\x01' + ipaddr
         except socket.error:
             # Well it's not an IP number,  so it's probably a DNS name.
             if self.__proxy[3]:
