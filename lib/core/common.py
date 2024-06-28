@@ -5276,6 +5276,9 @@ def parseRequestFile(reqFile, checkParams=True):
         Parses WebScarab logs (POST method not supported)
         """
 
+        if WEBSCARAB_SPLITTER not in content:
+            return
+
         reqResList = content.split(WEBSCARAB_SPLITTER)
 
         for request in reqResList:
