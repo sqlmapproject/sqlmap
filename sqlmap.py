@@ -437,7 +437,7 @@ def main():
             raise SystemExit
 
         elif any(_ in errMsg for _ in (": 9.9.9#",)):
-            errMsg = "LOL :)"
+            errMsg = "LOL xD"
             logger.critical(errMsg)
             raise SystemExit
 
