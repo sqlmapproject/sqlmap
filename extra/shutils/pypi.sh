@@ -38,7 +38,8 @@ setup(
     },
     download_url='https://github.com/sqlmapproject/sqlmap/archive/$VERSION.zip',
     license='GNU General Public License v2 (GPLv2)',
-    packages=find_packages(),
+    packages=['sqlmap'],
+    package_dir={'sqlmap':'sqlmap'},
     include_package_data=True,
     zip_safe=False,
     # https://pypi.python.org/pypi?%3Aaction=list_classifiers
