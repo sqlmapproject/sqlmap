@@ -2,9 +2,9 @@
 
 [![.github/workflows/tests.yml](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml/badge.svg)](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml) [![Python 2.6|2.7|3.x](https://img.shields.io/badge/python-2.6|2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![Twitter](https://img.shields.io/badge/twitter-@sqlmap-blue.svg)](https://twitter.com/sqlmap)
 
-sqlmap adalah alat bantu proyek sumber terbuka yang digunakan untuk melakukan uji penetrasi, mengotomasi proses deteksi, eksploitasi kelemahan _SQL injection_ serta pengambil-alihan server basis data.
+sqlmap adalah perangkat lunak sumber terbuka yang digunakan untuk melakukan uji penetrasi, mengotomasi proses deteksi, eksploitasi kelemahan _SQL injection_ serta pengambil-alihan server basis data.
 
-sqlmap dilengkapi dengan pendeteksi canggih dan fitur-fitur handal yang berguna bagi _penetration tester_. Alat ini menawarkan berbagai cara untuk mendeteksi basis data bahkan dapat mengakses sistem file dan mengeksekusi perintah dalam sistem operasi melalui koneksi _out-of-band_.
+sqlmap dilengkapi dengan pendeteksi canggih dan fitur-fitur handal yang berguna bagi _penetration tester_. Perangkat lunak ini menawarkan berbagai cara untuk mendeteksi basis data bahkan dapat mengakses sistem file dan mengeksekusi perintah dalam sistem operasi melalui koneksi _out-of-band_.
 
 Tangkapan Layar
 ----
