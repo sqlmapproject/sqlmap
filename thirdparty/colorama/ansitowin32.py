@@ -243,6 +243,6 @@ class AnsiToWin32(object):
                 # 0 - change title and icon (we will only change title)
                 # 1 - change icon (we don't support this)
                 # 2 - change title
-                if params[0] in '02':
-                    winterm.set_title(params[1])
+                # if params[0] in '02':
+                #     winterm.set_title(params[1])
         return text
