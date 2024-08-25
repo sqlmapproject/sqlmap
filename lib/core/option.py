@@ -2090,6 +2090,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.headersFp = {}
     kb.heuristicDbms = None
     kb.heuristicExtendedDbms = None
+    kb.heuristicCode = None
     kb.heuristicMode = False
     kb.heuristicPage = False
     kb.heuristicTest = None

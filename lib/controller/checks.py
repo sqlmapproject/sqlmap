@@ -581,7 +581,7 @@ def checkSqlInjection(place, parameter, value):
 
                             if injectable:
                                 if kb.pageStable and not any((conf.string, conf.notString, conf.regexp, conf.code, kb.nullConnection)):
-                                    if all((falseCode, trueCode)) and falseCode != trueCode:
+                                    if all((falseCode, trueCode)) and falseCode != trueCode and trueCode != kb.heuristicCode:
                                         suggestion = conf.code = trueCode
 
                                         infoMsg = "%sparameter '%s' appears to be '%s' injectable (with --code=%d)" % ("%s " % paramType if paramType != parameter else "", parameter, title, conf.code)
@@ -1050,9 +1050,10 @@ def heuristicCheckSqlInjection(place, parameter):
 
     payload = "%s%s%s" % (prefix, randStr, suffix)
     payload = agent.payload(place, parameter, newValue=payload)
-    page, _, _ = Request.queryPage(payload, place, content=True, raise404=False)
+    page, _, code = Request.queryPage(payload, place, content=True, raise404=False)
 
     kb.heuristicPage = page
+    kb.heuristicCode = code
     kb.heuristicMode = False
 
     parseFilePaths(page)
