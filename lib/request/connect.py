@@ -297,10 +297,10 @@ class Connect(object):
         finalCode = kwargs.get("finalCode", False)
         chunked = kwargs.get("chunked", False) or conf.chunked
 
-        start = time.time()
-
         if isinstance(conf.delay, (int, float)) and conf.delay > 0:
             time.sleep(conf.delay)
+
+        start = time.time()
 
         threadData = getCurrentThreadData()
         with kb.locks.request:
