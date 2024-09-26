@@ -45,6 +45,6 @@ sqlmap의 능력, 지원되는 기능과 모든 옵션과 스위치들의 목록
 * Issue tracker: https://github.com/sqlmapproject/sqlmap/issues
 * 사용자 매뉴얼: https://github.com/sqlmapproject/sqlmap/wiki
 * 자주 묻는 질문 (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* 트위터: [@sqlmap](https://twitter.com/sqlmap)
+* X: [@sqlmap](https://twitter.com/sqlmap)
 * 시연 영상: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * 스크린샷: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
