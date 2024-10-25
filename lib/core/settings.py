@@ -19,7 +19,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.8.9.1"
+VERSION = "1.8.10.0"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -686,7 +686,7 @@ PARAMETER_SPLITTING_REGEX = r"[,|;]"
 UNENCODED_ORIGINAL_VALUE = "original"
 
 # Common column names containing usernames (used for hash cracking in some cases)
-COMMON_USER_COLUMNS = ("login", "user", "username", "user_name", "user_login", "benutzername", "benutzer", "utilisateur", "usager", "consommateur", "utente", "utilizzatore", "utilizator", "utilizador", "usufrutuario", "korisnik", "uporabnik", "usuario", "consumidor", "client", "cuser")
+COMMON_USER_COLUMNS = ("login", "user", "username", "user_name", "user_login", "account", "account_name", "benutzername", "benutzer", "utilisateur", "usager", "consommateur", "utente", "utilizzatore", "utilizator", "utilizador", "usufrutuario", "korisnik", "uporabnik", "usuario", "consumidor", "client", "customer", "cuser")
 
 # Default delimiter in GET/POST values
 DEFAULT_GET_POST_DELIMITER = '&'
@@ -794,7 +794,7 @@ BOLD_PATTERNS = ("' injectable", "provided empty", "leftover chars", "might be i
 RANDOMIZATION_TLDS = ("com", "net", "ru", "org", "de", "uk", "br", "jp", "cn", "fr", "it", "pl", "tv", "edu", "in", "ir", "es", "me", "info", "gr", "gov", "ca", "co", "se", "cz", "to", "vn", "nl", "cc", "az", "hu", "ua", "be", "no", "biz", "io", "ch", "ro", "sk", "eu", "us", "tw", "pt", "fi", "at", "lt", "kz", "cl", "hr", "pk", "lv", "la", "pe", "au")
 
 # Generic www root directory names
-GENERIC_DOC_ROOT_DIRECTORY_NAMES = ("htdocs", "httpdocs", "public", "wwwroot", "www")
+GENERIC_DOC_ROOT_DIRECTORY_NAMES = ("htdocs", "httpdocs", "public", "public_html", "wwwroot", "www", "site")
 
 # Maximum length of a help part containing switch/option name(s)
 MAX_HELP_OPTION_LENGTH = 18
@@ -803,7 +803,7 @@ MAX_HELP_OPTION_LENGTH = 18
 MAX_CONNECT_RETRIES = 100
 
 # Strings for detecting formatting errors
-FORMAT_EXCEPTION_STRINGS = ("Type mismatch", "Error converting", "Please enter a", "Conversion failed", "String or binary data would be truncated", "Failed to convert", "unable to interpret text value", "Input string was not in a correct format", "System.FormatException", "java.lang.NumberFormatException", "ValueError: invalid literal", "TypeMismatchException", "CF_SQL_INTEGER", "CF_SQL_NUMERIC", " for CFSQLTYPE ", "cfqueryparam cfsqltype", "InvalidParamTypeException", "Invalid parameter type", "Attribute validation error for tag", "is not of type numeric", "<cfif Not IsNumeric(", "invalid input syntax for integer", "invalid input syntax for type", "invalid number", "character to number conversion error", "unable to interpret text value", "String was not recognized as a valid", "Convert.ToInt", "cannot be converted to a ", "InvalidDataException", "Arguments are of the wrong type")
+FORMAT_EXCEPTION_STRINGS = ("Type mismatch", "Error converting", "Please enter a", "Conversion failed", "String or binary data would be truncated", "Failed to convert", "unable to interpret text value", "Input string was not in a correct format", "System.FormatException", "java.lang.NumberFormatException", "ValueError: invalid literal", "TypeMismatchException", "CF_SQL_INTEGER", "CF_SQL_NUMERIC", " for CFSQLTYPE ", "cfqueryparam cfsqltype", "InvalidParamTypeException", "Invalid parameter type", "Attribute validation error for tag", "is not of type numeric", "<cfif Not IsNumeric(", "invalid input syntax for integer", "invalid input syntax for type", "invalid number", "character to number conversion error", "unable to interpret text value", "String was not recognized as a valid", "Convert.ToInt", "cannot be converted to a ", "InvalidDataException", "Arguments are of the wrong type", "Invalid conversion")
 
 # Regular expression used for extracting ASP.NET view state values
 VIEWSTATE_REGEX = r'(?i)(?P<name>__VIEWSTATE[^"]*)[^>]+value="(?P<result>[^"]+)'
@@ -908,7 +908,7 @@ KB_CHARS_BOUNDARY_CHAR = 'q'
 KB_CHARS_LOW_FREQUENCY_ALPHABET = "zqxjkvbp"
 
 # For filling in case of dumb push updates
-DUMMY_JUNK = "jaiSh6bi"
+DUMMY_JUNK = "Ataiphi2"
 
 # Printable bytes
 PRINTABLE_BYTES = set(bytes(string.printable, "ascii") if six.PY3 else string.printable)
