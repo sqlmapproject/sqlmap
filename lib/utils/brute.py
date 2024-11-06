@@ -228,93 +228,95 @@ def columnExists(columnFile, regex=None):
     columns.extend(_addPageTextWords())
     columns = filterListValue(columns, regex)
 
-    table = safeSQLIdentificatorNaming(conf.tbl, True)
+    for table in conf.tbl.split(','):
+        table = safeSQLIdentificatorNaming(table, True)
 
-    if conf.db and METADB_SUFFIX not in conf.db and Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD):
-        table = "%s.%s" % (safeSQLIdentificatorNaming(conf.db), table)
+        if conf.db and METADB_SUFFIX not in conf.db and Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD):
+            table = "%s.%s" % (safeSQLIdentificatorNaming(conf.db), table)
 
-    kb.threadContinue = True
-    kb.bruteMode = True
+        kb.threadContinue = True
+        kb.bruteMode = True
 
-    threadData = getCurrentThreadData()
-    threadData.shared.count = 0
-    threadData.shared.limit = len(columns)
-    threadData.shared.files = []
-
-    def columnExistsThread():
         threadData = getCurrentThreadData()
+        threadData.shared.count = 0
+        threadData.shared.limit = len(columns)
+        threadData.shared.files = []
 
-        while kb.threadContinue:
-            kb.locks.count.acquire()
-            if threadData.shared.count < threadData.shared.limit:
-                column = safeSQLIdentificatorNaming(columns[threadData.shared.count])
-                threadData.shared.count += 1
-                kb.locks.count.release()
-            else:
-                kb.locks.count.release()
-                break
+        def columnExistsThread():
+            threadData = getCurrentThreadData()
 
-            if Backend.isDbms(DBMS.MCKOI):
-                result = inject.checkBooleanExpression(safeStringFormat("0<(SELECT COUNT(%s) FROM %s)", (column, table)))
-            else:
-                result = inject.checkBooleanExpression(safeStringFormat(BRUTE_COLUMN_EXISTS_TEMPLATE, (column, table)))
+            while kb.threadContinue:
+                kb.locks.count.acquire()
 
-            kb.locks.io.acquire()
+                if threadData.shared.count < threadData.shared.limit:
+                    column = safeSQLIdentificatorNaming(columns[threadData.shared.count])
+                    threadData.shared.count += 1
+                    kb.locks.count.release()
+                else:
+                    kb.locks.count.release()
+                    break
 
-            if result:
-                threadData.shared.files.append(column)
+                if Backend.isDbms(DBMS.MCKOI):
+                    result = inject.checkBooleanExpression(safeStringFormat("0<(SELECT COUNT(%s) FROM %s)", (column, table)))
+                else:
+                    result = inject.checkBooleanExpression(safeStringFormat(BRUTE_COLUMN_EXISTS_TEMPLATE, (column, table)))
 
-                if conf.verbose in (1, 2) and not conf.api:
-                    clearConsoleLine(True)
-                    infoMsg = "[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), unsafeSQLIdentificatorNaming(column))
-                    dataToStdout(infoMsg, True)
+                kb.locks.io.acquire()
 
-            if conf.verbose in (1, 2):
-                status = "%d/%d items (%d%%)" % (threadData.shared.count, threadData.shared.limit, round(100.0 * threadData.shared.count / threadData.shared.limit))
-                dataToStdout("\r[%s] [INFO] tried %s" % (time.strftime("%X"), status), True)
+                if result:
+                    threadData.shared.files.append(column)
 
-            kb.locks.io.release()
+                    if conf.verbose in (1, 2) and not conf.api:
+                        clearConsoleLine(True)
+                        infoMsg = "[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), unsafeSQLIdentificatorNaming(column))
+                        dataToStdout(infoMsg, True)
 
-    try:
-        runThreads(conf.threads, columnExistsThread, threadChoice=True)
-    except KeyboardInterrupt:
-        warnMsg = "user aborted during column existence "
-        warnMsg += "check. sqlmap will display partial output"
-        logger.warning(warnMsg)
-    finally:
-        kb.bruteMode = False
+                if conf.verbose in (1, 2):
+                    status = "%d/%d items (%d%%)" % (threadData.shared.count, threadData.shared.limit, round(100.0 * threadData.shared.count / threadData.shared.limit))
+                    dataToStdout("\r[%s] [INFO] tried %s" % (time.strftime("%X"), status), True)
 
-    clearConsoleLine(True)
-    dataToStdout("\n")
+                kb.locks.io.release()
 
-    if not threadData.shared.files:
-        warnMsg = "no column(s) found"
-        logger.warning(warnMsg)
-    else:
-        columns = {}
+        try:
+            runThreads(conf.threads, columnExistsThread, threadChoice=True)
+        except KeyboardInterrupt:
+            warnMsg = "user aborted during column existence "
+            warnMsg += "check. sqlmap will display partial output"
+            logger.warning(warnMsg)
+        finally:
+            kb.bruteMode = False
 
-        for column in threadData.shared.files:
-            if Backend.getIdentifiedDbms() in (DBMS.MYSQL,):
-                result = not inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE %s REGEXP '[^0-9]')", (column, table, column)))
-            elif Backend.getIdentifiedDbms() in (DBMS.SQLITE,):
-                result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE %s NOT GLOB '*[^0-9]*')", (column, table, column)))
-            elif Backend.getIdentifiedDbms() in (DBMS.MCKOI,):
-                result = inject.checkBooleanExpression("%s" % safeStringFormat("0=(SELECT MAX(%s)-MAX(%s) FROM %s)", (column, column, table)))
-            else:
-                result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE ROUND(%s)=ROUND(%s))", (column, table, column, column)))
+        clearConsoleLine(True)
+        dataToStdout("\n")
 
-            if result:
-                columns[column] = "numeric"
-            else:
-                columns[column] = "non-numeric"
+        if not threadData.shared.files:
+            warnMsg = "no column(s) found"
+            logger.warning(warnMsg)
+        else:
+            columns = {}
 
-        kb.data.cachedColumns[conf.db] = {conf.tbl: columns}
+            for column in threadData.shared.files:
+                if Backend.getIdentifiedDbms() in (DBMS.MYSQL,):
+                    result = not inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE %s REGEXP '[^0-9]')", (column, table, column)))
+                elif Backend.getIdentifiedDbms() in (DBMS.SQLITE,):
+                    result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE %s NOT GLOB '*[^0-9]*')", (column, table, column)))
+                elif Backend.getIdentifiedDbms() in (DBMS.MCKOI,):
+                    result = inject.checkBooleanExpression("%s" % safeStringFormat("0=(SELECT MAX(%s)-MAX(%s) FROM %s)", (column, column, table)))
+                else:
+                    result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE ROUND(%s)=ROUND(%s))", (column, table, column, column)))
 
-        for _ in ((conf.db, conf.tbl, item[0], item[1]) for item in columns.items()):
-            if _ not in kb.brute.columns:
-                kb.brute.columns.append(_)
+                if result:
+                    columns[column] = "numeric"
+                else:
+                    columns[column] = "non-numeric"
 
-        hashDBWrite(HASHDB_KEYS.KB_BRUTE_COLUMNS, kb.brute.columns, True)
+            kb.data.cachedColumns[conf.db] = {table: columns}
+
+            for _ in ((conf.db, table, item[0], item[1]) for item in columns.items()):
+                if _ not in kb.brute.columns:
+                    kb.brute.columns.append(_)
+
+    hashDBWrite(HASHDB_KEYS.KB_BRUTE_COLUMNS, kb.brute.columns, True)
 
     return kb.data.cachedColumns
 
