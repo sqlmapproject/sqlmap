@@ -812,6 +812,7 @@ def _setTamperingFunctions():
                 raise SqlmapSyntaxException("cannot import tamper module '%s' (%s)" % (getUnicode(filename[:-3]), getSafeExString(ex)))
 
             priority = PRIORITY.NORMAL if not hasattr(module, "__priority__") else module.__priority__
+            priority = priority if priority is not None else PRIORITY.LOWEST
 
             for name, function in inspect.getmembers(module, inspect.isfunction):
                 if name == "tamper" and (hasattr(inspect, "signature") and all(_ in inspect.signature(function).parameters for _ in ("payload", "kwargs")) or inspect.getargspec(function).args and inspect.getargspec(function).keywords == "kwargs"):
