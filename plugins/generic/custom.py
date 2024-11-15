@@ -16,6 +16,7 @@ from lib.core.common import getSQLSnippet
 from lib.core.common import isListLike
 from lib.core.common import isStackingAvailable
 from lib.core.common import joinValue
+from lib.core.compat import xrange
 from lib.core.convert import getUnicode
 from lib.core.data import conf
 from lib.core.data import logger
