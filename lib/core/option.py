@@ -435,7 +435,7 @@ def _setStdinPipeTargets():
             def next(self):
                 try:
                     line = next(conf.stdinPipe)
-                except (IOError, OSError, TypeError):
+                except (IOError, OSError, TypeError, UnicodeDecodeError):
                     line = None
 
                 if line:
