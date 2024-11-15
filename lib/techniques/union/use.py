@@ -261,7 +261,7 @@ def unionUse(expression, unpack=True, dump=False):
         if match and not (Backend.isDbms(DBMS.ORACLE) and FROM_DUMMY_TABLE[DBMS.ORACLE] in expression) and not re.search(r"\b(MIN|MAX|COUNT|EXISTS)\(", expression):
             kb.jsonAggMode = True
             if Backend.isDbms(DBMS.MYSQL):
-                query = expression.replace(expressionFields, "CONCAT('%s',JSON_ARRAYAGG(CONCAT_WS('%s',%s)),'%s')" % (kb.chars.start, kb.chars.delimiter, expressionFields, kb.chars.stop), 1)
+                query = expression.replace(expressionFields, "CONCAT('%s',JSON_ARRAYAGG(CONCAT_WS('%s',%s)),'%s')" % (kb.chars.start, kb.chars.delimiter, ','.join(agent.nullAndCastField(field) for field in expressionFieldsList), kb.chars.stop), 1)
             elif Backend.isDbms(DBMS.ORACLE):
                 query = expression.replace(expressionFields, "'%s'||JSON_ARRAYAGG(%s)||'%s'" % (kb.chars.start, ("||'%s'||" % kb.chars.delimiter).join(expressionFieldsList), kb.chars.stop), 1)
             elif Backend.isDbms(DBMS.SQLITE):
