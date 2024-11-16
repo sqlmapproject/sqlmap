@@ -65,7 +65,7 @@ class Custom(object):
 
                 output = inject.getValue(query, fromUser=True)
 
-                if "SELECT" in sqlType and isListLike(output):
+                if sqlType and "SELECT" in sqlType and isListLike(output):
                     for i in xrange(len(output)):
                         if isListLike(output[i]):
                             output[i] = joinValue(output[i])
