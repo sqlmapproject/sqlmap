@@ -3716,10 +3716,12 @@ def joinValue(value, delimiter=','):
     '1,2'
     >>> joinValue('1')
     '1'
+    >>> joinValue(['1', None])
+    '1,None'
     """
 
     if isListLike(value):
-        retVal = delimiter.join(value)
+        retVal = delimiter.join(getUnicode(_) for _ in value)
     else:
         retVal = value
 
