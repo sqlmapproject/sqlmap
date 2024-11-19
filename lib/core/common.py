@@ -3721,7 +3721,7 @@ def joinValue(value, delimiter=','):
     """
 
     if isListLike(value):
-        retVal = delimiter.join(getUnicode(_) for _ in value)
+        retVal = delimiter.join(getText(_ if _ is not None else "None") for _ in value)
     else:
         retVal = value
 
