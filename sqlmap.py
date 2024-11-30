@@ -158,6 +158,11 @@ def main():
         if checkPipedInput():
             conf.batch = True
 
+        if conf.get("dumpFormat") == "SORTABLE_HTML":
+            conf.dumpFormat = "HTML"
+            conf.dumpSortable = True
+        else:
+            conf.dumpSortable = False
         if conf.get("api"):
             # heavy imports
             from lib.utils.api import StdDbOut

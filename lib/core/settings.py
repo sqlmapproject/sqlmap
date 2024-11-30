@@ -918,29 +918,163 @@ HTTP_CHUNKED_SPLIT_KEYWORDS = ("SELECT", "UPDATE", "INSERT", "FROM", "LOAD_FILE"
 
 # CSS style used in HTML dump format
 HTML_DUMP_CSS_STYLE = """<style>
-table{
-    margin:10;
-    background-color:#FFFFFF;
-    font-family:verdana;
-    font-size:12px;
-    align:center;
+table {
+  margin: 10px;
+  background: #fff;
+  font: 12px verdana;
+  text-align: center;
 }
 thead{
     font-weight:bold;
     background-color:#4F81BD;
-    color:#FFFFFF;
+    color: #fff;
 }
 tr:nth-child(even) {
-    background-color: #D3DFEE
-}
-td{
-    font-size:12px;
-}
-th{
-    font-size:12px;
+    background-color: #D3DFEE;
 }
 </style>"""
 
+HTML_DUMP_CSS_SORTABLE_STYLE = """
+<style>
+table thead th {
+  cursor: pointer;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+table thead th::after,
+table thead th::before {
+  color: transparent;
+}
+
+table thead th::after {
+  margin-left: 3px;
+  content: "▸";
+}
+
+table thead th:hover::after,
+table thead th[aria-sort]::after {
+  color: inherit;
+}
+
+table thead th[aria-sort=descending]::after {
+  content: "▾";
+}
+
+table thead th[aria-sort=ascending]::after {
+  content: "▴";
+}
+
+table thead th.indicator-left::before {
+  margin-right: 3px;
+  content: "▸";
+}
+
+table thead th.indicator-left[aria-sort=descending]::before {
+  color: inherit;
+  content: "▾";
+}
+
+table thead th.indicator-left[aria-sort=ascending]::before {
+  color: inherit;
+  content: "▴";
+}
+</style>
+"""
+HTML_DUMP_SORTABLE_JAVASCRIPT = """<script>
+window.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('click', event => {
+    try {
+      const isAltSort = event.shiftKey || event.altKey;
+
+      // Find the clicked table header
+      const findParentElement = (element, nodeName) => 
+        element.nodeName === nodeName ? element : findParentElement(element.parentNode, nodeName);
+      
+      const headerCell = findParentElement(event.target, 'TH');
+      const headerRow = headerCell.parentNode;
+      const thead = headerRow.parentNode;
+      const table = thead.parentNode;
+
+      if (thead.nodeName !== 'THEAD') return;
+
+      // Reset sort indicators on other headers
+      Array.from(headerRow.cells).forEach(cell => {
+        if (cell !== headerCell) cell.removeAttribute('aria-sort');
+      });
+
+      // Toggle sort direction
+      const currentSort = headerCell.getAttribute('aria-sort');
+      const isAscending = table.classList.contains('asc') && currentSort !== 'ascending';
+      const sortDirection = (currentSort === 'descending' || isAscending) ? 'ascending' : 'descending';
+      headerCell.setAttribute('aria-sort', sortDirection);
+
+      // Debounce sort operation
+      if (table.dataset.timer) clearTimeout(Number(table.dataset.timer));
+      
+      table.dataset.timer = setTimeout(() => {
+        sortTable(table, isAltSort);
+      }, 1).toString();
+    } catch (error) {
+      console.error('Sorting error:', error);
+    }
+  });
+});
+
+function sortTable(table, useAltSort) {
+  table.dispatchEvent(new CustomEvent('sort-start', { bubbles: true }));
+
+  const sortHeader = table.tHead.querySelector('th[aria-sort]');
+  const headerRow = table.tHead.children[0];
+  const isAscending = sortHeader.getAttribute('aria-sort') === 'ascending';
+  const shouldPushEmpty = table.classList.contains('n-last');
+  const sortColumnIndex = Number(sortHeader.dataset.sortCol ?? sortHeader.cellIndex);
+
+  const getCellValue = cell => {
+    if (useAltSort) return cell.dataset.sortAlt;
+    return cell.dataset.sort ?? cell.textContent;
+  };
+
+  const compareRows = (row1, row2) => {
+    const value1 = getCellValue(row1.cells[sortColumnIndex]);
+    const value2 = getCellValue(row2.cells[sortColumnIndex]);
+
+    // Handle empty values
+    if (shouldPushEmpty) {
+      if (value1 === '' && value2 !== '') return -1;
+      if (value2 === '' && value1 !== '') return 1;
+    }
+
+    // Compare numerically if possible, otherwise use string comparison
+    const numericDiff = Number(value1) - Number(value2);
+    const comparison = isNaN(numericDiff) ? 
+      value1.localeCompare(value2, undefined, { numeric: true }) : 
+      numericDiff;
+
+    // Handle tiebreaker
+    if (comparison === 0 && headerRow.cells[sortColumnIndex]?.dataset.sortTbr) {
+      const tiebreakIndex = Number(headerRow.cells[sortColumnIndex].dataset.sortTbr);
+      return compareRows(row1, row2, tiebreakIndex);
+    }
+
+    return isAscending ? -comparison : comparison;
+  };
+
+  // Sort each tbody
+  Array.from(table.tBodies).forEach(tbody => {
+    const rows = Array.from(tbody.rows);
+    const sortedRows = rows.sort(compareRows);
+    
+    const newTbody = tbody.cloneNode();
+    newTbody.append(...sortedRows);
+    tbody.replaceWith(newTbody);
+  });
+
+  table.dispatchEvent(new CustomEvent('sort-end', { bubbles: true }));
+}
+</script>"""
 # Leaving (dirty) possibility to change values from here (e.g. `export SQLMAP__MAX_NUMBER_OF_THREADS=20`)
 for key, value in os.environ.items():
     if key.upper().startswith("%s_" % SQLMAP_ENVIRONMENT_PREFIX):
