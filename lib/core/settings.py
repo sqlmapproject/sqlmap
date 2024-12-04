@@ -19,7 +19,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.8.11.11"
+VERSION = "1.8.12.0"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -59,6 +59,9 @@ LIVE_COOKIES_TIMEOUT = 120
 # Lower and upper values for match ratio in case of stable page
 LOWER_RATIO_BOUND = 0.02
 UPPER_RATIO_BOUND = 0.98
+
+# For filling in case of dumb push updates
+DUMMY_JUNK = "Gu8ohxi9"
 
 # Markers for special cases when parameter values contain html encoded characters
 PARAMETER_AMP_MARKER = "__AMP__"
@@ -906,9 +909,6 @@ KB_CHARS_BOUNDARY_CHAR = 'q'
 
 # Letters of lower frequency used in kb.chars
 KB_CHARS_LOW_FREQUENCY_ALPHABET = "zqxjkvbp"
-
-# For filling in case of dumb push updates
-DUMMY_JUNK = "Ataiphi2"
 
 # Printable bytes
 PRINTABLE_BYTES = set(bytes(string.printable, "ascii") if six.PY3 else string.printable)
