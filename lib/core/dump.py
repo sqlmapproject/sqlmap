@@ -7,6 +7,9 @@ See the file 'LICENSE' for copying permission
 
 import hashlib
 import os
+
+import csv
+
 import re
 import shutil
 import tempfile
@@ -710,6 +713,40 @@ class Dump(object):
     def sqlQuery(self, query, queryRes):
         self.string(query, queryRes, content_type=CONTENT_TYPE.SQL_QUERY)
 
+        #code to extract columns from the request
+        deb="SELECT"
+        fin="FROM"
+        temp1=(query.upper()).find(deb)
+
+        temp2=(query.upper()).find(fin)
+
+        T=len(deb)-temp1+1
+        temp_res=query[T:temp2]
+        temp_res=(temp_res.strip()).split(',')
+
+        #******************************************
+        #dictionarie for every value in queryRes
+        dt_save=[]
+        for i in range (len(queryRes)):
+            s=queryRes[i]
+            d={}
+            for j in range(len(temp_res)):
+                d.update({temp_res[j]:s[j]})
+            dt_save.append(d)
+            
+        #*******************************************
+        file_csv="data_save.csv"
+        if(len(queryRes)!=0):
+            with open(file_csv,mode='w',newline='') as file_csv:
+                writer=csv.DictWriter(file_csv,fieldnames=temp_res)
+                writer.writeheader()
+                for part in dt_save:
+                    writer.writerow(part)
+                print("data saved in csv format under "+"'"+os.path.realpath("data_save.csv")+"'")
+        else:
+            print("data don't exist to create CSV file")
+            
+            
     def rFile(self, fileData):
         self.lister("files saved to", fileData, sort=False, content_type=CONTENT_TYPE.FILE_READ)
 
