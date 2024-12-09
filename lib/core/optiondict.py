@@ -249,6 +249,7 @@ optDict = {
         "beep": "boolean",
         "dependencies": "boolean",
         "disableColoring": "boolean",
+        "disableHashing": "boolean",
         "listTampers": "boolean",
         "noLogging": "boolean",
         "offline": "boolean",
