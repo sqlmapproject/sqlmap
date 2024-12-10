@@ -1359,32 +1359,32 @@
         </roles>
         <statements/>
         <dbs>
-            <inband query="SELECT schema_name FROM information_schema.schemata"/>
-            <blind query="SELECT schema_name FROM information_schema.schemata ORDER BY schema_name LIMIT 1 OFFSET %d" count="SELECT COUNT(schema_name) FROM information_schema.schemata"/>
+            <inband query="SELECT name FROM system.databases"/>
+            <blind query="SELECT name FROM system.databases ORDER BY name LIMIT 1 OFFSET %d" count="SELECT COUNT(name) FROM system.databases"/>
         </dbs>
         <tables>
-            <inband query="SELECT table_schema,table_name FROM information_schema.tables" condition="table_schema"/>
-            <blind query="SELECT table_name FROM information_schema.tables WHERE table_schema='%s' LIMIT 1 OFFSET %d" count="SELECT COUNT(table_name) FROM information_schema.tables WHERE table_schema='%s'"/>
+            <inband query="SELECT database,name FROM system.tables" condition="database"/>
+            <blind query="SELECT name FROM system.tables WHERE database='%s' LIMIT 1 OFFSET %d" count="SELECT COUNT(name) FROM system.tables WHERE database='%s'"/>
         </tables>
         <columns>
-            <inband query="SELECT column_name,column_type FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='%s' AND table_schema='%s'" condition="column_name"/>
-            <blind query="SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='%s' AND table_schema='%s' LIMIT %d,1" query2="SELECT column_type FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='%s' AND column_name='%s' AND table_schema='%s'" count="SELECT COUNT(column_name) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='%s' AND table_schema='%s'" condition="column_name"/>
+            <inband query="SELECT name,type FROM system.columns WHERE table='%s' AND database='%s'" condition="name"/>
+            <blind query="SELECT name FROM system.columns WHERE table='%s' AND database='%s'" query2="SELECT type FROM system.columns WHERE table='%s' AND name='%s' AND database='%s'" count="SELECT COUNT(name) FROM system.columns WHERE table='%s' AND database='%s'" condition="name"/>
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s.%s ORDER BY %s"/>
             <blind query="SELECT %s FROM %s.%s ORDER BY %s LIMIT %d,1 " count="SELECT COUNT(*) FROM %s.%s"/>
         </dump_table>
         <search_table>
-            <inband query="SELECT table_schema,table_name FROM INFORMATION_SCHEMA.TABLES WHERE %s" condition="table_name" condition2="table_schema"/>
-            <blind query="SELECT DISTINCT(table_schema) FROM INFORMATION_SCHEMA.TABLES WHERE %s" query2="SELECT DISTINCT(table_name) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='%s'" count="SELECT COUNT(DISTINCT(table_schema)) FROM INFORMATION_SCHEMA.TABLES WHERE %s" count2="SELECT COUNT(DISTINCT(table_name)) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='%s'" condition="table_name" condition2="table_schema"/>
+            <inband query="SELECT database,name FROM system.tables WHERE %s" condition="name" condition2="database"/>
+            <blind query="SELECT DISTINCT(database) FROM system.tables WHERE %s" query2="SELECT DISTINCT(name) FROM system.tables WHERE database='%s'" count="SELECT COUNT(DISTINCT(database)) FROM system.tables WHERE %s" count2="SELECT COUNT(DISTINCT(name)) FROM system.tables WHERE database='%s'" condition="name" condition2="database"/>
         </search_table>
         <search_column>
-            <inband query="SELECT table_schema,table_name FROM INFORMATION_SCHEMA.COLUMNS WHERE %s" condition="column_name" condition2="table_schema" condition3="table_name"/>
-            <blind query="SELECT DISTINCT(table_schema) FROM INFORMATION_SCHEMA.COLUMNS WHERE %s" query2="SELECT DISTINCT(table_name) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema='%s'" count="SELECT COUNT(DISTINCT(table_schema)) FROM INFORMATION_SCHEMA.COLUMNS WHERE %s" count2="SELECT COUNT(DISTINCT(table_name)) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema='%s'" condition="column_name" condition2="table_schema" condition3="table_name"/>
+            <inband query="SELECT database,table FROM system.columns WHERE %s" condition="name" condition2="database" condition3="table"/>
+            <blind query="SELECT DISTINCT(database) FROM system.columns WHERE %s" query2="SELECT DISTINCT(table) FROM system.columns WHERE database='%s'" count="SELECT COUNT(DISTINCT(database)) FROM system.columns WHERE %s" count2="SELECT COUNT(DISTINCT(table)) FROM system.columns WHERE database='%s'" condition="name" condition2="database" condition3="table"/>
         </search_column>
         <search_db>
-            <inband query="SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA WHERE %s" condition="schema_name"/>
-            <blind query="SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA WHERE %s" count="SELECT COUNT(schema_name) FROM INFORMATION_SCHEMA.SCHEMATA WHERE %s" condition="schema_name"/>
+            <inband query="SELECT name FROM system.databases WHERE %s" condition="name"/>
+            <blind query="SELECT name FROM system.databases WHERE %s" count="SELECT COUNT(name) FROM system.databases WHERE %s" condition="name"/>
         </search_db>
     </dbms>
 
