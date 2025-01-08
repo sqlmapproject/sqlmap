@@ -1,0 +1,15 @@
+{
+  "name": "Ubuntu Devcontainer",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash"
+  },
+  "postCreateCommand": "sudo apt update && sudo apt upgrade -y",
+  "features": {
+    "docker-in-docker": "latest"
+  },
+  "extensions": [
+    "ms-python.python",
+    "dbaeumer.vscode-eslint"
+  ]
+}
