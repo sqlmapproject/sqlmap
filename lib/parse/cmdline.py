@@ -674,7 +674,7 @@ def cmdLineParser(argv=None):
             help="Store dumped data to a custom file")
 
         general.add_argument("--dump-format", dest="dumpFormat",
-            help="Format of dumped data (CSV (default), HTML or SQLITE)")
+            help="Format of dumped data (CSV (default), HTML, SORTABLE_HTML or SQLITE)")
 
         general.add_argument("--encoding", dest="encoding",
             help="Character encoding used for data retrieval (e.g. GBK)")
