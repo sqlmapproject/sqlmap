@@ -47,6 +47,8 @@ from lib.core.exception import SqlmapValueException
 from lib.core.replication import Replication
 from lib.core.settings import DUMP_FILE_BUFFER_SIZE
 from lib.core.settings import HTML_DUMP_CSS_STYLE
+from lib.core.settings import HTML_DUMP_CSS_SORTABLE_STYLE
+from lib.core.settings import HTML_DUMP_SORTABLE_JAVASCRIPT
 from lib.core.settings import IS_WIN
 from lib.core.settings import METADB_SUFFIX
 from lib.core.settings import MIN_BINARY_DISK_DUMP_SIZE
@@ -541,6 +543,9 @@ class Dump(object):
             dataToDumpFile(dumpFP, "<meta name=\"generator\" content=\"%s\" />\n" % VERSION_STRING)
             dataToDumpFile(dumpFP, "<title>%s</title>\n" % ("%s%s" % ("%s." % db if METADB_SUFFIX not in db else "", table)))
             dataToDumpFile(dumpFP, HTML_DUMP_CSS_STYLE)
+            if conf.dumpSortable:
+                dataToDumpFile(dumpFP, HTML_DUMP_CSS_SORTABLE_STYLE)
+                dataToDumpFile(dumpFP, HTML_DUMP_SORTABLE_JAVASCRIPT)
             dataToDumpFile(dumpFP, "\n</head>\n<body>\n<table>\n<thead>\n<tr>\n")
 
         if count == 1:
