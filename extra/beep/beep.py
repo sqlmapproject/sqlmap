@@ -49,7 +49,7 @@ def _win_wav_play(filename):
     winsound.PlaySound(filename, winsound.SND_FILENAME)
 
 def _linux_wav_play(filename):
-    for _ in ("aplay", "paplay", "play"):
+    for _ in ("paplay", "aplay", "mpv", "mplayer", "play"):
         if not os.system("%s '%s' 2>/dev/null" % (_, filename)):
             return
 
