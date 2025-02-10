@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: [ 'pypy-2.7', '3.12' ]
+        python-version: [ 'pypy-2.7', '3.13' ]
         exclude:
           - os: macos-latest
             python-version: 'pypy-2.7'
