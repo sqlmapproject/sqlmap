@@ -133,7 +133,9 @@ class Fingerprint(GenericFingerprint):
             infoMsg = "actively fingerprinting %s" % DBMS.PGSQL
             logger.info(infoMsg)
 
-            if inject.checkBooleanExpression("RANDOM_NORMAL(0.0, 1.0) IS NOT NULL"):
+            if inject.checkBooleanExpression("JSON_QUERY(NULL::jsonb, '$') IS NULL"):
+                Backend.setVersion(">= 17.0")
+            elif inject.checkBooleanExpression("RANDOM_NORMAL(0.0, 1.0) IS NOT NULL"):
                 Backend.setVersion(">= 16.0")
             elif inject.checkBooleanExpression("REGEXP_COUNT(NULL,NULL) IS NULL"):
                 Backend.setVersion(">= 15.0")
