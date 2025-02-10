@@ -62,4 +62,32 @@
     <regexp value="\bwp_">
         <info technology="WordPress"/>
     </regexp>
+
+    <regexp value="_session_id">
+        <info technology="Ruby on Rails"/>
+    </regexp>
+
+    <regexp value="sessionid">
+        <info technology="Django"/>
+    </regexp>
+
+    <regexp value="connect\.sid">
+        <info technology="Node.js (Express)"/>
+    </regexp>
+
+    <regexp value="laravel_session">
+        <info technology="Laravel (PHP)"/>
+    </regexp>
+
+    <regexp value="SESS[a-f0-9]{32}">
+        <info technology="Drupal"/>
+    </regexp>
+
+    <regexp value="joomla_[a-z0-9]+">
+        <info technology="Joomla"/>
+    </regexp>
+
+    <regexp value="sails\.sid">
+        <info technology="Sails.js"/>
+    </regexp>
 </root>
