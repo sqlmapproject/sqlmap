@@ -80,5 +80,5 @@
 * راهنمای کاربران: https://github.com/sqlmapproject/sqlmap/wiki
 * سوالات متداول: https://github.com/sqlmapproject/sqlmap/wiki/FAQ
 * توییتر: [@sqlmap](https://twitter.com/sqlmap)
-* رسانه: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
+* X: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * تصاویر: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
