@@ -511,9 +511,25 @@ class Connect(object):
                 url = getBytes(url)  # Note: Python3 requires text while Python2 has problems when mixing text with binary POST
 
             if webSocket:
+                ws_proxy_port = None
+                ws_proxy_host = None
+                ws_proxy_auth = None
+                ws_proxy_scheme = None
+                
+                if conf.proxy:
+                    ws_proxy_uri = _urllib.parse.urlsplit(conf.proxy)
+                    ws_proxy_port = ws_proxy_uri.port
+                    ws_proxy_host = ws_proxy_uri.hostname
+                    ws_proxy_scheme = ws_proxy_uri.scheme
+
+                if conf.proxyCred:
+                    ws_proxy_auth = conf.proxyCred.split(":")
+
                 ws = websocket.WebSocket()
                 ws.settimeout(WEBSOCKET_INITIAL_TIMEOUT if kb.webSocketRecvCount is None else timeout)
-                ws.connect(url, header=("%s: %s" % _ for _ in headers.items() if _[0] not in ("Host",)), cookie=cookie)  # WebSocket will add Host field of headers automatically
+                ws.connect(url, header=("%s: %s" % _ for _ in headers.items() if _[0] not in ("Host",)), cookie=cookie, 
+                            http_proxy_host=ws_proxy_host, http_proxy_port=ws_proxy_port, 
+                            http_proxy_auth=ws_proxy_auth, proxy_type=ws_proxy_scheme)  # WebSocket will add Host field of headers automatically
                 ws.send(urldecode(post or ""))
 
                 _page = []
