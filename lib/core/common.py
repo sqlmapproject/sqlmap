@@ -5605,7 +5605,8 @@ def checkSums():
             if match:
                 expected, filename = match.groups()
                 filepath = os.path.join(paths.SQLMAP_ROOT_PATH, filename).replace('/', os.path.sep)
-                checkFile(filepath)
+                if not checkFile(filepath, False):
+                    continue
                 with open(filepath, "rb") as f:
                     content = f.read()
                 if not hashlib.sha256(content).hexdigest() == expected:
