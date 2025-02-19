@@ -58,7 +58,7 @@ from lib.core.convert import getText
 from lib.core.convert import getUnicode
 from lib.core.convert import htmlUnescape
 from lib.core.convert import stdoutEncode
-from lib.core.data import cmdLineOptions
+from lib.core.data import cmdLineOptions, paths
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -5614,3 +5614,31 @@ def checkSums():
                     break
 
     return retVal
+
+
+def updateSums():
+    """
+    Update the content of the digest file (i.e. sha256sums.txt) with current file hashes
+    """
+    if not paths.get("DIGEST_FILE"):
+        return
+
+    # Read existing entries to maintain file order
+    entries = []
+    for entry in getFileItems(paths.DIGEST_FILE):
+        match = re.search(r"([0-9a-f]+)\s+([^\s]+)", entry)
+        if match:
+            _, filename = match.groups()
+            filepath = os.path.join(paths.SQLMAP_ROOT_PATH, filename).replace('/', os.path.sep)
+            if not checkFile(filepath, False):
+                continue
+            with open(filepath, "rb") as f:
+                content = f.read()
+            # Ensure both parts are bytes and use CRLF line endings
+            newline = b"%s  %s\n" % (hashlib.sha256(content).hexdigest().encode('utf-8'), filename.encode('utf-8'))
+            entries.append(newline)
+
+    # Write updated hashes back to file
+    if entries:
+        with open(paths.DIGEST_FILE, "wb") as f:
+            f.write(b"".join(entries))
