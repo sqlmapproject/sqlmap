@@ -18,7 +18,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Appends (Access) NULL byte character (%00) at the end of payload
+    Appends an (Access) NULL byte character (%00) at the end of payload
 
     Requirement:
         * Microsoft Access

@@ -14,7 +14,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Replaces apostrophe character (') with its illegal double unicode counterpart (e.g. ' -> %00%27)
+    Replaces single quotes (') with an illegal double Unicode encoding (e.g. ' -> %00%27)
 
     >>> tamper("1 AND '1'='1")
     '1 AND %00%271%00%27=%00%271'

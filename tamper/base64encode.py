@@ -15,7 +15,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Base64-encodes all characters in a given payload
+    Encodes the entire payload using Base64
 
     >>> tamper("1' AND SLEEP(5)#")
     'MScgQU5EIFNMRUVQKDUpIw=='

@@ -16,7 +16,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Replaces instances of <int> UNION with <int>e0UNION
+    Replaces an integer followed by UNION with an integer followed by e0UNION
 
     Requirement:
         * MySQL

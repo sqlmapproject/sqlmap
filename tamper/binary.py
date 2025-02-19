@@ -16,7 +16,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Injects keyword binary where possible
+    Injects the keyword binary where applicable
 
     Requirement:
         * MySQL

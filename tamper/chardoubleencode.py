@@ -16,7 +16,7 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Double URL-encodes all characters in a given payload (not processing already encoded) (e.g. SELECT -> %2553%2545%254C%2545%2543%2554)
+    Double URL-encodes each character in the payload (ignores already encoded ones) (e.g. SELECT -> %2553%2545%254C%2545%2543%2554)
 
     Notes:
         * Useful to bypass some weak web application firewalls that do not double URL-decode the request before processing it through their ruleset
