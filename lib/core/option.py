@@ -1175,7 +1175,7 @@ def _setHTTPHandlers():
                     proxyString = ""
 
                 proxyString += "%s:%d" % (hostname, port)
-                proxyHandler.proxies = {"http": proxyString, "https": proxyString}
+                proxyHandler.proxies = kb.proxies = {"http": proxyString, "https": proxyString}
 
             proxyHandler.__init__(proxyHandler.proxies)
 
@@ -2151,6 +2151,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.previousMethod = None
     kb.processNonCustom = None
     kb.processUserMarks = None
+    kb.proxies = None
     kb.proxyAuthHeader = None
     kb.queryCounter = 0
     kb.randomPool = {}
