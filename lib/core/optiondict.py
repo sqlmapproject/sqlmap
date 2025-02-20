@@ -30,6 +30,7 @@ optDict = {
         "liveCookies": "string",
         "loadCookies": "string",
         "dropSetCookie": "boolean",
+        "http2": "boolean",
         "agent": "string",
         "mobile": "boolean",
         "randomAgent": "boolean",

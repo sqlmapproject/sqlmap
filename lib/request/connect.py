@@ -90,6 +90,7 @@ from lib.core.enums import WEB_PLATFORM
 from lib.core.exception import SqlmapCompressionException
 from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapGenericException
+from lib.core.exception import SqlmapMissingDependence
 from lib.core.exception import SqlmapSkipTargetException
 from lib.core.exception import SqlmapSyntaxException
 from lib.core.exception import SqlmapTokenException
@@ -603,11 +604,6 @@ class Connect(object):
                 if not chunked:
                     requestMsg += "\r\n"
 
-                if not multipart:
-                    threadData.lastRequestMsg = requestMsg
-
-                    logger.log(CUSTOM_LOGGING.TRAFFIC_OUT, requestMsg)
-
                 if conf.cj:
                     for cookie in conf.cj:
                         if cookie.value is None:
@@ -616,7 +612,46 @@ class Connect(object):
                             for char in (r"\r", r"\n"):
                                 cookie.value = re.sub(r"(%s)([^ \t])" % char, r"\g<1>\t\g<2>", cookie.value)
 
-                conn = _urllib.request.urlopen(req)
+                if conf.http2:
+                    try:
+                        import httpx
+                        with httpx.Client(verify=False, http2=True, timeout=timeout, follow_redirects=True, cookies=conf.cj) as client:
+                            conn = client.request(method or (HTTPMETHOD.POST if post is not None else HTTPMETHOD.GET), url, headers=headers, data=post)
+                    except ImportError:
+                        raise SqlmapMissingDependence("httpx[http2] not available (e.g. 'pip%s install httpx[http2]')" % ('3' if six.PY3 else ""))
+                    else:
+                        conn.code = conn.status_code
+                        conn.msg = conn.reason_phrase
+                        conn.info = lambda c=conn: c.headers
+
+                        conn._read_buffer = conn.read()
+                        conn._read_offset = 0
+
+                        requestMsg = re.sub(" HTTP/[0-9.]+\r\n", " %s\r\n" % conn.http_version, requestMsg, count=1)
+
+                        if not multipart:
+                            threadData.lastRequestMsg = requestMsg
+
+                            logger.log(CUSTOM_LOGGING.TRAFFIC_OUT, requestMsg)
+
+                        def _read(count=None):
+                            offset = conn._read_offset
+                            if count is None:
+                                result = conn._read_buffer[offset:]
+                                conn._read_offset = len(conn._read_buffer)
+                            else:
+                                result = conn._read_buffer[offset: offset + count]
+                                conn._read_offset += len(result)
+                            return result
+
+                        conn.read = _read
+                else:
+                    if not multipart:
+                        threadData.lastRequestMsg = requestMsg
+
+                        logger.log(CUSTOM_LOGGING.TRAFFIC_OUT, requestMsg)
+
+                    conn = _urllib.request.urlopen(req)
 
                 if not kb.authHeader and getRequestHeader(req, HTTP_HEADER.AUTHORIZATION) and (conf.authType or "").lower() == AUTH_TYPE.BASIC.lower():
                     kb.authHeader = getUnicode(getRequestHeader(req, HTTP_HEADER.AUTHORIZATION))
@@ -699,7 +734,7 @@ class Connect(object):
             # Explicit closing of connection object
             if conn and not conf.keepAlive:
                 try:
-                    if hasattr(conn.fp, '_sock'):
+                    if hasattr(conn, "fp") and hasattr(conn.fp, '_sock'):
                         conn.fp._sock.close()
                     conn.close()
                 except Exception as ex:

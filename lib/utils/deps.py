@@ -95,6 +95,16 @@ def checkDependencies():
         missing_libraries.add('python-ntlm')
 
     try:
+        __import__("httpx")
+        debugMsg = "'httpx[http2]' third-party library is found"
+        logger.debug(debugMsg)
+    except ImportError:
+        warnMsg = "sqlmap requires 'httpx[http2]' third-party library "
+        warnMsg += "if you plan to use HTTP version 2"
+        logger.warning(warnMsg)
+        missing_libraries.add('httpx[http2]')
+
+    try:
         __import__("websocket._abnf")
         debugMsg = "'websocket-client' library is found"
         logger.debug(debugMsg)
