@@ -179,6 +179,9 @@ def main():
         if not conf.updateAll:
             # Postponed imports (faster start)
             if conf.smokeTest:
+                if conf.updateSums:
+                    from lib.core.common import updateSums
+                    updateSums()
                 from lib.core.testing import smokeTest
                 os._exitcode = 1 - (smokeTest() or 0)
             elif conf.vulnTest:

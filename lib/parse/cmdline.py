@@ -857,6 +857,9 @@ def cmdLineParser(argv=None):
         parser.add_argument("--smoke-test", dest="smokeTest", action="store_true",
             help=SUPPRESS)
 
+        parser.add_argument("--update-sums", dest="updateSums", action="store_true",
+            help=SUPPRESS)
+
         parser.add_argument("--vuln-test", dest="vulnTest", action="store_true",
             help=SUPPRESS)
 
