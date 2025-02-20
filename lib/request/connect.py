@@ -622,7 +622,7 @@ class Connect(object):
                         proxy_mounts = dict(("%s://" % key, httpx.HTTPTransport(proxy="%s%s" % ("http://" if not "://" in kb.proxies[key] else "", kb.proxies[key]))) for key in kb.proxies) if kb.proxies else None
                         with httpx.Client(verify=False, http2=True, timeout=timeout, follow_redirects=True, cookies=conf.cj, mounts=proxy_mounts) as client:
                             conn = client.request(method or (HTTPMETHOD.POST if post is not None else HTTPMETHOD.GET), url, headers=headers, data=post)
-                    except httpx.ConnectError as ex:
+                    except (httpx.HTTPError, httpx.InvalidURL, httpx.CookieConflict, httpx.StreamError) as ex:
                         raise _http_client.HTTPException(getSafeExString(ex))
                     else:
                         conn.code = conn.status_code
