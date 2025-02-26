@@ -79,6 +79,7 @@ class HTTPSConnection(_http_client.HTTPSConnection):
                         try:
                             # Reference(s): https://askubuntu.com/a/1263098
                             #               https://askubuntu.com/a/1250807
+                            #               https://git.zknt.org/mirror/bazarr/commit/7f05f932ffb84ba8b9e5630b2adc34dbd77e2b4a?style=split&whitespace=show-all&show-outdated=
                             _contexts[protocol].set_ciphers("ALL@SECLEVEL=0")
                         except (ssl.SSLError, AttributeError):
                             pass
