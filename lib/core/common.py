@@ -2554,7 +2554,7 @@ def initCommonOutputs():
                     if line not in kb.commonOutputs[key]:
                         kb.commonOutputs[key].add(line)
 
-def getFileItems(filename, commentPrefix='#', unicoded=True, lowercase=False, unique=False):
+def getFileItems(filename, commentPrefix='#', unicoded=True, lowercase=False, unique=False, raiseOnError=True):
     """
     Returns newline delimited items contained inside file
 
@@ -2567,7 +2567,7 @@ def getFileItems(filename, commentPrefix='#', unicoded=True, lowercase=False, un
     if filename:
         filename = filename.strip('"\'')
 
-    checkFile(filename)
+    checkFile(filename, raiseOnError=raiseOnError)
 
     try:
         with openFile(filename, 'r', errors="ignore") if unicoded else open(filename, 'r') as f:
@@ -5599,18 +5599,45 @@ def checkSums():
 
     retVal = True
 
-    if paths.get("DIGEST_FILE"):
-        for entry in getFileItems(paths.DIGEST_FILE):
-            match = re.search(r"([0-9a-f]+)\s+([^\s]+)", entry)
-            if match:
-                expected, filename = match.groups()
-                filepath = os.path.join(paths.SQLMAP_ROOT_PATH, filename).replace('/', os.path.sep)
-                if not checkFile(filepath, False):
-                    continue
-                with open(filepath, "rb") as f:
-                    content = f.read()
-                if not hashlib.sha256(content).hexdigest() == expected:
-                    retVal &= False
-                    break
+    for entry in getFileItems(paths.DIGEST_FILE, raiseOnError=False):
+        try:
+            (file_hash, file_name) = entry.split()
+        except ValueError:
+            retVal &= False
+            break
+        if len(file_hash) == 64:
+            if not hashlib.sha256(
+                openFile(
+                    os.path.join(
+                        paths.SQLMAP_ROOT_PATH, file_name.encode('utf-8').decode('utf-8')
+                    ).replace('/', os.path.sep),
+                    'rb', None).read()).hexdigest() == file_hash:
+                retVal &= False
+                break
 
     return retVal
+
+
+def updateSums():
+    # Read existing entries to maintain file order
+    entries = ""
+    for entry in getFileItems(paths.DIGEST_FILE, raiseOnError=False):
+        try:
+            (file_hash, file_name) = entry.split()
+        except ValueError:
+            break
+        if len(file_hash) == 64:
+            entries += "%s  %s\n" % (
+                   hashlib.sha256(
+                       openFile(
+                           os.path.join(
+                               paths.SQLMAP_ROOT_PATH, file_name.encode('utf-8').decode('utf-8')
+                           ).replace('/', os.path.sep), 'rb', None).read()
+                   ).hexdigest(),
+                   file_name.encode('utf-8').decode('utf-8'),
+               )
+        with open(paths.DIGEST_FILE, "w") as f:
+            f.write(entries)
+    else:
+        pass
+
