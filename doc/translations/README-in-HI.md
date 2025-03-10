@@ -44,7 +44,6 @@ sqlmap [Python](https://www.python.org/download/) संस्करण **2.6**,
 * समस्या ट्रैकर: https://github.com/sqlmapproject/sqlmap/issues
 * उपयोगकर्ता मैन्युअल: https://github.com/sqlmapproject/sqlmap/wiki
 * अक्सर पूछे जाने वाले प्रश्न (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* ट्विटर: [@sqlmap](https://twitter.com/sqlmap)
+* X: [@sqlmap](https://twitter.com/sqlmap)
 * डेमो: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * स्क्रीनशॉट: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
-* 
