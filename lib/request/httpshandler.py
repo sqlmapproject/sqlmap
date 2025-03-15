@@ -79,7 +79,8 @@ class HTTPSConnection(_http_client.HTTPSConnection):
                         try:
                             # Reference(s): https://askubuntu.com/a/1263098
                             #               https://askubuntu.com/a/1250807
-                            _contexts[protocol].set_ciphers("DEFAULT@SECLEVEL=1")
+                            #               https://git.zknt.org/mirror/bazarr/commit/7f05f932ffb84ba8b9e5630b2adc34dbd77e2b4a?style=split&whitespace=show-all&show-outdated=
+                            _contexts[protocol].set_ciphers("ALL@SECLEVEL=0")
                         except (ssl.SSLError, AttributeError):
                             pass
                     result = _contexts[protocol].wrap_socket(sock, do_handshake_on_connect=True, server_hostname=self.host if re.search(r"\A[\d.]+\Z", self.host or "") is None else None)

@@ -1,4 +1,4 @@
-# Copyright (c) 2010-2020 Benjamin Peterson
+# Copyright (c) 2010-2024 Benjamin Peterson
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@ import sys
 import types
 
 __author__ = "Benjamin Peterson <benjamin@python.org>"
-__version__ = "1.16.0"
+__version__ = "1.17.0"
 
 
 # Useful for very coarse version differentiation.
@@ -435,12 +435,17 @@ _urllib_request_moved_attributes = [
     MovedAttribute("HTTPErrorProcessor", "urllib2", "urllib.request"),
     MovedAttribute("urlretrieve", "urllib", "urllib.request"),
     MovedAttribute("urlcleanup", "urllib", "urllib.request"),
-    MovedAttribute("URLopener", "urllib", "urllib.request"),
-    MovedAttribute("FancyURLopener", "urllib", "urllib.request"),
     MovedAttribute("proxy_bypass", "urllib", "urllib.request"),
     MovedAttribute("parse_http_list", "urllib2", "urllib.request"),
     MovedAttribute("parse_keqv_list", "urllib2", "urllib.request"),
 ]
+if sys.version_info[:2] < (3, 14):
+    _urllib_request_moved_attributes.extend(
+        [
+            MovedAttribute("URLopener", "urllib", "urllib.request"),
+            MovedAttribute("FancyURLopener", "urllib", "urllib.request"),
+        ]
+    )
 for attr in _urllib_request_moved_attributes:
     setattr(Module_six_moves_urllib_request, attr.name, attr)
 del attr

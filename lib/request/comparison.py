@@ -21,7 +21,9 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import SqlmapNoneDataException
+from lib.core.exception import SqlmapSilentQuitException
 from lib.core.settings import DEFAULT_PAGE_ENCODING
+from lib.core.settings import DEV_EMAIL_ADDRESS
 from lib.core.settings import DIFF_TOLERANCE
 from lib.core.settings import HTML_TITLE_REGEX
 from lib.core.settings import LOWER_RATIO_BOUND
@@ -35,8 +37,14 @@ from lib.core.threads import getCurrentThreadData
 from thirdparty import six
 
 def comparison(page, headers, code=None, getRatioValue=False, pageLength=None):
-    _ = _adjust(_comparison(page, headers, code, getRatioValue, pageLength), getRatioValue)
-    return _
+    try:
+        _ = _adjust(_comparison(page, headers, code, getRatioValue, pageLength), getRatioValue)
+        return _
+    except:
+        warnMsg = "there was a KNOWN issue inside the internals regarding the difflib/comparison of pages. "
+        warnMsg += "Please report details privately via e-mail to '%s'" % DEV_EMAIL_ADDRESS
+        logger.critical(warnMsg)
+        raise SqlmapSilentQuitException
 
 def _adjust(condition, getRatioValue):
     if not any((conf.string, conf.notString, conf.regexp, conf.code)):
@@ -120,7 +128,7 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
         if isinstance(seqMatcher.a, six.binary_type) and isinstance(page, six.text_type):
             page = getBytes(page, kb.pageEncoding or DEFAULT_PAGE_ENCODING, "ignore")
         elif isinstance(seqMatcher.a, six.text_type) and isinstance(page, six.binary_type):
-            seqMatcher.a = getBytes(seqMatcher.a, kb.pageEncoding or DEFAULT_PAGE_ENCODING, "ignore")
+            seqMatcher.set_seq1(getBytes(seqMatcher.a, kb.pageEncoding or DEFAULT_PAGE_ENCODING, "ignore"))
 
         if any(_ is None for _ in (page, seqMatcher.a)):
             return None
@@ -146,12 +154,19 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
             if seq1 is None or seq2 is None:
                 return None
 
-            seq1 = seq1.replace(REFLECTED_VALUE_MARKER, "")
-            seq2 = seq2.replace(REFLECTED_VALUE_MARKER, "")
+            if isinstance(seq1, six.binary_type):
+                seq1 = seq1.replace(REFLECTED_VALUE_MARKER.encode(), b"")
+            elif isinstance(seq1, six.text_type):
+                seq1 = seq1.replace(REFLECTED_VALUE_MARKER, "")
+
+            if isinstance(seq2, six.binary_type):
+                seq2 = seq2.replace(REFLECTED_VALUE_MARKER.encode(), b"")
+            elif isinstance(seq2, six.text_type):
+                seq2 = seq2.replace(REFLECTED_VALUE_MARKER, "")
 
             if kb.heavilyDynamic:
-                seq1 = seq1.split("\n")
-                seq2 = seq2.split("\n")
+                seq1 = seq1.split("\n" if isinstance(seq1, six.text_type) else b"\n")
+                seq2 = seq2.split("\n" if isinstance(seq2, six.text_type) else b"\n")
 
                 key = None
             else:
