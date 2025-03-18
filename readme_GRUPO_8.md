@@ -37,7 +37,7 @@ SQLMap es una herramienta indispensable para cualquier profesional de cibersegur
 
 
 
-# APORTE 2
+# APORTE 2 - JHERMAN CANACUAN
 # SQLMap: Herramienta de Automatización para la Detección y Explotación de Inyecciones SQL
 
 **SQLMap** es una herramienta de código abierto desarrollada en Python que automatiza la detección y explotación de vulnerabilidades de inyección SQL en aplicaciones web. Su principal objetivo es facilitar a los profesionales de la ciberseguridad la identificación y explotación de fallos en bases de datos, permitiendo realizar auditorías de seguridad y pruebas de penetración de manera eficiente.
