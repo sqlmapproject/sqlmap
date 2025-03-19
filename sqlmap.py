@@ -543,7 +543,7 @@ def main():
         errMsg = maskSensitiveData(errMsg)
         excMsg = maskSensitiveData(excMsg)
 
-        if conf.get("api") or not valid:
+        if conf.get("api") or not valid or kb.lastCtrlCTime:
             logger.critical("%s\n%s" % (errMsg, excMsg))
         else:
             logger.critical(errMsg)
