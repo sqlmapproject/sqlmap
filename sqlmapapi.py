@@ -15,13 +15,12 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s',  # Log format
     level=logging.DEBUG,  # Set log level to DEBUG
     handlers=[
-        logging.StreamHandler(),  # Print logs to console
-        logging.FileHandler("app.log")  # Log to a file as well
+        logging.StreamHandler()  # Print logs to console
     ]
 )
 
-# Using the logger from lib.core.data
-from lib.core.data import logger  # Use the logger defined in the original code
+# Using the logger from lib.core.data (ensure no conflicts)
+from lib.core.data import logger
 
 sys.dont_write_bytecode = True
 
@@ -97,9 +96,6 @@ def main():
     try:
         dirtyPatches()
         resolveCrossReferences()
-
-        # Set default logging level to debug
-        logger.setLevel(logging.DEBUG)
 
         # Initialize paths
         setPaths(modulePath())
