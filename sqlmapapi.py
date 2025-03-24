@@ -14,11 +14,14 @@ import warnings
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s',  # Log format
     level=logging.DEBUG,  # Set log level to DEBUG
-    handlers=[logging.StreamHandler()]  # Print logs to console
+    handlers=[
+        logging.StreamHandler(),  # Print logs to console
+        logging.FileHandler("app.log")  # Log to a file as well
+    ]
 )
 
-# Logger object
-logger = logging.getLogger(__name__)
+# Using the logger from lib.core.data
+from lib.core.data import logger  # Use the logger defined in the original code
 
 sys.dont_write_bytecode = True
 
@@ -72,7 +75,6 @@ finally:
 
 from lib.core.common import getUnicode
 from lib.core.common import setPaths
-from lib.core.data import logger
 from lib.core.patch import dirtyPatches
 from lib.core.patch import resolveCrossReferences
 from lib.core.settings import RESTAPI_DEFAULT_ADAPTER
@@ -113,7 +115,6 @@ def main():
         apiparser.add_argument("--username", help="Basic authentication username (optional)")
         apiparser.add_argument("--password", help="Basic authentication password (optional)")
         (args, _) = apiparser.parse_known_args() if hasattr(apiparser, "parse_known_args") else apiparser.parse_args()
-
 
         # Start the client or the server
         if args.server:
