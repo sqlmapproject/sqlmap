@@ -6,14 +6,23 @@ See the file 'LICENSE' for copying permission
 """
 
 import sys
+import logging
+import os
+import warnings
+
+# Error management and logging setup
+logging.basicConfig(
+    format='%(asctime)s - %(levelname)s - %(message)s',  # Log format
+    level=logging.DEBUG,  # Set log level to DEBUG
+    handlers=[logging.StreamHandler()]  # Print logs to console
+)
+
+# Logger object
+logger = logging.getLogger(__name__)
 
 sys.dont_write_bytecode = True
 
 __import__("lib.utils.versioncheck")  # this has to be the first non-standard import
-
-import logging
-import os
-import warnings
 
 warnings.filterwarnings(action="ignore", category=UserWarning)
 warnings.filterwarnings(action="ignore", category=DeprecationWarning)
@@ -83,36 +92,43 @@ def main():
     """
     REST-JSON API main function
     """
+    try:
+        dirtyPatches()
+        resolveCrossReferences()
 
-    dirtyPatches()
-    resolveCrossReferences()
+        # Set default logging level to debug
+        logger.setLevel(logging.DEBUG)
 
-    # Set default logging level to debug
-    logger.setLevel(logging.DEBUG)
+        # Initialize paths
+        setPaths(modulePath())
 
-    # Initialize paths
-    setPaths(modulePath())
-
-    # Parse command line options
-    apiparser = ArgumentParser()
-    apiparser.add_argument("-s", "--server", help="Run as a REST-JSON API server", action="store_true")
-    apiparser.add_argument("-c", "--client", help="Run as a REST-JSON API client", action="store_true")
-    apiparser.add_argument("-H", "--host", help="Host of the REST-JSON API server (default \"%s\")" % RESTAPI_DEFAULT_ADDRESS, default=RESTAPI_DEFAULT_ADDRESS)
-    apiparser.add_argument("-p", "--port", help="Port of the REST-JSON API server (default %d)" % RESTAPI_DEFAULT_PORT, default=RESTAPI_DEFAULT_PORT, type=int)
-    apiparser.add_argument("--adapter", help="Server (bottle) adapter to use (default \"%s\")" % RESTAPI_DEFAULT_ADAPTER, default=RESTAPI_DEFAULT_ADAPTER)
-    apiparser.add_argument("--database", help="Set IPC database filepath (optional)")
-    apiparser.add_argument("--username", help="Basic authentication username (optional)")
-    apiparser.add_argument("--password", help="Basic authentication password (optional)")
-    (args, _) = apiparser.parse_known_args() if hasattr(apiparser, "parse_known_args") else apiparser.parse_args()
+        # Parse command line options
+        apiparser = ArgumentParser()
+        apiparser.add_argument("-s", "--server", help="Run as a REST-JSON API server", action="store_true")
+        apiparser.add_argument("-c", "--client", help="Run as a REST-JSON API client", action="store_true")
+        apiparser.add_argument("-H", "--host", help="Host of the REST-JSON API server (default \"%s\")" % RESTAPI_DEFAULT_ADDRESS, default=RESTAPI_DEFAULT_ADDRESS)
+        apiparser.add_argument("-p", "--port", help="Port of the REST-JSON API server (default %d)" % RESTAPI_DEFAULT_PORT, default=RESTAPI_DEFAULT_PORT, type=int)
+        apiparser.add_argument("--adapter", help="Server (bottle) adapter to use (default \"%s\")" % RESTAPI_DEFAULT_ADAPTER, default=RESTAPI_DEFAULT_ADAPTER)
+        apiparser.add_argument("--database", help="Set IPC database filepath (optional)")
+        apiparser.add_argument("--username", help="Basic authentication username (optional)")
+        apiparser.add_argument("--password", help="Basic authentication password (optional)")
+        (args, _) = apiparser.parse_known_args() if hasattr(apiparser, "parse_known_args") else apiparser.parse_args()
 
 
-    # Start the client or the server
-    if args.server:
-        server(args.host, args.port, adapter=args.adapter, username=args.username, password=args.password, database=args.database)
-    elif args.client:
-        client(args.host, args.port, username=args.username, password=args.password)
-    else:
-        apiparser.print_help()
+        # Start the client or the server
+        if args.server:
+            server(args.host, args.port, adapter=args.adapter, username=args.username, password=args.password, database=args.database)
+        elif args.client:
+            client(args.host, args.port, username=args.username, password=args.password)
+        else:
+            apiparser.print_help()
+
+    except Exception as e:
+        logger.critical("An error occurred while executing the main function: %s", e, exc_info=True)
+        raise  # Stop the program after the error
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        logger.critical("An unexpected error occurred while running the program: %s", e, exc_info=True)
