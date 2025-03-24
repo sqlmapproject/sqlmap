@@ -10,15 +10,6 @@ import logging
 import os
 import warnings
 
-# Error management and logging setup
-logging.basicConfig(
-    format='%(asctime)s - %(levelname)s - %(message)s',  # Log format
-    level=logging.DEBUG,  # Set log level to DEBUG
-    handlers=[
-        logging.StreamHandler()  # Print logs to console
-    ]
-)
-
 # Using the logger from lib.core.data (ensure no conflicts)
 from lib.core.data import logger
 
