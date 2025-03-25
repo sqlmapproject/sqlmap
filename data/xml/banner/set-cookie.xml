@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+     References:
+     * http://www.http-stats.com/Set-Cookie2
+     * http://www.owasp.org/index.php/Category:OWASP_Cookies_Database
+-->
+
+<root>
+    <regexp value="ASPSESSIONID">
+        <info technology="ASP" type="Windows"/>
+    </regexp>
+
+    <regexp value="ASP\.NET_SessionId|\.ASPXAUTH">
+        <info technology="ASP.NET" type="Windows"/>
+    </regexp>
+
+    <regexp value="JSESSIONID">
+        <info technology="JSP"/>
+    </regexp>
+
+    <regexp value="JServSessionId">
+        <info technology="JServ"/>
+    </regexp>
+
+    <regexp value="Ltpatoken">
+        <info technology="WebSphere"/>
+    </regexp>
+
+    <regexp value="PHPSESS">
+        <info technology="PHP"/>
+    </regexp>
+
+    <regexp value="RoxenUserID">
+        <info technology="Roxen"/>
+    </regexp>
+
+    <regexp value="wiki\d+_session">
+        <info technology="MediaWiki"/>
+    </regexp>
+
+    <regexp value="Apache">
+        <info technology="Apache"/>
+    </regexp>
+
+    <regexp value="DomAuthSessID">
+        <info technology="Domino|Notes"/>
+    </regexp>
+
+    <regexp value="CFID|CFTOKEN|CFMAGIC|CFGLOBALS">
+        <info technology="ColdFusion"/>
+    </regexp>
+
+    <regexp value="WebLogicSession">
+        <info technology="WebLogic"/>
+    </regexp>
+
+    <regexp value="MoodleSession">
+        <info technology="Moodle"/>
+    </regexp>
+
+    <regexp value="\bwp_">
+        <info technology="WordPress"/>
+    </regexp>
+
+    <regexp value="_session_id">
+        <info technology="Ruby on Rails"/>
+    </regexp>
+
+    <regexp value="sessionid">
+        <info technology="Django"/>
+    </regexp>
+
+    <regexp value="connect\.sid">
+        <info technology="Node.js (Express)"/>
+    </regexp>
+
+    <regexp value="laravel_session">
+        <info technology="Laravel (PHP)"/>
+    </regexp>
+
+    <regexp value="SESS[a-f0-9]{32}">
+        <info technology="Drupal"/>
+    </regexp>
+
+    <regexp value="joomla_[a-z0-9]+">
+        <info technology="Joomla"/>
+    </regexp>
+
+    <regexp value="sails\.sid">
+        <info technology="Sails.js"/>
+    </regexp>
+</root>

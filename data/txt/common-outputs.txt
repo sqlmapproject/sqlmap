@@ -1,0 +1,1196 @@
+# Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org/)
+# See the file 'LICENSE' for copying permission
+
+[Banners]
+
+# MySQL
+3.22.
+3.23.
+4.0.
+4.1.
+5.0.
+5.1.
+5.5.
+5.6.
+5.7.
+6.0.
+8.0.
+
+# PostgreSQL
+PostgreSQL 7.0
+PostgreSQL 7.1
+PostgreSQL 7.2
+PostgreSQL 7.3
+PostgreSQL 7.4
+PostgreSQL 8.0
+PostgreSQL 8.1
+PostgreSQL 8.2
+PostgreSQL 8.3
+PostgreSQL 8.4
+PostgreSQL 8.5
+PostgreSQL 9.0
+PostgreSQL 9.1
+PostgreSQL 9.2
+PostgreSQL 9.3
+PostgreSQL 9.4
+PostgreSQL 9.5
+PostgreSQL 9.6
+PostgreSQL 10.
+PostgreSQL 11.
+PostgreSQL 12.
+PostgreSQL 13.
+
+# Oracle
+Oracle Database 9i Standard Edition Release
+Oracle Database 9i Standard Edition Release 9.
+Oracle Database 9i Express Edition Release
+Oracle Database 9i Express Edition Release 9.
+Oracle Database 9i Enterprise Edition Release
+Oracle Database 9i Enterprise Edition Release 9.
+Oracle Database 10g Standard Edition Release
+Oracle Database 10g Standard Edition Release 10.
+Oracle Database 10g Express Edition Release
+Oracle Database 10g Enterprise Edition Release
+Oracle Database 10g Enterprise Edition Release 10.
+Oracle Database 11g Standard Edition Release
+Oracle Database 11g Standard Edition Release 11.
+Oracle Database 11g Express Edition Release
+Oracle Database 11g Express Edition Release 11.
+Oracle Database 11g Enterprise Edition Release
+Oracle Database 11g Enterprise Edition Release 11.
+Oracle Database 12c
+
+# Microsoft SQL Server
+Microsoft SQL Server 7.0
+Microsoft SQL Server 2000
+Microsoft SQL Server 2005
+Microsoft SQL Server 2008
+Microsoft SQL Server 2012
+Microsoft SQL Server 2014
+Microsoft SQL Server 2016
+Microsoft SQL Server 2017
+Microsoft SQL Server 2019
+
+
+[Users]
+
+# MySQL >= 5.0
+'debian-sys-maint'@'localhost'
+'root'@'%'
+'root'@'localhost'
+
+# MySQL < 5.0
+debian-sys-maint
+root
+
+# PostgreSQL
+postgres
+
+# Oracle
+ANONYMOUS
+CTXSYS
+DBSNMP
+DIP
+DMSYS
+EXFSYS
+MDDATA
+MDSYS
+MGMT_VIEW
+OLAPSYS
+ORDPLUGINS
+ORDSYS
+OUTLN
+SCOTT
+SI_INFORMTN_SCHEMA
+SYS
+SYSMAN
+SYSTEM
+TSMSYS
+WMSYS
+XDB
+
+# Microsoft SQL Server
+sa
+
+
+[Passwords]
+
+# MySQL
+*00E247AC5F9AF26AE0194B41E1E769DEE1429A29 # testpass
+
+# PostgreSQL
+md599e5ea7a6f7c3269995cba3927fd0093 # testpass
+
+# Oracle
+2D5A0C491B634F1B # testpass
+
+# Microsoft SQL Server
+0x0100098a6200f657f7d012dfa7dc1fd1b154d4dfb8cd20596d22 # testpass
+
+
+[Privileges]
+
+# MySQL >= 5.0
+ALTER
+ALTER ROUTINE
+CREATE
+CREATE ROUTINE
+CREATE TEMPORARY TABLES
+CREATE USER
+CREATE VIEW
+DELETE
+DROP
+EVENT
+EXECUTE
+FILE
+INDEX
+INSERT
+LOCK TABLES
+PROCESS
+REFERENCES
+RELOAD
+REPLICATION CLIENT
+REPLICATION SLAVE
+SELECT
+SHOW DATABASES
+SHOW VIEW
+SHUTDOWN
+SUPER
+TRIGGER
+UPDATE
+USAGE
+
+# MySQL < 5.0
+select_priv
+insert_priv
+update_priv
+delete_priv
+create_priv
+drop_priv
+reload_priv
+shutdown_priv
+process_priv
+file_priv
+grant_priv
+references_priv
+index_priv
+alter_priv
+show_db_priv
+super_priv
+create_tmp_table_priv
+lock_tables_priv
+execute_priv
+repl_slave_priv
+repl_client_priv
+create_view_priv
+show_view_priv
+create_routine_priv
+alter_routine_priv
+create_user_priv
+
+# PostgreSQL
+catupd
+createdb
+super
+
+# Oracle
+ADMINISTER ANY SQL TUNING SET
+ADMINISTER DATABASE TRIGGER
+ADMINISTER RESOURCE MANAGER
+ADMINISTER SQL TUNING SET
+ADVISOR
+ALTER ANY CLUSTER
+ALTER ANY DIMENSION
+ALTER ANY EVALUATION CONTEXT
+ALTER ANY INDEX
+ALTER ANY INDEXTYPE
+ALTER ANY LIBRARY
+ALTER ANY MATERIALIZED VIEW
+ALTER ANY OUTLINE
+ALTER ANY PROCEDURE
+ALTER ANY ROLE
+ALTER ANY RULE
+ALTER ANY RULE SET
+ALTER ANY SEQUENCE
+ALTER ANY SQL PROFILE
+ALTER ANY TABLE
+ALTER ANY TRIGGER
+ALTER ANY TYPE
+ALTER DATABASE
+ALTER PROFILE
+ALTER RESOURCE COST
+ALTER ROLLBACK SEGMENT
+ALTER SESSION
+ALTER SYSTEM
+ALTER TABLESPACE
+ALTER USER
+ANALYZE ANY
+ANALYZE ANY DICTIONARY
+AUDIT ANY
+AUDIT SYSTEM
+BACKUP ANY TABLE
+BECOME USER
+CHANGE NOTIFICATION
+COMMENT ANY TABLE
+CREATE ANY CLUSTER
+CREATE ANY CONTEXT
+CREATE ANY DIMENSION
+CREATE ANY DIRECTORY
+CREATE ANY EVALUATION CONTEXT
+CREATE ANY INDEX
+CREATE ANY INDEXTYPE
+CREATE ANY JOB
+CREATE ANY LIBRARY
+CREATE ANY MATERIALIZED VIEW
+CREATE ANY OPERATOR
+CREATE ANY OUTLINE
+CREATE ANY PROCEDURE
+CREATE ANY RULE
+CREATE ANY RULE SET
+CREATE ANY SEQUENCE
+CREATE ANY SQL PROFILE
+CREATE ANY SYNONYM
+CREATE ANY TABLE
+CREATE ANY TRIGGER
+CREATE ANY TYPE
+CREATE ANY VIEW
+CREATE CLUSTER
+CREATE DATABASE LINK
+CREATE DIMENSION
+CREATE EVALUATION CONTEXT
+CREATE EXTERNAL JOB
+CREATE INDEXTYPE
+CREATE JOB
+CREATE LIBRARY
+CREATE MATERIALIZED VIEW
+CREATE OPERATOR
+CREATE PROCEDURE
+CREATE PROFILE
+CREATE PUBLIC DATABASE LINK
+CREATE PUBLIC SYNONYM
+CREATE ROLE
+CREATE ROLLBACK SEGMENT
+CREATE RULE
+CREATE RULE SET
+CREATE SEQUENCE
+CREATE SESSION
+CREATE SYNONYM
+CREATE TABLE
+CREATE TABLESPACE
+CREATE TRIGGER
+CREATE TYPE
+CREATE USER
+CREATE VIEW
+DEBUG ANY PROCEDURE
+DEBUG CONNECT SESSION
+DELETE ANY TABLE
+DEQUEUE ANY QUEUE
+DROP ANY CLUSTER
+DROP ANY CONTEXT
+DROP ANY DIMENSION
+DROP ANY DIRECTORY
+DROP ANY EVALUATION CONTEXT
+DROP ANY INDEX
+DROP ANY INDEXTYPE
+DROP ANY LIBRARY
+DROP ANY MATERIALIZED VIEW
+DROP ANY OPERATOR
+DROP ANY OUTLINE
+DROP ANY PROCEDURE
+DROP ANY ROLE
+DROP ANY RULE
+DROP ANY RULE SET
+DROP ANY SEQUENCE
+DROP ANY SQL PROFILE
+DROP ANY SYNONYM
+DROP ANY TABLE
+DROP ANY TRIGGER
+DROP ANY TYPE
+DROP ANY VIEW
+DROP PROFILE
+DROP PUBLIC DATABASE LINK
+DROP PUBLIC SYNONYM
+DROP ROLLBACK SEGMENT
+DROP TABLESPACE
+DROP USER
+ENQUEUE ANY QUEUE
+EXECUTE ANY CLASS
+EXECUTE ANY EVALUATION CONTEXT
+EXECUTE ANY INDEXTYPE
+EXECUTE ANY LIBRARY
+EXECUTE ANY OPERATOR
+EXECUTE ANY PROCEDURE
+EXECUTE ANY PROGRAM
+EXECUTE ANY RULE
+EXECUTE ANY RULE SET
+EXECUTE ANY TYPE
+EXPORT FULL DATABASE
+FLASHBACK ANY TABLE
+FORCE ANY TRANSACTION
+FORCE TRANSACTION
+GLOBAL QUERY REWRITE
+GRANT ANY OBJECT PRIVILEGE
+GRANT ANY PRIVILEGE
+GRANT ANY ROLE
+IMPORT FULL DATABASE
+INSERT ANY TABLE
+LOCK ANY TABLE
+MANAGE ANY FILE GROUP
+MANAGE ANY QUEUE
+MANAGE FILE GROUP
+MANAGE SCHEDULER
+MANAGE TABLESPACE
+MERGE ANY VIEW
+ON COMMIT REFRESH
+QUERY REWRITE
+READ ANY FILE GROUP
+RESTRICTED SESSION
+RESUMABLE
+SELECT ANY DICTIONARY
+SELECT ANY SEQUENCE
+SELECT ANY TABLE
+SELECT ANY TRANSACTION
+UNDER ANY TABLE
+UNDER ANY TYPE
+UNDER ANY VIEW
+UNLIMITED TABLESPACE
+UPDATE ANY TABLE
+
+
+[Roles]
+
+# Oracle
+AQ_ADMINISTRATOR_ROLE
+AQ_USER_ROLE
+AUTHENTICATEDUSER
+CONNECT
+CTXAPP
+DBA
+DELETE_CATALOG_ROLE
+EJBCLIENT
+EXECUTE_CATALOG_ROLE
+EXP_FULL_DATABASE
+GATHER_SYSTEM_STATISTICS
+HS_ADMIN_ROLE
+IMP_FULL_DATABASE
+JAVA_ADMIN
+JAVADEBUGPRIV
+JAVA_DEPLOY
+JAVAIDPRIV
+JAVASYSPRIV
+JAVAUSERPRIV
+LOGSTDBY_ADMINISTRATOR
+MGMT_USER
+OEM_ADVISOR
+OEM_MONITOR
+OLAP_DBA
+OLAP_USER
+RECOVERY_CATALOG_OWNER
+RESOURCE
+SCHEDULER_ADMIN
+SELECT_CATALOG_ROLE
+TABLE_ACCESSERS
+WM_ADMIN_ROLE
+XDBADMIN
+XDBWEBSERVICES
+
+
+[Databases]
+
+# MySQL
+information_schema
+performance_schema
+mysql
+phpmyadmin
+
+# PostgreSQL
+pg_catalog
+postgres
+public
+template0
+template1
+
+# Microsoft SQL Server
+AdventureWorks
+AdventureWorksDW
+master
+model
+msdb
+ReportServer
+ReportServerTempDB
+tempdb
+
+
+[Tables]
+
+# MySQL >= 5.0
+CHARACTER_SETS
+COLLATION_CHARACTER_SET_APPLICABILITY
+COLLATIONS
+COLUMN_PRIVILEGES
+COLUMNS
+ENGINES
+EVENTS
+FILES
+GLOBAL_STATUS
+GLOBAL_VARIABLES
+KEY_COLUMN_USAGE
+PARTITIONS
+PLUGINS
+PROCESSLIST
+PROFILING
+REFERENTIAL_CONSTRAINTS
+ROUTINES
+SCHEMA_PRIVILEGES
+SCHEMATA
+SESSION_STATUS
+SESSION_VARIABLES
+STATISTICS
+TABLE_CONSTRAINTS
+TABLE_PRIVILEGES
+TABLES
+TRIGGERS
+USER_PRIVILEGES
+VIEWS
+
+# MySQL
+columns_priv
+db
+event
+func
+general_log
+help_category
+help_keyword
+help_relation
+help_topic
+host
+ndb_binlog_index
+plugin
+proc
+procs_priv
+servers
+slow_log
+tables_priv
+time_zone
+time_zone_leap_second
+time_zone_name
+time_zone_transition
+time_zone_transition_type
+user
+
+# phpMyAdmin
+pma_bookmark
+pma_column_info
+pma_designer_coords
+pma_history
+pma_pdf_pages
+pma_relation
+pma_table_coords
+pma_table_info
+
+# PostgreSQL
+pg_aggregate
+pg_am
+pg_amop
+pg_amproc
+pg_attrdef
+pg_attribute
+pg_authid
+pg_auth_members
+pg_cast
+pg_class
+pg_constraint
+pg_conversion
+pg_database
+pg_depend
+pg_description
+pg_enum
+pg_foreign_data_wrapper
+pg_foreign_server
+pg_index
+pg_inherits
+pg_language
+pg_largeobject
+pg_listener
+pg_namespace
+pg_opclass
+pg_operator
+pg_opfamily
+pg_pltemplate
+pg_proc
+pg_rewrite
+pg_shdepend
+pg_shdescription
+pg_statistic
+pg_tablespace
+pg_trigger
+pg_ts_config
+pg_ts_config_map
+pg_ts_dict
+pg_ts_parser
+pg_ts_template
+pg_type
+pg_user_mapping
+sql_features
+sql_implementation_info
+sql_languages
+sql_packages
+sql_parts
+sql_sizing
+sql_sizing_profiles
+
+# Oracle (demo database)
+BONUS
+DEPT
+EMP
+SALGRADE
+USERS
+
+# Microsoft SQL Server
+## Database: AdventureWorksDW
+AdventureWorksDWBuildVersion
+DatabaseLog
+DimAccount
+DimCurrency
+DimCustomer
+DimDepartmentGroup
+DimEmployee
+DimGeography
+DimOrganization
+DimProduct
+DimProductCategory
+DimProductSubcategory
+DimPromotion
+DimReseller
+DimSalesReason
+DimSalesTerritory
+DimScenario
+DimTime
+FactCurrencyRate
+FactFinance
+FactInternetSales
+FactInternetSalesReason
+FactResellerSales
+FactSalesQuota
+ProspectiveBuyer
+vAssocSeqLineItems
+vAssocSeqOrders
+vDMPrep
+vTargetMail
+vTimeSeries
+
+## Database: master
+all_columns
+all_objects
+all_parameters
+all_sql_modules
+all_views
+allocation_units
+assemblies
+assembly_files
+assembly_modules
+assembly_references
+assembly_types
+asymmetric_keys
+backup_devices
+certificates
+CHECK_CONSTRAINTS
+check_constraints
+COLUMN_DOMAIN_USAGE
+COLUMN_PRIVILEGES
+column_type_usages
+column_xml_schema_collection_usages
+columns
+COLUMNS
+computed_columns
+configurations
+CONSTRAINT_COLUMN_USAGE
+CONSTRAINT_TABLE_USAGE
+conversation_endpoints
+conversation_groups
+credentials
+crypt_properties
+data_spaces
+database_files
+database_mirroring
+database_mirroring_endpoints
+database_mirroring_witnesses
+database_permissions
+database_principal_aliases
+database_principals
+database_recovery_status
+database_role_members
+databases
+default_constraints
+destination_data_spaces
+dm_broker_activated_tasks
+dm_broker_connections
+dm_broker_forwarded_messages
+dm_broker_queue_monitors
+dm_clr_appdomains
+dm_clr_loaded_assemblies
+dm_clr_properties
+dm_clr_tasks
+dm_db_file_space_usage
+dm_db_index_usage_stats
+dm_db_mirroring_connections
+dm_db_missing_index_details
+dm_db_missing_index_group_stats
+dm_db_missing_index_groups
+dm_db_partition_stats
+dm_db_session_space_usage
+dm_db_task_space_usage
+dm_exec_background_job_queue
+dm_exec_background_job_queue_stats
+dm_exec_cached_plans
+dm_exec_connections
+dm_exec_query_optimizer_info
+dm_exec_query_stats
+dm_exec_query_transformation_stats
+dm_exec_requests
+dm_exec_sessions
+dm_fts_active_catalogs
+dm_fts_index_population
+dm_fts_memory_buffers
+dm_fts_memory_pools
+dm_fts_population_ranges
+dm_io_backup_tapes
+dm_io_cluster_shared_drives
+dm_io_pending_io_requests
+dm_os_buffer_descriptors
+dm_os_child_instances
+dm_os_cluster_nodes
+dm_os_hosts
+dm_os_latch_stats
+dm_os_loaded_modules
+dm_os_memory_allocations
+dm_os_memory_cache_clock_hands
+dm_os_memory_cache_counters
+dm_os_memory_cache_entries
+dm_os_memory_cache_hash_tables
+dm_os_memory_clerks
+dm_os_memory_objects
+dm_os_memory_pools
+dm_os_performance_counters
+dm_os_ring_buffers
+dm_os_schedulers
+dm_os_stacks
+dm_os_sublatches
+dm_os_sys_info
+dm_os_tasks
+dm_os_threads
+dm_os_virtual_address_dump
+dm_os_wait_stats
+dm_os_waiting_tasks
+dm_os_worker_local_storage
+dm_os_workers
+dm_qn_subscriptions
+dm_repl_articles
+dm_repl_schemas
+dm_repl_tranhash
+dm_repl_traninfo
+dm_tran_active_snapshot_database_transactions
+dm_tran_active_transactions
+dm_tran_current_snapshot
+dm_tran_current_transaction
+dm_tran_database_transactions
+dm_tran_locks
+dm_tran_session_transactions
+dm_tran_top_version_generators
+dm_tran_transactions_snapshot
+dm_tran_version_store
+DOMAIN_CONSTRAINTS
+DOMAINS
+endpoint_webmethods
+endpoints
+event_notification_event_types
+event_notifications
+events
+extended_procedures
+extended_properties
+filegroups
+foreign_key_columns
+foreign_keys
+fulltext_catalogs
+fulltext_document_types
+fulltext_index_catalog_usages
+fulltext_index_columns
+fulltext_indexes
+fulltext_languages
+http_endpoints
+identity_columns
+index_columns
+indexes
+internal_tables
+KEY_COLUMN_USAGE
+key_constraints
+key_encryptions
+linked_logins
+login_token
+master_files
+master_key_passwords
+message_type_xml_schema_collection_usages
+messages
+module_assembly_usages
+MSreplication_options
+numbered_procedure_parameters
+numbered_procedures
+objects
+openkeys
+parameter_type_usages
+parameter_xml_schema_collection_usages
+parameters
+PARAMETERS
+partition_functions
+partition_parameters
+partition_range_values
+partition_schemes
+partitions
+plan_guides
+procedures
+REFERENTIAL_CONSTRAINTS
+remote_logins
+remote_service_bindings
+routes
+ROUTINE_COLUMNS
+ROUTINES
+schemas
+SCHEMATA
+securable_classes
+server_assembly_modules
+server_event_notifications
+server_events
+server_permissions
+server_principals
+server_role_members
+server_sql_modules
+server_trigger_events
+server_triggers
+servers
+service_broker_endpoints
+service_contract_message_usages
+service_contract_usages
+service_contracts
+service_message_types
+service_queue_usages
+service_queues
+services
+soap_endpoints
+spt_fallback_db
+spt_fallback_dev
+spt_fallback_usg
+spt_monitor
+spt_values
+sql_dependencies
+sql_logins
+sql_modules
+stats
+stats_columns
+symmetric_keys
+synonyms
+sysaltfiles
+syscacheobjects
+syscharsets
+syscolumns
+syscomments
+sysconfigures
+sysconstraints
+syscurconfigs
+syscursorcolumns
+syscursorrefs
+syscursors
+syscursortables
+sysdatabases
+sysdepends
+sysdevices
+sysfilegroups
+sysfiles
+sysforeignkeys
+sysfulltextcatalogs
+sysindexes
+sysindexkeys
+syslanguages
+syslockinfo
+syslogins
+sysmembers
+sysmessages
+sysobjects
+sysoledbusers
+sysopentapes
+sysperfinfo
+syspermissions
+sysprocesses
+sysprotects
+sysreferences
+sysremotelogins
+syssegments
+sysservers
+system_columns
+system_components_surface_area_configuration
+system_internals_allocation_units
+system_internals_partition_columns
+system_internals_partitions
+system_objects
+system_parameters
+system_sql_modules
+system_views
+systypes
+sysusers
+TABLE_CONSTRAINTS
+TABLE_PRIVILEGES
+TABLES
+tables
+tcp_endpoints
+trace_categories
+trace_columns
+trace_event_bindings
+trace_events
+trace_subclass_values
+traces
+transmission_queue
+trigger_events
+triggers
+type_assembly_usages
+types
+user_token
+via_endpoints
+VIEW_COLUMN_USAGE
+VIEW_TABLE_USAGE
+views
+VIEWS
+xml_indexes
+xml_schema_attributes
+xml_schema_collections
+xml_schema_component_placements
+xml_schema_components
+xml_schema_elements
+xml_schema_facets
+xml_schema_model_groups
+xml_schema_namespaces
+xml_schema_types
+xml_schema_wildcard_namespaces
+xml_schema_wildcards
+
+## Database: msdb
+backupfile
+backupfilegroup
+backupmediafamily
+backupmediaset
+backupset
+log_shipping_monitor_alert
+log_shipping_monitor_error_detail
+log_shipping_monitor_history_detail
+log_shipping_monitor_primary
+log_shipping_monitor_secondary
+log_shipping_primaries
+log_shipping_primary_databases
+log_shipping_primary_secondaries
+log_shipping_secondaries
+log_shipping_secondary
+log_shipping_secondary_databases
+logmarkhistory
+MSdatatype_mappings
+MSdbms
+MSdbms_datatype
+MSdbms_datatype_mapping
+MSdbms_map
+restorefile
+restorefilegroup
+restorehistory
+sqlagent_info
+suspect_pages
+sysalerts
+syscachedcredentials
+syscategories
+sysdatatypemappings
+sysdbmaintplan_databases
+sysdbmaintplan_history
+sysdbmaintplan_jobs
+sysdbmaintplans
+sysdownloadlist
+sysdtscategories
+sysdtslog90
+sysdtspackagefolders90
+sysdtspackagelog
+sysdtspackages
+sysdtspackages90
+sysdtssteplog
+sysdtstasklog
+sysjobactivity
+sysjobhistory
+sysjobs
+sysjobs_view
+sysjobschedules
+sysjobservers
+sysjobsteps
+sysjobstepslogs
+sysmail_account
+sysmail_allitems
+sysmail_attachments
+sysmail_attachments_transfer
+sysmail_configuration
+sysmail_event_log
+sysmail_faileditems
+sysmail_log
+sysmail_mailattachments
+sysmail_mailitems
+sysmail_principalprofile
+sysmail_profile
+sysmail_profileaccount
+sysmail_query_transfer
+sysmail_send_retries
+sysmail_sentitems
+sysmail_server
+sysmail_servertype
+sysmail_unsentitems
+sysmaintplan_log
+sysmaintplan_logdetail
+sysmaintplan_plans
+sysmaintplan_subplans
+sysnotifications
+sysoperators
+sysoriginatingservers
+sysoriginatingservers_view
+sysproxies
+sysproxylogin
+sysproxyloginsubsystem_view
+sysproxysubsystem
+sysschedules
+sysschedules_localserver_view
+syssessions
+syssubsystems
+systargetservergroupmembers
+systargetservergroups
+systargetservers
+systargetservers_view
+systaskids
+
+## Database: AdventureWorks
+Address
+AddressType
+AWBuildVersion
+BillOfMaterials
+Contact
+ContactCreditCard
+ContactType
+CountryRegion
+CountryRegionCurrency
+CreditCard
+Culture
+Currency
+CurrencyRate
+Customer
+CustomerAddress
+DatabaseLog
+Department
+Document
+Employee
+EmployeeAddress
+EmployeeDepartmentHistory
+EmployeePayHistory
+ErrorLog
+Illustration
+Individual
+JobCandidate
+Location
+Product
+ProductCategory
+ProductCostHistory
+ProductDescription
+ProductDocument
+ProductInventory
+ProductListPriceHistory
+ProductModel
+ProductModelIllustration
+ProductModelProductDescriptionCulture
+ProductPhoto
+ProductProductPhoto
+ProductReview
+ProductSubcategory
+ProductVendor
+PurchaseOrderDetail
+PurchaseOrderHeader
+SalesOrderDetail
+SalesOrderHeader
+SalesOrderHeaderSalesReason
+SalesPerson
+SalesPersonQuotaHistory
+SalesReason
+SalesTaxRate
+SalesTerritory
+SalesTerritoryHistory
+ScrapReason
+Shift
+ShipMethod
+ShoppingCartItem
+SpecialOffer
+SpecialOfferProduct
+StateProvince
+Store
+StoreContact
+TransactionHistory
+TransactionHistoryArchive
+UnitMeasure
+vAdditionalContactInfo
+vEmployee
+vEmployeeDepartment
+vEmployeeDepartmentHistory
+Vendor
+VendorAddress
+VendorContact
+vIndividualCustomer
+vIndividualDemographics
+vJobCandidate
+vJobCandidateEducation
+vJobCandidateEmployment
+vProductAndDescription
+vProductModelCatalogDescription
+vProductModelInstructions
+vSalesPerson
+vSalesPersonSalesByFiscalYears
+vStateProvinceCountryRegion
+vStoreWithDemographics
+vVendor
+WorkOrder
+WorkOrderRouting
+
+
+[Columns]
+
+# MySQL
+## Table: mysql.user
+Alter_priv
+Alter_routine_priv
+Create_priv
+Create_routine_priv
+Create_tmp_table_priv
+Create_user_priv
+Create_view_priv
+Delete_priv
+Drop_priv
+Event_priv
+Execute_priv
+File_priv
+Grant_priv
+Host
+Index_priv
+Insert_priv
+Lock_tables_priv
+max_connections
+max_questions
+max_updates
+max_user_connections
+Password
+Process_priv
+References_priv
+Reload_priv
+Repl_client_priv
+Repl_slave_priv
+Select_priv
+Show_db_priv
+Show_view_priv
+Shutdown_priv
+ssl_cipher
+ssl_type
+Super_priv
+Trigger_priv
+Update_priv
+User
+x509_issuer
+x509_subject
+
+# Oracle (types)
+BINARY_INTEGER
+BLOB
+BOOLEAN
+CHAR
+CLOB
+DATE
+INTERVAL
+LONG
+MLSLABEL
+NCHAR
+NCLOB
+NUMBER
+NVARCHAR2
+RAW
+ROWID
+TIMESTAMP
+VARCHAR
+VARCHAR2
+XMLType
+
+# MySQL (types)
+bigint
+blob
+char
+date
+datetime
+decimal
+double
+enum
+float
+int
+set
+smallint
+text
+time
+tinyint
+varchar
+year
+
+# Microsoft SQL Server (types)
+bigint
+binary
+bit
+char
+cursor
+date
+datetime
+datetime2
+datetimeoffset
+decimal
+float
+image
+int
+money
+nchar
+ntext
+numeric
+nvarchar
+real
+smalldatetime
+smallint
+smallmoney
+sql_variant
+table
+text
+time
+timestamp
+tinyint
+uniqueidentifier
+varbinary
+varchar
+xml
+
+# PostgreSQL (types)
+bigint
+bigserial
+boolean
+bpchar
+bytea
+character
+date
+decimal
+double precision
+int4
+integer
+interval
+money
+numeric
+real
+serial
+smallint
+text
+time
+timestamp

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+
+<!-- https://angrytools.com/bootstrap/editor/ -->
+
+<html lang="en">
+<head>
+    <title>DEMO</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap-theme.min.css" rel="stylesheet">
+
+    <!--[if lt IE 9]><script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script><script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
+</head>
+<body>
+    <style>
+  #wrapper { width: 100%; }
+
+  #page-wrapper {
+    padding: 0 15px;
+    min-height: 568px;
+    background-color: #fff;
+  }
+
+  @media(min-width:768px) {
+    #page-wrapper {
+      position: inherit;
+      margin: 0 0 0 250px;
+      padding: 0 30px;
+      border-left: 1px solid #e7e7e7;
+    }
+  }
+
+  .sidebar .sidebar-nav.navbar-collapse { padding-right: 0; padding-left: 0; }
+  .sidebar .sidebar-search { padding: 15px; }
+  .sidebar ul li { border-bottom: 1px solid #e7e7e7; }
+
+  .sidebar ul li a.active { background-color: #eee; }
+
+  .sidebar .arrow { float: right;}
+  .sidebar .fa.arrow:before { content: "f104";}
+  .sidebar .active>a>.fa.arrow:before { content: "f107"; }
+  .sidebar .nav-second-level li,
+  .sidebar .nav-third-level li {
+    border-bottom: 0!important;
+  }
+
+  .sidebar .nav-second-level li a { padding-left: 37px; }
+  .sidebar .nav-third-level li a { padding-left: 52px; }
+
+  @media(min-width:768px) {
+    .sidebar {
+      z-index: 1;
+      position: absolute;
+      width: 250px;
+      margin-top: 51px;
+    }
+  }
+</style>
+<div id="wrapper">
+
+  <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">sqlmap</a>
+    </div>
+
+    <div class="navbar-default sidebar" role="navigation">
+      <div class="sidebar-nav navbar-collapse">
+        <ul class="nav" id="side-menu">
+          <li>
+            <a href="#"><em class="glyphicon glyphicon-home"></em> Options<span class="arrow"></span></a>
+            <ul class="nav nav-second-level">
+              <li><a>Target</a></li>
+              <li><a>Request</a></li>
+              <li><a>Optimization</a></li>
+              <li><a>Injection</a></li>
+              <li><a>Detection</a></li>
+              <li><a>Techniques</a></li>
+              <li><a>Fingerprint</a></li>
+              <li><a>Enumeration</a></li>
+              <li><a>Brute force</a></li>
+              <li><a>User-defined function injection</a></li>
+              <li><a>File system access</a></li>
+              <li><a>Operating system access</a></li>
+              <li><a>Windows registry access</a></li>
+              <li><a>General</a></li>
+              <li><a>Miscellaneous</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div id="page-wrapper">
+    <div class="row">
+      <h4>DEMO</h4>
+    </div>
+  </div>
+</div>
+<script>
+  /*
+ * metismenu - v1.0.3
+ * Easy menu jQuery plugin for Twitter Bootstrap 3
+ * https://github.com/onokumus/metisMenu
+ *
+ * Made by Osman Nuri Okumuş
+ * Under MIT License
+*/
+  !function(a,b,c){function d(b,c){this.element=b,this.settings=a.extend({},f,c),this._defaults=f,this._name=e,this.init()}var e="metisMenu",f={toggle:!0};d.prototype={init:function(){var b=a(this.element),c=this.settings.toggle;this.isIE()<=9?(b.find("li.active").has("ul").children("ul").collapse("show"),b.find("li").not(".active").has("ul").children("ul").collapse("hide")):(b.find("li.active").has("ul").children("ul").addClass("collapse in"),b.find("li").not(".active").has("ul").children("ul").addClass("collapse")),b.find("li").has("ul").children("a").on("click",function(b){b.preventDefault(),a(this).parent("li").toggleClass("active").children("ul").collapse("toggle"),c&&a(this).parent("li").siblings().removeClass("active").children("ul.in").collapse("hide")})},isIE:function(){for(var a,b=3,d=c.createElement("div"),e=d.getElementsByTagName("i");d.innerHTML="<!--[if gt IE "+ ++b+"]><i></i><![endif]-->",e[0];)return b>4?b:a}},a.fn[e]=function(b){return this.each(function(){a.data(this,"plugin_"+e)||a.data(this,"plugin_"+e,new d(this,b))})}}(jQuery,window,document);
+
+  $(function() {
+
+    $('#side-menu').metisMenu();
+
+  });
+
+  //Loads the correct sidebar on window load,
+  //collapses the sidebar on window resize.
+  // Sets the min-height of #page-wrapper to window size
+  $(function() {
+    $(window).bind("load resize", function() {
+      topOffset = 50;
+      width = (this.window.innerWidth > 0) ? this.window.innerWidth : this.screen.width;
+      if (width < 768) {
+        $('div.navbar-collapse').addClass('collapse')
+        topOffset = 100; // 2-row-menu
+      } else {
+        $('div.navbar-collapse').removeClass('collapse')
+      }
+
+      height = (this.window.innerHeight > 0) ? this.window.innerHeight : this.screen.height;
+      height = height - topOffset;
+      if (height < 1) height = 1;
+      if (height > topOffset) {
+        $("#page-wrapper").css("min-height", (height) + "px");
+      }
+    })
+  });
+</script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+</body>
+</html>

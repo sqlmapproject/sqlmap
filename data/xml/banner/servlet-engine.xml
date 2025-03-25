@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Reference: http://www.http-stats.com/Servlet-Engine -->
+
+<root>
+    <regexp value="Tomcat( Web Server)?\/([\d\.]+)">
+        <info technology="Tomcat" tech_version="1"/>
+    </regexp>
+
+    <regexp value="Enhydra Application Server/([\d\.]+)">
+        <info technology="Enhydra" tech_version="1"/>
+    </regexp>
+
+    <regexp value="Jetty/([\d\.]+)">
+        <info technology="Jetty" tech_version="1"/>
+    </regexp>
+
+    <regexp value="JSP[\-\_\/\ ]([\d\.]+)">
+        <info technology="JSP" tech_version="1"/>
+    </regexp>
+
+    <regexp value="Servlet[\-\_\/\ ]([\d\.]+)">
+        <info technology="Servlet" tech_version="1"/>
+    </regexp>
+
+    <regexp value="Java[\-\_\/\ ]([\d\.]+)">
+        <info technology="Java" tech_version="1"/>
+    </regexp>
+</root>

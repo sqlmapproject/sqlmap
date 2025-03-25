@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "runcmd", "runcmd\runcmd.vcproj", "{1C6185A9-871A-4F6E-9B2D-BE4399479784}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1C6185A9-871A-4F6E-9B2D-BE4399479784}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1C6185A9-871A-4F6E-9B2D-BE4399479784}.Debug|Win32.Build.0 = Debug|Win32
+		{1C6185A9-871A-4F6E-9B2D-BE4399479784}.Release|Win32.ActiveCfg = Release|Win32
+		{1C6185A9-871A-4F6E-9B2D-BE4399479784}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

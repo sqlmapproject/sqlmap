@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root>
+    <regexp value="PostgreSQL\s+([\w\.]+)">
+        <info dbms_version="1"/>
+    </regexp>
+
+    <!-- Windows -->
+    <regexp value="Visual C\+\+">
+        <info type="Windows"/>
+    </regexp>
+
+    <regexp value="mingw([\d]+)">
+        <info type="Windows"/>
+    </regexp>
+</root>

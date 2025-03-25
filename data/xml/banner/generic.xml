@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root>
+    <!-- Windows -->
+
+    <regexp value="(Microsoft|Windows|Win32)">
+        <info type="Windows"/>
+    </regexp>
+
+    <regexp value="Service Pack 0">
+        <info sp="0"/>
+    </regexp>
+
+    <regexp value="Service Pack 1">
+        <info sp="1"/>
+    </regexp>
+
+    <regexp value="Service Pack 2">
+        <info sp="2"/>
+    </regexp>
+
+    <regexp value="Service Pack 3">
+        <info sp="3"/>
+    </regexp>
+
+    <regexp value="Service Pack 4">
+        <info sp="4"/>
+    </regexp>
+
+    <regexp value="Service Pack 5">
+        <info sp="5"/>
+    </regexp>
+
+    <!-- Reference: https://msdn.microsoft.com/en-us/library/windows/desktop/ms724832%28v=vs.85%29.aspx -->
+
+    <regexp value="Windows.*\b10\.0">
+        <info type="Windows" distrib="2016|2019|2022|10|11"/>
+    </regexp>
+
+    <regexp value="Windows.*\b6\.3">
+        <info type="Windows" distrib="2012 R2|8.1"/>
+    </regexp>
+
+    <regexp value="Windows.*\b6\.2">
+        <info type="Windows" distrib="2012|8"/>
+    </regexp>
+
+    <regexp value="Windows.*\b6\.1">
+        <info type="Windows" distrib="2008 R2|7"/>
+    </regexp>
+
+    <regexp value="Windows.*\b6\.0">
+        <info type="Windows" distrib="2008|Vista"/>
+    </regexp>
+
+    <regexp value="Windows.*\b5\.2">
+        <info type="Windows" distrib="2003"/>
+    </regexp>
+
+    <regexp value="Windows.*\b5\.1">
+        <info type="Windows" distrib="XP"/>
+    </regexp>
+
+    <regexp value="Windows.*\b5\.0">
+        <info type="Windows" distrib="2000"/>
+    </regexp>
+
+    <regexp value="Windows.*\b4\.0">
+        <info type="Windows" distrib="NT 4.0"/>
+    </regexp>
+
+    <regexp value="Windows.*\b3\.0">
+        <info type="Windows" distrib="NT 4.0"/>
+    </regexp>
+
+    <regexp value="Windows.*\b2\.0">
+        <info type="Windows" distrib="NT 4.0"/>
+    </regexp>
+
+    <!-- Linux -->
+
+    <regexp value="Linux">
+        <info type="Linux"/>
+    </regexp>
+
+    <regexp value="\bArch\b">
+        <info type="Linux" distrib="Arch"/>
+    </regexp>
+
+    <regexp value="CentOS">
+        <info type="Linux" distrib="CentOS"/>
+    </regexp>
+
+    <regexp value="Cobalt">
+        <info type="Linux" distrib="Cobalt"/>
+    </regexp>
+
+    <regexp value="Conectiva">
+        <info type="Linux" distrib="Conectiva"/>
+    </regexp>
+
+    <regexp value="Debian">
+        <info type="Linux" distrib="Debian"/>
+    </regexp>
+
+    <regexp value="Fedora">
+        <info type="Linux" distrib="Fedora"/>
+    </regexp>
+
+    <regexp value="Gentoo">
+        <info type="Linux" distrib="Gentoo"/>
+    </regexp>
+
+    <regexp value="Knoppix">
+        <info type="Linux" distrib="Knoppix"/>
+    </regexp>
+
+    <regexp value="Mandrake">
+        <info type="Linux" distrib="Mandrake"/>
+    </regexp>
+
+    <regexp value="Manjaro">
+        <info type="Linux" distrib="Manjaro"/>
+    </regexp>
+
+    <regexp value="Mandriva">
+        <info type="Linux" distrib="Mandriva"/>
+    </regexp>
+
+    <regexp value="\bMint\b">
+        <info type="Linux" distrib="Mint"/>
+    </regexp>
+
+    <regexp value="\bPuppy\b">
+        <info type="Linux" distrib="Puppy"/>
+    </regexp>
+
+    <regexp value="Red[\-\_\ ]?Hat">
+        <info type="Linux" distrib="Red Hat"/>
+    </regexp>
+
+    <regexp value="Slackware">
+        <info type="Linux" distrib="Slackware"/>
+    </regexp>
+
+    <regexp value="SuSE">
+        <info type="Linux" distrib="SuSE"/>
+    </regexp>
+
+    <regexp value="Ubuntu">
+        <info type="Linux" distrib="Ubuntu"/>
+    </regexp>
+
+    <!-- BSD -->
+
+    <regexp value="FreeBSD">
+        <info type="FreeBSD"/>
+    </regexp>
+
+    <regexp value="NetBSD">
+        <info type="NetBSD"/>
+    </regexp>
+
+    <regexp value="OpenBSD">
+        <info type="OpenBSD"/>
+    </regexp>
+
+    <!-- Mac OSX -->
+
+    <regexp value="Mac[\-\_\ ]?OSX">
+        <info type="Mac OSX"/>
+    </regexp>
+
+    <regexp value="Darwin">
+        <info type="Mac OSX"/>
+    </regexp>
+</root>

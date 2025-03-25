@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Reference: https://publicwww.com/popular/powered/index.html -->
+
+<root>
+    <regexp value="PHP[\-\_\/\ ]([\d\.]+)">
+        <info technology="PHP" tech_version="1"/>
+    </regexp>
+
+    <regexp value="JSP[\-\_\/\ ]([\d\.]+)">
+        <info technology="JSP" tech_version="1"/>
+    </regexp>
+
+    <regexp value="ASP[\/\d\.]*$">
+        <info technology="ASP" type="Windows"/>
+    </regexp>
+
+    <regexp value="EasyEngine ([\d\.]+)">
+        <info technology="EasyEngine" tech_version="1"/>
+    </regexp>
+
+    <regexp value="Phusion Passenger ([\d\.]+)">
+        <info technology="Phusion Passenger" tech_version="1"/>
+    </regexp>
+
+    <regexp value="Craft CMS">
+        <info technology="Craft CMS"/>
+    </regexp>
+
+    <regexp value="Express">
+        <info technology="Express"/>
+    </regexp>
+
+    <regexp value="WP Engine">
+        <info technology="WP Engine"/>
+    </regexp>
+
+    <regexp value="PleskLin">
+        <info technology="Plesk" type="Linux"/>
+    </regexp>
+
+    <regexp value="PleskWin">
+        <info technology="Plesk" type="Windows"/>
+    </regexp>
+
+    <regexp value="ThinkPHP">
+        <info technology="ThinkPHP"/>
+    </regexp>
+
+    <regexp value="ASP\.NET">
+        <info technology="ASP.NET" type="Windows"/>
+    </regexp>
+
+    <regexp value="Tomcat[\-\_\/\ ]?([\d\.]+)">
+        <info technology="Tomcat" tech_version="1"/>
+    </regexp>
+
+    <regexp value="JBoss[\-\_\/\ ]?([\d\.]+)">
+        <info technology="JBoss" tech_version="1"/>
+    </regexp>
+
+    <regexp value="Servlet[\-\_\/\ ]?([\d\.]+)">
+        <info technology="Servlet" tech_version="1"/>
+    </regexp>
+</root>
