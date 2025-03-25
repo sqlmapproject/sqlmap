@@ -2315,7 +2315,7 @@ python.org/pypi/websocket-client/
 
 Switch: `--disable-coloring`
 
-sqlmap by default uses coloring while writting to console. In case of undesired effects (e.g. console appearance of uninterpreted ANSI coloring codes like `\x01\x1b[0;32m\x02[INFO]`) you can disable console output coloring by using this switch.
+sqlmap by default uses coloring while writing to console. In case of undesired effects (e.g. console appearance of uninterpreted ANSI coloring codes like `\x01\x1b[0;32m\x02[INFO]`) you can disable console output coloring by using this switch.
 
 ### Use Google dork results from specified page number
 
@@ -2406,7 +2406,7 @@ not be injectable
 [xx:xx:14] [INFO] skipping GET parameter 'ca'
 [xx:xx:14] [INFO] testing if GET parameter 'user' is dynamic
 [xx:xx:14] [WARNING] GET parameter 'user' does not appear dynamic
-[xx:xx:14] [WARNING] heuristic (basic) test shows that GET parameter 'user' migh
+[xx:xx:14] [WARNING] heuristic (basic) test shows that GET parameter 'user' might
 t not be injectable
 [xx:xx:14] [INFO] skipping GET parameter 'user'
 [xx:xx:14] [INFO] testing if GET parameter 'id' is dynamic
@@ -2889,7 +2889,7 @@ IPS",
             "time": "12:48:11"
         }, 
         {
-            "message": "testing 'AND boolean-based blind - WHERE or HAVING claus
+            "message": "testing 'AND boolean-based blind - WHERE or HAVING clause
 e'", 
             "level": "INFO", 
             "time": "12:48:11"
@@ -3184,7 +3184,7 @@ EPTIME]),[RANDNUM])",
                             "comment": "[GENERIC_SQL_COMMENT]", 
                             "matchRatio": 0.85, 
                             "trueCode": null, 
-                            "title": "Generic UNION query (NULL) - 1 to 20 colum
+                            "title": "Generic UNION query (NULL) - 1 to 20 column
 ns", 
                             "templatePayload": null, 
                             "vector": [
