@@ -17,7 +17,7 @@ from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 __priority__ = PRIORITY.HIGHEST
 
 def dependencies():
-    singleTimeWarnMessage("tamper script '%s' is only meant to be run on POST requests" % (os.path.basename(__file__).split(".")[0])
+    singleTimeWarnMessage("tamper script '%s' is only meant to be run on POST requests" % (os.path.basename(__file__).split(".")[0]))
 
 def tamper(payload, **kwargs):
     """
