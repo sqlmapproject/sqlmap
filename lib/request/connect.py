@@ -62,6 +62,7 @@ from lib.core.common import unsafeVariableNaming
 from lib.core.common import urldecode
 from lib.core.common import urlencode
 from lib.core.common import wasLastResponseDelayed
+from lib.core.compat import LooseVersion
 from lib.core.compat import patchHeaders
 from lib.core.compat import xrange
 from lib.core.convert import encodeBase64
@@ -109,6 +110,7 @@ from lib.core.settings import IS_WIN
 from lib.core.settings import JAVASCRIPT_HREF_REGEX
 from lib.core.settings import LARGE_READ_TRIM_MARKER
 from lib.core.settings import LIVE_COOKIES_TIMEOUT
+from lib.core.settings import MIN_HTTPX_VERSION
 from lib.core.settings import MAX_CONNECTION_READ_SIZE
 from lib.core.settings import MAX_CONNECTIONS_REGEX
 from lib.core.settings import MAX_CONNECTION_TOTAL_SIZE
@@ -617,6 +619,9 @@ class Connect(object):
                         import httpx
                     except ImportError:
                         raise SqlmapMissingDependence("httpx[http2] not available (e.g. 'pip%s install httpx[http2]')" % ('3' if six.PY3 else ""))
+
+                    if LooseVersion(httpx.__version__) < LooseVersion(MIN_HTTPX_VERSION):
+                        raise SqlmapMissingDependence("outdated version of httpx detected (%s<%s)" % (httpx.__version__, MIN_HTTPX_VERSION))
 
                     try:
                         proxy_mounts = dict(("%s://" % key, httpx.HTTPTransport(proxy="%s%s" % ("http://" if not "://" in kb.proxies[key] else "", kb.proxies[key]))) for key in kb.proxies) if kb.proxies else None

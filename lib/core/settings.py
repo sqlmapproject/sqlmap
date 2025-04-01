@@ -835,6 +835,9 @@ INVALID_UNICODE_PRIVATE_AREA = False
 # Format used for representing invalid unicode characters
 INVALID_UNICODE_CHAR_FORMAT = r"\x%02x"
 
+# Minimum supported version of httpx library (for --http2)
+MIN_HTTPX_VERSION = "0.28"
+
 # Regular expression for XML POST data
 XML_RECOGNITION_REGEX = r"(?s)\A\s*<[^>]+>(.+>)?\s*\Z"
 
