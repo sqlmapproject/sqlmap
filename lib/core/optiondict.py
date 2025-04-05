@@ -253,6 +253,7 @@ optDict = {
         "disableHashing": "boolean",
         "listTampers": "boolean",
         "noLogging": "boolean",
+        "noTruncate": "boolean",
         "offline": "boolean",
         "purge": "boolean",
         "resultsFile": "string",

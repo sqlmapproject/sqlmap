@@ -418,7 +418,7 @@ def unionUse(expression, unpack=True, dump=False):
                                     _ = ','.join("'%s'" % _ for _ in (flattenValue(arrayizeValue(items)) if not isinstance(items, six.string_types) else [items]))
                                     status = "[%s] [INFO] %s: %s" % (time.strftime("%X"), "resumed" if threadData.resumed else "retrieved", _ if kb.safeCharEncode else safecharencode(_))
 
-                                    if len(status) > width:
+                                    if len(status) > width and not conf.noTruncate:
                                         status = "%s..." % status[:width - 3]
 
                                     dataToStdout("%s\n" % status)
