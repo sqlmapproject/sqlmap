@@ -89,9 +89,10 @@ class Fingerprint(GenericFingerprint):
             logger.info(infoMsg)
 
             for version, check in (
-                ("2022", "CHARINDEX('16.0.',@@VERSION)>0"),
-                ("2019", "CHARINDEX('15.0.',@@VERSION)>0"),
                 ("Azure", "@@VERSION LIKE '%Azure%'"),
+                ("2025", "CHARINDEX('17.0.',@@VERSION)>0"),
+                ("2022", "GREATEST(NULL,NULL) IS NULL"),
+                ("2019", "CHARINDEX('15.0.',@@VERSION)>0"),
                 ("2017", "TRIM(NULL) IS NULL"),
                 ("2016", "ISJSON(NULL) IS NULL"),
                 ("2014", "CHARINDEX('12.0.',@@VERSION)>0"),
