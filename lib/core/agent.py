@@ -424,6 +424,8 @@ class Agent(object):
                 payload = re.sub(r"(?i)\bORD\(", "ASCII(", payload)
                 payload = re.sub(r"(?i)\bMID\(", "SUBSTR(", payload)
                 payload = re.sub(r"(?i)\bNCHAR\b", "CHAR", payload)
+            elif hashDBRetrieve(HASHDB_KEYS.DBMS_FORK) in (FORK.DM8,):
+                payload = re.sub(r"(?i)\bSUBSTRC\(", "SUBSTR(", payload)
 
             # NOTE: https://github.com/sqlmapproject/sqlmap/issues/5057
             match = re.search(r"(=0x)(303a303a)3(\d{2,})", payload)
