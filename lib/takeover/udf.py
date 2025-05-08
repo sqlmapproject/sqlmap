@@ -204,7 +204,7 @@ class UDF(object):
             msg = "what is the local path of the shared library? "
 
             while True:
-                self.udfLocalFile = readInput(msg)
+                self.udfLocalFile = readInput(msg, default=None, checkBatch=False)
 
                 if self.udfLocalFile:
                     break
