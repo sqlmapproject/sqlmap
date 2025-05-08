@@ -16,11 +16,9 @@ def dependencies():
 
 def tamper(payload, **kwargs):
     """
-    Replaces ORD() occurences with equivalent ASCII() calls 
-
+    Replaces ORD() occurences with equivalent ASCII() calls
     Requirement:
         * MySQL
-
     >>> tamper("ORD('42')")
     "ASCII('42')"
     """

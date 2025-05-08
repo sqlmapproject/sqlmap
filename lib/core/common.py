@@ -5301,7 +5301,7 @@ def parseRequestFile(reqFile, checkParams=True):
                 logger.warning(warnMsg)
                 continue
 
-            if not(conf.scope and not re.search(conf.scope, url, re.I)):
+            if not (conf.scope and not re.search(conf.scope, url, re.I)):
                 yield (url, method, None, cookie, tuple())
 
     def _parseBurpLog(content):
@@ -5451,7 +5451,7 @@ def parseRequestFile(reqFile, checkParams=True):
                     scheme = None
                     port = None
 
-                if not(conf.scope and not re.search(conf.scope, url, re.I)):
+                if not (conf.scope and not re.search(conf.scope, url, re.I)):
                     yield (url, conf.method or method, data, cookie, tuple(headers))
 
     content = readCachedFileContent(reqFile)

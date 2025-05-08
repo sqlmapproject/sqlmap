@@ -2699,7 +2699,6 @@ def _basicOptionValidation():
             warnMsg += "option '--retry-on' was provided"
             logger.warning(warnMsg)
 
-
     if conf.cookieDel and len(conf.cookieDel) != 1:
         errMsg = "option '--cookie-del' should contain a single character (e.g. ';')"
         raise SqlmapSyntaxException(errMsg)

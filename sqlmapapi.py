@@ -105,7 +105,6 @@ def main():
     apiparser.add_argument("--password", help="Basic authentication password (optional)")
     (args, _) = apiparser.parse_known_args() if hasattr(apiparser, "parse_known_args") else apiparser.parse_args()
 
-
     # Start the client or the server
     if args.server:
         server(args.host, args.port, adapter=args.adapter, username=args.username, password=args.password, database=args.database)

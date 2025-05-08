@@ -16,7 +16,7 @@ class _Getch(object):
         except ImportError:
             try:
                 self.impl = _GetchMacCarbon()
-            except(AttributeError, ImportError):
+            except (AttributeError, ImportError):
                 self.impl = _GetchUnix()
 
     def __call__(self):
