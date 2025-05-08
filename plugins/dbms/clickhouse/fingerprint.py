@@ -67,7 +67,7 @@ class Fingerprint(GenericFingerprint):
 
         infoMsg = "testing %s" % DBMS.CLICKHOUSE
         logger.info(infoMsg)
-        
+
         result = inject.checkBooleanExpression("halfMD5('abcd')='16356072519128051347'")
 
         if result:
@@ -80,7 +80,7 @@ class Fingerprint(GenericFingerprint):
                 logger.warning(warnMsg)
 
                 return False
-            
+
             setDbms(DBMS.CLICKHOUSE)
             self.getBanner()
             return True
