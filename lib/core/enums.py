@@ -107,6 +107,7 @@ class FORK(object):
     IRIS = "Iris"
     YUGABYTEDB = "YugabyteDB"
     OPENGAUSS = "OpenGauss"
+    DM8 = "DM8"
 
 class CUSTOM_LOGGING(object):
     PAYLOAD = 9
