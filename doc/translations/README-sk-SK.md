@@ -1,6 +1,6 @@
 # sqlmap ![](https://i.imgur.com/fe85aVR.png)
 
-[![.github/workflows/tests.yml](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml/badge.svg)](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml) [![Python 2.6|2.7|3.x](https://img.shields.io/badge/python-2.6|2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![Twitter](https://img.shields.io/badge/twitter-@sqlmap-blue.svg)](https://twitter.com/sqlmap)
+[![.github/workflows/tests.yml](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml/badge.svg)](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml) [![Python 2.6|2.7|3.x](https://img.shields.io/badge/python-2.6|2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![x](https://img.shields.io/badge/x-@sqlmap-blue.svg)](https://x.com/sqlmap)
 
 sqlmap je open source nástroj na penetračné testovanie, ktorý automatizuje proces detekovania a využívania chýb SQL injekcie a preberania databázových serverov. Je vybavený výkonným detekčným mechanizmom, mnohými výklenkovými funkciami pre dokonalého penetračného testera a širokou škálou prepínačov vrátane odtlačkov databázy, cez načítanie údajov z databázy, prístup k základnému súborovému systému a vykonávanie príkazov v operačnom systéme prostredníctvom mimopásmových pripojení.
 
@@ -45,6 +45,6 @@ Linky
 * Sledovač problémov: https://github.com/sqlmapproject/sqlmap/issues
 * Používateľská príručka: https://github.com/sqlmapproject/sqlmap/wiki
 * Často kladené otázky (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* X: [@sqlmap](https://twitter.com/sqlmap)
+* X: [@sqlmap](https://x.com/sqlmap)
 * Demá: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * Snímky obrazovky: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

@@ -1,6 +1,6 @@
 # sqlmap ![](https://i.imgur.com/fe85aVR.png)
 
-[![.github/workflows/tests.yml](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml/badge.svg)](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml) [![Python 2.6|2.7|3.x](https://img.shields.io/badge/python-2.6|2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![Twitter](https://img.shields.io/badge/twitter-@sqlmap-blue.svg)](https://twitter.com/sqlmap)
+[![.github/workflows/tests.yml](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml/badge.svg)](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml) [![Python 2.6|2.7|3.x](https://img.shields.io/badge/python-2.6|2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![x](https://img.shields.io/badge/x-@sqlmap-blue.svg)](https://x.com/sqlmap)
 
 sqlmap to open sourceowe narzędzie do testów penetracyjnych, które automatyzuje procesy detekcji, przejmowania i testowania odporności serwerów SQL na podatność na iniekcję niechcianego kodu. Zawiera potężny mechanizm detekcji, wiele niszowych funkcji dla zaawansowanych testów penetracyjnych oraz szeroki wachlarz opcji począwszy od identyfikacji bazy danych, poprzez wydobywanie z niej danych, a nawet pozwalających na dostęp do systemu plików oraz wykonywanie poleceń w systemie operacyjnym serwera poprzez niestandardowe połączenia.
 
@@ -45,6 +45,6 @@ Odnośniki
 * Zgłaszanie błędów: https://github.com/sqlmapproject/sqlmap/issues
 * Instrukcja użytkowania: https://github.com/sqlmapproject/sqlmap/wiki
 * Często zadawane pytania (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* X: [@sqlmap](https://twitter.com/sqlmap)
+* X: [@sqlmap](https://x.com/sqlmap)
 * Dema: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * Zrzuty ekranu: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

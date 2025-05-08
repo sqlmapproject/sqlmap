@@ -1,6 +1,6 @@
 # sqlmap ![](https://i.imgur.com/fe85aVR.png)
 
-[![.github/workflows/tests.yml](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml/badge.svg)](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml) [![Python 2.6|2.7|3.x](https://img.shields.io/badge/python-2.6|2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![Twitter](https://img.shields.io/badge/twitter-@sqlmap-blue.svg)](https://twitter.com/sqlmap)
+[![.github/workflows/tests.yml](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml/badge.svg)](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml) [![Python 2.6|2.7|3.x](https://img.shields.io/badge/python-2.6|2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![x](https://img.shields.io/badge/x-@sqlmap-blue.svg)](https://x.com/sqlmap)
 
 sqlmap एक ओपन सोर्स प्रवेश परीक्षण उपकरण है जो SQL इन्जेक्शन दोषों की पहचान और उपयोग की प्रक्रिया को स्वचलित करता है और डेटाबेस सर्वरों को अधिकृत कर लेता है। इसके साथ एक शक्तिशाली पहचान इंजन, अंतिम प्रवेश परीक्षक के लिए कई निचले विशेषताएँ और डेटाबेस प्रिंट करने, डेटाबेस से डेटा निकालने, नीचे के फ़ाइल सिस्टम तक पहुँचने और आउट-ऑफ-बैंड कनेक्शन के माध्यम से ऑपरेटिंग सिस्टम पर कमांड चलाने के लिए कई बड़े रेंज के स्विच शामिल हैं।
 
@@ -44,7 +44,7 @@ sqlmap [Python](https://www.python.org/download/) संस्करण **2.6**,
 * समस्या ट्रैकर: https://github.com/sqlmapproject/sqlmap/issues
 * उपयोगकर्ता मैन्युअल: https://github.com/sqlmapproject/sqlmap/wiki
 * अक्सर पूछे जाने वाले प्रश्न (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* ट्विटर: [@sqlmap](https://twitter.com/sqlmap)
+* ट्विटर: [@sqlmap](https://x.com/sqlmap)
 * डेमो: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * स्क्रीनशॉट: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
 * 
