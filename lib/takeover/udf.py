@@ -336,7 +336,7 @@ class UDF(object):
             msg += "\n[q] Quit"
 
             while True:
-                choice = readInput(msg).upper()
+                choice = readInput(msg, default=None, checkBatch=False).upper()
 
                 if choice == 'Q':
                     break
