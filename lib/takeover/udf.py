@@ -254,7 +254,7 @@ class UDF(object):
         for x in xrange(0, udfCount):
             while True:
                 msg = "what is the name of the UDF number %d? " % (x + 1)
-                udfName = readInput(msg)
+                udfName = readInput(msg, default=None, checkBatch=False)
 
                 if udfName:
                     self.udfs[udfName] = {}
