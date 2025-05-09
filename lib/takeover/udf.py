@@ -360,7 +360,7 @@ class UDF(object):
                 msg += "%d (data-type: %s)? " % (count, inp)
 
                 while True:
-                    parValue = readInput(msg)
+                    parValue = readInput(msg, default=None, checkBatch=False)
 
                     if parValue:
                         if "int" not in inp and "bool" not in inp:
