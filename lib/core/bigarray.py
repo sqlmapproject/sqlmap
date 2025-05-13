@@ -132,6 +132,17 @@ class BigArray(list):
 
         return ValueError, "%s is not in list" % value
 
+    def close(self):
+        while self.filenames:
+            filename = self.filenames.pop()
+            try:
+                self._os_remove(filename)
+            except OSError:
+                pass
+
+    def __del__(self):
+        self.close()
+
     def _dump(self, chunk):
         try:
             handle, filename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.BIG_ARRAY)
@@ -170,8 +181,12 @@ class BigArray(list):
         self.chunks, self.filenames = state
 
     def __getitem__(self, y):
+        length = len(self)
+        if length == 0:
+            raise IndexError("BigArray index out of range")
+
         while y < 0:
-            y += len(self)
+            y += length
 
         index = y // self.chunk_length
         offset = y % self.chunk_length
