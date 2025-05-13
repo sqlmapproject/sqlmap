@@ -14,6 +14,7 @@ import itertools
 import os
 import sys
 import tempfile
+import threading
 import zlib
 
 from lib.core.compat import xrange
@@ -74,6 +75,7 @@ class BigArray(list):
         self.chunk_length = sys.maxsize
         self.cache = None
         self.filenames = set()
+        self._lock = threading.Lock()
         self._os_remove = os.remove
         self._size_counter = 0
 
@@ -95,18 +97,19 @@ class BigArray(list):
         return self
 
     def append(self, value):
-        self.chunks[-1].append(value)
+        with self._lock:
+            self.chunks[-1].append(value)
 
-        if self.chunk_length == sys.maxsize:
-            self._size_counter += _size_of(value)
-            if self._size_counter >= BIGARRAY_CHUNK_SIZE:
-                self.chunk_length = len(self.chunks[-1])
-                self._size_counter = None
+            if self.chunk_length == sys.maxsize:
+                self._size_counter += _size_of(value)
+                if self._size_counter >= BIGARRAY_CHUNK_SIZE:
+                    self.chunk_length = len(self.chunks[-1])
+                    self._size_counter = None
 
-        if len(self.chunks[-1]) >= self.chunk_length:
-            filename = self._dump(self.chunks[-1])
-            self.chunks[-1] = filename
-            self.chunks.append([])
+            if len(self.chunks[-1]) >= self.chunk_length:
+                filename = self._dump(self.chunks[-1])
+                self.chunks[-1] = filename
+                self.chunks.append([])
 
     def extend(self, value):
         for _ in value:
