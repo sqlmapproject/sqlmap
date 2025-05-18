@@ -453,7 +453,7 @@ class des(_baseDes):
 
 	def __permutate(self, table, block):
 		"""Permutate this block with the specified table"""
-		return list(map(lambda x: block[x], table))
+		return [block[i] for i in table]
 
 	# Transform the secret key, so that it is ready for data processing
 	# Create the 16 subkeys, K[1] - K[16]
@@ -506,7 +506,7 @@ class des(_baseDes):
 			self.R = self.__permutate(des.__expansion_table, self.R)
 
 			# Exclusive or R[i - 1] with K[i], create B[1] to B[8] whilst here
-			self.R = list(map(lambda x, y: x ^ y, self.R, self.Kn[iteration]))
+			self.R = [b ^ k for b, k in zip(self.R, self.Kn[iteration])]
 			B = [self.R[:6], self.R[6:12], self.R[12:18], self.R[18:24], self.R[24:30], self.R[30:36], self.R[36:42], self.R[42:]]
 			# Optimization: Replaced below commented code with above
 			#j = 0
@@ -542,7 +542,7 @@ class des(_baseDes):
 			self.R = self.__permutate(des.__p, Bn)
 
 			# Xor with L[i - 1]
-			self.R = list(map(lambda x, y: x ^ y, self.R, self.L))
+			self.R = [b ^ l for b, l in zip(self.R, self.L)]
 			# Optimization: This now replaces the below commented code
 			#j = 0
 			#while j < len(self.R):
@@ -603,7 +603,7 @@ class des(_baseDes):
 			# Xor with IV if using CBC mode
 			if self.getMode() == CBC:
 				if crypt_type == des.ENCRYPT:
-					block = list(map(lambda x, y: x ^ y, block, iv))
+					block = [b ^ v for b, v in zip(block, iv)]
 					#j = 0
 					#while j < len(block):
 					#	block[j] = block[j] ^ iv[j]
@@ -612,7 +612,7 @@ class des(_baseDes):
 				processed_block = self.__des_crypt(block, crypt_type)
 
 				if crypt_type == des.DECRYPT:
-					processed_block = list(map(lambda x, y: x ^ y, processed_block, iv))
+					processed_block = [b ^ v for b, v in zip(processed_block, iv)]
 					#j = 0
 					#while j < len(processed_block):
 					#	processed_block[j] = processed_block[j] ^ iv[j]

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org/)
+Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
@@ -16,7 +16,7 @@ class _Getch(object):
         except ImportError:
             try:
                 self.impl = _GetchMacCarbon()
-            except(AttributeError, ImportError):
+            except (AttributeError, ImportError):
                 self.impl = _GetchUnix()
 
     def __call__(self):

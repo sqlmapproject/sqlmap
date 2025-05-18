@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org/)
+Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
@@ -624,7 +624,7 @@ class Connect(object):
                         raise SqlmapMissingDependence("outdated version of httpx detected (%s<%s)" % (httpx.__version__, MIN_HTTPX_VERSION))
 
                     try:
-                        proxy_mounts = dict(("%s://" % key, httpx.HTTPTransport(proxy="%s%s" % ("http://" if not "://" in kb.proxies[key] else "", kb.proxies[key]))) for key in kb.proxies) if kb.proxies else None
+                        proxy_mounts = dict(("%s://" % key, httpx.HTTPTransport(proxy="%s%s" % ("http://" if "://" not in kb.proxies[key] else "", kb.proxies[key]))) for key in kb.proxies) if kb.proxies else None
                         with httpx.Client(verify=False, http2=True, timeout=timeout, follow_redirects=True, cookies=conf.cj, mounts=proxy_mounts) as client:
                             conn = client.request(method or (HTTPMETHOD.POST if post is not None else HTTPMETHOD.GET), url, headers=headers, data=post)
                     except (httpx.HTTPError, httpx.InvalidURL, httpx.CookieConflict, httpx.StreamError) as ex:

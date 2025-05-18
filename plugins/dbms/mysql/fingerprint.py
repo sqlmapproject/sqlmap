@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org/)
+Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
@@ -45,9 +45,10 @@ class Fingerprint(GenericFingerprint):
         # Reference: https://dev.mysql.com/doc/relnotes/mysql/<major>.<minor>/en/
 
         versions = (
+            (90200, 90202),  # MySQL 9.2
             (90100, 90102),  # MySQL 9.1
             (90000, 90002),  # MySQL 9.0
-            (80400, 80404),  # MySQL 8.4
+            (80400, 80405),  # MySQL 8.4
             (80300, 80302),  # MySQL 8.3
             (80200, 80202),  # MySQL 8.2
             (80100, 80102),  # MySQL 8.1
@@ -207,8 +208,14 @@ class Fingerprint(GenericFingerprint):
 
             kb.data.has_information_schema = True
 
+            # Determine if it is MySQL >= 9.0.0
+            if inject.checkBooleanExpression("ISNULL(VECTOR_DIM(NULL))"):
+                Backend.setVersion(">= 9.0.0")
+                setDbms("%s 9" % DBMS.MYSQL)
+                self.getBanner()
+
             # Determine if it is MySQL >= 8.0.0
-            if inject.checkBooleanExpression("ISNULL(JSON_STORAGE_FREE(NULL))"):
+            elif inject.checkBooleanExpression("ISNULL(JSON_STORAGE_FREE(NULL))"):
                 Backend.setVersion(">= 8.0.0")
                 setDbms("%s 8" % DBMS.MYSQL)
                 self.getBanner()

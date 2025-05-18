@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org/)
+Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
@@ -104,7 +104,6 @@ def main():
     apiparser.add_argument("--username", help="Basic authentication username (optional)")
     apiparser.add_argument("--password", help="Basic authentication password (optional)")
     (args, _) = apiparser.parse_known_args() if hasattr(apiparser, "parse_known_args") else apiparser.parse_args()
-
 
     # Start the client or the server
     if args.server:

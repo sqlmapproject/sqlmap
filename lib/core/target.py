@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org/)
+Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
@@ -227,7 +227,7 @@ def _setRequestParams():
                     conf.data = getattr(conf.data, UNENCODED_ORIGINAL_VALUE, conf.data)
                     conf.data = conf.data.replace(kb.customInjectionMark, ASTERISK_MARKER)
                     conf.data = re.sub(r"(?si)(Content-Disposition:[^\n]+\s+name=\"(?P<name>[^\"]+)\"(?:[^f|^b]|f(?!ilename=)|b(?!oundary=))*?)((%s)--)" % ("\r\n" if "\r\n" in conf.data else '\n'),
-                                        functools.partial(process, repl=r"\g<1>%s\g<3>" % kb.customInjectionMark), conf.data)
+                                       functools.partial(process, repl=r"\g<1>%s\g<3>" % kb.customInjectionMark), conf.data)
 
         if not kb.postHint:
             if kb.customInjectionMark in conf.data:  # later processed

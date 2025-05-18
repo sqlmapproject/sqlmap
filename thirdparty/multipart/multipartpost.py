@@ -34,7 +34,7 @@ from thirdparty.six.moves import urllib as _urllib
 
 # Controls how sequences are uncoded. If true, elements may be given
 # multiple values by assigning a sequence.
-doseq = 1
+doseq = True
 
 
 class MultipartPostHandler(_urllib.request.BaseHandler):

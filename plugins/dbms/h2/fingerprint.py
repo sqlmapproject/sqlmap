@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org/)
+Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
@@ -93,7 +93,7 @@ class Fingerprint(GenericFingerprint):
             infoMsg = "confirming %s" % DBMS.H2
             logger.info(infoMsg)
 
-            result = inject.checkBooleanExpression("ROUNDMAGIC(PI())>=3")
+            result = inject.checkBooleanExpression("LEAST(ROUNDMAGIC(PI()),3)=3")
 
             if not result:
                 warnMsg = "the back-end DBMS is not %s" % DBMS.H2

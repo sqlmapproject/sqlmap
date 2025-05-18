@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org/)
+Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
@@ -269,7 +269,7 @@ FROM_DUMMY_TABLE = {
 HEURISTIC_NULL_EVAL = {
     DBMS.ACCESS: "CVAR(NULL)",
     DBMS.MAXDB: "ALPHA(NULL)",
-    DBMS.MSSQL: "DIFFERENCE(NULL,NULL)",
+    DBMS.MSSQL: "IIF(1=1,DIFFERENCE(NULL,NULL),0)",
     DBMS.MYSQL: "QUARTER(NULL XOR NULL)",
     DBMS.ORACLE: "INSTR2(NULL,NULL)",
     DBMS.PGSQL: "QUOTE_IDENT(NULL)",

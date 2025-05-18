@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org/)
+Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
@@ -511,7 +511,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             currentCharIndex = threadData.shared.index[0]
 
                         if kb.threadContinue:
-                            val = getChar(currentCharIndex, asciiTbl, not(charsetType is None and conf.charset))
+                            val = getChar(currentCharIndex, asciiTbl, not (charsetType is None and conf.charset))
                             if val is None:
                                 val = INFERENCE_UNKNOWN_CHAR
                         else:
@@ -657,7 +657,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     if not val:
                         val = getChar(index, otherCharset, otherCharset == asciiTbl)
                 else:
-                    val = getChar(index, asciiTbl, not(charsetType is None and conf.charset))
+                    val = getChar(index, asciiTbl, not (charsetType is None and conf.charset))
 
                 if val is None:
                     finalValue = partialValue

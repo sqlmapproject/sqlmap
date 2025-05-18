@@ -1,6 +1,6 @@
 # sqlmap ![](https://i.imgur.com/fe85aVR.png)
 
-[![.github/workflows/tests.yml](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml/badge.svg)](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml) [![Python 2.6|2.7|3.x](https://img.shields.io/badge/python-2.6|2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![Twitter](https://img.shields.io/badge/twitter-@sqlmap-blue.svg)](https://twitter.com/sqlmap)
+[![.github/workflows/tests.yml](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml/badge.svg)](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml) [![Python 2.6|2.7|3.x](https://img.shields.io/badge/python-2.6|2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![x](https://img.shields.io/badge/x-@sqlmap-blue.svg)](https://x.com/sqlmap)
 
 
 <div dir=rtl>
@@ -60,7 +60,7 @@ sqlmap لە دەرەوەی سندوق کاردەکات لەگەڵ [Python](https
 * شوێنپێهەڵگری کێشەکان: https://github.com/sqlmapproject/sqlmap/issues
 * ڕێنمایی بەکارهێنەر: https://github.com/sqlmapproject/sqlmap/wiki
 * پرسیارە زۆرەکان (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* X: [@sqlmap](https://twitter.com/sqlmap)
+* X: [@sqlmap](https://x.com/sqlmap)
 * دیمۆ: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * وێنەی شاشە: https://github.com/sqlmapproject/sqlmap/wiki/وێنەی شاشە
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org/)
+Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
@@ -204,7 +204,7 @@ class UDF(object):
             msg = "what is the local path of the shared library? "
 
             while True:
-                self.udfLocalFile = readInput(msg)
+                self.udfLocalFile = readInput(msg, default=None, checkBatch=False)
 
                 if self.udfLocalFile:
                     break
@@ -254,7 +254,7 @@ class UDF(object):
         for x in xrange(0, udfCount):
             while True:
                 msg = "what is the name of the UDF number %d? " % (x + 1)
-                udfName = readInput(msg)
+                udfName = readInput(msg, default=None, checkBatch=False)
 
                 if udfName:
                     self.udfs[udfName] = {}
@@ -336,7 +336,7 @@ class UDF(object):
             msg += "\n[q] Quit"
 
             while True:
-                choice = readInput(msg).upper()
+                choice = readInput(msg, default=None, checkBatch=False).upper()
 
                 if choice == 'Q':
                     break
@@ -360,7 +360,7 @@ class UDF(object):
                 msg += "%d (data-type: %s)? " % (count, inp)
 
                 while True:
-                    parValue = readInput(msg)
+                    parValue = readInput(msg, default=None, checkBatch=False)
 
                     if parValue:
                         if "int" not in inp and "bool" not in inp:

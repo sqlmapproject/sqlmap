@@ -16,7 +16,7 @@ cat > $TMP_DIR/setup.py << EOF
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org/)
+Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
@@ -68,7 +68,7 @@ cat > sqlmap/__init__.py << EOF
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org/)
+Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
@@ -82,7 +82,7 @@ cat > README.rst << "EOF"
 sqlmap
 ======
 
-|Python 2.6|2.7|3.x| |License| |Twitter|
+|Python 2.6|2.7|3.x| |License| |X|
 
 sqlmap is an open source penetration testing tool that automates the
 process of detecting and exploiting SQL injection flaws and taking over
@@ -160,7 +160,7 @@ Links
 -  User's manual: https://github.com/sqlmapproject/sqlmap/wiki
 -  Frequently Asked Questions (FAQ):
    https://github.com/sqlmapproject/sqlmap/wiki/FAQ
--  X: https://twitter.com/sqlmap
+-  X: https://x.com/sqlmap
 -  Demos: http://www.youtube.com/user/inquisb/videos
 -  Screenshots: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
 
@@ -168,8 +168,8 @@ Links
    :target: https://www.python.org/
 .. |License| image:: https://img.shields.io/badge/license-GPLv2-red.svg
    :target: https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE
-.. |Twitter| image:: https://img.shields.io/badge/twitter-@sqlmap-blue.svg
-   :target: https://twitter.com/sqlmap
+.. |X| image:: https://img.shields.io/badge/x-@sqlmap-blue.svg
+   :target: https://x.com/sqlmap
 
 .. pandoc --from=markdown --to=rst --output=README.rst sqlmap/README.md
 .. http://rst.ninjs.org/

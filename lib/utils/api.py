@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org/)
+Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
@@ -787,7 +787,7 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
             return
 
     commands = ("help", "new", "use", "data", "log", "status", "option", "stop", "kill", "list", "flush", "version", "exit", "bye", "quit")
-    colors =  ('red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'lightgrey', 'lightred', 'lightgreen', 'lightyellow', 'lightblue', 'lightmagenta', 'lightcyan')
+    colors = ('red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'lightgrey', 'lightred', 'lightgreen', 'lightyellow', 'lightblue', 'lightmagenta', 'lightcyan')
     autoCompletion(AUTOCOMPLETE_TYPE.API, commands=commands)
 
     taskid = None

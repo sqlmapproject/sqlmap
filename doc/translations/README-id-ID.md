@@ -1,6 +1,6 @@
 # sqlmap ![](https://i.imgur.com/fe85aVR.png)
 
-[![.github/workflows/tests.yml](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml/badge.svg)](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml) [![Python 2.6|2.7|3.x](https://img.shields.io/badge/python-2.6|2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![Twitter](https://img.shields.io/badge/twitter-@sqlmap-blue.svg)](https://twitter.com/sqlmap)
+[![.github/workflows/tests.yml](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml/badge.svg)](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml) [![Python 2.6|2.7|3.x](https://img.shields.io/badge/python-2.6|2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![x](https://img.shields.io/badge/x-@sqlmap-blue.svg)](https://x.com/sqlmap)
 
 sqlmap adalah perangkat lunak sumber terbuka yang digunakan untuk melakukan uji penetrasi, mengotomasi proses deteksi, eksploitasi kelemahan _SQL injection_ serta pengambil-alihan server basis data.
 
@@ -48,6 +48,6 @@ Tautan
 * Pelacak Masalah: https://github.com/sqlmapproject/sqlmap/issues
 * Wiki Manual Penggunaan: https://github.com/sqlmapproject/sqlmap/wiki
 * Pertanyaan Yang Sering Ditanyakan (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* X: [@sqlmap](https://twitter.com/sqlmap)
+* X: [@sqlmap](https://x.com/sqlmap)
 * Video Demo [#1](https://www.youtube.com/user/inquisb/videos) dan [#2](https://www.youtube.com/user/stamparm/videos)
 * Tangkapan Layar: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

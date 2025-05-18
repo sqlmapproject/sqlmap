@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org/)
+Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
@@ -277,7 +277,7 @@ def checkSqlInjection(place, parameter, value):
                     logger.debug(debugMsg)
                     continue
 
-                elif kb.reduceTests == False:
+                elif kb.reduceTests is False:
                     pass
 
                 # Skip DBMS-specific test if it does not match the
@@ -529,7 +529,7 @@ def checkSqlInjection(place, parameter, value):
                             truePage, trueHeaders, trueCode = threadData.lastComparisonPage or "", threadData.lastComparisonHeaders, threadData.lastComparisonCode
                             trueRawResponse = "%s%s" % (trueHeaders, truePage)
 
-                            if trueResult and not(truePage == falsePage and not any((kb.nullConnection, conf.code))):
+                            if trueResult and not (truePage == falsePage and not any((kb.nullConnection, conf.code))):
                                 # Perform the test's False request
                                 falseResult = Request.queryPage(genCmpPayload(), place, raise404=False)
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org/)
+Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
@@ -2698,7 +2698,6 @@ def _basicOptionValidation():
             warnMsg += "option '--retries' to %d because " % conf.retries
             warnMsg += "option '--retry-on' was provided"
             logger.warning(warnMsg)
-
 
     if conf.cookieDel and len(conf.cookieDel) != 1:
         errMsg = "option '--cookie-del' should contain a single character (e.g. ';')"

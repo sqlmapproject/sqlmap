@@ -1,6 +1,6 @@
 # sqlmap ![](https://i.imgur.com/fe85aVR.png)
 
-[![.github/workflows/tests.yml](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml/badge.svg)](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml) [![Python 2.6|2.7|3.x](https://img.shields.io/badge/python-2.6|2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![Twitter](https://img.shields.io/badge/twitter-@sqlmap-blue.svg)](https://twitter.com/sqlmap)
+[![.github/workflows/tests.yml](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml/badge.svg)](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml) [![Python 2.6|2.7|3.x](https://img.shields.io/badge/python-2.6|2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![x](https://img.shields.io/badge/x-@sqlmap-blue.svg)](https://x.com/sqlmap)
 
 sqlmap - это инструмент для тестирования уязвимостей с открытым исходным кодом, который автоматизирует процесс обнаружения и использования ошибок SQL-инъекций и захвата серверов баз данных. Он оснащен мощным механизмом обнаружения, множеством приятных функций для профессионального тестера уязвимостей и широким спектром скриптов, которые упрощают работу с базами данных, от сбора данных из базы данных, до доступа к базовой файловой системе и выполнения команд в операционной системе через out-of-band соединение.
 
@@ -45,6 +45,6 @@ sqlmap работает из коробки с [Python](https://www.python.org/d
 * Отслеживание проблем: https://github.com/sqlmapproject/sqlmap/issues
 * Пользовательский мануал: https://github.com/sqlmapproject/sqlmap/wiki
 * Часто задаваемые вопросы (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* X: [@sqlmap](https://twitter.com/sqlmap)
+* X: [@sqlmap](https://x.com/sqlmap)
 * Демки: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * Скриншоты: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
