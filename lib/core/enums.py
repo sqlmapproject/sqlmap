@@ -230,6 +230,7 @@ class REGISTRY_OPERATION(object):
 class DUMP_FORMAT(object):
     CSV = "CSV"
     HTML = "HTML"
+    SORTABLE_HTML = "SORTABLE_HTML"
     SQLITE = "SQLITE"
 
 class HTTP_HEADER(object):
