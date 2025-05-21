@@ -395,12 +395,15 @@ def processResponse(page, responseHeaders, code=None, status=None):
 
         with kb.locks.identYwaf:
             identYwaf.non_blind.clear()
-            if identYwaf.non_blind_check(rawResponse, silent=True):
-                for waf in set(identYwaf.non_blind):
-                    if waf not in kb.identifiedWafs:
-                        kb.identifiedWafs.add(waf)
-                        errMsg = "WAF/IPS identified as '%s'" % identYwaf.format_name(waf)
-                        singleTimeLogMessage(errMsg, logging.CRITICAL)
+            try:
+                if identYwaf.non_blind_check(rawResponse, silent=True):
+                    for waf in set(identYwaf.non_blind):
+                        if waf not in kb.identifiedWafs:
+                            kb.identifiedWafs.add(waf)
+                            errMsg = "WAF/IPS identified as '%s'" % identYwaf.format_name(waf)
+                            singleTimeLogMessage(errMsg, logging.CRITICAL)
+            except SystemError as ex:
+                singleTimeWarnMessage("internal error occurred in WAF/IPS detection ('%s')" % getSafeExString(ex))
 
     if kb.originalPage is None:
         for regex in (EVENTVALIDATION_REGEX, VIEWSTATE_REGEX):
