@@ -1405,7 +1405,10 @@ def _setHTTPExtraHeaders():
         debugMsg = "setting extra HTTP headers"
         logger.debug(debugMsg)
 
-        conf.headers = conf.headers.split("\n") if "\n" in conf.headers else conf.headers.split("\\n")
+        if "\n" in conf.headers:
+            conf.headers = conf.headers.replace("\r\n", "\n").split("\n")
+        elif "\\n" in conf.headers:
+            conf.headers = conf.headers.replace("\\r\\n", "\\n").split("\\n")
 
         for headerValue in conf.headers:
             if not headerValue.strip():
