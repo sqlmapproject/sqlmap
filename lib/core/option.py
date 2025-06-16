@@ -2546,11 +2546,11 @@ def _checkTor():
 
     try:
         page, _, _ = Request.getPage(url="https://check.torproject.org/api/ip", raise404=False)
-        content = json.loads(page)
-    except SqlmapConnectionException:
-        content = None
+        tor_status = json.loads(page)
+    except (SqlmapConnectionException, TypeError, ValueError):
+        tor_status = None
 
-    if not content or not content.get("IsTor"):
+    if not tor_status or not tor_status.get("IsTor"):
         errMsg = "it appears that Tor is not properly set. Please try using options '--tor-type' and/or '--tor-port'"
         raise SqlmapConnectionException(errMsg)
     else:
