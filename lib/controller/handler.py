@@ -6,6 +6,8 @@ See the file 'LICENSE' for copying permission
 """
 
 from lib.core.common import Backend
+from lib.core.common import getSafeExString
+from lib.core.common import singleTimeWarnMessage
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.dicts import DBMS_DICT
@@ -173,7 +175,8 @@ def setHandler():
                     conf.dbmsConnector.connect()
                 except Exception as ex:
                     if exception:
-                        raise exception
+                        singleTimeWarnMessage(getSafeExString(exception))
+                        raise
                     else:
                         if not isinstance(ex, NameError):
                             raise

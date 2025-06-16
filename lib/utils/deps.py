@@ -32,7 +32,7 @@ def checkDependencies():
             elif dbmsName in (DBMS.PGSQL, DBMS.CRATEDB):
                 __import__("psycopg2")
             elif dbmsName == DBMS.ORACLE:
-                __import__("cx_Oracle")
+                __import__("oracledb")
             elif dbmsName == DBMS.SQLITE:
                 __import__("sqlite3")
             elif dbmsName == DBMS.ACCESS:

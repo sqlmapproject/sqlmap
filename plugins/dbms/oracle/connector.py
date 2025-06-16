@@ -6,8 +6,8 @@ See the file 'LICENSE' for copying permission
 """
 
 try:
-    import cx_Oracle
-except:
+    import oracledb
+except ImportError:
     pass
 
 import logging
@@ -25,32 +25,26 @@ os.environ["NLS_LANG"] = ".AL32UTF8"
 
 class Connector(GenericConnector):
     """
-    Homepage: https://oracle.github.io/python-cx_Oracle/
-    User https://cx-oracle.readthedocs.io/en/latest/
-    API: https://wiki.python.org/moin/DatabaseProgramming
-    License: https://cx-oracle.readthedocs.io/en/latest/license.html#license
+    Homepage: https://oracle.github.io/python-oracledb/
+    User: https://python-oracledb.readthedocs.io/en/latest/
+    License: https://github.com/oracle/python-oracledb/blob/main/LICENSE.txt
     """
 
     def connect(self):
         self.initConnection()
-        # Reference: https://cx-oracle.readthedocs.io/en/latest/user_guide/connection_handling.html
-        self.__dsn = "%s:%d/%s" % (self.hostname, self.port, self.db)
+
         self.user = getText(self.user)
         self.password = getText(self.password)
 
         try:
-            self.connector = cx_Oracle.connect(dsn=self.__dsn, user=self.user, password=self.password, mode=cx_Oracle.SYSDBA)
+            dsn = oracledb.makedsn(self.hostname, self.port, service_name=self.db)
+            self.connector = oracledb.connect(user=self.user, password=self.password, dsn=dsn, mode=oracledb.AUTH_MODE_SYSDBA)
             logger.info("successfully connected as SYSDBA")
-        except (cx_Oracle.OperationalError, cx_Oracle.DatabaseError, cx_Oracle.InterfaceError) as ex:
-            if "Oracle Client library" in getSafeExString(ex):
-                msg = re.sub(r"DPI-\d+:\s+", "", getSafeExString(ex))
-                msg = re.sub(r': ("[^"]+")', r" (\g<1>)", msg)
-                msg = re.sub(r". See (http[^ ]+)", r'. See "\g<1>"', msg)
-                raise SqlmapConnectionException(msg)
-
+        except oracledb.DatabaseError as ex:
+            # Try again without SYSDBA
             try:
-                self.connector = cx_Oracle.connect(dsn=self.__dsn, user=self.user, password=self.password)
-            except (cx_Oracle.OperationalError, cx_Oracle.DatabaseError, cx_Oracle.InterfaceError) as ex:
+                self.connector = oracledb.connect(user=self.user, password=self.password, dsn=dsn)
+            except oracledb.DatabaseError as ex:
                 raise SqlmapConnectionException(ex)
 
         self.initCursor()
@@ -59,7 +53,7 @@ class Connector(GenericConnector):
     def fetchall(self):
         try:
             return self.cursor.fetchall()
-        except cx_Oracle.InterfaceError as ex:
+        except oracledb.InterfaceError as ex:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) '%s'" % getSafeExString(ex))
             return None
 
@@ -69,11 +63,10 @@ class Connector(GenericConnector):
         try:
             self.cursor.execute(getText(query))
             retVal = True
-        except cx_Oracle.DatabaseError as ex:
+        except oracledb.DatabaseError as ex:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) '%s'" % getSafeExString(ex))
 
         self.connector.commit()
-
         return retVal
 
     def select(self, query):
