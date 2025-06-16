@@ -11,6 +11,7 @@ import codecs
 import functools
 import glob
 import inspect
+import json
 import logging
 import os
 import random
@@ -2544,11 +2545,12 @@ def _checkTor():
     logger.info(infoMsg)
 
     try:
-        page, _, _ = Request.getPage(url="https://check.torproject.org/", raise404=False)
+        page, _, _ = Request.getPage(url="https://check.torproject.org/api/ip", raise404=False)
+        content = json.loads(page)
     except SqlmapConnectionException:
-        page = None
+        content = None
 
-    if not page or "Congratulations" not in page:
+    if not content or not content.get("IsTor"):
         errMsg = "it appears that Tor is not properly set. Please try using options '--tor-type' and/or '--tor-port'"
         raise SqlmapConnectionException(errMsg)
     else:
