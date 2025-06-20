@@ -1410,6 +1410,8 @@ def _setHTTPExtraHeaders():
             conf.headers = conf.headers.replace("\r\n", "\n").split("\n")
         elif "\\n" in conf.headers:
             conf.headers = conf.headers.replace("\\r\\n", "\\n").split("\\n")
+        else:
+            headers = [headers]
 
         for headerValue in conf.headers:
             if not headerValue.strip():
