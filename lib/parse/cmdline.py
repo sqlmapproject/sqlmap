@@ -408,6 +408,9 @@ def cmdLineParser(argv=None):
         techniques.add_argument("--time-sec", dest="timeSec", type=int,
             help="Seconds to delay the DBMS response (default %d)" % defaults.timeSec)
 
+        techniques.add_argument("--disable-stats", dest="disableStats", action="store_true",
+            help="Disable the statistical model for detecting the delay")
+
         techniques.add_argument("--union-cols", dest="uCols",
             help="Range of columns to test for UNION query SQL injection")
 
@@ -825,9 +828,6 @@ def cmdLineParser(argv=None):
             help=SUPPRESS)
 
         parser.add_argument("--disable-precon", dest="disablePrecon", action="store_true",
-            help=SUPPRESS)
-
-        parser.add_argument("--disable-stats", dest="disableStats", action="store_true",
             help=SUPPRESS)
 
         parser.add_argument("--profile", dest="profile", action="store_true",
