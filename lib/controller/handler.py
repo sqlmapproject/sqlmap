@@ -173,17 +173,17 @@ def setHandler():
             if not dialect or exception:
                 try:
                     conf.dbmsConnector.connect()
-                except Exception as ex:
+                except NameError:
+                    if exception:
+                        raise exception
+                    else:
+                        msg = "support for direct connection to '%s' is not available. " % dbms
+                        msg += "Please rerun with '--dependencies'"
+                        raise SqlmapConnectionException(msg)
+                except:
                     if exception:
                         singleTimeWarnMessage(getSafeExString(exception))
-                        raise
-                    else:
-                        if not isinstance(ex, NameError):
-                            raise
-                        else:
-                            msg = "support for direct connection to '%s' is not available. " % dbms
-                            msg += "Please rerun with '--dependencies'"
-                            raise SqlmapConnectionException(msg)
+                    raise
 
         if conf.forceDbms == dbms or handler.checkDbms():
             if kb.resolutionDbms:
