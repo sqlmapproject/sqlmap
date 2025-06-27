@@ -513,6 +513,11 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
+        elif "'cryptography' package is required":
+            errMsg = "third-party library 'cryptography' is required"
+            logger.critical(errMsg)
+            raise SystemExit
+
         elif "AttributeError: 'module' object has no attribute 'F_GETFD'" in excMsg:
             errMsg = "invalid runtime (\"%s\") " % excMsg.split("Error: ")[-1].strip()
             errMsg += "(Reference: 'https://stackoverflow.com/a/38841364' & 'https://bugs.python.org/issue24944#msg249231')"
