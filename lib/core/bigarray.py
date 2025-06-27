@@ -163,6 +163,9 @@ class BigArray(list):
             raise SqlmapSystemException(errMsg)
 
     def _checkcache(self, index):
+        if self.cache is not None and not isinstance(self.cache, Cache):
+            self.cache = None
+
         if (self.cache and self.cache.index != index and self.cache.dirty):
             filename = self._dump(self.cache.data)
             self.chunks[self.cache.index] = filename
