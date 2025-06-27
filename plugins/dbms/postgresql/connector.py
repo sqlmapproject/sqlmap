@@ -34,7 +34,7 @@ class Connector(GenericConnector):
 
         try:
             self.connector = psycopg2.connect(host=self.hostname, user=self.user, password=self.password, database=self.db, port=self.port)
-        except psycopg2.OperationalError as ex:
+        except (psycopg2.OperationalError, UnicodeDecodeError) as ex:
             raise SqlmapConnectionException(getSafeExString(ex))
 
         self.connector.set_client_encoding('UNICODE')
