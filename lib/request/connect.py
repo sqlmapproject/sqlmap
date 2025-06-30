@@ -1243,7 +1243,7 @@ class Connect(object):
                     warnMsg += ". sqlmap is going to retry the request"
                     logger.warning(warnMsg)
 
-                page, headers, code = Connect.getPage(url=conf.csrfUrl or conf.url, post=conf.csrfData or (conf.data if conf.csrfUrl == conf.url else None), method=conf.csrfMethod or (conf.method if conf.csrfUrl == conf.url else None), cookie=conf.parameters.get(PLACE.COOKIE), direct=True, silent=True, ua=conf.parameters.get(PLACE.USER_AGENT), referer=conf.parameters.get(PLACE.REFERER), host=conf.parameters.get(PLACE.HOST))
+                page, headers, code = Connect.getPage(url=conf.csrfUrl or conf.url, post=conf.csrfData or (conf.data if conf.csrfUrl == conf.url and (conf.csrfMethod or "").upper() == HTTPMETHOD.POST else None), method=conf.csrfMethod or (conf.method if conf.csrfUrl == conf.url else None), cookie=conf.parameters.get(PLACE.COOKIE), direct=True, silent=True, ua=conf.parameters.get(PLACE.USER_AGENT), referer=conf.parameters.get(PLACE.REFERER), host=conf.parameters.get(PLACE.HOST))
                 page = urldecode(page)  # for anti-CSRF tokens with special characters in their name (e.g. 'foo:bar=...')
 
                 match = re.search(r"(?i)<input[^>]+\bname=[\"']?(?P<name>%s)\b[^>]*\bvalue=[\"']?(?P<value>[^>'\"]*)" % conf.csrfToken, page or "", re.I)
