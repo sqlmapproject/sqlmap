@@ -93,7 +93,7 @@ class Fingerprint(GenericFingerprint):
                 infoMsg = "actively fingerprinting %s" % DBMS.SQLITE
                 logger.info(infoMsg)
 
-                result = inject.checkBooleanExpression("RANDOMBLOB(-1)>0")
+                result = inject.checkBooleanExpression("RANDOMBLOB(-1) IS NOT NULL")
                 version = '3' if result else '2'
                 Backend.setVersion(version)
 

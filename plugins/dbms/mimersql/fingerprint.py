@@ -68,7 +68,7 @@ class Fingerprint(GenericFingerprint):
         infoMsg = "testing %s" % DBMS.MIMERSQL
         logger.info(infoMsg)
 
-        result = inject.checkBooleanExpression("IRAND()>=0")
+        result = inject.checkBooleanExpression("IRAND() IS NOT NULL")
 
         if result:
             infoMsg = "confirming %s" % DBMS.MIMERSQL

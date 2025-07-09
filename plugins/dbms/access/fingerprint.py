@@ -162,7 +162,7 @@ class Fingerprint(GenericFingerprint):
             infoMsg = "confirming %s" % DBMS.ACCESS
             logger.info(infoMsg)
 
-            result = inject.checkBooleanExpression("IIF(ATN(2)>0,1,0) BETWEEN 2 AND 0")
+            result = inject.checkBooleanExpression("IIF(ATN(2) IS NOT NULL,1,0) BETWEEN 2 AND 0")
 
             if not result:
                 warnMsg = "the back-end DBMS is not %s" % DBMS.ACCESS
