@@ -16,7 +16,6 @@ from lib.core.threads import getCurrentThreadData
 
 _cache = {}
 _cache_lock = threading.Lock()
-_method_locks = {}
 
 def cachedmethod(f):
     """
@@ -87,14 +86,12 @@ def stackedmethod(f):
     return _
 
 def lockedmethod(f):
+    lock = threading.RLock()
+
     @functools.wraps(f)
     def _(*args, **kwargs):
-        if f not in _method_locks:
-            _method_locks[f] = threading.RLock()
-
-        with _method_locks[f]:
+        with lock:
             result = f(*args, **kwargs)
-
         return result
 
     return _
