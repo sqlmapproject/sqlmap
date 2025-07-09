@@ -15,7 +15,7 @@ from lib.core.settings import UNICODE_ENCODING
 from lib.core.threads import getCurrentThreadData
 
 _cache = {}
-_cache_lock = threading.Lock()
+_method_locks = {}
 
 def cachedmethod(f):
     """
@@ -37,22 +37,27 @@ def cachedmethod(f):
     """
 
     _cache[f] = LRUDict(capacity=MAX_CACHE_ITEMS)
+    _method_locks[f] = threading.RLock()
 
     @functools.wraps(f)
     def _f(*args, **kwargs):
+        parts = (
+            f.__module__ + "." + f.__name__,
+            "|".join(repr(a) for a in args),
+            "|".join("%s=%r" % (k, kwargs[k]) for k in sorted(kwargs))
+        )
         try:
-            key = int(hashlib.md5("|".join(str(_) for _ in (f, args, kwargs)).encode(UNICODE_ENCODING)).hexdigest(), 16) & 0x7fffffffffffffff
+            key = int(hashlib.md5("|".join(parts).encode(UNICODE_ENCODING)).hexdigest(), 16) & 0x7fffffffffffffff
         except ValueError:  # https://github.com/sqlmapproject/sqlmap/issues/4281 (NOTE: non-standard Python behavior where hexdigest returns binary value)
             result = f(*args, **kwargs)
         else:
-            try:
-                with _cache_lock:
-                    result = _cache[f][key]
-            except KeyError:
-                result = f(*args, **kwargs)
-
-                with _cache_lock:
-                    _cache[f][key] = result
+            lock, cache = _method_locks[f], _cache[f]
+            with lock:
+                try:
+                    result = cache[key]
+                except KeyError:
+                    result = f(*args, **kwargs)
+                    cache[key] = result
 
         return result
 

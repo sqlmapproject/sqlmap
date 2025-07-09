@@ -152,9 +152,10 @@ class LRUDict(object):
         return key in self.cache
 
     def __getitem__(self, key):
-        value = self.cache.pop(key)
-        self.cache[key] = value
-        return value
+        with self.__lock:
+            value = self.cache.pop(key)
+            self.cache[key] = value
+            return value
 
     def get(self, key):
         return self.__getitem__(key)
