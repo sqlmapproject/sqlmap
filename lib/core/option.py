@@ -1657,6 +1657,8 @@ def _createTemporaryDirectory():
             errMsg += "temporary directory location ('%s')" % getSafeExString(ex)
             raise SqlmapSystemException(errMsg)
 
+    conf.tempDirs.append(tempfile.tempdir)
+
     if six.PY3:
         _pympTempLeakPatch(kb.tempDir)
 
@@ -1982,6 +1984,8 @@ def _setConfAttributes():
     conf.dbmsHandler = None
     conf.dnsServer = None
     conf.dumpPath = None
+    conf.fileWriteType = None
+    conf.HARCollectorFactory = None
     conf.hashDB = None
     conf.hashDBFile = None
     conf.httpCollector = None
@@ -1998,9 +2002,8 @@ def _setConfAttributes():
     conf.resultsFP = None
     conf.scheme = None
     conf.tests = []
+    conf.tempDirs = []
     conf.trafficFP = None
-    conf.HARCollectorFactory = None
-    conf.fileWriteType = None
 
 def _setKnowledgeBaseAttributes(flushAll=True):
     """
