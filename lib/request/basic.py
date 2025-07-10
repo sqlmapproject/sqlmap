@@ -402,7 +402,7 @@ def processResponse(page, responseHeaders, code=None, status=None):
                             kb.identifiedWafs.add(waf)
                             errMsg = "WAF/IPS identified as '%s'" % identYwaf.format_name(waf)
                             singleTimeLogMessage(errMsg, logging.CRITICAL)
-            except SystemError as ex:
+            except Exception as ex:
                 singleTimeWarnMessage("internal error occurred in WAF/IPS detection ('%s')" % getSafeExString(ex))
 
     if kb.originalPage is None:
