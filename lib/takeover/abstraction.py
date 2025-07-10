@@ -143,6 +143,8 @@ class Abstraction(Web, UDF, XP_cmdshell):
             try:
                 command = _input("os-shell> ")
                 command = getUnicode(command, encoding=sys.stdin.encoding)
+            except UnicodeDecodeError:
+                pass
             except KeyboardInterrupt:
                 print()
                 errMsg = "user aborted"
