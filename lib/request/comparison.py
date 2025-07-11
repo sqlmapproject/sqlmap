@@ -21,9 +21,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.exception import SqlmapNoneDataException
-from lib.core.exception import SqlmapSilentQuitException
 from lib.core.settings import DEFAULT_PAGE_ENCODING
-from lib.core.settings import DEV_EMAIL_ADDRESS
 from lib.core.settings import DIFF_TOLERANCE
 from lib.core.settings import HTML_TITLE_REGEX
 from lib.core.settings import LOWER_RATIO_BOUND
@@ -37,14 +35,16 @@ from lib.core.threads import getCurrentThreadData
 from thirdparty import six
 
 def comparison(page, headers, code=None, getRatioValue=False, pageLength=None):
-    try:
-        _ = _adjust(_comparison(page, headers, code, getRatioValue, pageLength), getRatioValue)
-        return _
-    except:
-        warnMsg = "there was a KNOWN issue inside the internals regarding the difflib/comparison of pages. "
-        warnMsg += "Please report details privately via e-mail to '%s'" % DEV_EMAIL_ADDRESS
-        logger.critical(warnMsg)
-        raise SqlmapSilentQuitException
+    if not isinstance(page, (six.text_type, six.binary_type, type(None))):
+        logger.critical("got page of type %s; repr(page)[:200]=%s" % (type(page), repr(page)[:200]))
+
+        try:
+            page = b"".join(page)
+        except:
+            page = six.text_type(page)
+
+    _ = _adjust(_comparison(page, headers, code, getRatioValue, pageLength), getRatioValue)
+    return _
 
 def _adjust(condition, getRatioValue):
     if not any((conf.string, conf.notString, conf.regexp, conf.code)):
