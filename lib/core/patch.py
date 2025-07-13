@@ -99,6 +99,15 @@ def dirtyPatches():
         else:
             os.urandom = lambda size: "".join(chr(random.randint(0, 255)) for _ in xrange(size))
 
+    # Reference: https://github.com/sqlmapproject/sqlmap/issues/5929
+    try:
+        global collections
+        if not hasattr(collections, "MutableSet"):
+            import collections.abc
+            collections.MutableSet = collections.abc.MutableSet
+    except ImportError:
+        pass
+
     # Reference: https://github.com/sqlmapproject/sqlmap/issues/5727
     # Reference: https://stackoverflow.com/a/14076841
     try:
