@@ -22,8 +22,6 @@ def tamper(payload, **kwargs):
     >>> tamper("OR 1=1 #")
     'OR 1<=>1 #'
     """
-    if not payload:
-        return payload
-    # Replace '=' with '<=>'
-    payload = re.sub(r'(?<![><!])=(?!=)', '<=>', payload)
-    return payload
+    if payload:
+        # Replace '=' with '<=>'
+        return re.sub(r'(?<![><!])=(?!=)', '<=>', payload)
