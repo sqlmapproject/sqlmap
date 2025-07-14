@@ -25,5 +25,4 @@ def tamper(payload, **kwargs):
     """
     if payload:
         # Replace only ' OR ' (with spaces) to avoid breaking string literals
-        payload = payload.replace(" OR ", " || ")
-    return payload
+        return payload.replace(" OR ", " || ")
