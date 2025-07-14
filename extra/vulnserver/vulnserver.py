@@ -11,6 +11,7 @@ from __future__ import print_function
 
 import base64
 import json
+import os
 import re
 import sqlite3
 import sys
@@ -19,7 +20,7 @@ import traceback
 
 PY3 = sys.version_info >= (3, 0)
 UNICODE_ENCODING = "utf-8"
-DEBUG = False
+DEBUG = os.getenv('VULN_SERVER_DEBUG', '').lower() in ('true', '1', 'yes', 'on')
 
 if PY3:
     from http.client import INTERNAL_SERVER_ERROR
@@ -82,12 +83,17 @@ def init(quiet=False):
 
         print = _
 
+def debug_print(msg):
+    if DEBUG:
+        print("[DEBUG] %s" % msg)
+
 class ThreadingServer(ThreadingMixIn, HTTPServer):
     def finish_request(self, *args, **kwargs):
         try:
             HTTPServer.finish_request(self, *args, **kwargs)
         except Exception:
             if DEBUG:
+                debug_print("Error in finish_request:")
                 traceback.print_exc()
 
 class ReqHandler(BaseHTTPRequestHandler):
@@ -144,19 +150,26 @@ class ReqHandler(BaseHTTPRequestHandler):
                 try:
                     if self.params.get("echo", ""):
                         output += "%s<br>" % self.params["echo"]
+                        debug_print("Echo parameter: %s" % self.params["echo"])
 
                     if self.params.get("reflect", ""):
                         output += "%s<br>" % self.params.get("id")
+                        debug_print("Reflect parameter: %s" % self.params.get("id"))
 
                     with _lock:
                         if "query" in self.params:
+                            debug_print("Executing query: %s" % self.params["query"])
                             _cursor.execute(self.params["query"])
                         elif "id" in self.params:
                             if "base64" in self.params:
-                                _cursor.execute("SELECT * FROM users WHERE id=%s LIMIT 0, 1" % base64.b64decode("%s===" % self.params["id"], altchars=self.params.get("altchars")).decode())
+                                decoded_id = base64.b64decode("%s===" % self.params["id"], altchars=self.params.get("altchars")).decode()
+                                debug_print("Decoded base64 ID: %s" % decoded_id)
+                                _cursor.execute("SELECT * FROM users WHERE id=%s LIMIT 0, 1" % decoded_id)
                             else:
+                                debug_print("Executing query with ID: %s" % self.params["id"])
                                 _cursor.execute("SELECT * FROM users WHERE id=%s LIMIT 0, 1" % self.params["id"])
                         results = _cursor.fetchall()
+                        debug_print("Query results: %s" % results)
 
                     output += "<b>SQL results:</b><br>\n"
 
@@ -180,7 +193,9 @@ class ReqHandler(BaseHTTPRequestHandler):
                     output += "</body></html>"
                 except Exception as ex:
                     code = INTERNAL_SERVER_ERROR
-                    output = "%s: %s" % (re.search(r"'([^']+)'", str(type(ex))).group(1), ex)
+                    error_msg = "%s: %s" % (re.search(r"'([^']+)'", str(type(ex))).group(1), ex)
+                    debug_print("Error occurred: %s" % error_msg)
+                    output = error_msg
 
                 self.send_response(code)
 
@@ -213,7 +228,9 @@ class ReqHandler(BaseHTTPRequestHandler):
             data = self.rfile.read(length)
             data = unquote_plus(data.decode(UNICODE_ENCODING, "ignore"))
             self.data = data
+            debug_print("Received POST data: %s" % data)
         elif self.headers.get("Transfer-encoding") == "chunked":
+            debug_print("Processing chunked transfer encoding")
             data, line = b"", b""
             count = 0
 
@@ -243,13 +260,16 @@ def run(address=LISTEN_ADDRESS, port=LISTEN_PORT):
     try:
         _alive = True
         _server = ThreadingServer((address, port), ReqHandler)
+        debug_print("Initializing server at 'http://%s:%d'" % (address, port))
         print("[i] running HTTP server at 'http://%s:%d'" % (address, port))
         _server.serve_forever()
     except KeyboardInterrupt:
+        debug_print("Received keyboard interrupt")
         _server.socket.close()
         raise
     finally:
         _alive = False
+        debug_print("Server stopped")
 
 if __name__ == "__main__":
     try:
