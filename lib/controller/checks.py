@@ -802,22 +802,21 @@ def checkSqlInjection(place, parameter, value):
             logger.warning(warnMsg)
 
             if conf.multipleTargets:
-                msg = "how do you want to proceed? [ne(X)t target/(s)kip current test/(e)nd detection phase/(n)ext parameter/(c)hange verbosity/(q)uit]"
-                choice = readInput(msg, default='X', checkBatch=False).upper()
+                msg = "how do you want to proceed? [ne(X)t target/(s)kip current test/(e)nd detection phase/(n)ext parameter/(c)hange verbosity (c[0-6])/(q)uit]"
+                default = 'X'
             else:
-                msg = "how do you want to proceed? [(S)kip current test/(e)nd detection phase/(n)ext parameter/(c)hange verbosity/(q)uit]"
-                choice = readInput(msg, default='S', checkBatch=False).upper()
-
+                msg = "how do you want to proceed? [(S)kip current test/(e)nd detection phase/(n)ext parameter/(c)hange verbosity (c[0-6])/(q)uit]"
+                default = 'S'
+            choice = readInput(msg, default=default, checkBatch=False).upper()
+            
             if choice == 'X':
                 if conf.multipleTargets:
                     raise SqlmapSkipTargetException
-            elif choice == 'C':
-                choice = None
-                while not ((choice or "").isdigit() and 0 <= int(choice) <= 6):
-                    if choice:
-                        logger.warning("invalid value")
-                    msg = "enter new verbosity level: [0-6] "
-                    choice = readInput(msg, default=str(conf.verbose), checkBatch=False)
+            elif choice.startswith('C'):
+                if len(choice) == 1:
+                    choice = readInput("enter new verbosity level: [0-6] ", default=str(conf.verbose), checkBatch=False)
+                elif len(choice) == 2 and choice[1].isdigit() and 0 <= int(choice[1]) <= 6:
+                    choice = choice[1]
                 conf.verbose = int(choice)
                 setVerbosity()
                 if hasattr(test.request, "columns") and hasattr(test.request, "_columns"):
