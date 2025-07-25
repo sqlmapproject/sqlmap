@@ -1,6 +1,6 @@
 # sqlmap ![](https://i.imgur.com/fe85aVR.png)
 
-[![.github/workflows/tests.yml](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml/badge.svg)](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml) [![Python 2.6|2.7|3.x](https://img.shields.io/badge/python-2.6|2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![Twitter](https://img.shields.io/badge/twitter-@sqlmap-blue.svg)](https://twitter.com/sqlmap)
+[![.github/workflows/tests.yml](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml/badge.svg)](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml) [![Python 2.6|2.7|3.x](https://img.shields.io/badge/python-2.6|2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![X](https://img.shields.io/badge/x-@sqlmap-blue.svg)](https://x.com/sqlmap)
 
 **SQLMap** একটি ওপেন সোর্স পেনিট্রেশন টেস্টিং টুল যা স্বয়ংক্রিয়ভাবে SQL ইনজেকশন দুর্বলতা সনাক্ত ও শোষণ করতে এবং ডাটাবেস সার্ভার নিয়ন্ত্রণে নিতে সহায়তা করে। এটি একটি শক্তিশালী ডিটেকশন ইঞ্জিন, উন্নত ফিচার এবং পেনিট্রেশন টেস্টারদের জন্য দরকারি বিভিন্ন অপশন নিয়ে আসে। এর মাধ্যমে ডাটাবেস ফিঙ্গারপ্রিন্টিং, ডাটাবেস থেকে তথ্য আহরণ, ফাইল সিস্টেম অ্যাক্সেস, এবং অপারেটিং সিস্টেমে কমান্ড চালানোর মতো কাজ করা যায়, এমনকি আউট-অফ-ব্যান্ড সংযোগ ব্যবহার করেও।
 
@@ -50,13 +50,13 @@ SQLMap-এর সম্পূর্ণ ফিচার, ক্ষমতা, এ�
 লিঙ্কসমূহ
 ---
 
-- **হোমপেজ:** https://sqlmap.org
-- **ডাউনলোড:** [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) অথবা [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
-- **কমিটস RSS ফিড:** https://github.com/sqlmapproject/sqlmap/commits/master.atom
-- **ইস্যু ট্র্যাকার:** https://github.com/sqlmapproject/sqlmap/issues
-- **ব্যবহারকারীর ম্যানুয়াল:** https://github.com/sqlmapproject/sqlmap/wiki
-- **সচরাচর জিজ্ঞাসিত প্রশ্ন (FAQ):** https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-- **X (Twitter):** [@sqlmap](https://twitter.com/sqlmap)
-- **ডেমো ভিডিও:** [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
-- **স্ক্রিনশট:** https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
+* হোমপেজ: https://sqlmap.org
+* ডাউনলোড: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) অথবা [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
+* কমিটস RSS ফিড: https://github.com/sqlmapproject/sqlmap/commits/master.atom
+* ইস্যু ট্র্যাকার: https://github.com/sqlmapproject/sqlmap/issues
+* ব্যবহারকারীর ম্যানুয়াল: https://github.com/sqlmapproject/sqlmap/wiki
+* সচরাচর জিজ্ঞাসিত প্রশ্ন (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
+* X: [@sqlmap](https://x.com/sqlmap)
+* ডেমো ভিডিও: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
+* স্ক্রিনশট: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
 
