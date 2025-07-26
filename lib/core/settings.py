@@ -19,7 +19,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.9.7.9"
+VERSION = "1.9.7.10"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -64,18 +64,18 @@ UPPER_RATIO_BOUND = 0.98
 DUMMY_JUNK = "ahy9Ouge"
 
 # Markers for special cases when parameter values contain html encoded characters
-PARAMETER_AMP_MARKER = "__AMP__"
-PARAMETER_SEMICOLON_MARKER = "__SEMICOLON__"
-BOUNDARY_BACKSLASH_MARKER = "__BACKSLASH__"
-PARAMETER_PERCENTAGE_MARKER = "__PERCENTAGE__"
+PARAMETER_AMP_MARKER = "__PARAMETER_AMP__"
+PARAMETER_SEMICOLON_MARKER = "__PARAMETER_SEMICOLON__"
+BOUNDARY_BACKSLASH_MARKER = "__BOUNDARY_BACKSLASH__"
+PARAMETER_PERCENTAGE_MARKER = "__PARAMETER_PERCENTAGE__"
 PARTIAL_VALUE_MARKER = "__PARTIAL_VALUE__"
 PARTIAL_HEX_VALUE_MARKER = "__PARTIAL_HEX_VALUE__"
-URI_QUESTION_MARKER = "__QUESTION__"
+URI_QUESTION_MARKER = "__URI_QUESTION__"
 ASTERISK_MARKER = "__ASTERISK__"
 REPLACEMENT_MARKER = "__REPLACEMENT__"
 BOUNDED_BASE64_MARKER = "__BOUNDED_BASE64__"
 BOUNDED_INJECTION_MARKER = "__BOUNDED_INJECTION__"
-SAFE_VARIABLE_MARKER = "__SAFE__"
+SAFE_VARIABLE_MARKER = "__SAFE_VARIABLE__"
 SAFE_HEX_MARKER = "__SAFE_HEX__"
 DOLLAR_MARKER = "__DOLLAR__"
 
@@ -97,7 +97,7 @@ SELECT_FROM_TABLE_REGEX = r"\bSELECT\b.+?\bFROM\s+(?P<result>([\w.]|`[^`<>]+`)+)
 TEXT_CONTENT_TYPE_REGEX = r"(?i)(text|form|message|xml|javascript|ecmascript|json)"
 
 # Regular expression used for recognition of generic permission messages
-PERMISSION_DENIED_REGEX = r"(?P<result>(command|permission|access)\s*(was|is)?\s*denied)"
+PERMISSION_DENIED_REGEX = r"\b(?P<result>(command|permission|access|user)\s*(was|is|has been)?\s*(denied|forbidden|unauthorized|rejected|not allowed))"
 
 # Regular expression used in recognition of generic protection mechanisms
 GENERIC_PROTECTION_REGEX = r"(?i)\b(rejected|blocked|protection|incident|denied|detected|dangerous|firewall)\b"
