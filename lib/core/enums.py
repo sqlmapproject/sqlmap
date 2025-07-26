@@ -192,6 +192,7 @@ class HASH(object):
     APACHE_SHA1 = r'\A\{SHA\}[a-zA-Z0-9+/]+={0,2}\Z'
     VBULLETIN = r'\A[0-9a-fA-F]{32}:.{30}\Z'
     VBULLETIN_OLD = r'\A[0-9a-fA-F]{32}:.{3}\Z'
+    OSCOMMERCE_OLD = r'\A[0-9a-fA-F]{32}:.{2}\Z'
     SSHA = r'\A\{SSHA\}[a-zA-Z0-9+/]+={0,2}\Z'
     SSHA256 = r'\A\{SSHA256\}[a-zA-Z0-9+/]+={0,2}\Z'
     SSHA512 = r'\A\{SSHA512\}[a-zA-Z0-9+/]+={0,2}\Z'

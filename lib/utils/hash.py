@@ -478,6 +478,16 @@ def vbulletin_passwd(password, salt, **kwargs):
 
     return "%s:%s" % (md5(binascii.hexlify(md5(getBytes(password)).digest()) + getBytes(salt)).hexdigest(), salt)
 
+def oscommerce_old_passwd(password, salt, **kwargs):
+    """
+    Reference: http://ryanuber.com/09-24-2010/os-commerce-password-hashing.html
+
+    >>> oscommerce_old_passwd(password='testpass', salt='6b')
+    '16d39816e4545b3179f86f2d2d549af4:6b'
+    """
+
+    return "%s:%s" % (md5(getBytes(salt) + getBytes(password)).hexdigest(), salt)
+
 def phpass_passwd(password, salt, count, prefix, **kwargs):
     """
     Reference(s):
@@ -570,6 +580,7 @@ __functions__ = {
     HASH.APACHE_SHA1: apache_sha1_passwd,
     HASH.VBULLETIN: vbulletin_passwd,
     HASH.VBULLETIN_OLD: vbulletin_passwd,
+    HASH.OSCOMMERCE_OLD: oscommerce_old_passwd,
     HASH.SSHA: ssha_passwd,
     HASH.SSHA256: ssha256_passwd,
     HASH.SSHA512: ssha512_passwd,
@@ -1055,7 +1066,7 @@ def dictionaryAttack(attack_dict):
                             item = [(user, hash_), {"salt": hash_[0:2]}]
                         elif hash_regex in (HASH.UNIX_MD5_CRYPT, HASH.APACHE_MD5_CRYPT):
                             item = [(user, hash_), {"salt": hash_.split('$')[2], "magic": "$%s$" % hash_.split('$')[1]}]
-                        elif hash_regex in (HASH.JOOMLA, HASH.VBULLETIN, HASH.VBULLETIN_OLD):
+                        elif hash_regex in (HASH.JOOMLA, HASH.VBULLETIN, HASH.VBULLETIN_OLD, HASH.OSCOMMERCE_OLD):
                             item = [(user, hash_), {"salt": hash_.split(':')[-1]}]
                         elif hash_regex in (HASH.DJANGO_MD5, HASH.DJANGO_SHA1):
                             item = [(user, hash_), {"salt": hash_.split('$')[1]}]
@@ -1302,8 +1313,12 @@ def crackHashFile(hashFile):
     i = 0
     attack_dict = {}
 
+    check = None
     for line in getFileItems(conf.hashFile):
-        if ':' in line:
+        if check is None and not attack_dict and ':' in line:
+            check = any(re.search(_, line) for _ in getPublicTypeMembers(HASH, True))
+
+        if ':' in line and check is False:
             user, hash_ = line.split(':', 1)
             attack_dict[user] = [hash_]
         else:
