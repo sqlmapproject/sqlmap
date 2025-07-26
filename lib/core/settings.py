@@ -19,7 +19,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.9.7.10"
+VERSION = "1.9.7.11"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -103,7 +103,7 @@ PERMISSION_DENIED_REGEX = r"\b(?P<result>(command|permission|access|user)\s*(was
 GENERIC_PROTECTION_REGEX = r"(?i)\b(rejected|blocked|protection|incident|denied|detected|dangerous|firewall)\b"
 
 # Regular expression used to detect errors in fuzz(y) UNION test
-FUZZ_UNION_ERROR_REGEX = r"(?i)data\s?type|comparable|compatible|conversion|converting|failed|error"
+FUZZ_UNION_ERROR_REGEX = r"(?i)data\s?type|mismatch|comparable|compatible|conversion|converting|failed|error|unexpected"
 
 # Upper threshold for starting the fuzz(y) UNION test
 FUZZ_UNION_MAX_COLUMNS = 10
