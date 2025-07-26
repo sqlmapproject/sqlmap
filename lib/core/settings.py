@@ -19,7 +19,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.9.7.8"
+VERSION = "1.9.7.9"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -634,10 +634,10 @@ LAST_UPDATE_NAGGING_DAYS = 180
 MIN_ERROR_PARSING_NON_WRITING_RATIO = 0.05
 
 # Generic address for checking the Internet connection while using switch --check-internet (Note: https version does not work for Python < 2.7.9)
-CHECK_INTERNET_ADDRESS = "http://ipinfo.io/json"
+CHECK_INTERNET_ADDRESS = "http://www.google.com/generate_204"
 
-# Value to look for in response to CHECK_INTERNET_ADDRESS
-CHECK_INTERNET_VALUE = '"ip":'
+# HTTP code to look in response to CHECK_INTERNET_ADDRESS
+CHECK_INTERNET_CODE = 204
 
 # Payload used for checking of existence of WAF/IPS (dummier the better)
 IPS_WAF_CHECK_PAYLOAD = "AND 1=1 UNION ALL SELECT 1,NULL,'<script>alert(\"XSS\")</script>',table_name FROM information_schema.tables WHERE 2>1--/**/; EXEC xp_cmdshell('cat ../../../etc/passwd')#"
