@@ -19,7 +19,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.9.7.11"
+VERSION = "1.9.7.12"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -103,7 +103,7 @@ PERMISSION_DENIED_REGEX = r"\b(?P<result>(command|permission|access|user)\s*(was
 GENERIC_PROTECTION_REGEX = r"(?i)\b(rejected|blocked|protection|incident|denied|detected|dangerous|firewall)\b"
 
 # Regular expression used to detect errors in fuzz(y) UNION test
-FUZZ_UNION_ERROR_REGEX = r"(?i)data\s?type|mismatch|comparable|compatible|conversion|converting|failed|error|unexpected"
+FUZZ_UNION_ERROR_REGEX = r"(?i)data\s?type|mismatch|comparable|compatible|conversion|convert|failed|error|unexpected"
 
 # Upper threshold for starting the fuzz(y) UNION test
 FUZZ_UNION_MAX_COLUMNS = 10
@@ -142,13 +142,13 @@ BING_REGEX = r'<h2><a href="([^"]+)" h='
 DUMMY_SEARCH_USER_AGENT = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:49.0) Gecko/20100101 Firefox/49.0"
 
 # Regular expression used for extracting content from "textual" tags
-TEXT_TAG_REGEX = r"(?si)<(abbr|acronym|b|blockquote|br|center|cite|code|dt|em|font|h\d|i|li|p|pre|q|strong|sub|sup|td|th|title|tt|u)(?!\w).*?>(?P<result>[^<]+)"
+TEXT_TAG_REGEX = r"(?si)<(abbr|acronym|b|blockquote|br|center|cite|code|dt|em|font|h[1-6]|i|li|p|pre|q|strong|sub|sup|td|th|title|tt|u)(?!\w).*?>(?P<result>[^<]+)"
 
 # Regular expression used for recognition of IP addresses
 IP_ADDRESS_REGEX = r"\b(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\b"
 
 # Regular expression used for recognition of generic "your ip has been blocked" messages
-BLOCKED_IP_REGEX = r"(?i)(\A|\b)ip\b.*\b(banned|blocked|block list|firewall)"
+BLOCKED_IP_REGEX = r"(?i)(\A|\b)ip\b.*\b(banned|blocked|block\s?list|firewall)"
 
 # Dumping characters used in GROUP_CONCAT MySQL technique
 CONCAT_ROW_DELIMITER = ','
@@ -264,16 +264,16 @@ IS_WIN = PLATFORM == "nt"
 IS_TTY = hasattr(sys.stdout, "fileno") and os.isatty(sys.stdout.fileno())
 
 # DBMS system databases
-MSSQL_SYSTEM_DBS = ("Northwind", "master", "model", "msdb", "pubs", "tempdb", "Resource", "ReportServer", "ReportServerTempDB")
-MYSQL_SYSTEM_DBS = ("information_schema", "mysql", "performance_schema", "sys")
-PGSQL_SYSTEM_DBS = ("information_schema", "pg_catalog", "pg_toast", "pgagent")
+MSSQL_SYSTEM_DBS = ("Northwind", "master", "model", "msdb", "pubs", "tempdb", "Resource", "ReportServer", "ReportServerTempDB", "distribution", "mssqlsystemresource")
+MYSQL_SYSTEM_DBS = ("information_schema", "mysql", "performance_schema", "sys", "ndbinfo")
+PGSQL_SYSTEM_DBS = ("postgres", "template0", "template1", "information_schema", "pg_catalog", "pg_toast", "pgagent")
 ORACLE_SYSTEM_DBS = ("ADAMS", "ANONYMOUS", "APEX_030200", "APEX_PUBLIC_USER", "APPQOSSYS", "AURORA$ORB$UNAUTHENTICATED", "AWR_STAGE", "BI", "BLAKE", "CLARK", "CSMIG", "CTXSYS", "DBSNMP", "DEMO", "DIP", "DMSYS", "DSSYS", "EXFSYS", "FLOWS_%", "FLOWS_FILES", "HR", "IX", "JONES", "LBACSYS", "MDDATA", "MDSYS", "MGMT_VIEW", "OC", "OE", "OLAPSYS", "ORACLE_OCM", "ORDDATA", "ORDPLUGINS", "ORDSYS", "OUTLN", "OWBSYS", "PAPER", "PERFSTAT", "PM", "SCOTT", "SH", "SI_INFORMTN_SCHEMA", "SPATIAL_CSW_ADMIN_USR", "SPATIAL_WFS_ADMIN_USR", "SYS", "SYSMAN", "SYSTEM", "TRACESVR", "TSMSYS", "WK_TEST", "WKPROXY", "WKSYS", "WMSYS", "XDB", "XS$NULL")
 SQLITE_SYSTEM_DBS = ("sqlite_master", "sqlite_temp_master")
-ACCESS_SYSTEM_DBS = ("MSysAccessObjects", "MSysACEs", "MSysObjects", "MSysQueries", "MSysRelationships", "MSysAccessStorage", "MSysAccessXML", "MSysModules", "MSysModules2")
+ACCESS_SYSTEM_DBS = ("MSysAccessObjects", "MSysACEs", "MSysObjects", "MSysQueries", "MSysRelationships", "MSysAccessStorage", "MSysAccessXML", "MSysModules", "MSysModules2", "MSysNavPaneGroupCategories", "MSysNavPaneGroups", "MSysNavPaneGroupToObjects", "MSysNavPaneObjectIDs")
 FIREBIRD_SYSTEM_DBS = ("RDB$BACKUP_HISTORY", "RDB$CHARACTER_SETS", "RDB$CHECK_CONSTRAINTS", "RDB$COLLATIONS", "RDB$DATABASE", "RDB$DEPENDENCIES", "RDB$EXCEPTIONS", "RDB$FIELDS", "RDB$FIELD_DIMENSIONS", " RDB$FILES", "RDB$FILTERS", "RDB$FORMATS", "RDB$FUNCTIONS", "RDB$FUNCTION_ARGUMENTS", "RDB$GENERATORS", "RDB$INDEX_SEGMENTS", "RDB$INDICES", "RDB$LOG_FILES", "RDB$PAGES", "RDB$PROCEDURES", "RDB$PROCEDURE_PARAMETERS", "RDB$REF_CONSTRAINTS", "RDB$RELATIONS", "RDB$RELATION_CONSTRAINTS", "RDB$RELATION_FIELDS", "RDB$ROLES", "RDB$SECURITY_CLASSES", "RDB$TRANSACTIONS", "RDB$TRIGGERS", "RDB$TRIGGER_MESSAGES", "RDB$TYPES", "RDB$USER_PRIVILEGES", "RDB$VIEW_RELATIONS")
 MAXDB_SYSTEM_DBS = ("SYSINFO", "DOMAIN")
-SYBASE_SYSTEM_DBS = ("master", "model", "sybsystemdb", "sybsystemprocs")
-DB2_SYSTEM_DBS = ("NULLID", "SQLJ", "SYSCAT", "SYSFUN", "SYSIBM", "SYSIBMADM", "SYSIBMINTERNAL", "SYSIBMTS", "SYSPROC", "SYSPUBLIC", "SYSSTAT", "SYSTOOLS")
+SYBASE_SYSTEM_DBS = ("master", "model", "sybsystemdb", "sybsystemprocs", "tempdb")
+DB2_SYSTEM_DBS = ("NULLID", "SQLJ", "SYSCAT", "SYSFUN", "SYSIBM", "SYSIBMADM", "SYSIBMINTERNAL", "SYSIBMTS", "SYSPROC", "SYSPUBLIC", "SYSSTAT", "SYSTOOLS", "SYSDEBUG", "SYSINST")
 HSQLDB_SYSTEM_DBS = ("INFORMATION_SCHEMA", "SYSTEM_LOB")
 H2_SYSTEM_DBS = ("INFORMATION_SCHEMA",) + ("IGNITE", "ignite-sys-cache")
 INFORMIX_SYSTEM_DBS = ("sysmaster", "sysutils", "sysuser", "sysadmin")
@@ -430,7 +430,7 @@ META_CHARSET_REGEX = r'(?si)<head>.*<meta[^>]+charset="?(?P<result>[^"> ]+).*</h
 META_REFRESH_REGEX = r'(?i)<meta http-equiv="?refresh"?[^>]+content="?[^">]+;\s*(url=)?["\']?(?P<result>[^\'">]+)'
 
 # Regular expression used for parsing Javascript redirect request
-JAVASCRIPT_HREF_REGEX = r'<script>\s*(\w+\.)?location\.href\s*=["\'](?P<result>[^"\']+)'
+JAVASCRIPT_HREF_REGEX = r'<script>\s*(\w+\.)?location\.href\s*=\s*["\'](?P<result>[^"\']+)'
 
 # Regular expression used for parsing empty fields in tested form data
 EMPTY_FORM_FIELDS_REGEX = r'(&|\A)(?P<result>[^=]+=)(?=&|\Z)'
@@ -439,7 +439,7 @@ EMPTY_FORM_FIELDS_REGEX = r'(&|\A)(?P<result>[^=]+=)(?=&|\Z)'
 COMMON_PASSWORD_SUFFIXES = ("1", "123", "2", "12", "3", "13", "7", "11", "5", "22", "23", "01", "4", "07", "21", "14", "10", "06", "08", "8", "15", "69", "16", "6", "18")
 
 # Reference: http://www.the-interweb.com/serendipity/index.php?/archives/94-A-brief-analysis-of-40,000-leaked-MySpace-passwords.html
-COMMON_PASSWORD_SUFFIXES += ("!", ".", "*", "!!", "?", ";", "..", "!!!", ", ", "@")
+COMMON_PASSWORD_SUFFIXES += ("!", ".", "*", "!!", "?", ";", "..", "!!!", ",", "@")
 
 # Splitter used between requests in WebScarab log files
 WEBSCARAB_SPLITTER = "### Conversation"
@@ -547,7 +547,7 @@ IGNORE_PARAMETERS = ("__VIEWSTATE", "__VIEWSTATEENCRYPTED", "__VIEWSTATEGENERATO
 ASP_NET_CONTROL_REGEX = r"(?i)\Actl\d+\$"
 
 # Regex for Google analytics cookie names
-GOOGLE_ANALYTICS_COOKIE_REGEX = r"(?i)\A(__utm|_ga|_gid|_gat|_gcl_au)"
+GOOGLE_ANALYTICS_COOKIE_REGEX = r"(?i)\A(_ga|_gid|_gat|_gcl_au|__utm[abcz])"
 
 # Prefix for configuration overriding environment variables
 SQLMAP_ENVIRONMENT_PREFIX = "SQLMAP_"
@@ -613,7 +613,7 @@ DUMMY_SQL_INJECTION_CHARS = ";()'"
 DUMMY_USER_INJECTION = r"(?i)[^\w](AND|OR)\s+[^\s]+[=><]|\bUNION\b.+\bSELECT\b|\bSELECT\b.+\bFROM\b|\b(CONCAT|information_schema|SLEEP|DELAY|FLOOR\(RAND)\b"
 
 # Extensions skipped by crawler
-CRAWL_EXCLUDE_EXTENSIONS = ("3ds", "3g2", "3gp", "7z", "DS_Store", "a", "aac", "adp", "ai", "aif", "aiff", "apk", "ar", "asf", "au", "avi", "bak", "bin", "bk", "bmp", "btif", "bz2", "cab", "caf", "cgm", "cmx", "cpio", "cr2", "dat", "deb", "djvu", "dll", "dmg", "dmp", "dng", "doc", "docx", "dot", "dotx", "dra", "dsk", "dts", "dtshd", "dvb", "dwg", "dxf", "ear", "ecelp4800", "ecelp7470", "ecelp9600", "egg", "eol", "eot", "epub", "exe", "f4v", "fbs", "fh", "fla", "flac", "fli", "flv", "fpx", "fst", "fvt", "g3", "gif", "gz", "h261", "h263", "h264", "ico", "ief", "image", "img", "ipa", "iso", "jar", "jpeg", "jpg", "jpgv", "jpm", "jxr", "ktx", "lvp", "lz", "lzma", "lzo", "m3u", "m4a", "m4v", "mar", "mdi", "mid", "mj2", "mka", "mkv", "mmr", "mng", "mov", "movie", "mp3", "mp4", "mp4a", "mpeg", "mpg", "mpga", "mxu", "nef", "npx", "o", "oga", "ogg", "ogv", "otf", "pbm", "pcx", "pdf", "pea", "pgm", "pic", "png", "pnm", "ppm", "pps", "ppt", "pptx", "ps", "psd", "pya", "pyc", "pyo", "pyv", "qt", "rar", "ras", "raw", "rgb", "rip", "rlc", "rz", "s3m", "s7z", "scm", "scpt", "sgi", "shar", "sil", "smv", "so", "sub", "swf", "tar", "tbz2", "tga", "tgz", "tif", "tiff", "tlz", "ts", "ttf", "uvh", "uvi", "uvm", "uvp", "uvs", "uvu", "viv", "vob", "war", "wav", "wax", "wbmp", "wdp", "weba", "webm", "webp", "whl", "wm", "wma", "wmv", "wmx", "woff", "woff2", "wvx", "xbm", "xif", "xls", "xlsx", "xlt", "xm", "xpi", "xpm", "xwd", "xz", "z", "zip", "zipx")
+CRAWL_EXCLUDE_EXTENSIONS = frozenset(("3ds", "3g2", "3gp", "7z", "DS_Store", "a", "aac", "accdb", "access", "adp", "ai", "aif", "aiff", "apk", "ar", "asf", "au", "avi", "bak", "bin", "bin", "bk", "bkp", "bmp", "btif", "bz2", "c", "cab", "caf", "cfg", "cgm", "cmx", "com", "conf", "config", "cpio", "cpp", "cr2", "cue", "dat", "db", "dbf", "deb", "debug", "djvu", "dll", "dmg", "dmp", "dng", "doc", "docx", "dot", "dotx", "dra", "dsk", "dts", "dtshd", "dvb", "dwg", "dxf", "dylib", "ear", "ecelp4800", "ecelp7470", "ecelp9600", "egg", "elf", "env", "eol", "eot", "epub", "error", "exe", "f4v", "fbs", "fh", "fla", "flac", "fli", "flv", "fpx", "fst", "fvt", "g3", "gif", "go", "gz", "h", "h261", "h263", "h264", "ico", "ief", "img", "ini", "ipa", "iso", "jar", "java", "jpeg", "jpg", "jpgv", "jpm", "js", "jxr", "ktx", "lock", "log", "lvp", "lz", "lzma", "lzo", "m3u", "m4a", "m4v", "mar", "mdb", "mdi", "mid", "mj2", "mka", "mkv", "mmr", "mng", "mov", "movie", "mp3", "mp4", "mp4a", "mpeg", "mpg", "mpga", "msi", "mxu", "nef", "npx", "nrg", "o", "oga", "ogg", "ogv", "old", "otf", "ova", "ovf", "pbm", "pcx", "pdf", "pea", "pgm", "php", "pic", "pid", "pkg", "png", "pnm", "ppm", "pps", "ppt", "pptx", "ps", "psd", "py", "pya", "pyc", "pyo", "pyv", "qt", "rar", "ras", "raw", "rb", "rgb", "rip", "rlc", "rs", "run", "rz", "s3m", "s7z", "scm", "scpt", "service", "sgi", "shar", "sil", "smv", "so", "sock", "socket", "sqlite", "sqlitedb", "sub", "svc", "swf", "swo", "swp", "sys", "tar", "tbz2", "temp", "tga", "tgz", "tif", "tiff", "tlz", "tmp", "toast", "torrent", "ts", "ts", "ttf", "uvh", "uvi", "uvm", "uvp", "uvs", "uvu", "vbox", "vdi", "vhd", "vhdx", "viv", "vmdk", "vmx", "vob", "vxd", "war", "wav", "wax", "wbmp", "wdp", "weba", "webm", "webp", "whl", "wm", "wma", "wmv", "wmx", "woff", "woff2", "wvx", "xbm", "xif", "xls", "xlsx", "xlt", "xm", "xpi", "xpm", "xwd", "xz", "yaml", "yml", "z", "zip", "zipx"))
 
 # Patterns often seen in HTTP headers containing custom injection marking character '*'
 PROBLEMATIC_CUSTOM_INJECTION_PATTERNS = r"(;q=[^;']+)|(\*/\*)"
@@ -689,7 +689,7 @@ PARAMETER_SPLITTING_REGEX = r"[,|;]"
 UNENCODED_ORIGINAL_VALUE = "original"
 
 # Common column names containing usernames (used for hash cracking in some cases)
-COMMON_USER_COLUMNS = ("login", "user", "username", "user_name", "user_login", "account", "account_name", "benutzername", "benutzer", "utilisateur", "usager", "consommateur", "utente", "utilizzatore", "utilizator", "utilizador", "usufrutuario", "korisnik", "uporabnik", "usuario", "consumidor", "client", "customer", "cuser")
+COMMON_USER_COLUMNS = frozenset(("login", "user", "uname", "username", "user_name", "user_login", "account", "account_name", "auth_user", "benutzername", "benutzer", "utilisateur", "usager", "consommateur", "utente", "utilizzatore", "utilizator", "utilizador", "usufrutuario", "korisnik", "uporabnik", "usuario", "consumidor", "client", "customer", "cuser"))
 
 # Default delimiter in GET/POST values
 DEFAULT_GET_POST_DELIMITER = '&'
@@ -893,7 +893,7 @@ ZIP_HEADER = b"\x50\x4b\x03\x04"
 NETSCAPE_FORMAT_HEADER_COOKIES = "# Netscape HTTP Cookie File."
 
 # Infixes used for automatic recognition of parameters carrying anti-CSRF tokens
-CSRF_TOKEN_PARAMETER_INFIXES = ("csrf", "xsrf", "token")
+CSRF_TOKEN_PARAMETER_INFIXES = ("csrf", "xsrf", "token", "nonce")
 
 # Prefixes used in brute force search for web server document root
 BRUTE_DOC_ROOT_PREFIXES = {
