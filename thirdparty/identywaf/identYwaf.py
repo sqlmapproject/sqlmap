@@ -63,11 +63,11 @@ NAME = "identYwaf"
 VERSION = "1.0.131"
 BANNER = r"""
                                    ` __ __ `
- ____  ___      ___  ____   ______ `|  T  T` __    __   ____  _____ 
+ ____  ___      ___  ____   ______ `|  T  T` __    __   ____  _____
 l    j|   \    /  _]|    \ |      T`|  |  |`|  T__T  T /    T|   __|
  |  T |    \  /  [_ |  _  Yl_j  l_j`|  ~  |`|  |  |  |Y  o  ||  l_
  |  | |  D  YY    _]|  |  |  |  |  `|___  |`|  |  |  ||     ||   _|
- j  l |     ||   [_ |  |  |  |  |  `|     !` \      / |  |  ||  ] 
+ j  l |     ||   [_ |  |  |  |  |  `|     !` \      / |  |  ||  ]
 |____jl_____jl_____jl__j__j  l__j  `l____/ `  \_/\_/  l__j__jl__j  (%s)%s""".strip("\n") % (VERSION, "\n")
 
 RAW, TEXT, HTTPCODE, SERVER, TITLE, HTML, URL = xrange(7)
@@ -338,7 +338,7 @@ def load_data():
     global WAF_RECOGNITION_REGEX
 
     if os.path.isfile(DATA_JSON_FILE):
-        with codecs.open(DATA_JSON_FILE, "rb", encoding="utf8") as f:
+        with open(DATA_JSON_FILE, "r") as f:
             DATA_JSON.update(json.load(f))
 
         WAF_RECOGNITION_REGEX = ""
@@ -371,7 +371,7 @@ def init():
         if os.path.isfile(options.proxy_file):
             print(colorize("[o] loading proxy list..."))
 
-            with codecs.open(options.proxy_file, "rb", encoding="utf8") as f:
+            with open(options.proxy_file, "r") as f:
                 proxies.extend(re.sub(r"\s.*", "", _.strip()) for _ in f.read().strip().split('\n') if _.startswith("http"))
                 random.shuffle(proxies)
         else:
