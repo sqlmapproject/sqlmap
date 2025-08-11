@@ -104,7 +104,7 @@
 
     <!-- Interbase/Firebird -->
     <dbms value="Firebird">
-        <error regexp="Dynamic SQL Error"/>
+        <error regexp="Dynamic SQL Error.{1,10}SQL error code"/>
         <error regexp="Warning.*?\Wibase_"/>
         <error regexp="org\.firebirdsql\.jdbc"/>
         <error regexp="Pdo[./_\\]Firebird"/>
@@ -122,6 +122,7 @@
         <error regexp="org\.sqlite\.JDBC"/>
         <error regexp="Pdo[./_\\]Sqlite"/>
         <error regexp="SQLiteException"/>
+        <error regexp="SqliteError:"/>
     </dbms>
 
     <dbms value="SAP MaxDB">
@@ -129,7 +130,7 @@
         <error regexp="Warning.*?\Wmaxdb_"/>
         <error regexp="DriverSapDB"/>
         <error regexp="-3014.*?Invalid end of SQL statement"/>
-        <error regexp="com\.sap\.dbtech\.jdbc"/>
+        <error regexp="com\.sap\.db(tech)?\.jdbc"/>
         <error regexp="\[-3008\].*?: Invalid keyword or missing delimiter"/>
     </dbms>
 
