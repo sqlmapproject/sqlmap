@@ -27,7 +27,7 @@
         <error regexp="Npgsql\."/>
         <error regexp="PG::SyntaxError:"/>
         <error regexp="org\.postgresql\.util\.PSQLException"/>
-        <error regexp="ERROR:\s\ssyntax error at or near"/>
+        <error regexp="ERROR:\s+syntax error at or near"/>
         <error regexp="ERROR: parser: parse error at or near"/>
         <error regexp="PostgreSQL query failed"/>
         <error regexp="org\.postgresql\.jdbc"/>
@@ -164,7 +164,7 @@
 
     <dbms value="H2">
         <error regexp="org\.h2\.jdbc"/>
-        <error regexp="\[42000-192\]"/>
+        <error regexp="\[42000-\d+\]"/>
     </dbms>
 
     <dbms value="MonetDB">
@@ -211,7 +211,7 @@
     </dbms>
 
     <dbms value="ClickHouse">
-        <error regexp="Code: \d+. DB::Exception:"/>
+        <error regexp="Code: \d+[., ]+DB::Exception:"/>
         <error regexp="Syntax error: failed at position \d+"/>
     </dbms>
 
