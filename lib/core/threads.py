@@ -166,8 +166,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
                 _threadFunction()
             except (SqlmapUserQuitException, SqlmapSkipTargetException):
                 pass
-            finally:
-                return
+            return
 
         kb.multiThreadMode = True
 
