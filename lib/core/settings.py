@@ -295,7 +295,7 @@ VIRTUOSO_SYSTEM_DBS = ("",)
 
 # Note: (<regular>) + (<forks>)
 MSSQL_ALIASES = ("microsoft sql server", "mssqlserver", "mssql", "ms")
-MYSQL_ALIASES = ("mysql", "my") + ("mariadb", "maria", "memsql", "tidb", "percona", "drizzle")
+MYSQL_ALIASES = ("mysql", "my") + ("mariadb", "maria", "memsql", "tidb", "percona", "drizzle", "doris")
 PGSQL_ALIASES = ("postgresql", "postgres", "pgsql", "psql", "pg") + ("cockroach", "cockroachdb", "amazon redshift", "redshift", "greenplum", "yellowbrick", "enterprisedb", "yugabyte", "yugabytedb", "opengauss")
 ORACLE_ALIASES = ("oracle", "orcl", "ora", "or")
 SQLITE_ALIASES = ("sqlite", "sqlite3")
