@@ -92,7 +92,7 @@ class HTTPSConnection(_http_client.HTTPSConnection):
                         break
                     else:
                         sock.close()
-                except (ssl.SSLError, socket.error, _http_client.BadStatusLine) as ex:
+                except (ssl.SSLError, socket.error, _http_client.BadStatusLine, AttributeError) as ex:
                     self._tunnel_host = None
                     logger.debug("SSL connection error occurred for '%s' ('%s')" % (_lut[protocol], getSafeExString(ex)))
 
