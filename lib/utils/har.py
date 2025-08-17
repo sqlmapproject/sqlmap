@@ -11,12 +11,12 @@ import io
 import re
 import time
 
-from lib.core.bigarray import BigArray
-from lib.core.convert import getBytes
-from lib.core.convert import getText
-from lib.core.settings import VERSION
 from thirdparty.six.moves import BaseHTTPServer as _BaseHTTPServer
 from thirdparty.six.moves import http_client as _http_client
+
+from lib.core.bigarray import BigArray
+from lib.core.convert import getBytes, getText
+from lib.core.settings import VERSION
 
 # Reference: https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/HAR/Overview.html
 #            http://www.softwareishard.com/har/viewer/
@@ -158,6 +158,14 @@ class Response(object):
             remain = stream.read()
             altered = getBytes(status_line) + b"\r\n" + remain
             comment = first_line
+
+        # when the response is compressed, the previous layer of logging decompressed the body
+        # already, but did not adjust the content-length, see https://github.com/sqlmapproject/sqlmap/issues/5942
+        if re.search(b"Content-Encoding:\\s*(gzip|deflate|br|compress|x-gzip|x-compress)", altered, flags=re.IGNORECASE):
+            # remove Content-Length header as it refers to compressed size
+            altered = re.sub(b"Content-Length:\\s*\\d+\r\n", b'', altered, flags=re.IGNORECASE)
+            # remove Content-Encoding header as we're decompressing the content
+            altered = re.sub(b"Content-Encoding:\\s*[^\r\n]+\r\n", b'', altered, flags=re.IGNORECASE)
 
         response = _http_client.HTTPResponse(FakeSocket(altered))
         response.begin()
