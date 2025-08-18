@@ -177,6 +177,9 @@ def cmdLineParser(argv=None):
         request.add_argument("--drop-set-cookie", dest="dropSetCookie", action="store_true",
             help="Ignore Set-Cookie header from response")
 
+        request.add_argument("--http1.0", dest="http10", action="store_true",
+            help="Use HTTP version 1.0 (old)")
+
         request.add_argument("--http2", dest="http2", action="store_true",
             help="Use HTTP version 2 (experimental)")
 

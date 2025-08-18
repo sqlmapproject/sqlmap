@@ -2517,7 +2517,7 @@ def _setTorSocksProxySettings():
     socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5 if conf.torType == PROXY_TYPE.SOCKS5 else socks.PROXY_TYPE_SOCKS4, LOCALHOST, port)
     socks.wrapmodule(_http_client)
 
-def _setHttpChunked():
+def _setHttpOptions():
     if conf.chunked and conf.data:
         if hasattr(_http_client.HTTPConnection, "_set_content_length"):
             _http_client.HTTPConnection._set_content_length = lambda self, *args, **kwargs: None
@@ -2531,7 +2531,10 @@ def _setHttpChunked():
 
             _http_client.HTTPConnection.putheader = putheader
 
-def _checkWebSocket():
+    if conf.http10:
+        _http_client.HTTPConnection._http_vsn = 10
+        _http_client.HTTPConnection._http_vsn_str = 'HTTP/1.0'
+
     if conf.url and (conf.url.startswith("ws:/") or conf.url.startswith("wss:/")):
         try:
             from websocket import ABNF
@@ -2918,8 +2921,7 @@ def init():
     _setPostprocessFunctions()
     _setTrafficOutputFP()
     _setupHTTPCollector()
-    _setHttpChunked()
-    _checkWebSocket()
+    _setHttpOptions()
 
     parseTargetDirect()
 
