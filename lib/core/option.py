@@ -1129,13 +1129,17 @@ def _setHTTPHandlers():
                 errMsg = "invalid proxy address '%s' ('%s')" % (conf.proxy, getSafeExString(ex))
                 raise SqlmapSyntaxException(errMsg)
 
-            hostnamePort = _.netloc.rsplit(":", 1)
+            match = re.search(r"\A([^:]*):([^:]*)@([^@]+)\Z", _.netloc)
+            if match:
+                username, password = match.group(1), match.group(2)
+            else:
+                username, password = None, None
+
+            hostnamePort = _.netloc.rsplit('@', 1)[-1].rsplit(":", 1)
 
             scheme = _.scheme.upper()
             hostname = hostnamePort[0]
             port = None
-            username = None
-            password = None
 
             if len(hostnamePort) == 2:
                 try:
