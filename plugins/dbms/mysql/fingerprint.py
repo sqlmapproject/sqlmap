@@ -105,8 +105,12 @@ class Fingerprint(GenericFingerprint):
                 fork = FORK.PERCONA
             elif inject.checkBooleanExpression("AURORA_VERSION() LIKE '%'"):            # Reference: https://aws.amazon.com/premiumsupport/knowledge-center/aurora-version-number/
                 fork = FORK.AURORA
-            elif inject.checkBooleanExpression("BITMAP_UNION_COUNT(NULL) IS NULL"):      # Reference: Apache Doris specific BITMAP functions
+            elif inject.checkBooleanExpression("VERSION() LIKE '5.7.99'"):              # Reference: Apache Doris returns fixed version 5.7.99 for MySQL compatibility
                 fork = FORK.DORIS
+            elif inject.checkBooleanExpression("@@VERSION_COMMENT LIKE '%Doris%'"):      # Reference: Apache Doris version comment contains 'Doris'
+                fork = FORK.DORIS
+            elif inject.checkBooleanExpression("@@VERSION_COMMENT LIKE '%StarRocks%'"):  # Reference: StarRocks version comment contains 'StarRocks'
+                fork = FORK.STARROCKS
             else:
                 fork = ""
 
