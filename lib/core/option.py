@@ -1129,13 +1129,17 @@ def _setHTTPHandlers():
                 errMsg = "invalid proxy address '%s' ('%s')" % (conf.proxy, getSafeExString(ex))
                 raise SqlmapSyntaxException(errMsg)
 
-            hostnamePort = _.netloc.rsplit(":", 1)
+            match = re.search(r"\A([^:]*):([^:]*)@([^@]+)\Z", _.netloc)
+            if match:
+                username, password = match.group(1), match.group(2)
+            else:
+                username, password = None, None
+
+            hostnamePort = _.netloc.rsplit('@', 1)[-1].rsplit(":", 1)
 
             scheme = _.scheme.upper()
             hostname = hostnamePort[0]
             port = None
-            username = None
-            password = None
 
             if len(hostnamePort) == 2:
                 try:
@@ -2517,7 +2521,7 @@ def _setTorSocksProxySettings():
     socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5 if conf.torType == PROXY_TYPE.SOCKS5 else socks.PROXY_TYPE_SOCKS4, LOCALHOST, port)
     socks.wrapmodule(_http_client)
 
-def _setHttpChunked():
+def _setHttpOptions():
     if conf.chunked and conf.data:
         if hasattr(_http_client.HTTPConnection, "_set_content_length"):
             _http_client.HTTPConnection._set_content_length = lambda self, *args, **kwargs: None
@@ -2531,7 +2535,10 @@ def _setHttpChunked():
 
             _http_client.HTTPConnection.putheader = putheader
 
-def _checkWebSocket():
+    if conf.http10:
+        _http_client.HTTPConnection._http_vsn = 10
+        _http_client.HTTPConnection._http_vsn_str = 'HTTP/1.0'
+
     if conf.url and (conf.url.startswith("ws:/") or conf.url.startswith("wss:/")):
         try:
             from websocket import ABNF
@@ -2918,8 +2925,7 @@ def init():
     _setPostprocessFunctions()
     _setTrafficOutputFP()
     _setupHTTPCollector()
-    _setHttpChunked()
-    _checkWebSocket()
+    _setHttpOptions()
 
     parseTargetDirect()
 
