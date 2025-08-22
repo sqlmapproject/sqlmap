@@ -2284,8 +2284,29 @@ def _useWizardInterface():
             for _ in options:
                 conf.__setitem__(_, True)
 
-    logger.debug("muting sqlmap.. it will do the magic for you")
-    conf.verbose = 0
+    choice = None
+
+    while choice is None or choice not in ("", "0", "1", "2", "3", "4", "5", "6"):
+        message = "Verbosity level (--verbose). Please choose:\n"
+        message += "[0] Minimal output (wizard default)\n[1] Normal output (application default)\n[2] Debug output\n[3] Payload output\n[4] HTTP requests output\n[5] HTTP responses output\n[6] All HTTP traffic"
+        choice = readInput(message, default='0')
+
+        if choice == '1':
+            conf.verbose = 1
+        elif choice == '2':
+            conf.verbose = 2
+        elif choice == '3':
+            conf.verbose = 3
+        elif choice == '4':
+            conf.verbose = 4
+        elif choice == '5':
+            conf.verbose = 5
+        elif choice == '6':
+            conf.verbose = 6
+        else:
+            conf.verbose = 0
+
+    logger.debug("sqlmap configured.. it will do the magic for you")
 
     conf.batch = True
     conf.threads = 4
