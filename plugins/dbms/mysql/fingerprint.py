@@ -192,7 +192,8 @@ class Fingerprint(GenericFingerprint):
             infoMsg = "confirming %s" % DBMS.MYSQL
             logger.info(infoMsg)
 
-            result = inject.checkBooleanExpression("SESSION_USER() LIKE USER()")
+            # user@% LIKE user@host OR user@host LIKE user@%
+            result = inject.checkBooleanExpression("SESSION_USER() LIKE USER() OR USER() LIKE SESSION_USER()")
 
             if not result:
                 # Note: MemSQL doesn't support SESSION_USER()
