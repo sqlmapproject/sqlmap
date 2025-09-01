@@ -488,6 +488,44 @@ pma_relation
 pma_table_coords
 pma_table_info
 
+# Wordpress
+wp_users
+wp_posts
+wp_comments
+wp_options
+wp_postmeta
+wp_terms
+wp_term_taxonomy
+wp_term_relationships
+wp_links
+wp_commentmeta
+
+# WooCommerce
+wp_woocommerce_sessions
+wp_woocommerce_api_keys
+wp_woocommerce_attribute_taxonomies
+
+# Magento
+catalog_product_entity
+sales_order
+sales_order_item
+customer_entity
+quote
+
+# Drupal
+node
+users
+field_data_body
+field_revision_body
+taxonomy_term_data
+taxonomy_vocabulary
+
+# Joomla
+joomla_users
+joomla_content
+joomla_categories
+joomla_modules
+
 # PostgreSQL
 pg_aggregate
 pg_am
@@ -501,6 +539,8 @@ pg_cast
 pg_class
 pg_constraint
 pg_conversion
+pg_cron_job
+pg_cron_job_run_detail
 pg_database
 pg_depend
 pg_description
@@ -522,6 +562,7 @@ pg_rewrite
 pg_shdepend
 pg_shdescription
 pg_statistic
+pg_stat_statements
 pg_tablespace
 pg_trigger
 pg_ts_config
@@ -1194,3 +1235,21 @@ smallint
 text
 time
 timestamp
+
+# common columns
+created_at
+updated_at
+deleted_at
+created_on
+modified_on
+timestamp
+is_active
+is_deleted
+is_published
+status
+enabled
+user_id
+product_id
+category_id
+order_id
+customer_id
