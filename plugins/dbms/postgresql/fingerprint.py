@@ -141,7 +141,7 @@ class Fingerprint(GenericFingerprint):
                 Backend.setVersion(">= 15.0")
             elif inject.checkBooleanExpression("BIT_COUNT(NULL) IS NULL"):
                 Backend.setVersion(">= 14.0")
-            elif inject.checkBooleanExpression("GEN_RANDOM_UUID() IS NOT NULL"):
+            elif inject.checkBooleanExpression("NULL::anycompatible IS NULL"):
                 Backend.setVersion(">= 13.0")
             elif inject.checkBooleanExpression("SINH(0)=0"):
                 Backend.setVersion(">= 12.0")
