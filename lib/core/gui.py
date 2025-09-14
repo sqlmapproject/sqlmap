@@ -61,18 +61,6 @@ def runGui(parser):
             else:
                 self.set(self.old_value)
 
-    # Reference: https://code.activestate.com/recipes/580726-tkinter-notebook-that-fits-to-the-height-of-every-/
-    class AutoresizableNotebook(_tkinter_ttk.Notebook):
-        def __init__(self, master=None, **kw):
-            _tkinter_ttk.Notebook.__init__(self, master, **kw)
-            self.bind("<<NotebookTabChanged>>", self._on_tab_changed)
-
-        def _on_tab_changed(self, event):
-            event.widget.update_idletasks()
-
-            tab = event.widget.nametowidget(event.widget.select())
-            event.widget.configure(height=tab.winfo_reqheight())
-
     try:
         window = _tkinter.Tk()
     except Exception as ex:
@@ -81,11 +69,41 @@ def runGui(parser):
 
     window.title(VERSION_STRING)
 
-    # Reference: https://www.holadevs.com/pregunta/64750/change-selected-tab-color-in-ttknotebook
+    # Set theme and colors
+    bg_color = "#f5f5f5"
+    fg_color = "#333333"
+    accent_color = "#2c7fb8"
+    window.configure(background=bg_color)
+
+    # Configure styles
     style = _tkinter_ttk.Style()
-    settings = {"TNotebook.Tab": {"configure": {"padding": [5, 1], "background": "#fdd57e"}, "map": {"background": [("selected", "#C70039"), ("active", "#fc9292")], "foreground": [("selected", "#ffffff"), ("active", "#000000")]}}}
-    style.theme_create("custom", parent="alt", settings=settings)
-    style.theme_use("custom")
+
+    # Try to use a more modern theme if available
+    available_themes = style.theme_names()
+    if 'clam' in available_themes:
+        style.theme_use('clam')
+    elif 'alt' in available_themes:
+        style.theme_use('alt')
+
+    # Configure notebook style
+    style.configure("TNotebook", background=bg_color)
+    style.configure("TNotebook.Tab",
+                   padding=[10, 4],
+                   background="#e1e1e1",
+                   font=('Helvetica', 9))
+    style.map("TNotebook.Tab",
+             background=[("selected", accent_color), ("active", "#7fcdbb")],
+             foreground=[("selected", "white"), ("active", "white")])
+
+    # Configure button style
+    style.configure("TButton",
+                   padding=4,
+                   relief="flat",
+                   background=accent_color,
+                   foreground="white",
+                   font=('Helvetica', 9))
+    style.map("TButton",
+             background=[('active', '#41b6c4')])
 
     # Reference: https://stackoverflow.com/a/10018670
     def center(window):
@@ -138,16 +156,16 @@ def runGui(parser):
         config = {}
 
         for key in window._widgets:
-            dest, type = key
+            dest, widget_type = key
             widget = window._widgets[key]
 
             if hasattr(widget, "get") and not widget.get():
                 value = None
-            elif type == "string":
+            elif widget_type == "string":
                 value = widget.get()
-            elif type == "float":
+            elif widget_type == "float":
                 value = float(widget.get())
-            elif type == "int":
+            elif widget_type == "int":
                 value = int(widget.get())
             else:
                 value = bool(widget.var.get())
@@ -155,7 +173,9 @@ def runGui(parser):
             config[dest] = value
 
         for option in parser.option_list:
-            config[option.dest] = defaults.get(option.dest, None)
+            # Only set default if not already set by the user
+            if option.dest not in config or config[option.dest] is None:
+                config[option.dest] = defaults.get(option.dest, None)
 
         handle, configFile = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.CONFIG, text=True)
         os.close(handle)
@@ -183,12 +203,20 @@ def runGui(parser):
 
         top = _tkinter.Toplevel()
         top.title("Console")
+        top.configure(background=bg_color)
+
+        # Create a frame for the console
+        console_frame = _tkinter.Frame(top, bg=bg_color)
+        console_frame.pack(fill=_tkinter.BOTH, expand=True, padx=10, pady=10)
 
         # Reference: https://stackoverflow.com/a/13833338
-        text = _tkinter_scrolledtext.ScrolledText(top, undo=True)
+        text = _tkinter_scrolledtext.ScrolledText(console_frame, undo=True, wrap=_tkinter.WORD,
+                                                bg="#2c3e50", fg="#ecf0f1",
+                                                insertbackground="white",
+                                                font=('Consolas', 10))
         text.bind("<Key>", onKeyPress)
         text.bind("<Return>", onReturnPress)
-        text.pack()
+        text.pack(fill=_tkinter.BOTH, expand=True)
         text.focus()
 
         center(top)
@@ -196,7 +224,6 @@ def runGui(parser):
         while True:
             line = ""
             try:
-                # line = queue.get_nowait()
                 line = queue.get(timeout=.1)
                 text.insert(_tkinter.END, line)
             except _queue.Empty:
@@ -206,9 +233,10 @@ def runGui(parser):
                 if not alive:
                     break
 
-    menubar = _tkinter.Menu(window)
+    # Create a menu bar
+    menubar = _tkinter.Menu(window, bg=bg_color, fg=fg_color)
 
-    filemenu = _tkinter.Menu(menubar, tearoff=0)
+    filemenu = _tkinter.Menu(menubar, tearoff=0, bg=bg_color, fg=fg_color)
     filemenu.add_command(label="Open", state=_tkinter.DISABLED)
     filemenu.add_command(label="Save", state=_tkinter.DISABLED)
     filemenu.add_separator()
@@ -217,7 +245,7 @@ def runGui(parser):
 
     menubar.add_command(label="Run", command=run)
 
-    helpmenu = _tkinter.Menu(menubar, tearoff=0)
+    helpmenu = _tkinter.Menu(menubar, tearoff=0, bg=bg_color, fg=fg_color)
     helpmenu.add_command(label="Official site", command=lambda: webbrowser.open(SITE))
     helpmenu.add_command(label="Github pages", command=lambda: webbrowser.open(GIT_PAGE))
     helpmenu.add_command(label="Wiki pages", command=lambda: webbrowser.open(WIKI_PAGE))
@@ -226,59 +254,173 @@ def runGui(parser):
     helpmenu.add_command(label="About", command=lambda: _tkinter_messagebox.showinfo("About", "Copyright (c) 2006-2025\n\n    (%s)" % DEV_EMAIL_ADDRESS))
     menubar.add_cascade(label="Help", menu=helpmenu)
 
-    window.config(menu=menubar)
+    window.config(menu=menubar, bg=bg_color)
     window._widgets = {}
 
-    notebook = AutoresizableNotebook(window)
+    # Create header frame
+    header_frame = _tkinter.Frame(window, bg=bg_color, height=60)
+    header_frame.pack(fill=_tkinter.X, pady=(0, 5))
+    header_frame.pack_propagate(0)
 
-    first = None
-    frames = {}
+    # Add header label
+    title_label = _tkinter.Label(header_frame, text="Configuration",
+                                font=('Helvetica', 14),
+                                fg=accent_color, bg=bg_color)
+    title_label.pack(side=_tkinter.LEFT, padx=15)
 
+    # Add run button in header
+    run_button = _tkinter_ttk.Button(header_frame, text="Run", command=run, width=12)
+    run_button.pack(side=_tkinter.RIGHT, padx=15)
+
+    # Create notebook
+    notebook = _tkinter_ttk.Notebook(window)
+    notebook.pack(expand=1, fill="both", padx=5, pady=(0, 5))
+
+    # Store tab information for background loading
+    tab_frames = {}
+    tab_canvases = {}
+    tab_scrollable_frames = {}
+    tab_groups = {}
+
+    # Create empty tabs with scrollable areas first (fast)
     for group in parser.option_groups:
-        frame = frames[group.title] = _tkinter.Frame(notebook, width=200, height=200)
-        notebook.add(frames[group.title], text=group.title)
+        # Create a frame with scrollbar for the tab
+        tab_frame = _tkinter.Frame(notebook, bg=bg_color)
+        tab_frames[group.title] = tab_frame
 
-        _tkinter.Label(frame).grid(column=0, row=0, sticky=_tkinter.W)
+        # Create a canvas with scrollbar
+        canvas = _tkinter.Canvas(tab_frame, bg=bg_color, highlightthickness=0)
+        scrollbar = _tkinter_ttk.Scrollbar(tab_frame, orient="vertical", command=canvas.yview)
+        scrollable_frame = _tkinter.Frame(canvas, bg=bg_color)
 
-        row = 1
+        # Store references
+        tab_canvases[group.title] = canvas
+        tab_scrollable_frames[group.title] = scrollable_frame
+        tab_groups[group.title] = group
+
+        # Configure the canvas scrolling
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e, canvas=canvas: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        # Pack the canvas and scrollbar
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+
+        # Add the tab to the notebook
+        notebook.add(tab_frame, text=group.title)
+
+        # Add a loading indicator
+        loading_label = _tkinter.Label(scrollable_frame, text="Loading options...",
+                                     font=('Helvetica', 12),
+                                     fg=accent_color, bg=bg_color)
+        loading_label.pack(expand=True)
+
+    # Function to populate a tab in the background
+    def populate_tab(tab_name):
+        group = tab_groups[tab_name]
+        scrollable_frame = tab_scrollable_frames[tab_name]
+        canvas = tab_canvases[tab_name]
+
+        # Remove loading indicator
+        for child in scrollable_frame.winfo_children():
+            child.destroy()
+
+        # Add content to the scrollable frame
+        row = 0
+
         if group.get_description():
-            _tkinter.Label(frame, text="%s:" % group.get_description()).grid(column=0, row=1, columnspan=3, sticky=_tkinter.W)
-            _tkinter.Label(frame).grid(column=0, row=2, sticky=_tkinter.W)
-            row += 2
+            desc_label = _tkinter.Label(scrollable_frame, text=group.get_description(),
+                                      wraplength=600, justify="left",
+                                      font=('Helvetica', 9),
+                                      fg="#555555", bg=bg_color)
+            desc_label.grid(row=row, column=0, columnspan=3, sticky="w", padx=10, pady=(10, 5))
+            row += 1
 
         for option in group.option_list:
-            _tkinter.Label(frame, text="%s " % parser.formatter._format_option_strings(option)).grid(column=0, row=row, sticky=_tkinter.W)
+            # Option label
+            option_label = _tkinter.Label(scrollable_frame,
+                                        text=parser.formatter._format_option_strings(option) + ":",
+                                        font=('Helvetica', 9),
+                                        fg=fg_color, bg=bg_color,
+                                        anchor="w")
+            option_label.grid(row=row, column=0, sticky="w", padx=10, pady=2)
 
+            # Input widget
             if option.type == "string":
-                widget = _tkinter.Entry(frame)
+                widget = _tkinter.Entry(scrollable_frame, font=('Helvetica', 9),
+                                      relief="sunken", bd=1, width=20)
+                widget.grid(row=row, column=1, sticky="w", padx=5, pady=2)
             elif option.type == "float":
-                widget = ConstrainedEntry(frame, regex=r"\A\d*\.?\d*\Z")
+                widget = ConstrainedEntry(scrollable_frame, regex=r"\A\d*\.?\d*\Z",
+                                        font=('Helvetica', 9),
+                                        relief="sunken", bd=1, width=10)
+                widget.grid(row=row, column=1, sticky="w", padx=5, pady=2)
             elif option.type == "int":
-                widget = ConstrainedEntry(frame, regex=r"\A\d*\Z")
+                widget = ConstrainedEntry(scrollable_frame, regex=r"\A\d*\Z",
+                                        font=('Helvetica', 9),
+                                        relief="sunken", bd=1, width=10)
+                widget.grid(row=row, column=1, sticky="w", padx=5, pady=2)
             else:
                 var = _tkinter.IntVar()
-                widget = _tkinter.Checkbutton(frame, variable=var)
+                widget = _tkinter.Checkbutton(scrollable_frame, variable=var,
+                                            bg=bg_color, activebackground=bg_color)
                 widget.var = var
+                widget.grid(row=row, column=1, sticky="w", padx=5, pady=2)
 
-            first = first or widget
-            widget.grid(column=1, row=row, sticky=_tkinter.W)
+            # Help text (truncated to improve performance)
+            help_text = option.help
+            if len(help_text) > 100:
+                help_text = help_text[:100] + "..."
 
+            help_label = _tkinter.Label(scrollable_frame, text=help_text,
+                                      font=('Helvetica', 8),
+                                      fg="#666666", bg=bg_color,
+                                      wraplength=400, justify="left")
+            help_label.grid(row=row, column=2, sticky="w", padx=5, pady=2)
+
+            # Store widget reference
             window._widgets[(option.dest, option.type)] = widget
 
+            # Set default value
             default = defaults.get(option.dest)
             if default:
                 if hasattr(widget, "insert"):
                     widget.insert(0, default)
-
-            _tkinter.Label(frame, text=" %s" % option.help).grid(column=2, row=row, sticky=_tkinter.W)
+                elif hasattr(widget, "var"):
+                    widget.var.set(1 if default else 0)
 
             row += 1
 
-        _tkinter.Label(frame).grid(column=0, row=row, sticky=_tkinter.W)
+        # Add some padding at the bottom
+        _tkinter.Label(scrollable_frame, bg=bg_color, height=1).grid(row=row, column=0)
 
-    notebook.pack(expand=1, fill="both")
-    notebook.enable_traversal()
+        # Update the scroll region after adding all widgets
+        canvas.update_idletasks()
+        canvas.configure(scrollregion=canvas.bbox("all"))
 
-    first.focus()
+        # Update the UI to show the tab is fully loaded
+        window.update_idletasks()
 
+    # Function to populate tabs in the background
+    def populate_tabs_background():
+        for tab_name in tab_groups.keys():
+            # Schedule each tab to be populated with a small delay between them
+            window.after(100, lambda name=tab_name: populate_tab(name))
+
+    # Start populating tabs in the background after a short delay
+    window.after(500, populate_tabs_background)
+
+    # Set minimum window size
+    window.update()
+    window.minsize(800, 500)
+
+    # Center the window on screen
+    center(window)
+
+    # Start the GUI
     window.mainloop()
