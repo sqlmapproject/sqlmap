@@ -43,11 +43,11 @@ def cachedmethod(f):
     def _f(*args, **kwargs):
         parts = (
             f.__module__ + "." + f.__name__,
-            "|".join(repr(a) for a in args),
-            "|".join("%s=%r" % (k, kwargs[k]) for k in sorted(kwargs))
+            "^".join(repr(a) for a in args),
+            "^".join("%s=%r" % (k, kwargs[k]) for k in sorted(kwargs))
         )
         try:
-            key = int(hashlib.md5("|".join(parts).encode(UNICODE_ENCODING)).hexdigest(), 16) & 0x7fffffffffffffff
+            key = int(hashlib.md5("`".join(parts).encode(UNICODE_ENCODING)).hexdigest(), 16) & 0x7fffffffffffffff
         except ValueError:  # https://github.com/sqlmapproject/sqlmap/issues/4281 (NOTE: non-standard Python behavior where hexdigest returns binary value)
             result = f(*args, **kwargs)
         else:
