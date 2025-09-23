@@ -2,7 +2,7 @@
 
 [![.github/workflows/tests.yml](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml/badge.svg)](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml) [![Python 2.6|2.7|3.x](https://img.shields.io/badge/python-2.6|2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![x](https://img.shields.io/badge/x-@sqlmap-blue.svg)](https://x.com/sqlmap)
 
-sqlmap sql injection açıklarını otomatik olarak tespit ve istismar etmeye yarayan açık kaynak bir penetrasyon aracıdır. sqlmap gelişmiş tespit özelliğinin yanı sıra penetrasyon testleri sırasında gerekli olabilecek birçok aracı, uzak veritabanından, veri indirmek, dosya sistemine erişmek, dosya çalıştırmak gibi işlevleri de barındırmaktadır.
+sqlmap sql injection açıklarını otomatik olarak tespit ve bunlardan yararlanan açık kaynak bir penetrasyon aracıdır. sqlmap gelişmiş tespit özelliğinin yanı sıra penetrasyon testleri sırasında gerekli olabilecek birçok aracı, uzak veri tabanından, veri indirmek, dosya sistemine erişmek ve dosya çalıştırmak gibi işlevleri de barındırmaktadır.
 
 
 Ekran görüntüleri
