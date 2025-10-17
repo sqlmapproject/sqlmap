@@ -221,7 +221,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 markingValue = "'%s'" % CHAR_INFERENCE_MARK
                 unescapedCharValue = unescaper.escape("'%s'" % decodeIntToUnicode(posValue))
                 forgedPayload = agent.extractPayload(payload) or ""
-                forgedPayload = safeStringFormat(forgedPayload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, posValue)).replace(markingValue, unescapedCharValue)
+                forgedPayload = forgedPayload.replace(markingValue, unescapedCharValue)
+                forgedPayload = safeStringFormat(forgedPayload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, posValue))
                 result = Request.queryPage(agent.replacePayload(payload, forgedPayload), timeBasedCompare=timeBasedCompare, raise404=False)
                 incrementCounter(getTechnique())
 
@@ -246,7 +247,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 # e.g.: ... > '%c' -> ... > ORD(..)
                 markingValue = "'%s'" % CHAR_INFERENCE_MARK
                 unescapedCharValue = unescaper.escape("'%s'" % decodeIntToUnicode(value))
-                forgedPayload = safeStringFormat(validationPayload, (expressionUnescaped, idx)).replace(markingValue, unescapedCharValue)
+                forgedPayload = validationPayload.replace(markingValue, unescapedCharValue)
+                forgedPayload = safeStringFormat(forgedPayload, (expressionUnescaped, idx))
 
             result = not Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
 
@@ -352,7 +354,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                         # e.g.: ... > '%c' -> ... > ORD(..)
                         markingValue = "'%s'" % CHAR_INFERENCE_MARK
                         unescapedCharValue = unescaper.escape("'%s'" % decodeIntToUnicode(posValue))
-                        forgedPayload = safeStringFormat(payload, (expressionUnescaped, idx)).replace(markingValue, unescapedCharValue)
+                        forgedPayload = payload.replace(markingValue, unescapedCharValue)
+                        forgedPayload = safeStringFormat(forgedPayload, (expressionUnescaped, idx))
                         falsePayload = safeStringFormat(payload, (expressionUnescaped, idx)).replace(markingValue, NULL)
 
                     if timeBasedCompare:
