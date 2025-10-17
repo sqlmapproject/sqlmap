@@ -2204,18 +2204,18 @@ def safeStringFormat(format_, params):
             while True:
                 match = re.search(r"(\A|[^A-Za-z0-9])(%s)([^A-Za-z0-9]|\Z)", retVal)
                 if match:
-                    if count >= len(params):
-                        warnMsg = "wrong number of parameters during string formatting. "
-                        warnMsg += "Please report by e-mail content \"%r | %r | %r\" to '%s'" % (format_, params, retVal, DEV_EMAIL_ADDRESS)
-                        raise SqlmapValueException(warnMsg)
-                    else:
-                        try:
-                            retVal = re.sub(r"(\A|[^A-Za-z0-9])(%s)([^A-Za-z0-9]|\Z)", r"\g<1>%s\g<3>" % params[count], retVal, 1)
-                        except re.error:
-                            retVal = retVal.replace(match.group(0), match.group(0) % params[count], 1)
-                        count += 1
+                    try:
+                        retVal = re.sub(r"(\A|[^A-Za-z0-9])(%s)([^A-Za-z0-9]|\Z)", r"\g<1>%s\g<3>" % params[count % len(params)], retVal, 1)
+                    except re.error:
+                        retVal = retVal.replace(match.group(0), match.group(0) % params[count % len(params)], 1)
+                    count += 1
                 else:
                     break
+
+            if count > len(params) and count % len(params):
+                warnMsg = "wrong number of parameters during string formatting. "
+                warnMsg += "Please report by e-mail content \"%r | %r | %r\" to '%s'" % (format_, params, retVal, DEV_EMAIL_ADDRESS)
+                raise SqlmapValueException(warnMsg)
 
     retVal = getText(retVal).replace(PARAMETER_PERCENTAGE_MARKER, '%')
 
