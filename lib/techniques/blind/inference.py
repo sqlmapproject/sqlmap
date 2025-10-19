@@ -222,7 +222,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 unescapedCharValue = unescaper.escape("'%s'" % decodeIntToUnicode(posValue))
                 forgedPayload = agent.extractPayload(payload) or ""
                 forgedPayload = forgedPayload.replace(markingValue, unescapedCharValue)
-                forgedPayload = safeStringFormat(forgedPayload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx))
+                forgedPayload = safeStringFormat(forgedPayload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, posValue))
                 result = Request.queryPage(agent.replacePayload(payload, forgedPayload), timeBasedCompare=timeBasedCompare, raise404=False)
                 incrementCounter(getTechnique())
 
