@@ -194,7 +194,7 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
         result.redurl = getUnicode(redurl) if six.PY3 else redurl
         return result
 
-    http_error_301 = http_error_303 = http_error_307 = http_error_302
+    http_error_301 = http_error_303 = http_error_307 = http_error_308 = http_error_302
 
     def _infinite_loop_check(self, req):
         if hasattr(req, 'redirect_dict') and (req.redirect_dict.get(req.get_full_url(), 0) >= MAX_SINGLE_URL_REDIRECTIONS or len(req.redirect_dict) >= MAX_TOTAL_REDIRECTIONS):
