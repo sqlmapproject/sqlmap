@@ -601,7 +601,7 @@ def main():
 
         # short delay for thread finalization
         _ = time.time()
-        while threading.active_count() > 1 and (time.time() - _) > THREAD_FINALIZATION_TIMEOUT:
+        while threading.active_count() > 1 and (time.time() - _) < THREAD_FINALIZATION_TIMEOUT:
             time.sleep(0.01)
 
         if cmdLineOptions.get("sqlmapShell"):
