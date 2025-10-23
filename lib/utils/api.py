@@ -750,7 +750,7 @@ def _client(url, options=None):
             headers["Authorization"] = "Basic %s" % encodeBase64("%s:%s" % (DataStore.username or "", DataStore.password or ""), binary=False)
 
         req = _urllib.request.Request(url, data, headers)
-        response = _urllib.request.urlopen(req)
+        response = _urllib.request.urlopen(req, timeout=conf.timeout)
         text = getText(response.read())
     except:
         if options:

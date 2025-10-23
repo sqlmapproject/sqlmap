@@ -57,7 +57,7 @@ def _search(dork):
 
     try:
         req = _urllib.request.Request("https://www.google.com/ncr", headers=requestHeaders)
-        conn = _urllib.request.urlopen(req)
+        conn = _urllib.request.urlopen(req, timeout=conf.timeout)
     except Exception as ex:
         errMsg = "unable to connect to Google ('%s')" % getSafeExString(ex)
         raise SqlmapConnectionException(errMsg)
@@ -72,7 +72,7 @@ def _search(dork):
 
     try:
         req = _urllib.request.Request(url, headers=requestHeaders)
-        conn = _urllib.request.urlopen(req)
+        conn = _urllib.request.urlopen(req, timeout=conf.timeout)
 
         requestMsg = "HTTP request:\nGET %s" % url
         requestMsg += " %s" % _http_client.HTTPConnection._http_vsn_str
@@ -138,7 +138,7 @@ def _search(dork):
 
         try:
             req = _urllib.request.Request(url, data=getBytes(data), headers=requestHeaders)
-            conn = _urllib.request.urlopen(req)
+            conn = _urllib.request.urlopen(req, timeout=conf.timeout)
 
             requestMsg = "HTTP request:\nGET %s" % url
             requestMsg += " %s" % _http_client.HTTPConnection._http_vsn_str

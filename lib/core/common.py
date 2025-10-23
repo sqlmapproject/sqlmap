@@ -3919,7 +3919,7 @@ def getLatestRevision():
     req = _urllib.request.Request(url="https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/lib/core/settings.py", headers={HTTP_HEADER.USER_AGENT: fetchRandomAgent()})
 
     try:
-        content = getUnicode(_urllib.request.urlopen(req).read())
+        content = getUnicode(_urllib.request.urlopen(req, timeout=conf.timeout).read())
         retVal = extractRegexResult(r"VERSION\s*=\s*[\"'](?P<result>[\d.]+)", content)
     except:
         pass
@@ -3987,7 +3987,7 @@ def createGithubIssue(errMsg, excMsg):
         req = _urllib.request.Request(url="https://api.github.com/search/issues?q=%s" % _urllib.parse.quote("repo:sqlmapproject/sqlmap Unhandled exception (#%s)" % key), headers={HTTP_HEADER.USER_AGENT: fetchRandomAgent()})
 
         try:
-            content = _urllib.request.urlopen(req).read()
+            content = _urllib.request.urlopen(req, timeout=conf.timeout).read()
             _ = json.loads(content)
             duplicate = _["total_count"] > 0
             closed = duplicate and _["items"][0]["state"] == "closed"
@@ -4006,7 +4006,7 @@ def createGithubIssue(errMsg, excMsg):
         req = _urllib.request.Request(url="https://api.github.com/repos/sqlmapproject/sqlmap/issues", data=getBytes(json.dumps(data)), headers={HTTP_HEADER.AUTHORIZATION: "token %s" % token, HTTP_HEADER.USER_AGENT: fetchRandomAgent()})
 
         try:
-            content = getText(_urllib.request.urlopen(req).read())
+            content = getText(_urllib.request.urlopen(req, timeout=conf.timeout).read())
         except Exception as ex:
             content = None
             _excMsg = getSafeExString(ex)

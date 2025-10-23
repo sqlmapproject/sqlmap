@@ -661,7 +661,7 @@ class Connect(object):
 
                         logger.log(CUSTOM_LOGGING.TRAFFIC_OUT, requestMsg)
 
-                    conn = _urllib.request.urlopen(req)
+                    conn = _urllib.request.urlopen(req, timeout=conf.timeout)
 
                 if not kb.authHeader and getRequestHeader(req, HTTP_HEADER.AUTHORIZATION) and (conf.authType or "").lower() == AUTH_TYPE.BASIC.lower():
                     kb.authHeader = getUnicode(getRequestHeader(req, HTTP_HEADER.AUTHORIZATION))
