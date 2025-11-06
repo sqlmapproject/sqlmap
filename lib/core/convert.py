@@ -154,7 +154,7 @@ def rot13(data):
 
 def decodeHex(value, binary=True):
     """
-    Returns a decoded representation of provided hexadecimal value
+    Returns a decoded representation of the provided hexadecimal value
 
     >>> decodeHex("313233") == b"123"
     True
@@ -182,7 +182,7 @@ def decodeHex(value, binary=True):
 
 def encodeHex(value, binary=True):
     """
-    Returns a encoded representation of provided string value
+    Returns an encoded representation of the provided value
 
     >>> encodeHex(b"123") == b"313233"
     True
@@ -251,7 +251,7 @@ def decodeBase64(value, binary=True, encoding=None):
 
 def encodeBase64(value, binary=True, encoding=None, padding=True, safe=False):
     """
-    Returns a decoded representation of provided Base64 value
+    Returns a Base64 encoded representation of the provided value
 
     >>> encodeBase64(b"123") == b"MTIz"
     True

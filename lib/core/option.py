@@ -939,8 +939,8 @@ def _setPreprocessFunctions():
                     handle, filename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.PREPROCESS, suffix=".py")
                     os.close(handle)
 
-                    openFile(filename, "w+b").write("#!/usr/bin/env\n\ndef preprocess(req):\n    pass\n")
-                    openFile(os.path.join(os.path.dirname(filename), "__init__.py"), "w+b").write("pass")
+                    openFile(filename, "w+").write("#!/usr/bin/env\n\ndef preprocess(req):\n    pass\n")
+                    openFile(os.path.join(os.path.dirname(filename), "__init__.py"), "w+").write("pass")
 
                     errMsg = "function 'preprocess(req)' "
                     errMsg += "in preprocess script '%s' " % script
