@@ -316,7 +316,7 @@ def getBytes(value, encoding=None, errors="strict", unsafe=True):
             retVal = value.encode(encoding, errors)
 
             if unsafe:
-                retVal = re.sub(r"%s([0-9a-f]{2})" % SAFE_HEX_MARKER, lambda _: decodeHex(_.group(1)), retVal)
+                retVal = re.sub((r"%s([0-9a-f]{2})" % SAFE_HEX_MARKER).encode(), lambda _: decodeHex(_.group(1)), retVal)
         else:
             try:
                 retVal = value.encode(encoding, errors)
