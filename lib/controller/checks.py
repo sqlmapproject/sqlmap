@@ -521,7 +521,7 @@ def checkSqlInjection(place, parameter, value):
 
                                     if ratio == 1.0:
                                         continue
-                                except (MemoryError, OverflowError):
+                                except:
                                     pass
 
                             # Perform the test's True request
