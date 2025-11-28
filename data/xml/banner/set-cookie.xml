@@ -76,7 +76,7 @@
     </regexp>
 
     <regexp value="laravel_session">
-        <info technology="Laravel (PHP)"/>
+        <info technology="Laravel"/>
     </regexp>
 
     <regexp value="SESS[a-f0-9]{32}">

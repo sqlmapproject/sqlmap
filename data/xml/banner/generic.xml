@@ -3,7 +3,7 @@
 <root>
     <!-- Windows -->
 
-    <regexp value="(Microsoft|Windows|Win32)">
+    <regexp value="(Microsoft|Windows|Win32|Win64|WOW64|Cygwin|MinGW)">
         <info type="Windows"/>
     </regexp>
 
@@ -151,6 +151,34 @@
         <info type="Linux" distrib="Ubuntu"/>
     </regexp>
 
+    <regexp value="\bAlpine\b">
+        <info type="Linux" distrib="Alpine"/>
+    </regexp>
+
+    <regexp value="Oracle ?Linux">
+        <info type="Linux" distrib="Oracle"/>
+    </regexp>
+
+    <regexp value="\bRHEL\b">
+        <info type="Linux" distrib="Red Hat"/>
+    </regexp>
+
+    <regexp value="Amazon Linux">
+        <info type="Linux" distrib="Amazon"/>
+    </regexp>
+
+    <regexp value="Raspbian">
+        <info type="Linux" distrib="Raspbian"/>
+    </regexp>
+
+    <regexp value="\bKali\b">
+        <info type="Linux" distrib="Kali"/>
+    </regexp>
+
+    <regexp value="Rocky Linux">
+        <info type="Linux" distrib="Rocky"/>
+    </regexp>
+
     <!-- BSD -->
 
     <regexp value="FreeBSD">
@@ -167,11 +195,22 @@
 
     <!-- Mac OSX -->
 
-    <regexp value="Mac[\-\_\ ]?OSX">
+    <regexp value="Mac[\-\_\ ]?OS ?X|macOS|Darwin">
         <info type="Mac OSX"/>
     </regexp>
 
-    <regexp value="Darwin">
-        <info type="Mac OSX"/>
+    <!-- *nix -->
+
+    <regexp value="SunOS|Solaris">
+        <info type="SunOS"/>
     </regexp>
+
+    <regexp value="\bAIX\b">
+        <info type="AIX"/>
+    </regexp>
+
+    <regexp value="HP-UX|HPUX">
+        <info type="HP-UX"/>
+    </regexp>
+
 </root>

@@ -62,4 +62,8 @@
     <regexp value="Servlet[\-\_\/\ ]?([\d\.]+)">
         <info technology="Servlet" tech_version="1"/>
     </regexp>
+
+    <regexp value="Laravel">
+        <info technology="Laravel"/>
+    </regexp>
 </root>
