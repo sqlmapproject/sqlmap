@@ -635,3 +635,14 @@ if __name__ == "__main__":
 else:
     # cancelling postponed imports (because of CI/CD checks)
     __import__("lib.controller.controller")
+    if __name__ == " __main__":
+        try:
+            main()
+        except keyboardinterrupt:
+            pass
+        except systemexit:
+            raise
+            except
+            traceback.print_exc()
+
+        
