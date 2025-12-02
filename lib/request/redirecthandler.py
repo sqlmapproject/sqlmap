@@ -76,16 +76,10 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
         redurl = self._get_header_redirect(headers) if not conf.ignoreRedirects else None
 
         try:
-            content = fp.read(MAX_CONNECTION_TOTAL_SIZE)
+            content = fp.fp.read(MAX_CONNECTION_TOTAL_SIZE)
+            fp.fp = io.BytesIO(content)
         except:  # e.g. IncompleteRead
             content = b""
-        finally:
-            if content:
-                try:  # try to write it back to the read buffer so we could reuse it in further steps
-                    fp.fp._rbuf.truncate(0)
-                    fp.fp._rbuf.write(content)
-                except:
-                    pass
 
         content = decodePage(content, headers.get(HTTP_HEADER.CONTENT_ENCODING), headers.get(HTTP_HEADER.CONTENT_TYPE))
 
