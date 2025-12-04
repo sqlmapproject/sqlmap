@@ -5317,7 +5317,7 @@ def parseRequestFile(reqFile, checkParams=True):
                     _ = re.search(r"%s:.+" % re.escape(HTTP_HEADER.HOST), request)
                     if _:
                         host = _.group(0).strip()
-                        if not re.search(r":\d+\Z", host):
+                        if not re.search(r":\d+\Z", host) and int(port) != 80:
                             request = request.replace(host, "%s:%d" % (host, int(port)))
                     reqResList.append(request)
             else:
