@@ -860,6 +860,9 @@ def cmdLineParser(argv=None):
         parser.add_argument("--gui", dest="gui", action="store_true",
             help=SUPPRESS)
 
+        parser.add_argument("--ncgui", dest="ncgui", action="store_true",
+            help=SUPPRESS)
+
         parser.add_argument("--smoke-test", dest="smokeTest", action="store_true",
             help=SUPPRESS)
 
@@ -936,6 +939,13 @@ def cmdLineParser(argv=None):
             from lib.core.gui import runGui
 
             runGui(parser)
+
+            raise SqlmapSilentQuitException
+
+        elif "--ncgui" in argv:
+            from lib.core.ncgui import runNcGui
+
+            runNcGui(parser)
 
             raise SqlmapSilentQuitException
 
