@@ -16,6 +16,8 @@ from lib.core.common import dataToOutFile
 from lib.core.common import decloakToTemp
 from lib.core.common import decodeDbmsHexValue
 from lib.core.common import isListLike
+from lib.core.common import isNoneValue
+from lib.core.common import isNullValue
 from lib.core.common import isNumPosStrValue
 from lib.core.common import isStackingAvailable
 from lib.core.common import isTechniqueAvailable
@@ -243,8 +245,9 @@ class Filesystem(object):
 
             kb.fileReadMode = False
 
-            if fileContent in (None, "") and not Backend.isDbms(DBMS.PGSQL):
+            if (isNoneValue(fileContent) or isNullValue(fileContent)) and not Backend.isDbms(DBMS.PGSQL):
                 self.cleanup(onlyFileTbl=True)
+                fileContent = None
             elif isListLike(fileContent):
                 newFileContent = ""
 
