@@ -567,7 +567,7 @@ class Dump(object):
                         else:
                             dataToDumpFile(dumpFP, "%s%s" % (safeCSValue(column), conf.csvDel))
                     elif conf.dumpFormat == DUMP_FORMAT.HTML:
-                        dataToDumpFile(dumpFP, "<th>%s</th>" % getUnicode(htmlEscape(column).encode("ascii", "xmlcharrefreplace")))
+                        dataToDumpFile(dumpFP, "<th onclick=\"sortTable(%d,this)\">%s</th>" % (field - 1, getUnicode(htmlEscape(column).encode("ascii", "xmlcharrefreplace"))))
 
                 field += 1
 
@@ -663,7 +663,7 @@ class Dump(object):
 
         elif conf.dumpFormat in (DUMP_FORMAT.CSV, DUMP_FORMAT.HTML):
             if conf.dumpFormat == DUMP_FORMAT.HTML:
-                dataToDumpFile(dumpFP, "</tbody>\n</table>\n</body>\n</html>")
+                dataToDumpFile(dumpFP, "</tbody>\n</table>\n<script>let lc=-1,ld=1;function sortTable(n,h){var t=document.querySelector(\"table\"),r=Array.from(t.tBodies[0].rows);ld=(lc==n?-ld:1);lc=n;r.sort((a,b)=>{var x=a.cells[n].innerText.trim(),y=b.cells[n].innerText.trim(),nx=parseFloat(x),ny=parseFloat(y);return(!isNaN(nx)&&!isNaN(ny)?(nx-ny)*ld:x.localeCompare(y)*ld)});r.forEach(e=>t.tBodies[0].appendChild(e));Array.from(t.tHead.rows[0].cells).forEach(c=>{c.innerText=c.innerText.replace(/[\u2191\u2193]/g,\"\")});h.innerText=h.innerText+ (ld==1?\"\u2191\":\"\u2193\");}</script>\n</body>\n</html>")
             else:
                 dataToDumpFile(dumpFP, "\n")
             dumpFP.close()
