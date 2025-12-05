@@ -39,6 +39,7 @@ from lib.core.settings import SYBASE_ALIASES
 from lib.core.settings import VERTICA_ALIASES
 from lib.core.settings import VIRTUOSO_ALIASES
 from lib.core.settings import CLICKHOUSE_ALIASES
+from lib.core.settings import SNOWFLAKE_ALIASES
 
 FIREBIRD_TYPES = {
     261: "BLOB",
@@ -250,6 +251,7 @@ DBMS_DICT = {
     DBMS.FRONTBASE: (FRONTBASE_ALIASES, None, None, None),
     DBMS.RAIMA: (RAIMA_ALIASES, None, None, None),
     DBMS.VIRTUOSO: (VIRTUOSO_ALIASES, None, None, None),
+    DBMS.SNOWFLAKE: (SNOWFLAKE_ALIASES, None, None, "snowflake"),
 }
 
 # Reference: https://blog.jooq.org/tag/sysibm-sysdummy1/
