@@ -24,6 +24,7 @@ def tamper(payload, **kwargs):
 
     Reference:
         * http://shiflett.org/blog/2006/jan/addslashes-versus-mysql-real-escape-string
+        * https://lonewolfzero.wordpress.com/2017/07/03/addslashes-multibyte-sql-injection-mysql-and-php-case-study/
 
     >>> tamper("1' AND 1=1")
     '1%bf%27-- -'
