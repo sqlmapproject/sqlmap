@@ -109,10 +109,38 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
                     output = extractRegexResult(r"%s(?P<result>.*)%s" % (kb.chars.start, kb.chars.stop), removeReflectiveValues(_page, payload))
                     if output:
                         try:
+                            import html
+                            output_decoded = html.unescape(output)
+                            
+                            json_data = None
+                            try:
+                                json_data = json.loads(output_decoded)
+                            except json.JSONDecodeError as e:
+                                if output_decoded.strip().startswith('['):
+                                    last_complete = output_decoded.rfind('},', 0, e.pos)
+                                    if last_complete > 0:
+                                        repaired = output_decoded[:last_complete+1] + ']'
+                                        try:
+                                            json_data = json.loads(repaired)
+                                            warnMsg = "parsed %d rows from truncated JSON response" % len(json_data)
+                                            logger.warning(warnMsg)
+                                        except:
+                                            pass
+                                
+                                if json_data is None:
+                                    raise
+                            
+                            if not isinstance(json_data, list):
+                                json_data = [json_data]
+                            
+                            if json_data and isinstance(json_data[0], dict):
+                                fields = list(json_data[0].keys())
+                            else:
+                                fields = []
+                            
                             retVal = ""
-                            fields = re.findall(r'"([^"]+)":', extractRegexResult(r"{(?P<result>[^}]+)}", output))
-                            for row in json.loads(output):
-                                retVal += "%s%s%s" % (kb.chars.start, kb.chars.delimiter.join(getUnicode(row[field] or NULL) for field in fields), kb.chars.stop)
+                            for row in json_data:
+                                retVal += "%s%s%s" % (kb.chars.start, kb.chars.delimiter.join(getUnicode(row.get(field) or NULL) for field in fields), kb.chars.stop)
                         except:
                             retVal = None
                         else:
