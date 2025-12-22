@@ -1134,15 +1134,18 @@ def heuristicCheckSqlInjection(place, parameter):
         if conf.beep:
             beep()
 
-    for match in re.finditer(FI_ERROR_REGEX, page or ""):
-        if randStr1.lower() in match.group(0).lower():
-            infoMsg = "heuristic (FI) test shows that %sparameter '%s' might be vulnerable to file inclusion (FI) attacks" % ("%s " % paramType if paramType != parameter else "", parameter)
-            logger.info(infoMsg)
+    try:
+        for match in re.finditer(FI_ERROR_REGEX, page or ""):
+            if randStr1.lower() in match.group(0).lower():
+                infoMsg = "heuristic (FI) test shows that %sparameter '%s' might be vulnerable to file inclusion (FI) attacks" % ("%s " % paramType if paramType != parameter else "", parameter)
+                logger.info(infoMsg)
 
-            if conf.beep:
-                beep()
+                if conf.beep:
+                    beep()
 
-            break
+                break
+    except (SystemError, RuntimeError) as ex:
+        logger.debug("Skipping FI heuristic due to regex failure: %s", getSafeExString(ex))
 
     kb.disableHtmlDecoding = False
     kb.heuristicMode = False
