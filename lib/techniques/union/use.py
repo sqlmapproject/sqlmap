@@ -107,12 +107,23 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
             for _page in (page or "", (page or "").replace('\\"', '"')):
                 if Backend.isDbms(DBMS.MSSQL):
                     output = extractRegexResult(r"%s(?P<result>.*)%s" % (kb.chars.start, kb.chars.stop), removeReflectiveValues(_page, payload))
+
                     if output:
                         try:
-                            retVal = ""
-                            fields = re.findall(r'"([^"]+)":', extractRegexResult(r"{(?P<result>[^}]+)}", output))
-                            for row in json.loads(output):
-                                retVal += "%s%s%s" % (kb.chars.start, kb.chars.delimiter.join(getUnicode(row[field] or NULL) for field in fields), kb.chars.stop)
+                            retVal = None
+                            output_decoded = htmlUnescape(output)
+                            json_data = json.loads(output_decoded, object_pairs_hook=OrderedDict)
+
+                            if not isinstance(json_data, list):
+                                json_data = [json_data]
+
+                            if json_data and isinstance(json_data[0], dict):
+                                fields = list(json_data[0].keys())
+
+                                if fields:
+                                    retVal = ""
+                                    for row in json_data:
+                                        retVal += "%s%s%s" % (kb.chars.start, kb.chars.delimiter.join(getUnicode(row.get(field) or NULL) for field in fields), kb.chars.stop)
                         except:
                             retVal = None
                         else:
