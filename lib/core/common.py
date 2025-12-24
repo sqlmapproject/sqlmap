@@ -170,6 +170,7 @@ from lib.core.settings import REFLECTED_REPLACEMENT_REGEX
 from lib.core.settings import REFLECTED_REPLACEMENT_TIMEOUT
 from lib.core.settings import REFLECTED_VALUE_MARKER
 from lib.core.settings import REFLECTIVE_MISS_THRESHOLD
+from lib.core.settings import REPLACEMENT_MARKER
 from lib.core.settings import SENSITIVE_DATA_REGEX
 from lib.core.settings import SENSITIVE_OPTIONS
 from lib.core.settings import STDIN_PIPE_DASH
@@ -4149,6 +4150,11 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
             payload = getUnicode(urldecode(payload.replace(PAYLOAD_DELIMITER, ""), convall=True))
             regex = _(filterStringValue(payload, r"[A-Za-z0-9]", encodeStringEscape(REFLECTED_REPLACEMENT_REGEX)))
 
+            # NOTE: special case when part of the result shares the same output as the payload (e.g. ?id=1... and "sqlmap/1.0-dev (http://sqlmap.org)")
+            preserve = extractRegexResult(r"%s(?P<result>.+?)%s" % (kb.chars.start, kb.chars.stop), content)
+            if preserve:
+                content = content.replace(preserve, REPLACEMENT_MARKER)
+
             if regex != payload:
                 if all(part.lower() in content.lower() for part in filterNone(regex.split(REFLECTED_REPLACEMENT_REGEX))[1:]):  # fast optimization check
                     parts = regex.split(REFLECTED_REPLACEMENT_REGEX)
@@ -4218,6 +4224,9 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
                         if not suppressWarning:
                             debugMsg = "turning off reflection removal mechanism (for optimization purposes)"
                             logger.debug(debugMsg)
+
+            if preserve and retVal:
+                retVal = retVal.replace(REPLACEMENT_MARKER, preserve)
 
     except (MemoryError, SystemError):
         kb.reflectiveMechanism = False
