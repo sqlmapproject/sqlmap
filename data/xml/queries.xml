@@ -417,7 +417,8 @@
    </dbms>
 
    <dbms value="Firebird">
-        <cast query="TRIM(CAST(%s AS VARCHAR(10000)))"/>
+        <!--Firebird doesn't like big VARCHARs-->
+        <cast query="TRIM(CAST(%s AS VARCHAR(8000)))"/>
         <length query="CHAR_LENGTH(TRIM(%s))"/>
         <delimiter query="||"/>
         <limit query="ROWS %d TO %d"/>
