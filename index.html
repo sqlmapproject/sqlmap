@@ -13,7 +13,57 @@
     <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
     <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
 
+<!-- little playground for web scanners :)
+SQL error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 1
+Warning: oci_parse() [function.oci-parse]: ORA-01756: quoted string not properly terminated in /var/www/index.php on line 33 ORA-01756: quoted string not properly terminated
+Warning: pg_query() [function.pg-query]: Query failed: ERROR: unterminated quoted string at or near "' OFFSET 0 LIMIT 1 ^ in /var/www/index.php on line 35
+Error Type: Microsoft OLE DB Provider for ODBC Drivers (0x80040E14) [Microsoft][ODBC SQL Server Driver][SQL Server]Unclosed quotation mark after the character string ''. /index.asp, line 27
+Description: [Microsoft][ODBC SQL Server Driver][SQL Server]Line 1: Incorrect syntax near ''. Number: -2147217900 (0x80040E14)
+Warning: SQLite3::exec(): near "": syntax error in index.php on line 19
+-->
+
     <style>
+        .inner.clearfix {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            gap: 40px;
+        }
+
+        #sidebar {
+            order: 1;
+            width: 240px;
+            float: none !important;
+            margin: 0 !important;
+            flex-shrink: 0;
+        }
+
+        #main-content {
+            order: 2;
+            float: none !important;
+            width: auto !important;
+            flex-grow: 1;
+        }
+
+        @media (max-width: 850px) {
+            .inner.clearfix { flex-direction: column; }
+            #sidebar { width: 100%; order: 2; margin-top: 40px !important; }
+            #main-content { order: 1; }
+        }
+
+        footer h4 {
+            font-size: 1.1em;
+            text-transform: uppercase;
+            color: #444;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 5px;
+            margin-top: 35px;
+            margin-bottom: 15px;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
         strong, b {
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             font-weight: 700;
@@ -37,26 +87,22 @@
             justify-content: space-between;
             align-items: flex-start;
         }
-
         .features-col {
             flex: 1;
             padding-left: 20px;
+            margin-top: 0;
         }
-
-        @media (max-width: 850px) {
-            .features-container {
-                flex-direction: column;
-                gap: 0;
-            }
+        @media (max-width: 900px) {
+            .features-container { flex-direction: column; gap: 0; }
         }
 
         .nav-link {
             display: block;
-            padding: 6px 0;
+            padding: 8px 0;
             color: #444;
             text-decoration: none;
             font-family: 'Architects Daughter', cursive;
-            font-size: 1.2em;
+            font-size: 1.3em;
             border-bottom: 1px dotted #ccc;
         }
         .nav-link:hover {
@@ -66,23 +112,15 @@
         }
 
         html { scroll-behavior: smooth; }
-        
-        img {
-            max-width: 100%;
-            height: auto;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
+        img { max-width: 100%; height: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        code { color: #333; }
 
         footer {
-            margin-top: 50px;
+            margin-top: 60px;
             padding-top: 20px;
-            border-top: 2px solid #eee;
+            border-top: 4px solid #eee;
             color: #666;
             font-size: 0.9em;
-        }
-        
-        code {
-            color: #333;
         }
     </style>
 </head>
@@ -98,17 +136,32 @@
 
     <div id="content-wrapper">
         <div class="inner clearfix">
+
+            <aside id="sidebar">
+                <div style="margin-bottom: 30px;">
+                    <a href="#introduction" class="nav-link">Introduction</a>
+                    <a href="#features" class="nav-link">Features</a>
+                    <a href="#download" class="nav-link">Download</a>
+                    <a href="#documentation" class="nav-link">Docs</a>
+                    <a href="#demo" class="nav-link">Demo</a>
+                    <a href="#donate" class="nav-link">Donate</a>
+                </div>
+
+                <a href="https://github.com/sqlmapproject/sqlmap/zipball/master" class="button"><small>Download</small>.zip file</a>
+                <a href="https://github.com/sqlmapproject/sqlmap/tarball/master" class="button" style="background:url(images/download-button-green.png) no-repeat scroll 0 0 transparent"><small>Download</small>.tar.gz file</a>
+            </aside>
+
             <section id="main-content">
-                
+
                 <h1 id="introduction">Introduction</h1>
                 <p>sqlmap is an open source penetration testing tool that automates the process of detecting and exploiting SQL injection flaws and taking over of database servers. It comes with a powerful detection engine, many niche features for the ultimate penetration tester and a broad range of switches lasting from database fingerprinting, over data fetching from the database, to accessing the underlying file system and executing commands on the operating system via out-of-band connections.</p>
-                
+
                 <div style="text-align: center; margin: 25px 0;">
                     <img src="images/screenshot.png" alt="sqlmap screenshot">
                 </div>
 
                 <h1 id="features">Features</h1>
-                
+
                 <div class="features-container">
                     <ul class="features-col">
                         <li>Full support for <strong>MySQL, Oracle, PostgreSQL, Microsoft SQL Server, Microsoft Access, IBM DB2, SQLite, Firebird, Sybase, SAP MaxDB, Informix, MariaDB, MemSQL, TiDB, CockroachDB, HSQLDB, H2, MonetDB, Apache Derby, Amazon Redshift, Vertica, Mckoi, Presto, Altibase, MimerSQL, CrateDB, Greenplum, Drizzle, Apache Ignite, Cubrid, InterSystems Cache, IRIS, eXtremeDB, FrontBase, Raima Database Manager, YugabyteDB, Aurora, OpenGauss, ClickHouse, Virtuoso and DM8</strong> database management systems.</li>
@@ -133,7 +186,7 @@
                 <h1 id="download">Download</h1>
                 <p>You can download the latest <a href="https://github.com/sqlmapproject/sqlmap/zipball/master">zipball</a> or <a href="https://github.com/sqlmapproject/sqlmap/tarball/master">tarball</a>.</p>
                 <p>Preferably, you can download sqlmap by cloning the <a href="https://github.com/sqlmapproject/sqlmap">Git</a> repository:</p>
-                
+
                 <pre><code>git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev</code></pre>
 
                 <h1 id="documentation">Documentation</h1>
@@ -153,38 +206,24 @@
                 <p><strong>Bug reports are welcome</strong>! Please report all bugs on the <a href="https://github.com/sqlmapproject/sqlmap/issues">issue tracker</a>.</p>
 
                 <footer>
-                    <h1 id="donate" style="margin-top:0;">Donate</h1>
+                    <h4 id="donate">Donate</h4>
                     <p>sqlmap is the result of numerous hours of passionated work from a small team of computer security enthusiasts. If you appreciated our work and you want to see sqlmap kept being developed, please consider making a donation or sponsor our efforts via <a href="https://github.com/sponsors/sqlmapproject">Sponsor page</a> or via <a href="https://www.paypal.com/donate/?hosted_button_id=T6ASMS54Q5GNY">PayPal</a>.</p>
                     <p>We also accept <span style="color:#f7931a;font-size:105%;font-weight:bold">&#x0243;</span>itcoins to <code>1AUrrKYsamBEThdruYTQmUfMfLF7aaxU6x</code>.</p>
 
-                    <h1 id="license">License</h1>
+                    <h4 id="license">License</h4>
                     <p>Copyright &copy; 2006-2025 by <a href="mailto:bernardo@sqlmap.org">Bernardo Damele Assumpcao Guimaraes</a> and <a href="mailto:miroslav@sqlmap.org">Miroslav Stampar</a>. All rights reserved.</p>
                     <p>This program is free software; you may redistribute and/or modify it under the terms of the <a href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html">GNU General Public License</a>.</p>
 
-                    <h1 id="disclaimer">Disclaimer</h1>
+                    <h4 id="disclaimer">Disclaimer</h4>
                     <p><strong>Usage of sqlmap for attacking targets without prior mutual consent is illegal.</strong> Developers assume no liability and are not responsible for any misuse or damage caused by this program.</p>
 
-                    <h1 id="developers">Developers</h1>
+                    <h4 id="developers">Developers</h4>
                     <ul>
                         <li><a href="mailto:bernardo@sqlmap.org">Bernardo Damele A. G.</a> (<a href="https://x.com/bdamele">@bdamele</a>)</li>
                         <li><a href="mailto:miroslav@sqlmap.org">Miroslav Stampar</a> (<a href="https://x.com/stamparm">@stamparm</a>)</li>
                     </ul>
                 </footer>
             </section>
-
-            <aside id="sidebar">
-                <div style="margin-bottom: 30px;">
-                    <a href="#introduction" class="nav-link">Introduction</a>
-                    <a href="#features" class="nav-link">Features</a>
-                    <a href="#download" class="nav-link">Download</a>
-                    <a href="#documentation" class="nav-link">Docs</a>
-                    <a href="#demo" class="nav-link">Demo</a>
-                    <a href="#donate" class="nav-link">Donate</a>
-                </div>
-
-                <a href="https://github.com/sqlmapproject/sqlmap/zipball/master" class="button"><small>Download</small>.zip file</a>
-                <a href="https://github.com/sqlmapproject/sqlmap/tarball/master" class="button" style="background:url(images/download-button-green.png) no-repeat scroll 0 0 transparent"><small>Download</small>.tar.gz file</a>
-            </aside>
         </div>
     </div>
 
