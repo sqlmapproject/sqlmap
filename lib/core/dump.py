@@ -484,6 +484,12 @@ class Dump(object):
             dumpFP = openFile(dumpFileName, "wb" if not appendToFile else "ab", buffering=DUMP_FILE_BUFFER_SIZE)
 
         count = int(tableValues["__infos__"]["count"])
+        if count > TRIM_STDOUT_DUMP_SIZE:
+            warnMsg = "console output will be trimmed to "
+            warnMsg += "last %d rows due to " % TRIM_STDOUT_DUMP_SIZE
+            warnMsg += "large table size"
+            logger.warning(warnMsg)
+
         separator = str()
         field = 1
         fields = len(tableValues) - 1
@@ -584,12 +590,6 @@ class Dump(object):
 
         elif conf.dumpFormat == DUMP_FORMAT.SQLITE:
             rtable.beginTransaction()
-
-        if count > TRIM_STDOUT_DUMP_SIZE:
-            warnMsg = "console output will be trimmed to "
-            warnMsg += "last %d rows due to " % TRIM_STDOUT_DUMP_SIZE
-            warnMsg += "large table size"
-            logger.warning(warnMsg)
 
         for i in xrange(count):
             console = (i >= count - TRIM_STDOUT_DUMP_SIZE)

@@ -104,7 +104,7 @@ from lib.core.exception import SqlmapValueException
 from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
 from lib.core.settings import BANNER
-from lib.core.settings import BOLD_PATTERNS
+from lib.core.settings import BOLD_PATTERNS_REGEX
 from lib.core.settings import BOUNDARY_BACKSLASH_MARKER
 from lib.core.settings import BOUNDED_INJECTION_MARKER
 from lib.core.settings import BRUTE_DOC_ROOT_PREFIXES
@@ -959,7 +959,7 @@ def boldifyMessage(message, istty=None):
 
     retVal = message
 
-    if any(_ in message for _ in BOLD_PATTERNS):
+    if re.search(BOLD_PATTERNS_REGEX, message):
         retVal = setColor(message, bold=True, istty=istty)
 
     return retVal
