@@ -596,6 +596,9 @@ class Dump(object):
             field = 1
             values = []
 
+            if i == 0 and count > TRIM_STDOUT_DUMP_SIZE:
+                self._write(" ...")
+
             if conf.dumpFormat == DUMP_FORMAT.HTML:
                 dataToDumpFile(dumpFP, "<tr>")
 
