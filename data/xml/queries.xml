@@ -946,8 +946,8 @@
         <limitstring/>
         <order query="ORDER BY %s ASC"/>
         <count query="COUNT(%s)"/>
-        <!-- NOTE: comment without alphanumeric char in continuation is invalid -->
-        <comment query="--x"/>
+        <!-- NOTE: https://issues.apache.org/jira/browse/DERBY-3157 -->
+        <comment query="--aa"/>
         <substring query="SUBSTR((%s),%d,%d)"/>
         <concatenate query="%s||%s"/>
         <!-- NOTE: Apache Derby does not support implicit conversion from int to string -->
