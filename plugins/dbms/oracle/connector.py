@@ -12,7 +12,6 @@ except ImportError:
 
 import logging
 import os
-import re
 
 from lib.core.common import getSafeExString
 from lib.core.convert import getText
@@ -40,7 +39,7 @@ class Connector(GenericConnector):
             dsn = oracledb.makedsn(self.hostname, self.port, service_name=self.db)
             self.connector = oracledb.connect(user=self.user, password=self.password, dsn=dsn, mode=oracledb.AUTH_MODE_SYSDBA)
             logger.info("successfully connected as SYSDBA")
-        except oracledb.DatabaseError as ex:
+        except oracledb.DatabaseError:
             # Try again without SYSDBA
             try:
                 self.connector = oracledb.connect(user=self.user, password=self.password, dsn=dsn)
