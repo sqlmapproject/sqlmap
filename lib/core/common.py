@@ -47,6 +47,7 @@ from extra.beep.beep import beep
 from extra.cloak.cloak import decloak
 from lib.core.bigarray import BigArray
 from lib.core.compat import cmp
+from lib.core.compat import codecs_open
 from lib.core.compat import LooseVersion
 from lib.core.compat import round
 from lib.core.compat import xrange
@@ -3819,7 +3820,7 @@ def openFile(filename, mode='r', encoding=UNICODE_ENCODING, errors="reversible",
         return contextlib.closing(io.StringIO(readCachedFileContent(filename)))
     else:
         try:
-            return codecs.open(filename, mode, encoding, errors, buffering)
+            return codecs_open(filename, mode, encoding, errors, buffering)
         except IOError:
             errMsg = "there has been a file opening error for filename '%s'. " % filename
             errMsg += "Please check %s permissions on a file " % ("write" if mode and ('w' in mode or 'a' in mode or '+' in mode) else "read")
