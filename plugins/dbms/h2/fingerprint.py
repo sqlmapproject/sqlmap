@@ -103,6 +103,10 @@ class Fingerprint(GenericFingerprint):
             else:
                 setDbms(DBMS.H2)
 
+                result = inject.checkBooleanExpression("JSON_OBJECT() IS NOT NULL")
+                version = '2' if result else '1'
+                Backend.setVersion(version)
+
                 self.getBanner()
 
                 return True

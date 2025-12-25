@@ -13,6 +13,7 @@ from lib.core.common import Backend
 from lib.core.common import filterPairValues
 from lib.core.common import getLimitRange
 from lib.core.common import isAdminFromPrivileges
+from lib.core.common import isDBMSVersionAtLeast
 from lib.core.common import isInferenceAvailable
 from lib.core.common import isNoneValue
 from lib.core.common import isNullValue
@@ -104,6 +105,7 @@ class Users(object):
 
         condition = (Backend.isDbms(DBMS.MSSQL) and Backend.isVersionWithin(("2005", "2008")))
         condition |= (Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema)
+        condition |= (Backend.isDbms(DBMS.H2) and not isDBMSVersionAtLeast("2"))
 
         if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
             if Backend.isDbms(DBMS.MYSQL) and Backend.isFork(FORK.DRIZZLE):
