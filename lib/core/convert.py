@@ -472,7 +472,7 @@ def getConsoleLength(value):
     """
 
     if isinstance(value, six.text_type):
-        retVal = sum((2 if ord(_) >= 0x3000 else 1) for _ in value)
+        retVal = len(value) + sum(ord(_) >= 0x3000 for _ in value)
     else:
         retVal = len(value)
 

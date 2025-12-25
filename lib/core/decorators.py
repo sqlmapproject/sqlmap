@@ -7,6 +7,7 @@ See the file 'LICENSE' for copying permission
 
 import functools
 import hashlib
+import struct
 import threading
 
 from lib.core.datatype import LRUDict
@@ -47,7 +48,7 @@ def cachedmethod(f):
             "^".join("%s=%r" % (k, kwargs[k]) for k in sorted(kwargs))
         )
         try:
-            key = int(hashlib.md5("`".join(parts).encode(UNICODE_ENCODING)).hexdigest(), 16) & 0x7fffffffffffffff
+            key = struct.unpack(">Q", hashlib.md5("`".join(parts).encode(UNICODE_ENCODING)).digest()[:8])[0] & 0x7fffffffffffffff
         except ValueError:  # https://github.com/sqlmapproject/sqlmap/issues/4281 (NOTE: non-standard Python behavior where hexdigest returns binary value)
             result = f(*args, **kwargs)
         else:

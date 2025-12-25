@@ -65,6 +65,7 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.datatype import OrderedSet
+from lib.core.decorators import cachedmethod
 from lib.core.enums import DBMS
 from lib.core.enums import HASH
 from lib.core.enums import MKSTEMP_PREFIX
@@ -784,6 +785,7 @@ def attackDumpedTable():
                             table[column]['values'][i] = "%s (%s)" % (getUnicode(table[column]['values'][i]), getUnicode(lut[value.lower()] or HASH_EMPTY_PASSWORD_MARKER))
                             table[column]['length'] = max(table[column]['length'], len(table[column]['values'][i]))
 
+@cachedmethod
 def hashRecognition(value):
     """
     >>> hashRecognition("179ad45c6ce2cb97cf1029e212046e81") == HASH.MD5_GENERIC
