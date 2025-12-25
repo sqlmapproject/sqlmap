@@ -60,6 +60,7 @@ class DBMS(object):
     FRONTBASE = "FrontBase"
     RAIMA = "Raima Database Manager"
     VIRTUOSO = "Virtuoso"
+    SNOWFLAKE = "Snowflake"
 
 class DBMS_DIRECTORY_NAME(object):
     ACCESS = "access"
@@ -90,6 +91,7 @@ class DBMS_DIRECTORY_NAME(object):
     FRONTBASE = "frontbase"
     RAIMA = "raima"
     VIRTUOSO = "virtuoso"
+    SNOWFLAKE = "snowflake"
 
 class FORK(object):
     MARIADB = "MariaDB"
