@@ -615,7 +615,9 @@ class Dump(object):
                         value = getUnicode(info["values"][i])
                         value = DUMP_REPLACEMENTS.get(value, value)
 
-                    values.append(value)
+                    if conf.dumpFormat == DUMP_FORMAT.SQLITE:
+                        values.append(value)
+
                     maxlength = int(info["length"])
                     blank = " " * (maxlength - getConsoleLength(value))
                     self._write("| %s%s" % (value, blank), newline=False, console=console)
