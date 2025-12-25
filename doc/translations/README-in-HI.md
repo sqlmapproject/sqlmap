@@ -1,6 +1,6 @@
 # sqlmap ![](https://i.imgur.com/fe85aVR.png)
 
-[![.github/workflows/tests.yml](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml/badge.svg)](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml) [![Python 2.6|2.7|3.x](https://img.shields.io/badge/python-2.6|2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![x](https://img.shields.io/badge/x-@sqlmap-blue.svg)](https://x.com/sqlmap)
+[![.github/workflows/tests.yml](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml/badge.svg)](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml) [![Python 2.7|3.x](https://img.shields.io/badge/python-2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![x](https://img.shields.io/badge/x-@sqlmap-blue.svg)](https://x.com/sqlmap)
 
 sqlmap एक ओपन सोर्स प्रवेश परीक्षण उपकरण है जो SQL इन्जेक्शन दोषों की पहचान और उपयोग की प्रक्रिया को स्वचलित करता है और डेटाबेस सर्वरों को अधिकृत कर लेता है। इसके साथ एक शक्तिशाली पहचान इंजन, अंतिम प्रवेश परीक्षक के लिए कई निचले विशेषताएँ और डेटाबेस प्रिंट करने, डेटाबेस से डेटा निकालने, नीचे के फ़ाइल सिस्टम तक पहुँचने और आउट-ऑफ-बैंड कनेक्शन के माध्यम से ऑपरेटिंग सिस्टम पर कमांड चलाने के लिए कई बड़े रेंज के स्विच शामिल हैं।
 
@@ -20,7 +20,7 @@ sqlmap एक ओपन सोर्स प्रवेश परीक्षण
 
     git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
-sqlmap [Python](https://www.python.org/download/) संस्करण **2.6**, **2.7** और **3.x** पर किसी भी प्लेटफार्म पर तुरंत काम करता है।
+sqlmap [Python](https://www.python.org/download/) संस्करण **2.7** और **3.x** पर किसी भी प्लेटफार्म पर तुरंत काम करता है।
 
 उपयोग
 ----

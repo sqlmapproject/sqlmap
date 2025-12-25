@@ -1,6 +1,6 @@
 # sqlmap ![](https://i.imgur.com/fe85aVR.png)
 
-[![.github/workflows/tests.yml](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml/badge.svg)](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml) [![Python 2.6|2.7|3.x](https://img.shields.io/badge/python-2.6|2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![X](https://img.shields.io/badge/x-@sqlmap-blue.svg)](https://x.com/sqlmap)
+[![.github/workflows/tests.yml](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml/badge.svg)](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml) [![Python 2.7|3.x](https://img.shields.io/badge/python-2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![X](https://img.shields.io/badge/x-@sqlmap-blue.svg)](https://x.com/sqlmap)
 
 **SQLMap** একটি ওপেন সোর্স পেনিট্রেশন টেস্টিং টুল যা স্বয়ংক্রিয়ভাবে SQL ইনজেকশন দুর্বলতা সনাক্ত ও শোষণ করতে এবং ডাটাবেস সার্ভার নিয়ন্ত্রণে নিতে সহায়তা করে। এটি একটি শক্তিশালী ডিটেকশন ইঞ্জিন, উন্নত ফিচার এবং পেনিট্রেশন টেস্টারদের জন্য দরকারি বিভিন্ন অপশন নিয়ে আসে। এর মাধ্যমে ডাটাবেস ফিঙ্গারপ্রিন্টিং, ডাটাবেস থেকে তথ্য আহরণ, ফাইল সিস্টেম অ্যাক্সেস, এবং অপারেটিং সিস্টেমে কমান্ড চালানোর মতো কাজ করা যায়, এমনকি আউট-অফ-ব্যান্ড সংযোগ ব্যবহার করেও।
 
@@ -23,7 +23,7 @@
 git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 ```
 
-SQLMap স্বয়ংক্রিয়ভাবে [Python](https://www.python.org/download/) **2.6**, **2.7** এবং **3.x** সংস্করণে যেকোনো প্ল্যাটফর্মে কাজ করে।
+SQLMap স্বয়ংক্রিয়ভাবে [Python](https://www.python.org/download/) **2.7** এবং **3.x** সংস্করণে যেকোনো প্ল্যাটফর্মে কাজ করে।
 
 
 

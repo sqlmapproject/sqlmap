@@ -1,6 +1,6 @@
 # sqlmap ![](https://i.imgur.com/fe85aVR.png)
 
-[![.github/workflows/tests.yml](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml/badge.svg)](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml) [![Python 2.6|2.7|3.x](https://img.shields.io/badge/python-2.6|2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![x](https://img.shields.io/badge/x-@sqlmap-blue.svg)](https://x.com/sqlmap)
+[![.github/workflows/tests.yml](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml/badge.svg)](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml) [![Python 2.7|3.x](https://img.shields.io/badge/python-2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![x](https://img.shields.io/badge/x-@sqlmap-blue.svg)](https://x.com/sqlmap)
 
 sqlmap to open sourceowe narzędzie do testów penetracyjnych, które automatyzuje procesy detekcji, przejmowania i testowania odporności serwerów SQL na podatność na iniekcję niechcianego kodu. Zawiera potężny mechanizm detekcji, wiele niszowych funkcji dla zaawansowanych testów penetracyjnych oraz szeroki wachlarz opcji począwszy od identyfikacji bazy danych, poprzez wydobywanie z niej danych, a nawet pozwalających na dostęp do systemu plików oraz wykonywanie poleceń w systemie operacyjnym serwera poprzez niestandardowe połączenia.
 
@@ -20,7 +20,7 @@ Można również pobrać sqlmap klonując rezozytorium [Git](https://github.com/
 
     git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
-do użycia sqlmap potrzebny jest [Python](https://www.python.org/download/) w wersji **2.6**, **2.7** lub **3.x** na dowolnej platformie systemowej.
+do użycia sqlmap potrzebny jest [Python](https://www.python.org/download/) w wersji **2.7** lub **3.x** na dowolnej platformie systemowej.
 
 Sposób użycia
 ----

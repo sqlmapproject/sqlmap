@@ -1,6 +1,6 @@
 # sqlmap ![](https://i.imgur.com/fe85aVR.png)
 
-[![.github/workflows/tests.yml](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml/badge.svg)](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml) [![Python 2.6|2.7|3.x](https://img.shields.io/badge/python-2.6|2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![x](https://img.shields.io/badge/x-@sqlmap-blue.svg)](https://x.com/sqlmap)
+[![.github/workflows/tests.yml](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml/badge.svg)](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml) [![Python 2.7|3.x](https://img.shields.io/badge/python-2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![x](https://img.shields.io/badge/x-@sqlmap-blue.svg)](https://x.com/sqlmap)
 
 sqlmap je open source nástroj na penetračné testovanie, ktorý automatizuje proces detekovania a využívania chýb SQL injekcie a preberania databázových serverov. Je vybavený výkonným detekčným mechanizmom, mnohými výklenkovými funkciami pre dokonalého penetračného testera a širokou škálou prepínačov vrátane odtlačkov databázy, cez načítanie údajov z databázy, prístup k základnému súborovému systému a vykonávanie príkazov v operačnom systéme prostredníctvom mimopásmových pripojení.
 
@@ -20,7 +20,7 @@ Najlepšie je stiahnuť sqlmap naklonovaním [Git](https://github.com/sqlmapproj
 
     git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
-sqlmap funguje bez problémov s programovacím jazykom [Python](https://www.python.org/download/) vo verziách **2.6**, **2.7** a **3.x** na akejkoľvek platforme.
+sqlmap funguje bez problémov s programovacím jazykom [Python](https://www.python.org/download/) vo verziách **2.7** a **3.x** na akejkoľvek platforme.
 
 Využitie
 ----

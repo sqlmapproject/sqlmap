@@ -1,6 +1,6 @@
 # sqlmap ![](https://i.imgur.com/fe85aVR.png)
 
-[![.github/workflows/tests.yml](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml/badge.svg)](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml) [![Python 2.6|2.7|3.x](https://img.shields.io/badge/python-2.6|2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![x](https://img.shields.io/badge/x-@sqlmap-blue.svg)](https://x.com/sqlmap)
+[![.github/workflows/tests.yml](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml/badge.svg)](https://github.com/sqlmapproject/sqlmap/actions/workflows/tests.yml) [![Python 2.7|3.x](https://img.shields.io/badge/python-2.7|3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![x](https://img.shields.io/badge/x-@sqlmap-blue.svg)](https://x.com/sqlmap)
 
 sqlmap là một công cụ kiểm tra thâm nhập mã nguồn mở, nhằm tự động hóa quá trình phát hiện, khai thác lỗ hổng SQL injection và tiếp quản các máy chủ cơ sở dữ liệu. Công cụ này đi kèm với 
 một hệ thống phát hiện mạnh mẽ, nhiều tính năng thích hợp cho người kiểm tra thâm nhập (pentester) và một loạt các tùy chọn bao gồm phát hiện, truy xuất dữ liệu từ cơ sở dữ liệu, truy cập file hệ thống và thực hiện các lệnh trên hệ điều hành từ xa.
@@ -22,7 +22,7 @@ Tốt hơn là bạn nên tải xuống sqlmap bằng cách clone về repo [Git
 
     git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
-sqlmap hoạt động hiệu quả với [Python](https://www.python.org/download/) phiên bản **2.6**, **2.7** và **3.x** trên bất kì hệ điều hành nào.
+sqlmap hoạt động hiệu quả với [Python](https://www.python.org/download/) phiên bản **2.7** và **3.x** trên bất kì hệ điều hành nào.
 
 Sử dụng
 ----

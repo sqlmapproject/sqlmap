@@ -82,7 +82,7 @@ cat > README.rst << "EOF"
 sqlmap
 ======
 
-|Python 2.6|2.7|3.x| |License| |X|
+|Python 2.7|3.x| |License| |X|
 
 sqlmap is an open source penetration testing tool that automates the
 process of detecting and exploiting SQL injection flaws and taking over
@@ -123,7 +123,7 @@ If you prefer fetching daily updates, you can download sqlmap by cloning the
     git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
 
 sqlmap works out of the box with
-`Python <http://www.python.org/download/>`__ version **2.6**, **2.7** and
+`Python <http://www.python.org/download/>`__ version **2.7** and
 **3.x** on any platform.
 
 Usage
@@ -164,7 +164,7 @@ Links
 -  Demos: http://www.youtube.com/user/inquisb/videos
 -  Screenshots: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
 
-.. |Python 2.6|2.7|3.x| image:: https://img.shields.io/badge/python-2.6|2.7|3.x-yellow.svg
+.. |Python 2.7|3.x| image:: https://img.shields.io/badge/python-2.7|3.x-yellow.svg
    :target: https://www.python.org/
 .. |License| image:: https://img.shields.io/badge/license-GPLv2-red.svg
    :target: https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE
