@@ -81,7 +81,7 @@ def base64unpickle(value):
 
 def htmlUnescape(value):
     """
-    Returns (basic conversion) HTML unescaped value
+    Returns HTML unescaped value
 
     >>> htmlUnescape('a&lt;b') == 'a<b'
     True
@@ -89,21 +89,20 @@ def htmlUnescape(value):
     True
     >>> htmlUnescape('&#x66;&#x6f;&#x6f;&#x62;&#x61;&#x72;') == 'foobar'
     True
+    >>> htmlUnescape('&#102;&#111;&#111;&#98;&#97;&#114;') == 'foobar'
+    True
+    >>> htmlUnescape('&copy;&euro;') == htmlUnescape('&#xA9;&#x20AC;')
+    True
     """
 
-    retVal = value
-
     if value and isinstance(value, six.string_types):
-        replacements = (("&lt;", '<'), ("&gt;", '>'), ("&quot;", '"'), ("&nbsp;", ' '), ("&amp;", '&'), ("&apos;", "'"))
-        for code, value in replacements:
-            retVal = retVal.replace(code, value)
-
-        try:
-            retVal = re.sub(r"&#x([0-9a-fA-F]+);", lambda match: _unichr(int(match.group(1), 16)), retVal)
-        except (ValueError, OverflowError):
-            pass
-
-    return retVal
+        if six.PY3:
+            import html
+            return html.unescape(value)
+        else:
+            from six.moves import html_parser
+            return html_parser.HTMLParser().unescape(value)
+    return value
 
 def singleTimeWarnMessage(message):  # Cross-referenced function
     sys.stdout.write(message)
