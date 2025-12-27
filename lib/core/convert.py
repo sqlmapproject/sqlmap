@@ -85,6 +85,10 @@ def htmlUnescape(value):
 
     >>> htmlUnescape('a&lt;b') == 'a<b'
     True
+    >>> htmlUnescape('a&lt;b') == 'a<b'
+    True
+    >>> htmlUnescape('&#x66;&#x6f;&#x6f;&#x62;&#x61;&#x72;') == 'foobar'
+    True
     """
 
     retVal = value
@@ -95,7 +99,7 @@ def htmlUnescape(value):
             retVal = retVal.replace(code, value)
 
         try:
-            retVal = re.sub(r"&#x([^ ;]+);", lambda match: _unichr(int(match.group(1), 16)), retVal)
+            retVal = re.sub(r"&#x([0-9a-fA-F]+);", lambda match: _unichr(int(match.group(1), 16)), retVal)
         except (ValueError, OverflowError):
             pass
 
