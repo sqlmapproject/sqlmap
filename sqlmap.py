@@ -450,7 +450,7 @@ def main():
         elif kb.get("dumpKeyboardInterrupt"):
             raise SystemExit
 
-        elif any(_ in excMsg for _ in ("Broken pipe",)):
+        elif any(_ in excMsg for _ in ("Broken pipe", "KeyboardInterrupt")):
             raise SystemExit
 
         elif valid is False:
