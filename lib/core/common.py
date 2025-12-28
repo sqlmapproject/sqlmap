@@ -5017,6 +5017,10 @@ def extractExpectedValue(value, expected):
 
     >>> extractExpectedValue(['1'], EXPECTED.BOOL)
     True
+    >>> extractExpectedValue(['17'], EXPECTED.BOOL)
+    True
+    >>> extractExpectedValue(['0'], EXPECTED.BOOL)
+    False
     >>> extractExpectedValue('1', EXPECTED.INT)
     1
     >>> extractExpectedValue('7\\xb9645', EXPECTED.INT) is None
@@ -5037,10 +5041,10 @@ def extractExpectedValue(value, expected):
                     value = value == "true"
                 elif value in ('t', 'f'):
                     value = value == 't'
-                elif value in ("1", "-1"):
-                    value = True
                 elif value == '0':
                     value = False
+                elif re.search(r"\A-?[1-9]\d*\Z", value):
+                    value = True
                 else:
                     value = None
         elif expected == EXPECTED.INT:

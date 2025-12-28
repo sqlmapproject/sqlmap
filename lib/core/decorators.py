@@ -49,16 +49,21 @@ def cachedmethod(f):
         )
         try:
             key = struct.unpack(">Q", hashlib.md5("`".join(parts).encode(UNICODE_ENCODING)).digest()[:8])[0] & 0x7fffffffffffffff
-        except ValueError:  # https://github.com/sqlmapproject/sqlmap/issues/4281 (NOTE: non-standard Python behavior where hexdigest returns binary value)
+        except (struct.error, ValueError):  # https://github.com/sqlmapproject/sqlmap/issues/4281 (NOTE: non-standard Python behavior where hexdigest returns binary value)
             result = f(*args, **kwargs)
         else:
             lock, cache = _method_locks[f], _cache[f]
+
             with lock:
-                try:
-                    result = cache[key]
-                except KeyError:
-                    result = f(*args, **kwargs)
-                    cache[key] = result
+                if key in cache:
+                    return cache[key]
+
+            result = f(*args, **kwargs)
+
+            with lock:
+                cache[key] = result
+
+            return result
 
         return result
 
