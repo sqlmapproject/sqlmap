@@ -31,6 +31,7 @@ from lib.core.settings import SAFE_HEX_MARKER
 from lib.core.settings import UNICODE_ENCODING
 from thirdparty import six
 from thirdparty.six import unichr as _unichr
+from thirdparty.six.moves import html_parser
 from thirdparty.six.moves import collections_abc as _collections
 
 try:
@@ -100,7 +101,6 @@ def htmlUnescape(value):
             import html
             return html.unescape(value)
         else:
-            from six.moves import html_parser
             return html_parser.HTMLParser().unescape(value)
     return value
 
