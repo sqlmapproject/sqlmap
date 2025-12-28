@@ -3339,14 +3339,14 @@ def filterNone(values):
     """
     Emulates filterNone([...]) functionality
 
-    >>> filterNone([1, 2, "", None, 3])
-    [1, 2, 3]
+    >>> filterNone([1, 2, "", None, 3, 0])
+    [1, 2, 3, 0]
     """
 
     retVal = values
 
     if isinstance(values, _collections.Iterable):
-        retVal = [_ for _ in values if _]
+        retVal = [_ for _ in values if _ or _ == 0]
 
     return retVal
 

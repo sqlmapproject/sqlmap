@@ -58,7 +58,7 @@ def base64pickle(value):
         try:
             retVal = encodeBase64(pickle.dumps(value), binary=False)
         except:
-            retVal = encodeBase64(pickle.dumps(str(value), PICKLE_PROTOCOL), binary=False)
+            raise
 
     return retVal
 
@@ -146,13 +146,19 @@ def rot13(data):
     'sbbone jnf urer!!'
     >>> rot13('sbbone jnf urer!!')
     'foobar was here!!'
+    >>> rot13(b'foobar was here!!')
+    'sbbone jnf urer!!'
     """
 
-    # Reference: https://stackoverflow.com/a/62662878
     retVal = ""
     alphabit = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+    if isinstance(data, six.binary_type):
+        data = getText(data)
+
     for char in data:
         retVal += alphabit[alphabit.index(char) + 13] if char in alphabit else char
+
     return retVal
 
 def decodeHex(value, binary=True):
