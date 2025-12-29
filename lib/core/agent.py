@@ -744,7 +744,7 @@ class Agent(object):
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'+" % kb.chars.start, 1)
                 concatenatedQuery += "+'%s'" % kb.chars.stop
             elif fieldsSelectTop:
-                topNum = re.search(r"\ASELECT\s+TOP(\s+\d+|\s*\([^)]+\))\s+", concatenatedQuery, re.I).group(1)
+                topNum = fieldsSelectTop.group(1)
                 concatenatedQuery = concatenatedQuery.replace("SELECT TOP%s " % topNum, "TOP%s '%s'+" % (topNum, kb.chars.start), 1)
                 concatenatedQuery = concatenatedQuery.replace(" FROM ", "+'%s' FROM " % kb.chars.stop, 1)
             elif fieldsSelectCase:
