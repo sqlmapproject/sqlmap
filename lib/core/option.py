@@ -69,6 +69,7 @@ from lib.core.data import mergedOptions
 from lib.core.data import queries
 from lib.core.datatype import AttribDict
 from lib.core.datatype import InjectionDict
+from lib.core.datatype import LRUDict
 from lib.core.datatype import OrderedSet
 from lib.core.defaults import defaults
 from lib.core.dicts import DBMS_DICT
@@ -2035,7 +2036,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
 
     kb.cache = AttribDict()
     kb.cache.addrinfo = {}
-    kb.cache.content = {}
+    kb.cache.content = LRUDict(capacity=16)
     kb.cache.comparison = {}
     kb.cache.encoding = {}
     kb.cache.alphaBoundaries = None

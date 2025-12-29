@@ -4542,7 +4542,7 @@ def randomizeParameterValue(value):
             if original != candidate:
                 break
 
-        retVal = retVal.replace(original, candidate)
+        retVal = retVal.replace(original, candidate, 1)
 
     if re.match(r"\A[^@]+@.+\.[a-z]+\Z", value):
         parts = retVal.split('.')
@@ -5159,8 +5159,8 @@ def prioritySortColumns(columns):
     Sorts given column names by length in ascending order while those containing
     string 'id' go first
 
-    >>> prioritySortColumns(['password', 'userid', 'name'])
-    ['userid', 'name', 'password']
+    >>> prioritySortColumns(['password', 'userid', 'name', 'id'])
+    ['id', 'userid', 'name', 'password']
     """
 
     def _(column):
