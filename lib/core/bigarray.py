@@ -66,7 +66,7 @@ class BigArray(list):
     """
     List-like class used for storing large amounts of data (disk cached)
 
-    >>> _ = BigArray(xrange(100000))
+    >>> _ = BigArray(xrange(100000), chunk_size=500 * 1024)
     >>> _[20] = 0
     >>> _[-1] = 999
     >>> _[99999]
@@ -97,7 +97,7 @@ class BigArray(list):
     100000
     """
 
-    def __init__(self, items=None):
+    def __init__(self, items=None, chunk_size=BIGARRAY_CHUNK_SIZE):
         self.chunks = [[]]
         self.chunk_length = sys.maxsize
         self.cache = None
@@ -105,6 +105,7 @@ class BigArray(list):
         self._lock = threading.Lock()
         self._os_remove = os.remove
         self._size_counter = 0
+        self._chunk_size = chunk_size
 
         for item in (items or []):
             self.append(item)
@@ -129,7 +130,7 @@ class BigArray(list):
 
             if self.chunk_length == sys.maxsize:
                 self._size_counter += _size_of(value)
-                if self._size_counter >= BIGARRAY_CHUNK_SIZE:
+                if self._size_counter >= self._chunk_size:
                     self.chunk_length = len(self.chunks[-1])
                     self._size_counter = None
 

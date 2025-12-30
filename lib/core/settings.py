@@ -19,7 +19,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.9.12.31"
+VERSION = "1.9.12.32"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -655,7 +655,7 @@ WAF_ATTACK_VECTORS = (
 ROTATING_CHARS = ('\\', '|', '|', '/', '-')
 
 # Approximate chunk length (in bytes) used by BigArray objects (only last chunk and cached one are held in memory)
-BIGARRAY_CHUNK_SIZE = 1024 * 1024
+BIGARRAY_CHUNK_SIZE = 32 * 1024 * 1024
 
 # Compress level used for storing BigArray chunks to disk (0-9)
 BIGARRAY_COMPRESS_LEVEL = 4
