@@ -22,7 +22,8 @@ from lib.core.data import logger
 from lib.core.exception import SqlmapConnectionException
 from lib.core.settings import HASHDB_END_TRANSACTION_RETRIES
 from lib.core.settings import HASHDB_FLUSH_RETRIES
-from lib.core.settings import HASHDB_FLUSH_THRESHOLD
+from lib.core.settings import HASHDB_FLUSH_THRESHOLD_ITEMS
+from lib.core.settings import HASHDB_FLUSH_THRESHOLD_TIME
 from lib.core.settings import HASHDB_RETRIEVE_RETRIES
 from lib.core.threads import getCurrentThreadData
 from lib.core.threads import getCurrentThreadName
@@ -34,15 +35,17 @@ class HashDB(object):
         self._write_cache = {}
         self._cache_lock = threading.Lock()
         self._connections = []
+        self._last_flush_time = time.time()
 
     def _get_cursor(self):
         threadData = getCurrentThreadData()
 
         if threadData.hashDBCursor is None:
             try:
-                connection = sqlite3.connect(self.filepath, timeout=3, isolation_level=None)
+                connection = sqlite3.connect(self.filepath, timeout=3, isolation_level=None, check_same_thread=False)
                 self._connections.append(connection)
                 threadData.hashDBCursor = connection.cursor()
+                threadData.hashDBCursor.execute("PRAGMA journal_mode=WAL")
                 threadData.hashDBCursor.execute("CREATE TABLE IF NOT EXISTS storage (id INTEGER PRIMARY KEY, value TEXT)")
                 connection.commit()
             except Exception as ex:
@@ -86,7 +89,7 @@ class HashDB(object):
     def retrieve(self, key, unserialize=False):
         retVal = None
 
-        if key and (self._write_cache or os.path.isfile(self.filepath)):
+        if key and (self._write_cache or self._connections or os.path.isfile(self.filepath)):
             hash_ = HashDB.hashKey(key)
             retVal = self._write_cache.get(hash_)
             if not retVal:
@@ -123,28 +126,26 @@ class HashDB(object):
     def write(self, key, value, serialize=False):
         if key:
             hash_ = HashDB.hashKey(key)
-            self._cache_lock.acquire()
-            self._write_cache[hash_] = getUnicode(value) if not serialize else serializeObject(value)
-            self._cache_lock.release()
+            with self._cache_lock:
+                self._write_cache[hash_] = getUnicode(value) if not serialize else serializeObject(value)
+                cache_size = len(self._write_cache)
+                time_since_flush = time.time() - self._last_flush_time
 
-        if getCurrentThreadName() in ('0', "MainThread"):
-            self.flush()
+            if cache_size >= HASHDB_FLUSH_THRESHOLD_ITEMS or time_since_flush >= HASHDB_FLUSH_THRESHOLD_TIME:
+                self.flush()
 
-    def flush(self, forced=False):
-        if not self._write_cache:
-            return
+    def flush(self):
+        with self._cache_lock:
+            if not self._write_cache:
+                return
 
-        if not forced and len(self._write_cache) < HASHDB_FLUSH_THRESHOLD:
-            return
-
-        self._cache_lock.acquire()
-        _ = self._write_cache
-        self._write_cache = {}
-        self._cache_lock.release()
+            flush_cache = self._write_cache
+            self._write_cache = {}
+            self._last_flush_time = time.time()
 
         try:
             self.beginTransaction()
-            for hash_, value in _.items():
+            for hash_, value in flush_cache.items():
                 retries = 0
                 while True:
                     try:
@@ -160,7 +161,8 @@ class HashDB(object):
                             logger.debug(debugMsg)
                             break
 
-                        if retries == 0:
+                        # NOTE: skipping the retries == 0 for graceful resolution of multi-threaded runs
+                        if retries == 1:
                             warnMsg = "there has been a problem while writing to "
                             warnMsg += "the session file ('%s')" % getSafeExString(ex)
                             logger.warning(warnMsg)

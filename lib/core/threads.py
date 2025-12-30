@@ -255,7 +255,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
                     pass
 
         if conf.get("hashDB"):
-            conf.hashDB.flush(True)
+            conf.hashDB.flush()
 
         if cleanupFunction:
             cleanupFunction()
