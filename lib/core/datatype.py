@@ -102,8 +102,8 @@ class AttribDict(dict):
         return retVal
 
 class InjectionDict(AttribDict):
-    def __init__(self):
-        AttribDict.__init__(self)
+    def __init__(self, **kwargs):
+        AttribDict.__init__(self, **kwargs)
 
         self.place = None
         self.parameter = None
