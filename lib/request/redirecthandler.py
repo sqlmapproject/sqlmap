@@ -33,6 +33,7 @@ from lib.core.threads import getCurrentThreadData
 from lib.request.basic import decodePage
 from lib.request.basic import parseResponse
 from thirdparty import six
+from thirdparty.six.moves import http_client as _http_client
 from thirdparty.six.moves import urllib as _urllib
 
 class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
@@ -67,7 +68,12 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
                 self.redirect_request = self._redirect_request
 
     def _redirect_request(self, req, fp, code, msg, headers, newurl):
-        return _urllib.request.Request(newurl.replace(' ', '%20'), data=req.data, headers=req.headers, origin_req_host=req.get_origin_req_host() if hasattr(req, "get_origin_req_host") else req.origin_req_host)
+        retVal = _urllib.request.Request(newurl.replace(' ', '%20'), data=req.data, headers=req.headers, origin_req_host=req.get_origin_req_host() if hasattr(req, "get_origin_req_host") else req.origin_req_host)
+
+        if hasattr(req, "redirect_dict"):
+            retVal.redirect_dict = req.redirect_dict
+
+        return retVal
 
     def http_error_302(self, req, fp, code, msg, headers):
         start = time.time()
@@ -78,7 +84,10 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
         try:
             content = fp.fp.read(MAX_CONNECTION_TOTAL_SIZE)
             fp.fp = io.BytesIO(content)
-        except:  # e.g. IncompleteRead
+        except _http_client.IncompleteRead as ex:
+            content = ex.partial
+            fp.fp = io.BytesIO(content)
+        except:
             content = b""
 
         content = decodePage(content, headers.get(HTTP_HEADER.CONTENT_ENCODING), headers.get(HTTP_HEADER.CONTENT_TYPE))
