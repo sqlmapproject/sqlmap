@@ -12,6 +12,7 @@ except:
 
 import itertools
 import os
+import shutil
 import sys
 import tempfile
 import threading
@@ -28,6 +29,13 @@ try:
 except TypeError:
     DEFAULT_SIZE_OF = 16
 
+try:
+    # Python 2: basestring covers str and unicode
+    STRING_TYPES = (basestring,)
+except NameError:
+    # Python 3: str and bytes are separate
+    STRING_TYPES = (str, bytes)
+
 def _size_of(instance):
     """
     Returns total size of a given instance / object (in bytes)
@@ -35,7 +43,9 @@ def _size_of(instance):
 
     retval = sys.getsizeof(instance, DEFAULT_SIZE_OF)
 
-    if isinstance(instance, dict):
+    if isinstance(instance, STRING_TYPES):
+        return retval
+    elif isinstance(instance, dict):
         retval += sum(_size_of(_) for _ in itertools.chain.from_iterable(instance.items()))
     elif hasattr(instance, "__iter__"):
         retval += sum(_size_of(_) for _ in instance if _ != instance)
@@ -58,12 +68,29 @@ class BigArray(list):
 
     >>> _ = BigArray(xrange(100000))
     >>> _[20] = 0
+    >>> _[-1] = 999
     >>> _[99999]
-    99999
+    999
+    >>> _[100000]
+    Traceback (most recent call last):
+    ...
+    IndexError: BigArray index out of range
     >>> _ += [0]
+    >>> sum(_)
+    4999850980
+    >>> _[len(_) // 2] = 17
+    >>> sum(_)
+    4999800997
     >>> _[100000]
     0
-    >>> _ = _ + [1]
+    >>> _[0] = [None]
+    >>> _.index(0)
+    20
+    >>> import pickle; __ = pickle.loads(pickle.dumps(_))
+    >>> __.append(1)
+    >>> len(_)
+    100001
+    >>> _ = __
     >>> _[-1]
     1
     >>> len([_ for _ in BigArray(xrange(100000))])
@@ -134,15 +161,23 @@ class BigArray(list):
             if self[index] == value:
                 return index
 
-        return ValueError, "%s is not in list" % value
+        raise ValueError("%s is not in list" % value)
+
+    def __reduce__(self):
+        return (self.__class__, (), self.__getstate__())
 
     def close(self):
-        while self.filenames:
-            filename = self.filenames.pop()
-            try:
-                self._os_remove(filename)
-            except OSError:
-                pass
+        with self._lock:
+            while self.filenames:
+                filename = self.filenames.pop()
+                try:
+                    self._os_remove(filename)
+                except OSError:
+                    pass
+            self.chunks = [[]]
+            self.cache = None
+            self.chunk_length = getattr(sys, "maxsize", None)
+            self._size_counter = 0
 
     def __del__(self):
         self.close()
@@ -181,41 +216,89 @@ class BigArray(list):
                 raise SqlmapSystemException(errMsg)
 
     def __getstate__(self):
-        return self.chunks, self.filenames
+        if self.cache and self.cache.dirty:
+            filename = self._dump(self.cache.data)
+            self.chunks[self.cache.index] = filename
+            self.cache.dirty = False
+
+        return self.chunks, self.filenames, self.chunk_length
 
     def __setstate__(self, state):
         self.__init__()
-        self.chunks, self.filenames = state
+        chunks, filenames, self.chunk_length = state
+
+        file_mapping = {}
+        self.filenames = set()
+        self.chunks = []
+
+        for filename in filenames:
+            if not os.path.exists(filename):
+                continue
+
+            try:
+                handle, new_filename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.BIG_ARRAY)
+                os.close(handle)
+                shutil.copyfile(filename, new_filename)
+                self.filenames.add(new_filename)
+                file_mapping[filename] = new_filename
+            except (OSError, IOError):
+                pass
+
+        for chunk in chunks:
+            if isinstance(chunk, STRING_TYPES):
+                if chunk in file_mapping:
+                    self.chunks.append(file_mapping[chunk])
+                else:
+                    errMsg = "exception occurred while restoring BigArray chunk "
+                    errMsg += "from file '%s'" % chunk
+                    raise SqlmapSystemException(errMsg)
+            else:
+                self.chunks.append(chunk)
 
     def __getitem__(self, y):
-        length = len(self)
-        if length == 0:
-            raise IndexError("BigArray index out of range")
+        with self._lock:
+            length = len(self)
+            if length == 0:
+                raise IndexError("BigArray index out of range")
 
-        while y < 0:
-            y += length
+            if y < 0:
+                y += length
 
-        index = y // self.chunk_length
-        offset = y % self.chunk_length
-        chunk = self.chunks[index]
+            if y < 0 or y >= length:
+                raise IndexError("BigArray index out of range")
 
-        if isinstance(chunk, list):
-            return chunk[offset]
-        else:
-            self._checkcache(index)
-            return self.cache.data[offset]
+            index = y // self.chunk_length
+            offset = y % self.chunk_length
+            chunk = self.chunks[index]
+
+            if isinstance(chunk, list):
+                return chunk[offset]
+            else:
+                self._checkcache(index)
+                return self.cache.data[offset]
 
     def __setitem__(self, y, value):
-        index = y // self.chunk_length
-        offset = y % self.chunk_length
-        chunk = self.chunks[index]
+        with self._lock:
+            length = len(self)
+            if length == 0:
+                raise IndexError("BigArray index out of range")
 
-        if isinstance(chunk, list):
-            chunk[offset] = value
-        else:
-            self._checkcache(index)
-            self.cache.data[offset] = value
-            self.cache.dirty = True
+            if y < 0:
+                y += length
+
+            if y < 0 or y >= length:
+                raise IndexError("BigArray index out of range")
+
+            index = y // self.chunk_length
+            offset = y % self.chunk_length
+            chunk = self.chunks[index]
+
+            if isinstance(chunk, list):
+                chunk[offset] = value
+            else:
+                self._checkcache(index)
+                self.cache.data[offset] = value
+                self.cache.dirty = True
 
     def __repr__(self):
         return "%s%s" % ("..." if len(self.chunks) > 1 else "", self.chunks[-1].__repr__())

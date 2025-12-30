@@ -19,7 +19,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.9.12.29"
+VERSION = "1.9.12.30"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -658,7 +658,7 @@ ROTATING_CHARS = ('\\', '|', '|', '/', '-')
 BIGARRAY_CHUNK_SIZE = 1024 * 1024
 
 # Compress level used for storing BigArray chunks to disk (0-9)
-BIGARRAY_COMPRESS_LEVEL = 9
+BIGARRAY_COMPRESS_LEVEL = 4
 
 # Maximum number of socket pre-connects
 SOCKET_PRE_CONNECT_QUEUE_SIZE = 3
