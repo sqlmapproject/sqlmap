@@ -182,7 +182,12 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
             if key in kb.cache.comparison:
                 ratio = kb.cache.comparison[key]
             else:
-                ratio = round(seqMatcher.quick_ratio() if not kb.heavilyDynamic else seqMatcher.ratio(), 3)
+                try:
+                    ratio = seqMatcher.quick_ratio() if not kb.heavilyDynamic else seqMatcher.ratio()
+                except (TypeError, MemoryError):
+                    ratio = seqMatcher.ratio()
+
+                ratio = round(ratio, 3)
 
             if key:
                 kb.cache.comparison[key] = ratio
