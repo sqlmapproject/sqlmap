@@ -80,6 +80,7 @@ def vulnTest():
 
     retVal = True
     count = 0
+    cleanups = []
 
     while True:
         address, port = "127.0.0.1", random.randint(10000, 65535)
@@ -130,9 +131,11 @@ def vulnTest():
 
     handle, config = tempfile.mkstemp(suffix=".conf")
     os.close(handle)
+    cleanups.append(config)
 
     handle, database = tempfile.mkstemp(suffix=".sqlite")
     os.close(handle)
+    cleanups.append(database)
 
     with sqlite3.connect(database) as conn:
         c = conn.cursor()
@@ -140,12 +143,15 @@ def vulnTest():
 
     handle, request = tempfile.mkstemp(suffix=".req")
     os.close(handle)
+    cleanups.append(request)
 
     handle, log = tempfile.mkstemp(suffix=".log")
     os.close(handle)
+    cleanups.append(log)
 
     handle, multiple = tempfile.mkstemp(suffix=".lst")
     os.close(handle)
+    cleanups.append(multiple)
 
     content = "POST / HTTP/1.0\nUser-Agent: foobar\nHost: %s:%s\n\nid=1\n" % (address, port)
     with open(request, "w+") as f:
@@ -206,6 +212,12 @@ def vulnTest():
         logger.info("vuln test final result: PASSED")
     else:
         logger.error("vuln test final result: FAILED")
+
+    for filename in cleanups:
+        try:
+            os.remove(filename)
+        except:
+            pass
 
     return retVal
 
