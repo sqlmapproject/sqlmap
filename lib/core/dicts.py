@@ -177,7 +177,7 @@ MYSQL_PRIVS = {
 PGSQL_PRIVS = {
     1: "createdb",
     2: "super",
-    3: "catupd",
+    3: "replication",
 }
 
 # Reference(s): http://stackoverflow.com/a/17672504
@@ -269,7 +269,7 @@ FROM_DUMMY_TABLE = {
 HEURISTIC_NULL_EVAL = {
     DBMS.ACCESS: "CVAR(NULL)",
     DBMS.MAXDB: "ALPHA(NULL)",
-    DBMS.MSSQL: "IIF(1=1,DIFFERENCE(NULL,NULL),0)",
+    DBMS.MSSQL: "PARSENAME(NULL,NULL)",
     DBMS.MYSQL: "IFNULL(QUARTER(NULL),NULL XOR NULL)",  # NOTE: previous form (i.e., QUARTER(NULL XOR NULL)) was bad as some optimization engines wrongly evaluate QUARTER(NULL XOR NULL) to 0
     DBMS.ORACLE: "INSTR2(NULL,NULL)",
     DBMS.PGSQL: "QUOTE_IDENT(NULL)",
@@ -397,7 +397,7 @@ DUMP_DATA_PREPROCESS = {
 
 DEFAULT_DOC_ROOTS = {
     OS.WINDOWS: ("C:/xampp/htdocs/", "C:/wamp/www/", "C:/Inetpub/wwwroot/"),
-    OS.LINUX: ("/var/www/", "/var/www/html", "/var/www/htdocs", "/usr/local/apache2/htdocs", "/usr/local/www/data", "/var/apache2/htdocs", "/var/www/nginx-default", "/srv/www/htdocs", "/usr/local/var/www")  # Reference: https://wiki.apache.org/httpd/DistrosDefaultLayout
+    OS.LINUX: ("/var/www/", "/var/www/html", "/var/www/htdocs", "/usr/local/apache2/htdocs", "/usr/local/www/data", "/var/apache2/htdocs", "/var/www/nginx-default", "/srv/www/htdocs", "/usr/local/var/www", "/usr/share/nginx/html")
 }
 
 PART_RUN_CONTENT_TYPES = {
