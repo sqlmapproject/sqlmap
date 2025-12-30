@@ -106,7 +106,11 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
         # Dynamic content lines to be excluded before comparison
         if not kb.nullConnection:
             page = removeDynamicContent(page)
-            seqMatcher.set_seq1(removeDynamicContent(kb.pageTemplate))
+            if threadData.lastPageTemplate != kb.pageTemplate:
+                threadData.lastPageTemplateCleaned = removeDynamicContent(kb.pageTemplate)
+                threadData.lastPageTemplate = kb.pageTemplate
+
+            seqMatcher.set_seq1(threadData.lastPageTemplateCleaned)
 
         if not pageLength:
             pageLength = len(page)
