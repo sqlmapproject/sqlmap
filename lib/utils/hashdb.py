@@ -26,7 +26,6 @@ from lib.core.settings import HASHDB_FLUSH_THRESHOLD_ITEMS
 from lib.core.settings import HASHDB_FLUSH_THRESHOLD_TIME
 from lib.core.settings import HASHDB_RETRIEVE_RETRIES
 from lib.core.threads import getCurrentThreadData
-from lib.core.threads import getCurrentThreadName
 from thirdparty import six
 
 class HashDB(object):
@@ -42,10 +41,9 @@ class HashDB(object):
 
         if threadData.hashDBCursor is None:
             try:
-                connection = sqlite3.connect(self.filepath, timeout=3, isolation_level=None, check_same_thread=False)
+                connection = sqlite3.connect(self.filepath, timeout=10, isolation_level=None, check_same_thread=False)
                 self._connections.append(connection)
                 threadData.hashDBCursor = connection.cursor()
-                threadData.hashDBCursor.execute("PRAGMA journal_mode=WAL")
                 threadData.hashDBCursor.execute("CREATE TABLE IF NOT EXISTS storage (id INTEGER PRIMARY KEY, value TEXT)")
                 connection.commit()
             except Exception as ex:
