@@ -286,7 +286,7 @@ HEURISTIC_NULL_EVAL = {
     DBMS.CUBRID: "(NULL SETEQ NULL)",
     DBMS.CACHE: "%SQLUPPER NULL",
     DBMS.EXTREMEDB: "NULLIFZERO(hashcode(NULL))",
-    DBMS.RAIMA: "IF(ROWNUMBER()>0,CONVERT(NULL,TINYINT),NULL))",
+    DBMS.RAIMA: "IF(ROWNUMBER()>0,CONVERT(NULL,TINYINT),NULL)",
     DBMS.VIRTUOSO: "__MAX_NOTNULL(NULL)",
     DBMS.CLICKHOUSE: "halfMD5(NULL) IS NULL",
 }
@@ -324,6 +324,7 @@ SQL_STATEMENTS = {
         "update ",
         "delete ",
         "merge ",
+        "copy ",
         "load ",
     ),
 
