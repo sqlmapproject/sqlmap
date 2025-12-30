@@ -87,7 +87,7 @@ class AttribDict(dict):
         self.__dict__ = dict
 
     def __deepcopy__(self, memo):
-        retVal = self.__class__()
+        retVal = self.__class__(keycheck=self.keycheck)
         memo[id(self)] = retVal
 
         for attr in dir(self):
@@ -157,8 +157,11 @@ class LRUDict(object):
             self.cache[key] = value
             return value
 
-    def get(self, key):
-        return self.__getitem__(key)
+    def get(self, key, default=None):
+        try:
+            return self.__getitem__(key)
+        except:
+            return default
 
     def __setitem__(self, key, value):
         with self.__lock:
