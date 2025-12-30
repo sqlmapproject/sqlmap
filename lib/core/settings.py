@@ -19,7 +19,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.9.12.34"
+VERSION = "1.9.12.35"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -191,7 +191,7 @@ MAX_TECHNIQUES_PER_VALUE = 2
 MAX_BUFFERED_PARTIAL_UNION_LENGTH = 1024
 
 # Maximum size of cache used in @cachedmethod decorator
-MAX_CACHE_ITEMS = 256
+MAX_CACHE_ITEMS = 1024
 
 # Suffix used for naming meta databases in DBMS(es) without explicit database name
 METADB_SUFFIX = "_masterdb"

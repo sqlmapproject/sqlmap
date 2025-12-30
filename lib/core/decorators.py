@@ -42,28 +42,34 @@ def cachedmethod(f):
 
     @functools.wraps(f)
     def _f(*args, **kwargs):
-        parts = (
-            f.__module__ + "." + f.__name__,
-            "^".join(repr(a) for a in args),
-            "^".join("%s=%r" % (k, kwargs[k]) for k in sorted(kwargs))
-        )
         try:
-            key = struct.unpack(">Q", hashlib.md5("`".join(parts).encode(UNICODE_ENCODING)).digest()[:8])[0] & 0x7fffffffffffffff
-        except (struct.error, ValueError):  # https://github.com/sqlmapproject/sqlmap/issues/4281 (NOTE: non-standard Python behavior where hexdigest returns binary value)
-            result = f(*args, **kwargs)
-        else:
-            lock, cache = _method_locks[f], _cache[f]
+            # NOTE: fast-path
+            if kwargs:
+                key = hash((f, args, tuple(map(type, args)), frozenset(kwargs.items()))) & 0x7fffffffffffffff
+            else:
+                key = hash((f, args, tuple(map(type, args)))) & 0x7fffffffffffffff
+        except TypeError:
+            # NOTE: failback slow-path
+            parts = (
+                f.__module__ + "." + f.__name__,
+                "^".join(repr(a) for a in args),
+                "^".join("%s=%r" % (k, kwargs[k]) for k in sorted(kwargs))
+            )
+            try:
+                key = struct.unpack(">Q", hashlib.md5("`".join(parts).encode(UNICODE_ENCODING)).digest()[:8])[0] & 0x7fffffffffffffff
+            except (struct.error, ValueError):
+                return f(*args, **kwargs)
 
-            with lock:
-                if key in cache:
-                    return cache[key]
+        lock, cache = _method_locks[f], _cache[f]
 
-            result = f(*args, **kwargs)
+        with lock:
+            if key in cache:
+                return cache[key]
 
-            with lock:
-                cache[key] = result
+        result = f(*args, **kwargs)
 
-            return result
+        with lock:
+            cache[key] = result
 
         return result
 
