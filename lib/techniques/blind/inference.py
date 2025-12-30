@@ -291,6 +291,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             if "'%s'" % CHAR_INFERENCE_MARK in payload:
                 for char in ('\n', '\r'):
                     if ord(char) in charTbl:
+                        if not isinstance(charTbl, list):
+                            charTbl = list(charTbl)
                         charTbl.remove(ord(char))
 
             if not charTbl:
