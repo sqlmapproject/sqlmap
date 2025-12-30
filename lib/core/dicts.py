@@ -273,7 +273,7 @@ HEURISTIC_NULL_EVAL = {
     DBMS.MYSQL: "IFNULL(QUARTER(NULL),NULL XOR NULL)",  # NOTE: previous form (i.e., QUARTER(NULL XOR NULL)) was bad as some optimization engines wrongly evaluate QUARTER(NULL XOR NULL) to 0
     DBMS.ORACLE: "INSTR2(NULL,NULL)",
     DBMS.PGSQL: "QUOTE_IDENT(NULL)",
-    DBMS.SQLITE: "UNLIKELY(NULL)",
+    DBMS.SQLITE: "JULIANDAY(NULL)",
     DBMS.H2: "STRINGTOUTF8(NULL)",
     DBMS.MONETDB: "CODE(NULL)",
     DBMS.DERBY: "NULLIF(USER,SESSION_USER)",
@@ -380,8 +380,19 @@ DEPRECATED_OPTIONS = {
 }
 
 DUMP_DATA_PREPROCESS = {
-    DBMS.ORACLE: {"XMLTYPE": "(%s).getStringVal()"},  # Reference: https://www.tibcommunity.com/docs/DOC-3643
-    DBMS.MSSQL: {"IMAGE": "CONVERT(VARBINARY(MAX),%s)"},
+    DBMS.ORACLE: {"XMLTYPE": "(%s).getStringVal()"},
+    DBMS.MSSQL: {
+        "IMAGE": "CONVERT(VARBINARY(MAX),%s)",
+        "GEOMETRY": "(%s).STAsText()",
+        "GEOGRAPHY": "(%s).STAsText()"
+    },
+    DBMS.PGSQL: {
+        "GEOMETRY": "ST_AsText(%s)",
+        "GEOGRAPHY": "ST_AsText(%s)"
+    },
+    DBMS.MYSQL: {
+        "GEOMETRY": "ST_AsText(%s)"
+    }
 }
 
 DEFAULT_DOC_ROOTS = {
