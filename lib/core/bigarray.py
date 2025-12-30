@@ -47,8 +47,8 @@ def _size_of(instance):
         return retval
     elif isinstance(instance, dict):
         retval += sum(_size_of(_) for _ in itertools.chain.from_iterable(instance.items()))
-    elif hasattr(instance, "__iter__"):
-        retval += sum(_size_of(_) for _ in instance if _ != instance)
+    elif isinstance(instance, (list, tuple, set, frozenset)):
+        retval += sum(_size_of(_) for _ in instance if _ is not instance)
 
     return retval
 
