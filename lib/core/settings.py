@@ -19,7 +19,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.9.12.46"
+VERSION = "1.9.12.47"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -139,7 +139,7 @@ DUCKDUCKGO_REGEX = r'<a class="result__url" href="(htt[^"]+)'
 BING_REGEX = r'<h2><a href="([^"]+)" h='
 
 # Dummy user agent for search (if default one returns different results)
-DUMMY_SEARCH_USER_AGENT = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:49.0) Gecko/20100101 Firefox/49.0"
+DUMMY_SEARCH_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:141.0) Gecko/20100101 Firefox/141.0"
 
 # Regular expression used for extracting content from "textual" tags
 TEXT_TAG_REGEX = r"(?si)<(abbr|acronym|b|blockquote|br|center|cite|code|dt|em|font|h[1-6]|i|li|p|pre|q|strong|sub|sup|td|th|title|tt|u)(?!\w).*?>(?P<result>[^<]+)"
@@ -887,7 +887,7 @@ MAX_HISTORY_LENGTH = 1000
 MIN_ENCODED_LEN_CHECK = 5
 
 # Timeout in seconds in which Metasploit remote session has to be initialized
-METASPLOIT_SESSION_TIMEOUT = 120
+METASPLOIT_SESSION_TIMEOUT = 180
 
 # Reference: http://www.postgresql.org/docs/9.0/static/catalog-pg-largeobject.html
 LOBLKSIZE = 2048
@@ -906,7 +906,7 @@ CSRF_TOKEN_PARAMETER_INFIXES = ("csrf", "xsrf", "token", "nonce")
 
 # Prefixes used in brute force search for web server document root
 BRUTE_DOC_ROOT_PREFIXES = {
-    OS.LINUX: ("/var/www", "/usr/local/apache", "/usr/local/apache2", "/usr/local/www/apache22", "/usr/local/www/apache24", "/usr/local/httpd", "/var/www/nginx-default", "/srv/www", "/var/www/%TARGET%", "/var/www/vhosts/%TARGET%", "/var/www/virtual/%TARGET%", "/var/www/clients/vhosts/%TARGET%", "/var/www/clients/virtual/%TARGET%"),
+    OS.LINUX: ("/var/www", "/usr/local/apache", "/usr/local/apache2", "/usr/local/www/apache22", "/usr/local/www/apache24", "/usr/local/httpd", "/var/www/nginx-default", "/srv/www", "/var/www/%TARGET%", "/var/www/vhosts/%TARGET%", "/var/www/virtual/%TARGET%", "/var/www/clients/vhosts/%TARGET%", "/var/www/clients/virtual/%TARGET%", "/Library/WebServer/Documents", "/opt/homebrew/var/www"),
     OS.WINDOWS: ("/xampp", "/Program Files/xampp", "/wamp", "/Program Files/wampp", "/Apache/Apache", "/apache", "/Program Files/Apache Group/Apache", "/Program Files/Apache Group/Apache2", "/Program Files/Apache Group/Apache2.2", "/Program Files/Apache Group/Apache2.4", "/Inetpub/wwwroot", "/Inetpub/wwwroot/%TARGET%", "/Inetpub/vhosts/%TARGET%")
 }
 
