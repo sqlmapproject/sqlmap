@@ -372,6 +372,7 @@ class WEB_PLATFORM(object):
     ASP = "asp"
     ASPX = "aspx"
     JSP = "jsp"
+    CFM = "cfm"
 
 class CONTENT_TYPE(object):
     TARGET = 0

@@ -1095,6 +1095,8 @@ def heuristicCheckSqlInjection(place, parameter):
             errMsg += "int.TryParse(Request.QueryString[\"%s\"], out %s)" % (parameter, parameter)
         elif platform == WEB_PLATFORM.JSP:
             errMsg += "%s=Integer.parseInt(request.getParameter(\"%s\"))" % (parameter, parameter)
+        elif platform == WEB_PLATFORM.CFM:
+            errMsg += "%s=Val(url.%s)" % (parameter, parameter)
         else:
             errMsg += "$%s=intval($_REQUEST[\"%s\"])" % (parameter, parameter)
 
