@@ -19,7 +19,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.9.12.36"
+VERSION = "1.9.12.37"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -719,7 +719,7 @@ HASHDB_RETRIEVE_RETRIES = 3
 HASHDB_END_TRANSACTION_RETRIES = 3
 
 # Unique milestone value used for forced deprecation of old HashDB values (e.g. when changing hash/pickle mechanism)
-HASHDB_MILESTONE_VALUE = "OdqjeUpBLc"  # python -c 'import random, string; print "".join(random.sample(string.ascii_letters, 10))'
+HASHDB_MILESTONE_VALUE = "GpqxbkWTfz"  # python -c 'import random, string; print "".join(random.sample(string.ascii_letters, 10))'
 
 # Pickle protocl used for storage of serialized data inside HashDB (https://docs.python.org/3/library/pickle.html#data-stream-format)
 PICKLE_PROTOCOL = 2

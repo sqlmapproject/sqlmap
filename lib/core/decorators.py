@@ -56,7 +56,7 @@ def cachedmethod(f):
                 "^".join("%s=%r" % (k, kwargs[k]) for k in sorted(kwargs))
             )
             try:
-                key = struct.unpack(">Q", hashlib.md5("`".join(parts).encode(UNICODE_ENCODING)).digest()[:8])[0] & 0x7fffffffffffffff
+                key = struct.unpack("<Q", hashlib.md5("`".join(parts).encode(UNICODE_ENCODING)).digest()[:8])[0] & 0x7fffffffffffffff
             except (struct.error, ValueError):
                 return f(*args, **kwargs)
 

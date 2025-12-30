@@ -8,6 +8,7 @@ See the file 'LICENSE' for copying permission
 import hashlib
 import os
 import sqlite3
+import struct
 import threading
 import time
 
@@ -81,7 +82,7 @@ class HashDB(object):
     @staticmethod
     def hashKey(key):
         key = getBytes(key if isinstance(key, six.text_type) else repr(key), errors="xmlcharrefreplace")
-        retVal = int(hashlib.md5(key).hexdigest(), 16) & 0x7fffffffffffffff  # Reference: http://stackoverflow.com/a/4448400
+        retVal = struct.unpack("<Q", hashlib.md5(key).digest()[:8])[0] & 0x7fffffffffffffff
         return retVal
 
     def retrieve(self, key, unserialize=False):
