@@ -239,6 +239,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             Used in inference - in time-based SQLi if original and retrieved value are not equal there will be a deliberate delay
             """
 
+            threadData = getCurrentThreadData()
+
             validationPayload = re.sub(r"(%s.*?)%s(.*?%s)" % (PAYLOAD_DELIMITER, INFERENCE_GREATER_CHAR, PAYLOAD_DELIMITER), r"\g<1>%s\g<2>" % INFERENCE_NOT_EQUALS_CHAR, payload)
 
             if "'%s'" % CHAR_INFERENCE_MARK not in payload:
@@ -267,6 +269,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             continuousOrder means that distance between each two neighbour's
             numerical values is exactly 1
             """
+
+            threadData = getCurrentThreadData()
 
             result = tryHint(idx)
 
