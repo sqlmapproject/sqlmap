@@ -224,7 +224,8 @@ class NcursesUI:
             # Draw value
             value_str = ""
             if option['type'] == 'bool':
-                value_str = "[X]" if option['value'] else "[ ]"
+                value = option['value'] if option['value'] is not None else option.get('default')
+                value_str = "[X]" if value else "[ ]"
             else:
                 value_str = str(option['value']) if option['value'] else ""
                 if option['default'] and not option['value']:
@@ -367,7 +368,7 @@ class NcursesUI:
                 for tab in self.tabs:
                     for option in tab['options']:
                         dest = option['dest']
-                        value = option['value'] if option['value'] else option.get('default')
+                        value = option['value'] if option['value'] is not None else option.get('default')
 
                         if option['type'] == 'bool':
                             config[dest] = bool(value)
@@ -526,7 +527,7 @@ class NcursesUI:
         for tab in self.tabs:
             for option in tab['options']:
                 dest = option['dest']
-                value = option['value'] if option['value'] else option.get('default')
+                value = option['value'] if option['value'] is not None else option.get('default')
 
                 if option['type'] == 'bool':
                     config[dest] = bool(value)
@@ -580,10 +581,11 @@ class NcursesUI:
                 close_fds=not IS_WIN
             )
 
-            # Make it non-blocking
-            import fcntl
-            flags = fcntl.fcntl(process.stdout, fcntl.F_GETFL)
-            fcntl.fcntl(process.stdout, fcntl.F_SETFL, flags | os.O_NONBLOCK)
+            if not IS_WIN:
+                # Make it non-blocking
+                import fcntl
+                flags = fcntl.fcntl(process.stdout, fcntl.F_GETFL)
+                fcntl.fcntl(process.stdout, fcntl.F_SETFL, flags | os.O_NONBLOCK)
 
             output_win.nodelay(True)
             console_win.nodelay(True)
