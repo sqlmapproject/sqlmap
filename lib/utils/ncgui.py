@@ -91,7 +91,7 @@ class NcursesUI:
     def _draw_header(self):
         """Draw the header bar"""
         height, width = self.stdscr.getmaxyx()
-        header = " sqlmap - Ncurses GUI "
+        header = " sqlmap - Ncurses TUI "
         self.stdscr.attron(curses.color_pair(1) | curses.A_BOLD)
         self.stdscr.addstr(0, 0, header.center(width))
         self.stdscr.attroff(curses.color_pair(1) | curses.A_BOLD)
@@ -750,12 +750,11 @@ class NcursesUI:
                 if option['type'] == 'bool':
                     option['value'] = not option['value']
 
-def runNcGui(parser):
-    """Main entry point for ncurses GUI"""
+def runTui(parser):
+    """Main entry point for ncurses TUI"""
     # Check if ncurses is available
     if curses is None:
-        raise SqlmapMissingDependence("missing 'curses' module (try installing 'windows-curses' on Windows)")
-
+        raise SqlmapMissingDependence("missing 'curses' module (optional Python module). Use a Python build that includes curses/ncurses, or install the platform-provided equivalent (e.g. for Windows: pip install windows-curses)")
     try:
         # Initialize and run
         def main(stdscr):
