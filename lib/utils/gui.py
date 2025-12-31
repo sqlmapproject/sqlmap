@@ -67,7 +67,7 @@ def runGui(parser):
         errMsg = "unable to create GUI window ('%s')" % getSafeExString(ex)
         raise SqlmapSystemException(errMsg)
 
-    window.title(VERSION_STRING)
+    window.title("sqlmap - Tk GUI")
 
     # Set theme and colors
     bg_color = "#f5f5f5"
@@ -251,7 +251,7 @@ def runGui(parser):
     helpmenu.add_command(label="Wiki pages", command=lambda: webbrowser.open(WIKI_PAGE))
     helpmenu.add_command(label="Report issue", command=lambda: webbrowser.open(ISSUES_PAGE))
     helpmenu.add_separator()
-    helpmenu.add_command(label="About", command=lambda: _tkinter_messagebox.showinfo("About", "Copyright (c) 2006-2025\n\n    (%s)" % DEV_EMAIL_ADDRESS))
+    helpmenu.add_command(label="About", command=lambda: _tkinter_messagebox.showinfo("About", "%s\n\n    (%s)" % (VERSION_STRING, DEV_EMAIL_ADDRESS)))
     menubar.add_cascade(label="Help", menu=helpmenu)
 
     window.config(menu=menubar, bg=bg_color)
