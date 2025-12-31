@@ -405,10 +405,13 @@ def getText(value, encoding=None):
 
 def stdoutEncode(value):
     """
-    Returns binary representation of a given Unicode value safe for writing to stdout
+    Returns textual representation of a given value safe for writing to stdout
+    >>> stdoutEncode(b"foobar")
+    'foobar'
     """
 
-    value = value or ""
+    if value is None:
+        value = ""
 
     if IS_WIN and IS_TTY and kb.get("codePage", -1) is None:
         output = shellExec("chcp")
@@ -418,36 +421,32 @@ def stdoutEncode(value):
             try:
                 candidate = "cp%s" % match.group(1)
                 codecs.lookup(candidate)
-            except LookupError:
-                pass
-            else:
                 kb.codePage = candidate
+            except (LookupError, TypeError):
+                pass
 
         kb.codePage = kb.codePage or ""
 
-    if isinstance(value, six.text_type):
-        encoding = kb.get("codePage") or getattr(sys.stdout, "encoding", None) or UNICODE_ENCODING
+    encoding = kb.get("codePage") or getattr(sys.stdout, "encoding", None) or UNICODE_ENCODING
 
-        while True:
-            try:
-                retVal = value.encode(encoding)
-                break
-            except UnicodeEncodeError as ex:
-                value = value[:ex.start] + "?" * (ex.end - ex.start) + value[ex.end:]
+    if six.PY3:
+        if isinstance(value, (bytes, bytearray)):
+            value = getUnicode(value, encoding)
+        elif not isinstance(value, str):
+            value = str(value)
 
-                warnMsg = "cannot properly display (some) Unicode characters "
-                warnMsg += "inside your terminal ('%s') environment. All " % encoding
-                warnMsg += "unhandled occurrences will result in "
-                warnMsg += "replacement with '?' character. Please, find "
-                warnMsg += "proper character representation inside "
-                warnMsg += "corresponding output files"
-                singleTimeWarnMessage(warnMsg)
-
-        if six.PY3:
-            retVal = getUnicode(retVal, encoding)
-
+        try:
+            retVal = value.encode(encoding, errors="replace").decode(encoding, errors="replace")
+        except (LookupError, TypeError):
+            retVal = value.encode("ascii", errors="replace").decode("ascii", errors="replace")
     else:
-        retVal = value
+        if isinstance(value, six.text_type):
+            try:
+                retVal = value.encode(encoding, errors="replace")
+            except (LookupError, TypeError):
+                retVal = value.encode("ascii", errors="replace")
+        else:
+            retVal = value
 
     return retVal
 
