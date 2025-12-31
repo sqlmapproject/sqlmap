@@ -5,6 +5,7 @@ Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
+import codecs
 import ntpath
 import os
 
@@ -18,7 +19,6 @@ from lib.core.common import readInput
 from lib.core.compat import xrange
 from lib.core.convert import encodeBase64
 from lib.core.convert import encodeHex
-from lib.core.convert import rot13
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -334,7 +334,7 @@ class Filesystem(GenericFilesystem):
         Raq Shapgvba"""
 
         # NOTE: https://github.com/sqlmapproject/sqlmap/issues/5581
-        vbs = rot13(vbs)
+        vbs = codecs.decode(vbs, "rot13")
         vbs = vbs.replace("    ", "")
         encodedFileContent = encodeBase64(localFileContent, binary=False)
 

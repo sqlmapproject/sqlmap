@@ -138,29 +138,6 @@ def dejsonize(data):
 
     return json.loads(data)
 
-def rot13(data):
-    """
-    Returns ROT13 encoded/decoded text
-
-    >>> rot13('foobar was here!!')
-    'sbbone jnf urer!!'
-    >>> rot13('sbbone jnf urer!!')
-    'foobar was here!!'
-    >>> rot13(b'foobar was here!!')
-    'sbbone jnf urer!!'
-    """
-
-    retVal = ""
-    alphabit = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
-    if isinstance(data, six.binary_type):
-        data = getText(data)
-
-    for char in data:
-        retVal += alphabit[alphabit.index(char) + 13] if char in alphabit else char
-
-    return retVal
-
 def decodeHex(value, binary=True):
     """
     Returns a decoded representation of the provided hexadecimal value
