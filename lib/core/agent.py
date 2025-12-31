@@ -119,7 +119,10 @@ class Agent(object):
             if place == PLACE.URI:
                 origValue = origValue.split(kb.customInjectionMark)[0]
             else:
-                origValue = filterNone(re.search(_, origValue.split(BOUNDED_INJECTION_MARKER)[0]) for _ in (r"\w+\Z", r"[^\"'><]+\Z", r"[^ ]+\Z"))[0].group(0)
+                try:
+                    origValue = filterNone(re.search(_, origValue.split(BOUNDED_INJECTION_MARKER)[0]) for _ in (r"\w+\Z", r"[^\"'><]+\Z", r"[^ ]+\Z"))[0].group(0)
+                except IndexError:
+                    pass
             origValue = origValue[origValue.rfind('/') + 1:]
             for char in ('?', '=', ':', ',', '&'):
                 if char in origValue:
@@ -883,14 +886,16 @@ class Agent(object):
             query = query[len("TOP %s " % topNum):]
             unionQuery += "TOP %s " % topNum
 
-        intoRegExp = re.search(r"(\s+INTO (DUMP|OUT)FILE\s+'(.+?)')", query, re.I)
+        intoFileRegExp = re.search(r"(\s+INTO (DUMP|OUT)FILE\s+'(.+?)')", query, re.I)
 
-        if intoRegExp:
-            intoRegExp = intoRegExp.group(1)
-            query = query[:query.index(intoRegExp)]
+        if intoFileRegExp:
+            infoFile = intoFileRegExp.group(1)
+            query = query[:query.index(infoFile)]
 
             position = 0
             char = NULL
+        else:
+            infoFile = None
 
         for element in xrange(0, count):
             if element > 0:
@@ -909,8 +914,8 @@ class Agent(object):
         if fromTable and not unionQuery.endswith(fromTable):
             unionQuery += fromTable
 
-        if intoRegExp:
-            unionQuery += intoRegExp
+        if infoFile:
+            unionQuery += infoFile
 
         if multipleUnions:
             unionQuery += " UNION ALL SELECT "
