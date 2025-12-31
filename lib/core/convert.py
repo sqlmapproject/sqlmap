@@ -338,6 +338,8 @@ def getUnicode(value, encoding=None, noneToNull=False):
     True
     >>> getUnicode(None) == 'None'
     True
+    >>> getUnicode(b'/etc/passwd') == '/etc/passwd'
+    True
     """
 
     # Best position for --time-limit mechanism
@@ -354,7 +356,7 @@ def getUnicode(value, encoding=None, noneToNull=False):
         candidates = filterNone((encoding, kb.get("pageEncoding") if kb.get("originalPage") else None, conf.get("encoding"), UNICODE_ENCODING, sys.getfilesystemencoding()))
         if all(_ in value for _ in (b'<', b'>')):
             pass
-        elif any(_ in value for _ in (b":\\", b'/', b'.')) and b'\n' not in value:
+        elif b'\n' not in value and re.search(r"(?i)\w+\.\w{2,3}\Z|\A(\w:\\|/\w+)", six.text_type(value, UNICODE_ENCODING, errors="ignore")):
             candidates = filterNone((encoding, sys.getfilesystemencoding(), kb.get("pageEncoding") if kb.get("originalPage") else None, UNICODE_ENCODING, conf.get("encoding")))
         elif conf.get("encoding") and b'\n' not in value:
             candidates = filterNone((encoding, conf.get("encoding"), kb.get("pageEncoding") if kb.get("originalPage") else None, sys.getfilesystemencoding(), UNICODE_ENCODING))
