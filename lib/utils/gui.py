@@ -67,7 +67,7 @@ def runGui(parser):
         errMsg = "unable to create GUI window ('%s')" % getSafeExString(ex)
         raise SqlmapSystemException(errMsg)
 
-    window.title("sqlmap - Tk GUI")
+    window.title("sqlmap - Tkinter GUI")
 
     # Set theme and colors
     bg_color = "#f5f5f5"

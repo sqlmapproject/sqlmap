@@ -775,6 +775,9 @@ def cmdLineParser(argv=None):
         miscellaneous.add_argument("--disable-hashing", dest="disableHashing", action="store_true",
             help="Disable hash analysis on table dumps")
 
+        miscellaneous.add_argument("--gui", dest="gui", action="store_true",
+            help="Experimental Tkinter GUI")
+
         miscellaneous.add_argument("--list-tampers", dest="listTampers", action="store_true",
             help="Display list of available tamper scripts")
 
@@ -798,6 +801,9 @@ def cmdLineParser(argv=None):
 
         miscellaneous.add_argument("--tmp-dir", dest="tmpDir",
             help="Local directory for storing temporary files")
+
+        miscellaneous.add_argument("--tui", dest="tui", action="store_true",
+            help="Experimental ncurses TUI")
 
         miscellaneous.add_argument("--unstable", dest="unstable", action="store_true",
             help="Adjust options for unstable connections")
@@ -855,12 +861,6 @@ def cmdLineParser(argv=None):
             help=SUPPRESS)
 
         parser.add_argument("--non-interactive", dest="nonInteractive", action="store_true",
-            help=SUPPRESS)
-
-        parser.add_argument("--gui", dest="gui", action="store_true",
-            help=SUPPRESS)
-
-        parser.add_argument("--tui", dest="tui", action="store_true",
             help=SUPPRESS)
 
         parser.add_argument("--smoke-test", dest="smokeTest", action="store_true",

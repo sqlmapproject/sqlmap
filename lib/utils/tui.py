@@ -91,7 +91,7 @@ class NcursesUI:
     def _draw_header(self):
         """Draw the header bar"""
         height, width = self.stdscr.getmaxyx()
-        header = " sqlmap - Ncurses TUI "
+        header = " sqlmap - ncurses TUI "
         self.stdscr.attron(curses.color_pair(1) | curses.A_BOLD)
         self.stdscr.addstr(0, 0, header.center(width))
         self.stdscr.attroff(curses.color_pair(1) | curses.A_BOLD)
