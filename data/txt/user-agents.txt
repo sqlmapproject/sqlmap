@@ -1,4 +1,4 @@
-# Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org)
+# Copyright (c) 2006-2026 sqlmap developers (https://sqlmap.org)
 # See the file 'LICENSE' for copying permission
 
 Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36
