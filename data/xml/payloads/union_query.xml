@@ -1,7 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
+<?xml version="4.0" encoding="UTF-8"?>
 <root>
     <!-- UNION query tests -->
+    
+    <!-- ============= GENERIC TESTS ============= -->
+    
+    <!-- Your existing generic tests (keep as is) -->
     <test>
         <title>Generic UNION query ([CHAR]) - [COLSTART] to [COLSTOP] columns (custom)</title>
         <stype>6</stype>
@@ -59,6 +62,7 @@
         </response>
     </test>
 
+    <!-- 1-10 generic (yours) -->
     <test>
         <title>Generic UNION query ([CHAR]) - 1 to 10 columns</title>
         <stype>6</stype>
@@ -116,6 +120,7 @@
         </response>
     </test>
 
+    <!-- 11-20 generic (yours) -->
     <test>
         <title>Generic UNION query ([CHAR]) - 11 to 20 columns</title>
         <stype>6</stype>
@@ -173,6 +178,7 @@
         </response>
     </test>
 
+    <!-- 21-30 generic (yours) -->
     <test>
         <title>Generic UNION query ([CHAR]) - 21 to 30 columns</title>
         <stype>6</stype>
@@ -230,6 +236,7 @@
         </response>
     </test>
 
+    <!-- 31-40 generic (yours) -->
     <test>
         <title>Generic UNION query ([CHAR]) - 31 to 40 columns</title>
         <stype>6</stype>
@@ -287,6 +294,7 @@
         </response>
     </test>
 
+    <!-- 41-50 generic (yours) -->
     <test>
         <title>Generic UNION query ([CHAR]) - 41 to 50 columns</title>
         <stype>6</stype>
@@ -305,6 +313,7 @@
             <union/>
         </response>
     </test>
+    
     <test>
         <title>Generic UNION query (NULL) - 41 to 50 columns</title>
         <stype>6</stype>
@@ -343,6 +352,9 @@
         </response>
     </test>
 
+    <!-- ============= MYSQL TESTS ============= -->
+    
+    <!-- MySQL custom (yours) -->
     <test>
         <title>MySQL UNION query ([CHAR]) - [COLSTART] to [COLSTOP] columns (custom)</title>
         <stype>6</stype>
@@ -409,6 +421,7 @@
         </details>
     </test>
 
+    <!-- MySQL 1-10 (yours) -->
     <test>
         <title>MySQL UNION query ([CHAR]) - 1 to 10 columns</title>
         <stype>6</stype>
@@ -475,6 +488,7 @@
         </details>
     </test>
 
+    <!-- MySQL 11-20 (yours) -->
     <test>
         <title>MySQL UNION query ([CHAR]) - 11 to 20 columns</title>
         <stype>6</stype>
@@ -541,6 +555,7 @@
         </details>
     </test>
 
+    <!-- MySQL 21-30 (yours) -->
     <test>
         <title>MySQL UNION query ([CHAR]) - 21 to 30 columns</title>
         <stype>6</stype>
@@ -607,6 +622,7 @@
         </details>
     </test>
 
+    <!-- MySQL 31-40 (yours) -->
     <test>
         <title>MySQL UNION query ([CHAR]) - 31 to 40 columns</title>
         <stype>6</stype>
@@ -673,6 +689,7 @@
         </details>
     </test>
 
+    <!-- MySQL 41-50 (yours) -->
     <test>
         <title>MySQL UNION query ([CHAR]) - 41 to 50 columns</title>
         <stype>6</stype>
@@ -738,5 +755,473 @@
             <dbms>MySQL</dbms>
         </details>
     </test>
+
+    <!-- ============= POSTGRESQL TESTS ============= -->
+    
+    <!-- PostgreSQL custom -->
+    <test>
+        <title>PostgreSQL UNION query ([CHAR]) - [COLSTART] to [COLSTOP] columns (custom)</title>
+        <stype>6</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>--</comment>
+            <char>[CHAR]</char>
+            <columns>[COLSTART]-[COLSTOP]</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL UNION query (NULL) - [COLSTART] to [COLSTOP] columns (custom)</title>
+        <stype>6</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>--</comment>
+            <char>NULL</char>
+            <columns>[COLSTART]-[COLSTOP]</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL UNION query ([RANDNUM]) - [COLSTART] to [COLSTOP] columns (custom)</title>
+        <stype>6</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>--</comment>
+            <char>[RANDNUM]</char>
+            <columns>[COLSTART]-[COLSTOP]</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
+    <!-- PostgreSQL 1-10 -->
+    <test>
+        <title>PostgreSQL UNION query ([CHAR]) - 1 to 10 columns</title>
+        <stype>6</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>--</comment>
+            <char>[CHAR]</char>
+            <columns>1-10</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL UNION query (NULL) - 1 to 10 columns</title>
+        <stype>6</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>--</comment>
+            <char>NULL</char>
+            <columns>1-10</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL UNION query ([RANDNUM]) - 1 to 10 columns</title>
+        <stype>6</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>--</comment>
+            <char>[RANDNUM]</char>
+            <columns>1-10</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
+    <!-- PostgreSQL 11-20 -->
+    <test>
+        <title>PostgreSQL UNION query ([CHAR]) - 11 to 20 columns</title>
+        <stype>6</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>--</comment>
+            <char>[CHAR]</char>
+            <columns>11-20</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>PostgreSQL UNION query (NULL) - 11 to 20 columns</title>
+        <stype>6</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>--</comment>
+            <char>NULL</char>
+            <columns>11-20</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+        <details>
+            <dbms>PostgreSQL</dbms>
+        </details>
+    </test>
+
+    <!-- ============= MSSQL TESTS ============= -->
+    
+    <!-- MSSQL custom -->
+    <test>
+        <title>Microsoft SQL Server UNION query ([CHAR]) - [COLSTART] to [COLSTOP] columns (custom)</title>
+        <stype>6</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>--</comment>
+            <char>[CHAR]</char>
+            <columns>[COLSTART]-[COLSTOP]</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server UNION query (NULL) - [COLSTART] to [COLSTOP] columns (custom)</title>
+        <stype>6</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>--</comment>
+            <char>NULL</char>
+            <columns>[COLSTART]-[COLSTOP]</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+        </details>
+    </test>
+
+    <!-- MSSQL 1-10 -->
+    <test>
+        <title>Microsoft SQL Server UNION query ([CHAR]) - 1 to 10 columns</title>
+        <stype>6</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>--</comment>
+            <char>[CHAR]</char>
+            <columns>1-10</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server UNION query (NULL) - 1 to 10 columns</title>
+        <stype>6</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>--</comment>
+            <char>NULL</char>
+            <columns>1-10</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+        </details>
+    </test>
+
+    <!-- ============= ORACLE TESTS ============= -->
+    
+    <!-- Oracle custom -->
+    <test>
+        <title>Oracle UNION query ([CHAR]) - [COLSTART] to [COLSTOP] columns (custom)</title>
+        <stype>6</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>--</comment>
+            <char>[CHAR]</char>
+            <columns>[COLSTART]-[COLSTOP]</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <!-- Oracle 1-10 -->
+    <test>
+        <title>Oracle UNION query (NULL) - 1 to 10 columns</title>
+        <stype>6</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>--</comment>
+            <char>NULL</char>
+            <columns>1-10</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
+    <!-- ============= ADVANCED TECHNIQUES ============= -->
+    
+    <!-- UNION ALL variations -->
+    <test>
+        <title>Generic UNION ALL query ([CHAR]) - 1 to 10 columns</title>
+        <stype>6</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION ALL]</vector>
+        <request>
+            <payload/>
+            <comment>[GENERIC_SQL_COMMENT]</comment>
+            <char>[CHAR]</char>
+            <columns>1-10</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+    </test>
+
+    <!-- WAF bypass: inline comments -->
+    <test>
+        <title>MySQL inline comment UNION ([CHAR]) - 1 to 10 columns</title>
+        <stype>6</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>/*!50000UNION*/ /*!50000SELECT*/</vector>
+        <request>
+            <payload/>
+            <comment>#</comment>
+            <char>[CHAR]</char>
+            <columns>1-10</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+        </details>
+    </test>
+
+    <!-- WAF bypass: whitespace variations -->
+    <test>
+        <title>Generic UNION with whitespace obfuscation ([CHAR]) - 1 to 10 columns</title>
+        <stype>6</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>%0aUNION%0aSELECT%0a</vector>
+        <request>
+            <payload/>
+            <comment>[GENERIC_SQL_COMMENT]</comment>
+            <char>[CHAR]</char>
+            <columns>1-10</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+    </test>
+
+    <!-- Stacked queries -->
+    <test>
+        <title>Stacked query UNION attempt ([CHAR]) - 1 to 10 columns</title>
+        <stype>6</stype>
+        <level>4</level>
+        <risk>2</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>;[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>[GENERIC_SQL_COMMENT]</comment>
+            <char>[CHAR]</char>
+            <columns>1-10</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+    </test>
+
+    <!-- HEX encoding -->
+    <test>
+        <title>HEX encoded UNION query (0x[HEX]) - 1 to 10 columns</title>
+        <stype>6</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>[GENERIC_SQL_COMMENT]</comment>
+            <char>0x[HEX]</char>
+            <columns>1-10</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+    </test>
+
+    <!-- Extended column ranges -->
+    <test>
+        <title>Generic UNION query ([CHAR]) - 51 to 60 columns</title>
+        <stype>6</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>[GENERIC_SQL_COMMENT]</comment>
+            <char>[CHAR]</char>
+            <columns>51-60</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+    </test>
+
+    <test>
+        <title>Generic UNION query (NULL) - 51 to 60 columns</title>
+        <stype>6</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3,4,5</clause>
+        <where>1</where>
+        <vector>[UNION]</vector>
+        <request>
+            <payload/>
+            <comment>[GENERIC_SQL_COMMENT]</comment>
+            <char>NULL</char>
+            <columns>51-60</columns>
+        </request>
+        <response>
+            <union/>
+        </response>
+    </test>
+
+    <!-- ============= END ============= -->
+    
     <!-- End of UNION query tests -->
 </root>
