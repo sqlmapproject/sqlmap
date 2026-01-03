@@ -163,7 +163,7 @@ def update():
             infoMsg += "to use a GitHub for Windows client for updating "
             infoMsg += "purposes (https://desktop.github.com/) or just "
             infoMsg += "download the latest snapshot from "
-            infoMsg += "https://github.com/sqlmapproject/sqlmap/downloads"
+            infoMsg += "https://github.com/sqlmapproject/sqlmap/releases"
         else:
             infoMsg = "for Linux platform it's recommended "
             infoMsg += "to install a standard 'git' package (e.g.: 'apt install git')"
