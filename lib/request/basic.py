@@ -258,7 +258,7 @@ def getHeuristicCharEncoding(page):
     'ascii'
     """
 
-    key = hash(page)
+    key = (len(page), hash(page))
     retVal = kb.cache.encoding[key] if key in kb.cache.encoding else detect(page[:HEURISTIC_PAGE_SIZE_THRESHOLD])["encoding"]
     kb.cache.encoding[key] = retVal
 
