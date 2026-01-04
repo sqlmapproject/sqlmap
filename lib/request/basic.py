@@ -10,7 +10,6 @@ import gzip
 import io
 import logging
 import re
-import struct
 import zlib
 
 from lib.core.common import Backend
@@ -291,14 +290,16 @@ def decodePage(page, contentEncoding, contentType, percentDecode=True):
 
         try:
             if contentEncoding == "deflate":
-                data = io.BytesIO(zlib.decompress(page, -15))  # Reference: http://stackoverflow.com/questions/1089662/python-inflate-and-deflate-implementations
+                obj = zlib.decompressobj(-15)
+                page = obj.decompress(page, MAX_CONNECTION_TOTAL_SIZE + 1)
+                page += obj.flush()
+                if len(page) > MAX_CONNECTION_TOTAL_SIZE:
+                    raise Exception("size too large")
             else:
                 data = gzip.GzipFile("", "rb", 9, io.BytesIO(page))
-                size = struct.unpack("<l", page[-4:])[0]  # Reference: http://pydoc.org/get.cgi/usr/local/lib/python2.5/gzip.py
-                if size > MAX_CONNECTION_TOTAL_SIZE:
+                page = data.read(MAX_CONNECTION_TOTAL_SIZE + 1)
+                if len(page) > MAX_CONNECTION_TOTAL_SIZE:
                     raise Exception("size too large")
-
-            page = data.read()
         except Exception as ex:
             if b"<html" not in page:  # in some cases, invalid "Content-Encoding" appears for plain HTML (should be ignored)
                 errMsg = "detected invalid data for declared content "
