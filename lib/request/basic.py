@@ -281,8 +281,8 @@ def decodePage(page, contentEncoding, contentType, percentDecode=True):
     if not page or (conf.nullConnection and len(page) < 2):
         return getUnicode(page)
 
-    contentEncoding = contentEncoding.lower() if hasattr(contentEncoding, "lower") else ""
-    contentType = contentType.lower() if hasattr(contentType, "lower") else ""
+    contentEncoding = getText(contentEncoding).lower() if contentEncoding else ""
+    contentType = getText(contentType).lower() if contentType else ""
 
     if contentEncoding in ("gzip", "x-gzip", "deflate"):
         if not kb.pageCompress:
