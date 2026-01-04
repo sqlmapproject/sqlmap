@@ -65,6 +65,7 @@ class HTTPSConnection(_http_client.HTTPSConnection):
         #               https://www.mnot.net/blog/2014/12/27/python_2_and_tls_sni
         if hasattr(ssl, "SSLContext"):
             for protocol in (_ for _ in _protocols if _ >= ssl.PROTOCOL_TLSv1):
+                sock = None
                 try:
                     sock = create_sock()
                     if protocol not in _contexts:
@@ -94,6 +95,8 @@ class HTTPSConnection(_http_client.HTTPSConnection):
                         sock.close()
                 except (ssl.SSLError, socket.error, _http_client.BadStatusLine, AttributeError) as ex:
                     self._tunnel_host = None
+                    if sock:
+                        sock.close()
                     logger.debug("SSL connection error occurred for '%s' ('%s')" % (_lut[protocol], getSafeExString(ex)))
 
         elif hasattr(ssl, "wrap_socket"):
