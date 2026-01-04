@@ -295,7 +295,11 @@ def getBytes(value, encoding=None, errors="strict", unsafe=True):
     except (LookupError, TypeError):
         encoding = UNICODE_ENCODING
 
-    if isinstance(value, six.text_type):
+    if isinstance(value, bytearray):
+        return bytes(value)
+    elif isinstance(value, memoryview):
+        return value.tobytes()
+    elif isinstance(value, six.text_type):
         if INVALID_UNICODE_PRIVATE_AREA:
             if unsafe:
                 for char in xrange(0xF0000, 0xF00FF + 1):

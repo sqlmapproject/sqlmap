@@ -75,7 +75,7 @@ class Popen(subprocess.Popen):
     def recv_err(self, maxsize=None):
         return self._recv('stderr', maxsize)
 
-    def send_recv(self, input='', maxsize=None):
+    def send_recv(self, input=b'', maxsize=None):
         return self.send(input), self.recv(maxsize), self.recv_err(maxsize)
 
     def get_conn_maxsize(self, which, maxsize):
@@ -97,7 +97,7 @@ class Popen(subprocess.Popen):
             try:
                 x = msvcrt.get_osfhandle(self.stdin.fileno())
                 (_, written) = WriteFile(x, input)
-            except ValueError:
+            except (ValueError, NameError):
                 return self._close('stdin')
             except Exception as ex:
                 if getattr(ex, "args", None) and ex.args[0] in (109, errno.ESHUTDOWN):
@@ -187,7 +187,7 @@ def recv_some(p, t=.1, e=1, tr=5, stderr=0):
             y.append(r)
         else:
             time.sleep(max((x - time.time()) / tr, 0))
-    return b''.join(y)
+    return b''.join(getBytes(i) for i in y)
 
 def send_all(p, data):
     if not data:
