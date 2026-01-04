@@ -101,7 +101,7 @@ def dirtyPatches():
 
     # Reference: https://github.com/sqlmapproject/sqlmap/issues/5929
     try:
-        global collections
+        import collections
         if not hasattr(collections, "MutableSet"):
             import collections.abc
             collections.MutableSet = collections.abc.MutableSet
@@ -139,7 +139,7 @@ def dirtyPatches():
     # Installing "reversible" unicode (decoding) error handler
     def _reversible(ex):
         if INVALID_UNICODE_PRIVATE_AREA:
-            return (u"".join(_unichr(int('000f00%2x' % (_ if isinstance(_, int) else ord(_)), 16)) for _ in ex.object[ex.start:ex.end]), ex.end)
+            return (u"".join(_unichr(int('000f00%02x' % (_ if isinstance(_, int) else ord(_)), 16)) for _ in ex.object[ex.start:ex.end]), ex.end)
         else:
             return (u"".join(INVALID_UNICODE_CHAR_FORMAT % (_ if isinstance(_, int) else ord(_)) for _ in ex.object[ex.start:ex.end]), ex.end)
 
