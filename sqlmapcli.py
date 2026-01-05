@@ -119,16 +119,18 @@ class SQLMapCLI:
         if "sqlmap identified the following injection point" in output:
             # Extract injection details
             lines = output.split('\n')
-            param = None  # Initialize to avoid undefined reference
+            current_param = 'Unknown'  # Default parameter name
+            
             for i, line in enumerate(lines):
                 if "Parameter:" in line:
-                    param = line.split("Parameter:")[1].strip()
-                if "Type:" in line:
+                    current_param = line.split("Parameter:")[1].strip()
+                elif "Type:" in line:
                     vuln_type = line.split("Type:")[1].strip()
+                    # Check if next line contains the title
                     if i + 1 < len(lines) and "Title:" in lines[i + 1]:
                         title = lines[i + 1].split("Title:")[1].strip()
                         vulns.append({
-                            'parameter': param if param is not None else 'Unknown',
+                            'parameter': current_param,
                             'type': vuln_type,
                             'title': title
                         })
