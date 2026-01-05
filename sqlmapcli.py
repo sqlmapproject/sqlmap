@@ -329,8 +329,18 @@ class SQLMapCLI:
         
         url = Prompt.ask("\n[cyan]Enter target URL[/cyan]")
         
+        # Ask if this is a POST request
+        has_data = Confirm.ask("[cyan]Does this request require POST data/body?[/cyan]", default=False)
+        
+        data = None
+        if has_data:
+            self.console.print("\n[dim]Examples:[/dim]")
+            self.console.print("[dim]  JSON: {\"email\":\"test@example.com\",\"password\":\"pass123\"}[/dim]")
+            self.console.print("[dim]  Form: username=admin&password=secret[/dim]")
+            data = Prompt.ask("\n[cyan]Enter POST data/body[/cyan]")
+        
         scan_type = Prompt.ask(
-            "[cyan]Select scan type[/cyan]",
+            "\n[cyan]Select scan type[/cyan]",
             choices=["quick", "comprehensive"],
             default="quick"
         )
@@ -338,11 +348,11 @@ class SQLMapCLI:
         if scan_type == "quick":
             level = int(Prompt.ask("[cyan]Test level (1-5)[/cyan]", default="1"))
             risk = int(Prompt.ask("[cyan]Test risk (1-3)[/cyan]", default="1"))
-            self.quick_scan(url, level, risk)
+            self.quick_scan(url, level, risk, data=data)
         else:
             max_level = int(Prompt.ask("[cyan]Maximum test level (1-5)[/cyan]", default="5"))
             max_risk = int(Prompt.ask("[cyan]Maximum test risk (1-3)[/cyan]", default="3"))
-            self.comprehensive_scan(url, max_level, max_risk)
+            self.comprehensive_scan(url, max_level, max_risk, data=data)
 
 
 def main():

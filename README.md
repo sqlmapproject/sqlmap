@@ -57,13 +57,14 @@ python sqlmapcli.py -u "https://demo.owasp-juice.shop/rest/products/search?q=tes
 ```bash
 python sqlmapcli.py --interactive
 ```
+*Interactive mode now prompts for POST data/body, supporting both JSON and form data.*
 
 #### Features
 
 ✨ **Beautiful output** with Rich library - panels, tables, progress bars  
 ⚡ **One-line comprehensive testing** - test all risk/level combinations automatically  
 📊 **Clear result summaries** - vulnerability tables with color-coded findings  
-🎯 **Interactive mode** - guided prompts for easy testing  
+🎯 **Interactive mode** - guided prompts for easy testing, including POST data support  
 ⏱️ **Progress tracking** - see exactly what's being tested in real-time  
 
 #### CLI Options

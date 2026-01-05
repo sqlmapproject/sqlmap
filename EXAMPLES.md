@@ -45,6 +45,8 @@ python sqlmapcli.py --interactive
 
 This will ask you:
 - Target URL
+- Whether the request requires POST data/body
+- POST data/body (if needed) - supports JSON or form data
 - Scan type (quick or comprehensive)
 - Custom level and risk settings
 
