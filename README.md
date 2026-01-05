@@ -40,17 +40,17 @@ pip install -r requirements.txt
 
 **Quick scan** (default settings):
 ```bash
-python sqlmapcli.py -u "http://example.com/page?id=1"
+python sqlmapcli.py -u "https://demo.owasp-juice.shop/rest/products/search?q=test"
 ```
 
 **Comprehensive scan** (tests all risk and level combinations):
 ```bash
-python sqlmapcli.py -u "http://example.com/page?id=1" --comprehensive
+python sqlmapcli.py -u "https://demo.owasp-juice.shop/rest/products/search?q=test" --comprehensive
 ```
 
 **Custom level and risk**:
 ```bash
-python sqlmapcli.py -u "http://example.com/page?id=1" --level 3 --risk 2
+python sqlmapcli.py -u "https://demo.owasp-juice.shop/rest/products/search?q=test" --level 3 --risk 2
 ```
 
 **Interactive mode**:

@@ -13,14 +13,14 @@ pip install -r requirements.txt
 Test a single URL with minimal risk:
 
 ```bash
-python sqlmapcli.py -u "http://example.com/page?id=1"
+python sqlmapcli.py -u "https://demo.owasp-juice.shop/rest/products/search?q=test"
 ```
 
 ### 2. Comprehensive Scan
 Test all combinations of risk (1-3) and levels (1-5) automatically:
 
 ```bash
-python sqlmapcli.py -u "http://example.com/page?id=1" --comprehensive
+python sqlmapcli.py -u "https://demo.owasp-juice.shop/rest/products/search?q=test" --comprehensive
 ```
 
 This runs **15 tests total** (5 levels × 3 risks) and provides a complete vulnerability assessment.
@@ -30,10 +30,10 @@ Run a specific test configuration:
 
 ```bash
 # Medium level, medium risk
-python sqlmapcli.py -u "http://example.com/page?id=1" --level 3 --risk 2
+python sqlmapcli.py -u "https://demo.owasp-juice.shop/rest/products/search?q=test" --level 3 --risk 2
 
 # High level, high risk
-python sqlmapcli.py -u "http://example.com/page?id=1" --level 5 --risk 3
+python sqlmapcli.py -u "https://demo.owasp-juice.shop/rest/products/search?q=test" --level 5 --risk 3
 ```
 
 ### 4. Interactive Mode
@@ -53,8 +53,25 @@ Limit the comprehensive scan to specific max values:
 
 ```bash
 # Test only up to level 3 and risk 2
-python sqlmapcli.py -u "http://example.com/page?id=1" --comprehensive --max-level 3 --max-risk 2
+python sqlmapcli.py -u "https://demo.owasp-juice.shop/rest/products/search?q=test" --comprehensive --max-level 3 --max-risk 2
 ```
+
+## Real-World Testing Example
+
+**Using OWASP Juice Shop Demo** (a legitimate vulnerable application for security testing):
+
+```bash
+# Quick scan on OWASP Juice Shop REST API with GET parameter
+python sqlmapcli.py -u "https://demo.owasp-juice.shop/rest/products/search?q=test" --level 2 --risk 2
+
+# Test login endpoint with POST data (JSON)
+python sqlmapcli.py -u "https://demo.owasp-juice.shop/rest/user/login" --data='{"email":"test@example.com","password":"password123"}' --level 2 --risk 2
+
+# Comprehensive scan on login endpoint
+python sqlmapcli.py -u "https://demo.owasp-juice.shop/rest/user/login" --data='{"email":"test@example.com","password":"password123"}' --comprehensive
+```
+
+This is a real, legitimate target designed for security testing and learning.
 
 ## Understanding Levels and Risks
 
@@ -128,12 +145,16 @@ python sqlmapcli.py -u "http://example.com/page?id=1" --comprehensive --max-leve
 3. **Adjust timeout if needed**: Some tests may take longer on slow networks
 4. **Legal use only**: Only test targets you have explicit permission to test
 
-## Demo
+## Testing Resources
 
-To see a demonstration of the UI without running actual tests:
+**⚠️ IMPORTANT**: Only test websites you own or have explicit written permission to test.
 
-```bash
-python demo.py
-```
+For learning and practice, you can use legitimate SQL injection testing websites designed for security education:
 
-This shows example output with simulated results.
+- **DVWA** (Damn Vulnerable Web Application) - Set up locally
+- **WebGoat** - OWASP's deliberately insecure application
+- **bWAPP** - Buggy Web Application for practicing
+- **OWASP Juice Shop** - Modern vulnerable web application
+- **Local test environments** - Set up your own vulnerable applications
+
+Always ensure you have permission before testing any website. Unauthorized testing is illegal.

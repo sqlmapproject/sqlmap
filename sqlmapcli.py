@@ -80,7 +80,7 @@ class SQLMapCLI:
         self.console.print()
     
     def run_sqlmap_test(self, url: str, level: int, risk: int, technique: str = "BEUSTQ", 
-                        batch: bool = True, extra_args: List[str] = None) -> Tuple[bool, str]:
+                        batch: bool = True, data: str = None, extra_args: List[str] = None) -> Tuple[bool, str]:
         """Run sqlmap with specified parameters"""
         cmd = [
             sys.executable,
@@ -94,6 +94,9 @@ class SQLMapCLI:
         
         if batch:
             cmd.append("--batch")
+        
+        if data:
+            cmd.extend(["--data", data, "--method", "POST"])
         
         if extra_args:
             cmd.extend(extra_args)
@@ -150,7 +153,7 @@ class SQLMapCLI:
         }
     
     def comprehensive_scan(self, url: str, max_level: int = 5, max_risk: int = 3, 
-                          techniques: str = "BEUSTQ"):
+                          techniques: str = "BEUSTQ", data: str = None):
         """Run comprehensive scan with all levels and risks"""
         self.results['target'] = url
         self.results['start_time'] = datetime.now()
@@ -188,7 +191,7 @@ class SQLMapCLI:
                         description=f"[cyan]Testing Level {level}, Risk {risk}..."
                     )
                     
-                    success, output = self.run_sqlmap_test(url, level, risk, techniques)
+                    success, output = self.run_sqlmap_test(url, level, risk, techniques, data=data)
                     parsed = self.parse_results(output)
                     
                     status = "✓" if success else "✗"
@@ -217,14 +220,18 @@ class SQLMapCLI:
         self.console.print(results_table)
         self.display_summary()
     
-    def quick_scan(self, url: str, level: int = 1, risk: int = 1):
+    def quick_scan(self, url: str, level: int = 1, risk: int = 1, data: str = None):
         """Run a quick scan with default settings"""
         self.results['target'] = url
         self.results['start_time'] = datetime.now()
         
+        scan_info = f"[cyan]Running quick scan on:[/cyan]\n[yellow]{url}[/yellow]\n[dim]Level: {level}, Risk: {risk}[/dim]"
+        if data:
+            scan_info += f"\n[dim]POST Data: {data}[/dim]"
+        
         self.console.print(
             Panel(
-                f"[cyan]Running quick scan on:[/cyan]\n[yellow]{url}[/yellow]\n[dim]Level: {level}, Risk: {risk}[/dim]",
+                scan_info,
                 border_style="cyan",
                 box=box.ROUNDED
             )
@@ -238,7 +245,7 @@ class SQLMapCLI:
         ) as progress:
             
             task = progress.add_task("[cyan]Scanning for vulnerabilities...", total=None)
-            success, output = self.run_sqlmap_test(url, level, risk)
+            success, output = self.run_sqlmap_test(url, level, risk, data=data)
             progress.update(task, completed=True)
         
         parsed = self.parse_results(output)
@@ -334,14 +341,17 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Quick scan with default settings
-  python sqlmapcli.py -u "http://example.com/page?id=1"
+  # Quick scan with default settings (GET parameter)
+  python sqlmapcli.py -u "https://demo.owasp-juice.shop/rest/products/search?q=test"
+  
+  # Test with POST data (JSON)
+  python sqlmapcli.py -u "https://demo.owasp-juice.shop/rest/user/login" --data='{"email":"test@example.com","password":"pass123"}'
   
   # Comprehensive scan (all risk and level combinations)
-  python sqlmapcli.py -u "http://example.com/page?id=1" --comprehensive
+  python sqlmapcli.py -u "https://demo.owasp-juice.shop/rest/products/search?q=test" --comprehensive
   
-  # Custom level and risk
-  python sqlmapcli.py -u "http://example.com/page?id=1" --level 3 --risk 2
+  # Custom level and risk with POST data
+  python sqlmapcli.py -u "https://demo.owasp-juice.shop/rest/user/login" --data='{"email":"test@example.com","password":"pass123"}' --level 3 --risk 2
   
   # Interactive mode
   python sqlmapcli.py --interactive
@@ -399,6 +409,12 @@ Examples:
     )
     
     parser.add_argument(
+        '--data',
+        type=str,
+        help='Data string to be sent through POST (e.g., "username=test&password=test")'
+    )
+    
+    parser.add_argument(
         '-i', '--interactive',
         action='store_true',
         help='Run in interactive mode'
@@ -435,10 +451,11 @@ Examples:
             args.url, 
             max_level=args.max_level,
             max_risk=args.max_risk,
-            techniques=args.technique
+            techniques=args.technique,
+            data=args.data
         )
     else:
-        cli.quick_scan(args.url, level=args.level, risk=args.risk)
+        cli.quick_scan(args.url, level=args.level, risk=args.risk, data=args.data)
 
 
 if __name__ == "__main__":
