@@ -76,8 +76,13 @@ python sqlmapcli.py --interactive
 --max-level {1-5}     Maximum level for comprehensive scan
 --max-risk {1-3}      Maximum risk for comprehensive scan
 --technique           SQL injection techniques (default: BEUSTQ)
+--data                POST data string (JSON or form data)
+--raw                 Show raw sqlmap output (bypasses formatting)
+--verbose {0-6}       Sqlmap verbosity level (default: 1)
 -i, --interactive     Interactive mode
 ```
+
+**Note**: Use `--raw` flag to see the exact same output as running sqlmap directly. This ensures you get all details that sqlmap provides without any formatting or parsing.
 
 ---
 

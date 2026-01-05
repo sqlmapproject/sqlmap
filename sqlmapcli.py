@@ -80,7 +80,8 @@ class SQLMapCLI:
         self.console.print()
     
     def run_sqlmap_test(self, url: str, level: int, risk: int, technique: str = "BEUSTQ", 
-                        batch: bool = True, data: str = None, extra_args: List[str] = None) -> Tuple[bool, str]:
+                        batch: bool = True, data: str = None, verbose: int = 1, 
+                        extra_args: List[str] = None) -> Tuple[bool, str]:
         """Run sqlmap with specified parameters"""
         cmd = [
             sys.executable,
@@ -89,7 +90,7 @@ class SQLMapCLI:
             f"--level={level}",
             f"--risk={risk}",
             f"--technique={technique}",
-            "-v", "1"
+            "-v", str(verbose)
         ]
         
         if batch:
@@ -153,7 +154,7 @@ class SQLMapCLI:
         }
     
     def comprehensive_scan(self, url: str, max_level: int = 5, max_risk: int = 3, 
-                          techniques: str = "BEUSTQ", data: str = None):
+                          techniques: str = "BEUSTQ", data: str = None, verbose: int = 1):
         """Run comprehensive scan with all levels and risks"""
         self.results['target'] = url
         self.results['start_time'] = datetime.now()
@@ -191,7 +192,7 @@ class SQLMapCLI:
                         description=f"[cyan]Testing Level {level}, Risk {risk}..."
                     )
                     
-                    success, output = self.run_sqlmap_test(url, level, risk, techniques, data=data)
+                    success, output = self.run_sqlmap_test(url, level, risk, techniques, data=data, verbose=verbose)
                     parsed = self.parse_results(output)
                     
                     status = "✓" if success else "✗"
@@ -220,22 +221,31 @@ class SQLMapCLI:
         self.console.print(results_table)
         self.display_summary()
     
-    def quick_scan(self, url: str, level: int = 1, risk: int = 1, data: str = None):
+    def quick_scan(self, url: str, level: int = 1, risk: int = 1, data: str = None, 
+                   raw: bool = False, verbose: int = 1):
         """Run a quick scan with default settings"""
         self.results['target'] = url
         self.results['start_time'] = datetime.now()
         
-        scan_info = f"[cyan]Running quick scan on:[/cyan]\n[yellow]{url}[/yellow]\n[dim]Level: {level}, Risk: {risk}[/dim]"
-        if data:
-            scan_info += f"\n[dim]POST Data: {data}[/dim]"
-        
-        self.console.print(
-            Panel(
-                scan_info,
-                border_style="cyan",
-                box=box.ROUNDED
+        if not raw:
+            scan_info = f"[cyan]Running quick scan on:[/cyan]\n[yellow]{url}[/yellow]\n[dim]Level: {level}, Risk: {risk}[/dim]"
+            if data:
+                scan_info += f"\n[dim]POST Data: {data}[/dim]"
+            
+            self.console.print(
+                Panel(
+                    scan_info,
+                    border_style="cyan",
+                    box=box.ROUNDED
+                )
             )
-        )
+        
+        if raw:
+            # Raw mode - just show sqlmap output directly
+            self.console.print("[cyan]Running sqlmap...[/cyan]\n")
+            success, output = self.run_sqlmap_test(url, level, risk, data=data, verbose=verbose)
+            self.console.print(output)
+            return
         
         with Progress(
             SpinnerColumn(),
@@ -245,7 +255,7 @@ class SQLMapCLI:
         ) as progress:
             
             task = progress.add_task("[cyan]Scanning for vulnerabilities...", total=None)
-            success, output = self.run_sqlmap_test(url, level, risk, data=data)
+            success, output = self.run_sqlmap_test(url, level, risk, data=data, verbose=verbose)
             progress.update(task, completed=True)
         
         parsed = self.parse_results(output)
@@ -415,6 +425,19 @@ Examples:
     )
     
     parser.add_argument(
+        '--raw',
+        action='store_true',
+        help='Show raw sqlmap output without formatting'
+    )
+    
+    parser.add_argument(
+        '--verbose',
+        type=int,
+        choices=[0, 1, 2, 3, 4, 5, 6],
+        help='Sqlmap verbosity level (0-6, default: 1)'
+    )
+    
+    parser.add_argument(
         '-i', '--interactive',
         action='store_true',
         help='Run in interactive mode'
@@ -446,16 +469,26 @@ Examples:
         sys.exit(1)
     
     # Run appropriate scan
+    verbose_level = args.verbose if args.verbose is not None else 1
+    
     if args.comprehensive:
         cli.comprehensive_scan(
             args.url, 
             max_level=args.max_level,
             max_risk=args.max_risk,
             techniques=args.technique,
-            data=args.data
+            data=args.data,
+            verbose=verbose_level
         )
     else:
-        cli.quick_scan(args.url, level=args.level, risk=args.risk, data=args.data)
+        cli.quick_scan(
+            args.url, 
+            level=args.level, 
+            risk=args.risk, 
+            data=args.data,
+            raw=args.raw,
+            verbose=verbose_level
+        )
 
 
 if __name__ == "__main__":

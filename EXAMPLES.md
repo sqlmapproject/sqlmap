@@ -56,6 +56,19 @@ Limit the comprehensive scan to specific max values:
 python sqlmapcli.py -u "https://demo.owasp-juice.shop/rest/products/search?q=test" --comprehensive --max-level 3 --max-risk 2
 ```
 
+### 6. Raw Output Mode
+Get the exact same output as running sqlmap directly:
+
+```bash
+# Show raw sqlmap output without formatting
+python sqlmapcli.py -u "https://demo.owasp-juice.shop/rest/user/login" --data='{"email":"test@example.com","password":"pass123"}' --level 2 --risk 2 --raw
+
+# Increase verbosity for more details
+python sqlmapcli.py -u "https://demo.owasp-juice.shop/rest/user/login" --data='{"email":"test@example.com","password":"pass123"}' --verbose 3 --raw
+```
+
+**Note**: The `--raw` flag ensures the CLI output matches sqlmap exactly, bypassing all formatting and parsing.
+
 ## Real-World Testing Example
 
 **Using OWASP Juice Shop Demo** (a legitimate vulnerable application for security testing):
