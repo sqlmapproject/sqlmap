@@ -25,6 +25,64 @@ sqlmap works out of the box with [Python](https://www.python.org/download/) vers
 Usage
 ----
 
+### SQLMap CLI - Beautiful Automated Testing 🎨
+
+**NEW**: We now have a beautiful CLI wrapper that automates comprehensive SQL injection testing in a single command!
+
+#### Quick Start
+
+Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+#### Examples
+
+**Quick scan** (default settings):
+```bash
+python sqlmapcli.py -u "http://example.com/page?id=1"
+```
+
+**Comprehensive scan** (tests all risk and level combinations):
+```bash
+python sqlmapcli.py -u "http://example.com/page?id=1" --comprehensive
+```
+
+**Custom level and risk**:
+```bash
+python sqlmapcli.py -u "http://example.com/page?id=1" --level 3 --risk 2
+```
+
+**Interactive mode**:
+```bash
+python sqlmapcli.py --interactive
+```
+
+#### Features
+
+✨ **Beautiful output** with Rich library - panels, tables, progress bars  
+⚡ **One-line comprehensive testing** - test all risk/level combinations automatically  
+📊 **Clear result summaries** - vulnerability tables with color-coded findings  
+🎯 **Interactive mode** - guided prompts for easy testing  
+⏱️ **Progress tracking** - see exactly what's being tested in real-time  
+
+#### CLI Options
+
+```
+-u, --url              Target URL
+--comprehensive        Run all risk/level combinations (1-3 risk, 1-5 levels)
+--level {1-5}         Test level (default: 1)
+--risk {1-3}          Test risk (default: 1)
+--max-level {1-5}     Maximum level for comprehensive scan
+--max-risk {1-3}      Maximum risk for comprehensive scan
+--technique           SQL injection techniques (default: BEUSTQ)
+-i, --interactive     Interactive mode
+```
+
+---
+
+### Original SQLMap Usage
+
 To get a list of basic options and switches use:
 
     python sqlmap.py -h
