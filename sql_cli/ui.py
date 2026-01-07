@@ -7,6 +7,7 @@ from .models import ScanResult
 
 console = Console()
 
+
 def print_banner():
     """Display a beautiful banner"""
     banner = """
@@ -32,6 +33,7 @@ def print_banner():
         )
     )
     console.print()
+
 
 def display_summary(results: ScanResult):
     """Display a comprehensive summary of results"""
@@ -87,28 +89,29 @@ def display_summary(results: ScanResult):
 
     console.print()
 
+
 def display_batch_results(results: List[Dict]):
     """Display batch scan results in a table"""
     console.print()
-    
+
     # Create results table
     results_table = Table(title="Batch Scan Results", box=box.ROUNDED)
     results_table.add_column("URL", style="cyan", no_wrap=False)
     results_table.add_column("Status", justify="center")
     results_table.add_column("Vulnerabilities", style="magenta")
-    
+
     vulnerable_count = 0
     successful_count = 0
-    
+
     for result in results:
-        url = result['url'][:60] + '...' if len(result['url']) > 60 else result['url']
-        
-        if result.get('error'):
+        url = result["url"][:60] + "..." if len(result["url"]) > 60 else result["url"]
+
+        if result.get("error"):
             status = "[red]✗ Error[/red]"
             vulns = f"[red]{result['error'][:40]}[/red]"
-        elif result['success']:
+        elif result["success"]:
             successful_count += 1
-            if result['is_vulnerable']:
+            if result["is_vulnerable"]:
                 vulnerable_count += 1
                 status = "[red]✓ Vulnerable[/red]"
                 vulns = f"[red]{len(result['vulnerabilities'])} found[/red]"
@@ -118,11 +121,11 @@ def display_batch_results(results: List[Dict]):
         else:
             status = "[yellow]✗ Failed[/yellow]"
             vulns = "[yellow]N/A[/yellow]"
-        
+
         results_table.add_row(url, status, vulns)
-    
+
     console.print(results_table)
-    
+
     # Summary
     console.print()
     summary = f"""
@@ -132,14 +135,14 @@ def display_batch_results(results: List[Dict]):
   Vulnerable: [red]{vulnerable_count}[/red]
   Clean: [green]{successful_count - vulnerable_count}[/green]
     """
-    
+
     border_color = "red" if vulnerable_count > 0 else "green"
     console.print(
         Panel(
             summary.strip(),
             title="[bold]Summary[/bold]",
             border_style=border_color,
-            box=box.DOUBLE
+            box=box.DOUBLE,
         )
     )
     console.print()
