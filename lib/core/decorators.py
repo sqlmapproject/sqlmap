@@ -96,7 +96,7 @@ def stackedmethod(f):
             result = f(*args, **kwargs)
         finally:
             if len(threadData.valueStack) > originalLevel:
-                threadData.valueStack = threadData.valueStack[:originalLevel]
+                del threadData.valueStack[originalLevel:]
 
         return result
 
