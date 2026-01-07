@@ -71,6 +71,61 @@ python sqlmapcli.py -u "https://demo.owasp-juice.shop/rest/user/login" --data='{
 
 **Note**: The `--raw` flag ensures the CLI output matches sqlmap exactly, bypassing all formatting and parsing.
 
+### 7. Batch Mode - Test Multiple Endpoints
+Test multiple endpoints with concurrency:
+
+```bash
+# Test multiple endpoints from a JSON file with 5 concurrent scans (default)
+python sqlmapcli.py -b endpoints.json --level 2 --risk 2
+
+# Test with higher concurrency (10 concurrent scans)
+python sqlmapcli.py -b endpoints.json --level 2 --risk 2 --concurrency 10
+
+# Test with custom settings
+python sqlmapcli.py -b endpoints.json --level 3 --risk 2 --concurrency 5
+```
+
+**Batch File Format** (`endpoints.json`):
+```json
+[
+  {
+    "url": "https://demo.owasp-juice.shop/rest/products/search?q=test"
+  },
+  {
+    "url": "https://demo.owasp-juice.shop/rest/user/login",
+    "data": "{\"email\":\"test@example.com\",\"password\":\"password123\"}"
+  },
+  {
+    "url": "https://demo.owasp-juice.shop/api/Users/1"
+  }
+]
+```
+
+**Features**:
+- Tests N endpoints with M concurrency
+- Automatically saves logs for each endpoint
+- Displays progress and summary table
+- Supports both GET and POST requests
+
+### 8. Log Management
+
+Logs are automatically saved to the `logs/` folder:
+
+```bash
+# Run scan with logging (default behavior)
+python sqlmapcli.py -u "https://demo.owasp-juice.shop/rest/products/search?q=test"
+# Log saved to: logs/sqlmap_https___demo_owasp_juice_shop_rest_produ_20260107_123456.log
+
+# Disable logging if needed
+python sqlmapcli.py -u "https://demo.owasp-juice.shop/rest/products/search?q=test" --no-logs
+```
+
+**Log Features**:
+- Automatic log folder creation
+- Timestamped log files
+- Sanitized filenames based on URL
+- Complete sqlmap output saved
+
 ## Real-World Testing Example
 
 **Using OWASP Juice Shop Demo** (a legitimate vulnerable application for security testing):

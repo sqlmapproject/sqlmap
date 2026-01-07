@@ -7,9 +7,12 @@ Automates comprehensive SQL injection testing with a single command
 import subprocess
 import sys
 import argparse
+import re
+import json
 from pathlib import Path
 from typing import List, Dict, Tuple, Optional, TypedDict, Any
 from datetime import datetime
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 try:
     from rich.console import Console
@@ -31,6 +34,7 @@ except ImportError:
 console = Console()
 
 SQLMAP_PATH = Path(__file__).parent / "sqlmap.py"
+LOGS_DIR = Path(__file__).parent / "logs"
 
 SQL_TECHNIQUES = {
     "B": "Boolean-based blind",
@@ -51,16 +55,37 @@ class ScanResult(TypedDict):
 
 
 class SQLMapCLI:
-    def __init__(self):
+    def __init__(self, enable_logging: bool = True):
         self.console = Console()
+        self.enable_logging = enable_logging
         self.results: ScanResult = {
-            "total_tests": 0,
-            "vulnerabilities": [],
-            "start_time": None,
-            "end_time": None,
-            "target": None,
+            'total_tests': 0,
+            'vulnerabilities': [],
+            'start_time': None,
+            'end_time': None,
+            'target': None
         }
-
+        
+        # Create logs directory if it doesn't exist
+        if self.enable_logging:
+            LOGS_DIR.mkdir(exist_ok=True)
+    
+    def get_log_filename(self, url: str) -> Path:
+        """Generate a log filename based on URL and timestamp"""
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        # Sanitize URL for filename
+        safe_url = re.sub(r'[^\w\-_\.]', '_', url)[:50]
+        return LOGS_DIR / f"sqlmap_{safe_url}_{timestamp}.log"
+    
+    def save_log(self, log_file: Path, content: str):
+        """Save content to log file"""
+        try:
+            with open(log_file, 'w', encoding='utf-8') as f:
+                f.write(content)
+            self.console.print(f"[dim]Log saved to: {log_file}[/dim]")
+        except Exception as e:
+            self.console.print(f"[yellow]Warning: Could not save log: {e}[/yellow]")
+    
     def print_banner(self):
         """Display a beautiful banner"""
         banner = """
@@ -280,6 +305,11 @@ class SQLMapCLI:
                 url, level, risk, data=data, verbose=verbose
             )
             self.console.print(output)
+            
+            # Save log
+            if self.enable_logging:
+                log_file = self.get_log_filename(url)
+                self.save_log(log_file, output)
             return
 
         with Progress(
@@ -295,7 +325,12 @@ class SQLMapCLI:
                 url, level, risk, data=data, verbose=verbose
             )
             progress.update(task, completed=True)
-
+        
+        # Save log
+        if self.enable_logging:
+            log_file = self.get_log_filename(url)
+            self.save_log(log_file, output)
+        
         parsed = self.parse_results(output)
         self.results["vulnerabilities"] = parsed["vulnerabilities"]
         self.results["total_tests"] = 1
@@ -360,7 +395,163 @@ class SQLMapCLI:
             )
 
         self.console.print()
-
+    
+    def process_single_endpoint(self, endpoint: Dict, level: int, risk: int, verbose: int) -> Dict:
+        """Process a single endpoint for batch mode"""
+        url = endpoint.get('url')
+        data = endpoint.get('data')
+        
+        try:
+            success, output = self.run_sqlmap_test(url, level, risk, data=data, verbose=verbose)
+            
+            # Save log
+            if self.enable_logging:
+                log_file = self.get_log_filename(url)
+                self.save_log(log_file, output)
+            
+            parsed = self.parse_results(output)
+            
+            return {
+                'url': url,
+                'data': data,
+                'success': success,
+                'vulnerabilities': parsed['vulnerabilities'],
+                'is_vulnerable': parsed['is_vulnerable']
+            }
+        except Exception as e:
+            return {
+                'url': url,
+                'data': data,
+                'success': False,
+                'error': str(e),
+                'vulnerabilities': [],
+                'is_vulnerable': False
+            }
+    
+    def batch_scan(self, endpoints: List[Dict], level: int = 1, risk: int = 1, 
+                   concurrency: int = 5, verbose: int = 1):
+        """Run batch scan on multiple endpoints with concurrency"""
+        self.console.print(
+            Panel(
+                f"[cyan]Batch Scan Mode[/cyan]\n"
+                f"[dim]Testing {len(endpoints)} endpoint(s) with concurrency={concurrency}[/dim]\n"
+                f"[dim]Level: {level}, Risk: {risk}[/dim]",
+                border_style="cyan",
+                box=box.ROUNDED
+            )
+        )
+        
+        results = []
+        completed = 0
+        
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+            TextColumn("({task.completed}/{task.total})"),
+            TimeElapsedColumn(),
+            console=self.console
+        ) as progress:
+            
+            task = progress.add_task(
+                "[cyan]Processing endpoints...", 
+                total=len(endpoints)
+            )
+            
+            with ThreadPoolExecutor(max_workers=concurrency) as executor:
+                future_to_endpoint = {
+                    executor.submit(
+                        self.process_single_endpoint, 
+                        endpoint, 
+                        level, 
+                        risk, 
+                        verbose
+                    ): endpoint 
+                    for endpoint in endpoints
+                }
+                
+                for future in as_completed(future_to_endpoint):
+                    endpoint = future_to_endpoint[future]
+                    try:
+                        result = future.result()
+                        results.append(result)
+                        completed += 1
+                        progress.update(task, advance=1)
+                    except Exception as e:
+                        results.append({
+                            'url': endpoint.get('url'),
+                            'data': endpoint.get('data'),
+                            'success': False,
+                            'error': str(e),
+                            'vulnerabilities': [],
+                            'is_vulnerable': False
+                        })
+                        completed += 1
+                        progress.update(task, advance=1)
+        
+        # Display batch results
+        self.display_batch_results(results)
+        
+        return results
+    
+    def display_batch_results(self, results: List[Dict]):
+        """Display batch scan results in a table"""
+        self.console.print()
+        
+        # Create results table
+        results_table = Table(title="Batch Scan Results", box=box.ROUNDED)
+        results_table.add_column("URL", style="cyan", no_wrap=False)
+        results_table.add_column("Status", justify="center")
+        results_table.add_column("Vulnerabilities", style="magenta")
+        
+        vulnerable_count = 0
+        successful_count = 0
+        
+        for result in results:
+            url = result['url'][:60] + '...' if len(result['url']) > 60 else result['url']
+            
+            if result.get('error'):
+                status = "[red]✗ Error[/red]"
+                vulns = f"[red]{result['error'][:40]}[/red]"
+            elif result['success']:
+                successful_count += 1
+                if result['is_vulnerable']:
+                    vulnerable_count += 1
+                    status = "[red]✓ Vulnerable[/red]"
+                    vulns = f"[red]{len(result['vulnerabilities'])} found[/red]"
+                else:
+                    status = "[green]✓ Clean[/green]"
+                    vulns = "[green]None[/green]"
+            else:
+                status = "[yellow]✗ Failed[/yellow]"
+                vulns = "[yellow]N/A[/yellow]"
+            
+            results_table.add_row(url, status, vulns)
+        
+        self.console.print(results_table)
+        
+        # Summary
+        self.console.print()
+        summary = f"""
+[cyan]Batch Summary:[/cyan]
+  Total Endpoints: {len(results)}
+  Successful Scans: {successful_count}
+  Vulnerable: [red]{vulnerable_count}[/red]
+  Clean: [green]{successful_count - vulnerable_count}[/green]
+        """
+        
+        border_color = "red" if vulnerable_count > 0 else "green"
+        self.console.print(
+            Panel(
+                summary.strip(),
+                title="[bold]Summary[/bold]",
+                border_style=border_color,
+                box=box.DOUBLE
+            )
+        )
+        self.console.print()
+    
     def interactive_mode(self):
         """Interactive mode for user input"""
         self.console.print()
@@ -422,8 +613,14 @@ Examples:
   # Comprehensive scan (all risk and level combinations)
   python sqlmapcli.py -u "https://demo.owasp-juice.shop/rest/products/search?q=test" --comprehensive
   
-  # Custom level and risk with POST data
-  python sqlmapcli.py -u "https://demo.owasp-juice.shop/rest/user/login" --data='{"email":"test@example.com","password":"pass123"}' --level 3 --risk 2
+  # Batch mode - test multiple endpoints from JSON file
+  python sqlmapcli.py -b endpoints.json --level 2 --risk 2 --concurrency 10
+  
+  # Batch mode example JSON file format:
+  # [
+  #   {"url": "https://example.com/api/users?id=1"},
+  #   {"url": "https://example.com/api/login", "data": "{\\"user\\":\\"test\\",\\"pass\\":\\"test\\"}"}
+  # ]
   
   # Interactive mode
   python sqlmapcli.py --interactive
@@ -499,10 +696,29 @@ Examples:
     parser.add_argument(
         "-i", "--interactive", action="store_true", help="Run in interactive mode"
     )
-
+    
+    parser.add_argument(
+        '-b', '--batch-file',
+        type=str,
+        help='Path to JSON file containing multiple endpoints to test'
+    )
+    
+    parser.add_argument(
+        '-c', '--concurrency',
+        type=int,
+        default=5,
+        help='Number of concurrent scans for batch mode (default: 5)'
+    )
+    
+    parser.add_argument(
+        '--no-logs',
+        action='store_true',
+        help='Disable saving logs to the logs folder'
+    )
+    
     args = parser.parse_args()
-
-    cli = SQLMapCLI()
+    
+    cli = SQLMapCLI(enable_logging=not args.no_logs)
     cli.print_banner()
 
     # Check if sqlmap exists
@@ -520,12 +736,36 @@ Examples:
     if args.interactive:
         cli.interactive_mode()
         return
-
+    
+    # Batch mode
+    if args.batch_file:
+        try:
+            with open(args.batch_file, 'r') as f:
+                endpoints = json.load(f)
+            
+            if not isinstance(endpoints, list):
+                console.print("[bold red]Error: Batch file must contain a JSON array of endpoints[/bold red]")
+                sys.exit(1)
+            
+            verbose_level = args.verbose if args.verbose is not None else 1
+            cli.batch_scan(
+                endpoints,
+                level=args.level,
+                risk=args.risk,
+                concurrency=args.concurrency,
+                verbose=verbose_level
+            )
+            return
+        except FileNotFoundError:
+            console.print(f"[bold red]Error: Batch file not found: {args.batch_file}[/bold red]")
+            sys.exit(1)
+        except json.JSONDecodeError as e:
+            console.print(f"[bold red]Error: Invalid JSON in batch file: {e}[/bold red]")
+            sys.exit(1)
+    
     # Check if URL is provided
     if not args.url:
-        console.print(
-            "[bold red]Error: URL is required (use -u or --interactive)[/bold red]"
-        )
+        console.print("[bold red]Error: URL is required (use -u, -b, or --interactive)[/bold red]")
         parser.print_help()
         sys.exit(1)
 
