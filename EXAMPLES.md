@@ -75,10 +75,10 @@ python sqlmapcli.py -u "https://demo.owasp-juice.shop/rest/user/login" --data='{
 Test multiple endpoints with concurrency:
 
 ```bash
-# Test multiple endpoints from a JSON file with 5 concurrent scans (default)
+# Test multiple endpoints from a JSON file with auto-scaled concurrency (default, typically 2x CPU cores)
 python sqlmapcli.py -b endpoints.json --level 2 --risk 2
 
-# Test with higher concurrency (10 concurrent scans)
+# Test with specific concurrency (10 concurrent scans)
 python sqlmapcli.py -b endpoints.json --level 2 --risk 2 --concurrency 10
 
 # Test with custom settings

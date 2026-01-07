@@ -73,14 +73,50 @@ def interactive_mode(scanner: SQLMapScanner):
     )
 
     if scan_type == "quick":
-        level = int(Prompt.ask("[cyan]Test level (1-5)[/cyan]", default="1"))
-        risk = int(Prompt.ask("[cyan]Test risk (1-3)[/cyan]", default="1"))
+        # Input validation for level and risk
+        while True:
+            try:
+                level_str = Prompt.ask("[cyan]Test level (1-5)[/cyan]", default="1")
+                level = int(level_str)
+                if 1 <= level <= 5:
+                    break
+                console.print("[red]Level must be between 1 and 5[/red]")
+            except ValueError:
+                console.print("[red]Please enter a valid number[/red]")
+        
+        while True:
+            try:
+                risk_str = Prompt.ask("[cyan]Test risk (1-3)[/cyan]", default="1")
+                risk = int(risk_str)
+                if 1 <= risk <= 3:
+                    break
+                console.print("[red]Risk must be between 1 and 3[/red]")
+            except ValueError:
+                console.print("[red]Please enter a valid number[/red]")
+        
         scanner.quick_scan(url, level, risk, data=data, headers=headers)
     else:
-        max_level = int(
-            Prompt.ask("[cyan]Maximum test level (1-5)[/cyan]", default="5")
-        )
-        max_risk = int(Prompt.ask("[cyan]Maximum test risk (1-3)[/cyan]", default="3"))
+        # Input validation for max_level and max_risk
+        while True:
+            try:
+                max_level_str = Prompt.ask("[cyan]Maximum test level (1-5)[/cyan]", default="5")
+                max_level = int(max_level_str)
+                if 1 <= max_level <= 5:
+                    break
+                console.print("[red]Level must be between 1 and 5[/red]")
+            except ValueError:
+                console.print("[red]Please enter a valid number[/red]")
+        
+        while True:
+            try:
+                max_risk_str = Prompt.ask("[cyan]Maximum test risk (1-3)[/cyan]", default="3")
+                max_risk = int(max_risk_str)
+                if 1 <= max_risk <= 3:
+                    break
+                console.print("[red]Risk must be between 1 and 3[/red]")
+            except ValueError:
+                console.print("[red]Please enter a valid number[/red]")
+        
         scanner.comprehensive_scan(url, max_level, max_risk, data=data, headers=headers)
 
 
@@ -197,6 +233,21 @@ Examples:
                 verbose=verbose_level,
             )
             return
+        except FileNotFoundError:
+            console.print(
+                f"[bold red]Error: Batch file not found: {args.batch_file}[/bold red]"
+            )
+            sys.exit(1)
+        except json.JSONDecodeError as e:
+            console.print(
+                f"[bold red]Error: Invalid JSON in batch file '{args.batch_file}': {e}[/bold red]"
+            )
+            sys.exit(1)
+        except PermissionError:
+            console.print(
+                f"[bold red]Error: Permission denied when reading batch file: {args.batch_file}[/bold red]"
+            )
+            sys.exit(1)
         except Exception as e:
             console.print(f"[bold red]Error loading batch file: {e}[/bold red]")
             sys.exit(1)

@@ -74,7 +74,7 @@ python sqlmapcli.py --interactive
 ```
 -u, --url              Target URL
 -b, --batch-file       JSON file with multiple endpoints
--c, --concurrency      Concurrent scans for batch mode (default: 5)
+-c, --concurrency      Concurrent scans for batch mode (default: 0 for auto-scale based on CPU count)
 --comprehensive        Run all risk/level combinations (1-3 risk, 1-5 levels)
 --level {1-5}         Test level (default: 1)
 --risk {1-3}          Test risk (default: 1)

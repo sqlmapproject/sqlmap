@@ -122,10 +122,21 @@ class SQLMapScanner:
                 # Cleanup temporary output directory
                 try:
                     shutil.rmtree(tmp_output_dir)
-                except:
-                    pass
+                except Exception as cleanup_error:
+                    console.log(
+                        f"Failed to remove temporary sqlmap output directory {tmp_output_dir!r}: {cleanup_error}"
+                    )
 
                 return process.returncode == 0, full_output
+            else:
+                # Run without progress (non-interactive)
+                result = subprocess.run(
+                    cmd, capture_output=True, text=True, timeout=600
+                )
+
+                # Cleanup temporary output directory
+                try:
+                    shutil.rmtree(tmp_output_dir)
                 except Exception as cleanup_error:
                     console.log(
                         f"Failed to remove temporary sqlmap output directory {tmp_output_dir!r}: {cleanup_error}"
@@ -255,9 +266,33 @@ class SQLMapScanner:
                     )
 
                     if parsed["is_vulnerable"]:
-                        self.results["vulnerabilities"].extend(
-                            parsed["vulnerabilities"]
-                        )
+                        # Deduplicate vulnerabilities across different level/risk combinations
+                        existing_keys = set()
+                        for v in self.results["vulnerabilities"]:
+                            if isinstance(v, dict):
+                                param = v.get("parameter")
+                                vtype = v.get("type")
+                                title = v.get("title")
+                            else:
+                                param = getattr(v, "parameter", None)
+                                vtype = getattr(v, "type", None)
+                                title = getattr(v, "title", None)
+                            existing_keys.add((param, vtype, title))
+
+                        for v in parsed["vulnerabilities"]:
+                            if isinstance(v, dict):
+                                param = v.get("parameter")
+                                vtype = v.get("type")
+                                title = v.get("title")
+                            else:
+                                param = getattr(v, "parameter", None)
+                                vtype = getattr(v, "type", None)
+                                title = getattr(v, "title", None)
+
+                            key = (param, vtype, title)
+                            if key not in existing_keys:
+                                self.results["vulnerabilities"].append(v)
+                                existing_keys.add(key)
 
                     results_table.add_row(
                         str(level),
@@ -359,7 +394,7 @@ class SQLMapScanner:
 
         headers = endpoint.get("headers")
         if headers is not None and isinstance(headers, list):
-            headers = "\\n".join(headers)
+            headers = "\n".join(headers)
 
         try:
             # Force verbosity 3 for better progress tracking if in batch mode
