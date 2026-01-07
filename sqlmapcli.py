@@ -149,8 +149,7 @@ class SQLMapCLI:
             result = subprocess.run(
                 cmd,
                 capture_output=True,
-                text=True,
-                timeout=600,  # 10 minute timeout per test
+                text=True
             )
             return result.returncode == 0, result.stdout + result.stderr
         except subprocess.TimeoutExpired:
