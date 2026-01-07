@@ -25,6 +25,77 @@ sqlmap works out of the box with [Python](https://www.python.org/download/) vers
 Usage
 ----
 
+### SQLMap CLI - Beautiful Automated Testing 🎨
+
+**NEW**: We now have a beautiful CLI wrapper that automates comprehensive SQL injection testing in a single command!
+
+#### Quick Start
+
+Install dependencies:
+```bash
+pip install rich
+```
+
+#### Examples
+
+**Quick scan** (default settings):
+```bash
+python sqlmapcli.py -u "https://demo.owasp-juice.shop/rest/products/search?q=test"
+```
+
+**Comprehensive scan** (tests all risk and level combinations):
+```bash
+python sqlmapcli.py -u "https://demo.owasp-juice.shop/rest/products/search?q=test" --comprehensive
+```
+
+**Custom level and risk**:
+```bash
+python sqlmapcli.py -u "https://demo.owasp-juice.shop/rest/products/search?q=test" --level 3 --risk 2
+```
+
+**Interactive mode**:
+```bash
+python sqlmapcli.py --interactive
+```
+*Interactive mode now prompts for POST data/body, supporting both JSON and form data.*
+
+#### Features
+
+✨ **Beautiful output** with Rich library - panels, tables, progress bars  
+⚡ **One-line comprehensive testing** - test all risk/level combinations automatically  
+📊 **Clear result summaries** - vulnerability tables with color-coded findings  
+🎯 **Interactive mode** - guided prompts for easy testing, including POST data support  
+⏱️ **Progress tracking** - see exactly what's being tested in real-time  
+🔄 **Batch processing** - test multiple endpoints with configurable concurrency  
+📝 **Automatic logging** - saves all scan results to logs/ folder  
+
+#### CLI Options
+
+```
+-u, --url              Target URL
+-b, --batch-file       JSON file with multiple endpoints
+-c, --concurrency      Concurrent scans for batch mode (default: 0 for auto-scale based on CPU count)
+--comprehensive        Run all risk/level combinations (1-3 risk, 1-5 levels)
+--level {1-5}         Test level (default: 1)
+--risk {1-3}          Test risk (default: 1)
+--max-level {1-5}     Maximum level for comprehensive scan
+--max-risk {1-3}      Maximum risk for comprehensive scan
+--technique           SQL injection techniques (default: BEUSTQ)
+--data                POST data string (JSON or form data)
+--raw                 Show raw sqlmap output (bypasses formatting)
+--verbose {0-6}       Sqlmap verbosity level (default: 1)
+--no-logs             Disable automatic log saving
+-i, --interactive     Interactive mode
+```
+
+**Note**: Use `--raw` flag to see the exact same output as running sqlmap directly. This ensures you get all details that sqlmap provides without any formatting or parsing.
+
+**Batch Mode**: Test multiple endpoints from a JSON file with concurrent scanning. See `endpoints.json.example` for format.
+
+---
+
+### Original SQLMap Usage
+
 To get a list of basic options and switches use:
 
     python sqlmap.py -h

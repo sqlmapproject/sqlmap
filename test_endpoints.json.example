@@ -1,0 +1,19 @@
+[
+  {
+    "url": "https://httpbin.org/get?id=1",
+    "headers": [
+      "X-Test-Header: value1",
+      "X-Auth-Token: secret123"
+    ]
+  },
+  {
+    "url": "https://httpbin.org/post",
+    "data": {
+      "username": "admin",
+      "id": 123
+    },
+    "headers": [
+        "Content-Type: application/json"
+    ]
+  }
+]
