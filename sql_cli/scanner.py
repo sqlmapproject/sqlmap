@@ -137,13 +137,6 @@ class SQLMapScanner:
                     pass
 
                 return result.returncode == 0, result.stdout + result.stderr
-        except subprocess.TimeoutExpired:
-            # Cleanup on timeout
-            try:
-                shutil.rmtree(tmp_output_dir)
-            except:
-                pass
-            return False, "Test timed out after 10 minutes"
         except Exception as e:
             # Cleanup on error
             try:
