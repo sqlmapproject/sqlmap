@@ -4,9 +4,16 @@
   },
   {
     "url": "https://demo.owasp-juice.shop/rest/user/login",
-    "data": "{\"email\":\"test@example.com\",\"password\":\"password123\"}"
+    "data": {
+      "email": "test@example.com",
+      "password": "password123"
+    }
   },
   {
-    "url": "https://demo.owasp-juice.shop/api/Users/1"
+    "url": "https://demo.owasp-juice.shop/api/Users/1",
+    "headers": [
+      "Authorization: Bearer my_secret_token",
+      "X-Custom-Header: value"
+    ]
   }
 ]
