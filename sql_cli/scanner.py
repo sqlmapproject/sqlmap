@@ -126,23 +126,29 @@ class SQLMapScanner:
                     pass
 
                 return process.returncode == 0, full_output
-            else:
-                # Standard blocking run
-                result = subprocess.run(cmd, capture_output=True, text=True)
-
-                # Cleanup temporary output directory
-                try:
-                    shutil.rmtree(tmp_output_dir)
-                except:
-                    pass
+                except Exception as cleanup_error:
+                    console.log(
+                        f"Failed to remove temporary sqlmap output directory {tmp_output_dir!r}: {cleanup_error}"
+                    )
 
                 return result.returncode == 0, result.stdout + result.stderr
+        except subprocess.TimeoutExpired:
+            # Cleanup on timeout
+            try:
+                shutil.rmtree(tmp_output_dir)
+            except Exception as cleanup_error:
+                console.log(
+                    f"Failed to remove temporary sqlmap output directory {tmp_output_dir!r} after timeout: {cleanup_error}"
+                )
+            return False, "Test timed out after 10 minutes"
         except Exception as e:
             # Cleanup on error
             try:
                 shutil.rmtree(tmp_output_dir)
-            except:
-                pass
+            except Exception as cleanup_error:
+                console.log(
+                    f"Failed to remove temporary sqlmap output directory {tmp_output_dir!r} after error: {cleanup_error}"
+                )
             return False, str(e)
 
     def parse_results(self, output: str) -> Dict[str, Any]:
