@@ -66,11 +66,15 @@ python sqlmapcli.py --interactive
 📊 **Clear result summaries** - vulnerability tables with color-coded findings  
 🎯 **Interactive mode** - guided prompts for easy testing, including POST data support  
 ⏱️ **Progress tracking** - see exactly what's being tested in real-time  
+🔄 **Batch processing** - test multiple endpoints with configurable concurrency  
+📝 **Automatic logging** - saves all scan results to logs/ folder  
 
 #### CLI Options
 
 ```
 -u, --url              Target URL
+-b, --batch-file       JSON file with multiple endpoints
+-c, --concurrency      Concurrent scans for batch mode (default: 5)
 --comprehensive        Run all risk/level combinations (1-3 risk, 1-5 levels)
 --level {1-5}         Test level (default: 1)
 --risk {1-3}          Test risk (default: 1)
@@ -80,10 +84,13 @@ python sqlmapcli.py --interactive
 --data                POST data string (JSON or form data)
 --raw                 Show raw sqlmap output (bypasses formatting)
 --verbose {0-6}       Sqlmap verbosity level (default: 1)
+--no-logs             Disable automatic log saving
 -i, --interactive     Interactive mode
 ```
 
 **Note**: Use `--raw` flag to see the exact same output as running sqlmap directly. This ensures you get all details that sqlmap provides without any formatting or parsing.
+
+**Batch Mode**: Test multiple endpoints from a JSON file with concurrent scanning. See `endpoints.json.example` for format.
 
 ---
 
