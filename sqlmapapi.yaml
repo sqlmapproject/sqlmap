@@ -37,6 +37,106 @@ paths:
                   success:
                     type: boolean
                     example: true
+  /task/{taskid}/delete:
+    get:
+      description: Delete an existing task
+      parameters:
+        - in: path
+          name: taskid
+          required: true
+          schema:
+            type: string
+          description: Scan task ID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+  /option/{taskid}/list:
+    get:
+      description: List options for a given task ID
+      parameters:
+        - in: path
+          name: taskid
+          required: true
+          schema:
+            type: string
+          description: Scan task ID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  options:
+                    type: array
+                    items:
+                      type: object
+  /option/{taskid}/get:
+    post:
+      description: Get value of option(s) for a certain task ID
+      parameters:
+        - in: path
+          name: taskid
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+              example: ["url", "cookie"]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  options:
+                    type: object
+  /option/{taskid}/set:
+    post:
+      description: Set value of option(s) for a certain task ID
+      parameters:
+        - in: path
+          name: taskid
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: {"cookie": "id=1"}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
   /scan/{taskid}/start:
     post:
       description: Launch a scan
@@ -120,31 +220,6 @@ paths:
                   success:
                     type: boolean
                     example: true
-  /scan/{taskid}/list:
-    get:
-      description: List options for a given task ID
-      parameters:
-        - in: path
-          name: taskid
-          required: true
-          schema:
-            type: string
-          description: Scan task ID
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  options:
-                    type: array
-                    items:
-                      type: object
   /scan/{taskid}/data:
     get:
       description: Retrieve the scan resulting data
@@ -202,27 +277,6 @@ paths:
   /scan/{taskid}/kill:
     get:
       description: Kill a scan
-      parameters:
-        - in: path
-          name: taskid
-          required: true
-          schema:
-            type: string
-          description: Scan task ID
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-  /task/{taskid}/delete:
-    get:
-      description: Delete an existing task
       parameters:
         - in: path
           name: taskid
