@@ -52,8 +52,8 @@ SCHEMA = """
     INSERT INTO users (id, name, surname) VALUES (1, 'luther', 'blisset');
     INSERT INTO users (id, name, surname) VALUES (2, 'fluffy', 'bunny');
     INSERT INTO users (id, name, surname) VALUES (3, 'wu', 'ming');
-    INSERT INTO users (id, name, surname) VALUES (4, 'sqlmap/1.0-dev (https://sqlmap.org)', 'user agent header');
-    INSERT INTO users (id, name, surname) VALUES (5, NULL, 'nameisnull');
+    INSERT INTO users (id, name, surname) VALUES (4, NULL, 'nameisnull');
+    INSERT INTO users (id, name, surname) VALUES (5, 'sqlmap/1.0-dev (https://sqlmap.org)', 'user agent header');
 
     CREATE TABLE creds (
         user_id INTEGER,
