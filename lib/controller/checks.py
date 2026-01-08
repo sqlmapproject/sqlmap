@@ -554,7 +554,7 @@ def checkSqlInjection(place, parameter, value):
 
                                     injectable = True
 
-                                elif (threadData.lastComparisonRatio or 0) > UPPER_RATIO_BOUND and not any((conf.string, conf.notString, conf.regexp, conf.code, kb.nullConnection)):
+                                elif (threadData.lastComparisonRatio or 0) > UPPER_RATIO_BOUND and not any((conf.string, conf.notString, conf.regexp, conf.code, conf.titles, kb.nullConnection)):
                                     originalSet = set(getFilteredPageContent(kb.pageTemplate, True, "\n").split("\n"))
                                     trueSet = set(getFilteredPageContent(truePage, True, "\n").split("\n"))
                                     falseSet = set(getFilteredPageContent(falsePage, True, "\n").split("\n"))
@@ -580,7 +580,7 @@ def checkSqlInjection(place, parameter, value):
                                                     break
 
                             if injectable:
-                                if kb.pageStable and not any((conf.string, conf.notString, conf.regexp, conf.code, kb.nullConnection)):
+                                if kb.pageStable and not any((conf.string, conf.notString, conf.regexp, conf.code, conf.titles, kb.nullConnection)):
                                     if all((falseCode, trueCode)) and falseCode != trueCode and trueCode != kb.heuristicCode:
                                         suggestion = conf.code = trueCode
 

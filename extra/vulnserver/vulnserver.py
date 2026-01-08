@@ -178,7 +178,7 @@ class ReqHandler(BaseHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(b"<!DOCTYPE html><html><head><title>vulnserver</title></head><body><h3>GET:</h3><a href='/?id=1'>link</a><hr><h3>POST:</h3><form method='post'>ID: <input type='text' name='id'><input type='submit' value='Submit'></form></body></html>")
             else:
-                code, output = OK, ""
+                code, output = OK, "<body><html>"
 
                 try:
                     if self.params.get("echo", ""):
@@ -215,6 +215,11 @@ class ReqHandler(BaseHTTPRequestHandler):
                             output += "</table>\n"
                         else:
                             output += "no results found"
+
+                        if not results:
+                            output = "<title>No results</title>" + output
+                        else:
+                            output = "<title>Results</title>" + output
 
                     output += "</body></html>"
                 except Exception as ex:
