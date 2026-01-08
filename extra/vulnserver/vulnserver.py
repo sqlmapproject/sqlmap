@@ -11,8 +11,10 @@ from __future__ import print_function
 
 import base64
 import json
+import random
 import re
 import sqlite3
+import string
 import sys
 import threading
 import traceback
@@ -73,11 +75,15 @@ _cursor = None
 _lock = None
 _server = None
 _alive = False
+_csrf_token = None
 
 def init(quiet=False):
     global _conn
     global _cursor
     global _lock
+    global _csrf_token
+
+    _csrf_token = "".join(random.sample(string.ascii_letters + string.digits, 20))
 
     _conn = sqlite3.connect(":memory:", isolation_level=None, check_same_thread=False)
     _cursor = _conn.cursor()
@@ -141,6 +147,28 @@ class ReqHandler(BaseHTTPRequestHandler):
                 params[key] = params[key][-1]
 
         self.url, self.params = path, params
+
+        if self.url == "/csrf":
+            if self.params.get("csrf_token") == _csrf_token:
+                self.url = "/"
+            else:
+                self.send_response(OK)
+                self.send_header("Content-type", "text/html; charset=%s" % UNICODE_ENCODING)
+                self.end_headers()
+
+                form = (
+                    "<html><body>"
+                    "CSRF protection check<br>"
+                    "<form action='/csrf' method='POST'>"
+                    "<input type='hidden' name='csrf_token' value='%s'>"
+                    "id: <input type='text' name='id'>"
+                    "<input type='submit' value='Submit'>"
+                    "</form>"
+                    "</body></html>"
+                ) % _csrf_token
+
+                self.wfile.write(form.encode(UNICODE_ENCODING))
+                return
 
         if self.url == '/':
             if not any(_ in self.params for _ in ("id", "query")):
