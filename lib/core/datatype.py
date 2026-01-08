@@ -170,7 +170,7 @@ class LRUDict(object):
             except KeyError:
                 if len(self.cache) >= self.capacity:
                     self.cache.popitem(last=False)
-        self.cache[key] = value
+            self.cache[key] = value
 
     def set(self, key, value):
         self.__setitem__(key, value)
