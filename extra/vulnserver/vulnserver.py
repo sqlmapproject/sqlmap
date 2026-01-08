@@ -49,9 +49,20 @@ SCHEMA = """
     );
     INSERT INTO users (id, name, surname) VALUES (1, 'luther', 'blisset');
     INSERT INTO users (id, name, surname) VALUES (2, 'fluffy', 'bunny');
-    INSERT INTO users (id, name, surname) VALUES (3, 'wu', '179ad45c6ce2cb97cf1029e212046e81');
+    INSERT INTO users (id, name, surname) VALUES (3, 'wu', 'ming');
     INSERT INTO users (id, name, surname) VALUES (4, 'sqlmap/1.0-dev (https://sqlmap.org)', 'user agent header');
     INSERT INTO users (id, name, surname) VALUES (5, NULL, 'nameisnull');
+
+    CREATE TABLE creds (
+        user_id INTEGER,
+        password_hash TEXT,
+        FOREIGN KEY (user_id) REFERENCES users(id)
+    );
+    INSERT INTO creds (user_id, password_hash) VALUES (1, 'db3a16990a0008a3b04707fdef6584a0');
+    INSERT INTO creds (user_id, password_hash) VALUES (2, '4db967ce67b15e7fb84c266a76684729');
+    INSERT INTO creds (user_id, password_hash) VALUES (3, 'f5a2950eaa10f9e99896800eacbe8275');
+    INSERT INTO creds (user_id, password_hash) VALUES (4, NULL);
+    INSERT INTO creds (user_id, password_hash) VALUES (5, '179ad45c6ce2cb97cf1029e212046e81');
 """
 
 LISTEN_ADDRESS = "localhost"

@@ -3461,7 +3461,10 @@ def parseSqliteTableSchema(value):
             columns[column] = match.group(3) or "TEXT"
 
         table[safeSQLIdentificatorNaming(conf.tbl, True)] = columns
-        kb.data.cachedColumns[conf.db] = table
+        if conf.db in kb.data.cachedColumns:
+            kb.data.cachedColumns[conf.db].update(table)
+        else:
+            kb.data.cachedColumns[conf.db] = table
 
     return retVal
 
