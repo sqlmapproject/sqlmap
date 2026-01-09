@@ -248,6 +248,7 @@ def checkCharEncoding(encoding, warn=True):
 
     return encoding
 
+@lockedmethod
 def getHeuristicCharEncoding(page):
     """
     Returns page encoding charset detected by usage of heuristics

@@ -103,6 +103,17 @@ def stackedmethod(f):
     return _
 
 def lockedmethod(f):
+    """
+    Decorates a function or method with a reentrant lock (only one thread can execute the function at a time)
+
+    >>> @lockedmethod
+    ... def recursive_count(n):
+    ...     if n <= 0: return 0
+    ...     return n + recursive_count(n - 1)
+    >>> recursive_count(5)
+    15
+    """
+
     lock = threading.RLock()
 
     @functools.wraps(f)
