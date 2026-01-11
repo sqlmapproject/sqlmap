@@ -82,7 +82,7 @@ class Fingerprint(GenericFingerprint):
         if conf.direct:
             result = True
         else:
-            result = inject.checkBooleanExpression("UNICODE(SQUARE(NULL)) IS NULL")
+            result = inject.checkBooleanExpression("IS_SRVROLEMEMBER(NULL) IS NULL")
 
         if result:
             infoMsg = "confirming %s" % DBMS.MSSQL
