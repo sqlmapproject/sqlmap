@@ -1786,4 +1786,66 @@
         <search_table/>
         <search_column/>
    </dbms>
+    <dbms value="Snowflake">
+        <cast query="CAST(%s AS VARCHAR)"/>
+        <length query="LENGTH(%s)"/>
+        <isnull query="NVL(%s, ' ')"/>
+        <delimiter query="||"/>
+        <limit query="LIMIT %d OFFSET %d"/>
+        <limitregexp query="\s+LIMIT\s+([\d]+)\s+OFFSET\s+([\d]+)"/>
+        <limitgroupstart query="1"/>
+        <limitgroupstop query="2"/>
+        <limitstring query=" LIMIT "/>
+        <order query="ORDER BY %s ASC"/>
+        <count query="COUNT(%s)"/>
+        <comment query="--"/>
+        <concatenate query="%s||%s"/>
+        <case query="SELECT CASE WHEN (%s) THEN 1 ELSE 0 END"/>
+        <inference query="ASCII(SUBSTR((%s),%d,1))>%d"/>
+        <banner query="SELECT CURRENT_VERSION()"/>
+        <current_user query="SELECT CURRENT_USER()"/>
+        <current_db query="SELECT CURRENT_DATABASE()"/>
+        <hostname/>
+        <table_comment/>
+        <column_comment/>
+        <is_dba query="CURRENT_ROLE()='ACCOUNTADMIN'"/>
+        
+        <dbs>
+            <inband query="SELECT DATABASE_NAME FROM SNOWFLAKE.INFORMATION_SCHEMA.DATABASES"/>
+            <blind query="SELECT DATABASE_NAME FROM SNOWFLAKE.INFORMATION_SCHEMA.DATABASES ORDER BY DATABASE_NAME LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM SNOWFLAKE.INFORMATION_SCHEMA.DATABASES"/>
+        </dbs>
+
+        <tables>
+            <inband query="SELECT TABLE_CATALOG, TABLE_NAME FROM INFORMATION_SCHEMA.TABLES" condition="TABLE_TYPE='BASE TABLE' AND TABLE_CATALOG"/>
+            
+            <blind query="SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_CATALOG='%s' ORDER BY TABLE_NAME LIMIT 1 OFFSET %d" count="SELECT COUNT(TABLE_NAME) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_CATALOG='%s'"
+            />
+        </tables>
+        
+        <columns>
+            <inband query="SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='%s' AND TABLE_CATALOG='%s'"/>
+            <blind query="SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='%s' AND TABLE_CATALOG='%s' LIMIT 1 OFFSET %d" query2="SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='%s' AND COLUMN_NAME='%s' AND TABLE_CATALOG='%s'" count="SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='%s' AND TABLE_CATALOG='%s'"/>
+        </columns>
+        
+        <dump_table>
+            <inband query="SELECT %s FROM TABLE('%s')"/>
+            <blind query="SELECT %s FROM %s.%s LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM %s.%s"/>
+        </dump_table>
+        
+        <users>
+            <inband query="SELECT NAME FROM SNOWFLAKE.ACCOUNT_USAGE.USERS"/>
+            <blind query="SELECT NAME FROM SNOWFLAKE.ACCOUNT_USAGE.USERS LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM SNOWFLAKE.ACCOUNT_USAGE.USERS"/>
+        </users>
+        
+        <roles>
+            <inband query="SELECT NAME FROM SNOWFLAKE.ACCOUNT_USAGE.ROLES"/>
+            <blind query="SELECT NAME FROM SNOWFLAKE.ACCOUNT_USAGE.ROLES LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM SNOWFLAKE.ACCOUNT_USAGE.ROLES"/>
+        </roles>
+        
+        <privileges/>
+        <statements/>
+        <search_db/>
+        <search_table/>
+        <search_column/>
+    </dbms>
 </root>

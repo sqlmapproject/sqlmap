@@ -41,6 +41,7 @@ from lib.core.settings import SQLITE_ALIASES
 from lib.core.settings import SYBASE_ALIASES
 from lib.core.settings import VERTICA_ALIASES
 from lib.core.settings import VIRTUOSO_ALIASES
+from lib.core.settings import SNOWFLAKE_ALIASES
 from lib.utils.sqlalchemy import SQLAlchemy
 
 from plugins.dbms.access.connector import Connector as AccessConn
@@ -99,6 +100,8 @@ from plugins.dbms.vertica.connector import Connector as VerticaConn
 from plugins.dbms.vertica import VerticaMap
 from plugins.dbms.virtuoso.connector import Connector as VirtuosoConn
 from plugins.dbms.virtuoso import VirtuosoMap
+from plugins.dbms.snowflake.connector import Connector as SnowflakeConn
+from plugins.dbms.snowflake import SnowflakeMap
 
 def setHandler():
     """
@@ -107,6 +110,7 @@ def setHandler():
     """
 
     items = [
+        (DBMS.SNOWFLAKE, SNOWFLAKE_ALIASES, SnowflakeMap, SnowflakeConn),
         (DBMS.MYSQL, MYSQL_ALIASES, MySQLMap, MySQLConn),
         (DBMS.ORACLE, ORACLE_ALIASES, OracleMap, OracleConn),
         (DBMS.PGSQL, PGSQL_ALIASES, PostgreSQLMap, PostgreSQLConn),
@@ -135,6 +139,7 @@ def setHandler():
         (DBMS.FRONTBASE, FRONTBASE_ALIASES, FrontBaseMap, FrontBaseConn),
         (DBMS.RAIMA, RAIMA_ALIASES, RaimaMap, RaimaConn),
         (DBMS.VIRTUOSO, VIRTUOSO_ALIASES, VirtuosoMap, VirtuosoConn),
+        # TODO: put snowflake stuff on this line
     ]
 
     _ = max(_ if (conf.get("dbms") or Backend.getIdentifiedDbms() or kb.heuristicExtendedDbms or "").lower() in _[1] else () for _ in items)
