@@ -15,6 +15,12 @@ class Enumeration(GenericEnumeration):
         logger.warning(warnMsg)
         return {}
 
+    def getRoles(self, *args, **kwargs):
+        warnMsg = "on Snowflake it is not possible to enumerate the user roles"
+        logger.warning(warnMsg)
+
+        return {}
+
     def searchDb(self):
         warnMsg = "on Snowflake it is not possible to search databases"
         logger.warning(warnMsg)
