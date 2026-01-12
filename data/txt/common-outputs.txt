@@ -15,6 +15,14 @@
 5.7.
 6.0.
 8.0.
+8.1.
+8.2.
+8.3.
+8.4.
+9.0.
+9.1.
+9.2.
+9.3.
 
 # PostgreSQL
 PostgreSQL 7.0
@@ -39,6 +47,10 @@ PostgreSQL 10.
 PostgreSQL 11.
 PostgreSQL 12.
 PostgreSQL 13.
+PostgreSQL 14.
+PostgreSQL 15.
+PostgreSQL 16.
+PostgreSQL 17.
 
 # Oracle
 Oracle Database 9i Standard Edition Release
@@ -59,6 +71,11 @@ Oracle Database 11g Express Edition Release 11.
 Oracle Database 11g Enterprise Edition Release
 Oracle Database 11g Enterprise Edition Release 11.
 Oracle Database 12c
+Oracle Database 18c
+Oracle Database 19c
+Oracle Database 21c
+Oracle Database 23ai
+Oracle Database 26ai
 
 # Microsoft SQL Server
 Microsoft SQL Server 7.0
@@ -70,6 +87,8 @@ Microsoft SQL Server 2014
 Microsoft SQL Server 2016
 Microsoft SQL Server 2017
 Microsoft SQL Server 2019
+Microsoft SQL Server 2022
+Microsoft SQL Server 2025
 
 
 [Users]
@@ -420,6 +439,10 @@ ReportServer
 ReportServerTempDB
 tempdb
 
+# Cloud Defaults
+rdsadmin
+innodb
+azure_maintenance
 
 [Tables]
 
@@ -1095,6 +1118,29 @@ vVendor
 WorkOrder
 WorkOrderRouting
 
+# Common tables
+
+accounts
+admin
+audit
+backup
+config
+configuration
+customers
+data
+files
+history
+images
+log
+logs
+members
+messages
+orders
+products
+settings
+test
+tokens
+uploads
 
 [Columns]
 
@@ -1236,20 +1282,51 @@ text
 time
 timestamp
 
-# common columns
+# Common columns
+active
+address
+admin
+blocked
+category_id
+city
+confirmed
+country
 created_at
-updated_at
-deleted_at
 created_on
-modified_on
-timestamp
+customer_id
+deleted
+deleted_at
+dob
+email
+enabled
+first_name
+flag
+gender
+hidden
 is_active
 is_deleted
 is_published
-status
-enabled
-user_id
-product_id
-category_id
+last_name
+locked
+login
+modified_on
+name
 order_id
-customer_id
+password
+phone
+private
+product_id
+public
+role
+salt
+state
+status
+timestamp
+token
+type
+updated_at
+user_id
+username
+visible
+zip
+zip_code
