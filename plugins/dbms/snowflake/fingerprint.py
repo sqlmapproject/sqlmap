@@ -79,7 +79,7 @@ class Fingerprint(GenericFingerprint):
             infoMsg = "confirming %s" % DBMS.SNOWFLAKE
             logger.info(infoMsg)
 
-            result = inject.checkBooleanExpression("MD5_NUMBER_UPPER64('z')=MD5_NUMBER_UPPER64('z')")
+            result = inject.checkBooleanExpression("MD5_NUMBER_UPPER64('[RANDSTR]')=MD5_NUMBER_UPPER64('[RANDSTR]')")
             if not result:
                 warnMsg = "the back-end DBMS is not %s" % DBMS.SNOWFLAKE
                 logger.warning(warnMsg)
