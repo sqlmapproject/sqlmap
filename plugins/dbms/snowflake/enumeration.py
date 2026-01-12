@@ -29,7 +29,7 @@ class Enumeration(GenericEnumeration):
         raise SqlmapUnsupportedFeatureException(errMsg)
 
     def getPrivileges(self, *args, **kwargs):
-        warnMsg = "on SQLite it is not possible to enumerate the user privileges"
+        warnMsg = "on Snowflake it is not possible to enumerate the user privileges"
         logger.warning(warnMsg)
         return {}
 
