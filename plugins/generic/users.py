@@ -457,7 +457,7 @@ class Users(object):
 
                             # In MySQL >= 5.0 and Oracle we get the list
                             # of privileges as string
-                            elif Backend.isDbms(DBMS.ORACLE) or (Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema) or Backend.getIdentifiedDbms() in (DBMS.VERTICA, DBMS.MIMERSQL, DBMS.CUBRID):
+                            elif Backend.isDbms(DBMS.ORACLE) or (Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema) or Backend.getIdentifiedDbms() in (DBMS.VERTICA, DBMS.MIMERSQL, DBMS.CUBRID, DBMS.SNOWFLAKE):
                                 privileges.add(privilege)
 
                             # In MySQL < 5.0 we get Y if the privilege is

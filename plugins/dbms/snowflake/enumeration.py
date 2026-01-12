@@ -23,8 +23,3 @@ class Enumeration(GenericEnumeration):
     def searchColumn(self):
         errMsg = "on Snowflake it is not possible to search columns"
         raise SqlmapUnsupportedFeatureException(errMsg)
-
-    def getPrivileges(self, *args, **kwargs):
-        warnMsg = "on Snowflake it is not possible to enumerate the user privileges"
-        logger.warning(warnMsg)
-        return {}
