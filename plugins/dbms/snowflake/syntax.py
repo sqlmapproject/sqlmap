@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2006-2025 sqlmap developers (https://sqlmap.org)
+Copyright (c) 2006-2026 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
@@ -17,7 +17,6 @@ class Syntax(GenericSyntax):
         """
 
         def escaper(value):
-            # Convert each character to its ASCII code and wrap with CHR()
-            return "||".join(f"CHR({ord(c)})" for c in value)
+            return "||".join("CHR(%d)" % _ for _ in getOrds(value))
 
         return Syntax._escape(expression, quote, escaper)
