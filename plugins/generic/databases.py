@@ -83,7 +83,7 @@ class Databases(object):
         if not kb.data.currentDb and Backend.isDbms(DBMS.VERTICA):
             kb.data.currentDb = VERTICA_DEFAULT_SCHEMA
 
-        if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.PGSQL, DBMS.MONETDB, DBMS.DERBY, DBMS.VERTICA, DBMS.PRESTO, DBMS.MIMERSQL, DBMS.CRATEDB, DBMS.CACHE, DBMS.FRONTBASE):
+        if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.PGSQL, DBMS.MONETDB, DBMS.DERBY, DBMS.VERTICA, DBMS.PRESTO, DBMS.MIMERSQL, DBMS.CRATEDB, DBMS.CACHE, DBMS.FRONTBASE, DBMS.SNOWFLAKE):
             warnMsg = "on %s you'll need to use " % Backend.getIdentifiedDbms()
             warnMsg += "schema names for enumeration as the counterpart to database "
             warnMsg += "names on other DBMSes"
