@@ -237,4 +237,11 @@
         <error regexp="Virtuoso S0002 Error"/>
         <error regexp="\[(Virtuoso Driver|Virtuoso iODBC Driver)\]\[Virtuoso Server\]"/>
     </dbms>
+
+    <dbms value="Snowflake">
+        <error regexp="001003 \(42000\):"/>
+        <error regexp="100038 \(22018\):"/>
+        <error regexp="000904 \(42000\):"/>
+        <error regexp="SQL compilation error: (syntax )?error line \d+ at position \d+"/>
+    </dbms>
 </root>
