@@ -15,10 +15,6 @@ class Enumeration(GenericEnumeration):
         logger.warning(warnMsg)
         return {}
 
-    def getHostname(self):
-        warnMsg = "on Snowflake it is not possible to enumerate the hostname"
-        logger.warning(warnMsg)
-
     def searchDb(self):
         warnMsg = "on Snowflake it is not possible to search databases"
         logger.warning(warnMsg)

@@ -1806,7 +1806,7 @@
         <banner query="CURRENT_VERSION()"/>
         <current_user query="CURRENT_USER()"/>
         <current_db query="CURRENT_SCHEMA()"/>
-        <hostname/>
+        <hostname query="PARSE_JSON(SYSTEM$ALLOWLIST())[0]:host"/>
         <table_comment/>
         <column_comment/>
         <is_dba query="CURRENT_ROLE()='ACCOUNTADMIN'"/>
