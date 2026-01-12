@@ -1835,7 +1835,10 @@
             <blind query="SELECT NAME FROM SNOWFLAKE.ACCOUNT_USAGE.ROLES LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM SNOWFLAKE.ACCOUNT_USAGE.ROLES"/>
         </roles>
         <privileges/>
-        <statements/>
+        <statements>
+            <inband query="SELECT QUERY_TEXT FROM TABLE(INFORMATION_SCHEMA.QUERY_HISTORY())"/>
+            <blind query="SELECT QUERY_TEXT FROM TABLE(INFORMATION_SCHEMA.QUERY_HISTORY()) ORDER BY START_TIME DESC LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM TABLE(INFORMATION_SCHEMA.QUERY_HISTORY())"/>
+        </statements>
         <search_db/>
         <search_table/>
         <search_column/>

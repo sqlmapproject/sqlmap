@@ -28,8 +28,3 @@ class Enumeration(GenericEnumeration):
         warnMsg = "on Snowflake it is not possible to enumerate the user privileges"
         logger.warning(warnMsg)
         return {}
-
-    def getStatements(self):
-        warnMsg = "on Snowflake it is not possible to enumerate the SQL statements"
-        logger.warning(warnMsg)
-        return []
