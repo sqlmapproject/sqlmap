@@ -1596,13 +1596,13 @@ Tag: <test>
         <risk>1</risk>
         <clause>1-8</clause>
         <where>1</where>
-        <vector>;SELECT CASE WHEN [INFERENCE] THEN 1 ELSE NULL END</vector>
+        <vector>;SELECT CASE WHEN [INFERENCE] THEN 1 ELSE NULL END FROM DUAL</vector>
         <request>
-            <payload>;SELECT CASE WHEN [RANDNUM]=[RANDNUM] THEN 1 ELSE NULL END</payload>
+            <payload>;SELECT CASE WHEN [RANDNUM]=[RANDNUM] THEN 1 ELSE NULL END FROM DUAL</payload>
             <comment>--</comment>
         </request>
         <response>
-            <comparison>;SELECT CASE WHEN [RANDNUM]=[RANDNUM1] THEN 1 ELSE NULL END</comparison>
+            <comparison>;SELECT CASE WHEN [RANDNUM]=[RANDNUM1] THEN 1 ELSE NULL END FROM DUAL</comparison>
         </response>
         <details>
             <dbms>SAP MaxDB</dbms>
