@@ -9,6 +9,7 @@
         <error regexp="check the manual that (corresponds to|fits) your MySQL server version"/>
         <error regexp="check the manual that (corresponds to|fits) your MariaDB server version" fork="MariaDB"/>
         <error regexp="check the manual that (corresponds to|fits) your Drizzle server version" fork="Drizzle"/>
+        <error regexp="check the manual that (corresponds to|fits) your TiDB server version" fork="TiDB"/>
         <error regexp="Unknown column '[^ ]+' in 'field list'"/>
         <error regexp="MySqlClient\."/>
         <error regexp="com\.mysql\.jdbc"/>
