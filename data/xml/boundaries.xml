@@ -437,7 +437,7 @@ Formats:
         <clause>9</clause>
         <where>1</where>
         <ptype>1</ptype>
-        <prefix>+(SELECT [RANDSTR] WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <prefix>+(SELECT '[RANDSTR]' WHERE [RANDNUM]=[RANDNUM]</prefix>
         <suffix>)+</suffix>
     </boundary>
 
@@ -446,8 +446,8 @@ Formats:
         <clause>9</clause>
         <where>1</where>
         <ptype>2</ptype>
-        <prefix>+(SELECT '[RANDSTR]' WHERE [RANDNUM]=[RANDNUM]</prefix>
-        <suffix>)+</suffix>
+        <prefix>'+(SELECT '[RANDSTR]' WHERE [RANDNUM]=[RANDNUM]</prefix>
+        <suffix>)+'</suffix>
     </boundary>
     <!-- End of pre-WHERE generic boundaries -->
 
