@@ -126,7 +126,7 @@ DEFAULT_OUTPUT_ENCODING = "utf-8"
 
 def _match_css_class(str):
     """Build a RE to match the given CSS class."""
-    return re.compile(r"(^|.*\s)%s($|\s)" % str)
+    return re.compile(r"(^|.*\s)%s($|\s)" % re.escape(str))
 
 # First, the classes that represent markup elements.
 
@@ -490,7 +490,7 @@ class NavigableString(text_type, PageElement):
     def __str__(self, encoding=DEFAULT_OUTPUT_ENCODING):
         # Substitute outgoing XML entities.
         data = self.BARE_AMPERSAND_OR_BRACKET.sub(self._sub_entity, self)
-        if encoding:
+        if encoding and sys.version_info < (3, 0):
             return data.encode(encoding)
         else:
             return data
