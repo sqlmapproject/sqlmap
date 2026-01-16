@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """SocksiPy - Python SOCKS module.
-Version 1.00
+Version 1.01
 
 Copyright 2006 Dan-Haim. All rights reserved.
 
@@ -44,6 +44,7 @@ mainly to merge bug fixes found in Sourceforge
 
 """
 
+import functools
 import socket
 import struct
 
@@ -107,8 +108,29 @@ def wrapmodule(module):
     This will only work on modules that import socket directly into the namespace;
     most of the Python Standard Library falls into this category.
     """
-    if _defaultproxy != None:
-        module.socket.socket = socksocket
+    if _defaultproxy is not None:
+        _orig_socket_ctor = _orgsocket
+
+        @functools.wraps(_orig_socket_ctor)
+        def guarded_socket(*args, **kwargs):
+            # socket.socket([family[, type[, proto]]])
+            family = args[0] if len(args) > 0 else kwargs.get("family", socket.AF_INET)
+            stype  = args[1] if len(args) > 1 else kwargs.get("type", socket.SOCK_STREAM)
+
+            # Normalize socket type by stripping flags (Py3.3+ may OR these in)
+            flags = 0
+            flags |= getattr(socket, "SOCK_CLOEXEC", 0)
+            flags |= getattr(socket, "SOCK_NONBLOCK", 0)
+            base_type = stype & ~flags
+
+            if family in (socket.AF_INET, getattr(socket, "AF_INET6", socket.AF_INET)) and base_type == socket.SOCK_STREAM:
+                return socksocket(*args, **kwargs)
+
+            # Fallback: don't proxy AF_UNIX / raw / etc.
+            return _orig_socket_ctor(*args, **kwargs)
+
+        module.socket.socket = guarded_socket
+
         if _defaultproxy[0] == PROXY_TYPE_SOCKS4:
             # Note: unable to prevent DNS leakage in SOCKS4 (Reference: https://security.stackexchange.com/a/171280)
             pass
