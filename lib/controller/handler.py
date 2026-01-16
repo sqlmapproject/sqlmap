@@ -110,7 +110,6 @@ def setHandler():
     """
 
     items = [
-        (DBMS.SNOWFLAKE, SNOWFLAKE_ALIASES, SnowflakeMap, SnowflakeConn),
         (DBMS.MYSQL, MYSQL_ALIASES, MySQLMap, MySQLConn),
         (DBMS.ORACLE, ORACLE_ALIASES, OracleMap, OracleConn),
         (DBMS.PGSQL, PGSQL_ALIASES, PostgreSQLMap, PostgreSQLConn),
@@ -139,7 +138,7 @@ def setHandler():
         (DBMS.FRONTBASE, FRONTBASE_ALIASES, FrontBaseMap, FrontBaseConn),
         (DBMS.RAIMA, RAIMA_ALIASES, RaimaMap, RaimaConn),
         (DBMS.VIRTUOSO, VIRTUOSO_ALIASES, VirtuosoMap, VirtuosoConn),
-        # TODO: put snowflake stuff on this line
+        (DBMS.SNOWFLAKE, SNOWFLAKE_ALIASES, SnowflakeMap, SnowflakeConn),
     ]
 
     _ = max(_ if (conf.get("dbms") or Backend.getIdentifiedDbms() or kb.heuristicExtendedDbms or "").lower() in _[1] else () for _ in items)
