@@ -15,8 +15,6 @@ This file lists bundled packages and their associated licensing terms.
   Copyright (C) 2013, Jonathan Hartley.
 * The `Fcrypt` library located under `thirdparty/fcrypt/`.
   Copyright (C) 2000, 2001, 2004 Carey Evans.
-* The `PrettyPrint` library located under `thirdparty/prettyprint/`.
-  Copyright (C) 2010, Chris Hall.
 * The `SocksiPy` library located under `thirdparty/socks/`.
   Copyright (C) 2006, Dan-Haim.
 

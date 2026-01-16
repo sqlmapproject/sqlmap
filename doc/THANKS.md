@@ -194,9 +194,6 @@ David Guimaraes, <skysbsb(at)gmail.com>
 * for reporting considerable amount of bugs
 * for suggesting several features
 
-Chris Hall, <chris.hall(at)mod10.net>
-* for coding the prettyprint.py library
-
 Tate Hansen, <tate(at)clearnetsec.com>
 * for donating to sqlmap development
 
