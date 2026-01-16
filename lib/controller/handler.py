@@ -44,63 +44,34 @@ from lib.core.settings import VIRTUOSO_ALIASES
 from lib.core.settings import SNOWFLAKE_ALIASES
 from lib.utils.sqlalchemy import SQLAlchemy
 
-from plugins.dbms.access.connector import Connector as AccessConn
 from plugins.dbms.access import AccessMap
-from plugins.dbms.altibase.connector import Connector as AltibaseConn
 from plugins.dbms.altibase import AltibaseMap
-from plugins.dbms.cache.connector import Connector as CacheConn
 from plugins.dbms.cache import CacheMap
-from plugins.dbms.clickhouse.connector import Connector as ClickHouseConn
 from plugins.dbms.clickhouse import ClickHouseMap
-from plugins.dbms.cratedb.connector import Connector as CrateDBConn
 from plugins.dbms.cratedb import CrateDBMap
-from plugins.dbms.cubrid.connector import Connector as CubridConn
 from plugins.dbms.cubrid import CubridMap
-from plugins.dbms.db2.connector import Connector as DB2Conn
 from plugins.dbms.db2 import DB2Map
-from plugins.dbms.derby.connector import Connector as DerbyConn
 from plugins.dbms.derby import DerbyMap
-from plugins.dbms.extremedb.connector import Connector as ExtremeDBConn
 from plugins.dbms.extremedb import ExtremeDBMap
-from plugins.dbms.firebird.connector import Connector as FirebirdConn
 from plugins.dbms.firebird import FirebirdMap
-from plugins.dbms.frontbase.connector import Connector as FrontBaseConn
 from plugins.dbms.frontbase import FrontBaseMap
-from plugins.dbms.h2.connector import Connector as H2Conn
 from plugins.dbms.h2 import H2Map
-from plugins.dbms.hsqldb.connector import Connector as HSQLDBConn
 from plugins.dbms.hsqldb import HSQLDBMap
-from plugins.dbms.informix.connector import Connector as InformixConn
 from plugins.dbms.informix import InformixMap
-from plugins.dbms.maxdb.connector import Connector as MaxDBConn
 from plugins.dbms.maxdb import MaxDBMap
-from plugins.dbms.mckoi.connector import Connector as MckoiConn
 from plugins.dbms.mckoi import MckoiMap
-from plugins.dbms.mimersql.connector import Connector as MimerSQLConn
 from plugins.dbms.mimersql import MimerSQLMap
-from plugins.dbms.monetdb.connector import Connector as MonetDBConn
 from plugins.dbms.monetdb import MonetDBMap
-from plugins.dbms.mssqlserver.connector import Connector as MSSQLServerConn
 from plugins.dbms.mssqlserver import MSSQLServerMap
-from plugins.dbms.mysql.connector import Connector as MySQLConn
 from plugins.dbms.mysql import MySQLMap
-from plugins.dbms.oracle.connector import Connector as OracleConn
 from plugins.dbms.oracle import OracleMap
-from plugins.dbms.postgresql.connector import Connector as PostgreSQLConn
 from plugins.dbms.postgresql import PostgreSQLMap
-from plugins.dbms.presto.connector import Connector as PrestoConn
 from plugins.dbms.presto import PrestoMap
-from plugins.dbms.raima.connector import Connector as RaimaConn
 from plugins.dbms.raima import RaimaMap
-from plugins.dbms.sqlite.connector import Connector as SQLiteConn
 from plugins.dbms.sqlite import SQLiteMap
-from plugins.dbms.sybase.connector import Connector as SybaseConn
 from plugins.dbms.sybase import SybaseMap
-from plugins.dbms.vertica.connector import Connector as VerticaConn
 from plugins.dbms.vertica import VerticaMap
-from plugins.dbms.virtuoso.connector import Connector as VirtuosoConn
 from plugins.dbms.virtuoso import VirtuosoMap
-from plugins.dbms.snowflake.connector import Connector as SnowflakeConn
 from plugins.dbms.snowflake import SnowflakeMap
 
 def setHandler():
@@ -110,35 +81,35 @@ def setHandler():
     """
 
     items = [
-        (DBMS.MYSQL, MYSQL_ALIASES, MySQLMap, MySQLConn),
-        (DBMS.ORACLE, ORACLE_ALIASES, OracleMap, OracleConn),
-        (DBMS.PGSQL, PGSQL_ALIASES, PostgreSQLMap, PostgreSQLConn),
-        (DBMS.MSSQL, MSSQL_ALIASES, MSSQLServerMap, MSSQLServerConn),
-        (DBMS.SQLITE, SQLITE_ALIASES, SQLiteMap, SQLiteConn),
-        (DBMS.ACCESS, ACCESS_ALIASES, AccessMap, AccessConn),
-        (DBMS.FIREBIRD, FIREBIRD_ALIASES, FirebirdMap, FirebirdConn),
-        (DBMS.MAXDB, MAXDB_ALIASES, MaxDBMap, MaxDBConn),
-        (DBMS.SYBASE, SYBASE_ALIASES, SybaseMap, SybaseConn),
-        (DBMS.DB2, DB2_ALIASES, DB2Map, DB2Conn),
-        (DBMS.HSQLDB, HSQLDB_ALIASES, HSQLDBMap, HSQLDBConn),
-        (DBMS.H2, H2_ALIASES, H2Map, H2Conn),
-        (DBMS.INFORMIX, INFORMIX_ALIASES, InformixMap, InformixConn),
-        (DBMS.MONETDB, MONETDB_ALIASES, MonetDBMap, MonetDBConn),
-        (DBMS.DERBY, DERBY_ALIASES, DerbyMap, DerbyConn),
-        (DBMS.VERTICA, VERTICA_ALIASES, VerticaMap, VerticaConn),
-        (DBMS.MCKOI, MCKOI_ALIASES, MckoiMap, MckoiConn),
-        (DBMS.PRESTO, PRESTO_ALIASES, PrestoMap, PrestoConn),
-        (DBMS.ALTIBASE, ALTIBASE_ALIASES, AltibaseMap, AltibaseConn),
-        (DBMS.MIMERSQL, MIMERSQL_ALIASES, MimerSQLMap, MimerSQLConn),
-        (DBMS.CLICKHOUSE, CLICKHOUSE_ALIASES, ClickHouseMap, ClickHouseConn),
-        (DBMS.CRATEDB, CRATEDB_ALIASES, CrateDBMap, CrateDBConn),
-        (DBMS.CUBRID, CUBRID_ALIASES, CubridMap, CubridConn),
-        (DBMS.CACHE, CACHE_ALIASES, CacheMap, CacheConn),
-        (DBMS.EXTREMEDB, EXTREMEDB_ALIASES, ExtremeDBMap, ExtremeDBConn),
-        (DBMS.FRONTBASE, FRONTBASE_ALIASES, FrontBaseMap, FrontBaseConn),
-        (DBMS.RAIMA, RAIMA_ALIASES, RaimaMap, RaimaConn),
-        (DBMS.VIRTUOSO, VIRTUOSO_ALIASES, VirtuosoMap, VirtuosoConn),
-        (DBMS.SNOWFLAKE, SNOWFLAKE_ALIASES, SnowflakeMap, SnowflakeConn),
+        (DBMS.MYSQL, MYSQL_ALIASES, MySQLMap, "plugins.dbms.mysql.connector"),
+        (DBMS.ORACLE, ORACLE_ALIASES, OracleMap, "plugins.dbms.oracle.connector"),
+        (DBMS.PGSQL, PGSQL_ALIASES, PostgreSQLMap, "plugins.dbms.postgresql.connector"),
+        (DBMS.MSSQL, MSSQL_ALIASES, MSSQLServerMap, "plugins.dbms.mssqlserver.connector"),
+        (DBMS.SQLITE, SQLITE_ALIASES, SQLiteMap, "plugins.dbms.sqlite.connector"),
+        (DBMS.ACCESS, ACCESS_ALIASES, AccessMap, "plugins.dbms.access.connector"),
+        (DBMS.FIREBIRD, FIREBIRD_ALIASES, FirebirdMap, "plugins.dbms.firebird.connector"),
+        (DBMS.MAXDB, MAXDB_ALIASES, MaxDBMap, "plugins.dbms.maxdb.connector"),
+        (DBMS.SYBASE, SYBASE_ALIASES, SybaseMap, "plugins.dbms.sybase.connector"),
+        (DBMS.DB2, DB2_ALIASES, DB2Map, "plugins.dbms.db2.connector"),
+        (DBMS.HSQLDB, HSQLDB_ALIASES, HSQLDBMap, "plugins.dbms.hsqldb.connector"),
+        (DBMS.H2, H2_ALIASES, H2Map, "plugins.dbms.h2.connector"),
+        (DBMS.INFORMIX, INFORMIX_ALIASES, InformixMap, "plugins.dbms.informix.connector"),
+        (DBMS.MONETDB, MONETDB_ALIASES, MonetDBMap, "plugins.dbms.monetdb.connector"),
+        (DBMS.DERBY, DERBY_ALIASES, DerbyMap, "plugins.dbms.derby.connector"),
+        (DBMS.VERTICA, VERTICA_ALIASES, VerticaMap, "plugins.dbms.vertica.connector"),
+        (DBMS.MCKOI, MCKOI_ALIASES, MckoiMap, "plugins.dbms.mckoi.connector"),
+        (DBMS.PRESTO, PRESTO_ALIASES, PrestoMap, "plugins.dbms.presto.connector"),
+        (DBMS.ALTIBASE, ALTIBASE_ALIASES, AltibaseMap, "plugins.dbms.altibase.connector"),
+        (DBMS.MIMERSQL, MIMERSQL_ALIASES, MimerSQLMap, "plugins.dbms.mimersql.connector"),
+        (DBMS.CLICKHOUSE, CLICKHOUSE_ALIASES, ClickHouseMap, "plugins.dbms.clickhouse.connector"),
+        (DBMS.CRATEDB, CRATEDB_ALIASES, CrateDBMap, "plugins.dbms.cratedb.connector"),
+        (DBMS.CUBRID, CUBRID_ALIASES, CubridMap, "plugins.dbms.cubrid.connector"),
+        (DBMS.CACHE, CACHE_ALIASES, CacheMap, "plugins.dbms.cache.connector"),
+        (DBMS.EXTREMEDB, EXTREMEDB_ALIASES, ExtremeDBMap, "plugins.dbms.extremedb.connector"),
+        (DBMS.FRONTBASE, FRONTBASE_ALIASES, FrontBaseMap, "plugins.dbms.frontbase.connector"),
+        (DBMS.RAIMA, RAIMA_ALIASES, RaimaMap, "plugins.dbms.raima.connector"),
+        (DBMS.VIRTUOSO, VIRTUOSO_ALIASES, VirtuosoMap, "plugins.dbms.virtuoso.connector"),
+        (DBMS.SNOWFLAKE, SNOWFLAKE_ALIASES, SnowflakeMap, "plugins.dbms.snowflake.connector"),
     ]
 
     _ = max(_ if (conf.get("dbms") or Backend.getIdentifiedDbms() or kb.heuristicExtendedDbms or "").lower() in _[1] else () for _ in items)
@@ -146,7 +117,7 @@ def setHandler():
         items.remove(_)
         items.insert(0, _)
 
-    for dbms, aliases, Handler, Connector in items:
+    for dbms, aliases, Handler, connector in items:
         if conf.forceDbms:
             if conf.forceDbms.lower() not in aliases:
                 continue
@@ -158,9 +129,12 @@ def setHandler():
                 continue
 
         handler = Handler()
-        conf.dbmsConnector = Connector()
+        conf.dbmsConnector = None
 
         if conf.direct:
+            _ = __import__(connector, fromlist=['Connector'])
+            conf.dbmsConnector = _.Connector()
+
             exception = None
             dialect = DBMS_DICT[dbms][3]
 
