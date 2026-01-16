@@ -271,7 +271,7 @@ be bound by the terms and conditions of this License Agreement.
 # MIT
 
 * The `bottle` web framework library located under `thirdparty/bottle/`.
-  Copyright (C) 2018, Marcel Hellkamp.
+  Copyright (C) 2024, Marcel Hellkamp.
 * The `identYwaf` library located under `thirdparty/identywaf/`.
   Copyright (C) 2019-2021, Miroslav Stampar.
 * The `ordereddict` library located under `thirdparty/odict/`.

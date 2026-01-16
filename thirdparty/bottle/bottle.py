@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 """
 Bottle is a fast and simple micro-framework for small web applications. It
 offers request dispatching (Routes) with URL parameter support, templates,
@@ -9,15 +10,14 @@ Python Standard Library.
 
 Homepage and documentation: http://bottlepy.org/
 
-Copyright (c) 2009-2018, Marcel Hellkamp.
+Copyright (c) 2009-2024, Marcel Hellkamp.
 License: MIT (see LICENSE for details)
 """
 
-from __future__ import print_function
 import sys
 
 __author__ = 'Marcel Hellkamp'
-__version__ = '0.13-dev'
+__version__ = '0.13.4'
 __license__ = 'MIT'
 
 ###############################################################################
@@ -94,12 +94,13 @@ if py3k:
     from urllib.parse import urlencode, quote as urlquote, unquote as urlunquote
     urlunquote = functools.partial(urlunquote, encoding='latin1')
     from http.cookies import SimpleCookie, Morsel, CookieError
-    from collections import defaultdict
     from collections.abc import MutableMapping as DictMixin
     from types import ModuleType as new_module
     import pickle
     from io import BytesIO
     import configparser
+    from datetime import timezone
+    UTC = timezone.utc
     # getfullargspec was deprecated in 3.5 and un-deprecated in 3.6
     # getargspec was deprecated in 3.0 and removed in 3.11
     from inspect import getfullargspec
@@ -117,6 +118,7 @@ if py3k:
     def _raise(*a):
         raise a[0](a[1]).with_traceback(a[2])
 else:  # 2.x
+    warnings.warn("Python 2 support will be dropped in Bottle 0.14", DeprecationWarning)
     import httplib
     import thread
     from urlparse import urljoin, SplitResult as UrlSplitResult
@@ -127,11 +129,19 @@ else:  # 2.x
     from imp import new_module
     from StringIO import StringIO as BytesIO
     import ConfigParser as configparser
-    from collections import MutableMapping as DictMixin, defaultdict
+    from collections import MutableMapping as DictMixin
     from inspect import getargspec
+    from datetime import tzinfo
+
+    class _UTC(tzinfo):
+        def utcoffset(self, dt): return timedelta(0)
+        def tzname(self, dt): return "UTC"
+        def dst(self, dt): return timedelta(0)
+    UTC = _UTC()
 
     unicode = unicode
     json_loads = json_lds
+
     exec(compile('def _raise(*a): raise a[0], a[1], a[2]', '<py3fix>', 'exec'))
 
 # Some helpers for string/byte handling
@@ -168,13 +178,13 @@ def update_wrapper(wrapper, wrapped, *a, **ka):
 # And yes, I know PEP-8, but sometimes a lower-case classname makes more sense.
 
 
-def depr(major, minor, cause, fix):
+def depr(major, minor, cause, fix, stacklevel=3):
     text = "Warning: Use of deprecated feature or API. (Deprecated in Bottle-%d.%d)\n"\
            "Cause: %s\n"\
            "Fix: %s\n" % (major, minor, cause, fix)
     if DEBUG == 'strict':
         raise DeprecationWarning(text)
-    warnings.warn(text, DeprecationWarning, stacklevel=3)
+    warnings.warn(text, DeprecationWarning, stacklevel=stacklevel)
     return DeprecationWarning(text)
 
 
@@ -340,7 +350,8 @@ class Router(object):
             g = match.groups()
             if g[2] is not None:
                 depr(0, 13, "Use of old route syntax.",
-                            "Use <name> instead of :name in routes.")
+                            "Use <name> instead of :name in routes.",
+                            stacklevel=4)
             if len(g[0]) % 2:  # Escaped wildcard
                 prefix += match.group(0)[len(g[0]):]
                 offset = match.end()
@@ -417,7 +428,7 @@ class Router(object):
         if (flatpat, method) in self._groups:
             if DEBUG:
                 msg = 'Route <%s %s> overwrites a previously defined route'
-                warnings.warn(msg % (method, rule), RuntimeWarning)
+                warnings.warn(msg % (method, rule), RuntimeWarning, stacklevel=3)
             self.dyna_routes[method][
                 self._groups[flatpat, method]] = whole_rule
         else:
@@ -562,18 +573,17 @@ class Route(object):
         """ Return the callback. If the callback is a decorated function, try to
             recover the original function. """
         func = self.callback
-        func = getattr(func, '__func__' if py3k else 'im_func', func)
-        closure_attr = '__closure__' if py3k else 'func_closure'
-        while hasattr(func, closure_attr) and getattr(func, closure_attr):
-            attributes = getattr(func, closure_attr)
-            func = attributes[0].cell_contents
-
-            # in case of decorators with multiple arguments
-            if not isinstance(func, FunctionType):
-                # pick first FunctionType instance from multiple arguments
-                func = filter(lambda x: isinstance(x, FunctionType),
-                              map(lambda x: x.cell_contents, attributes))
-                func = list(func)[0]  # py3 support
+        while True:
+            if getattr(func, '__wrapped__', False):
+                func = func.__wrapped__
+            elif getattr(func, '__func__', False):
+                func = func.__func__
+            elif getattr(func, '__closure__', False):
+                cells_values = (cell.cell_contents for cell in func.__closure__)
+                isfunc = lambda x: isinstance(x, FunctionType) or hasattr(x, '__call__')
+                func = next(iter(filter(isfunc, cells_values)), func)
+            else:
+                break
         return func
 
     def get_callback_args(self):
@@ -592,7 +602,9 @@ class Route(object):
 
     def __repr__(self):
         cb = self.get_undecorated_callback()
-        return '<%s %s -> %s:%s>' % (self.method, self.rule, cb.__module__, cb.__name__)
+        return '<%s %s -> %s:%s>' % (
+            self.method, self.rule, cb.__module__, getattr(cb, '__name__', '__call__')
+        )
 
 ###############################################################################
 # Application Object ###########################################################
@@ -1131,405 +1143,11 @@ class Bottle(object):
     def __setattr__(self, name, value):
         if name in self.__dict__:
             raise AttributeError("Attribute %s already defined. Plugin conflict?" % name)
-        self.__dict__[name] = value
-
+        object.__setattr__(self, name, value)
 
 ###############################################################################
 # HTTP and WSGI Tools ##########################################################
 ###############################################################################
-
-# Multipart parsing stuff
-
-class StopMarkupException(BottleException):
-    pass
-
-
-HYPHEN = tob('-')
-CR = tob('\r')
-LF = tob('\n')
-CRLF = CR + LF
-LFCRLF = LF + CR + LF
-HYPHENx2 = HYPHEN * 2
-CRLFx2 = CRLF * 2
-CRLF_LEN = len(CRLF)
-CRLFx2_LEN = len(CRLFx2)
-
-MULTIPART_BOUNDARY_PATT = re.compile(r'^multipart/.+?boundary=(.+?)(;|$)')
-
-class MPHeadersEaeter:
-    end_headers_patt = re.compile(tob(r'(\r\n\r\n)|(\r(\n\r?)?)$'))
-
-    def __init__(self):
-        self.headers_end_expected = None
-        self.eat_meth = self._eat_first_crlf_or_last_hyphens
-        self._meth_map = {
-            CR: self._eat_lf,
-            HYPHEN: self._eat_last_hyphen
-        }
-        self.stopped = False
-
-    def eat(self, chunk, base):
-        pos = self.eat_meth(chunk, base)
-        if pos is None: return
-        if self.eat_meth != self._eat_headers:
-            if self.stopped:
-                raise StopMarkupException()
-            base = pos
-            self.eat_meth = self._eat_headers
-            return self.eat(chunk, base)
-        # found headers section end, reset eater
-        self.eat_meth = self._eat_first_crlf_or_last_hyphens
-        return pos
-
-    def _eat_last_hyphen(self, chunk, base):
-        chunk_start = chunk[base: base + 2]
-        if not chunk_start: return
-        if chunk_start == HYPHEN:
-            self.stopped = True
-            return base + 1
-        raise HTTPError(422, 'Last hyphen was expected, got (first 2 symbols slice): %s' % chunk_start)
-
-    def _eat_lf(self, chunk, base):
-        chunk_start = chunk[base: base + 1]
-        if not chunk_start: return
-        if chunk_start == LF: return base + 1
-        invalid_sequence = CR + chunk_start
-        raise HTTPError(422, 'Malformed headers, found invalid sequence: %s' % invalid_sequence)
-
-    def _eat_first_crlf_or_last_hyphens(self, chunk, base):
-        chunk_start = chunk[base: base + 2]
-        if not chunk_start: return
-        if chunk_start == CRLF: return base + 2
-        if len(chunk_start) == 1:
-            self.eat_meth = self._meth_map.get(chunk_start)
-        elif chunk_start == HYPHENx2:
-            self.stopped = True
-            return base + 2
-        if self.eat_meth is None:
-            raise HTTPError(422, 'Malformed headers, invalid section start: %s' % chunk_start)
-
-    def _eat_headers(self, chunk, base):
-        expected = self.headers_end_expected
-        if expected is not None:
-            expected_len = len(expected)
-            chunk_start = chunk[base:expected_len]
-            if chunk_start == expected:
-                self.headers_end_expected = None
-                return base + expected_len - CRLFx2_LEN
-            chunk_start_len = len(chunk_start)
-            if not chunk_start_len: return
-            if chunk_start_len < expected_len:
-                if expected.startswith(chunk_start):
-                    self.headers_end_expected = expected[chunk_start_len:]
-                    return
-                self.headers_end_expected = None
-            if expected == LF:  # we saw CRLFCR
-                invalid_sequence = CR + chunk_start[0:1]
-                # NOTE we don not catch all CRLF-malformed errors, but only obvious ones
-                # to stop doing useless work
-                raise HTTPError(422, 'Malformed headers, found invalid sequence: %s' % invalid_sequence)
-            else:
-                assert expected_len >= 2  # (CR)LFCRLF or (CRLF)CRLF
-                self.headers_end_expected = None
-        assert self.headers_end_expected is None
-        s = self.end_headers_patt.search(chunk, base)
-        if s is None: return
-        end_found = s.start(1)
-        if end_found >= 0: return end_found
-        end_head = s.group(2)
-        if end_head is not None:
-            self.headers_end_expected = CRLFx2[len(end_head):]
-
-
-class MPBodyMarkup:
-    def __init__(self, boundary):
-        self.markups = []
-        self.error = None
-        if CR in boundary:
-            raise HTTPError(422, 'The `CR` must not be in the boundary: %s' % boundary)
-        boundary = HYPHENx2 + boundary
-        self.boundary = boundary
-        token = CRLF + boundary
-        self.tlen = len(token)
-        self.token = token
-        self.trest = self.trest_len = None
-        self.abspos = 0
-        self.abs_start_section = 0
-        self.headers_eater = MPHeadersEaeter()
-        self.cur_meth = self._eat_start_boundary
-        self._eat_headers = self.headers_eater.eat
-        self.stopped = False
-        self.idx = idx = defaultdict(list)   # 1-based indices for each token symbol
-        for i, c in enumerate(token, start=1):
-            idx[c].append([i, token[:i]])
-
-    def _match_tail(self, s, start, end):
-        idxs = self.idx.get(s[end - 1])
-        if idxs is None: return
-        slen = end - start
-        assert slen <= self.tlen
-        for i, thead in idxs:  # idxs is 1-based index
-            search_pos = slen - i
-            if search_pos < 0: return
-            if s[start + search_pos:end] == thead: return i  # if s_tail == token_head
-
-    def _iter_markup(self, chunk):
-        if self.stopped:
-            raise StopMarkupException()
-        cur_meth = self.cur_meth
-        abs_start_section = self.abs_start_section
-        start_next_sec = 0
-        skip_start = 0
-        tlen = self.tlen
-        eat_data, eat_headers = self._eat_data, self._eat_headers
-        while True:
-            try:
-                end_section = cur_meth(chunk, start_next_sec)
-            except StopMarkupException:
-                self.stopped = True
-                return
-            if end_section is None: break
-            if cur_meth == eat_headers:
-                sec_name = 'headers'
-                start_next_sec = end_section + CRLFx2_LEN
-                cur_meth = eat_data
-                skip_start = 0
-            elif cur_meth == eat_data:
-                sec_name = 'data'
-                start_next_sec = end_section + tlen
-                skip_start = CRLF_LEN
-                cur_meth = eat_headers
-            else:
-                assert cur_meth == self._eat_start_boundary
-                sec_name = 'data'
-                start_next_sec = end_section + tlen
-                skip_start = CRLF_LEN
-                cur_meth = eat_headers
-
-                # if the body starts with a hyphen,
-                # we will have a negative abs_end_section equal to the length of the CRLF
-                abs_end_section = self.abspos + end_section
-                if abs_end_section < 0:
-                    assert abs_end_section == -CRLF_LEN
-                    end_section = -self.abspos
-            yield sec_name, (abs_start_section, self.abspos + end_section)
-            abs_start_section = self.abspos + start_next_sec + skip_start
-        self.abspos += len(chunk)
-        self.cur_meth = cur_meth
-        self.abs_start_section = abs_start_section
-
-    def _eat_start_boundary(self, chunk, base):
-        if self.trest is None:
-            chunk_start = chunk[base: base + 1]
-            if not chunk_start: return
-            if chunk_start == CR: return self._eat_data(chunk, base)
-            boundary = self.boundary
-            if chunk.startswith(boundary): return base - CRLF_LEN
-            if chunk_start != boundary[:1]:
-                raise HTTPError(
-                    422, 'Invalid multipart/formdata body start, expected hyphen or CR, got: %s' % chunk_start)
-            self.trest = boundary
-            self.trest_len = len(boundary)
-        end_section = self._eat_data(chunk, base)
-        if end_section is not None: return end_section
-
-    def _eat_data(self, chunk, base):
-        chunk_len = len(chunk)
-        token, tlen, trest, trest_len = self.token, self.tlen, self.trest, self.trest_len
-        start = base
-        match_tail = self._match_tail
-        part = None
-        while True:
-            end = start + tlen
-            if end > chunk_len:
-                part = chunk[start:]
-                break
-            if trest is not None:
-                if chunk[start:start + trest_len] == trest:
-                    data_end = start + trest_len - tlen
-                    self.trest_len = self.trest = None
-                    return data_end
-                else:
-                    trest_len = trest = None
-            matched_len = match_tail(chunk, start, end)
-            if matched_len is not None:
-                if matched_len == tlen:
-                    self.trest_len = self.trest = None
-                    return start
-                else:
-                    trest_len, trest = tlen - matched_len, token[matched_len:]
-            start += tlen
-        # process the tail of the chunk
-        if part:
-            part_len = len(part)
-            if trest is not None:
-                if part_len < trest_len:
-                    if trest.startswith(part):
-                        trest_len -= part_len
-                        trest = trest[part_len:]
-                        part = None
-                    else:
-                        trest_len = trest = None
-                else:
-                    if part.startswith(trest):
-                        data_end = start + trest_len - tlen
-                        self.trest_len = self.trest = None
-                        return data_end
-                    trest_len = trest = None
-
-            if part is not None:
-                assert trest is None
-                matched_len = match_tail(part, 0, part_len)
-                if matched_len is not None:
-                    trest_len, trest = tlen - matched_len, token[matched_len:]
-        self.trest_len, self.trest = trest_len, trest
-
-    def _parse(self, chunk):
-        for name, start_end in self._iter_markup(chunk):
-            self.markups.append([name, start_end])
-
-    def parse(self, chunk):
-        if self.error is not None: return
-        try:
-            self._parse(chunk)
-        except Exception as exc:
-            self.error = exc
-
-
-class MPBytesIOProxy:
-    def __init__(self, src, start, end):
-        self._src = src
-        self._st = start
-        self._end = end
-        self._pos = start
-
-    def tell(self):
-        return self._pos - self._st
-
-    def seek(self, pos):
-        if pos < 0: pos = 0
-        self._pos = min(self._st + pos, self._end)
-
-    def read(self, sz=None):
-        max_sz = self._end - self._pos
-        if max_sz <= 0:
-            return tob('')
-        if sz is not None and sz > 0:
-            sz = min(sz, max_sz)
-        else:
-            sz = max_sz
-        self._src.seek(self._pos)
-        self._pos += sz
-        return self._src.read(sz)
-
-    def writable(self):
-        return False
-
-    def fileno(self):
-        raise OSError('Not supported')
-
-    def closed(self):
-        return self._src.closed()
-
-    def close(self):
-        pass
-
-
-class MPHeader:
-    def __init__(self, name, value, options):
-        self.name = name
-        self.value = value
-        self.options = options
-
-
-class MPFieldStorage:
-
-    _patt = re.compile(tonat('(.+?)(=(.+?))?(;|$)'))
-
-    def __init__(self):
-        self.name = None
-        self.value = None
-        self.filename = None
-        self.file = None
-        self.ctype = None
-        self.headers = {}
-
-    def read(self, src, headers_section, data_section, max_read):
-        start, end = headers_section
-        sz = end - start
-        has_read = sz
-        if has_read > max_read:
-            raise HTTPError(413, 'Request entity too large')
-        src.seek(start)
-        headers_raw = tonat(src.read(sz))
-        for header_raw in headers_raw.splitlines():
-            header = self.parse_header(header_raw)
-            self.headers[header.name] = header
-            if header.name == 'Content-Disposition':
-                self.name = header.options['name']
-                self.filename = header.options.get('filename')
-            elif header.name == 'Content-Type':
-                self.ctype = header.value
-        if self.name is None:
-            raise HTTPError(422, 'Noname field found while parsing multipart/formdata body: %s' % header_raw)
-        if self.filename is not None:
-            self.file = MPBytesIOProxy(src, *data_section)
-        else:
-            start, end = data_section
-            sz = end - start
-            if sz:
-                has_read += sz
-                if has_read > max_read:
-                    raise HTTPError(413, 'Request entity too large')
-                src.seek(start)
-                self.value = tonat(src.read(sz))
-            else:
-                self.value = ''
-        return has_read
-
-    @classmethod
-    def parse_header(cls, s):
-        htype, rest = s.split(':', 1)
-        opt_iter = cls._patt.finditer(rest)
-        hvalue = next(opt_iter).group(1).strip()
-        dct = {}
-        for it in opt_iter:
-            k = it.group(1).strip()
-            v = it.group(3)
-            if v is not None:
-                v = v.strip('"')
-            dct[k.lower()] = v
-        return MPHeader(name=htype, value=hvalue, options=dct)
-
-    @classmethod
-    def iter_items(cls, src, markup, max_read):
-        iter_markup = iter(markup)
-        # check & skip empty data (body should start from empty data)
-        null_data = next(iter_markup, None)
-        if null_data is None: return
-        sec_name, [start, end] = null_data
-        assert sec_name == 'data'
-        if end > 0:
-            raise HTTPError(
-                422, 'Malformed multipart/formdata, unexpected data before the first boundary at: [%d:%d]'
-                % (start, end))
-        headers = next(iter_markup, None)
-        data = next(iter_markup, None)
-        while headers:
-            sec_name, headers_slice = headers
-            assert sec_name == 'headers'
-            if not data:
-                raise HTTPError(
-                    422, 'Malformed multipart/formdata, no data found for the field at: [%d:%d]'
-                    % tuple(headers_slice))
-            sec_name, data_slice = data
-            assert sec_name == 'data'
-            field = cls()
-            has_read = field.read(src, headers_slice, data_slice, max_read=max_read)
-            max_read -= has_read
-            yield field
-            headers = next(iter_markup, None)
-            data = next(iter_markup, None)
 
 
 class BaseRequest(object):
@@ -1720,10 +1338,6 @@ class BaseRequest(object):
 
     @DictProperty('environ', 'bottle.request.body', read_only=True)
     def _body(self):
-        mp_markup = None
-        mp_boundary_match = MULTIPART_BOUNDARY_PATT.match(self.environ.get('CONTENT_TYPE', ''))
-        if mp_boundary_match is not None:
-            mp_markup = MPBodyMarkup(tob(mp_boundary_match.group(1)))
         try:
             read_func = self.environ['wsgi.input'].read
         except KeyError:
@@ -1733,15 +1347,12 @@ class BaseRequest(object):
         body, body_size, is_temp_file = BytesIO(), 0, False
         for part in body_iter(read_func, self.MEMFILE_MAX):
             body.write(part)
-            if mp_markup is not None:
-                mp_markup.parse(part)
             body_size += len(part)
             if not is_temp_file and body_size > self.MEMFILE_MAX:
                 body, tmp = NamedTemporaryFile(mode='w+b'), body
                 body.write(tmp.getvalue())
                 del tmp
                 is_temp_file = True
-        body.multipart_markup = mp_markup
         self.environ['wsgi.input'] = body
         body.seek(0)
         return body
@@ -1779,31 +1390,35 @@ class BaseRequest(object):
     def POST(self):
         """ The values of :attr:`forms` and :attr:`files` combined into a single
             :class:`FormsDict`. Values are either strings (form values) or
-            instances of :class:`MPBytesIOProxy` (file uploads).
+            instances of :class:`FileUpload`.
         """
         post = FormsDict()
+        content_type = self.environ.get('CONTENT_TYPE', '')
+        content_type, options = _parse_http_header(content_type)[0]
         # We default to application/x-www-form-urlencoded for everything that
         # is not multipart and take the fast path (also: 3.1 workaround)
-        if not self.content_type.startswith('multipart/'):
+        if not content_type.startswith('multipart/'):
             body = tonat(self._get_body_string(self.MEMFILE_MAX), 'latin1')
             for key, value in _parse_qsl(body):
                 post[key] = value
             return post
 
-        if py3k:
-            post.recode_unicode = False
-        body = self.body
-        markup = body.multipart_markup
-        if markup is None:
-            raise HTTPError(400, '`boundary` required for mutlipart content')
-        elif markup.error is not None:
-            raise markup.error
-        for item in MPFieldStorage.iter_items(body, markup.markups, self.MEMFILE_MAX):
-            if item.filename is None:
-                post[item.name] = item.value
+        post.recode_unicode = False
+        charset = options.get("charset", "utf8")
+        boundary = options.get("boundary")
+        if not boundary:
+            raise MultipartError("Invalid content type header, missing boundary")
+        parser = _MultipartParser(self.body, boundary, self.content_length,
+            mem_limit=self.MEMFILE_MAX, memfile_limit=self.MEMFILE_MAX,
+            charset=charset)
+
+        for part in parser.parse():
+            if not part.filename and part.is_buffered():
+                post[part.name] = tonat(part.value, 'utf8')
             else:
-                post[item.name] = FileUpload(item.file, item.name,
-                                             item.filename, item.headers)
+                post[part.name] = FileUpload(part.file, part.name,
+                                            part.filename, part.headerlist)
+
         return post
 
     @property
@@ -1974,6 +1589,7 @@ class BaseRequest(object):
             raise AttributeError('Attribute %r not defined.' % name)
 
     def __setattr__(self, name, value):
+        """ Define new attributes that are local to the bound request environment. """
         if name == 'environ': return object.__setattr__(self, name, value)
         key = 'bottle.request.ext.%s' % name
         if hasattr(self, name):
@@ -2024,14 +1640,6 @@ class BaseResponse(object):
         This class does support dict-like case-insensitive item-access to
         headers, but is NOT a dict. Most notably, iterating over a response
         yields parts of the body and not the headers.
-
-        :param body: The response body as one of the supported types.
-        :param status: Either an HTTP status code (e.g. 200) or a status line
-                       including the reason phrase (e.g. '200 OK').
-        :param headers: A dictionary or a list of name-value pairs.
-
-        Additional keyword arguments are added to the list of headers.
-        Underscores in the header name are replaced with dashes.
     """
 
     default_status = 200
@@ -2047,6 +1655,16 @@ class BaseResponse(object):
     }
 
     def __init__(self, body='', status=None, headers=None, **more_headers):
+        """ Create a new response object.
+
+        :param body: The response body as one of the supported types.
+        :param status: Either an HTTP status code (e.g. 200) or a status line
+                       including the reason phrase (e.g. '200 OK').
+        :param headers: A dictionary or a list of name-value pairs.
+
+        Additional keyword arguments are added to the list of headers.
+        Underscores in the header name are replaced with dashes.
+        """
         self._cookies = None
         self._headers = {}
         self.body = body
@@ -2185,7 +1803,7 @@ class BaseResponse(object):
     content_length = HeaderProperty('Content-Length', reader=int, default=-1)
     expires = HeaderProperty(
         'Expires',
-        reader=lambda x: datetime.utcfromtimestamp(parse_date(x)),
+        reader=lambda x: datetime.fromtimestamp(parse_date(x), UTC),
         writer=lambda x: http_date(x))
 
     @property
@@ -2337,10 +1955,18 @@ Response = BaseResponse
 
 
 class HTTPResponse(Response, BottleException):
+    """ A subclass of :class:`Response` that can be raised or returned from request
+        handlers to short-curcuit request processing and override changes made to the
+        global :data:`request` object. This bypasses error handlers, even if the status
+        code indicates an error. Return or raise :class:`HTTPError` to trigger error
+        handlers.
+    """
+
     def __init__(self, body='', status=None, headers=None, **more_headers):
         super(HTTPResponse, self).__init__(body, status, headers, **more_headers)
 
     def apply(self, other):
+        """ Copy the state of this response to a different :class:`Response` object. """
         other._status_code = self._status_code
         other._status_line = self._status_line
         other._headers = self._headers
@@ -2349,6 +1975,8 @@ class HTTPResponse(Response, BottleException):
 
 
 class HTTPError(HTTPResponse):
+    """ A subclass of :class:`HTTPResponse` that triggers error handlers. """
+
     default_status = 500
 
     def __init__(self,
@@ -2459,6 +2087,12 @@ class _ImportRedirect(object):
         if '.' not in fullname: return
         if fullname.rsplit('.', 1)[0] != self.name: return
         return self
+
+    def create_module(self, spec):
+        return self.load_module(spec.name)
+
+    def exec_module(self, module):
+        pass # This probably breaks importlib.reload() :/
 
     def load_module(self, fullname):
         if fullname in sys.modules: return sys.modules[fullname]
@@ -2725,10 +2359,10 @@ _UNSET = object()
 
 class ConfigDict(dict):
     """ A dict-like configuration storage with additional support for
-        namespaces, validators, meta-data, overlays and more.
+        namespaces, validators, meta-data and overlays.
 
-        This dict-like class is heavily optimized for read access. All read-only
-        methods as well as item access should be as fast as the built-in dict.
+        This dict-like class is heavily optimized for read access.
+        Read-only methods and item access should be as fast as a native dict.
     """
 
     __slots__ = ('_meta', '_change_listener', '_overlays', '_virtual_keys', '_source', '__weakref__')
@@ -2743,29 +2377,19 @@ class ConfigDict(dict):
         #: Keys of values copied from the source (values we do not own)
         self._virtual_keys = set()
 
-    def load_module(self, path, squash=True):
+    def load_module(self, name, squash=True):
         """Load values from a Python module.
 
-           Example modue ``config.py``::
+           Import a python module by name and add all upper-case module-level
+           variables to this config dict.
 
-                DEBUG = True
-                SQLITE = {
-                    "db": ":memory:"
-                }
-
-
-           >>> c = ConfigDict()
-           >>> c.load_module('config')
-           {DEBUG: True, 'SQLITE.DB': 'memory'}
-           >>> c.load_module("config", False)
-           {'DEBUG': True, 'SQLITE': {'DB': 'memory'}}
-
-           :param squash: If true (default), dictionary values are assumed to
-                          represent namespaces (see :meth:`load_dict`).
+           :param name: Module name to import and load.
+           :param squash: If true (default), nested dicts are assumed to
+              represent namespaces and flattened (see :meth:`load_dict`).
         """
-        config_obj = load(path)
-        obj = {key: getattr(config_obj, key) for key in dir(config_obj)
-               if key.isupper()}
+        config_obj = load(name)
+        obj = {key: getattr(config_obj, key)
+               for key in dir(config_obj) if key.isupper()}
 
         if squash:
             self.load_dict(obj)
@@ -2774,28 +2398,15 @@ class ConfigDict(dict):
         return self
 
     def load_config(self, filename, **options):
-        """ Load values from an ``*.ini`` style config file.
+        """ Load values from ``*.ini`` style config files using configparser.
 
-            A configuration file consists of sections, each led by a
-            ``[section]`` header, followed by key/value entries separated by
-            either ``=`` or ``:``. Section names and keys are case-insensitive.
-            Leading and trailing whitespace is removed from keys and values.
-            Values can be omitted, in which case the key/value delimiter may
-            also be left out. Values can also span multiple lines, as long as
-            they are indented deeper than the first line of the value. Commands
-            are prefixed by ``#`` or ``;`` and may only appear on their own on
-            an otherwise empty line.
+            INI style sections (e.g. ``[section]``) are used as namespace for
+            all keys within that section. Both section and key names may contain
+            dots as namespace separators and are converted to lower-case.
 
-            Both section and key names may contain dots (``.``) as namespace
-            separators. The actual configuration parameter name is constructed
-            by joining section name and key name together and converting to
-            lower case.
-
-            The special sections ``bottle`` and ``ROOT`` refer to the root
-            namespace and the ``DEFAULT`` section defines default values for all
+            The special sections ``[bottle]`` and ``[ROOT]`` refer to the root
+            namespace and the ``[DEFAULT]`` section defines default values for all
             other sections.
-
-            With Python 3, extended string interpolation is enabled.
 
             :param filename: The path of a config file, or a list of paths.
             :param options: All keyword parameters are passed to the underlying
@@ -2849,7 +2460,7 @@ class ConfigDict(dict):
         for key, value in dict(*a, **ka).items():
             self[prefix + key] = value
 
-    def setdefault(self, key, value):
+    def setdefault(self, key, value=None):
         if key not in self:
             self[key] = value
         return self[key]
@@ -2887,8 +2498,7 @@ class ConfigDict(dict):
                 overlay._delete_virtual(key)
 
     def _set_virtual(self, key, value):
-        """ Recursively set or update virtual keys. Do nothing if non-virtual
-            value is present. """
+        """ Recursively set or update virtual keys. """
         if key in self and key not in self._virtual_keys:
             return  # Do nothing for non-virtual keys.
 
@@ -2900,8 +2510,7 @@ class ConfigDict(dict):
             overlay._set_virtual(key, value)
 
     def _delete_virtual(self, key):
-        """ Recursively delete virtual entry. Do nothing if key is not virtual.
-        """
+        """ Recursively delete virtual entry. """
         if key not in self._virtual_keys:
             return  # Do nothing for non-virtual keys.
 
@@ -2926,7 +2535,10 @@ class ConfigDict(dict):
         return self._meta.get(key, {}).get(metafield, default)
 
     def meta_set(self, key, metafield, value):
-        """ Set the meta field for a key to a new value. """
+        """ Set the meta field for a key to a new value.
+
+            Meta-fields are shared between all members of an overlay tree.
+        """
         self._meta.setdefault(key, {})[metafield] = value
 
     def meta_list(self, key):
@@ -3127,7 +2739,7 @@ class ResourceManager(object):
 
 class FileUpload(object):
     def __init__(self, fileobj, name, filename, headers=None):
-        """ Wrapper for file uploads. """
+        """ Wrapper for a single file uploaded via ``multipart/form-data``. """
         #: Open file(-like) object (BytesIO buffer or temporary file)
         self.file = fileobj
         #: Name of the upload form field
@@ -3259,12 +2871,12 @@ def static_file(filename, root,
         ``If-None-Match``) are answered with ``304 Not Modified`` whenever
         possible. ``HEAD`` and ``Range`` requests (used by download managers to
         check or continue partial downloads) are also handled automatically.
-
     """
 
     root = os.path.join(os.path.abspath(root), '')
     filename = os.path.abspath(os.path.join(root, filename.strip('/\\')))
     headers = headers.copy() if headers else {}
+    getenv = request.environ.get
 
     if not filename.startswith(root):
         return HTTPError(403, "Access denied.")
@@ -3274,30 +2886,31 @@ def static_file(filename, root,
         return HTTPError(403, "You do not have permission to access this file.")
 
     if mimetype is True:
-        if download and download is not True:
-            mimetype, encoding = mimetypes.guess_type(download)
-        else:
-            mimetype, encoding = mimetypes.guess_type(filename)
-        if encoding:
-            headers['Content-Encoding'] = encoding
+        name = download if isinstance(download, str) else filename
+        mimetype, encoding = mimetypes.guess_type(name)
+        if encoding == 'gzip':
+            mimetype = 'application/gzip'
+        elif encoding: # e.g. bzip2 -> application/x-bzip2
+            mimetype = 'application/x-' + encoding
+
+    if charset and mimetype and 'charset=' not in mimetype \
+        and (mimetype[:5] == 'text/' or mimetype == 'application/javascript'):
+        mimetype += '; charset=%s' % charset
 
     if mimetype:
-        if (mimetype[:5] == 'text/' or mimetype == 'application/javascript')\
-          and charset and 'charset' not in mimetype:
-            mimetype += '; charset=%s' % charset
         headers['Content-Type'] = mimetype
 
+    if download is True:
+        download = os.path.basename(filename)
+
     if download:
-        download = os.path.basename(filename if download is True else download)
+        download = download.replace('"','')
         headers['Content-Disposition'] = 'attachment; filename="%s"' % download
 
     stats = os.stat(filename)
     headers['Content-Length'] = clen = stats.st_size
-    headers['Last-Modified'] = email.utils.formatdate(stats.st_mtime,
-                                                      usegmt=True)
+    headers['Last-Modified'] = email.utils.formatdate(stats.st_mtime, usegmt=True)
     headers['Date'] = email.utils.formatdate(time.time(), usegmt=True)
-
-    getenv = request.environ.get
 
     if etag is None:
         etag = '%d:%d:%d:%d:%s' % (stats.st_dev, stats.st_ino, stats.st_mtime,
@@ -3416,7 +3029,7 @@ def _parse_http_header(h):
             values.append((parts[0].strip(), {}))
             for attr in parts[1:]:
                 name, value = attr.split('=', 1)
-                values[-1][1][name.strip()] = value.strip()
+                values[-1][1][name.strip().lower()] = value.strip()
     else:
         lop, key, attrs = ',', None, {}
         for quoted, plain, tok in _hsplit(h):
@@ -3428,9 +3041,9 @@ def _parse_http_header(h):
                 if tok == '=':
                     key = value
                 else:
-                    attrs[value] = ''
+                    attrs[value.strip().lower()] = ''
             elif lop == '=' and key:
-                attrs[key] = value
+                attrs[key.strip().lower()] = value
                 key = None
             lop = tok
     return values
@@ -3594,6 +3207,255 @@ hook      = make_default_app_wrapper('hook')
 install   = make_default_app_wrapper('install')
 uninstall = make_default_app_wrapper('uninstall')
 url       = make_default_app_wrapper('get_url')
+
+
+###############################################################################
+# Multipart Handling ###########################################################
+###############################################################################
+# cgi.FieldStorage was deprecated in Python 3.11 and removed in 3.13
+# This implementation is based on https://github.com/defnull/multipart/
+
+
+class MultipartError(HTTPError):
+    def __init__(self, msg):
+        HTTPError.__init__(self, 400, "MultipartError: " + msg)
+
+
+class _MultipartParser(object):
+    def __init__(
+        self,
+        stream,
+        boundary,
+        content_length=-1,
+        disk_limit=2 ** 30,
+        mem_limit=2 ** 20,
+        memfile_limit=2 ** 18,
+        buffer_size=2 ** 16,
+        charset="latin1",
+    ):
+        self.stream = stream
+        self.boundary = boundary
+        self.content_length = content_length
+        self.disk_limit = disk_limit
+        self.memfile_limit = memfile_limit
+        self.mem_limit = min(mem_limit, self.disk_limit)
+        self.buffer_size = min(buffer_size, self.mem_limit)
+        self.charset = charset
+
+        if not boundary:
+            raise MultipartError("No boundary.")
+
+        if self.buffer_size - 6 < len(boundary):  # "--boundary--\r\n"
+            raise MultipartError("Boundary does not fit into buffer_size.")
+
+    def _lineiter(self):
+        """ Iterate over a binary file-like object (crlf terminated) line by
+            line. Each line is returned as a (line, crlf) tuple. Lines larger
+            than buffer_size are split into chunks where all but the last chunk
+            has an empty string instead of crlf. Maximum chunk size is twice the
+            buffer size.
+        """
+
+        read = self.stream.read
+        maxread, maxbuf = self.content_length, self.buffer_size
+        partial = b""  # Contains the last (partial) line
+
+        while True:
+            chunk = read(maxbuf if maxread < 0 else min(maxbuf, maxread))
+            maxread -= len(chunk)
+            if not chunk:
+                if partial:
+                    yield partial, b''
+                break
+
+            if partial:
+                chunk = partial + chunk
+
+            scanpos = 0
+            while True:
+                i = chunk.find(b'\r\n', scanpos)
+                if i >= 0:
+                    yield chunk[scanpos:i], b'\r\n'
+                    scanpos = i + 2
+                else: # CRLF not found
+                    partial = chunk[scanpos:] if scanpos else chunk
+                    break
+
+            if len(partial) > maxbuf:
+                yield partial[:-1], b""
+                partial = partial[-1:]
+
+    def parse(self):
+        """ Return a MultiPart iterator. Can only be called once. """
+
+        lines, line = self._lineiter(), ""
+        separator = b"--" + tob(self.boundary)
+        terminator = separator + b"--"
+        mem_used, disk_used = 0, 0  # Track used resources to prevent DoS
+        is_tail = False  # True if the last line was incomplete (cutted)
+
+        # Consume first boundary. Ignore any preamble, as required by RFC
+        # 2046, section 5.1.1.
+        for line, nl in lines:
+            if line in (separator, terminator):
+                break
+        else:
+            raise MultipartError("Stream does not contain boundary")
+
+        # First line is termainating boundary -> empty multipart stream
+        if line == terminator:
+            for _ in lines:
+                raise MultipartError("Found data after empty multipart stream")
+            return
+
+        part_options = {
+            "buffer_size": self.buffer_size,
+            "memfile_limit": self.memfile_limit,
+            "charset": self.charset,
+        }
+        part = _MultipartPart(**part_options)
+
+        for line, nl in lines:
+            if not is_tail and (line == separator or line == terminator):
+                part.finish()
+                if part.is_buffered():
+                    mem_used += part.size
+                else:
+                    disk_used += part.size
+                yield part
+                if line == terminator:
+                    break
+                part = _MultipartPart(**part_options)
+            else:
+                is_tail = not nl  # The next line continues this one
+                try:
+                    part.feed(line, nl)
+                    if part.is_buffered():
+                        if part.size + mem_used > self.mem_limit:
+                            raise MultipartError("Memory limit reached.")
+                    elif part.size + disk_used > self.disk_limit:
+                        raise MultipartError("Disk limit reached.")
+                except MultipartError:
+                    part.close()
+                    raise
+        else:
+            part.close()
+
+        if line != terminator:
+            raise MultipartError("Unexpected end of multipart stream.")
+
+
+class _MultipartPart(object):
+    def __init__(self, buffer_size=2 ** 16, memfile_limit=2 ** 18, charset="latin1"):
+        self.headerlist = []
+        self.headers = None
+        self.file = False
+        self.size = 0
+        self._buf = b""
+        self.disposition = None
+        self.name = None
+        self.filename = None
+        self.content_type = None
+        self.charset = charset
+        self.memfile_limit = memfile_limit
+        self.buffer_size = buffer_size
+
+    def feed(self, line, nl=""):
+        if self.file:
+            return self.write_body(line, nl)
+        return self.write_header(line, nl)
+
+    def write_header(self, line, nl):
+        line = line.decode(self.charset)
+
+        if not nl:
+            raise MultipartError("Unexpected end of line in header.")
+
+        if not line.strip():  # blank line -> end of header segment
+            self.finish_header()
+        elif line[0] in " \t" and self.headerlist:
+            name, value = self.headerlist.pop()
+            self.headerlist.append((name, value + line.strip()))
+        else:
+            if ":" not in line:
+                raise MultipartError("Syntax error in header: No colon.")
+
+            name, value = line.split(":", 1)
+            self.headerlist.append((name.strip(), value.strip()))
+
+    def write_body(self, line, nl):
+        if not line and not nl:
+            return  # This does not even flush the buffer
+
+        self.size += len(line) + len(self._buf)
+        self.file.write(self._buf + line)
+        self._buf = nl
+
+        if self.content_length > 0 and self.size > self.content_length:
+            raise MultipartError("Size of body exceeds Content-Length header.")
+
+        if self.size > self.memfile_limit and isinstance(self.file, BytesIO):
+            self.file, old = NamedTemporaryFile(mode="w+b"), self.file
+            old.seek(0)
+
+            copied, maxcopy, chunksize = 0, self.size, self.buffer_size
+            read, write = old.read, self.file.write
+            while copied < maxcopy:
+                chunk = read(min(chunksize, maxcopy - copied))
+                write(chunk)
+                copied += len(chunk)
+
+    def finish_header(self):
+        self.file = BytesIO()
+        self.headers = HeaderDict(self.headerlist)
+        content_disposition = self.headers.get("Content-Disposition")
+        content_type = self.headers.get("Content-Type")
+
+        if not content_disposition:
+            raise MultipartError("Content-Disposition header is missing.")
+
+        self.disposition, self.options = _parse_http_header(content_disposition)[0]
+        self.name = self.options.get("name")
+        if "filename" in self.options:
+            self.filename = self.options.get("filename")
+            if self.filename[1:3] == ":\\" or self.filename[:2] == "\\\\":
+                self.filename = self.filename.split("\\")[-1] # ie6 bug
+
+        self.content_type, options = _parse_http_header(content_type)[0] if content_type else (None, {})
+        self.charset = options.get("charset") or self.charset
+
+        self.content_length = int(self.headers.get("Content-Length", "-1"))
+
+    def finish(self):
+        if not self.file:
+            raise MultipartError("Incomplete part: Header section not closed.")
+        self.file.seek(0)
+
+    def is_buffered(self):
+        """ Return true if the data is fully buffered in memory."""
+        return isinstance(self.file, BytesIO)
+
+    @property
+    def value(self):
+        """ Data decoded with the specified charset """
+
+        return self.raw.decode(self.charset)
+
+    @property
+    def raw(self):
+        """ Data without decoding """
+        pos = self.file.tell()
+        self.file.seek(0)
+
+        try:
+            return self.file.read()
+        finally:
+            self.file.seek(pos)
+
+    def close(self):
+        if self.file:
+            self.file.close()
+            self.file = False
 
 ###############################################################################
 # Server Adapter ###############################################################
@@ -4811,5 +4673,9 @@ def _main(argv):  # pragma: no coverage
         config=config)
 
 
-if __name__ == '__main__':  # pragma: no coverage
+def main():
     _main(sys.argv)
+
+
+if __name__ == '__main__':  # pragma: no coverage
+    main()
