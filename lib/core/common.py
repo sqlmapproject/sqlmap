@@ -2065,7 +2065,7 @@ def getCharset(charsetType=None):
 
     # Digits
     elif charsetType == CHARSET_TYPE.DIGITS:
-        asciiTbl.extend((0, 9))
+        asciiTbl.extend(xrange(0, 10))
         asciiTbl.extend(xrange(47, 58))
 
     # Hexadecimal

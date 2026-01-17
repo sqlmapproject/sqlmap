@@ -471,13 +471,16 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 bit = 0
                 while len(candidates) > 1:
                     bits = {}
+                    maxCandidate = max(candidates)
+                    maxBits = maxCandidate.bit_length() if maxCandidate > 0 else 1
+
                     for candidate in candidates:
-                        bit = 0
-                        while candidate:
+                        for bit in xrange(maxBits):
                             bits.setdefault(bit, 0)
-                            bits[bit] += 1 if candidate & 1 else -1
-                            candidate >>= 1
-                            bit += 1
+                            if candidate & (1 << bit):
+                                bits[bit] += 1
+                            else:
+                                bits[bit] -= 1
 
                     choice = sorted(bits.items(), key=lambda _: abs(_[1]))[0][0]
                     mask = 1 << choice
@@ -499,7 +502,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     incrementCounter(getTechnique())
 
                     if result:
-                        return decodeIntToUnicode(candidates[0])
+                        if candidates[0] == 0:      # Trailing zeros
+                            return None
+                        else:
+                            return decodeIntToUnicode(candidates[0])
 
         # Go multi-threading (--threads > 1)
         if numThreads > 1 and isinstance(length, int) and length > 1:

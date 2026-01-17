@@ -121,9 +121,10 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
                                 fields = list(json_data[0].keys())
 
                                 if fields:
-                                    retVal = ""
+                                    parts = []
                                     for row in json_data:
-                                        retVal += "%s%s%s" % (kb.chars.start, kb.chars.delimiter.join(getUnicode(row.get(field) or NULL) for field in fields), kb.chars.stop)
+                                        parts.append("%s%s%s" % (kb.chars.start, kb.chars.delimiter.join(getUnicode(row.get(field) or NULL) for field in fields), kb.chars.stop))
+                                    retVal = "".join(parts)
                         except:
                             retVal = None
                         else:
