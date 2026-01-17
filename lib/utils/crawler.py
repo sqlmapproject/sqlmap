@@ -254,7 +254,7 @@ def storeResultsToFile(results):
         infoMsg = "writing crawling results to a temporary file '%s' " % filename
         logger.info(infoMsg)
 
-        with openFile(filename, "w+b") as f:
+        with openFile(filename, "w+") as f:
             if conf.forms:
                 f.write("URL,POST\n")
 

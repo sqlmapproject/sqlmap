@@ -490,7 +490,7 @@ class Connect(object):
                 headers = forgeHeaders(auxHeaders, headers)
 
             if kb.headersFile:
-                content = openFile(kb.headersFile, "rb").read()
+                content = openFile(kb.headersFile, 'r').read()
                 for line in content.split("\n"):
                     line = getText(line.strip())
                     if ':' in line:

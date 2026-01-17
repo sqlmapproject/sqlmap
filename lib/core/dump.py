@@ -110,7 +110,7 @@ class Dump(object):
 
         self._outputFile = os.path.join(conf.outputPath, "log")
         try:
-            self._outputFP = openFile(self._outputFile, "ab" if not conf.flushSession else "wb")
+            self._outputFP = openFile(self._outputFile, 'a' if not conf.flushSession else 'w')
         except IOError as ex:
             errMsg = "error occurred while opening log file ('%s')" % getSafeExString(ex)
             raise SqlmapGenericException(errMsg)
@@ -453,7 +453,7 @@ class Dump(object):
             dumpFileName = conf.dumpFile or os.path.join(dumpDbPath, re.sub(r'[\\/]', UNSAFE_DUMP_FILEPATH_REPLACEMENT, "%s.%s" % (unsafeSQLIdentificatorNaming(table), conf.dumpFormat.lower())))
             if not checkFile(dumpFileName, False):
                 try:
-                    openFile(dumpFileName, "w+b").close()
+                    openFile(dumpFileName, "w+").close()
                 except SqlmapSystemException:
                     raise
                 except:
@@ -481,7 +481,7 @@ class Dump(object):
                         else:
                             count += 1
 
-            dumpFP = openFile(dumpFileName, "wb" if not appendToFile else "ab", buffering=DUMP_FILE_BUFFER_SIZE)
+            dumpFP = openFile(dumpFileName, 'w' if not appendToFile else 'a', buffering=DUMP_FILE_BUFFER_SIZE)
 
         count = int(tableValues["__infos__"]["count"])
         if count > TRIM_STDOUT_DUMP_SIZE:

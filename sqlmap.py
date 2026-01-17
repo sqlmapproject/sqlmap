@@ -593,7 +593,7 @@ def main():
 
         if conf.get("harFile"):
             try:
-                with openFile(conf.harFile, "w+b") as f:
+                with openFile(conf.harFile, "w+") as f:
                     json.dump(conf.httpCollector.obtain(), fp=f, indent=4, separators=(',', ': '))
             except SqlmapBaseException as ex:
                 errMsg = getSafeExString(ex)

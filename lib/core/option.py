@@ -753,7 +753,7 @@ def _listTamperingFunctions():
         logger.info(infoMsg)
 
         for script in sorted(glob.glob(os.path.join(paths.SQLMAP_TAMPER_PATH, "*.py"))):
-            content = openFile(script, "rb").read()
+            content = openFile(script, 'r').read()
             match = re.search(r'(?s)__priority__.+"""(.+)"""', content)
             if match:
                 comment = match.group(1).strip()
@@ -1015,8 +1015,8 @@ def _setPostprocessFunctions():
                     handle, filename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.PREPROCESS, suffix=".py")
                     os.close(handle)
 
-                    openFile(filename, "w+b").write("#!/usr/bin/env\n\ndef postprocess(page, headers=None, code=None):\n    return page, headers, code\n")
-                    openFile(os.path.join(os.path.dirname(filename), "__init__.py"), "w+b").write("pass")
+                    openFile(filename, "w+").write("#!/usr/bin/env\n\ndef postprocess(page, headers=None, code=None):\n    return page, headers, code\n")
+                    openFile(os.path.join(os.path.dirname(filename), "__init__.py"), "w+").write("pass")
 
                     errMsg = "function 'postprocess(page, headers=None, code=None)' "
                     errMsg += "in postprocess script '%s' " % script
@@ -1593,7 +1593,7 @@ def _createHomeDirectories():
                 os.makedirs(directory)
 
             _ = os.path.join(directory, randomStr())
-            open(_, "w+b").close()
+            open(_, "w+").close()
             os.remove(_)
 
             if conf.get("outputDir") and context == "output":
@@ -1623,7 +1623,7 @@ def _createTemporaryDirectory():
 
             _ = os.path.join(conf.tmpDir, randomStr())
 
-            open(_, "w+b").close()
+            open(_, "w+").close()
             os.remove(_)
 
             tempfile.tempdir = conf.tmpDir

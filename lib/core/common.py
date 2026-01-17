@@ -2465,7 +2465,7 @@ def getSQLSnippet(dbms, sfile, **variables):
 
     return retVal
 
-def readCachedFileContent(filename, mode="rb"):
+def readCachedFileContent(filename, mode='r'):
     """
     Cached reading of file content (avoiding multiple same file reading)
 
@@ -3609,7 +3609,7 @@ def saveConfig(conf, filename):
 
             config.set(family, option, value)
 
-    with openFile(filename, "wb") as f:
+    with openFile(filename, 'w') as f:
         try:
             config.write(f)
         except IOError as ex:
@@ -3815,6 +3815,7 @@ def openFile(filename, mode='r', encoding=UNICODE_ENCODING, errors="reversible",
     # Reference: https://stackoverflow.com/a/37462452
     if 'b' in mode:
         buffering = 0
+        encoding = None
 
     if filename == STDIN_PIPE_DASH:
         if filename not in kb.cache.content:
@@ -4022,7 +4023,7 @@ def createGithubIssue(errMsg, excMsg):
             logger.info(infoMsg)
 
             try:
-                with openFile(paths.GITHUB_HISTORY, "a+b") as f:
+                with openFile(paths.GITHUB_HISTORY, "a+") as f:
                     f.write("%s\n" % key)
             except:
                 pass
@@ -5103,7 +5104,7 @@ def resetCookieJar(cookieJar):
                 os.close(handle)
 
                 # Reference: http://www.hashbangcode.com/blog/netscape-http-cooke-file-parser-php-584.html
-                with openFile(filename, "w+b") as f:
+                with openFile(filename, "w+") as f:
                     f.write("%s\n" % NETSCAPE_FORMAT_HEADER_COOKIES)
                     for line in lines:
                         _ = line.split("\t")

@@ -64,7 +64,7 @@ def configFileParser(configFile):
     logger.debug(debugMsg)
 
     checkFile(configFile)
-    configFP = openFile(configFile, "rb")
+    configFP = openFile(configFile, 'r')
 
     try:
         config = UnicodeRawConfigParser()
