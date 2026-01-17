@@ -1411,7 +1411,7 @@ def parseJson(content):
     """
     This function parses POST_HINT.JSON and POST_HINT.JSON_LIKE content
 
-    >>> parseJson("{'id':1}")["id"] == 1
+    >>> parseJson("{'id':1, 'foo':[2,3,4]}")["id"] == 1
     True
     >>> parseJson('{"id":1}')["id"] == 1
     True
@@ -1429,10 +1429,10 @@ def parseJson(content):
         if quote == '"':
             retVal = json.loads(content)
         elif quote == "'":
-            content = content.replace('"', '\\"')
-            content = content.replace("\\'", BOUNDARY_BACKSLASH_MARKER)
-            content = content.replace("'", '"')
-            content = content.replace(BOUNDARY_BACKSLASH_MARKER, "'")
+            def _(match):
+                return '"%s"' % match.group(1).replace('"', '\\"')
+
+            content = re.sub(r"'((?:[^'\\]|\\.)*)'", _, content)
             retVal = json.loads(content)
     except:
         pass
