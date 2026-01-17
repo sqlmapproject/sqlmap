@@ -27,6 +27,7 @@ class Wordlist(six.Iterator):
     def __init__(self, filenames, proc_id=None, proc_count=None, custom=None):
         self.filenames = [filenames] if isinstance(filenames, six.string_types) else filenames
         self.fp = None
+        self.zip_file = None
         self.index = 0
         self.counter = -1
         self.current = None
@@ -49,16 +50,16 @@ class Wordlist(six.Iterator):
             self.current = self.filenames[self.index]
             if isZipFile(self.current):
                 try:
-                    _ = zipfile.ZipFile(self.current, 'r')
+                    self.zip_file = zipfile.ZipFile(self.current, 'r')
                 except zipfile.error as ex:
                     errMsg = "something appears to be wrong with "
                     errMsg += "the file '%s' ('%s'). Please make " % (self.current, getSafeExString(ex))
                     errMsg += "sure that you haven't made any changes to it"
                     raise SqlmapInstallationException(errMsg)
-                if len(_.namelist()) == 0:
+                if len(self.zip_file.namelist()) == 0:
                     errMsg = "no file(s) inside '%s'" % self.current
                     raise SqlmapDataException(errMsg)
-                self.fp = _.open(_.namelist()[0])
+                self.fp = self.zip_file.open(self.zip_file.namelist()[0])
             else:
                 self.fp = open(self.current, "rb")
             self.iter = iter(self.fp)
@@ -69,6 +70,10 @@ class Wordlist(six.Iterator):
         if self.fp:
             self.fp.close()
             self.fp = None
+
+        if self.zip_file:
+            self.zip_file.close()
+            self.zip_file = None
 
     def __next__(self):
         retVal = None
