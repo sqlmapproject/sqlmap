@@ -415,7 +415,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             # list
                             if expand and shiftTable:
                                 charTbl = xrange(maxChar + 1, (maxChar + 1) << shiftTable.pop())
-                                originalTbl = xrange(charTbl)
+                                originalTbl = xrange(charTbl[0], charTbl[-1] + 1)
                                 maxChar = maxValue = charTbl[-1]
                                 minValue = charTbl[0]
                             else:
