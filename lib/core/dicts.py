@@ -229,7 +229,7 @@ DBMS_DICT = {
     DBMS.ORACLE: (ORACLE_ALIASES, "python-oracledb", "https://oracle.github.io/python-oracledb/", "oracle"),
     DBMS.SQLITE: (SQLITE_ALIASES, "python-sqlite", "https://docs.python.org/3/library/sqlite3.html", "sqlite"),
     DBMS.ACCESS: (ACCESS_ALIASES, "python-pyodbc", "https://github.com/mkleehammer/pyodbc", "access"),
-    DBMS.FIREBIRD: (FIREBIRD_ALIASES, "python-kinterbasdb", "http://kinterbasdb.sourceforge.net/", "firebird"),
+    DBMS.FIREBIRD: (FIREBIRD_ALIASES, "python-kinterbasdb", "https://kinterbasdb.sourceforge.net/", "firebird"),
     DBMS.MAXDB: (MAXDB_ALIASES, None, None, "maxdb"),
     DBMS.SYBASE: (SYBASE_ALIASES, "python-pymssql", "https://github.com/pymssql/pymssql", "sybase"),
     DBMS.DB2: (DB2_ALIASES, "python ibm-db", "https://github.com/ibmdb/python-ibmdb", "ibm_db_sa"),

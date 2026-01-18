@@ -203,7 +203,7 @@ def main():
                                     target = targets[i]
 
                                     if not re.search(r"(?i)\Ahttp[s]*://", target):
-                                        target = "http://%s" % target
+                                        target = "https://%s" % target
 
                                     infoMsg = "starting crawler for target URL '%s' (%d/%d)" % (target, i + 1, len(targets))
                                     logger.info(infoMsg)
