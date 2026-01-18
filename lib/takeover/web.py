@@ -335,7 +335,7 @@ class Web(object):
                     handle, filename = tempfile.mkstemp()
                     os.close(handle)
 
-                    with openFile(filename, "w+b") as f:
+                    with openFile(filename, "w+") as f:
                         _ = getText(decloak(os.path.join(paths.SQLMAP_SHELL_PATH, "stagers", "stager.%s_" % self.webPlatform)))
                         _ = _.replace(SHELL_WRITABLE_DIR_TAG, directory.replace('/', '\\\\') if Backend.isOs(OS.WINDOWS) else directory)
                         f.write(_)
