@@ -1,4 +1,6 @@
 #!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
 
 if [ ! -f ~/.pypirc ]; then
     echo "File ~/.pypirc is missing"
@@ -9,10 +11,11 @@ declare -x SCRIPTPATH="${0}"
 SETTINGS="${SCRIPTPATH%/*}/../../lib/core/settings.py"
 VERSION=$(cat $SETTINGS | grep -E "^VERSION =" | cut -d '"' -f 2 | cut -d '.' -f 1-3)
 TYPE=pip
-TMP_DIR=/tmp/pypi
-mkdir $TMP_DIR
-cd $TMP_DIR
-cat > $TMP_DIR/setup.py << EOF
+TMP_DIR="$(mktemp -d -t pypi.XXXXXXXX)"
+cleanup() { rm -rf -- "${TMP_DIR:?}"; }
+trap cleanup EXIT
+cd "$TMP_DIR"
+cat > "$TMP_DIR/setup.py" << EOF
 #!/usr/bin/env python
 
 """
@@ -176,8 +179,14 @@ Links
 EOF
 sed -i "s/^VERSION =.*/VERSION = \"$VERSION\"/g" sqlmap/lib/core/settings.py
 sed -i "s/^TYPE =.*/TYPE = \"$TYPE\"/g" sqlmap/lib/core/settings.py
-for file in $(find sqlmap -type f | grep -v -E "\.(git|yml)"); do echo include $file >> MANIFEST.in; done
+: > MANIFEST.in
+while IFS= read -r -d '' file; do
+    case "$file" in
+        *.git|*.yml) continue ;;
+    esac
+    echo "include $file" >> MANIFEST.in
+done < <(find sqlmap -type f -print0)
 python setup.py sdist bdist_wheel
 twine check dist/*
 twine upload --config-file=~/.pypirc dist/*
-rm -rf $TMP_DIR
+rm -rf "$TMP_DIR"
