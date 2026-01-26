@@ -23,7 +23,6 @@ from lib.core.enums import MKSTEMP_PREFIX
 from lib.core.exception import SqlmapMissingDependence
 from lib.core.exception import SqlmapSystemException
 from lib.core.settings import IS_WIN
-from thirdparty.six.moves import queue as _queue
 from thirdparty.six.moves import configparser as _configparser
 
 class NcursesUI:
@@ -37,7 +36,6 @@ class NcursesUI:
         self.fields = {}
         self.running = False
         self.process = None
-        self.queue = None
 
         # Initialize colors
         curses.start_color()
