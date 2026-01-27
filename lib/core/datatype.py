@@ -20,21 +20,18 @@ class AttribDict(dict):
     >>> foo.bar = 1
     >>> foo.bar
     1
+    >>> import copy; copy.deepcopy(foo).bar
+    1
     """
 
     def __init__(self, indict=None, attribute=None, keycheck=True):
         if indict is None:
             indict = {}
 
-        # Set any attributes here - before initialisation
-        # these remain as normal attributes
-        self.attribute = attribute
-        self.keycheck = keycheck
         dict.__init__(self, indict)
-        self.__initialised = True
-
-        # After initialisation, setting attributes
-        # is the same as setting an item
+        self.__dict__["_attribute"] = attribute
+        self.__dict__["_keycheck"] = keycheck
+        self.__dict__["_initialized"] = True
 
     def __getattr__(self, item):
         """
@@ -45,7 +42,7 @@ class AttribDict(dict):
         try:
             return self.__getitem__(item)
         except KeyError:
-            if self.keycheck:
+            if self.__dict__.get("_keycheck"):
                 raise AttributeError("unable to access item '%s'" % item)
             else:
                 return None
@@ -58,7 +55,7 @@ class AttribDict(dict):
         try:
             return self.pop(item)
         except KeyError:
-            if self.keycheck:
+            if self.__dict__.get("_keycheck"):
                 raise AttributeError("unable to access item '%s'" % item)
             else:
                 return None
@@ -69,14 +66,8 @@ class AttribDict(dict):
         Only if we are initialised
         """
 
-        # This test allows attributes to be set in the __init__ method
-        if "_AttribDict__initialised" not in self.__dict__:
-            return dict.__setattr__(self, item, value)
-
-        # Any normal attributes are handled normally
-        elif item in self.__dict__:
-            dict.__setattr__(self, item, value)
-
+        if "_initialized" not in self.__dict__ or item in self.__dict__:
+            self.__dict__[item] = value
         else:
             self.__setitem__(item, value)
 
@@ -87,14 +78,12 @@ class AttribDict(dict):
         self.__dict__ = dict
 
     def __deepcopy__(self, memo):
-        retVal = self.__class__(keycheck=self.keycheck)
+        retVal = self.__class__(keycheck=self.__dict__.get("_keycheck"))
         memo[id(self)] = retVal
 
-        for attr in dir(self):
-            if not attr.startswith('_'):
-                value = getattr(self, attr)
-                if not isinstance(value, (types.BuiltinFunctionType, types.FunctionType, types.MethodType)):
-                    setattr(retVal, attr, copy.deepcopy(value, memo))
+        for attr, value in self.__dict__.items():
+            if attr not in ('_attribute', '_keycheck', '_initialized'):
+                setattr(retVal, attr, copy.deepcopy(value, memo))
 
         for key, value in self.items():
             retVal.__setitem__(key, copy.deepcopy(value, memo))
