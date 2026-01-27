@@ -22,43 +22,39 @@ def getRevisionNumber():
 
     retVal = None
     filePath = None
-    _ = os.path.dirname(__file__)
+    directory = os.path.dirname(__file__)
 
     while True:
-        filePath = os.path.join(_, ".git", "HEAD")
-        if os.path.exists(filePath):
+        candidate = os.path.join(directory, ".git", "HEAD")
+        if os.path.exists(candidate):
+            filePath = candidate
             break
-        else:
-            filePath = None
-            if _ == os.path.dirname(_):
-                break
-            else:
-                _ = os.path.dirname(_)
 
-    while True:
-        if filePath and os.path.isfile(filePath):
-            with openFile(filePath, "r") as f:
-                content = getText(f.read())
-                filePath = None
-
-                if content.startswith("ref: "):
-                    try:
-                        filePath = os.path.join(_, ".git", content.replace("ref: ", "")).strip()
-                    except UnicodeError:
-                        pass
-
-                if filePath is None:
-                    match = re.match(r"(?i)[0-9a-f]{32}", content)
-                    retVal = match.group(0) if match else None
-                    break
-        else:
+        parent = os.path.dirname(directory)
+        if parent == directory:
             break
+        directory = parent
+
+    if filePath:
+        with openFile(filePath, "r") as f:
+            content = getText(f.read()).strip()
+
+            if content.startswith("ref: "):
+                ref_path = content.replace("ref: ", "").strip()
+                filePath = os.path.join(directory, ".git", ref_path)
+
+                if os.path.exists(filePath):
+                    with openFile(filePath, "r") as f_ref:
+                        content = getText(f_ref.read()).strip()
+
+            match = re.match(r"(?i)[0-9a-f]{40}", content)
+            retVal = match.group(0) if match else None
 
     if not retVal:
         try:
-            process = subprocess.Popen("git rev-parse --verify HEAD", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            process = subprocess.Popen(["git", "rev-parse", "--verify", "HEAD"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             stdout, _ = process.communicate()
-            match = re.search(r"(?i)[0-9a-f]{32}", getText(stdout or ""))
+            match = re.search(r"(?i)[0-9a-f]{40}", getText(stdout or ""))
             retVal = match.group(0) if match else None
         except:
             pass
