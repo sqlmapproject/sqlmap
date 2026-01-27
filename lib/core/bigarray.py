@@ -305,11 +305,29 @@ class BigArray(list):
         return "%s%s" % ("..." if len(self.chunks) > 1 else "", self.chunks[-1].__repr__())
 
     def __iter__(self):
-        for i in xrange(len(self)):
-            try:
-                yield self[i]
-            except IndexError:
-                break
+        with self._lock:
+            chunks = list(self.chunks)
+            cache_index = self.cache.index if isinstance(self.cache, Cache) else None
+            cache_data = self.cache.data if isinstance(self.cache, Cache) else None
+
+        for idx, chunk in enumerate(chunks):
+            if isinstance(chunk, list):
+                for item in chunk:
+                    yield item
+            else:
+                try:
+                    if cache_index == idx and cache_data is not None:
+                        data = cache_data
+                    else:
+                        with open(chunk, "rb") as f:
+                            data = pickle.loads(zlib.decompress(f.read()))
+                except Exception as ex:
+                    errMsg = "exception occurred while retrieving data "
+                    errMsg += "from a temporary file ('%s')" % ex
+                    raise SqlmapSystemException(errMsg)
+
+                for item in data:
+                    yield item
 
     def __len__(self):
         return len(self.chunks[-1]) if len(self.chunks) == 1 else (len(self.chunks) - 1) * self.chunk_length + len(self.chunks[-1])
