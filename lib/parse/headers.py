@@ -29,9 +29,8 @@ def headersParser(headers):
             "x-powered-by": os.path.join(paths.SQLMAP_XML_BANNER_PATH, "x-powered-by.xml"),
         }
 
-    for header in (_.lower() for _ in headers if _.lower() in kb.headerPaths):
-        value = headers[header]
-        xmlfile = kb.headerPaths[header]
-        handler = FingerprintHandler(value, kb.headersFp)
-        parseXmlFile(xmlfile, handler)
-        parseXmlFile(paths.GENERIC_XML, handler)
+    for header, xmlfile in kb.headerPaths.items():
+        if header in headers:
+            handler = FingerprintHandler(headers[header], kb.headersFp)
+            parseXmlFile(xmlfile, handler)
+            parseXmlFile(paths.GENERIC_XML, handler)
