@@ -188,13 +188,15 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
             threads.append(thread)
 
         # And wait for them to all finish
-        alive = True
-        while alive:
+        while True:
             alive = False
             for thread in threads:
-                if thread.is_alive():
+                if thread.isAlive():
                     alive = True
-                    time.sleep(0.1)
+                    break
+            if not alive:
+                break
+            time.sleep(0.1)
 
     except (KeyboardInterrupt, SqlmapUserQuitException) as ex:
         print()
@@ -211,8 +213,8 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
         if numThreads > 1:
             logger.info("waiting for threads to finish%s" % (" (Ctrl+C was pressed)" if isinstance(ex, KeyboardInterrupt) else ""))
         try:
-            while (threading.active_count() > 1):
-                pass
+            while threading.active_count() > 1:
+                time.sleep(0.1)
 
         except KeyboardInterrupt:
             kb.multipleCtrlC = True
