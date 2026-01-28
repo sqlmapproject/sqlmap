@@ -2923,22 +2923,15 @@ def findMultipartPostBoundary(post):
     """
 
     retVal = None
-
-    done = set()
-    candidates = []
+    counts = {}
 
     for match in re.finditer(r"(?m)^--(.+?)(--)?$", post or ""):
-        _ = match.group(1).strip().strip('-')
+        boundary = match.group(1).strip().strip('-')
+        counts[boundary] = counts.get(boundary, 0) + 1
 
-        if _ in done:
-            continue
-        else:
-            candidates.append((post.count(_), _))
-            done.add(_)
-
-    if candidates:
-        candidates.sort(key=lambda _: _[0], reverse=True)
-        retVal = candidates[0][1]
+    if counts:
+        sorted_boundaries = sorted(counts.items(), key=lambda x: x[1], reverse=True)
+        retVal = sorted_boundaries[0][0]
 
     return retVal
 
