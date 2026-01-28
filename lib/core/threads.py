@@ -191,7 +191,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
         while True:
             alive = False
             for thread in threads:
-                if thread.isAlive():
+                if thread.is_alive():
                     alive = True
                     break
             if not alive:
