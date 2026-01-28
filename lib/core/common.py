@@ -4512,34 +4512,32 @@ def randomizeParameterValue(value):
 
     retVal = value
 
-    value = re.sub(r"%[0-9a-fA-F]{2}", "", value)
+    retVal = re.sub(r"%[0-9a-fA-F]{2}", "", retVal)
 
-    for match in re.finditer(r"[A-Z]+", value):
+    def _replace_upper(match):
+        original = match.group()
         while True:
-            original = match.group()
-            candidate = randomStr(len(match.group())).upper()
-            if original != candidate:
-                break
+            candidate = randomStr(len(original)).upper()
+            if candidate != original:
+                return candidate
 
-        retVal = retVal.replace(original, candidate)
-
-    for match in re.finditer(r"[a-z]+", value):
+    def _replace_lower(match):
+        original = match.group()
         while True:
-            original = match.group()
-            candidate = randomStr(len(match.group())).lower()
-            if original != candidate:
-                break
+            candidate = randomStr(len(original)).lower()
+            if candidate != original:
+                return candidate
 
-        retVal = retVal.replace(original, candidate)
-
-    for match in re.finditer(r"[0-9]+", value):
+    def _replace_digit(match):
+        original = match.group()
         while True:
-            original = match.group()
-            candidate = str(randomInt(len(match.group())))
-            if original != candidate:
-                break
+            candidate = str(randomInt(len(original)))
+            if candidate != original:
+                return candidate
 
-        retVal = retVal.replace(original, candidate, 1)
+    retVal = re.sub(r"[A-Z]+", _replace_upper, retVal)
+    retVal = re.sub(r"[a-z]+", _replace_lower, retVal)
+    retVal = re.sub(r"[0-9]+", _replace_digit, retVal)
 
     if re.match(r"\A[^@]+@.+\.[a-z]+\Z", value):
         parts = retVal.split('.')
