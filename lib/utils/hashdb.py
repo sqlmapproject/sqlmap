@@ -45,6 +45,9 @@ class HashDB(object):
         if threadData.hashDBCursor is None:
             try:
                 connection = sqlite3.connect(self.filepath, timeout=10, isolation_level=None, check_same_thread=False)
+                connection.execute("PRAGMA journal_mode=WAL")
+                connection.execute("PRAGMA synchronous=NORMAL")
+                connection.execute("PRAGMA busy_timeout=10000")
                 self._connections.append(connection)
                 threadData.hashDBCursor = connection.cursor()
                 threadData.hashDBCursor.execute("CREATE TABLE IF NOT EXISTS storage (id INTEGER PRIMARY KEY, value TEXT)")
@@ -66,7 +69,9 @@ class HashDB(object):
         threadData = getCurrentThreadData()
         try:
             if threadData.hashDBCursor:
-                threadData.hashDBCursor.connection.commit()
+                if self._write_cache:
+                    self.flush()
+
                 threadData.hashDBCursor.close()
                 threadData.hashDBCursor.connection.close()
                 threadData.hashDBCursor = None
@@ -74,9 +79,11 @@ class HashDB(object):
             pass
 
     def closeAll(self):
+        if self._write_cache:
+            self.flush()
+
         for connection in self._connections:
             try:
-                connection.commit()
                 connection.close()
             except:
                 pass
