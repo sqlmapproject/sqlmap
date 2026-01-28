@@ -5562,6 +5562,7 @@ def removePostHintPrefix(value):
 
     return re.sub(r"\A(%s) " % '|'.join(re.escape(__) for __ in getPublicTypeMembers(POST_HINT, onlyValues=True)), "", value)
 
+
 def chunkSplitPostData(data):
     """
     Convert POST data to chunked transfer-encoded data (Note: splitting done by SQL keywords)
@@ -5572,7 +5573,7 @@ def chunkSplitPostData(data):
     """
 
     length = len(data)
-    retVal = ""
+    retVal = []
     index = 0
 
     while index < length:
@@ -5592,12 +5593,14 @@ def chunkSplitPostData(data):
                 break
 
         index += chunkSize
-        retVal += "%x;%s\r\n" % (chunkSize, salt)
-        retVal += "%s\r\n" % candidate
 
-    retVal += "0\r\n\r\n"
+        # Append to list instead of recreating the string
+        retVal.append("%x;%s\r\n" % (chunkSize, salt))
+        retVal.append("%s\r\n" % candidate)
 
-    return retVal
+    retVal.append("0\r\n\r\n")
+
+    return "".join(retVal)
 
 def checkSums():
     """
