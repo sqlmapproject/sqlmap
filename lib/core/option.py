@@ -1034,12 +1034,13 @@ def _setDNSCache():
     """
 
     def _getaddrinfo(*args, **kwargs):
-        if args in kb.cache.addrinfo:
-            return kb.cache.addrinfo[args]
+        key = (args, frozenset(kwargs.items()))
 
-        else:
-            kb.cache.addrinfo[args] = socket._getaddrinfo(*args, **kwargs)
-            return kb.cache.addrinfo[args]
+        if key in kb.cache.addrinfo:
+            return kb.cache.addrinfo[key]
+
+        kb.cache.addrinfo[key] = socket._getaddrinfo(*args, **kwargs)
+        return kb.cache.addrinfo[key]
 
     if not hasattr(socket, "_getaddrinfo"):
         socket._getaddrinfo = socket.getaddrinfo
