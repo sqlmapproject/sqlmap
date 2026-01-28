@@ -8,6 +8,7 @@ See the file 'LICENSE' for copying permission
 from __future__ import division
 
 import codecs
+import collections
 import functools
 import glob
 import inspect
@@ -1057,11 +1058,31 @@ def _setSocketPreConnect():
     def _thread():
         while kb.get("threadContinue") and not conf.get("disablePrecon"):
             try:
-                for key in socket._ready:
-                    if len(socket._ready[key]) < SOCKET_PRE_CONNECT_QUEUE_SIZE:
-                        s = socket.create_connection(*key[0], **dict(key[1]))
-                        with kb.locks.socket:
-                            socket._ready[key].append((s, time.time()))
+                with kb.locks.socket:
+                    keys = list(socket._ready.keys())
+
+                for key in keys:
+                    with kb.locks.socket:
+                        q = socket._ready.get(key)
+                        if q is None or len(q) >= SOCKET_PRE_CONNECT_QUEUE_SIZE:
+                            continue
+                        args = key[0]
+                        kwargs = dict(key[1])
+
+                    s = socket._create_connection(*args, **kwargs)
+
+                    with kb.locks.socket:
+                        q = socket._ready.get(key)
+                        if q is not None and len(q) < SOCKET_PRE_CONNECT_QUEUE_SIZE:
+                            q.append((s, time.time()))
+                            s = None
+
+                    if s is not None:
+                        try:
+                            s.close()
+                        except:
+                            pass
+
             except KeyboardInterrupt:
                 break
             except:
@@ -1071,26 +1092,36 @@ def _setSocketPreConnect():
 
     def create_connection(*args, **kwargs):
         retVal = None
+        stale = []
 
         key = (tuple(args), frozenset(kwargs.items()))
         with kb.locks.socket:
             if key not in socket._ready:
-                socket._ready[key] = []
+                socket._ready[key] = collections.deque()
 
-            while len(socket._ready[key]) > 0:
-                candidate, created = socket._ready[key].pop(0)
+            q = socket._ready[key]
+            while len(q) > 0:
+                candidate, created = q.popleft()
                 if (time.time() - created) < PRECONNECT_CANDIDATE_TIMEOUT:
                     retVal = candidate
                     break
                 else:
-                    try:
-                        candidate.shutdown(socket.SHUT_RDWR)
-                        candidate.close()
-                    except socket.error:
-                        pass
+                    stale.append(candidate)
+
+        for candidate in stale:
+            try:
+                candidate.shutdown(socket.SHUT_RDWR)
+                candidate.close()
+            except:
+                pass
 
         if not retVal:
             retVal = socket._create_connection(*args, **kwargs)
+        else:
+            try:
+                retVal.settimeout(kwargs.get("timeout", socket.getdefaulttimeout()))
+            except:
+                pass
 
         return retVal
 
