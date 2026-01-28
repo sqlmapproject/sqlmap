@@ -187,8 +187,7 @@ class BigArray(list):
         try:
             handle, filename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.BIG_ARRAY)
             self.filenames.add(filename)
-            os.close(handle)
-            with open(filename, "w+b") as f:
+            with os.fdopen(handle, "w+b") as f:
                 f.write(zlib.compress(pickle.dumps(chunk, pickle.HIGHEST_PROTOCOL), BIGARRAY_COMPRESS_LEVEL))
             return filename
         except (OSError, IOError) as ex:
