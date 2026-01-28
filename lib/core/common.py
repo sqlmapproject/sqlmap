@@ -5639,10 +5639,9 @@ def checkSums():
                     continue
                 with open(filepath, "rb") as f:
                     content = f.read()
-                    if b"\r\n" in content and b"sqlmap" in content:
+                    if b'\0' not in content:
                         content = content.replace(b"\r\n", b"\n")
                 if not hashlib.sha256(content).hexdigest() == expected:
                     retVal &= False
-                    break
 
     return retVal
