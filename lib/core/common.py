@@ -1477,10 +1477,18 @@ def cleanQuery(query):
     """
 
     retVal = query
+    queryLower = query.lower()
 
     for sqlStatements in SQL_STATEMENTS.values():
         for sqlStatement in sqlStatements:
             candidate = sqlStatement.replace("(", "").replace(")", "").strip()
+
+            # OPTIMIZATION: Skip expensive regex compilation/search if the keyword
+            # isn't even present in the string. This makes the function O(K) instead of O(N*K)
+            # for the expensive regex part (where K is num keywords).
+            if not candidate or candidate.lower() not in queryLower:
+                continue
+
             queryMatch = re.search(r"(?i)\b(%s)\b" % candidate, query)
 
             if queryMatch and "sys_exec" not in query:
