@@ -20,6 +20,7 @@ from lib.core.compat import xrange
 from lib.core.convert import getBytes
 from lib.core.convert import getUnicode
 from lib.core.data import logger
+from lib.core.datatype import LRUDict
 from lib.core.exception import SqlmapConnectionException
 from lib.core.settings import HASHDB_END_TRANSACTION_RETRIES
 from lib.core.settings import HASHDB_FLUSH_RETRIES
@@ -33,6 +34,7 @@ class HashDB(object):
     def __init__(self, filepath):
         self.filepath = filepath
         self._write_cache = {}
+        self._read_cache = LRUDict(capacity=100)
         self._cache_lock = threading.Lock()
         self._connections = []
         self._last_flush_time = time.time()
@@ -91,6 +93,10 @@ class HashDB(object):
         if key and (self._write_cache or self._connections or os.path.isfile(self.filepath)):
             hash_ = HashDB.hashKey(key)
             retVal = self._write_cache.get(hash_)
+
+            if retVal is None:
+                retVal = self._read_cache.get(hash_)
+
             if not retVal:
                 for _ in xrange(HASHDB_RETRIEVE_RETRIES):
                     try:
@@ -111,6 +117,9 @@ class HashDB(object):
 
                     time.sleep(1)
 
+                if retVal is not None:
+                    self._read_cache[hash_] = retVal
+
         if retVal and unserialize:
             try:
                 retVal = unserializeObject(retVal)
@@ -126,7 +135,7 @@ class HashDB(object):
         if key:
             hash_ = HashDB.hashKey(key)
             with self._cache_lock:
-                self._write_cache[hash_] = getUnicode(value) if not serialize else serializeObject(value)
+                self._write_cache[hash_] = self._read_cache[hash_] = getUnicode(value) if not serialize else serializeObject(value)
                 cache_size = len(self._write_cache)
                 time_since_flush = time.time() - self._last_flush_time
 
