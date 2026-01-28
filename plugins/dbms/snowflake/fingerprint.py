@@ -83,11 +83,11 @@ class Fingerprint(GenericFingerprint):
                 warnMsg = "the back-end DBMS is not %s" % DBMS.SNOWFLAKE
                 logger.warning(warnMsg)
                 return False
-            
+
             setDbms(DBMS.SNOWFLAKE)
             self.getBanner()
             return True
-            
+
         else:
             warnMsg = "the back-end DBMS is not %s" % DBMS.SNOWFLAKE
             logger.warning(warnMsg)
