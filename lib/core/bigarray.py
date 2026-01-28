@@ -93,6 +93,10 @@ class BigArray(list):
     >>> _ = __
     >>> _[-1]
     1
+    >>> _.pop()
+    1
+    >>> len(_)
+    100001
     >>> len([_ for _ in BigArray(xrange(100000))])
     100000
     """
@@ -148,8 +152,11 @@ class BigArray(list):
             if not self.chunks[-1] and len(self.chunks) > 1:
                 self.chunks.pop()
                 try:
-                    with open(self.chunks[-1], "rb") as f:
+                    filename = self.chunks[-1]
+                    with open(filename, "rb") as f:
                         self.chunks[-1] = pickle.loads(zlib.decompress(f.read()))
+                    self._os_remove(filename)
+                    self.filenames.discard(filename)
                 except IOError as ex:
                     errMsg = "exception occurred while retrieving data "
                     errMsg += "from a temporary file ('%s')" % ex
