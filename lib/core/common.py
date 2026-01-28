@@ -5176,10 +5176,12 @@ def prioritySortColumns(columns):
     ['id', 'userid', 'name', 'password']
     """
 
-    def _(column):
-        return column and re.search(r"^id|id$", column, re.I) is not None
+    recompile = re.compile(r"^id|id$", re.I)
 
-    return sorted(sorted(columns, key=len), key=functools.cmp_to_key(lambda x, y: -1 if _(x) and not _(y) else 1 if not _(x) and _(y) else 0))
+    return sorted(columns, key=lambda col: (
+        not (col and recompile.search(col)),
+        len(col)
+    ))
 
 def getRequestHeader(request, name):
     """
