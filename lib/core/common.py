@@ -5643,5 +5643,6 @@ def checkSums():
                         content = content.replace(b"\r\n", b"\n")
                 if not hashlib.sha256(content).hexdigest() == expected:
                     retVal &= False
+                    break
 
     return retVal
