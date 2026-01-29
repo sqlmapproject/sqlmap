@@ -7,6 +7,7 @@ See the file 'LICENSE' for copying permission
 
 import codecs
 import os
+import platform
 import random
 import re
 import string
@@ -19,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.1.83"
+VERSION = "1.10.1.84"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -259,6 +260,7 @@ WEBSOCKET_INITIAL_TIMEOUT = 3
 PLATFORM = os.name
 PYVERSION = sys.version.split()[0]
 IS_WIN = PLATFORM == "nt"
+IS_PYPY = platform.python_implementation() == "PyPy"
 
 # Check if running in terminal
 IS_TTY = hasattr(sys.stdout, "fileno") and os.isatty(sys.stdout.fileno())

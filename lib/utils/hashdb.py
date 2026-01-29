@@ -27,6 +27,7 @@ from lib.core.settings import HASHDB_FLUSH_RETRIES
 from lib.core.settings import HASHDB_FLUSH_THRESHOLD_ITEMS
 from lib.core.settings import HASHDB_FLUSH_THRESHOLD_TIME
 from lib.core.settings import HASHDB_RETRIEVE_RETRIES
+from lib.core.settings import IS_PYPY
 from lib.core.threads import getCurrentThreadData
 from thirdparty import six
 
@@ -45,7 +46,8 @@ class HashDB(object):
         if threadData.hashDBCursor is None:
             try:
                 connection = sqlite3.connect(self.filepath, timeout=10, isolation_level=None, check_same_thread=False)
-                connection.execute("PRAGMA journal_mode=WAL")
+                if not IS_PYPY:
+                    connection.execute("PRAGMA journal_mode=WAL")
                 connection.execute("PRAGMA synchronous=NORMAL")
                 connection.execute("PRAGMA busy_timeout=10000")
                 self._connections.append(connection)
