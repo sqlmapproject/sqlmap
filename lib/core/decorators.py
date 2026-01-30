@@ -6,13 +6,10 @@ See the file 'LICENSE' for copying permission
 """
 
 import functools
-import hashlib
-import struct
 import threading
 
 from lib.core.datatype import LRUDict
 from lib.core.settings import MAX_CACHE_ITEMS
-from lib.core.settings import UNICODE_ENCODING
 from lib.core.threads import getCurrentThreadData
 
 _cache = {}
@@ -40,31 +37,37 @@ def cachedmethod(f):
     _cache[f] = LRUDict(capacity=MAX_CACHE_ITEMS)
     _method_locks[f] = threading.RLock()
 
+    def _freeze(val):
+        if isinstance(val, (list, set, tuple)):
+            return tuple(_freeze(x) for x in val)
+        if isinstance(val, dict):
+            return tuple(sorted((k, _freeze(v)) for k, v in val.items()))
+        return val
+
     @functools.wraps(f)
     def _f(*args, **kwargs):
-        try:
-            # NOTE: fast-path
-            if kwargs:
-                key = hash((f, args, tuple(map(type, args)), frozenset(kwargs.items()))) & 0x7fffffffffffffff
-            else:
-                key = hash((f, args, tuple(map(type, args)))) & 0x7fffffffffffffff
-        except TypeError:
-            # NOTE: failback slow-path
-            parts = (
-                f.__module__ + "." + f.__name__,
-                "^".join(repr(a) for a in args),
-                "^".join("%s=%r" % (k, kwargs[k]) for k in sorted(kwargs))
-            )
-            try:
-                key = struct.unpack("<Q", hashlib.md5("`".join(parts).encode(UNICODE_ENCODING)).digest()[:8])[0] & 0x7fffffffffffffff
-            except (struct.error, ValueError):
-                return f(*args, **kwargs)
-
         lock, cache = _method_locks[f], _cache[f]
 
-        with lock:
-            if key in cache:
-                return cache[key]
+        try:
+            if kwargs:
+                key = (args, frozenset(kwargs.items()))
+            else:
+                key = args
+
+            with lock:
+                if key in cache:
+                    return cache[key]
+
+        except TypeError:
+            # Note: fallback (slowpath(
+            if kwargs:
+                key = (_freeze(args), _freeze(kwargs))
+            else:
+                key = _freeze(args)
+
+            with lock:
+                if key in cache:
+                    return cache[key]
 
         result = f(*args, **kwargs)
 
