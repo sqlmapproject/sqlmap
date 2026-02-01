@@ -17,7 +17,7 @@ from thirdparty.six.moves import http_client as _http_client
 
 abortedFlag = None
 
-def parseSitemap(url, retVal=None):
+def parseSitemap(url, retVal=None, visited=None):
     global abortedFlag
 
     if retVal is not None:
@@ -27,6 +27,12 @@ def parseSitemap(url, retVal=None):
         if retVal is None:
             abortedFlag = False
             retVal = OrderedSet()
+            visited = set()
+
+        if url in visited:
+            return retVal
+
+        visited.add(url)
 
         try:
             content = Request.getPage(url=url, raise404=True)[0] if not abortedFlag else ""
@@ -34,18 +40,28 @@ def parseSitemap(url, retVal=None):
             errMsg = "invalid URL given for sitemap ('%s')" % url
             raise SqlmapSyntaxException(errMsg)
 
-        for match in re.finditer(r"<loc>\s*([^<]+)", content or ""):
-            if abortedFlag:
-                break
-            url = match.group(1).strip()
-            if url.endswith(".xml") and "sitemap" in url.lower():
-                if kb.followSitemapRecursion is None:
-                    message = "sitemap recursion detected. Do you want to follow? [y/N] "
-                    kb.followSitemapRecursion = readInput(message, default='N', boolean=True)
-                if kb.followSitemapRecursion:
-                    parseSitemap(url, retVal)
-            else:
-                retVal.add(url)
+        if content:
+            content = re.sub(r"", "", content, flags=re.DOTALL)
+
+            for match in re.finditer(r"<\w*?loc[^>]*>\s*([^<]+)", content, re.I):
+                if abortedFlag:
+                    break
+
+                foundUrl = match.group(1).strip()
+
+                # Basic validation to avoid junk
+                if not foundUrl.startswith("http"):
+                    continue
+
+                if foundUrl.endswith(".xml") and "sitemap" in foundUrl.lower():
+                    if kb.followSitemapRecursion is None:
+                        message = "sitemap recursion detected. Do you want to follow? [y/N] "
+                        kb.followSitemapRecursion = readInput(message, default='N', boolean=True)
+
+                    if kb.followSitemapRecursion:
+                        parseSitemap(foundUrl, retVal, visited)
+                else:
+                    retVal.add(foundUrl)
 
     except KeyboardInterrupt:
         abortedFlag = True
