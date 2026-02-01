@@ -160,6 +160,23 @@ def dirtyPatches():
 
         logging._releaseLock = _releaseLock
 
+    from xml.etree import ElementTree as et
+    if not getattr(et, "_patched", False):
+        _real_parse = et.parse
+
+        def _safe_parse(source, parser=None):
+            if parser is None:
+                parser = et.XMLParser()
+                if hasattr(parser, "parser"):
+                    def reject(*args): raise ValueError("XML entities are forbidden")
+                    parser.parser.EntityDeclHandler = reject
+                    parser.parser.UnparsedEntityDeclHandler = reject
+
+            return _real_parse(source, parser=parser)
+
+        et.parse = _safe_parse
+        et._patched = True
+
 def resolveCrossReferences():
     """
     Place for cross-reference resolution
