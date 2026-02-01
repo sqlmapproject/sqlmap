@@ -38,6 +38,8 @@ class AttribDict(dict):
         Maps values to attributes
         Only called if there *is NOT* an attribute with this name
         """
+        if item.startswith('__') and item.endswith('__'):
+             raise AttributeError(item)
 
         try:
             return self.__getitem__(item)
