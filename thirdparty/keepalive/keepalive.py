@@ -164,8 +164,10 @@ class ConnectionManager:
 
     def set_ready(self, connection, ready):
         self._lock.acquire()
-        if connection in self._readymap: self._readymap[connection] = ready
-        self._lock.release()
+        try:
+            if connection in self._readymap: self._readymap[connection] = ready
+        finally:
+            self._lock.release()
 
     def get_ready_conn(self, host):
         conn = None
@@ -258,6 +260,16 @@ class KeepAliveHandler:
 
         if DEBUG: DEBUG.info("STATUS: %s, %s", r.status, r.reason)
 
+        if not r.will_close:
+            try:
+                headers = getattr(r, 'msg', None)
+                if headers:
+                    c_head = headers.get("connection")
+                    if c_head and "close" in c_head.lower():
+                        r.will_close = True
+            except Exception:
+                pass
+
         # if not a persistent connection, don't try to reuse it
         if r.will_close:
             if DEBUG: DEBUG.info('server will close connection, discarding')
@@ -322,16 +334,16 @@ class KeepAliveHandler:
 
     def _start_transaction(self, h, req):
         try:
-            if req.data is not None:
+            if req.data:
                 data = req.data
                 if hasattr(req, 'selector'):
                     h.putrequest(req.get_method() or 'POST', req.selector, skip_host=req.has_header("Host"), skip_accept_encoding=req.has_header("Accept-encoding"))
                 else:
                     h.putrequest(req.get_method() or 'POST', req.get_selector(), skip_host=req.has_header("Host"), skip_accept_encoding=req.has_header("Accept-encoding"))
-                if not req.has_header('Content-type'):
+                if 'Content-type' not in req.headers:
                     h.putheader('Content-type',
                                 'application/x-www-form-urlencoded')
-                if not req.has_header('Content-length'):
+                if 'Content-length' not in req.headers:
                     h.putheader('Content-length', '%d' % len(data))
             else:
                 if hasattr(req, 'selector'):
@@ -341,17 +353,17 @@ class KeepAliveHandler:
         except (socket.error, _http_client.HTTPException) as err:
             raise _urllib.error.URLError(err)
 
-        if not req.has_header('Connection'):
+        if 'Connection' not in req.headers:
             h.putheader('Connection', 'keep-alive')
 
         for args in self.parent.addheaders:
-            if not req.has_header(args[0]):
+            if args[0] not in req.headers:
                 h.putheader(*args)
         for k, v in req.headers.items():
             h.putheader(k, v)
         h.endheaders()
-        if req.data is not None:
-            h.send(data)
+        if req.data:
+            h.send(req.data)
 
     def _get_connection(self, host):
         raise NotImplementedError()
