@@ -463,11 +463,11 @@ class Backend(object):
     @staticmethod
     def setArch():
         msg = "what is the back-end database management system architecture?"
-        msg += "\n[1] 32-bit (default)"
-        msg += "\n[2] 64-bit"
+        msg += "\n[1] 32-bit"
+        msg += "\n[2] 64-bit (default)"
 
         while True:
-            choice = readInput(msg, default='1')
+            choice = readInput(msg, default='2')
 
             if hasattr(choice, "isdigit") and choice.isdigit() and int(choice) in (1, 2):
                 kb.arch = 32 if int(choice) == 1 else 64
