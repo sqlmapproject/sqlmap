@@ -278,8 +278,8 @@ def unionUse(expression, unpack=True, dump=False):
                 query = expression.replace(expressionFields, "'%s'||JSON_ARRAYAGG(%s)||'%s'" % (kb.chars.start, ("||'%s'||" % kb.chars.delimiter).join(expressionFieldsList), kb.chars.stop), 1)
             elif Backend.isDbms(DBMS.SQLITE):
                 query = expression.replace(expressionFields, "'%s'||JSON_GROUP_ARRAY(%s)||'%s'" % (kb.chars.start, ("||'%s'||" % kb.chars.delimiter).join("COALESCE(%s,' ')" % field for field in expressionFieldsList), kb.chars.stop), 1)
-            elif Backend.isDbms(DBMS.PGSQL):    # Note: ARRAY_AGG does CSV alike output, thus enclosing start/end inside each item
-                query = expression.replace(expressionFields, "ARRAY_AGG('%s'||%s||'%s')::text" % (kb.chars.start, ("||'%s'||" % kb.chars.delimiter).join("COALESCE(%s::text,' ')" % field for field in expressionFieldsList), kb.chars.stop), 1)
+            elif Backend.isDbms(DBMS.PGSQL):
+                query = expression.replace(expressionFields, "STRING_AGG('%s'||%s||'%s','')" % (kb.chars.start, ("||'%s'||" % kb.chars.delimiter).join("COALESCE(%s::text,' ')" % field for field in expressionFieldsList), kb.chars.stop), 1)
             elif Backend.isDbms(DBMS.MSSQL):
                 query = "'%s'+(%s FOR JSON AUTO, INCLUDE_NULL_VALUES)+'%s'" % (kb.chars.start, expression, kb.chars.stop)
             output = _oneShotUnionUse(query, False)
