@@ -227,17 +227,18 @@ class Connect(object):
 
     @staticmethod
     def _connReadProxy(conn):
-        retVal = b""
+        parts = []
 
         if not kb.dnsMode and conn:
             headers = conn.info()
             if kb.pageCompress and headers and hasattr(headers, "getheader") and (headers.getheader(HTTP_HEADER.CONTENT_ENCODING, "").lower() in ("gzip", "deflate") or "text" not in headers.getheader(HTTP_HEADER.CONTENT_TYPE, "").lower()):
-                retVal = conn.read(MAX_CONNECTION_TOTAL_SIZE)
-                if len(retVal) == MAX_CONNECTION_TOTAL_SIZE:
+                part = conn.read(MAX_CONNECTION_TOTAL_SIZE)
+                if len(part) == MAX_CONNECTION_TOTAL_SIZE:
                     warnMsg = "large compressed response detected. Disabling compression"
                     singleTimeWarnMessage(warnMsg)
                     kb.pageCompress = False
                     raise SqlmapCompressionException
+                parts.append(part)
             else:
                 while True:
                     if not conn:
@@ -252,18 +253,20 @@ class Connect(object):
                         warnMsg = "large response detected. This could take a while"
                         singleTimeWarnMessage(warnMsg)
                         part = re.sub(getBytes(r"(?si)%s.+?%s" % (kb.chars.stop, kb.chars.start)), getBytes("%s%s%s" % (kb.chars.stop, LARGE_READ_TRIM_MARKER, kb.chars.start)), part)
-                        retVal += part
+                        parts.append(part)
                     else:
-                        retVal += part
+                        parts.append(part)
                         break
 
-                    if len(retVal) > MAX_CONNECTION_TOTAL_SIZE:
+                    if sum(len(_) for _ in parts) > MAX_CONNECTION_TOTAL_SIZE:
                         warnMsg = "too large response detected. Automatically trimming it"
                         singleTimeWarnMessage(warnMsg)
                         break
 
         if conf.yuge:
-            retVal = YUGE_FACTOR * retVal
+            parts = YUGE_FACTOR * parts
+
+        retVal = b"".join(parts)
 
         return retVal
 
