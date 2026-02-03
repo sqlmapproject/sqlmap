@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.2.9"
+VERSION = "1.10.2.10"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -122,7 +122,10 @@ PRECONNECT_CANDIDATE_TIMEOUT = 10
 PRECONNECT_INCOMPATIBLE_SERVERS = ("SimpleHTTP", "BaseHTTP")
 
 # Identify WAF/IPS inside limited number of responses (Note: for optimization purposes)
-IDENTYWAF_PARSE_LIMIT = 10
+IDENTYWAF_PARSE_COUNT_LIMIT = 10
+
+# Identify WAF/IPS inside limited size of responses
+IDENTYWAF_PARSE_PAGE_LIMIT = 4 * 1024
 
 # Maximum sleep time in "Murphy" (testing) mode
 MAX_MURPHY_SLEEP_TIME = 3
@@ -779,7 +782,7 @@ MAX_CONNECTION_TOTAL_SIZE = 100 * 1024 * 1024
 # For preventing MemoryError exceptions (caused when using large sequences in difflib.SequenceMatcher)
 MAX_DIFFLIB_SEQUENCE_LENGTH = 10 * 1024 * 1024
 
-# Page size threshold used in heuristic checks (e.g. getHeuristicCharEncoding(), identYwaf, htmlParser, etc.)
+# Page size threshold used in heuristic checks (e.g. getHeuristicCharEncoding(), htmlParser, etc.)
 HEURISTIC_PAGE_SIZE_THRESHOLD = 64 * 1024
 
 # Maximum (multi-threaded) length of entry in bisection algorithm
