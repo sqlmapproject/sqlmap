@@ -1057,6 +1057,7 @@ def _setSocketPreConnect():
 
     def _thread():
         while kb.get("threadContinue") and not conf.get("disablePrecon"):
+            done = False
             try:
                 with kb.locks.socket:
                     keys = list(socket._ready.keys())
@@ -1076,6 +1077,7 @@ def _setSocketPreConnect():
                         if q is not None and len(q) < SOCKET_PRE_CONNECT_QUEUE_SIZE:
                             q.append((s, time.time()))
                             s = None
+                            done = True
 
                     if s is not None:
                         try:
@@ -1088,7 +1090,7 @@ def _setSocketPreConnect():
             except:
                 pass
             finally:
-                time.sleep(0.01)
+                time.sleep(0.01 if not done else 0.001)
 
     def create_connection(*args, **kwargs):
         retVal = None
