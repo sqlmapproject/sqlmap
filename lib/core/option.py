@@ -2086,6 +2086,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.chars.stop = "%s%s%s" % (KB_CHARS_BOUNDARY_CHAR, randomStr(length=3, alphabet=KB_CHARS_LOW_FREQUENCY_ALPHABET), KB_CHARS_BOUNDARY_CHAR)
     kb.chars.at, kb.chars.space, kb.chars.dollar, kb.chars.hash_ = ("%s%s%s" % (KB_CHARS_BOUNDARY_CHAR, _, KB_CHARS_BOUNDARY_CHAR) for _ in randomStr(length=4, lowercase=True))
 
+    kb.checkWafMode = False
     kb.choices = AttribDict(keycheck=False)
     kb.codePage = None
     kb.commonOutputs = None

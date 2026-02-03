@@ -1377,6 +1377,7 @@ def checkWaf():
     kb.choices.redirect = REDIRECTION.YES
     kb.resendPostOnRedirect = False
     conf.timeout = IPS_WAF_CHECK_TIMEOUT
+    kb.checkWafMode = True
 
     try:
         retVal = (Request.queryPage(place=place, value=value, getRatioValue=True, noteResponseTime=False, silent=True, raise404=False, disableTampering=True)[1] or 0) < IPS_WAF_CHECK_RATIO
@@ -1384,6 +1385,7 @@ def checkWaf():
         retVal = True
     finally:
         kb.matchRatio = None
+        kb.checkWafMode = False
 
         conf.timeout = popValue()
         kb.resendPostOnRedirect = popValue()
