@@ -453,6 +453,14 @@ def _setHashDB():
                 errMsg = "unable to flush the session file ('%s')" % getSafeExString(ex)
                 raise SqlmapFilePathException(errMsg)
 
+        for suffix in ("-shm", "-wal"):
+            leftover = conf.hashDBFile + suffix
+            if os.path.exists(leftover):
+                try:
+                    os.remove(leftover)
+                except OSError:
+                    pass
+
     conf.hashDB = HashDB(conf.hashDBFile)
 
 def _resumeHashDBValues():
