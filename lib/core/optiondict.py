@@ -63,6 +63,7 @@ optDict = {
         "safeReqFile": "string",
         "safeFreq": "integer",
         "skipUrlEncode": "boolean",
+        "skipXmlEncode": "boolean",
         "csrfToken": "string",
         "csrfUrl": "string",
         "csrfMethod": "string",

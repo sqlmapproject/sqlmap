@@ -1116,7 +1116,7 @@ class Connect(object):
             logger.log(CUSTOM_LOGGING.PAYLOAD, safecharencode(payload.replace('\\', BOUNDARY_BACKSLASH_MARKER)).replace(BOUNDARY_BACKSLASH_MARKER, '\\'))
 
             if place == PLACE.CUSTOM_POST and kb.postHint:
-                if kb.postHint in (POST_HINT.SOAP, POST_HINT.XML):
+                if kb.postHint in (POST_HINT.SOAP, POST_HINT.XML) and not conf.skipXmlEncode:
                     # payloads in SOAP/XML should have chars > and < replaced
                     # with their HTML encoded counterparts
                     payload = payload.replace("&#", SAFE_HEX_MARKER)
