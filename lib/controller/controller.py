@@ -56,6 +56,7 @@ from lib.core.enums import HTTPMETHOD
 from lib.core.enums import NOTE
 from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
+from lib.core.enums import POST_HINT
 from lib.core.exception import SqlmapBaseException
 from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapNoneDataException
@@ -710,6 +711,16 @@ def start():
 
                         if not conf.randomAgent:
                             errMsg += " and/or switch '--random-agent'"
+
+                    if kb.postHint in (POST_HINT.SOAP, POST_HINT.XML):
+                        if conf.skipXmlEncode:
+                            errMsg += ". Also, you can try to rerun by omitting the "
+                            errMsg += "option '--skip-xmlencode' as the target may "
+                            errMsg += "require proper XML encoding of payload data"
+                        else:
+                            errMsg += ". Also, you can try to rerun by providing the "
+                            errMsg += "option '--skip-xmlencode' as the target may "
+                            errMsg += "not require XML encoding of payload data"
 
                     raise SqlmapNotVulnerableException(errMsg.rstrip('.'))
             else:
