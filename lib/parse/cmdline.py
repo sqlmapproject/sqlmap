@@ -276,8 +276,8 @@ def cmdLineParser(argv=None):
         request.add_argument("--skip-urlencode", dest="skipUrlEncode", action="store_true",
             help="Skip URL encoding of payload data")
 
-        request.add_argument("--skip-xml-encode", dest="skipXmlEncode", action="store_true",
-            help="Skip HTML encoding of payload data for SOAP/XML")
+        request.add_argument("--skip-xmlencode", dest="skipXmlEncode", action="store_true",
+            help="Skip safe encoding of payload data for SOAP/XML")
 
         request.add_argument("--csrf-token", dest="csrfToken",
             help="Parameter used to hold anti-CSRF token")
