@@ -1993,11 +1993,16 @@ def getLocalIP():
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((conf.hostname, conf.port))
         retVal, _ = s.getsockname()
-        s.close()
     except:
         debugMsg = "there was an error in opening socket "
         debugMsg += "connection toward '%s'" % conf.hostname
         logger.debug(debugMsg)
+    finally:
+        if s:
+            try:
+                s.close()
+            except:
+                pass
 
     return retVal
 
