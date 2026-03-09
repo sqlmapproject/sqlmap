@@ -265,6 +265,15 @@ optDict = {
         "verbose": "integer",
     },
 
+    "AI": {
+        "ai": "boolean",
+        "aiOptimizePayloads": "boolean",
+        "aiWafBypass": "boolean",
+        "aiReport": "boolean",
+        "aiAutoTamper": "boolean",
+        "aiRiskAssess": "boolean",
+    },
+
     "Hidden": {
         "dummy": "boolean",
         "disablePrecon": "boolean",

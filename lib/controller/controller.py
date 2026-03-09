@@ -79,6 +79,83 @@ from lib.core.target import initTargetEnv
 from lib.core.target import setupTargetEnv
 from lib.utils.hash import crackHashFile
 
+def _initAIEngine():
+    """
+    Initialize the AI smart scan engine if AI mode is enabled.
+    """
+
+    if conf.ai:
+        from lib.ai.engine import AISmartScan
+        kb.aiSmartScan = AISmartScan()
+        kb.aiSmartScan.startScan()
+
+def _aiAnalyzeWaf():
+    """
+    Run AI WAF analysis after standard WAF check.
+    """
+
+    if not conf.ai or not conf.aiWafBypass or not kb.aiSmartScan:
+        return
+
+    if kb.originalPage and kb.headersFp:
+        wafs = kb.aiSmartScan.analyzeWaf(kb.originalPage, kb.headersFp, kb.originalCode)
+        if wafs:
+            topWaf, confidence = wafs[0]
+            infoMsg = "[AI] WAF identified: %s (confidence: %.0f%%)" % (topWaf, confidence * 100)
+            logger.info(infoMsg)
+
+            tampers = kb.aiSmartScan.wafAnalyzer.getRecommendedTampers(topWaf)
+            if tampers:
+                infoMsg = "[AI] Recommended tamper scripts: %s" % ", ".join(tampers[:5])
+                logger.info(infoMsg)
+
+                if conf.aiAutoTamper and not conf.tamper:
+                    from lib.ai.tamper_advisor import getAITamperAdvisor
+                    advisor = getAITamperAdvisor()
+                    combo = advisor.getTamperCombination(
+                        wafName=topWaf,
+                        dbms=kb.heuristicDbms or (kb.dbms if hasattr(kb, "dbms") else None)
+                    )
+                    if combo:
+                        infoMsg = "[AI] Auto-selecting tamper scripts: %s" % combo
+                        logger.info(infoMsg)
+
+def _aiAssessParameter(place, parameter, value):
+    """
+    Use AI to assess parameter injection risk.
+    Returns risk score (0.0-1.0).
+    """
+
+    if not conf.ai or not conf.aiRiskAssess or not kb.aiSmartScan:
+        return 0.5
+
+    score = kb.aiSmartScan.assessParameterRisk(place, parameter, value)
+    if score >= 0.7:
+        infoMsg = "[AI] Parameter '%s' has HIGH injection risk (%.0f%%)" % (parameter, score * 100)
+        logger.info(infoMsg)
+    elif score <= 0.3:
+        infoMsg = "[AI] Parameter '%s' has LOW injection risk (%.0f%%)" % (parameter, score * 100)
+        logger.info(infoMsg)
+
+    return score
+
+def _aiGenerateReport():
+    """
+    Generate AI-powered vulnerability analysis report at scan end.
+    """
+
+    if not conf.ai or not conf.aiReport:
+        return
+
+    from lib.ai.report import generateAIReport
+
+    scanStats = None
+    if kb.aiSmartScan:
+        scanStats = kb.aiSmartScan.getScanSummary()
+
+    report = generateAIReport(kb.injections, scanStats)
+    dataToStdout(report + "\n")
+
 def _selectInjection():
     """
     Selection function for injection place, parameters and type.
@@ -281,6 +358,9 @@ def start():
         action()
         return True
 
+    # Initialize AI engine if enabled
+    _initAIEngine()
+
     if conf.url and not any((conf.forms, conf.crawlDepth)):
         kb.targets.add((conf.url, conf.method, conf.data, conf.cookie, None))
 
@@ -447,6 +527,9 @@ def start():
 
             checkWaf()
 
+            # AI WAF analysis
+            _aiAnalyzeWaf()
+
             if conf.nullConnection:
                 checkNullConnection()
 
@@ -588,6 +671,9 @@ def start():
                         kb.testedParams.add(paramKey)
 
                         if testSqlInj:
+                            # AI parameter risk assessment
+                            _aiAssessParameter(place, parameter, value)
+
                             try:
                                 if place == PLACE.COOKIE:
                                     pushValue(kb.mergeCookies)
@@ -720,6 +806,9 @@ def start():
                 _saveToHashDB()
                 _showInjections()
                 _selectInjection()
+
+                # Generate AI report
+                _aiGenerateReport()
 
             if kb.injection.place is not None and kb.injection.parameter is not None:
                 if conf.multipleTargets:

@@ -24,7 +24,7 @@ VERSION = "1.10.2.18"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
-DESCRIPTION = "automatic SQL injection and database takeover tool"
+DESCRIPTION = "AI-powered automatic SQL injection and database takeover tool"
 SITE = "https://sqlmap.org"
 DEFAULT_USER_AGENT = "%s (%s)" % (VERSION_STRING, SITE)
 DEV_EMAIL_ADDRESS = "dev@sqlmap.org"
@@ -41,7 +41,8 @@ BANNER = """\033[01;33m\
  ___ ___[.]_____ ___ ___  \033[01;37m{\033[01;%dm%s\033[01;37m}\033[01;33m
 |_ -| . [.]     | .'| . |
 |___|_  [.]_|_|_|__,|  _|
-      |_|V...       |_|   \033[0m\033[4;37m%s\033[0m\n
+      |_|V...       |_|   \033[0m\033[4;37m%s\033[0m
+\033[01;36m    [AI-Powered Engine]\033[0m\n
 """ % (TYPE_COLORS.get(TYPE, 31), VERSION_STRING.split('/')[-1], SITE)
 
 # Minimum distance of ratio from kb.matchRatio to result in True

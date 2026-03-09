@@ -2044,6 +2044,14 @@ def _setConfAttributes():
     conf.tempDirs = []
     conf.trafficFP = None
 
+    # AI options
+    conf.ai = False
+    conf.aiOptimizePayloads = False
+    conf.aiWafBypass = False
+    conf.aiReport = False
+    conf.aiAutoTamper = False
+    conf.aiRiskAssess = False
+
 def _setKnowledgeBaseAttributes(flushAll=True):
     """
     This function set some needed attributes into the knowledge base
@@ -2239,6 +2247,9 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.webSocketRecvCount = None
     kb.wizardMode = False
     kb.xpCmdshellAvailable = False
+
+    # AI engine state
+    kb.aiSmartScan = None
 
     if flushAll:
         kb.checkSitemap = None

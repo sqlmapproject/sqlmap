@@ -133,6 +133,15 @@ def checkSqlInjection(place, parameter, value):
     kb.data.setdefault("randomInt", str(randomInt(10)))
     kb.data.setdefault("randomStr", str(randomStr(10)))
 
+    # AI payload optimization: reorder tests by predicted effectiveness
+    if conf.ai and conf.aiOptimizePayloads and kb.aiSmartScan:
+        try:
+            tests.sort(key=lambda t: kb.aiSmartScan.payloadOptimizer.getPayloadScore(t) if hasattr(t, 'stype') else 50, reverse=True)
+            infoMsg = "[AI] Payloads reordered by predicted effectiveness"
+            logger.info(infoMsg)
+        except Exception:
+            pass
+
     while tests:
         test = tests.pop(0)
 
@@ -792,7 +801,16 @@ def checkSqlInjection(place, parameter, value):
 
                 if injectable is True:
                     kb.vulnHosts.add(conf.hostname)
+
+                    # AI: record successful test
+                    if conf.ai and kb.aiSmartScan:
+                        kb.aiSmartScan.recordTestResult(stype, reqPayload, True, injection.dbms)
+
                     break
+
+            # AI: record failed test
+            if conf.ai and kb.aiSmartScan and not injectable:
+                kb.aiSmartScan.recordTestResult(stype, title, False)
 
             # Reset forced back-end DBMS value
             Backend.flushForcedDbms()

@@ -817,6 +817,27 @@ def cmdLineParser(argv=None):
         miscellaneous.add_argument("--wizard", dest="wizard", action="store_true",
             help="Simple wizard interface for beginner users")
 
+        # AI options
+        ai = parser.add_argument_group("AI", "These options enable AI-powered intelligent scanning features")
+
+        ai.add_argument("--ai", dest="ai", action="store_true",
+            help="Enable AI-powered smart scan engine")
+
+        ai.add_argument("--ai-optimize-payloads", dest="aiOptimizePayloads", action="store_true",
+            help="Use AI to prioritize and optimize injection payloads")
+
+        ai.add_argument("--ai-waf-bypass", dest="aiWafBypass", action="store_true",
+            help="AI-powered WAF fingerprinting and bypass recommendations")
+
+        ai.add_argument("--ai-report", dest="aiReport", action="store_true",
+            help="Generate AI-powered vulnerability analysis report")
+
+        ai.add_argument("--ai-auto-tamper", dest="aiAutoTamper", action="store_true",
+            help="Let AI auto-select tamper scripts based on target analysis")
+
+        ai.add_argument("--ai-risk-assess", dest="aiRiskAssess", action="store_true",
+            help="AI parameter risk assessment to prioritize testing")
+
         # Hidden and/or experimental options
         parser.add_argument("--crack", dest="hashFile",
             help=SUPPRESS)  # "Load and crack hashes from a file (standalone)"
