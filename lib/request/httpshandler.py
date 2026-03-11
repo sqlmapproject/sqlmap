@@ -84,7 +84,18 @@ class HTTPSConnection(_http_client.HTTPSConnection):
                             _contexts[protocol].set_ciphers("ALL@SECLEVEL=0")
                         except (ssl.SSLError, AttributeError):
                             pass
-                    result = _contexts[protocol].wrap_socket(sock, do_handshake_on_connect=True, server_hostname=self.host if re.search(r"\A[\d.]+\Z", self.host or "") is None else None)
+
+                    hostname = self.host
+                    if self.host:
+                        hostname = conf.host
+                    else:
+                        for header, value in conf.httpHeaders:
+                            if header.lower() == "host":
+                                hostname = value
+                                break
+                    hostname = hostname if re.search(r"\A[\d.]+\Z", hostname or "") is None else None
+                    result = _contexts[protocol].wrap_socket(sock, do_handshake_on_connect=True, server_hostname=hostname)
+
                     if result:
                         success = True
                         self.sock = result
