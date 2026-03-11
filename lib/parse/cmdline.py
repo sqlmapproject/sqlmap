@@ -321,8 +321,21 @@ def cmdLineParser(argv=None):
         optimization.add_argument("--null-connection", dest="nullConnection", action="store_true",
             help="Retrieve page length without actual HTTP response body")
 
+        optimization.add_argument("--async", dest="async_opt",
+            action="store_true",
+            help="Use experimental asynchronous bisection for time-based "
+                 "blind injection")
+
         optimization.add_argument("--threads", dest="threads", type=int,
             help="Max number of concurrent HTTP(s) requests (default %d)" % defaults.threads)
+
+        optimization.add_argument("--async-time-based", dest="asyncTimeBased",
+            action="store_true",
+            help="Use async mode for time-based blind injection (faster)")
+
+        optimization.add_argument("--async-concurrent", dest="asyncConcurrent",
+            type=int,
+            help="Max concurrent async requests for time-based (default 5)")
 
         # Injection options
         injection = parser.add_argument_group("Injection", "These options can be used to specify which parameters to test for, provide custom injection payloads and optional tampering scripts")

@@ -20,6 +20,7 @@ from lib.core.common import filterControlChars
 from lib.core.common import getCharset
 from lib.core.common import getCounter
 from lib.core.common import getPartRun
+from lib.core.common import getSafeExString
 from lib.core.common import getTechnique
 from lib.core.common import getTechniqueData
 from lib.core.common import goGoodSamaritan
@@ -69,6 +70,41 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     Bisection algorithm that can be used to perform blind SQL injection
     on an affected host
     """
+
+    # Try async mode for time-based if enabled
+    if conf.get("asyncTimeBased") and length and getTechnique() in (
+            PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED):
+        try:
+            from lib.techniques.blind.inference_async import bisection_async
+            
+            infoMsg = "using async mode for time-based blind injection"
+            logger.info(infoMsg)
+            
+            max_concurrent = conf.get("asyncConcurrent") or 5
+            retrieved_length, async_result = bisection_async(
+                payload=payload,
+                expression=expression,
+                length=length,
+                charsetType=charsetType,
+                max_concurrent=max_concurrent
+            )
+            
+            if async_result is not None:
+                infoMsg = "async extraction completed successfully"
+                logger.info(infoMsg)
+                return retrieved_length, async_result
+            else:
+                warnMsg = "async extraction returned None, "
+                warnMsg += "falling back to sync mode"
+                logger.warning(warnMsg)
+                
+        except (ImportError, SyntaxError):
+            warnMsg = "async mode requires Python 3.5+ and 'aiohttp' module"
+            logger.warning(warnMsg)
+        except Exception as ex:
+            warnMsg = "async extraction failed (%s), " % getSafeExString(ex)
+            warnMsg += "falling back to sync mode"
+            logger.warning(warnMsg)
 
     abortedFlag = False
     showEta = False
@@ -506,6 +542,34 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             return None
                         else:
                             return decodeIntToUnicode(candidates[0])
+
+        # Asynchronous time-based execution (--async)
+        if timeBasedCompare and getattr(conf, "async_opt", False) \
+                and isinstance(length, int) and length > 1:
+            try:
+                import lib.techniques.blind.inference_async as ia
+                if ia.HAS_AIOHTTP:
+                    engine = ia.AsyncTimeBasedInference(
+                        max_concurrent_requests=conf.threads or 5)
+                    import asyncio
+                    
+                    try:
+                        loop = asyncio.get_event_loop()
+                    except RuntimeError:
+                        loop = asyncio.new_event_loop()
+                        asyncio.set_event_loop(loop)
+                        
+                    result = loop.run_until_complete(
+                        engine.extract_data_async(
+                            expression, payload, length, charsetType,
+                            firstChar, lastChar)
+                    )
+                    
+                    if result:
+                        return result
+            except Exception as ex:
+                errMsg = "an error occurred during async execution: %s" % ex
+                logger.error(errMsg)
 
         # Go multi-threading (--threads > 1)
         if numThreads > 1 and isinstance(length, int) and length > 1:
