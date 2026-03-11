@@ -86,7 +86,7 @@ class HTTPSConnection(_http_client.HTTPSConnection):
                             pass
 
                     hostname = self.host
-                    if self.host:
+                    if conf.host:
                         hostname = conf.host
                     else:
                         for header, value in conf.httpHeaders:
