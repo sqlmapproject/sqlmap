@@ -52,6 +52,7 @@ from lib.utils.pivotdumptable import pivotDumpTable
 from thirdparty import six
 from thirdparty.six.moves import zip as _zip
 
+G_column_name_list=['']
 class Entries(object):
     """
     This class defines entries' enumeration functionalities for plugins.
@@ -169,6 +170,7 @@ class Entries(object):
                 infoMsg = "fetching entries"
                 if conf.col:
                     infoMsg += " of column(s) '%s'" % colNames
+                G_column_name_list[0] = colString
                 infoMsg += " for table '%s'" % unsafeSQLIdentificatorNaming(tbl)
                 if METADB_SUFFIX.upper() not in conf.db.upper():
                     infoMsg += " in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
