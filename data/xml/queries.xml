@@ -1843,4 +1843,67 @@
         <search_table/>
         <search_column/>
     </dbms>
+
+    <dbms value="Spanner">
+        <cast query="CAST(%s AS STRING)"/>
+        <length query="CHAR_LENGTH(CAST(%s AS STRING))"/>
+        <isnull query="IFNULL(CAST(%s AS STRING),' ')"/>
+        <delimiter query="||"/>
+        <limit query="LIMIT %d OFFSET %d"/>
+        <limitregexp query="\s+LIMIT\s+([\d]+)\s+OFFSET\s+([\d]+)" query2="\s+LIMIT\s+([\d]+)"/>
+        <limitgroupstart query="2"/>
+        <limitgroupstop query="1"/>
+        <limitstring query=" OFFSET "/>
+        <order query="ORDER BY %s ASC"/>
+        <count query="COUNT(%s)"/>
+        <comment query="--" query2="#"/>
+        <substring query="SUBSTR(CAST((%s) AS STRING),%d,%d)"/>
+        <concatenate query="%s||%s"/>
+        <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
+        <hex query="TO_HEX(CAST(%s AS BYTES))"/>
+        <inference query="TO_CODE_POINTS(SUBSTR(CAST((%s) AS STRING),%d,1))[SAFE_OFFSET(0)]>%d"/>
+        <banner query="'Google Cloud Spanner'"/>
+        <current_user/>
+        <current_db/>
+        <hostname/>
+        <table_comment/>
+        <column_comment/>
+        <is_dba/>
+        <users/>
+        <passwords/>
+        <privileges/>
+        <roles/>
+        <statements>
+            <inband query="SELECT text FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE"/>
+            <blind query="SELECT text FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE" count="SELECT COUNT(text) FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE"/>
+        </statements>
+        <dbs>
+            <inband query="SELECT CASE schema_name WHEN '' THEN 'default' ELSE schema_name END FROM INFORMATION_SCHEMA.SCHEMATA"/>
+            <blind query="SELECT CASE schema_name WHEN '' THEN 'default' ELSE schema_name END FROM INFORMATION_SCHEMA.SCHEMATA GROUP BY schema_name ORDER BY schema_name LIMIT 1 OFFSET %d" count="SELECT COUNT(DISTINCT schema_name) FROM INFORMATION_SCHEMA.SCHEMATA"/>
+        </dbs>
+        <tables>
+            <inband query="SELECT CASE table_schema WHEN '' THEN 'default' ELSE table_schema END,table_name FROM INFORMATION_SCHEMA.TABLES" condition="table_schema"/>
+            <blind query="SELECT table_name FROM INFORMATION_SCHEMA.TABLES WHERE table_schema=CASE '%s' WHEN 'default' THEN '' ELSE '%s' END ORDER BY table_name" count="SELECT COUNT(table_name) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema=CASE '%s' WHEN 'default' THEN '' ELSE '%s' END"/>
+        </tables>
+        <columns>
+            <inband query="SELECT column_name,spanner_type FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='%s' AND table_schema=CASE '%s' WHEN 'default' THEN '' ELSE '%s' END" condition="column_name"/>
+            <blind query="SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='%s' AND table_schema=CASE '%s' WHEN 'default' THEN '' ELSE '%s' END ORDER BY column_name" query2="SELECT spanner_type FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='%s' AND column_name='%s' AND table_schema=CASE '%s' WHEN 'default' THEN '' ELSE '%s' END" count="SELECT COUNT(column_name) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='%s' AND table_schema=CASE '%s' WHEN 'default' THEN '' ELSE '%s' END" condition="column_name"/>
+        </columns>
+        <dump_table>
+            <inband query="SELECT %s FROM %s.%s ORDER BY %s"/>
+            <blind query="SELECT %s FROM %s.%s ORDER BY %s LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM %s.%s"/>
+        </dump_table>
+        <search_db>
+            <inband query="SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA WHERE %s" condition="schema_name"/>
+            <blind query="SELECT DISTINCT(schema_name) FROM INFORMATION_SCHEMA.SCHEMATA WHERE %s ORDER BY schema_name" count="SELECT COUNT(DISTINCT(schema_name)) FROM INFORMATION_SCHEMA.SCHEMATA WHERE %s" condition="schema_name"/>
+        </search_db>
+        <search_table>
+            <inband query="SELECT table_schema,table_name FROM INFORMATION_SCHEMA.TABLES WHERE %s" condition="table_name" condition2="table_schema"/>
+            <blind query="SELECT DISTINCT(table_schema) FROM INFORMATION_SCHEMA.TABLES WHERE %s ORDER BY table_schema" query2="SELECT table_name FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='%s'" count="SELECT COUNT(DISTINCT(table_schema)) FROM INFORMATION_SCHEMA.TABLES WHERE %s" count2="SELECT COUNT(table_name) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='%s'" condition="table_name" condition2="table_schema"/>
+        </search_table>
+        <search_column>
+            <inband query="SELECT table_schema,table_name FROM INFORMATION_SCHEMA.COLUMNS WHERE %s" condition="column_name" condition2="table_schema" condition3="table_name"/>
+            <blind query="SELECT DISTINCT(table_schema) FROM INFORMATION_SCHEMA.COLUMNS WHERE %s ORDER BY table_schema" query2="SELECT DISTINCT(table_name) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema='%s'" count="SELECT COUNT(DISTINCT(table_schema)) FROM INFORMATION_SCHEMA.COLUMNS WHERE %s" count2="SELECT COUNT(DISTINCT(table_name)) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema='%s'" condition="column_name" condition2="table_schema" condition3="table_name"/>
+        </search_column>
+    </dbms>
 </root>

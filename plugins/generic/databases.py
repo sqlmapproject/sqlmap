@@ -108,7 +108,7 @@ class Databases(object):
             warnMsg += "names will be fetched from 'mysql' database"
             logger.warning(warnMsg)
 
-        elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.PGSQL, DBMS.MONETDB, DBMS.DERBY, DBMS.VERTICA, DBMS.PRESTO, DBMS.MIMERSQL, DBMS.CRATEDB, DBMS.CACHE, DBMS.FRONTBASE, DBMS.SNOWFLAKE):
+        elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.PGSQL, DBMS.MONETDB, DBMS.DERBY, DBMS.VERTICA, DBMS.PRESTO, DBMS.MIMERSQL, DBMS.CRATEDB, DBMS.CACHE, DBMS.FRONTBASE, DBMS.SNOWFLAKE, DBMS.SPANNER):
             warnMsg = "schema names are going to be used on %s " % Backend.getIdentifiedDbms()
             warnMsg += "for enumeration as the counterpart to database "
             warnMsg += "names on other DBMSes"
@@ -311,6 +311,9 @@ class Databases(object):
                     if len(dbs) < 2 and ("%s," % condition) in query:
                         query = query.replace("%s," % condition, "", 1)
 
+                    if Backend.isDbms(DBMS.SPANNER):
+                        query = query.replace("IN ('default')", "IN ('')")
+
                 if query:
                     values = inject.getValue(query, blind=False, time=False)
 
@@ -371,7 +374,9 @@ class Databases(object):
                     infoMsg += "database '%s'" % unsafeSQLIdentificatorNaming(db)
                     logger.info(infoMsg)
 
-                    if Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.FIREBIRD, DBMS.MAXDB, DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB):
+                    if Backend.getIdentifiedDbms() in (DBMS.SPANNER,):
+                        query = _count % (unsafeSQLIdentificatorNaming(db), unsafeSQLIdentificatorNaming(db))
+                    elif Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.FIREBIRD, DBMS.MAXDB, DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB):
                         query = _count % unsafeSQLIdentificatorNaming(db)
                     else:
                         query = _count
@@ -404,6 +409,8 @@ class Databases(object):
                             query = _query % index
                         elif Backend.getIdentifiedDbms() in (DBMS.HSQLDB, DBMS.INFORMIX, DBMS.FRONTBASE, DBMS.VIRTUOSO):
                             query = _query % (index, unsafeSQLIdentificatorNaming(db))
+                        elif Backend.getIdentifiedDbms() in (DBMS.SPANNER,):
+                            query = _query % (unsafeSQLIdentificatorNaming(db), unsafeSQLIdentificatorNaming(db), index)
                         else:
                             query = _query % (unsafeSQLIdentificatorNaming(db), index)
 
@@ -628,6 +635,10 @@ class Databases(object):
                     if Backend.isDbms(DBMS.MYSQL) and Backend.isFork(FORK.DRIZZLE):
                         query = re.sub("column_type", "data_type", query, flags=re.I)
 
+                elif Backend.isDbms(DBMS.SPANNER):
+                    query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db), unsafeSQLIdentificatorNaming(conf.db))
+                    query += condQuery
+
                 elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE, DBMS.MIMERSQL, DBMS.SNOWFLAKE):
                     query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(tbl.upper()), unsafeSQLIdentificatorNaming(conf.db.upper()))
                     query += condQuery
@@ -773,6 +784,10 @@ class Databases(object):
                     query = rootQuery.blind.count % unsafeSQLIdentificatorNaming(tbl)
                     query += condQuery
 
+                elif Backend.isDbms(DBMS.SPANNER):
+                    query = rootQuery.blind.count % (unsafeSQLIdentificatorNaming(tbl), conf.db, conf.db)
+                    query += condQuery
+
                 elif Backend.isDbms(DBMS.INFORMIX):
                     query = rootQuery.blind.count % (conf.db, conf.db, conf.db, conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl))
                     query += condQuery
@@ -841,6 +856,9 @@ class Databases(object):
                     elif Backend.isDbms(DBMS.SNOWFLAKE):
                         query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(tbl.upper()), unsafeSQLIdentificatorNaming(conf.db.upper()))
                         field = None
+                    elif Backend.isDbms(DBMS.SPANNER):
+                        query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db), unsafeSQLIdentificatorNaming(conf.db))
+                        field = None
                     elif Backend.getIdentifiedDbms() in (DBMS.MONETDB, DBMS.CLICKHOUSE):
                         query = safeStringFormat(rootQuery.blind.query, (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db), index))
                         field = None
@@ -895,6 +913,8 @@ class Databases(object):
                                 query = rootQuery.blind.query2 % (conf.db, conf.db, conf.db, conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl), column)
                             elif Backend.isDbms(DBMS.MONETDB):
                                 query = rootQuery.blind.query2 % (column, unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
+                            elif Backend.isDbms(DBMS.SPANNER):
+                                query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(tbl), column, unsafeSQLIdentificatorNaming(conf.db), unsafeSQLIdentificatorNaming(conf.db))
 
                             colType = unArrayizeValue(inject.getValue(query, union=False, error=False))
                             key = int(colType) if hasattr(colType, "isdigit") and colType.isdigit() else colType

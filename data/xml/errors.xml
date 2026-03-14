@@ -245,4 +245,8 @@
         <error regexp="000904 \(42000\):"/>
         <error regexp="SQL compilation error: (syntax )?error line \d+ at position \d+"/>
     </dbms>
+
+    <dbms value="Spanner">
+        <error regexp="type.googleapis.com/zetasql.ErrorMessageModeForPayload"/>
+    </dbms>
 </root>

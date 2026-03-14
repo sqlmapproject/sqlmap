@@ -61,6 +61,7 @@ class DBMS(object):
     RAIMA = "Raima Database Manager"
     VIRTUOSO = "Virtuoso"
     SNOWFLAKE = "Snowflake"
+    SPANNER = "Spanner"
 
 class DBMS_DIRECTORY_NAME(object):
     ACCESS = "access"
@@ -92,6 +93,7 @@ class DBMS_DIRECTORY_NAME(object):
     RAIMA = "raima"
     VIRTUOSO = "virtuoso"
     SNOWFLAKE = "snowflake"
+    SPANNER = "spanner"
 
 class FORK(object):
     MARIADB = "MariaDB"

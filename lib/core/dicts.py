@@ -40,6 +40,7 @@ from lib.core.settings import VERTICA_ALIASES
 from lib.core.settings import VIRTUOSO_ALIASES
 from lib.core.settings import CLICKHOUSE_ALIASES
 from lib.core.settings import SNOWFLAKE_ALIASES
+from lib.core.settings import SPANNER_ALIASES
 
 FIREBIRD_TYPES = {
     261: "BLOB",
@@ -252,6 +253,7 @@ DBMS_DICT = {
     DBMS.RAIMA: (RAIMA_ALIASES, None, None, None),
     DBMS.VIRTUOSO: (VIRTUOSO_ALIASES, None, None, None),
     DBMS.SNOWFLAKE: (SNOWFLAKE_ALIASES, None, None, "snowflake"),
+    DBMS.SPANNER: (SPANNER_ALIASES, None, None, "spanner"),
 }
 
 # Reference: https://blog.jooq.org/tag/sysibm-sysdummy1/
@@ -292,6 +294,7 @@ HEURISTIC_NULL_EVAL = {
     DBMS.VIRTUOSO: "__MAX_NOTNULL(NULL)",
     DBMS.CLICKHOUSE: "halfMD5(NULL)",
     DBMS.SNOWFLAKE: "BOOLNOT(NULL)",
+    DBMS.SPANNER: "FARM_FINGERPRINT(NULL)",
 }
 
 SQL_STATEMENTS = {

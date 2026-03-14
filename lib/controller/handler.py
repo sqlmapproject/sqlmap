@@ -42,6 +42,7 @@ from lib.core.settings import SYBASE_ALIASES
 from lib.core.settings import VERTICA_ALIASES
 from lib.core.settings import VIRTUOSO_ALIASES
 from lib.core.settings import SNOWFLAKE_ALIASES
+from lib.core.settings import SPANNER_ALIASES
 from lib.utils.sqlalchemy import SQLAlchemy
 
 from plugins.dbms.access import AccessMap
@@ -73,6 +74,7 @@ from plugins.dbms.sybase import SybaseMap
 from plugins.dbms.vertica import VerticaMap
 from plugins.dbms.virtuoso import VirtuosoMap
 from plugins.dbms.snowflake import SnowflakeMap
+from plugins.dbms.spanner import SpannerMap
 
 def setHandler():
     """
@@ -110,6 +112,7 @@ def setHandler():
         (DBMS.RAIMA, RAIMA_ALIASES, RaimaMap, "plugins.dbms.raima.connector"),
         (DBMS.VIRTUOSO, VIRTUOSO_ALIASES, VirtuosoMap, "plugins.dbms.virtuoso.connector"),
         (DBMS.SNOWFLAKE, SNOWFLAKE_ALIASES, SnowflakeMap, "plugins.dbms.snowflake.connector"),
+        (DBMS.SPANNER, SPANNER_ALIASES, SpannerMap, "plugins.dbms.spanner.connector"),
     ]
 
     _ = max(_ if (conf.get("dbms") or Backend.getIdentifiedDbms() or kb.heuristicExtendedDbms or "").lower() in _[1] else () for _ in items)
