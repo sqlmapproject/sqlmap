@@ -148,6 +148,11 @@ def main():
         resolveCrossReferences()
         checkEnvironment()
         setPaths(modulePath())
+
+        # Check for NO_COLOR environment variable
+        if os.environ.get("NO_COLOR") not in (None, ""):
+            conf.disableColoring = True
+
         banner()
 
         # Store original command line options for possible later restoration
