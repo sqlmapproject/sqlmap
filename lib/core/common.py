@@ -4764,7 +4764,11 @@ def findPageForms(content, url, raiseException=False, addToTargets=False):
                 retVal.add(target)
 
     for match in re.finditer(r"\.post\(['\"]([^'\"]*)['\"],\s*\{([^}]*)\}", content):
-        url = _urllib.parse.urljoin(url, htmlUnescape(match.group(1)))
+        try:
+            url = _urllib.parse.urljoin(url, htmlUnescape(match.group(1)))
+        except ValueError:
+            continue
+
         data = ""
 
         for name, value in re.findall(r"['\"]?(\w+)['\"]?\s*:\s*(['\"][^'\"]+)?", match.group(2)):
