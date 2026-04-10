@@ -23,6 +23,9 @@ try:
 
     class _ColorizingStreamHandler(ColorizingStreamHandler):
         def colorize(self, message, levelno, force=False):
+            from lib.core.data import conf # import inside function to avoid ImportError
+            if conf.get("disableColoring"):
+                return message
             if levelno in self.level_map and (self.is_tty or force):
                 bg, fg, bold = self.level_map[levelno]
                 params = []
