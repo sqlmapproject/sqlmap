@@ -2671,6 +2671,13 @@ def _basicOptionValidation():
         errMsg = "switch '--dump' is incompatible with switch '--search'"
         raise SqlmapSyntaxException(errMsg)
 
+    if conf.alert and os.environ.get("SQLMAP_UNSAFE_ALERT") != '1':
+        errMsg = "for security reasons, to prevent execution of potentially malicious "
+        errMsg += "OS commands via configuration files or copy-paste attacks, "
+        errMsg += "the '--alert' option requires the environment variable "
+        errMsg += "'SQLMAP_UNSAFE_ALERT=1' to be explicitly set"
+        raise SqlmapSystemException(errMsg)
+
     if conf.chunked and not any((conf.data, conf.requestFile, conf.forms)):
         errMsg = "switch '--chunked' requires usage of (POST) options/switches '--data', '-r' or '--forms'"
         raise SqlmapSyntaxException(errMsg)
