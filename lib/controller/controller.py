@@ -437,7 +437,7 @@ def start():
                 continue
 
             if conf.rParam and kb.originalPage:
-                kb.randomPool = dict([_ for _ in kb.randomPool.items() if isinstance(_[1], list)])
+                kb.randomPool = dict(_ for _ in kb.randomPool.items() if isinstance(_[1], list))
 
                 for match in re.finditer(r"(?si)<select[^>]+\bname\s*=\s*[\"']([^\"']+)(.+?)</select>", kb.originalPage):
                     name, _ = match.groups()

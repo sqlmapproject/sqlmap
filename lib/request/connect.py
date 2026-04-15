@@ -640,7 +640,7 @@ class Connect(object):
                         conn._read_buffer = conn.read()
                         conn._read_offset = 0
 
-                        requestMsg = re.sub(" HTTP/[0-9.]+\r\n", " %s\r\n" % conn.http_version, requestMsg, count=1)
+                        requestMsg = re.sub(r" HTTP/[0-9.]+\r\n", " %s\r\n" % conn.http_version, requestMsg, count=1)
 
                         if not multipart:
                             threadData.lastRequestMsg = requestMsg
