@@ -178,6 +178,41 @@ def dirtyPatches():
         et.parse = _safe_parse
         et._patched = True
 
+    import io
+    import pickle
+    if not getattr(pickle, "_patched", False):
+        class RestrictedUnpickler(pickle.Unpickler):
+            def find_class(self, module, name):
+                # blacklist for OS-level execution modules
+                if module in ("os", "subprocess", "sys", "posix", "nt", "pty", "commands", "shutil"):
+                    raise ValueError("Unpickling of module '%s' is forbidden" % module)
+
+                # Python 2/3 method resolution
+                if hasattr(pickle.Unpickler, "find_class"):
+                    return pickle.Unpickler.find_class(self, module, name)
+
+                __import__(module)
+                return getattr(sys.modules[module], name)
+
+        def _safe_loads(data):
+            try:
+                stream = io.BytesIO(data)
+            except TypeError:
+                stream = io.StringIO(data)
+
+            return RestrictedUnpickler(stream).load()
+
+        pickle.loads = _safe_loads
+        pickle._patched = True
+
+    try:
+        import cPickle
+        if not getattr(cPickle, "_patched", False):
+            cPickle.loads = pickle.loads
+            cPickle._patched = True
+    except ImportError:
+        pass
+
     try:
         import builtins
     except ImportError:
