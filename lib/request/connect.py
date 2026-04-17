@@ -561,6 +561,10 @@ class Connect(object):
             else:
                 post = getBytes(post)
 
+                # Reference: https://github.com/sqlmapproject/sqlmap/issues/6049
+                if cmdLineOptions.method is None and method == HTTPMETHOD.GET and post == b"":
+                    post = None
+
                 if unArrayizeValue(conf.base64Parameter) == HTTPMETHOD.POST:
                     if kb.place != HTTPMETHOD.POST:
                         conf.data = getattr(conf.data, UNENCODED_ORIGINAL_VALUE, conf.data)
