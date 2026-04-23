@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.4.5"
+VERSION = "1.10.4.6"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -847,7 +847,7 @@ RESTAPI_DEFAULT_ADDRESS = "127.0.0.1"
 RESTAPI_DEFAULT_PORT = 8775
 
 # Unsupported options by REST-JSON API server
-RESTAPI_UNSUPPORTED_OPTIONS = ("sqlShell", "wizard")
+RESTAPI_UNSUPPORTED_OPTIONS = ("sqlShell", "wizard", "evalCode", "alert")
 
 # Use "Supplementary Private Use Area-A"
 INVALID_UNICODE_PRIVATE_AREA = False
