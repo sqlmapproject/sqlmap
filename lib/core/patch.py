@@ -184,7 +184,7 @@ def dirtyPatches():
         class RestrictedUnpickler(pickle.Unpickler):
             def find_class(self, module, name):
                 # blacklist for OS-level execution modules
-                if module in ("os", "subprocess", "sys", "posix", "nt", "pty", "commands", "shutil", "builtins", "__builtin__"):
+                if module in ("os", "subprocess", "sys", "posix", "nt", "pty", "commands", "shutil"):
                     raise ValueError("Unpickling of module '%s' is forbidden" % module)
 
                 # Python 2/3 method resolution
