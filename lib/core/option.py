@@ -2678,6 +2678,13 @@ def _basicOptionValidation():
         errMsg += "'SQLMAP_UNSAFE_ALERT=1' to be explicitly set"
         raise SqlmapSystemException(errMsg)
 
+    if conf.evalCode and os.environ.get("SQLMAP_UNSAFE_EVAL") != '1':
+        errMsg = "for security reasons, to prevent execution of potentially malicious "
+        errMsg += "Python code via configuration files or copy-paste attacks, "
+        errMsg += "the '--eval' option requires the environment variable "
+        errMsg += "'SQLMAP_UNSAFE_EVAL=1' to be explicitly set"
+        raise SqlmapSystemException(errMsg)
+
     if conf.chunked and not any((conf.data, conf.requestFile, conf.forms)):
         errMsg = "switch '--chunked' requires usage of (POST) options/switches '--data', '-r' or '--forms'"
         raise SqlmapSyntaxException(errMsg)
