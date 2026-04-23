@@ -13,6 +13,7 @@ import contextlib
 import copy
 import functools
 import getpass
+import hmac
 import hashlib
 import inspect
 import io
@@ -5654,3 +5655,28 @@ def checkSums():
                     break
 
     return retVal
+
+def safeCompareStrings(a, b):
+    """
+    Constant-time string comparison to prevent timing attacks.
+    >>> safeCompareStrings("test", "test")
+    True
+    >>> safeCompareStrings("test", None)
+    False
+    >>> safeCompareStrings("test1", "test2")
+    False
+    """
+    if a is None or b is None:
+        return a == b
+
+    if hasattr(hmac, "compare_digest"):
+        return hmac.compare_digest(a, b)
+
+    # Fallback for Python < 2.7.7 and < 3.3
+    if len(a) != len(b):
+        return False
+
+    result = 0
+    for x, y in zip(a, b):
+        result |= ord(x) ^ ord(y)
+    return result == 0

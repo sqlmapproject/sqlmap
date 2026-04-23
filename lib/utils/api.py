@@ -293,7 +293,7 @@ def setRestAPILog():
 
 # Generic functions
 def is_admin(token):
-    return DataStore.admin_token == token
+    return safeCompareStrings(DataStore.admin_token, token)
 
 @hook('before_request')
 def check_authentication():
