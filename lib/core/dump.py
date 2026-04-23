@@ -410,14 +410,17 @@ class Dump(object):
             db = "All"
         table = tableValues["__infos__"]["table"]
 
+        safeDb = re.sub(r"[^\w]", UNSAFE_DUMP_FILEPATH_REPLACEMENT, unsafeSQLIdentificatorNaming(db))
+        safeTable = re.sub(r"[^\w]", UNSAFE_DUMP_FILEPATH_REPLACEMENT, unsafeSQLIdentificatorNaming(table))
+
         if conf.api:
             self._write(tableValues, content_type=CONTENT_TYPE.DUMP_TABLE)
 
         try:
-            dumpDbPath = os.path.join(conf.dumpPath, unsafeSQLIdentificatorNaming(db))
+            dumpDbPath = os.path.join(conf.dumpPath, safeDb)
         except UnicodeError:
             try:
-                dumpDbPath = os.path.join(conf.dumpPath, normalizeUnicode(unsafeSQLIdentificatorNaming(db)))
+                dumpDbPath = os.path.join(conf.dumpPath, normalizeUnicode(safeDb))
             except (UnicodeError, OSError):
                 tempDir = tempfile.mkdtemp(prefix="sqlmapdb")
                 warnMsg = "currently unable to use regular dump directory. "
@@ -427,16 +430,14 @@ class Dump(object):
                 dumpDbPath = tempDir
 
         if conf.dumpFormat == DUMP_FORMAT.SQLITE:
-            replication = Replication(os.path.join(conf.dumpPath, "%s.sqlite3" % unsafeSQLIdentificatorNaming(db)))
+            replication = Replication(os.path.join(conf.dumpPath, "%s.sqlite3" % safeDb))
         elif conf.dumpFormat in (DUMP_FORMAT.CSV, DUMP_FORMAT.HTML):
             if not os.path.isdir(dumpDbPath):
                 try:
                     os.makedirs(dumpDbPath)
                 except:
                     warnFile = True
-
-                    _ = re.sub(r"[^\w]", UNSAFE_DUMP_FILEPATH_REPLACEMENT, unsafeSQLIdentificatorNaming(db))
-                    dumpDbPath = os.path.join(conf.dumpPath, "%s-%s" % (_, hashlib.md5(getBytes(db)).hexdigest()[:8]))
+                    dumpDbPath = os.path.join(conf.dumpPath, "%s-%s" % (safeDb, hashlib.md5(getBytes(db)).hexdigest()[:8]))
 
                     if not os.path.isdir(dumpDbPath):
                         try:
@@ -450,7 +451,8 @@ class Dump(object):
 
                             dumpDbPath = tempDir
 
-            dumpFileName = conf.dumpFile or os.path.join(dumpDbPath, re.sub(r'[\\/]', UNSAFE_DUMP_FILEPATH_REPLACEMENT, "%s.%s" % (unsafeSQLIdentificatorNaming(table), conf.dumpFormat.lower())))
+            dumpFileName = conf.dumpFile or os.path.join(dumpDbPath, "%s.%s" % (safeTable, conf.dumpFormat.lower()))
+
             if not checkFile(dumpFileName, False):
                 try:
                     openFile(dumpFileName, "w+").close()
@@ -458,13 +460,10 @@ class Dump(object):
                     raise
                 except:
                     warnFile = True
-
-                    _ = re.sub(r"[^\w]", UNSAFE_DUMP_FILEPATH_REPLACEMENT, normalizeUnicode(unsafeSQLIdentificatorNaming(table)))
-                    if len(_) < len(table) or IS_WIN and table.upper() in WINDOWS_RESERVED_NAMES:
-                        _ = re.sub(r"[^\w]", UNSAFE_DUMP_FILEPATH_REPLACEMENT, unsafeSQLIdentificatorNaming(table))
-                        dumpFileName = os.path.join(dumpDbPath, "%s-%s.%s" % (_, hashlib.md5(getBytes(table)).hexdigest()[:8], conf.dumpFormat.lower()))
+                    if IS_WIN and safeTable.upper() in WINDOWS_RESERVED_NAMES:
+                        dumpFileName = os.path.join(dumpDbPath, "%s-%s.%s" % (safeTable, hashlib.md5(getBytes(table)).hexdigest()[:8], conf.dumpFormat.lower()))
                     else:
-                        dumpFileName = os.path.join(dumpDbPath, "%s.%s" % (_, conf.dumpFormat.lower()))
+                        dumpFileName = os.path.join(dumpDbPath, "%s.%s" % (safeTable, conf.dumpFormat.lower()))
             else:
                 appendToFile = any((conf.limitStart, conf.limitStop))
 
@@ -548,7 +547,7 @@ class Dump(object):
             dataToDumpFile(dumpFP, "<!DOCTYPE html>\n<html>\n<head>\n")
             dataToDumpFile(dumpFP, "<meta http-equiv=\"Content-type\" content=\"text/html;charset=%s\">\n" % UNICODE_ENCODING)
             dataToDumpFile(dumpFP, "<meta name=\"generator\" content=\"%s\" />\n" % VERSION_STRING)
-            dataToDumpFile(dumpFP, "<title>%s</title>\n" % ("%s%s" % ("%s." % db if METADB_SUFFIX not in db else "", table)))
+            dataToDumpFile(dumpFP, "<title>%s</title>\n" % ("%s%s" % ("%s." % db if METADB_SUFFIX not in db else "", table)).replace("<", ""))
             dataToDumpFile(dumpFP, HTML_DUMP_CSS_STYLE)
             dataToDumpFile(dumpFP, "\n</head>\n<body>\n<table>\n<thead>\n<tr>\n")
 
