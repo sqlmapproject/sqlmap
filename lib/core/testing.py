@@ -199,6 +199,8 @@ def vulnTest():
             os.close(handle)
             cmd = cmd.replace("<tmpfile>", tmp)
 
+        os.environ["SQLMAP_UNSAFE_EVAL"] = '1'
+
         output = shellExec(cmd)
 
         if not all((check in output if not check.startswith('~') else check[1:] not in output) for check in checks) or "unhandled exception" in output:
