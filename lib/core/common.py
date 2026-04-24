@@ -131,7 +131,7 @@ from lib.core.settings import FORCE_COOKIE_EXPIRATION_TIME
 from lib.core.settings import FORM_SEARCH_REGEX
 from lib.core.settings import GENERIC_DOC_ROOT_DIRECTORY_NAMES
 from lib.core.settings import GIT_PAGE
-from lib.core.settings import GITHUB_REPORT_OAUTH_TOKEN
+from lib.core.settings import GITHUB_REPORT_PAT_TOKEN
 from lib.core.settings import GOOGLE_ANALYTICS_COOKIE_REGEX
 from lib.core.settings import HASHDB_MILESTONE_VALUE
 from lib.core.settings import HOST_ALIASES
@@ -4014,7 +4014,7 @@ def createGithubIssue(errMsg, excMsg):
             pass
 
         data = {"title": "Unhandled exception (#%s)" % key, "body": "```%s\n```\n```\n%s```" % (errMsg, excMsg)}
-        token = getText(zlib.decompress(decodeBase64(GITHUB_REPORT_OAUTH_TOKEN[::-1], binary=True))[0::2][::-1])
+        token = getText(zlib.decompress(decodeBase64(GITHUB_REPORT_PAT_TOKEN[::-1], binary=True))[0::2][::-1])
         req = _urllib.request.Request(url="https://api.github.com/repos/sqlmapproject/sqlmap/issues", data=getBytes(json.dumps(data)), headers={HTTP_HEADER.AUTHORIZATION: "token %s" % token, HTTP_HEADER.USER_AGENT: fetchRandomAgent()})
 
         try:
