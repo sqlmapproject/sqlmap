@@ -78,3 +78,59 @@ Translations
 * [Turkish](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-tr-TR.md)
 * [Ukrainian](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-uk-UA.md)
 * [Vietnamese](https://github.com/sqlmapproject/sqlmap/blob/master/doc/translations/README-vi-VN.md)
+
+## Troubleshooting
+
+This section helps users resolve common issues encountered while using sqlmap.
+
+---
+
+### Missing mandatory option error
+If you run sqlmap without specifying a target, you may see:
+missing a mandatory option (-u, -d, -l, -m, -r, -g, -c, etc.)
+
+Solution:
+Always specify a valid target URL:
+
+python sqlmap.py -u "http://example.com/page.php?id=1"
+
+---
+
+### Connection problems
+If sqlmap cannot connect to the target URL:
+- Ensure the website is reachable in a browser
+- Try using a different User-Agent:
+--random-agent
+- Check your internet connection or firewall restrictions
+
+---
+
+### Injection not detected (false negative)
+If sqlmap does not detect SQL injection:
+- Increase testing intensity:
+--level=5 --risk=3
+
+- Try all techniques:
+
+--technique=BEUSTQ
+
+- Test specific parameter manually using `-p`
+
+---
+
+### WAF / Firewall blocking requests
+Some websites may block sqlmap requests.
+
+Possible solutions:
+- Use random User-Agent:
+--random-agent
+- Add delay between requests:
+--delay=2
+- Use tamper scripts to bypass filtering:
+--tamper=space2comment
+---
+### General tip
+For better results, always ensure:
+- Target is reachable
+- Correct parameter is provided
+- Proper technique selection is used
