@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.4.11"
+VERSION = "1.10.4.12"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -712,7 +712,7 @@ DEFAULT_COOKIE_DELIMITER = ';'
 FORCE_COOKIE_EXPIRATION_TIME = "9999999999"
 
 # Github OAuth token used for creating an automatic Issue for unhandled exceptions
-GITHUB_REPORT_OAUTH_TOKEN = "wxqc7vTeW8ohIcX+1wK55Mnql2Ex9cP+2s1dqTr/mjlZJVfLnq24fMAi08v5vRvOmuhVZQdOT/lhIRovWvIJrdECD1ud8VMPWpxY+NmjHoEx+VLK1/vCAUBwJe"
+GITHUB_REPORT_OAUTH_TOKEN = "0EZh0n8npcacTH4oBcdKKWvfZLcdGWx0N5XFHD2xYaQDOkmI9LWaeDvZRZUMDz8l96RDH3+LVsbwGE5zUtaau0kld9VXG20fVbYES3ooFpNv+U9J5OTnaT2OlZcYzk4w5veT+GiHV5cuCngOJ6QgL1+qRpZDX1gzFecXbm2sNfQ2SGjT5McQe1mtxMTN7WsS1fQfPH+RhMUgbnwXJ5YG6EsBNZWOyk0C16QnekrVtuQpK0/ZVvU560uQhoMsP1/FBguBwJe"
 
 # Flush HashDB threshold number of cached items
 HASHDB_FLUSH_THRESHOLD_ITEMS = 200
