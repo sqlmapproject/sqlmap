@@ -1401,7 +1401,7 @@ def banner():
     if not any(_ in sys.argv for _ in ("--version", "--api")) and not conf.get("disableBanner"):
         result = BANNER
 
-        if not IS_TTY or any(_ in sys.argv for _ in ("--disable-coloring", "--disable-colouring")):
+        if not IS_TTY or conf.get("disableColoring") or any(_ in sys.argv for _ in ("--disable-coloring", "--disable-colouring")):
             result = clearColors(result)
         elif IS_WIN:
             coloramainit()
