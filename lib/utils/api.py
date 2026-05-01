@@ -23,6 +23,7 @@ import time
 from lib.core.common import dataToStdout
 from lib.core.common import getSafeExString
 from lib.core.common import openFile
+from lib.core.common import safeCompareStrings
 from lib.core.common import saveConfig
 from lib.core.common import setColor
 from lib.core.common import unArrayizeValue
