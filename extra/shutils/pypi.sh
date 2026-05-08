@@ -63,6 +63,10 @@ setup(
     },
 )
 EOF
+cat > "$TMP_DIR/setup.cfg" << "EOF"
+[bdist_wheel]
+universal = 1
+EOF
 wget "https://github.com/sqlmapproject/sqlmap/archive/$VERSION.zip" -O sqlmap.zip
 unzip sqlmap.zip
 rm sqlmap.zip
