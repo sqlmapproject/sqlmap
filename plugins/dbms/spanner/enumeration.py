@@ -44,3 +44,7 @@ class Enumeration(GenericEnumeration):
         logger.warning(warnMsg)
 
         return {}
+
+    def getHostname(self):
+        warnMsg = "on Spanner it is not possible to enumerate the hostname"
+        logger.warning(warnMsg)
