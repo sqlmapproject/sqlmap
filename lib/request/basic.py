@@ -297,6 +297,11 @@ def decodePage(page, contentEncoding, contentType, percentDecode=True):
             if contentEncoding == "deflate":
                 obj = zlib.decompressobj(-15)
                 page = obj.decompress(page, MAX_CONNECTION_TOTAL_SIZE + 1)
+
+                # catch the deflate bomb before flush() forcefully expands it into RAM
+                if len(page) > MAX_CONNECTION_TOTAL_SIZE:
+                    raise Exception("size too large")
+
                 page += obj.flush()
                 if len(page) > MAX_CONNECTION_TOTAL_SIZE:
                     raise Exception("size too large")
