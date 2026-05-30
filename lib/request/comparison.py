@@ -34,6 +34,67 @@ from lib.core.settings import URI_HTTP_HEADER
 from lib.core.threads import getCurrentThreadData
 from thirdparty import six
 
+MATCH_RATIO_MIN_SAMPLES = 3
+MATCH_RATIO_MAX_SAMPLES = 7
+
+def _toBytes(value):
+    if value is None:
+        return b""
+    elif isinstance(value, six.binary_type):
+        return value
+    elif isinstance(value, six.text_type):
+        return getBytes(value, kb.pageEncoding or DEFAULT_PAGE_ENCODING, "ignore")
+    else:
+        return getBytes(six.text_type(value), kb.pageEncoding or DEFAULT_PAGE_ENCODING, "ignore")
+
+def _sampledSimilarity(first, second):
+    """
+    Lightweight fallback similarity for very large responses.
+
+    It avoids expensive full-sequence matching while still comparing actual
+    content (not only response length), reducing false positives.
+    """
+
+    first, second = _toBytes(first), _toBytes(second)
+
+    if first == second:
+        return 1.0
+    elif not first or not second:
+        return float(first == second)
+
+    firstLength, secondLength = len(first), len(second)
+    ratio = 1.0 * min(firstLength, secondLength) / max(firstLength, secondLength)
+
+    window = min(4096, firstLength, secondLength)
+    if not window:
+        return ratio
+
+    similarity = 0.0
+    positions = (0.0, 0.25, 0.5, 0.75, 1.0)
+
+    for position in positions:
+        firstStart = int(max(0, firstLength - window) * position)
+        secondStart = int(max(0, secondLength - window) * position)
+
+        firstChunk = first[firstStart:firstStart + window]
+        secondChunk = second[secondStart:secondStart + window]
+
+        similarity += (1.0 * sum(left == right for left, right in zip(firstChunk, secondChunk)) / window)
+
+    similarity /= len(positions)
+
+    # Favor actual content match while still accounting for size drift.
+    return 0.7 * similarity + 0.3 * ratio
+
+def _median(values):
+    ordered = sorted(values)
+    middle = len(ordered) // 2
+
+    if len(ordered) % 2:
+        return ordered[middle]
+    else:
+        return (ordered[middle - 1] + ordered[middle]) / 2.0
+
 def comparison(page, headers, code=None, getRatioValue=False, pageLength=None):
     if not isinstance(page, (six.text_type, six.binary_type, type(None))):
         logger.critical("got page of type %s; repr(page)[:200]=%s" % (type(page), repr(page)[:200]))
@@ -60,6 +121,14 @@ def _adjust(condition, getRatioValue):
 
 def _comparison(page, headers, code, getRatioValue, pageLength):
     threadData = getCurrentThreadData()
+    calibrationKey = hash((kb.pageTemplate, conf.textOnly, conf.titles))
+
+    if kb.matchRatio is not None:
+        kb.matchRatioCandidates = []
+        kb.matchRatioCalibrationKey = None
+    elif getattr(kb, "matchRatioCalibrationKey", None) != calibrationKey:
+        kb.matchRatioCandidates = []
+        kb.matchRatioCalibrationKey = calibrationKey
 
     if kb.testMode:
         threadData.lastComparisonHeaders = listToStrValue(_ for _ in headers.headers if not _.startswith("%s:" % URI_HTTP_HEADER)) if headers else ""
@@ -142,9 +211,7 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
             if not page or not seqMatcher.a:
                 return float(seqMatcher.a == page)
             else:
-                ratio = 1. * len(seqMatcher.a) / len(page)
-                if ratio > 1:
-                    ratio = 1. / ratio
+                ratio = _sampledSimilarity(seqMatcher.a, page)
         else:
             seq1, seq2 = None, None
 
@@ -203,8 +270,14 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
     # current injected value changes the url page content
     if kb.matchRatio is None:
         if ratio >= LOWER_RATIO_BOUND and ratio <= UPPER_RATIO_BOUND:
-            kb.matchRatio = ratio
-            logger.debug("setting match ratio for current parameter to %.3f" % kb.matchRatio)
+            kb.matchRatioCandidates.append(ratio)
+            kb.matchRatioCandidates = kb.matchRatioCandidates[-MATCH_RATIO_MAX_SAMPLES:]
+
+            if len(kb.matchRatioCandidates) >= MATCH_RATIO_MIN_SAMPLES:
+                kb.matchRatio = round(_median(kb.matchRatioCandidates), 3)
+                kb.matchRatioCandidates = []
+                kb.matchRatioCalibrationKey = None
+                logger.debug("setting match ratio for current parameter to %.3f (median of %d samples)" % (kb.matchRatio, MATCH_RATIO_MIN_SAMPLES))
 
     if kb.testMode:
         threadData.lastComparisonRatio = ratio
