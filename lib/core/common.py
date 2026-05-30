@@ -3298,6 +3298,11 @@ def removeDynamicContent(page):
     """
     Removing dynamic content from supplied page basing removal on
     precalculated dynamic markings
+
+    Note: lazy quantifiers (`.+?`) are used on purpose. Greedy matching
+    would collapse everything between the first prefix and the last
+    suffix on pages where those anchors repeat (e.g. SPAs, templated
+    listings), masking real differences between True/False responses.
     """
 
     if page:
@@ -3307,11 +3312,11 @@ def removeDynamicContent(page):
             if prefix is None and suffix is None:
                 continue
             elif prefix is None:
-                page = re.sub(r"(?s)^.+%s" % re.escape(suffix), suffix.replace('\\', r'\\'), page)
+                page = re.sub(r"(?s)^.+?%s" % re.escape(suffix), suffix.replace('\\', r'\\'), page)
             elif suffix is None:
                 page = re.sub(r"(?s)%s.+$" % re.escape(prefix), prefix.replace('\\', r'\\'), page)
             else:
-                page = re.sub(r"(?s)%s.+%s" % (re.escape(prefix), re.escape(suffix)), "%s%s" % (prefix.replace('\\', r'\\'), suffix.replace('\\', r'\\')), page)
+                page = re.sub(r"(?s)%s.+?%s" % (re.escape(prefix), re.escape(suffix)), "%s%s" % (prefix.replace('\\', r'\\'), suffix.replace('\\', r'\\')), page)
 
     return page
 
