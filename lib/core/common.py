@@ -107,7 +107,6 @@ from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
 from lib.core.settings import BANNER
 from lib.core.settings import BOLD_PATTERNS_REGEX
-from lib.core.settings import BOUNDARY_BACKSLASH_MARKER
 from lib.core.settings import BOUNDED_INJECTION_MARKER
 from lib.core.settings import BRUTE_DOC_ROOT_PREFIXES
 from lib.core.settings import BRUTE_DOC_ROOT_SUFFIXES
@@ -1630,7 +1629,7 @@ def parseTargetDirect():
                 conf.dbmsPass = details.group("pass").strip("'\"")
             else:
                 if conf.dbmsCred:
-                    conf.dbmsUser, conf.dbmsPass = conf.dbmsCred.split(':')
+                    conf.dbmsUser, conf.dbmsPass = conf.dbmsCred.split(':', 1)
                 else:
                     conf.dbmsUser = ""
                     conf.dbmsPass = ""
