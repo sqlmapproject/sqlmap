@@ -1147,8 +1147,11 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
             return conf.answers
 
         for item in conf.answers.split(','):
-            question = item.split('=')[0].strip()
-            answer = item.split('=')[1] if len(item.split('=')) > 1 else None
+            if '=' in item:
+                question, answer = item.split('=', 1)
+                question = question.strip()
+            else:
+                question, answer = item.strip(), None
             if answer and question.lower() in message.lower():
                 retVal = getUnicode(answer, UNICODE_ENCODING)
             elif answer is None and retVal:
