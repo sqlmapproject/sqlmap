@@ -519,7 +519,8 @@ class Connect(object):
             if webSocket:
                 ws = websocket.WebSocket()
                 ws.settimeout(WEBSOCKET_INITIAL_TIMEOUT if kb.webSocketRecvCount is None else timeout)
-                ws.connect(url, header=("%s: %s" % _ for _ in headers.items() if _[0] not in ("Host",)), cookie=cookie)  # WebSocket will add Host field of headers automatically
+                wsHeaders = tuple("%s: %s" % _ for _ in headers.items() if _[0] not in ("Host",))
+                ws.connect(url, header=wsHeaders, cookie=cookie)  # WebSocket will add Host field of headers automatically
                 ws.send(urldecode(post or ""))
 
                 _page = []
@@ -547,7 +548,7 @@ class Connect(object):
                 responseHeaders = _(ws.getheaders())
                 responseHeaders.headers = ["%s: %s\r\n" % (_[0].capitalize(), _[1]) for _ in responseHeaders.items()]
 
-                requestHeaders += "\r\n".join(["%s: %s" % (u"-".join(_.capitalize() for _ in getUnicode(key).split(u'-')) if hasattr(key, "capitalize") else getUnicode(key), getUnicode(value)) for (key, value) in responseHeaders.items()])
+                requestHeaders += "\r\n".join(wsHeaders)
                 requestMsg += "\r\n%s" % requestHeaders
 
                 if post is not None:
