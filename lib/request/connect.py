@@ -505,7 +505,7 @@ class Connect(object):
 
             for key, value in list(headers.items()):
                 if key.upper() == HTTP_HEADER.ACCEPT_ENCODING.upper():
-                    value = re.sub(r"(?i)(,)br(,)?", lambda match: ',' if match.group(1) and match.group(2) else "", value) or "identity"
+                    value = ','.join(_ for _ in re.split(r"\s*,\s*", value) if _.split(';', 1)[0].lower() != "br") or "identity"
 
                 del headers[key]
                 if isinstance(value, six.string_types):
