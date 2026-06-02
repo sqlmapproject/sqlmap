@@ -422,7 +422,7 @@ class Connect(object):
             elif target:
                 if conf.forceSSL:
                     url = re.sub(r"(?i)\A(http|ws):", r"\g<1>s:", url)
-                    url = re.sub(r"(?i):80/", ":443/", url)
+                    url = re.sub(r"(?i):80(?=[/?#]|\Z)", ":443", url)
 
                 if PLACE.GET in conf.parameters and not get:
                     get = conf.parameters[PLACE.GET]
