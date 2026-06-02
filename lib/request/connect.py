@@ -540,7 +540,7 @@ class Connect(object):
 
                 ws.close()
                 code = ws.status
-                status = _http_client.responses[code]
+                status = _http_client.responses.get(code, "")
 
                 class _(dict):
                     pass
