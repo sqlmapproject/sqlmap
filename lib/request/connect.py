@@ -994,7 +994,7 @@ class Connect(object):
 
         # Dirty patch for Python3.11.0a7 (e.g. https://github.com/sqlmapproject/sqlmap/issues/5091)
         if not sys.version.startswith("3.11."):
-            if conf.retryOn and re.search(conf.retryOn, page, re.I):
+            if conf.retryOn and re.search(conf.retryOn, page or "", re.I):
                 if threadData.retriesCount < conf.retries:
                     warnMsg = "forced retry of the request because of undesired page content"
                     logger.warning(warnMsg)
