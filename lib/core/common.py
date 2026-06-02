@@ -1018,7 +1018,7 @@ def clearColors(message):
 
     retVal = message
 
-    if isinstance(message, str):
+    if isinstance(message, six.string_types):
         retVal = re.sub(r"\x1b\[[\d;]+m", "", message)
 
     return retVal
