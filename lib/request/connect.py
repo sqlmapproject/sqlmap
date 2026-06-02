@@ -1371,7 +1371,8 @@ class Connect(object):
                         variables[name] = value
 
             if post and kb.postHint in (POST_HINT.JSON, POST_HINT.JSON_LIKE):
-                for name, value in (parseJson(post) or {}).items():
+                json_ = parseJson(post)
+                for name, value in (json_ if isinstance(json_, dict) else {}).items():
                     if safeVariableNaming(name) != name:
                         conf.evalCode = re.sub(r"\b%s\b" % re.escape(name), safeVariableNaming(name), conf.evalCode)
                         name = safeVariableNaming(name)
