@@ -38,10 +38,10 @@ def tamper(payload, **kwargs):
                     retVal += "+"
                     continue
 
-            elif payload[i] == '\'':
+            elif payload[i] == '\'' and (i == 0 or payload[i - 1] != '\\'):
                 quote = not quote
 
-            elif payload[i] == '"':
+            elif payload[i] == '"' and (i == 0 or payload[i - 1] != '\\'):
                 doublequote = not doublequote
 
             elif payload[i] == " " and not doublequote and not quote:
