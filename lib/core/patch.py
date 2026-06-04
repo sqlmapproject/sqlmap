@@ -85,7 +85,7 @@ def dirtyPatches():
         _http_client.LineAndFileWrapper.readline = _
 
     # to prevent too much "guessing" in case of binary data retrieval
-    thirdparty.chardet.universaldetector.MINIMUM_THRESHOLD = 0.90
+    thirdparty.chardet.universaldetector.UniversalDetector.MINIMUM_THRESHOLD = 0.90
 
     match = re.search(r" --method[= ](\w+)", " ".join(sys.argv))
     if match and match.group(1).upper() != PLACE.POST:
