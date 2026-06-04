@@ -79,7 +79,7 @@ class Filesystem(GenericFilesystem):
             if length > chunkSize:
                 result = []
 
-                for i in xrange(1, length, chunkSize):
+                for i in xrange(1, length + 1, chunkSize):
                     chunk = inject.getValue("SELECT MID(%s, %d, %d) FROM %s" % (self.tblField, i, chunkSize, self.fileTblName), unpack=False, resumeValue=False, charsetType=CHARSET_TYPE.HEXADECIMAL)
                     result.append(chunk)
             else:
