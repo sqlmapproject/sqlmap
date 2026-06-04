@@ -61,6 +61,6 @@ def tamper(payload, **kwargs):
                     if len(_) > 1 and _ not in (_.lower(), _.upper()):
                         break
 
-                retVal = retVal.replace(word, _)
+                retVal = re.sub(r"\b%s\b" % word, _, retVal)
 
     return retVal

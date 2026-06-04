@@ -45,6 +45,6 @@ def tamper(payload, **kwargs):
                     index = randomRange(1, len(word) - 1)
                     _ = word[:index] + "/**/" + word[index:]
 
-                retVal = retVal.replace(word, _)
+                retVal = re.sub(r"\b%s\b" % word, _, retVal)
 
     return retVal
