@@ -119,7 +119,7 @@ class Filesystem(GenericFilesystem):
             DECLARE @firstint INT
             DECLARE @secondint INT
 
-            SET @tempint = CONVERT(INT, (SELECT ASCII(SUBSTRING(%s, @counter, 1)) FROM %s))
+            SET @tempint = CONVERT(INT, (SELECT TOP 1 ASCII(SUBSTRING(%s, @counter, 1)) FROM %s))
             SET @firstint = floor(@tempint/16)
             SET @secondint = @tempint - (@firstint * 16)
             SET @hexstr = @hexstr + SUBSTRING(@charset, @firstint+1, 1) + SUBSTRING(@charset, @secondint+1, 1)
