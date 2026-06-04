@@ -47,7 +47,7 @@ class Filesystem(GenericFilesystem):
         logger.debug(debugMsg)
 
         # Reference: http://hsqldb.org/doc/guide/sqlroutines-chapt.html#src_jrt_procedures
-        invokeQuery = "CALL %s('%s', CAST('%s' AS VARBINARY(%s)))" % (func_name, remoteFile, fcEncodedStr, max_bytes)
+        invokeQuery = "CALL %s('%s', X'%s')" % (func_name, remoteFile, fcEncodedStr)
         inject.goStacked(invokeQuery)
 
         logger.debug("cleaning up the database management system")
