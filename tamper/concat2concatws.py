@@ -6,6 +6,7 @@ See the file 'LICENSE' for copying permission
 """
 
 import os
+import re
 
 from lib.core.common import singleTimeWarnMessage
 from lib.core.enums import DBMS
@@ -35,6 +36,6 @@ def tamper(payload, **kwargs):
     """
 
     if payload:
-        payload = payload.replace("CONCAT(", "CONCAT_WS(MID(CHAR(0),0,0),")
+        payload = re.sub(r"(?i)(?<!GROUP_)CONCAT\(", "CONCAT_WS(MID(CHAR(0),0,0),", payload)
 
     return payload
