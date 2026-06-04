@@ -185,7 +185,7 @@ class Response(object):
             "size": len(self.content or "")
         }
 
-        binary = set([b'\0', b'\1'])
+        binary = set([b'\0', b'\1', u'\0', u'\1', 0, 1])
         if any(c in binary for c in self.content):
             content["encoding"] = "base64"
             content["text"] = getText(base64.b64encode(self.content))
