@@ -34,6 +34,8 @@
         <error regexp="org\.postgresql\.jdbc"/>
         <error regexp="Pdo[./_\\]Pgsql"/>
         <error regexp="PSQLException"/>
+        <error regexp="at or near &quot;[^&quot;]*&quot;: syntax error" fork="CockroachDB"/>
+        <error regexp="See: https?://(go\.crdb\.dev|github\.com/cockroachdb)" fork="CockroachDB"/>
     </dbms>
 
     <dbms value="Microsoft SQL Server">
