@@ -197,9 +197,9 @@ class Enumeration(GenericEnumeration):
                 return {conf.db: kb.data.cachedColumns[conf.db]}
 
             if dumpMode and colList:
-                table = {}
-                table[safeSQLIdentificatorNaming(tbl, True)] = dict((_, None) for _ in colList)
-                kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] = table
+                if safeSQLIdentificatorNaming(conf.db) not in kb.data.cachedColumns:
+                    kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] = {}
+                kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)] = dict((_, None) for _ in colList)
                 continue
 
             infoMsg = "fetching columns "
@@ -219,8 +219,9 @@ class Enumeration(GenericEnumeration):
                 for columnname, datatype, length in _zip(retVal[0]["%s.columnname" % kb.aliasName], retVal[0]["%s.datatype" % kb.aliasName], retVal[0]["%s.len" % kb.aliasName]):
                     columns[safeSQLIdentificatorNaming(columnname)] = "%s(%s)" % (datatype, length)
 
-                table[tbl] = columns
-                kb.data.cachedColumns[conf.db] = table
+                if conf.db not in kb.data.cachedColumns:
+                    kb.data.cachedColumns[conf.db] = {}
+                kb.data.cachedColumns[conf.db][tbl] = columns
 
         return kb.data.cachedColumns
 

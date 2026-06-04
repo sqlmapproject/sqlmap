@@ -265,9 +265,9 @@ class Enumeration(GenericEnumeration):
                 return {conf.db: kb.data.cachedColumns[conf.db]}
 
             if dumpMode and colList:
-                table = {}
-                table[safeSQLIdentificatorNaming(tbl, True)] = dict((_, None) for _ in colList)
-                kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] = table
+                if safeSQLIdentificatorNaming(conf.db) not in kb.data.cachedColumns:
+                    kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] = {}
+                kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)] = dict((_, None) for _ in colList)
                 continue
 
             infoMsg = "fetching columns "
@@ -286,8 +286,9 @@ class Enumeration(GenericEnumeration):
                     for name, type_ in filterPairValues(_zip(retVal[0]["%s.name" % kb.aliasName], retVal[0]["%s.usertype" % kb.aliasName])):
                         columns[name] = SYBASE_TYPES.get(int(type_) if hasattr(type_, "isdigit") and type_.isdigit() else type_, type_)
 
-                    table[safeSQLIdentificatorNaming(tbl, True)] = columns
-                    kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] = table
+                    if safeSQLIdentificatorNaming(conf.db) not in kb.data.cachedColumns:
+                        kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] = {}
+                    kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)] = columns
 
                     break
 
