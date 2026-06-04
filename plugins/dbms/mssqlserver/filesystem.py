@@ -336,6 +336,7 @@ class Filesystem(GenericFilesystem):
         # NOTE: https://github.com/sqlmapproject/sqlmap/issues/5581
         vbs = codecs.decode(vbs, "rot13")
         vbs = vbs.replace("    ", "")
+        vbs = vbs % (randFilePath, remoteFile)
         encodedFileContent = encodeBase64(localFileContent, binary=False)
 
         logger.debug("uploading the file base64-encoded content to %s, please wait.." % randFilePath)
