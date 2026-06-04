@@ -33,25 +33,29 @@ def tamper(payload, **kwargs):
     'IF(ISNULL(1),2,1)'
     """
 
-    if payload and payload.find("IFNULL") > -1:
+    if payload and payload.find("IFNULL(") > -1:
         while payload.find("IFNULL(") > -1:
             index = payload.find("IFNULL(")
             depth = 1
             comma, end = None, None
+            quote, doublequote = False, False
 
             for i in xrange(index + len("IFNULL("), len(payload)):
-                if depth == 1 and payload[i] == ',':
-                    comma = i
+                if payload[i] == '\'' and (i == 0 or payload[i - 1] != '\\'):
+                    quote = not quote
+                elif payload[i] == '"' and (i == 0 or payload[i - 1] != '\\'):
+                    doublequote = not doublequote
 
-                elif depth == 1 and payload[i] == ')':
-                    end = i
-                    break
-
-                elif payload[i] == '(':
-                    depth += 1
-
-                elif payload[i] == ')':
-                    depth -= 1
+                if not quote and not doublequote:
+                    if depth == 1 and payload[i] == ',':
+                        comma = i
+                    elif depth == 1 and payload[i] == ')':
+                        end = i
+                        break
+                    elif payload[i] == '(':
+                        depth += 1
+                    elif payload[i] == ')':
+                        depth -= 1
 
             if comma and end:
                 _ = payload[index + len("IFNULL("):comma]

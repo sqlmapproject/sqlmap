@@ -36,26 +36,30 @@ def tamper(payload, **kwargs):
     'SELECT CASE WHEN (1=1) THEN (SELECT "foo") ELSE (NULL) END'
     """
 
-    if payload and payload.find("IF") > -1:
+    if payload and payload.find("IF(") > -1:
         payload = payload.replace("()", REPLACEMENT_MARKER)
         while payload.find("IF(") > -1:
             index = payload.find("IF(")
             depth = 1
             commas, end = [], None
+            quote, doublequote = False, False
 
             for i in xrange(index + len("IF("), len(payload)):
-                if depth == 1 and payload[i] == ',':
-                    commas.append(i)
+                if payload[i] == '\'' and (i == 0 or payload[i - 1] != '\\'):
+                    quote = not quote
+                elif payload[i] == '"' and (i == 0 or payload[i - 1] != '\\'):
+                    doublequote = not doublequote
 
-                elif depth == 1 and payload[i] == ')':
-                    end = i
-                    break
-
-                elif payload[i] == '(':
-                    depth += 1
-
-                elif payload[i] == ')':
-                    depth -= 1
+                if not quote and not doublequote:
+                    if depth == 1 and payload[i] == ',':
+                        commas.append(i)
+                    elif depth == 1 and payload[i] == ')':
+                        end = i
+                        break
+                    elif payload[i] == '(':
+                        depth += 1
+                    elif payload[i] == ')':
+                        depth -= 1
 
             if len(commas) == 2 and end:
                 a = payload[index + len("IF("):commas[0]].strip("()")
