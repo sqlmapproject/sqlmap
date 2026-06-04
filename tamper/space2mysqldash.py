@@ -35,12 +35,22 @@ def tamper(payload, **kwargs):
     retVal = ""
 
     if payload:
+        quote, doublequote = False, False
+
         for i in xrange(len(payload)):
-            if payload[i].isspace():
-                retVal += "--%0A"
-            elif payload[i] == '#' or payload[i:i + 3] == '-- ':
-                retVal += payload[i:]
-                break
+            if payload[i] == '\'' and (i == 0 or payload[i - 1] != '\\'):
+                quote = not quote
+            elif payload[i] == '"' and (i == 0 or payload[i - 1] != '\\'):
+                doublequote = not doublequote
+
+            if not quote and not doublequote:
+                if payload[i].isspace():
+                    retVal += "--%0A"
+                elif payload[i] == '#' or payload[i:i + 3] == '-- ':
+                    retVal += payload[i:]
+                    break
+                else:
+                    retVal += payload[i]
             else:
                 retVal += payload[i]
 
