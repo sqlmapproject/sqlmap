@@ -2884,9 +2884,6 @@ def extractErrorMessage(page):
     retVal = None
 
     if isinstance(page, six.string_types):
-        if wasLastResponseDBMSError():
-            page = re.sub(r"<[^>]+>", "", page)
-
         for regex in ERROR_PARSING_REGEXES:
             match = re.search(regex, page, re.IGNORECASE)
 
@@ -2897,6 +2894,7 @@ def extractErrorMessage(page):
                     break
 
         if not retVal and wasLastResponseDBMSError():
+            page = re.sub(r"<[^>]+>", "", page)
             match = re.search(r"[^\n]*SQL[^\n:]*:[^\n]*", page, re.IGNORECASE)
 
             if match:
