@@ -203,7 +203,7 @@ class Agent(object):
                 origValue = encodeBase64(origValue, binary=False, encoding=conf.encoding or UNICODE_ENCODING)
 
         if place in (PLACE.URI, PLACE.CUSTOM_POST, PLACE.CUSTOM_HEADER):
-            _ = "%s%s" % (origValue, kb.customInjectionMark)
+            _ = "%s%s" % (_origValue if base64Encoding else origValue, kb.customInjectionMark)
 
             if kb.postHint == POST_HINT.JSON and isNumber(origValue) and not isNumber(newValue) and '"%s"' % _ not in paramString:
                 newValue = '"%s"' % self.addPayloadDelimiters(newValue)
