@@ -65,7 +65,7 @@ class Filesystem(GenericFilesystem):
             for sqlQuery in sqlQueries:
                 inject.goStacked(sqlQuery)
 
-            inject.goStacked("INSERT INTO pg_largeobject VALUES (%d, %d, DECODE((SELECT %s FROM %s), 'base64'))" % (self.oid, self.page, self.tblField, self.fileTblName))
+            inject.goStacked("INSERT INTO pg_largeobject VALUES (%d, %d, DECODE((SELECT ARRAY_TO_STRING(ARRAY_AGG(%s), '') FROM %s), 'base64'))" % (self.oid, self.page, self.tblField, self.fileTblName))
             inject.goStacked("DELETE FROM %s" % self.fileTblName)
 
             self.page += 1
