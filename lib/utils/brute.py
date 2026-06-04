@@ -310,7 +310,9 @@ def columnExists(columnFile, regex=None):
                 else:
                     columns[column] = "non-numeric"
 
-            kb.data.cachedColumns[conf.db] = {table: columns}
+            if conf.db not in kb.data.cachedColumns:
+                kb.data.cachedColumns[conf.db] = {}
+            kb.data.cachedColumns[conf.db][table] = columns
 
             for _ in ((conf.db, table, item[0], item[1]) for item in columns.items()):
                 if _ not in kb.brute.columns:
