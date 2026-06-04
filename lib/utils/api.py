@@ -660,7 +660,7 @@ def download(taskid, target, filename):
 
     path = os.path.abspath(os.path.join(paths.SQLMAP_OUTPUT_PATH, target, filename))
     # Prevent file path traversal
-    if not path.startswith(paths.SQLMAP_OUTPUT_PATH):
+    if not path.startswith(os.path.join(paths.SQLMAP_OUTPUT_PATH, "")):
         logger.warning("[%s] Forbidden path (%s)" % (taskid, target))
         return jsonize({"success": False, "message": "Forbidden path"})
 
