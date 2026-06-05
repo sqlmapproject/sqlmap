@@ -384,7 +384,7 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
-        elif "AttributeError:" in excMsg and re.search(r"3\.11\.\d+a", sys.version):
+        elif any(_ in excMsg for _ in ("AttributeError:", "TypeError:")) and re.search(r"3\.11\.\d+a", sys.version):
             errMsg = "there is a known issue when sqlmap is run with ALPHA versions of Python 3.11. "
             errMsg += "Please download a stable Python version"
             logger.critical(errMsg)
