@@ -392,6 +392,7 @@ def task_delete(taskid):
     Delete an existing task
     """
     if taskid in DataStore.tasks:
+        DataStore.tasks[taskid].engine_kill()
         DataStore.tasks.pop(taskid)
 
         logger.debug("(%s) Deleted task" % taskid)
