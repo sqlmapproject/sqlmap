@@ -283,6 +283,8 @@ def getBytes(value, encoding=None, errors="strict", unsafe=True):
 
     >>> getBytes(u"foo\\\\x01\\\\x83\\\\xffbar") == b"foo\\x01\\x83\\xffbar"
     True
+    >>> getBytes(u"C:\\\\\\\\x64\\\\secrets.txt") == b"C:\\\\x64\\\\secrets.txt"
+    True
     """
 
     retVal = value
@@ -316,7 +318,8 @@ def getBytes(value, encoding=None, errors="strict", unsafe=True):
                 retVal = value.encode(UNICODE_ENCODING, errors="replace")
 
             if unsafe:
-                retVal = re.sub(b"\\\\x([0-9a-f]{2})", lambda _: decodeHex(_.group(1)), retVal)
+                retVal = re.sub(b"(?<!\\\\)\\\\x([0-9a-fA-F]{2})", lambda _: decodeHex(_.group(1)), retVal)
+                retVal = retVal.replace(b"\\\\x", b"\\x")
 
     return retVal
 
