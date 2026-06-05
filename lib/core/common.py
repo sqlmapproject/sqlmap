@@ -2223,7 +2223,8 @@ def safeStringFormat(format_, params):
                 match = re.search(r"(\A|[^A-Za-z0-9])(%s)([^A-Za-z0-9]|\Z)", retVal)
                 if match:
                     try:
-                        retVal = re.sub(r"(\A|[^A-Za-z0-9])(%s)([^A-Za-z0-9]|\Z)", r"\g<1>%s\g<3>" % params[count % len(params)], retVal, 1)
+                        _ = getUnicode(params[count % len(params)])
+                        retVal = re.sub(r"(\A|[^A-Za-z0-9])(%s)([^A-Za-z0-9]|\Z)", r"\g<1>%s\g<3>" % _.replace('\\', r'\\'), retVal, 1)
                     except re.error:
                         retVal = retVal.replace(match.group(0), match.group(0) % params[count % len(params)], 1)
                     count += 1
