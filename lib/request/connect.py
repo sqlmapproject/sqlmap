@@ -7,6 +7,7 @@ See the file 'LICENSE' for copying permission
 
 import binascii
 import inspect
+import io
 import logging
 import os
 import random
@@ -643,6 +644,9 @@ class Connect(object):
                     except (httpx.HTTPError, httpx.InvalidURL, httpx.CookieConflict, httpx.StreamError) as ex:
                         raise _http_client.HTTPException(getSafeExString(ex))
                     else:
+                        if conn.status_code >= 400:
+                            raise _urllib.error.HTTPError(url, conn.status_code, conn.reason_phrase, conn.headers, io.BytesIO(conn.read()))
+
                         conn.code = conn.status_code
                         conn.msg = conn.reason_phrase
                         conn.info = lambda c=conn: c.headers
