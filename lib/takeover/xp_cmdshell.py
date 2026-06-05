@@ -226,8 +226,8 @@ class XP_cmdshell(object):
 
                 if isNumPosStrValue(count):
                     for index in getLimitRange(count):
-                        query = agent.limitQuery(index, query, self.tblField)
-                        output.append(inject.getValue(query, union=False, error=False, resumeValue=False))
+                        limitedQuery = agent.limitQuery(index, query, self.tblField)
+                        output.append(inject.getValue(limitedQuery, union=False, error=False, resumeValue=False))
 
             inject.goStacked("DELETE FROM %s" % self.cmdTblName)
 
