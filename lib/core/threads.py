@@ -213,7 +213,14 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
         if numThreads > 1:
             logger.info("waiting for threads to finish%s" % (" (Ctrl+C was pressed)" if isinstance(ex, KeyboardInterrupt) else ""))
         try:
-            while threading.active_count() > 1:
+            while True:
+                alive = False
+                for thread in threads:
+                    if thread.is_alive():
+                        alive = True
+                        break
+                if not alive:
+                    break
                 time.sleep(0.1)
 
         except KeyboardInterrupt:

@@ -18,7 +18,6 @@ from lib.core.common import extractRegexResult
 from lib.core.common import getLatestRevision
 from lib.core.common import getSafeExString
 from lib.core.common import openFile
-from lib.core.common import pollProcess
 from lib.core.common import readInput
 from lib.core.convert import getText
 from lib.core.data import conf
@@ -51,7 +50,6 @@ def update():
         output = ""
         try:
             process = subprocess.Popen("pip install -U sqlmap", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=paths.SQLMAP_ROOT_PATH)
-            pollProcess(process, True)
             output, _ = process.communicate()
             success = not process.returncode
         except Exception as ex:
@@ -138,7 +136,6 @@ def update():
         output = ""
         try:
             process = subprocess.Popen("git checkout . && git pull %s HEAD" % GIT_REPOSITORY, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=paths.SQLMAP_ROOT_PATH)
-            pollProcess(process, True)
             output, _ = process.communicate()
             success = not process.returncode
         except Exception as ex:

@@ -605,10 +605,7 @@ class Dump(object):
                 if column != "__infos__":
                     info = tableValues[column]
 
-                    if len(info["values"]) <= i:
-                        continue
-
-                    if info["values"][i] is None:
+                    if len(info["values"]) <= i or info["values"][i] is None:
                         value = u''
                     else:
                         value = getUnicode(info["values"][i])

@@ -119,8 +119,8 @@ class Database(object):
                 else:
                     break
 
-        if statement.lstrip().upper().startswith("SELECT"):
-            return self.cursor.fetchall()
+            if statement.lstrip().upper().startswith("SELECT"):
+                return self.cursor.fetchall()
 
     def init(self):
         self.execute("CREATE TABLE IF NOT EXISTS logs(id INTEGER PRIMARY KEY AUTOINCREMENT, taskid INTEGER, time TEXT, level TEXT, message TEXT)")
