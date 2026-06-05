@@ -2971,11 +2971,10 @@ def urldecode(value, encoding=None, unsafe="%%?&=;+%s" % CUSTOM_INJECTION_MARK_C
             result = _urllib.parse.unquote_plus(value) if spaceplus else _urllib.parse.unquote(value)
         else:
             result = value
-            charset = set(string.printable) - set(unsafe)
 
             def _(match):
                 char = decodeHex(match.group(1), binary=False)
-                return char if char in charset else match.group(0)
+                return char if char not in unsafe else match.group(0)
 
             if spaceplus:
                 result = result.replace('+', ' ')  # plus sign has a special meaning in URL encoded data (hence the usage of _urllib.parse.unquote_plus in convall case)
