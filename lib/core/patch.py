@@ -185,7 +185,11 @@ def dirtyPatches():
             def find_class(self, module, name):
                 # blacklist for OS-level execution modules
                 if module in ("os", "subprocess", "sys", "posix", "nt", "pty", "commands", "shutil"):
-                    raise ValueError("Unpickling of module '%s' is forbidden" % module)
+                    raise ValueError("unpickling of module '%s' is forbidden" % module)
+
+                # partial whitelist for builtins to allow safe data types but block eval/exec/__import__
+                if module in ("builtins", "__builtin__") and name not in ("set", "frozenset", "dict", "list", "tuple", "int", "float", "bool", "str", "bytes", "bytearray", "object", "NoneType"):
+                    raise ValueError("unpickling of '%s.%s' is forbidden" % (module, name))
 
                 # Python 2/3 method resolution
                 if hasattr(pickle.Unpickler, "find_class"):
