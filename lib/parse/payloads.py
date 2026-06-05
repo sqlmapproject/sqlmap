@@ -106,6 +106,11 @@ def loadPayloads():
     >>> loadPayloads()
     >>> len(conf.tests) > 0
     True
+    >>> db2_light = [test for test in conf.tests if "IBM DB2" in test.get("title", "") and "light query" in test.get("title", "")]
+    >>> len(db2_light)
+    5
+    >>> all("T3" not in test.request.payload for test in db2_light)
+    True
     """
 
     for payloadFile in PAYLOAD_XML_FILES:
