@@ -2639,6 +2639,10 @@ def _basicOptionValidation():
         errMsg = "switch '--text-only' is incompatible with switch '--null-connection'"
         raise SqlmapSyntaxException(errMsg)
 
+    if conf.http2 and any((conf.tor, conf.proxy and conf.proxy.lower().startswith("socks"))):
+        errMsg = "HTTP/2 support is currently incompatible with SOCKS/Tor proxies"
+        raise SqlmapSyntaxException(errMsg)
+
     if conf.uValues and conf.uChar:
         errMsg = "option '--union-values' is incompatible with option '--union-char'"
         raise SqlmapSyntaxException(errMsg)
