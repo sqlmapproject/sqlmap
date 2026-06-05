@@ -1047,7 +1047,7 @@ def dictionaryAttack(attack_dict):
                             hash_ = hash_.lower()
 
                         if hash_regex in (HASH.MD5_BASE64, HASH.SHA1_BASE64, HASH.SHA256_BASE64, HASH.SHA512_BASE64):
-                            item = [(user, encodeHex(decodeBase64(hash_, binary=True))), {}]
+                            item = [(user, encodeHex(decodeBase64(hash_, binary=True), binary=False)), {}]
                         elif hash_regex in (HASH.MYSQL, HASH.MYSQL_OLD, HASH.MD5_GENERIC, HASH.SHA1_GENERIC, HASH.SHA224_GENERIC, HASH.SHA256_GENERIC, HASH.SHA384_GENERIC, HASH.SHA512_GENERIC, HASH.APACHE_SHA1):
                             if hash_.startswith("0x"):  # Reference: https://docs.microsoft.com/en-us/sql/t-sql/functions/hashbytes-transact-sql?view=sql-server-2017
                                 hash_ = hash_[2:]
