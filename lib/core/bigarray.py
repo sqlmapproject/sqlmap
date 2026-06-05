@@ -151,16 +151,26 @@ class BigArray(list):
         with self._lock:
             if not self.chunks[-1] and len(self.chunks) > 1:
                 self.chunks.pop()
+                filename = self.chunks[-1]
+                idx = len(self.chunks) - 1
+
+                if self.cache and self.cache.index == idx and self.cache.dirty:
+                    self.chunks[-1] = self.cache.data
+                    self.cache.dirty = False
+                else:
+                    try:
+                        with open(filename, "rb") as f:
+                            self.chunks[-1] = pickle.loads(zlib.decompress(f.read()))
+                    except IOError as ex:
+                        errMsg = "exception occurred while retrieving data "
+                        errMsg += "from a temporary file ('%s')" % ex
+                        raise SqlmapSystemException(errMsg)
+
                 try:
-                    filename = self.chunks[-1]
-                    with open(filename, "rb") as f:
-                        self.chunks[-1] = pickle.loads(zlib.decompress(f.read()))
                     self._os_remove(filename)
                     self.filenames.discard(filename)
-                except IOError as ex:
-                    errMsg = "exception occurred while retrieving data "
-                    errMsg += "from a temporary file ('%s')" % ex
-                    raise SqlmapSystemException(errMsg)
+                except OSError:
+                    pass
 
         return self.chunks[-1].pop()
 
