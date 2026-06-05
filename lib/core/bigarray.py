@@ -233,12 +233,22 @@ class BigArray(list):
                 raise SqlmapSystemException(errMsg)
 
     def __getstate__(self):
-        if self.cache and self.cache.dirty:
-            filename = self._dump(self.cache.data)
-            self.chunks[self.cache.index] = filename
-            self.cache.dirty = False
+        with self._lock:
+            if self.cache and self.cache.dirty:
+                old_filename = self.chunks[self.cache.index]
+                filename = self._dump(self.cache.data)
+                self.chunks[self.cache.index] = filename
 
-        return self.chunks, self.filenames, self.chunk_length
+                if isinstance(old_filename, STRING_TYPES):
+                    try:
+                        self._os_remove(old_filename)
+                        self.filenames.discard(old_filename)
+                    except OSError:
+                        pass
+
+                self.cache.dirty = False
+
+            return self.chunks, self.filenames, self.chunk_length
 
     def __setstate__(self, state):
         self.__init__()
