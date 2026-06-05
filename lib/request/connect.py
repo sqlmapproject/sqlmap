@@ -530,6 +530,10 @@ class Connect(object):
                     while True:
                         try:
                             _page.append(ws.recv())
+                            if sum(len(_) for _ in _page) > MAX_CONNECTION_TOTAL_SIZE:
+                                warnMsg = "too large websocket response detected. Automatically trimming it"
+                                singleTimeWarnMessage(warnMsg)
+                                break
                         except websocket.WebSocketTimeoutException:
                             kb.webSocketRecvCount = len(_page)
                             break
