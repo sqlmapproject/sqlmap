@@ -1464,10 +1464,13 @@ def parsePasswordHash(password):
         retVal = "%s\n" % password
         retVal += "%sheader: %s\n" % (blank, password[:6])
         retVal += "%ssalt: %s\n" % (blank, password[6:14])
-        retVal += "%smixedcase: %s\n" % (blank, password[14:54])
 
-        if password[54:]:
-            retVal += "%suppercase: %s" % (blank, password[54:])
+        if password.startswith("0x0200"):
+            retVal += "%shash: %s\n" % (blank, password[14:])
+        else:
+            retVal += "%smixedcase: %s\n" % (blank, password[14:54])
+            if password[54:]:
+                retVal += "%suppercase: %s" % (blank, password[54:])
 
     return retVal
 
