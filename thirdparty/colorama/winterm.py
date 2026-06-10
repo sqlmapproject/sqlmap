@@ -1,6 +1,12 @@
 # Copyright Jonathan Hartley 2013. BSD 3-Clause license, see LICENSE file.
-from . import win32
+try:
+    from msvcrt import get_osfhandle
+except ImportError:
+    def get_osfhandle(_):
+        raise OSError("This isn't windows!")
 
+
+from . import win32
 
 # from wincon.h
 class WinColor(object):
@@ -44,6 +50,7 @@ class WinTerm(object):
     def reset_all(self, on_stderr=None):
         self.set_attrs(self._default)
         self.set_console(attrs=self._default)
+        self._light = 0
 
     def fore(self, fore=None, light=False, on_stderr=False):
         if fore is None:
@@ -122,13 +129,14 @@ class WinTerm(object):
         if mode == 0:
             from_coord = csbi.dwCursorPosition
             cells_to_erase = cells_in_screen - cells_before_cursor
-        if mode == 1:
+        elif mode == 1:
             from_coord = win32.COORD(0, 0)
             cells_to_erase = cells_before_cursor
         elif mode == 2:
             from_coord = win32.COORD(0, 0)
             cells_to_erase = cells_in_screen
         else:
+            # invalid mode
             return
         # fill the entire screen with blanks
         win32.FillConsoleOutputCharacter(handle, ' ', cells_to_erase, from_coord)
@@ -149,13 +157,14 @@ class WinTerm(object):
         if mode == 0:
             from_coord = csbi.dwCursorPosition
             cells_to_erase = csbi.dwSize.X - csbi.dwCursorPosition.X
-        if mode == 1:
+        elif mode == 1:
             from_coord = win32.COORD(0, csbi.dwCursorPosition.Y)
             cells_to_erase = csbi.dwCursorPosition.X
         elif mode == 2:
             from_coord = win32.COORD(0, csbi.dwCursorPosition.Y)
             cells_to_erase = csbi.dwSize.X
         else:
+            # invalid mode
             return
         # fill the entire screen with blanks
         win32.FillConsoleOutputCharacter(handle, ' ', cells_to_erase, from_coord)
@@ -164,3 +173,23 @@ class WinTerm(object):
 
     def set_title(self, title):
         win32.SetConsoleTitle(title)
+
+
+def enable_vt_processing(fd):
+    if win32.windll is None or not win32.winapi_test():
+        return False
+
+    try:
+        handle = get_osfhandle(fd)
+        mode = win32.GetConsoleMode(handle)
+        win32.SetConsoleMode(
+            handle,
+            mode | win32.ENABLE_VIRTUAL_TERMINAL_PROCESSING,
+        )
+
+        mode = win32.GetConsoleMode(handle)
+        if mode & win32.ENABLE_VIRTUAL_TERMINAL_PROCESSING:
+            return True
+    # Can get TypeError in testsuite where 'fd' is a Mock()
+    except (OSError, TypeError):
+        return False
