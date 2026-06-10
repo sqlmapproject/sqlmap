@@ -490,6 +490,11 @@ def option_set(taskid):
         logger.warning("[%s] Invalid JSON options provided to option_set()" % taskid)
         return jsonize({"success": False, "message": "Invalid JSON options"})
 
+    for key in request.json:
+        if key in RESTAPI_UNSUPPORTED_OPTIONS:
+            logger.warning("[%s] Unsupported option '%s' provided to option_set()" % (taskid, key))
+            return jsonize({"success": False, "message": "Unsupported option '%s'" % key})
+
     for option, value in request.json.items():
         DataStore.tasks[taskid].set_option(option, value)
 
@@ -686,6 +691,9 @@ def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=REST
     """
     REST-JSON API server
     """
+
+    if not all((username, password)):
+        logger.critical("REST-JSON API server requires both username and password")
 
     DataStore.admin_token = encodeHex(os.urandom(16), binary=False)
     DataStore.username = username
