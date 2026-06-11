@@ -655,7 +655,7 @@ def paramToDict(place, parameters=None):
                         kb.base64Originals[parameter] = oldValue = value
                         value = urldecode(value, convall=True)
                         value = decodeBase64(value, binary=False, encoding=conf.encoding or UNICODE_ENCODING)
-                        parameters = re.sub(r"\b%s(\b|\Z)" % re.escape(oldValue), value, parameters)
+                        parameters = re.sub(r"\b%s(\b|\Z)" % re.escape(oldValue), value.replace('\\', r'\\'), parameters)
                     except:
                         errMsg = "parameter '%s' does not contain " % parameter
                         errMsg += "valid Base64 encoded value ('%s')" % value
