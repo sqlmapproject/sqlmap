@@ -87,8 +87,10 @@ class Wordlist(six.Iterator):
                 errMsg += "sure that you haven't made any changes to it"
                 raise SqlmapInstallationException(errMsg)
             except StopIteration:
-                self.adjust()
-                retVal = next(self.iter).rstrip()
+                if self.index > len(self.filenames):  # Note: no more sources (filenames + custom) to switch to
+                    raise
+                self.adjust()  # Note: switch to the next source and retry (gracefully skipping empty ones)
+                continue
             if not self.proc_count or self.counter % self.proc_count == self.proc_id:
                 break
         return retVal

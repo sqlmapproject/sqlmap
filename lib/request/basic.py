@@ -282,6 +282,8 @@ def decodePage(page, contentEncoding, contentType, percentDecode=True):
     '<html>foo&bar</html>'
     >>> getText(decodePage(b"&#x9;", None, "text/html; charset=utf-8"))
     '\\t'
+    >>> getText(decodePage(b"&#x4A;", None, "text/html; charset=utf-8"))
+    'J'
     """
 
     if not page or (conf.nullConnection and len(page) < 2):

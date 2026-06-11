@@ -4283,7 +4283,10 @@ def safeSQLIdentificatorNaming(name, isTable=False):
     '[begin]'
     >>> getText(safeSQLIdentificatorNaming("foobar"))
     'foobar'
-    >>> kb.forceDbms = popValue()
+    >>> kb.forcedDbms = DBMS.FIREBIRD
+    >>> getText(safeSQLIdentificatorNaming("foo bar"))
+    '"foo bar"'
+    >>> kb.forcedDbms = popValue()
     """
 
     retVal = name
