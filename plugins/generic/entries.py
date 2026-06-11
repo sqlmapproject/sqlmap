@@ -319,7 +319,7 @@ class Entries(object):
                         logger.warning(warnMsg)
 
                         for column in colList:
-                            lengths[column] = len(column)
+                            lengths[column] = getConsoleLength(column)
                             entries[column] = []
 
                     elif not isNumPosStrValue(count):
@@ -361,7 +361,7 @@ class Entries(object):
                                         if column not in entries:
                                             entries[column] = BigArray()
 
-                                        lengths[column] = max(lengths[column], len(DUMP_REPLACEMENTS.get(getUnicode(value), getUnicode(value))))
+                                        lengths[column] = max(lengths[column], getConsoleLength(DUMP_REPLACEMENTS.get(getUnicode(value), getUnicode(value))))
                                         entries[column].append(value)
 
                             except KeyboardInterrupt:
@@ -432,7 +432,7 @@ class Entries(object):
                                     value = NULL if column in emptyColumns else inject.getValue(query, union=False, error=False, dump=True)
                                     value = '' if value is None else value
 
-                                    lengths[column] = max(lengths[column], len(DUMP_REPLACEMENTS.get(getUnicode(value), getUnicode(value))))
+                                    lengths[column] = max(lengths[column], getConsoleLength(DUMP_REPLACEMENTS.get(getUnicode(value), getUnicode(value))))
                                     entries[column].append(value)
 
                         except KeyboardInterrupt:
@@ -442,7 +442,7 @@ class Entries(object):
                             logger.warning(warnMsg)
 
                     for column, columnEntries in entries.items():
-                        length = max(lengths[column], len(column))
+                        length = max(lengths[column], getConsoleLength(column))
 
                         kb.data.dumpedTable[column] = {"length": length, "values": columnEntries}
 
