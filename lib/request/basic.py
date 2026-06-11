@@ -235,13 +235,13 @@ def checkCharEncoding(encoding, warn=True):
     # Reference: http://docs.python.org/library/codecs.html
     try:
         codecs.lookup(encoding)
-    except:
+    except LookupError:
         encoding = None
 
     if encoding:
         try:
             six.text_type(getBytes(randomStr()), encoding)
-        except:
+        except (UnicodeDecodeError, LookupError):
             if warn:
                 warnMsg = "invalid web page charset '%s'" % encoding
                 singleTimeLogMessage(warnMsg, logging.WARN, encoding)
