@@ -1163,7 +1163,7 @@ class Connect(object):
                         postUrlEncode = False
 
             if conf.hpp:
-                if not any(conf.url.lower().endswith(_.lower()) for _ in (WEB_PLATFORM.ASP, WEB_PLATFORM.ASPX)):
+                if (extractRegexResult(r"\.(?P<result>\w+)(?:\?|\Z)", conf.url) or "").lower() not in (WEB_PLATFORM.ASP, WEB_PLATFORM.ASPX):
                     warnMsg = "HTTP parameter pollution should work only against "
                     warnMsg += "ASP(.NET) targets"
                     singleTimeWarnMessage(warnMsg)

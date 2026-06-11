@@ -1088,7 +1088,7 @@ def heuristicCheckSqlInjection(place, parameter):
     if casting:
         errMsg = "possible %s casting detected (e.g. '" % ("integer" if origValue.isdigit() else "type")
 
-        platform = conf.url.split('.')[-1].lower()
+        platform = (extractRegexResult(r"\.(?P<result>\w+)(?:\?|\Z)", conf.url) or conf.url.split('.')[-1]).lower()
         if platform == WEB_PLATFORM.ASP:
             errMsg += "%s=CInt(request.querystring(\"%s\"))" % (parameter, parameter)
         elif platform == WEB_PLATFORM.ASPX:
