@@ -232,7 +232,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/TaskId"
       requestBody:
-        required: true
+        required: false
         content:
           application/json:
             schema:
@@ -272,13 +272,7 @@ paths:
         Sets one or more options on a task. Values are persisted in the task option
         object and are used when the scan is started.
 
-        Hardened behavior: options listed in `x-sqlmap-unsupported-options` should be
-        rejected here with `success: false`, matching `/scan/{taskid}/start`.
-      x-sqlmap-unsupported-options:
-        - sqlShell
-        - wizard
-        - evalCode
-        - alert
+        Unsupported, read-only, and unknown options are rejected with `success: false`.
       parameters:
         - $ref: "#/components/parameters/TaskId"
       requestBody:
@@ -315,6 +309,10 @@ paths:
                   value:
                     success: false
                     message: "Unsupported option 'evalCode'"
+                unknownOption:
+                  value:
+                    success: false
+                    message: "Unknown option 'doesNotExist'"
         "401":
           $ref: "#/components/responses/Unauthorized"
 
@@ -327,13 +325,8 @@ paths:
         Applies the provided options to the task and starts sqlmap in a separate process.
         The response contains the spawned engine process ID.
 
-        Current API behavior rejects options listed in `x-sqlmap-unsupported-options`
-        when they are supplied in this request body.
-      x-sqlmap-unsupported-options:
-        - sqlShell
-        - wizard
-        - evalCode
-        - alert
+        Unsupported, read-only, and unknown options are rejected with `success: false`.
+        Starting a scan for an already running task returns `success: false`.
       parameters:
         - $ref: "#/components/parameters/TaskId"
       requestBody:
@@ -364,6 +357,14 @@ paths:
                   value:
                     success: false
                     message: "Unsupported option 'evalCode'"
+                unknownOption:
+                  value:
+                    success: false
+                    message: "Unknown option 'doesNotExist'"
+                scanAlreadyRunning:
+                  value:
+                    success: false
+                    message: Scan already running
                 invalidJson:
                   value:
                     success: false
@@ -647,10 +648,6 @@ components:
                 message: Invalid start or end value, must be digits
 
   schemas:
-    SuccessFlag:
-      type: boolean
-      description: Indicates whether the API action succeeded.
-
     ErrorResponse:
       type: object
       required: [success, message]
@@ -726,7 +723,7 @@ components:
 
     OptionValue:
       description: Value accepted by sqlmap options. The exact type depends on the option.
-      oneOf:
+      anyOf:
         - type: string
           nullable: true
         - type: boolean
@@ -741,8 +738,8 @@ components:
       type: object
       description: |
         Dynamic object containing sqlmap option names and values. Option names map to
-        sqlmap's internal option dictionary. Unsupported REST API options should be
-        rejected by endpoints that accept this object.
+        sqlmap's internal option dictionary. Unsupported, read-only, and unknown
+        options are rejected by endpoints that accept this object.
       additionalProperties:
         $ref: "#/components/schemas/OptionValue"
       example:
@@ -764,8 +761,7 @@ components:
 
     OptionGetRequest:
       type: array
-      description: List of option names to return.
-      minItems: 1
+      description: List of option names to return. Empty or missing input returns an empty options object.
       items:
         type: string
         minLength: 1
@@ -826,7 +822,7 @@ components:
           description: Numeric content type stored by sqlmap.
           example: 0
         value:
-          oneOf:
+          anyOf:
             - type: string
               nullable: true
             - type: boolean
