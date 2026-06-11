@@ -93,7 +93,7 @@ class Database(object):
         self.connection = sqlite3.connect(self.database, timeout=3, isolation_level=None, check_same_thread=False)
         self.cursor = self.connection.cursor()
         self.lock = threading.Lock()
-        logger.debug("REST-JSON API %s connected to IPC database" % who)
+        logger.debug("REST API %s connected to IPC database" % who)
 
     def disconnect(self):
         if self.cursor:
@@ -706,11 +706,11 @@ def version(token=None):
 
 def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=RESTAPI_DEFAULT_ADAPTER, username=None, password=None, database=None):
     """
-    REST-JSON API server
+    REST API server
     """
 
     if not all((username, password)):
-        logger.critical("REST-JSON API server requires both username and password")
+        logger.critical("REST API server requires both username and password")
 
     DataStore.admin_token = encodeHex(os.urandom(16), binary=False)
     DataStore.username = username
@@ -727,7 +727,7 @@ def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=REST
             s.bind((host, 0))
             port = s.getsockname()[1]
 
-    logger.info("Running REST-JSON API server at '%s:%d'.." % (host, port))
+    logger.info("Running REST API server at '%s:%d'.." % (host, port))
     logger.info("Admin (secret) token: %s" % DataStore.admin_token)
     logger.debug("IPC database: '%s'" % Database.filepath)
 
@@ -787,7 +787,7 @@ def _client(url, options=None):
 
 def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=None, password=None):
     """
-    REST-JSON API client
+    REST API client
     """
 
     DataStore.username = username
@@ -801,14 +801,14 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
     logger.debug(dbgMsg)
 
     addr = "http://%s:%d" % (host, port)
-    logger.info("Starting REST-JSON API client to '%s'..." % addr)
+    logger.info("Starting REST API client to '%s'..." % addr)
 
     try:
         _client(addr)
     except Exception as ex:
         if not isinstance(ex, _urllib.error.HTTPError) or ex.code == _http_client.UNAUTHORIZED:
             errMsg = "There has been a problem while connecting to the "
-            errMsg += "REST-JSON API server at '%s' " % addr
+            errMsg += "REST API server at '%s' " % addr
             errMsg += "(%s)" % getSafeExString(ex)
             logger.critical(errMsg)
             return

@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.6.80"
+VERSION = "1.10.6.81"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -840,13 +840,13 @@ LIMITED_ROWS_TEST_NUMBER = 15
 # Default adapter to use for bottle server
 RESTAPI_DEFAULT_ADAPTER = "wsgiref"
 
-# Default REST-JSON API server listen address
+# Default REST API server listen address
 RESTAPI_DEFAULT_ADDRESS = "127.0.0.1"
 
-# Default REST-JSON API server listen port
+# Default REST API server listen port
 RESTAPI_DEFAULT_PORT = 8775
 
-# Unsupported options by REST-JSON API server
+# Unsupported options by REST API server
 RESTAPI_UNSUPPORTED_OPTIONS = ("sqlShell", "wizard", "evalCode", "alert")
 
 # Use "Supplementary Private Use Area-A"

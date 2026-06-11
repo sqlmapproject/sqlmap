@@ -1,9 +1,9 @@
 openapi: 3.0.3
 info:
-  title: sqlmap REST-JSON API
+  title: sqlmap REST API
   version: "1.0.0"
   description: |
-    OpenAPI/Swagger specification for sqlmapapi.py, the sqlmap REST-JSON API server.
+    OpenAPI/Swagger specification for sqlmapapi.py, the sqlmap REST API server.
 
     This specification describes the API surface implemented by `lib/utils/api.py`.
     The API is expected to be protected with HTTP Basic authentication when started
