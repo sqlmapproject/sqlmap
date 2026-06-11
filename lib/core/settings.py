@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.6.70"
+VERSION = "1.10.6.71"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -552,7 +552,7 @@ UNSAFE_DUMP_FILEPATH_REPLACEMENT = '_'
 RESTORE_MERGED_OPTIONS = ("col", "db", "dbms", "os", "dnsDomain", "privEsc", "tbl", "regexp", "string", "textOnly", "threads", "timeSec", "tmpPath", "uChar", "user")
 
 # Parameters to be ignored in detection phase (upper case)
-IGNORE_PARAMETERS = ("__VIEWSTATE", "__VIEWSTATEENCRYPTED", "__VIEWSTATEGENERATOR", "__EVENTARGUMENT", "__EVENTTARGET", "__EVENTVALIDATION", "ASPSESSIONID", "ASP.NET_SESSIONID", "JSESSIONID", "CFID", "CFTOKEN")
+IGNORE_PARAMETERS = ("__VIEWSTATE", "__VIEWSTATEENCRYPTED", "__VIEWSTATEGENERATOR", "__EVENTARGUMENT", "__EVENTTARGET", "__EVENTVALIDATION", "__SCROLLPOSITIONX", "__SCROLLPOSITIONY", "__PREVIOUSPAGE", "ASPSESSIONID", "ASP.NET_SESSIONID", "JSESSIONID", "PHPSESSID", "SESSID", "CFID", "CFTOKEN")
 
 # Regular expression used for recognition of ASP.NET control parameters
 ASP_NET_CONTROL_REGEX = r"(?i)\Actl\d+\$"
@@ -913,7 +913,7 @@ ZIP_HEADER = b"\x50\x4b\x03\x04"
 NETSCAPE_FORMAT_HEADER_COOKIES = "# Netscape HTTP Cookie File."
 
 # Infixes used for automatic recognition of parameters carrying anti-CSRF tokens
-CSRF_TOKEN_PARAMETER_INFIXES = ("csrf", "xsrf", "token", "nonce")
+CSRF_TOKEN_PARAMETER_INFIXES = ("csrf", "xsrf", "token", "nonce", "antiforgery", "authenticity_token", "requestverificationtoken")
 
 # Prefixes used in brute force search for web server document root
 BRUTE_DOC_ROOT_PREFIXES = {
