@@ -3283,7 +3283,7 @@ def findDynamicContent(firstPage, secondPage):
                 suffix = suffix[:DYNAMICITY_BOUNDARY_LENGTH]
 
                 for _ in (firstPage, secondPage):
-                    match = re.search(r"(?s)%s(.+)%s" % (re.escape(prefix), re.escape(suffix)), _)
+                    match = re.search(r"(?s)%s(.+?)%s" % (re.escape(prefix), re.escape(suffix)), _)
                     if match:
                         infix = match.group(1)
                         if infix[0].isalnum():
