@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.6.71"
+VERSION = "1.10.6.72"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -971,14 +971,14 @@ for key, value in os.environ.items():
         _ = key[len(SQLMAP_ENVIRONMENT_PREFIX) + 1:].upper()
         if _ in globals():
             original = globals()[_]
-            if isinstance(original, int):
+            if isinstance(original, bool):
+                globals()[_] = value.lower() in ('1', 'true')
+            elif isinstance(original, int):
                 try:
                     globals()[_] = int(value)
                 except ValueError:
                     pass
-            elif isinstance(original, bool):
-                globals()[_] = value.lower() in ('1', 'true')
             elif isinstance(original, (list, tuple)):
-                globals()[_] = [__.strip() for __ in _.split(',')]
+                globals()[_] = [__.strip() for __ in value.split(',')]
             else:
                 globals()[_] = value
