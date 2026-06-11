@@ -45,14 +45,17 @@ class Fingerprint(GenericFingerprint):
         # Reference: https://dev.mysql.com/doc/relnotes/mysql/<major>.<minor>/en/
 
         versions = (
-            (90300, 90302),  # MySQL 9.3
-            (90200, 90202),  # MySQL 9.2
-            (90100, 90102),  # MySQL 9.1
+            (90600, 90601),  # MySQL 9.6
+            (90500, 90501),  # MySQL 9.5
+            (90400, 90401),  # MySQL 9.4
+            (90300, 90301),  # MySQL 9.3
+            (90200, 90201),  # MySQL 9.2
+            (90100, 90101),  # MySQL 9.1
             (90000, 90002),  # MySQL 9.0
-            (80400, 80406),  # MySQL 8.4
-            (80300, 80302),  # MySQL 8.3
-            (80200, 80202),  # MySQL 8.2
-            (80100, 80102),  # MySQL 8.1
+            (80400, 80409),  # MySQL 8.4
+            (80300, 80301),  # MySQL 8.3
+            (80200, 80201),  # MySQL 8.2
+            (80100, 80101),  # MySQL 8.1
             (80000, 80043),  # MySQL 8.0
             (60000, 60014),  # MySQL 6.0
             (50700, 50745),  # MySQL 5.7
