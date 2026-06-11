@@ -2467,7 +2467,7 @@ def getSQLSnippet(dbms, sfile, **variables):
         retVal = retVal.replace(_, randomStr())
 
     for _ in re.findall(r"%RANDINT\d+%", retVal, re.I):
-        retVal = retVal.replace(_, randomInt())
+        retVal = retVal.replace(_, getText(randomInt()))
 
     variables = re.findall(r"(?<!\bLIKE ')%(\w+)%", retVal, re.I)
 
