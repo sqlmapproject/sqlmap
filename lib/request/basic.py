@@ -352,8 +352,7 @@ def decodePage(page, contentEncoding, contentType, percentDecode=True):
             # e.g. %20%28%29
             if percentDecode:
                 if b"%" in page:
-                    page = re.sub(b"%([0-9a-f]{2})", lambda _: decodeHex(_.group(1)), page)
-                    page = re.sub(b"%([0-9A-F]{2})", lambda _: decodeHex(_.group(1)), page)     # Note: %DeepSee_SQL in CACHE
+                    page = re.sub(b"(?i)%([0-9a-f]{2})", lambda _: decodeHex(_.group(1)), page)
 
             # e.g. &amp;
             page = re.sub(b"&([^;]+);", lambda _: six.int2byte(HTML_ENTITIES[getText(_.group(1))]) if HTML_ENTITIES.get(getText(_.group(1)), 256) < 256 else _.group(0), page)
