@@ -78,6 +78,8 @@ class DataStore(object):
     username = None
     password = None
 
+RESTAPI_READONLY_OPTIONS = ("api", "taskid", "database")
+
 # API objects
 class Database(object):
     filepath = None
@@ -296,6 +298,19 @@ def setRestAPILog():
 def is_admin(token):
     return safeCompareStrings(DataStore.admin_token, token)
 
+def validate_task_options(taskid, options, caller):
+    if not isinstance(options, dict):
+        logger.warning("[%s] Invalid JSON options provided to %s()" % (taskid, caller))
+        return "Invalid JSON options"
+
+    for key in options:
+        if key in RESTAPI_UNSUPPORTED_OPTIONS or key in RESTAPI_READONLY_OPTIONS:
+            logger.warning("[%s] Unsupported option '%s' provided to %s()" % (taskid, key, caller))
+            return "Unsupported option '%s'" % key
+        elif key not in DataStore.tasks[taskid].options:
+            logger.warning("[%s] Unknown option '%s' provided to %s()" % (taskid, key, caller))
+            return "Unknown option '%s'" % key
+
 @hook('before_request')
 def check_authentication():
     if not any((DataStore.username, DataStore.password)):
@@ -490,10 +505,9 @@ def option_set(taskid):
         logger.warning("[%s] Invalid JSON options provided to option_set()" % taskid)
         return jsonize({"success": False, "message": "Invalid JSON options"})
 
-    for key in request.json:
-        if key in RESTAPI_UNSUPPORTED_OPTIONS:
-            logger.warning("[%s] Unsupported option '%s' provided to option_set()" % (taskid, key))
-            return jsonize({"success": False, "message": "Unsupported option '%s'" % key})
+    message = validate_task_options(taskid, request.json, "option_set")
+    if message:
+        return jsonize({"success": False, "message": message})
 
     for option, value in request.json.items():
         DataStore.tasks[taskid].set_option(option, value)
@@ -516,10 +530,13 @@ def scan_start(taskid):
         logger.warning("[%s] Invalid JSON options provided to scan_start()" % taskid)
         return jsonize({"success": False, "message": "Invalid JSON options"})
 
-    for key in request.json:
-        if key in RESTAPI_UNSUPPORTED_OPTIONS:
-            logger.warning("[%s] Unsupported option '%s' provided to scan_start()" % (taskid, key))
-            return jsonize({"success": False, "message": "Unsupported option '%s'" % key})
+    if DataStore.tasks[taskid].engine_process() is not None and not DataStore.tasks[taskid].engine_has_terminated():
+        logger.warning("[%s] Scan already running" % taskid)
+        return jsonize({"success": False, "message": "Scan already running"})
+
+    message = validate_task_options(taskid, request.json, "scan_start")
+    if message:
+        return jsonize({"success": False, "message": message})
 
     # Initialize sqlmap engine's options with user's provided options, if any
     for option, value in request.json.items():
@@ -601,7 +618,7 @@ def scan_data(taskid):
         json_data_message.append({"status": status, "type": content_type, "value": dejsonize(value)})
 
     # Read all error messages from the IPC database
-    for error in DataStore.current_db.execute("SELECT error FROM errors WHERE taskid = ? ORDER BY id ASC", (taskid,)):
+    for error, in DataStore.current_db.execute("SELECT error FROM errors WHERE taskid = ? ORDER BY id ASC", (taskid,)):
         json_errors_message.append(error)
 
     logger.debug("(%s) Retrieved scan data and error messages" % taskid)

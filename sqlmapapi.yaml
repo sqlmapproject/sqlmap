@@ -726,9 +726,9 @@ components:
 
     OptionValue:
       description: Value accepted by sqlmap options. The exact type depends on the option.
-      nullable: true
       oneOf:
         - type: string
+          nullable: true
         - type: boolean
         - type: integer
         - type: number
@@ -826,7 +826,16 @@ components:
           description: Numeric content type stored by sqlmap.
           example: 0
         value:
-          nullable: true
+          oneOf:
+            - type: string
+              nullable: true
+            - type: boolean
+            - type: integer
+            - type: number
+            - type: array
+              items: {}
+            - type: object
+              additionalProperties: true
           description: JSON-decoded scan output value. Shape depends on the content type.
       additionalProperties: true
 
