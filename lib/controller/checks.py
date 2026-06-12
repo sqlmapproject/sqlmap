@@ -1238,7 +1238,7 @@ def checkDynamicContent(firstPage, secondPage):
             kb.heavilyDynamic = True
 
             secondPage, _, _ = Request.queryPage(content=True)
-            findDynamicContent(firstPage, secondPage)
+            findDynamicContent(firstPage, secondPage, merge=True)
 
 def checkStability():
     """

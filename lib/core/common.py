@@ -3237,10 +3237,14 @@ def aliasToDbmsEnum(dbms):
 
     return retVal
 
-def findDynamicContent(firstPage, secondPage):
+def findDynamicContent(firstPage, secondPage, merge=False):
     """
     This function checks if the provided pages have dynamic content. If they
     are dynamic, proper markings will be made
+
+    Note: with merge=True the newly found markings are accumulated into the
+    existing ones (e.g. when refining across multiple original-page samples)
+    instead of replacing them
 
     >>> findDynamicContent("Lorem ipsum dolor sit amet, congue tation referrentur ei sed. Ne nec legimus habemus recusabo, natum reque et per. Facer tritani reprehendunt eos id, modus constituam est te. Usu sumo indoctum ad, pri paulo molestiae complectitur no.", "Lorem ipsum dolor sit amet, congue tation referrentur ei sed. Ne nec legimus habemus recusabo, natum reque et per. <script src='ads.js'></script>Facer tritani reprehendunt eos id, modus constituam est te. Usu sumo indoctum ad, pri paulo molestiae complectitur no.")
     >>> kb.dynamicMarkings
@@ -3254,7 +3258,9 @@ def findDynamicContent(firstPage, secondPage):
     singleTimeLogMessage(infoMsg)
 
     blocks = list(SequenceMatcher(None, firstPage, secondPage).get_matching_blocks())
-    kb.dynamicMarkings = []
+
+    if not merge:
+        kb.dynamicMarkings = []
 
     # Removing too small matching blocks
     for block in blocks[:]:
@@ -3292,7 +3298,9 @@ def findDynamicContent(firstPage, secondPage):
                             suffix = trimAlphaNum(suffix)
                         break
 
-            kb.dynamicMarkings.append((prefix if prefix else None, suffix if suffix else None))
+            marking = (prefix if prefix else None, suffix if suffix else None)
+            if marking not in kb.dynamicMarkings:  # Note: avoiding duplicates (e.g. when accumulating markings across samples)
+                kb.dynamicMarkings.append(marking)
 
     if len(kb.dynamicMarkings) > 0:
         infoMsg = "dynamic content marked for removal (%d region%s)" % (len(kb.dynamicMarkings), 's' if len(kb.dynamicMarkings) > 1 else '')
