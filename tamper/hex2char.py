@@ -39,7 +39,7 @@ def tamper(payload, **kwargs):
     retVal = payload
 
     if payload:
-        for match in re.finditer(r"\b0x([0-9a-f]+)\b", retVal):
+        for match in re.finditer(r"(?i)\b0x([0-9a-f]+)\b", retVal):
             if len(match.group(1)) > 2:
                 result = "CONCAT(%s)" % ','.join("CHAR(%d)" % _ for _ in getOrds(decodeHex(match.group(1))))
             else:
