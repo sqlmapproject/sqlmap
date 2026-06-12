@@ -9,7 +9,7 @@ import re
 
 from lib.core.enums import PRIORITY
 
-__priority__ = PRIORITY.LOWEST
+__priority__ = PRIORITY.HIGHEST
 
 def dependencies():
     pass

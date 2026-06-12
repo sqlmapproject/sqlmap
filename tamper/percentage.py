@@ -11,7 +11,7 @@ import string
 from lib.core.common import singleTimeWarnMessage
 from lib.core.enums import PRIORITY
 
-__priority__ = PRIORITY.LOW
+__priority__ = PRIORITY.LOWEST
 
 def dependencies():
     singleTimeWarnMessage("tamper script '%s' is only meant to be run against ASP web applications" % os.path.basename(__file__).split(".")[0])
