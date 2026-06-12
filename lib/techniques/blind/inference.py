@@ -152,6 +152,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             lastChar = 0
         elif conf.lastChar is not None and (isinstance(conf.lastChar, int) or (hasattr(conf.lastChar, "isdigit") and conf.lastChar.isdigit())):
             lastChar = int(conf.lastChar)
+            if kb.fileReadMode:  # Note: file content is retrieved hex-encoded (2 chars per byte), mirroring the firstChar handling above
+                lastChar <<= 1
         elif hasattr(lastChar, "isdigit") and lastChar.isdigit() or isinstance(lastChar, int):
             lastChar = int(lastChar)
         else:
