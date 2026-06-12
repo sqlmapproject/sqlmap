@@ -2071,7 +2071,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.cache = AttribDict()
     kb.cache.addrinfo = {}
     kb.cache.content = LRUDict(capacity=16)
-    kb.cache.comparison = {}
+    kb.cache.comparison = LRUDict(capacity=256)
     kb.cache.encoding = LRUDict(capacity=256)
     kb.cache.alphaBoundaries = None
     kb.cache.hashRegex = None
