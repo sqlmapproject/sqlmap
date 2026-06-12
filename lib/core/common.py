@@ -4122,6 +4122,9 @@ def intersect(containerA, containerB, lowerCase=False):
 def decodeStringEscape(value):
     """
     Decodes escaped string values (e.g. "\\t" -> "\t")
+
+    >>> decodeStringEscape("a" + chr(92) + "tb") == "a" + chr(9) + "b"
+    True
     """
 
     retVal = value
@@ -4136,6 +4139,9 @@ def decodeStringEscape(value):
 def encodeStringEscape(value):
     """
     Encodes escaped string values (e.g. "\t" -> "\\t")
+
+    >>> encodeStringEscape("a" + chr(9) + "b") == "a" + chr(92) + "tb"
+    True
     """
 
     retVal = value
