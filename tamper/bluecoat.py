@@ -44,7 +44,7 @@ def tamper(payload, **kwargs):
 
     if payload:
         retVal = re.sub(r"\b(?P<word>[A-Z_]+)(?=[^\w(]|\Z)", process, retVal)
-        retVal = re.sub(r"\s*=\s*", " LIKE ", retVal)
+        retVal = re.sub(r"\s*(?<![<>!=])=(?!=)\s*", " LIKE ", retVal)  # Note: skipping compound operators (e.g. >=, <=, !=)
         retVal = retVal.replace("%09 ", "%09")
 
     return retVal
