@@ -231,8 +231,8 @@ class UDF(object):
             errMsg += "but the database underlying operating system is Linux"
             raise SqlmapMissingMandatoryOptionException(errMsg)
 
-        self.udfSharedLibName = os.path.basename(self.udfLocalFile).split(".")[0]
-        self.udfSharedLibExt = os.path.basename(self.udfLocalFile).split(".")[1]
+        self.udfSharedLibName = os.path.splitext(os.path.basename(self.udfLocalFile))[0]
+        self.udfSharedLibExt = os.path.splitext(self.udfLocalFile)[1][1:]
 
         msg = "how many user-defined functions do you want to create "
         msg += "from the shared library? "

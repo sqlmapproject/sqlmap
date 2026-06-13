@@ -122,6 +122,8 @@ class SQLAlchemy(GenericConnector):
 
         try:
             self.cursor = self.connector.execute(query)
+            if hasattr(self.connector, "commit"):  # Note: SQLAlchemy 2.0+ dropped implicit autocommit (otherwise DML changes - e.g. via --sql-query - would be silently lost)
+                self.connector.commit()
             retVal = True
         except (_sqlalchemy.exc.OperationalError, _sqlalchemy.exc.ProgrammingError) as ex:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % getSafeExString(ex))

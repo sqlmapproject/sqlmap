@@ -26,6 +26,8 @@ class xrange(object):
     True
     >>> list(xrange(0, 7, 2)) == list(range(0, 7, 2))
     True
+    >>> list(xrange(8, 0, -2)) == list(range(8, 0, -2))
+    True
     >>> foobar = xrange(1, 10)
     >>> 7 in foobar
     True
@@ -33,6 +35,12 @@ class xrange(object):
     False
     >>> foobar[0]
     1
+    >>> 6 in xrange(8, 0, -2)
+    True
+    >>> 0 in xrange(8, 0, -2)
+    False
+    >>> xrange(0, 10, 2).index(4)
+    2
     """
 
     __slots__ = ['_slice']
@@ -71,10 +79,17 @@ class xrange(object):
         return self._len()
 
     def _len(self):
-        return max(0, 1 + int((self.stop - 1 - self.start) // self.step))
+        if self.step > 0:
+            lo, hi, step = self.start, self.stop, self.step
+        else:  # Note: normalizing for descending ranges (negative step)
+            lo, hi, step = self.stop, self.start, -self.step
+        return max(0, (hi - lo + step - 1) // step)
 
     def __contains__(self, value):
-        return (self.start <= value < self.stop) and (value - self.start) % self.step == 0
+        if self.step > 0:
+            return self.start <= value < self.stop and (value - self.start) % self.step == 0
+        else:
+            return self.stop < value <= self.start and (value - self.start) % self.step == 0
 
     def __getitem__(self, index):
         if isinstance(index, slice):
@@ -98,7 +113,7 @@ class xrange(object):
         return self.start + self.step * i
 
     def index(self, i):
-        if self.start <= i < self.stop:
-            return i - self.start
+        if i in self:
+            return (i - self.start) // self.step  # Note: also accounts for step != 1 (and descending ranges)
         else:
             raise ValueError("%d is not in list" % i)

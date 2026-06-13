@@ -1229,6 +1229,9 @@ class Agent(object):
     def removePayloadDelimiters(self, value):
         """
         Removes payload delimiters from inside the input string
+
+        >>> agent.removePayloadDelimiters(agent.addPayloadDelimiters("1 AND 1=1")) == "1 AND 1=1"
+        True
         """
 
         return value.replace(PAYLOAD_DELIMITER, "") if value else value
@@ -1236,6 +1239,9 @@ class Agent(object):
     def extractPayload(self, value):
         """
         Extracts payload from inside of the input string
+
+        >>> agent.extractPayload("prefix" + agent.addPayloadDelimiters("1 AND 1=1") + "suffix") == "1 AND 1=1"
+        True
         """
 
         _ = re.escape(PAYLOAD_DELIMITER)

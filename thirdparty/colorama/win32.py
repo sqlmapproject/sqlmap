@@ -4,6 +4,8 @@
 STDOUT = -11
 STDERR = -12
 
+ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004
+
 try:
     import ctypes
     from ctypes import LibraryLoader
@@ -83,33 +85,45 @@ else:
     ]
     _FillConsoleOutputAttribute.restype = wintypes.BOOL
 
-    _SetConsoleTitleW = windll.kernel32.SetConsoleTitleA
+    _SetConsoleTitleW = windll.kernel32.SetConsoleTitleW
     _SetConsoleTitleW.argtypes = [
-        wintypes.LPCSTR
+        wintypes.LPCWSTR
     ]
     _SetConsoleTitleW.restype = wintypes.BOOL
 
-    handles = {
-        STDOUT: _GetStdHandle(STDOUT),
-        STDERR: _GetStdHandle(STDERR),
-    }
+    _GetConsoleMode = windll.kernel32.GetConsoleMode
+    _GetConsoleMode.argtypes = [
+        wintypes.HANDLE,
+        POINTER(wintypes.DWORD)
+    ]
+    _GetConsoleMode.restype = wintypes.BOOL
 
-    def winapi_test():
-        handle = handles[STDOUT]
+    _SetConsoleMode = windll.kernel32.SetConsoleMode
+    _SetConsoleMode.argtypes = [
+        wintypes.HANDLE,
+        wintypes.DWORD
+    ]
+    _SetConsoleMode.restype = wintypes.BOOL
+
+    def _winapi_test(handle):
         csbi = CONSOLE_SCREEN_BUFFER_INFO()
         success = _GetConsoleScreenBufferInfo(
             handle, byref(csbi))
         return bool(success)
 
+    def winapi_test():
+        return any(_winapi_test(h) for h in
+                   (_GetStdHandle(STDOUT), _GetStdHandle(STDERR)))
+
     def GetConsoleScreenBufferInfo(stream_id=STDOUT):
-        handle = handles[stream_id]
+        handle = _GetStdHandle(stream_id)
         csbi = CONSOLE_SCREEN_BUFFER_INFO()
         success = _GetConsoleScreenBufferInfo(
             handle, byref(csbi))
         return csbi
 
     def SetConsoleTextAttribute(stream_id, attrs):
-        handle = handles[stream_id]
+        handle = _GetStdHandle(stream_id)
         return _SetConsoleTextAttribute(handle, attrs)
 
     def SetConsoleCursorPosition(stream_id, position, adjust=True):
@@ -127,11 +141,11 @@ else:
             adjusted_position.Y += sr.Top
             adjusted_position.X += sr.Left
         # Resume normal processing
-        handle = handles[stream_id]
+        handle = _GetStdHandle(stream_id)
         return _SetConsoleCursorPosition(handle, adjusted_position)
 
     def FillConsoleOutputCharacter(stream_id, char, length, start):
-        handle = handles[stream_id]
+        handle = _GetStdHandle(stream_id)
         char = c_char(char.encode())
         length = wintypes.DWORD(length)
         num_written = wintypes.DWORD(0)
@@ -142,7 +156,7 @@ else:
 
     def FillConsoleOutputAttribute(stream_id, attr, length, start):
         ''' FillConsoleOutputAttribute( hConsole, csbi.wAttributes, dwConSize, coordScreen, &cCharsWritten )'''
-        handle = handles[stream_id]
+        handle = _GetStdHandle(stream_id)
         attribute = wintypes.WORD(attr)
         length = wintypes.DWORD(length)
         num_written = wintypes.DWORD(0)
@@ -152,3 +166,15 @@ else:
 
     def SetConsoleTitle(title):
         return _SetConsoleTitleW(title)
+
+    def GetConsoleMode(handle):
+        mode = wintypes.DWORD()
+        success = _GetConsoleMode(handle, byref(mode))
+        if not success:
+            raise ctypes.WinError()
+        return mode.value
+
+    def SetConsoleMode(handle, mode):
+        success = _SetConsoleMode(handle, mode)
+        if not success:
+            raise ctypes.WinError()

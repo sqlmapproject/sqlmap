@@ -32,6 +32,6 @@ def tamper(payload, **kwargs):
     retVal = payload
 
     if payload:
-        retVal = re.sub(r"\s*=\s*", " RLIKE ", retVal)
+        retVal = re.sub(r"\s*(?<![<>!=])=(?!=)\s*", " RLIKE ", retVal)  # Note: skipping compound operators (e.g. >=, <=, !=)
 
     return retVal

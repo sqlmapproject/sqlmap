@@ -4,9 +4,14 @@ on:
   pull_request:
     branches: [ master ]
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+
     strategy:
       matrix:
         include:
@@ -22,11 +27,15 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
+          persist-credentials: false
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+
+      - name: Python sanity
+        run: python -VV
 
       - name: Basic import test
         run: python -c "import sqlmap; import sqlmapapi"

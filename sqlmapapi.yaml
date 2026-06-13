@@ -1,297 +1,898 @@
-openapi: 3.0.1
+openapi: 3.0.3
 info:
-  title: sqlmapapi OpenAPI/Swagger specification
-  version: '0.1'
+  title: sqlmap REST API
+  version: "1.0.0"
+  description: |
+    OpenAPI/Swagger specification for sqlmapapi.py, the sqlmap REST API server.
+
+    This specification describes the API surface implemented by `lib/utils/api.py`.
+    The API is expected to be protected with HTTP Basic authentication when started
+    with `--username` and `--password`; hardened builds should require credentials
+    for server/client usage.
+
+    Notes for implementers:
+      * Most sqlmap options are represented as dynamic JSON object properties.
+      * API-level failures are commonly returned as HTTP 200 with `success: false`
+        and a `message` field, matching the current server behavior.
+      * The API starts scans by spawning sqlmap in a separate process and storing
+        logs/data in the configured IPC database.
+  license:
+    name: GPL-2.0-only or commercial
+    url: https://github.com/sqlmapproject/sqlmap/blob/master/LICENSE
+  contact:
+    name: sqlmap project
+    url: https://sqlmap.org
+externalDocs:
+  description: sqlmap project repository
+  url: https://github.com/sqlmapproject/sqlmap
+servers:
+  - url: http://127.0.0.1:8775
+    description: Default local sqlmapapi.py server
+security:
+  - basicAuth: []
+tags:
+  - name: Version
+    description: Server/version metadata
+  - name: Tasks
+    description: Task lifecycle management
+  - name: Options
+    description: Task option inspection and mutation
+  - name: Scans
+    description: Scan process lifecycle, status, logs, and results
+  - name: Admin
+    description: Task pool administration
+  - name: Files
+    description: Retrieval of output files
 paths:
   /version:
     get:
-      description: Fetch server version
+      tags: [Version]
+      operationId: getVersion
+      summary: Fetch server version
+      description: Returns the sqlmap version string reported by the API server.
       responses:
-        '200':
-          description: OK
+        "200":
+          description: Server version returned.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  version:
-                    type: string
-                    example: "1.5.7.7#dev"
-                  success:
-                    type: boolean
-                    example: true
+                $ref: "#/components/schemas/VersionResponse"
+              examples:
+                success:
+                  value:
+                    success: true
+                    version: "1.10.6.51#dev"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
   /task/new:
     get:
-      description: Create a new task
+      tags: [Tasks]
+      operationId: createTask
+      summary: Create a new task
+      description: Creates an empty task and returns a 16-character hexadecimal task ID.
       responses:
-        '200':
-          description: OK
+        "200":
+          description: Task created.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  taskid:
-                    type: string
-                    example: "fad44d6beef72285"
-                  success:
-                    type: boolean
-                    example: true
+                $ref: "#/components/schemas/TaskNewResponse"
+              examples:
+                success:
+                  value:
+                    success: true
+                    taskid: "fad44d6beef72285"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
   /task/{taskid}/delete:
     get:
-      description: Delete an existing task
+      tags: [Tasks]
+      operationId: deleteTask
+      summary: Delete an existing task
+      description: Kills the task process, if still running, and removes the task from the in-memory task pool.
       parameters:
-        - in: path
-          name: taskid
-          required: true
-          schema:
-            type: string
-          description: Scan task ID
+        - $ref: "#/components/parameters/TaskId"
       responses:
-        '200':
-          description: OK
+        "200":
+          description: Task deleted.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
+                $ref: "#/components/schemas/SimpleSuccessResponse"
+              examples:
+                success:
+                  value:
+                    success: true
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Non-existing task ID.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                notFound:
+                  value:
+                    success: false
+                    message: Non-existing task ID
+
+  /admin/list:
+    get:
+      tags: [Admin]
+      operationId: listTasksForRemoteAddress
+      summary: List visible tasks
+      description: |
+        Lists task statuses visible to the caller. Without the admin token path variant,
+        the server returns tasks associated with the same remote address.
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminList"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /admin/{token}/list:
+    get:
+      tags: [Admin]
+      operationId: listTasksWithAdminToken
+      summary: List all tasks with admin token
+      description: Lists all task statuses when the path token matches the server-generated admin token.
+      parameters:
+        - $ref: "#/components/parameters/AdminToken"
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminList"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /admin/flush:
+    get:
+      tags: [Admin]
+      operationId: flushTasksForRemoteAddress
+      summary: Flush visible tasks
+      description: |
+        Kills and removes tasks visible to the caller. Without the admin token path variant,
+        the server flushes tasks associated with the same remote address.
+      responses:
+        "200":
+          description: Matching tasks flushed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimpleSuccessResponse"
+              examples:
+                success:
+                  value:
+                    success: true
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /admin/{token}/flush:
+    get:
+      tags: [Admin]
+      operationId: flushTasksWithAdminToken
+      summary: Flush all tasks with admin token
+      description: Kills and removes all tasks when the path token matches the server-generated admin token.
+      parameters:
+        - $ref: "#/components/parameters/AdminToken"
+      responses:
+        "200":
+          description: Matching tasks flushed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimpleSuccessResponse"
+              examples:
+                success:
+                  value:
+                    success: true
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
   /option/{taskid}/list:
     get:
-      description: List options for a given task ID
+      tags: [Options]
+      operationId: listOptions
+      summary: List task options
+      description: Returns the current option object for a task.
       parameters:
-        - in: path
-          name: taskid
-          required: true
-          schema:
-            type: string
-          description: Scan task ID
+        - $ref: "#/components/parameters/TaskId"
       responses:
-        '200':
-          description: OK
+        "200":
+          description: Options returned, or an API-level failure envelope for an invalid task ID.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  options:
-                    type: array
-                    items:
-                      type: object
+                oneOf:
+                  - $ref: "#/components/schemas/OptionListResponse"
+                  - $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                success:
+                  value:
+                    success: true
+                    options:
+                      url: "http://testasp.vulnweb.com/showforum.asp?id=1"
+                      batch: true
+                      threads: 1
+                invalidTask:
+                  value:
+                    success: false
+                    message: Invalid task ID
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
   /option/{taskid}/get:
     post:
-      description: Get value of option(s) for a certain task ID
+      tags: [Options]
+      operationId: getOptions
+      summary: Get selected task options
+      description: Returns values for the requested option names.
       parameters:
-        - in: path
-          name: taskid
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/TaskId"
       requestBody:
+        required: false
         content:
           application/json:
             schema:
-              type: array
-              items:
-                type: string
-              example: ["url", "cookie"]
+              $ref: "#/components/schemas/OptionGetRequest"
+            examples:
+              selectedOptions:
+                value: ["url", "cookie"]
       responses:
-        '200':
-          description: OK
+        "200":
+          description: Selected options returned, or an API-level failure envelope.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  options:
-                    type: object
+                oneOf:
+                  - $ref: "#/components/schemas/OptionGetResponse"
+                  - $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                success:
+                  value:
+                    success: true
+                    options:
+                      url: "http://testasp.vulnweb.com/showforum.asp?id=1"
+                      cookie: "id=1"
+                unknownOption:
+                  value:
+                    success: false
+                    message: "Unknown option 'doesNotExist'"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
   /option/{taskid}/set:
     post:
-      description: Set value of option(s) for a certain task ID
+      tags: [Options]
+      operationId: setOptions
+      summary: Set task options
+      description: |
+        Sets one or more options on a task. Values are persisted in the task option
+        object and are used when the scan is started.
+
+        Unsupported, read-only, and unknown options are rejected with `success: false`.
       parameters:
-        - in: path
-          name: taskid
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/TaskId"
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              type: object
-              example: {"cookie": "id=1"}
+              $ref: "#/components/schemas/SqlmapOptions"
+            examples:
+              setCookie:
+                value:
+                  cookie: "id=1"
+              setTarget:
+                value:
+                  url: "http://testasp.vulnweb.com/showforum.asp?id=1"
       responses:
-        '200':
-          description: OK
+        "200":
+          description: Options set, or an API-level failure envelope.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
+                oneOf:
+                  - $ref: "#/components/schemas/SimpleSuccessResponse"
+                  - $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                success:
+                  value:
+                    success: true
+                invalidJson:
+                  value:
+                    success: false
+                    message: Invalid JSON options
+                unsupportedOption:
+                  value:
+                    success: false
+                    message: "Unsupported option 'evalCode'"
+                unknownOption:
+                  value:
+                    success: false
+                    message: "Unknown option 'doesNotExist'"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
   /scan/{taskid}/start:
     post:
-      description: Launch a scan
+      tags: [Scans]
+      operationId: startScan
+      summary: Launch a scan
+      description: |
+        Applies the provided options to the task and starts sqlmap in a separate process.
+        The response contains the spawned engine process ID.
+
+        Unsupported, read-only, and unknown options are rejected with `success: false`.
+        Starting a scan for an already running task returns `success: false`.
       parameters:
-        - in: path
-          name: taskid
-          required: true
-          schema:
-            type: string
-          description: Scan task ID
+        - $ref: "#/components/parameters/TaskId"
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                url:
-                  type: string
+              $ref: "#/components/schemas/SqlmapOptions"
             examples:
-              '0':
-                value: '{"url":"http://testphp.vulnweb.com/artists.php?artist=1"}'
+              basicUrlScan:
+                value:
+                  url: "http://testasp.vulnweb.com/showforum.asp?id=1"
       responses:
-        '200':
-          description: OK
+        "200":
+          description: Scan started, or an API-level failure envelope.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  engineid:
-                    type: integer
-                    example: 19720
-                  success:
-                    type: boolean
-                    example: true
+                oneOf:
+                  - $ref: "#/components/schemas/ScanStartResponse"
+                  - $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                success:
+                  value:
+                    success: true
+                    engineid: 19720
+                unsupportedOption:
+                  value:
+                    success: false
+                    message: "Unsupported option 'evalCode'"
+                unknownOption:
+                  value:
+                    success: false
+                    message: "Unknown option 'doesNotExist'"
+                scanAlreadyRunning:
+                  value:
+                    success: false
+                    message: Scan already running
+                invalidJson:
+                  value:
+                    success: false
+                    message: Invalid JSON options
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
   /scan/{taskid}/stop:
     get:
-      description: Stop a scan
+      tags: [Scans]
+      operationId: stopScan
+      summary: Stop a scan
+      description: Terminates the running scan process for the task and waits for process exit.
       parameters:
-        - in: path
-          name: taskid
-          required: true
-          schema:
-            type: string
-          description: Scan task ID
+        - $ref: "#/components/parameters/TaskId"
       responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-  /scan/{taskid}/status:
-    get:
-      description: Fetch status of a scan
-      parameters:
-        - in: path
-          name: taskid
-          required: true
-          schema:
-            type: string
-          description: Scan task ID
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: terminated
-                  returncode:
-                    type: integer
-                    example: 0
-                  success:
-                    type: boolean
-                    example: true
-  /scan/{taskid}/data:
-    get:
-      description: Retrieve the scan resulting data
-      parameters:
-        - in: path
-          name: taskid
-          required: true
-          schema:
-            type: string
-          description: Scan task ID
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      type: object
-                  success:
-                    type: boolean
-                    example: true
-                  error:
-                    type: array
-                    items:
-                      type: object
-  /scan/{taskid}/log:
-    get:
-      description: Retrieve the log messages
-      parameters:
-        - in: path
-          name: taskid
-          required: true
-          schema:
-            type: string
-          description: Scan task ID
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  log:
-                    type: array
-                    items:
-                      type: object
-                  success:
-                    type: boolean
-                    example: true
+        "200":
+          $ref: "#/components/responses/ScanControl"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
   /scan/{taskid}/kill:
     get:
-      description: Kill a scan
+      tags: [Scans]
+      operationId: killScan
+      summary: Kill a scan
+      description: Force-kills the running scan process for the task and waits for process exit.
       parameters:
-        - in: path
-          name: taskid
-          required: true
-          schema:
-            type: string
-          description: Scan task ID
+        - $ref: "#/components/parameters/TaskId"
       responses:
-        '200':
-          description: OK
+        "200":
+          $ref: "#/components/responses/ScanControl"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /scan/{taskid}/status:
+    get:
+      tags: [Scans]
+      operationId: getScanStatus
+      summary: Fetch scan status
+      description: Returns the process status and return code for the task.
+      parameters:
+        - $ref: "#/components/parameters/TaskId"
+      responses:
+        "200":
+          description: Scan status returned, or an API-level failure envelope.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
+                oneOf:
+                  - $ref: "#/components/schemas/ScanStatusResponse"
+                  - $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                running:
+                  value:
+                    success: true
+                    status: running
+                    returncode: null
+                terminated:
+                  value:
+                    success: true
+                    status: terminated
+                    returncode: 0
+                notRunning:
+                  value:
+                    success: true
+                    status: not running
+                    returncode: null
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /scan/{taskid}/data:
+    get:
+      tags: [Scans]
+      operationId: getScanData
+      summary: Retrieve scan data
+      description: Returns structured scan output and recorded error messages for the task.
+      parameters:
+        - $ref: "#/components/parameters/TaskId"
+      responses:
+        "200":
+          description: Scan data returned, or an API-level failure envelope.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/ScanDataResponse"
+                  - $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                success:
+                  value:
+                    success: true
+                    data:
+                      - status: 1
+                        type: 0
+                        value: []
+                    error: []
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /scan/{taskid}/log:
+    get:
+      tags: [Scans]
+      operationId: getScanLog
+      summary: Retrieve all scan log messages
+      description: Returns all recorded log messages for the task.
+      parameters:
+        - $ref: "#/components/parameters/TaskId"
+      responses:
+        "200":
+          $ref: "#/components/responses/ScanLog"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /scan/{taskid}/log/{start}/{end}:
+    get:
+      tags: [Scans]
+      operationId: getScanLogRange
+      summary: Retrieve a bounded scan log range
+      description: Returns log messages with database IDs from `start` through `end`, inclusive.
+      parameters:
+        - $ref: "#/components/parameters/TaskId"
+        - name: start
+          in: path
+          required: true
+          description: Inclusive starting log row ID. Must be a positive integer.
+          schema:
+            type: integer
+            minimum: 1
+            example: 1
+        - name: end
+          in: path
+          required: true
+          description: Inclusive ending log row ID. Must be greater than or equal to `start`.
+          schema:
+            type: integer
+            minimum: 1
+            example: 100
+      responses:
+        "200":
+          $ref: "#/components/responses/ScanLog"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /download/{taskid}/{target}/{filename}:
+    get:
+      tags: [Files]
+      operationId: downloadOutputFile
+      summary: Download an output file
+      description: |
+        Retrieves a file from sqlmap's output directory for the given task/target and
+        returns it as Base64 in JSON.
+
+        Implementation note: `filename` is a Bottle `:path` parameter and may contain
+        slash characters in the running server. Some OpenAPI tooling requires those
+        slashes to be URL-encoded or handled with a custom client.
+      x-bottle-path-parameter: filename
+      parameters:
+        - $ref: "#/components/parameters/TaskId"
+        - name: target
+          in: path
+          required: true
+          description: Target output-directory name.
+          schema:
+            type: string
+            example: testasp.vulnweb.com
+        - name: filename
+          in: path
+          required: true
+          description: Output file path relative to the target directory.
+          allowReserved: true
+          schema:
+            type: string
+            example: log
+      responses:
+        "200":
+          description: File returned, or an API-level failure envelope.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/DownloadResponse"
+                  - $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                success:
+                  value:
+                    success: true
+                    file: "SGVsbG8K"
+                forbidden:
+                  value:
+                    success: false
+                    message: Forbidden path
+                missing:
+                  value:
+                    success: false
+                    message: File does not exist
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: |
+        HTTP Basic authentication using the `--username` and `--password` values
+        supplied to sqlmapapi.py. Hardened builds should require both values.
+
+  parameters:
+    TaskId:
+      name: taskid
+      in: path
+      required: true
+      description: 16-character hexadecimal scan task ID.
+      schema:
+        type: string
+        pattern: "^[0-9a-fA-F]{16}$"
+        example: fad44d6beef72285
+    AdminToken:
+      name: token
+      in: path
+      required: true
+      description: Server-generated admin token printed when sqlmapapi.py starts.
+      schema:
+        type: string
+        pattern: "^[0-9a-fA-F]{32}$"
+        example: "0123456789abcdef0123456789abcdef"
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid HTTP Basic credentials. The response body is empty.
+    AdminList:
+      description: Task pool listing returned.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AdminListResponse"
+          examples:
+            success:
+              value:
+                success: true
+                tasks:
+                  fad44d6beef72285: running
+                  c04d8c5c7582efb4: terminated
+                tasks_num: 2
+    ScanControl:
+      description: Scan control action completed, or an API-level failure envelope.
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: "#/components/schemas/SimpleSuccessResponse"
+              - $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            success:
+              value:
+                success: true
+            invalidTask:
+              value:
+                success: false
+                message: Invalid task ID
+    ScanLog:
+      description: Scan log returned, or an API-level failure envelope.
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: "#/components/schemas/ScanLogResponse"
+              - $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            success:
+              value:
+                success: true
+                log:
+                  - time: "12:34:56"
+                    level: INFO
+                    message: testing connection to the target URL
+            invalidRange:
+              value:
+                success: false
+                message: Invalid start or end value, must be digits
+
+  schemas:
+    ErrorResponse:
+      type: object
+      required: [success, message]
+      properties:
+        success:
+          type: boolean
+          enum: [false]
+        message:
+          type: string
+      additionalProperties: false
+
+    SimpleSuccessResponse:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+      additionalProperties: false
+
+    VersionResponse:
+      type: object
+      required: [success, version]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        version:
+          type: string
+          description: sqlmap version string without the `sqlmap/` prefix.
+          example: "1.10.6.51#dev"
+      additionalProperties: false
+
+    TaskNewResponse:
+      type: object
+      required: [success, taskid]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        taskid:
+          type: string
+          pattern: "^[0-9a-fA-F]{16}$"
+          example: fad44d6beef72285
+      additionalProperties: false
+
+    AdminListResponse:
+      type: object
+      required: [success, tasks, tasks_num]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        tasks:
+          type: object
+          description: Object keyed by task ID, with current task status as the value.
+          additionalProperties:
+            $ref: "#/components/schemas/ScanStatus"
+          example:
+            fad44d6beef72285: running
+        tasks_num:
+          type: integer
+          minimum: 0
+          example: 1
+      additionalProperties: false
+
+    ScanStatus:
+      type: string
+      enum:
+        - not running
+        - running
+        - terminated
+
+    OptionValue:
+      description: Value accepted by sqlmap options. The exact type depends on the option.
+      anyOf:
+        - type: string
+          nullable: true
+        - type: boolean
+        - type: integer
+        - type: number
+        - type: array
+          items: {}
+        - type: object
+          additionalProperties: true
+
+    SqlmapOptions:
+      type: object
+      description: |
+        Dynamic object containing sqlmap option names and values. Option names map to
+        sqlmap's internal option dictionary. Unsupported, read-only, and unknown
+        options are rejected by endpoints that accept this object.
+      additionalProperties:
+        $ref: "#/components/schemas/OptionValue"
+      example:
+        url: "http://testasp.vulnweb.com/showforum.asp?id=1"
+        cookie: "id=1"
+        batch: true
+        threads: 1
+
+    OptionListResponse:
+      type: object
+      required: [success, options]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        options:
+          $ref: "#/components/schemas/SqlmapOptions"
+      additionalProperties: false
+
+    OptionGetRequest:
+      type: array
+      description: List of option names to return. Empty or missing input returns an empty options object.
+      items:
+        type: string
+        minLength: 1
+      example:
+        - url
+        - cookie
+
+    OptionGetResponse:
+      type: object
+      required: [success, options]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        options:
+          $ref: "#/components/schemas/SqlmapOptions"
+      additionalProperties: false
+
+    ScanStartResponse:
+      type: object
+      required: [success, engineid]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        engineid:
+          type: integer
+          description: Process ID of the spawned sqlmap engine.
+          example: 19720
+      additionalProperties: false
+
+    ScanStatusResponse:
+      type: object
+      required: [success, status, returncode]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        status:
+          $ref: "#/components/schemas/ScanStatus"
+        returncode:
+          type: integer
+          nullable: true
+          description: Process return code, or null when no process is running or the process has not exited.
+          example: 0
+      additionalProperties: false
+
+    ScanDataItem:
+      type: object
+      required: [status, type, value]
+      properties:
+        status:
+          type: integer
+          description: Numeric content status stored by sqlmap.
+          example: 1
+        type:
+          type: integer
+          description: Numeric content type stored by sqlmap.
+          example: 0
+        value:
+          anyOf:
+            - type: string
+              nullable: true
+            - type: boolean
+            - type: integer
+            - type: number
+            - type: array
+              items: {}
+            - type: object
+              additionalProperties: true
+          description: JSON-decoded scan output value. Shape depends on the content type.
+      additionalProperties: true
+
+    ScanDataResponse:
+      type: object
+      required: [success, data, error]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/ScanDataItem"
+        error:
+          type: array
+          items:
+            type: string
+      additionalProperties: false
+
+    LogEntry:
+      type: object
+      required: [time, level, message]
+      properties:
+        time:
+          type: string
+          description: Server-local time in HH:MM:SS format.
+          pattern: "^[0-2][0-9]:[0-5][0-9]:[0-5][0-9]$"
+          example: "12:34:56"
+        level:
+          type: string
+          description: Python logging level name.
+          example: INFO
+        message:
+          type: string
+          example: testing connection to the target URL
+      additionalProperties: false
+
+    ScanLogResponse:
+      type: object
+      required: [success, log]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        log:
+          type: array
+          items:
+            $ref: "#/components/schemas/LogEntry"
+      additionalProperties: false
+
+    DownloadResponse:
+      type: object
+      required: [success, file]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        file:
+          type: string
+          format: byte
+          description: Base64-encoded file content.
+          example: SGVsbG8K
+      additionalProperties: false

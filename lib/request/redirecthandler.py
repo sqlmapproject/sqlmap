@@ -156,7 +156,7 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
             try:
                 result = _urllib.request.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)
             except _urllib.error.HTTPError as ex:
-                result = ex
+                result = error = ex
 
                 # Dirty hack for https://github.com/sqlmapproject/sqlmap/issues/4046
                 try:
@@ -178,7 +178,7 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
                 if not hasattr(result, "read"):
                     def _(self, length=None):
                         try:
-                            retVal = getSafeExString(ex)        # Note: pyflakes mistakenly marks 'ex' as undefined (NOTE: tested in both Python2 and Python3)
+                            retVal = getSafeExString(error)
                         except:
                             retVal = ""
                         return getBytes(retVal)

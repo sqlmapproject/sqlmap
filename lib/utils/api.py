@@ -78,6 +78,8 @@ class DataStore(object):
     username = None
     password = None
 
+RESTAPI_READONLY_OPTIONS = ("api", "taskid", "database")
+
 # API objects
 class Database(object):
     filepath = None
@@ -91,7 +93,7 @@ class Database(object):
         self.connection = sqlite3.connect(self.database, timeout=3, isolation_level=None, check_same_thread=False)
         self.cursor = self.connection.cursor()
         self.lock = threading.Lock()
-        logger.debug("REST-JSON API %s connected to IPC database" % who)
+        logger.debug("REST API %s connected to IPC database" % who)
 
     def disconnect(self):
         if self.cursor:
@@ -296,6 +298,19 @@ def setRestAPILog():
 def is_admin(token):
     return safeCompareStrings(DataStore.admin_token, token)
 
+def validate_task_options(taskid, options, caller):
+    if not isinstance(options, dict):
+        logger.warning("[%s] Invalid JSON options provided to %s()" % (taskid, caller))
+        return "Invalid JSON options"
+
+    for key in options:
+        if key in RESTAPI_UNSUPPORTED_OPTIONS or key in RESTAPI_READONLY_OPTIONS:
+            logger.warning("[%s] Unsupported option '%s' provided to %s()" % (taskid, key, caller))
+            return "Unsupported option '%s'" % key
+        elif key not in DataStore.tasks[taskid].options:
+            logger.warning("[%s] Unknown option '%s' provided to %s()" % (taskid, key, caller))
+            return "Unknown option '%s'" % key
+
 @hook('before_request')
 def check_authentication():
     if not any((DataStore.username, DataStore.password)):
@@ -490,6 +505,10 @@ def option_set(taskid):
         logger.warning("[%s] Invalid JSON options provided to option_set()" % taskid)
         return jsonize({"success": False, "message": "Invalid JSON options"})
 
+    message = validate_task_options(taskid, request.json, "option_set")
+    if message:
+        return jsonize({"success": False, "message": message})
+
     for option, value in request.json.items():
         DataStore.tasks[taskid].set_option(option, value)
 
@@ -511,10 +530,13 @@ def scan_start(taskid):
         logger.warning("[%s] Invalid JSON options provided to scan_start()" % taskid)
         return jsonize({"success": False, "message": "Invalid JSON options"})
 
-    for key in request.json:
-        if key in RESTAPI_UNSUPPORTED_OPTIONS:
-            logger.warning("[%s] Unsupported option '%s' provided to scan_start()" % (taskid, key))
-            return jsonize({"success": False, "message": "Unsupported option '%s'" % key})
+    if DataStore.tasks[taskid].engine_process() is not None and not DataStore.tasks[taskid].engine_has_terminated():
+        logger.warning("[%s] Scan already running" % taskid)
+        return jsonize({"success": False, "message": "Scan already running"})
+
+    message = validate_task_options(taskid, request.json, "scan_start")
+    if message:
+        return jsonize({"success": False, "message": message})
 
     # Initialize sqlmap engine's options with user's provided options, if any
     for option, value in request.json.items():
@@ -596,7 +618,7 @@ def scan_data(taskid):
         json_data_message.append({"status": status, "type": content_type, "value": dejsonize(value)})
 
     # Read all error messages from the IPC database
-    for error in DataStore.current_db.execute("SELECT error FROM errors WHERE taskid = ? ORDER BY id ASC", (taskid,)):
+    for error, in DataStore.current_db.execute("SELECT error FROM errors WHERE taskid = ? ORDER BY id ASC", (taskid,)):
         json_errors_message.append(error)
 
     logger.debug("(%s) Retrieved scan data and error messages" % taskid)
@@ -684,8 +706,11 @@ def version(token=None):
 
 def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=RESTAPI_DEFAULT_ADAPTER, username=None, password=None, database=None):
     """
-    REST-JSON API server
+    REST API server
     """
+
+    if not all((username, password)):
+        logger.critical("REST API server requires both username and password")
 
     DataStore.admin_token = encodeHex(os.urandom(16), binary=False)
     DataStore.username = username
@@ -702,7 +727,7 @@ def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=REST
             s.bind((host, 0))
             port = s.getsockname()[1]
 
-    logger.info("Running REST-JSON API server at '%s:%d'.." % (host, port))
+    logger.info("Running REST API server at '%s:%d'.." % (host, port))
     logger.info("Admin (secret) token: %s" % DataStore.admin_token)
     logger.debug("IPC database: '%s'" % Database.filepath)
 
@@ -762,7 +787,7 @@ def _client(url, options=None):
 
 def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=None, password=None):
     """
-    REST-JSON API client
+    REST API client
     """
 
     DataStore.username = username
@@ -770,20 +795,20 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
 
     dbgMsg = "Example client access from command line:"
     dbgMsg += "\n\t$ taskid=$(curl http://%s:%d/task/new 2>1 | grep -o -I '[a-f0-9]\\{16\\}') && echo $taskid" % (host, port)
-    dbgMsg += "\n\t$ curl -H \"Content-Type: application/json\" -X POST -d '{\"url\": \"http://testphp.vulnweb.com/artists.php?artist=1\"}' http://%s:%d/scan/$taskid/start" % (host, port)
+    dbgMsg += "\n\t$ curl -H \"Content-Type: application/json\" -X POST -d '{\"url\": \"http://testasp.vulnweb.com/showforum.asp?id=1\"}' http://%s:%d/scan/$taskid/start" % (host, port)
     dbgMsg += "\n\t$ curl http://%s:%d/scan/$taskid/data" % (host, port)
     dbgMsg += "\n\t$ curl http://%s:%d/scan/$taskid/log" % (host, port)
     logger.debug(dbgMsg)
 
     addr = "http://%s:%d" % (host, port)
-    logger.info("Starting REST-JSON API client to '%s'..." % addr)
+    logger.info("Starting REST API client to '%s'..." % addr)
 
     try:
         _client(addr)
     except Exception as ex:
         if not isinstance(ex, _urllib.error.HTTPError) or ex.code == _http_client.UNAUTHORIZED:
             errMsg = "There has been a problem while connecting to the "
-            errMsg += "REST-JSON API server at '%s' " % addr
+            errMsg += "REST API server at '%s' " % addr
             errMsg += "(%s)" % getSafeExString(ex)
             logger.critical(errMsg)
             return
@@ -900,7 +925,7 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
 
         elif command in ("help", "?"):
             msg = "help           Show this help message\n"
-            msg += "new ARGS       Start a new scan task with provided arguments (e.g. 'new -u \"http://testphp.vulnweb.com/artists.php?artist=1\"')\n"
+            msg += "new ARGS       Start a new scan task with provided arguments (e.g. 'new -u \"http://testasp.vulnweb.com/showforum.asp?id=1\"')\n"
             msg += "use TASKID     Switch current context to different task (e.g. 'use c04d8c5c7582efb4')\n"
             msg += "data           Retrieve and show data for current task\n"
             msg += "log            Retrieve and show log for current task\n"

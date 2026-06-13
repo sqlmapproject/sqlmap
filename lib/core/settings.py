@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.6.50"
+VERSION = "1.10.6.95"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -62,7 +62,7 @@ LOWER_RATIO_BOUND = 0.02
 UPPER_RATIO_BOUND = 0.98
 
 # For filling in case of dumb push updates
-DUMMY_JUNK = "fooj0Zo4"
+DUMMY_JUNK = "Phah5jue"
 
 # Markers for special cases when parameter values contain html encoded characters
 PARAMETER_AMP_MARKER = "__PARAMETER_AMP__"
@@ -476,7 +476,7 @@ URI_INJECTABLE_REGEX = r"//[^/]*/([^\.*?]+)\Z"
 SENSITIVE_DATA_REGEX = r"(\s|=)(?P<result>[^\s=]*\b%s\b[^\s]*)\s"
 
 # Options to explicitly mask in anonymous (unhandled exception) reports (along with anything carrying the <hostname> inside)
-SENSITIVE_OPTIONS = ("hostname", "answers", "data", "dnsDomain", "googleDork", "authCred", "proxyCred", "tbl", "db", "col", "user", "cookie", "proxy", "fileRead", "fileWrite", "fileDest", "testParameter", "authCred", "sqlQuery", "requestFile", "csrfToken", "csrfData", "csrfUrl", "testParameter")
+SENSITIVE_OPTIONS = ("hostname", "answers", "data", "dnsDomain", "googleDork", "proxyCred", "tbl", "db", "col", "user", "cookie", "proxy", "fileRead", "fileWrite", "fileDest", "authCred", "sqlQuery", "requestFile", "csrfToken", "csrfData", "csrfUrl", "testParameter")
 
 # Maximum number of threads (avoiding connection issues and/or DoS)
 MAX_NUMBER_OF_THREADS = 10
@@ -554,7 +554,7 @@ UNSAFE_DUMP_FILEPATH_REPLACEMENT = '_'
 RESTORE_MERGED_OPTIONS = ("col", "db", "dbms", "os", "dnsDomain", "privEsc", "tbl", "regexp", "string", "textOnly", "threads", "timeSec", "tmpPath", "uChar", "user")
 
 # Parameters to be ignored in detection phase (upper case)
-IGNORE_PARAMETERS = ("__VIEWSTATE", "__VIEWSTATEENCRYPTED", "__VIEWSTATEGENERATOR", "__EVENTARGUMENT", "__EVENTTARGET", "__EVENTVALIDATION", "ASPSESSIONID", "ASP.NET_SESSIONID", "JSESSIONID", "CFID", "CFTOKEN")
+IGNORE_PARAMETERS = ("__VIEWSTATE", "__VIEWSTATEENCRYPTED", "__VIEWSTATEGENERATOR", "__EVENTARGUMENT", "__EVENTTARGET", "__EVENTVALIDATION", "__SCROLLPOSITIONX", "__SCROLLPOSITIONY", "__PREVIOUSPAGE", "ASPSESSIONID", "ASP.NET_SESSIONID", "JSESSIONID", "PHPSESSID", "SESSID", "CFID", "CFTOKEN")
 
 # Regular expression used for recognition of ASP.NET control parameters
 ASP_NET_CONTROL_REGEX = r"(?i)\Actl\d+\$"
@@ -626,7 +626,7 @@ DUMMY_SQL_INJECTION_CHARS = ";()'"
 DUMMY_USER_INJECTION = r"(?i)[^\w](AND|OR)\s+[^\s]+[=><]|\bUNION\b.+\bSELECT\b|\bSELECT\b.+\bFROM\b|\b(CONCAT|information_schema|SLEEP|DELAY|FLOOR\(RAND)\b"
 
 # Extensions skipped by crawler
-CRAWL_EXCLUDE_EXTENSIONS = frozenset(("3ds", "3g2", "3gp", "7z", "DS_Store", "a", "aac", "accdb", "access", "adp", "ai", "aif", "aiff", "apk", "ar", "asf", "au", "avi", "bak", "bin", "bin", "bk", "bkp", "bmp", "btif", "bz2", "c", "cab", "caf", "cfg", "cgm", "cmx", "com", "conf", "config", "cpio", "cpp", "cr2", "cue", "dat", "db", "dbf", "deb", "debug", "djvu", "dll", "dmg", "dmp", "dng", "doc", "docx", "dot", "dotx", "dra", "dsk", "dts", "dtshd", "dvb", "dwg", "dxf", "dylib", "ear", "ecelp4800", "ecelp7470", "ecelp9600", "egg", "elf", "env", "eol", "eot", "epub", "error", "exe", "f4v", "fbs", "fh", "fla", "flac", "fli", "flv", "fpx", "fst", "fvt", "g3", "gif", "go", "gz", "h", "h261", "h263", "h264", "ico", "ief", "img", "ini", "ipa", "iso", "jar", "java", "jpeg", "jpg", "jpgv", "jpm", "js", "jxr", "ktx", "lock", "log", "lvp", "lz", "lzma", "lzo", "m3u", "m4a", "m4v", "mar", "mdb", "mdi", "mid", "mj2", "mka", "mkv", "mmr", "mng", "mov", "movie", "mp3", "mp4", "mp4a", "mpeg", "mpg", "mpga", "msi", "mxu", "nef", "npx", "nrg", "o", "oga", "ogg", "ogv", "old", "otf", "ova", "ovf", "pbm", "pcx", "pdf", "pea", "pgm", "php", "pic", "pid", "pkg", "png", "pnm", "ppm", "pps", "ppt", "pptx", "ps", "psd", "py", "pya", "pyc", "pyo", "pyv", "qt", "rar", "ras", "raw", "rb", "rgb", "rip", "rlc", "rs", "run", "rz", "s3m", "s7z", "scm", "scpt", "service", "sgi", "shar", "sil", "smv", "so", "sock", "socket", "sqlite", "sqlitedb", "sub", "svc", "swf", "swo", "swp", "sys", "tar", "tbz2", "temp", "tga", "tgz", "tif", "tiff", "tlz", "tmp", "toast", "torrent", "ts", "ts", "ttf", "uvh", "uvi", "uvm", "uvp", "uvs", "uvu", "vbox", "vdi", "vhd", "vhdx", "viv", "vmdk", "vmx", "vob", "vxd", "war", "wav", "wax", "wbmp", "wdp", "weba", "webm", "webp", "whl", "wm", "wma", "wmv", "wmx", "woff", "woff2", "wvx", "xbm", "xif", "xls", "xlsx", "xlt", "xm", "xpi", "xpm", "xwd", "xz", "yaml", "yml", "z", "zip", "zipx"))
+CRAWL_EXCLUDE_EXTENSIONS = frozenset(("3ds", "3g2", "3gp", "7z", "DS_Store", "a", "aac", "accdb", "access", "adp", "ai", "aif", "aiff", "apk", "ar", "asf", "au", "avi", "bak", "bin", "bk", "bkp", "bmp", "btif", "bz2", "c", "cab", "caf", "cfg", "cgm", "cmx", "com", "conf", "config", "cpio", "cpp", "cr2", "cue", "dat", "db", "dbf", "deb", "debug", "djvu", "dll", "dmg", "dmp", "dng", "doc", "docx", "dot", "dotx", "dra", "dsk", "dts", "dtshd", "dvb", "dwg", "dxf", "dylib", "ear", "ecelp4800", "ecelp7470", "ecelp9600", "egg", "elf", "env", "eol", "eot", "epub", "error", "exe", "f4v", "fbs", "fh", "fla", "flac", "fli", "flv", "fpx", "fst", "fvt", "g3", "gif", "go", "gz", "h", "h261", "h263", "h264", "ico", "ief", "img", "ini", "ipa", "iso", "jar", "java", "jpeg", "jpg", "jpgv", "jpm", "js", "jxr", "ktx", "lock", "log", "lvp", "lz", "lzma", "lzo", "m3u", "m4a", "m4v", "mar", "mdb", "mdi", "mid", "mj2", "mka", "mkv", "mmr", "mng", "mov", "movie", "mp3", "mp4", "mp4a", "mpeg", "mpg", "mpga", "msi", "mxu", "nef", "npx", "nrg", "o", "oga", "ogg", "ogv", "old", "otf", "ova", "ovf", "pbm", "pcx", "pdf", "pea", "pgm", "php", "pic", "pid", "pkg", "png", "pnm", "ppm", "pps", "ppt", "pptx", "ps", "psd", "py", "pya", "pyc", "pyo", "pyv", "qt", "rar", "ras", "raw", "rb", "rgb", "rip", "rlc", "rs", "run", "rz", "s3m", "s7z", "scm", "scpt", "service", "sgi", "shar", "sil", "smv", "so", "sock", "socket", "sqlite", "sqlitedb", "sub", "svc", "swf", "swo", "swp", "sys", "tar", "tbz2", "temp", "tga", "tgz", "tif", "tiff", "tlz", "tmp", "toast", "torrent", "ts", "ttf", "uvh", "uvi", "uvm", "uvp", "uvs", "uvu", "vbox", "vdi", "vhd", "vhdx", "viv", "vmdk", "vmx", "vob", "vxd", "war", "wav", "wax", "wbmp", "wdp", "weba", "webm", "webp", "whl", "wm", "wma", "wmv", "wmx", "woff", "woff2", "wvx", "xbm", "xif", "xls", "xlsx", "xlt", "xm", "xpi", "xpm", "xwd", "xz", "yaml", "yml", "z", "zip", "zipx"))
 
 # Patterns often seen in HTTP headers containing custom injection marking character '*'
 PROBLEMATIC_CUSTOM_INJECTION_PATTERNS = r"(;q=[^;']+)|(\*/\*)"
@@ -828,7 +828,7 @@ MAX_HELP_OPTION_LENGTH = 18
 MAX_CONNECT_RETRIES = 100
 
 # Strings for detecting formatting errors
-FORMAT_EXCEPTION_STRINGS = ("Type mismatch", "Error converting", "Please enter a", "Conversion failed", "String or binary data would be truncated", "Failed to convert", "unable to interpret text value", "Input string was not in a correct format", "System.FormatException", "java.lang.NumberFormatException", "ValueError: invalid literal", "TypeMismatchException", "CF_SQL_INTEGER", "CF_SQL_NUMERIC", " for CFSQLTYPE ", "cfqueryparam cfsqltype", "InvalidParamTypeException", "Invalid parameter type", "Attribute validation error for tag", "is not of type numeric", "<cfif Not IsNumeric(", "invalid input syntax for integer", "invalid input syntax for type", "invalid number", "character to number conversion error", "unable to interpret text value", "String was not recognized as a valid", "Convert.ToInt", "cannot be converted to a ", "InvalidDataException", "Arguments are of the wrong type", "Invalid conversion")
+FORMAT_EXCEPTION_STRINGS = ("Type mismatch", "Error converting", "Please enter a", "Conversion failed", "String or binary data would be truncated", "Failed to convert", "unable to interpret text value", "Input string was not in a correct format", "System.FormatException", "java.lang.NumberFormatException", "ValueError: invalid literal", "TypeMismatchException", "CF_SQL_INTEGER", "CF_SQL_NUMERIC", " for CFSQLTYPE ", "cfqueryparam cfsqltype", "InvalidParamTypeException", "Invalid parameter type", "Attribute validation error for tag", "is not of type numeric", "<cfif Not IsNumeric(", "invalid input syntax for integer", "invalid input syntax for type", "invalid number", "character to number conversion error", "String was not recognized as a valid", "Convert.ToInt", "cannot be converted to a ", "InvalidDataException", "Arguments are of the wrong type", "Invalid conversion")
 
 # Regular expression used for extracting ASP.NET view state values
 VIEWSTATE_REGEX = r'(?i)(?P<name>__VIEWSTATE[^"]*)[^>]+value="(?P<result>[^"]+)'
@@ -842,13 +842,13 @@ LIMITED_ROWS_TEST_NUMBER = 15
 # Default adapter to use for bottle server
 RESTAPI_DEFAULT_ADAPTER = "wsgiref"
 
-# Default REST-JSON API server listen address
+# Default REST API server listen address
 RESTAPI_DEFAULT_ADDRESS = "127.0.0.1"
 
-# Default REST-JSON API server listen port
+# Default REST API server listen port
 RESTAPI_DEFAULT_PORT = 8775
 
-# Unsupported options by REST-JSON API server
+# Unsupported options by REST API server
 RESTAPI_UNSUPPORTED_OPTIONS = ("sqlShell", "wizard", "evalCode", "alert")
 
 # Use "Supplementary Private Use Area-A"
@@ -973,14 +973,14 @@ for key, value in os.environ.items():
         _ = key[len(SQLMAP_ENVIRONMENT_PREFIX) + 1:].upper()
         if _ in globals():
             original = globals()[_]
-            if isinstance(original, int):
+            if isinstance(original, bool):
+                globals()[_] = value.lower() in ('1', 'true')
+            elif isinstance(original, int):
                 try:
                     globals()[_] = int(value)
                 except ValueError:
                     pass
-            elif isinstance(original, bool):
-                globals()[_] = value.lower() in ('1', 'true')
             elif isinstance(original, (list, tuple)):
-                globals()[_] = [__.strip() for __ in _.split(',')]
+                globals()[_] = [__.strip() for __ in value.split(',')]
             else:
                 globals()[_] = value

@@ -655,7 +655,7 @@ def paramToDict(place, parameters=None):
                         kb.base64Originals[parameter] = oldValue = value
                         value = urldecode(value, convall=True)
                         value = decodeBase64(value, binary=False, encoding=conf.encoding or UNICODE_ENCODING)
-                        parameters = re.sub(r"\b%s(\b|\Z)" % re.escape(oldValue), value, parameters)
+                        parameters = re.sub(r"\b%s(\b|\Z)" % re.escape(oldValue), value.replace('\\', r'\\'), parameters)
                     except:
                         errMsg = "parameter '%s' does not contain " % parameter
                         errMsg += "valid Base64 encoded value ('%s')" % value
@@ -2467,7 +2467,7 @@ def getSQLSnippet(dbms, sfile, **variables):
         retVal = retVal.replace(_, randomStr())
 
     for _ in re.findall(r"%RANDINT\d+%", retVal, re.I):
-        retVal = retVal.replace(_, randomInt())
+        retVal = retVal.replace(_, getText(randomInt()))
 
     variables = re.findall(r"(?<!\bLIKE ')%(\w+)%", retVal, re.I)
 
@@ -3237,10 +3237,14 @@ def aliasToDbmsEnum(dbms):
 
     return retVal
 
-def findDynamicContent(firstPage, secondPage):
+def findDynamicContent(firstPage, secondPage, merge=False):
     """
     This function checks if the provided pages have dynamic content. If they
     are dynamic, proper markings will be made
+
+    Note: with merge=True the newly found markings are accumulated into the
+    existing ones (e.g. when refining across multiple original-page samples)
+    instead of replacing them
 
     >>> findDynamicContent("Lorem ipsum dolor sit amet, congue tation referrentur ei sed. Ne nec legimus habemus recusabo, natum reque et per. Facer tritani reprehendunt eos id, modus constituam est te. Usu sumo indoctum ad, pri paulo molestiae complectitur no.", "Lorem ipsum dolor sit amet, congue tation referrentur ei sed. Ne nec legimus habemus recusabo, natum reque et per. <script src='ads.js'></script>Facer tritani reprehendunt eos id, modus constituam est te. Usu sumo indoctum ad, pri paulo molestiae complectitur no.")
     >>> kb.dynamicMarkings
@@ -3254,7 +3258,9 @@ def findDynamicContent(firstPage, secondPage):
     singleTimeLogMessage(infoMsg)
 
     blocks = list(SequenceMatcher(None, firstPage, secondPage).get_matching_blocks())
-    kb.dynamicMarkings = []
+
+    if not merge:
+        kb.dynamicMarkings = []
 
     # Removing too small matching blocks
     for block in blocks[:]:
@@ -3283,7 +3289,7 @@ def findDynamicContent(firstPage, secondPage):
                 suffix = suffix[:DYNAMICITY_BOUNDARY_LENGTH]
 
                 for _ in (firstPage, secondPage):
-                    match = re.search(r"(?s)%s(.+)%s" % (re.escape(prefix), re.escape(suffix)), _)
+                    match = re.search(r"(?s)%s(.+?)%s" % (re.escape(prefix), re.escape(suffix)), _)
                     if match:
                         infix = match.group(1)
                         if infix[0].isalnum():
@@ -3292,7 +3298,9 @@ def findDynamicContent(firstPage, secondPage):
                             suffix = trimAlphaNum(suffix)
                         break
 
-            kb.dynamicMarkings.append((prefix if prefix else None, suffix if suffix else None))
+            marking = (prefix if prefix else None, suffix if suffix else None)
+            if marking not in kb.dynamicMarkings:  # Note: avoiding duplicates (e.g. when accumulating markings across samples)
+                kb.dynamicMarkings.append(marking)
 
     if len(kb.dynamicMarkings) > 0:
         infoMsg = "dynamic content marked for removal (%d region%s)" % (len(kb.dynamicMarkings), 's' if len(kb.dynamicMarkings) > 1 else '')
@@ -3311,11 +3319,11 @@ def removeDynamicContent(page):
             if prefix is None and suffix is None:
                 continue
             elif prefix is None:
-                page = re.sub(r"(?s)^.+%s" % re.escape(suffix), suffix.replace('\\', r'\\'), page)
+                page = re.sub(r"(?s)^.+?%s" % re.escape(suffix), suffix.replace('\\', r'\\'), page)
             elif suffix is None:
                 page = re.sub(r"(?s)%s.+$" % re.escape(prefix), prefix.replace('\\', r'\\'), page)
             else:
-                page = re.sub(r"(?s)%s.+%s" % (re.escape(prefix), re.escape(suffix)), "%s%s" % (prefix.replace('\\', r'\\'), suffix.replace('\\', r'\\')), page)
+                page = re.sub(r"(?s)%s.+?%s" % (re.escape(prefix), re.escape(suffix)), "%s%s" % (prefix.replace('\\', r'\\'), suffix.replace('\\', r'\\')), page)
 
     return page
 
@@ -4122,6 +4130,9 @@ def intersect(containerA, containerB, lowerCase=False):
 def decodeStringEscape(value):
     """
     Decodes escaped string values (e.g. "\\t" -> "\t")
+
+    >>> decodeStringEscape("a" + chr(92) + "tb") == "a" + chr(9) + "b"
+    True
     """
 
     retVal = value
@@ -4136,6 +4147,9 @@ def decodeStringEscape(value):
 def encodeStringEscape(value):
     """
     Encodes escaped string values (e.g. "\t" -> "\\t")
+
+    >>> encodeStringEscape("a" + chr(9) + "b") == "a" + chr(92) + "tb"
+    True
     """
 
     retVal = value
@@ -4283,7 +4297,10 @@ def safeSQLIdentificatorNaming(name, isTable=False):
     '[begin]'
     >>> getText(safeSQLIdentificatorNaming("foobar"))
     'foobar'
-    >>> kb.forceDbms = popValue()
+    >>> kb.forcedDbms = DBMS.FIREBIRD
+    >>> getText(safeSQLIdentificatorNaming("foo bar"))
+    '"foo bar"'
+    >>> kb.forcedDbms = popValue()
     """
 
     retVal = name
@@ -4303,9 +4320,9 @@ def safeSQLIdentificatorNaming(name, isTable=False):
             if not conf.noEscape:
                 retVal = unsafeSQLIdentificatorNaming(retVal)
 
-                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS, DBMS.CUBRID, DBMS.SQLITE, DBMS.SPANNER):  # Note: in SQLite double-quotes are treated as string if column/identifier is non-existent (e.g. SELECT "foobar" FROM users)
+                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS, DBMS.CUBRID, DBMS.SQLITE, DBMS.SPANNER, DBMS.CLICKHOUSE):  # Note: in SQLite double-quotes are treated as string if column/identifier is non-existent (e.g. SELECT "foobar" FROM users)
                     retVal = "`%s`" % retVal
-                elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2, DBMS.HSQLDB, DBMS.H2, DBMS.INFORMIX, DBMS.MONETDB, DBMS.VERTICA, DBMS.MCKOI, DBMS.PRESTO, DBMS.CRATEDB, DBMS.CACHE, DBMS.EXTREMEDB, DBMS.FRONTBASE, DBMS.RAIMA, DBMS.VIRTUOSO, DBMS.SNOWFLAKE):
+                elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2, DBMS.HSQLDB, DBMS.H2, DBMS.INFORMIX, DBMS.MONETDB, DBMS.VERTICA, DBMS.MCKOI, DBMS.PRESTO, DBMS.CRATEDB, DBMS.CACHE, DBMS.EXTREMEDB, DBMS.FRONTBASE, DBMS.RAIMA, DBMS.VIRTUOSO, DBMS.SNOWFLAKE, DBMS.FIREBIRD, DBMS.DERBY, DBMS.MAXDB):
                     retVal = "\"%s\"" % retVal
                 elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.ALTIBASE, DBMS.MIMERSQL, DBMS.HANA):
                     retVal = "\"%s\"" % retVal.upper()
@@ -4342,9 +4359,9 @@ def unsafeSQLIdentificatorNaming(name):
     retVal = name
 
     if isinstance(name, six.string_types):
-        if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS, DBMS.CUBRID, DBMS.SQLITE, DBMS.SPANNER):
+        if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS, DBMS.CUBRID, DBMS.SQLITE, DBMS.SPANNER, DBMS.CLICKHOUSE):
             retVal = name.replace("`", "")
-        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2, DBMS.HSQLDB, DBMS.H2, DBMS.INFORMIX, DBMS.MONETDB, DBMS.VERTICA, DBMS.MCKOI, DBMS.PRESTO, DBMS.CRATEDB, DBMS.CACHE, DBMS.EXTREMEDB, DBMS.FRONTBASE, DBMS.RAIMA, DBMS.VIRTUOSO, DBMS.SNOWFLAKE):
+        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2, DBMS.HSQLDB, DBMS.H2, DBMS.INFORMIX, DBMS.MONETDB, DBMS.VERTICA, DBMS.MCKOI, DBMS.PRESTO, DBMS.CRATEDB, DBMS.CACHE, DBMS.EXTREMEDB, DBMS.FRONTBASE, DBMS.RAIMA, DBMS.VIRTUOSO, DBMS.SNOWFLAKE, DBMS.FIREBIRD, DBMS.DERBY, DBMS.MAXDB):
             retVal = name.replace("\"", "")
         elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.ALTIBASE, DBMS.MIMERSQL, DBMS.HANA):
             retVal = name.replace("\"", "").upper()

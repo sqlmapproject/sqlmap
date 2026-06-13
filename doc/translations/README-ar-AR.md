@@ -58,7 +58,7 @@
 ----
 
 * الصفحة الرئيسية: https://sqlmap.org
-* التحميل: [.tar.gz](https://github.com/sqlmapproject/sqlmap/tarball/master) أو [.zip](https://github.com/sqlmapproject/sqlmap/zipball/master)
+* التحميل: [&#x202A;.tar.gz&#x202C;](https://github.com/sqlmapproject/sqlmap/tarball/master) أو [&#x202A;.zip&#x202C;](https://github.com/sqlmapproject/sqlmap/zipball/master)
 * تغذية التحديثات RSS: https://github.com/sqlmapproject/sqlmap/commits/master.atom
 * تتبع المشكلات: https://github.com/sqlmapproject/sqlmap/issues
 * دليل المستخدم: https://github.com/sqlmapproject/sqlmap/wiki

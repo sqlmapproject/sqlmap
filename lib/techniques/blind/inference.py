@@ -152,6 +152,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             lastChar = 0
         elif conf.lastChar is not None and (isinstance(conf.lastChar, int) or (hasattr(conf.lastChar, "isdigit") and conf.lastChar.isdigit())):
             lastChar = int(conf.lastChar)
+            if kb.fileReadMode:  # Note: file content is retrieved hex-encoded (2 chars per byte), mirroring the firstChar handling above
+                lastChar <<= 1
         elif hasattr(lastChar, "isdigit") and lastChar.isdigit() or isinstance(lastChar, int):
             lastChar = int(lastChar)
         else:
@@ -512,6 +514,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             threadData.shared.value = [None] * length
             threadData.shared.index = [firstChar]    # As list for python nested function scoping
             threadData.shared.start = firstChar
+            threadData.shared.retrieved = 0
+            threadData.shared.endIndex = 0
 
             try:
                 def blindThread():
@@ -537,7 +541,11 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             break
 
                         with kb.locks.value:
-                            threadData.shared.value[currentCharIndex - 1 - firstChar] = val
+                            idx = currentCharIndex - 1 - firstChar
+                            threadData.shared.value[idx] = val
+                            threadData.shared.retrieved += 1
+                            if idx > threadData.shared.endIndex:
+                                threadData.shared.endIndex = idx
                             currentValue = list(threadData.shared.value)
 
                         if kb.threadContinue:
@@ -545,24 +553,17 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                 progress.progress(threadData.shared.index[0])
                             elif conf.verbose >= 1:
                                 startCharIndex = 0
-                                endCharIndex = 0
-
-                                for i in xrange(length):
-                                    if currentValue[i] is not None:
-                                        endCharIndex = max(endCharIndex, i)
+                                endCharIndex = threadData.shared.endIndex
 
                                 output = ''
 
                                 if endCharIndex > conf.progressWidth:
                                     startCharIndex = endCharIndex - conf.progressWidth
 
-                                count = threadData.shared.start
+                                count = threadData.shared.start + threadData.shared.retrieved
 
                                 for i in xrange(startCharIndex, endCharIndex + 1):
                                     output += '_' if currentValue[i] is None else filterControlChars(currentValue[i] if len(currentValue[i]) == 1 else ' ', replacement=' ')
-
-                                for i in xrange(length):
-                                    count += 1 if currentValue[i] is not None else 0
 
                                 if startCharIndex > 0:
                                     output = ".." + output[2:]

@@ -7,7 +7,7 @@ See the file 'LICENSE' for copying permission
 
 from lib.core.enums import PRIORITY
 
-__priority__ = PRIORITY.HIGH
+__priority__ = PRIORITY.LOWEST
 
 def tamper(payload, **kwargs):
     """

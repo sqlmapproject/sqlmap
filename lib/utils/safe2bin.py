@@ -74,6 +74,11 @@ def safecharencode(value):
 def safechardecode(value, binary=False):
     """
     Reverse function to safecharencode
+
+    >>> safechardecode(u'test123') == u'test123'
+    True
+    >>> safechardecode(safecharencode(u'test\x01\x02\xaf')) == u'test\x01\x02\xaf'
+    True
     """
 
     retVal = value

@@ -7,7 +7,7 @@ See the file 'LICENSE' for copying permission
 
 from lib.core.enums import PRIORITY
 
-__priority__ = PRIORITY.LOW
+__priority__ = PRIORITY.LOWEST
 
 def dependencies():
     pass

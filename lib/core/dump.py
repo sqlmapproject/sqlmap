@@ -299,8 +299,8 @@ class Dump(object):
                         colType = columns[column]
 
                         column = unsafeSQLIdentificatorNaming(column)
-                        maxlength1 = max(maxlength1, len(column or ""))
-                        maxlength2 = max(maxlength2, len(colType or ""))
+                        maxlength1 = max(maxlength1, getConsoleLength(column or ""))
+                        maxlength2 = max(maxlength2, getConsoleLength(colType or ""))
 
                     maxlength1 = max(maxlength1, len("COLUMN"))
                     lines1 = "-" * (maxlength1 + 2)
@@ -337,10 +337,10 @@ class Dump(object):
                         colType = columns[column]
 
                         column = unsafeSQLIdentificatorNaming(column)
-                        blank1 = " " * (maxlength1 - len(column))
+                        blank1 = " " * (maxlength1 - getConsoleLength(column))
 
                         if colType is not None:
-                            blank2 = " " * (maxlength2 - len(colType))
+                            blank2 = " " * (maxlength2 - getConsoleLength(colType))
                             self._write("| %s%s | %s%s |" % (column, blank1, colType, blank2))
                         else:
                             self._write("| %s%s |" % (column, blank1))

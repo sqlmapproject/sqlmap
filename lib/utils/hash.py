@@ -616,7 +616,7 @@ def _finalize(retVal, results, processes, attack_info=None):
             removals.add((user, hash_))
             hashDBWrite(hash_, word)
 
-        for item in attack_info or []:
+        for item in list(attack_info or []):
             if (item[0][0], item[0][1]) in removals:
                 attack_info.remove(item)
 
@@ -1081,7 +1081,7 @@ def dictionaryAttack(attack_dict):
 
                         if item and hash_ not in keys:
                             resumed = hashDBRetrieve(hash_)
-                            if not resumed:
+                            if resumed is None:
                                 attack_info.append(item)
                                 user_hash.append(item[0])
                             else:

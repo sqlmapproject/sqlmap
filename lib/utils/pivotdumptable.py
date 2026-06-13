@@ -18,6 +18,7 @@ from lib.core.common import singleTimeWarnMessage
 from lib.core.common import unArrayizeValue
 from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.compat import xrange
+from lib.core.convert import getConsoleLength
 from lib.core.convert import getUnicode
 from lib.core.data import conf
 from lib.core.data import kb
@@ -58,7 +59,7 @@ def pivotDumpTable(table, colList, count=None, blind=True, alias=None):
         logger.info(infoMsg)
 
         for column in colList:
-            lengths[column] = len(column)
+            lengths[column] = getConsoleLength(column)
             entries[column] = []
 
         return entries, lengths
@@ -169,7 +170,7 @@ def pivotDumpTable(table, colList, count=None, blind=True, alias=None):
 
                 value = "" if isNoneValue(value) else unArrayizeValue(value)
 
-                lengths[column] = max(lengths[column], len(DUMP_REPLACEMENTS.get(getUnicode(value), getUnicode(value))))
+                lengths[column] = max(lengths[column], getConsoleLength(DUMP_REPLACEMENTS.get(getUnicode(value), getUnicode(value))))
                 entries[column].append(value)
 
     except KeyboardInterrupt:

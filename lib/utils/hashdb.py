@@ -106,7 +106,7 @@ class HashDB(object):
             if retVal is None:
                 retVal = self._read_cache.get(hash_)
 
-            if not retVal:
+            if retVal is None:
                 for _ in xrange(HASHDB_RETRIEVE_RETRIES):
                     try:
                         for row in self.cursor.execute("SELECT value FROM storage WHERE id=?", (hash_,)):
