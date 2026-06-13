@@ -25,6 +25,7 @@ from lib.core.settings import EXTREMEDB_ALIASES
 from lib.core.settings import FIREBIRD_ALIASES
 from lib.core.settings import FRONTBASE_ALIASES
 from lib.core.settings import H2_ALIASES
+from lib.core.settings import HANA_ALIASES
 from lib.core.settings import HSQLDB_ALIASES
 from lib.core.settings import INFORMIX_ALIASES
 from lib.core.settings import MAXDB_ALIASES
@@ -57,6 +58,7 @@ from plugins.dbms.extremedb import ExtremeDBMap
 from plugins.dbms.firebird import FirebirdMap
 from plugins.dbms.frontbase import FrontBaseMap
 from plugins.dbms.h2 import H2Map
+from plugins.dbms.hana import HANAMap
 from plugins.dbms.hsqldb import HSQLDBMap
 from plugins.dbms.informix import InformixMap
 from plugins.dbms.maxdb import MaxDBMap
@@ -113,6 +115,7 @@ def setHandler():
         (DBMS.VIRTUOSO, VIRTUOSO_ALIASES, VirtuosoMap, "plugins.dbms.virtuoso.connector"),
         (DBMS.SNOWFLAKE, SNOWFLAKE_ALIASES, SnowflakeMap, "plugins.dbms.snowflake.connector"),
         (DBMS.SPANNER, SPANNER_ALIASES, SpannerMap, "plugins.dbms.spanner.connector"),
+        (DBMS.HANA, HANA_ALIASES, HANAMap, "plugins.dbms.hana.connector"),
     ]
 
     _ = max(_ if (conf.get("dbms") or Backend.getIdentifiedDbms() or kb.heuristicExtendedDbms or "").lower() in _[1] else () for _ in items)

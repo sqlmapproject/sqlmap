@@ -21,6 +21,7 @@ from lib.core.settings import EXTREMEDB_ALIASES
 from lib.core.settings import FIREBIRD_ALIASES
 from lib.core.settings import FRONTBASE_ALIASES
 from lib.core.settings import H2_ALIASES
+from lib.core.settings import HANA_ALIASES
 from lib.core.settings import HSQLDB_ALIASES
 from lib.core.settings import INFORMIX_ALIASES
 from lib.core.settings import MAXDB_ALIASES
@@ -254,6 +255,7 @@ DBMS_DICT = {
     DBMS.VIRTUOSO: (VIRTUOSO_ALIASES, None, None, None),
     DBMS.SNOWFLAKE: (SNOWFLAKE_ALIASES, None, None, "snowflake"),
     DBMS.SPANNER: (SPANNER_ALIASES, None, None, "spanner"),
+    DBMS.HANA: (HANA_ALIASES, "hdbcli", "https://pypi.org/project/hdbcli/", "hana"),
 }
 
 # Reference: https://blog.jooq.org/tag/sysibm-sysdummy1/
@@ -267,7 +269,8 @@ FROM_DUMMY_TABLE = {
     DBMS.INFORMIX: " FROM SYSMASTER:SYSDUAL",
     DBMS.DERBY: " FROM SYSIBM.SYSDUMMY1",
     DBMS.MIMERSQL: " FROM SYSTEM.ONEROW",
-    DBMS.FRONTBASE: " FROM INFORMATION_SCHEMA.IO_STATISTICS"
+    DBMS.FRONTBASE: " FROM INFORMATION_SCHEMA.IO_STATISTICS",
+    DBMS.HANA: " FROM DUMMY"
 }
 
 HEURISTIC_NULL_EVAL = {
@@ -295,6 +298,7 @@ HEURISTIC_NULL_EVAL = {
     DBMS.CLICKHOUSE: "halfMD5(NULL)",
     DBMS.SNOWFLAKE: "BOOLNOT(NULL)",
     DBMS.SPANNER: "FARM_FINGERPRINT(NULL)",
+    DBMS.HANA: "MAP(NULL,NULL,NULL,NULL,NULL)",
 }
 
 SQL_STATEMENTS = {

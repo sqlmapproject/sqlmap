@@ -639,7 +639,7 @@ class Databases(object):
                     query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db), unsafeSQLIdentificatorNaming(conf.db))
                     query += condQuery
 
-                elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE, DBMS.MIMERSQL, DBMS.SNOWFLAKE):
+                elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE, DBMS.MIMERSQL, DBMS.SNOWFLAKE, DBMS.HANA):
                     query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(tbl.upper()), unsafeSQLIdentificatorNaming(conf.db.upper()))
                     query += condQuery
 

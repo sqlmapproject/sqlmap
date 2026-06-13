@@ -1906,4 +1906,77 @@
             <blind query="SELECT DISTINCT(table_schema) FROM INFORMATION_SCHEMA.COLUMNS WHERE %s ORDER BY table_schema" query2="SELECT DISTINCT(table_name) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema='%s'" count="SELECT COUNT(DISTINCT(table_schema)) FROM INFORMATION_SCHEMA.COLUMNS WHERE %s" count2="SELECT COUNT(DISTINCT(table_name)) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema='%s'" condition="column_name" condition2="table_schema" condition3="table_name"/>
         </search_column>
     </dbms>
+
+    <dbms value="SAP HANA">
+        <cast query="CAST(%s AS VARCHAR(5000))"/>
+        <length query="LENGTH(%s)"/>
+        <isnull query="IFNULL(%s,' ')"/>
+        <delimiter query="||"/>
+        <limit query="LIMIT %d OFFSET %d"/>
+        <limitregexp query="\s+LIMIT\s+([\d]+)\s+OFFSET\s+([\d]+)" query2="\s+LIMIT\s+([\d]+)"/>
+        <limitgroupstart query="2"/>
+        <limitgroupstop query="1"/>
+        <limitstring query=" OFFSET "/>
+        <order query="ORDER BY %s ASC"/>
+        <count query="COUNT(%s)"/>
+        <comment query="--"/>
+        <substring query="SUBSTRING(%s,%d,%d)"/>
+        <concatenate query="%s||%s"/>
+        <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END) FROM DUMMY"/>
+        <hex query="HEX(%s)"/>
+        <inference query="ASCII(SUBSTRING((%s),%d,1))>%d"/>
+        <banner query="SELECT VERSION FROM SYS.M_DATABASE"/>
+        <current_user query="SELECT CURRENT_USER FROM DUMMY"/>
+        <current_db query="SELECT CURRENT_SCHEMA FROM DUMMY"/>
+        <hostname query="SELECT HOST FROM SYS.M_HOST_INFORMATION WHERE KEY='host_name'"/>
+        <table_comment query="SELECT COMMENTS FROM SYS.TABLES WHERE TABLE_NAME='%s' AND SCHEMA_NAME='%s'"/>
+        <column_comment query="SELECT COMMENTS FROM SYS.TABLE_COLUMNS WHERE TABLE_NAME='%s' AND COLUMN_NAME='%s' AND SCHEMA_NAME='%s'"/>
+        <is_dba query="EXISTS(SELECT * FROM SYS.GRANTED_PRIVILEGES WHERE GRANTEE=CURRENT_USER AND PRIVILEGE='DBADMIN')"/>
+        <check_udf/>
+        <users>
+            <inband query="SELECT USER_NAME FROM SYS.USERS"/>
+            <blind query="SELECT USER_NAME FROM SYS.USERS ORDER BY USER_NAME LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM SYS.USERS"/>
+        </users>
+        <passwords/>
+        <privileges>
+            <inband query="SELECT GRANTEE,PRIVILEGE FROM SYS.GRANTED_PRIVILEGES WHERE OBJECT_TYPE='SYSTEMPRIVILEGE'" condition="grantee"/>
+            <blind query="SELECT PRIVILEGE FROM SYS.GRANTED_PRIVILEGES WHERE OBJECT_TYPE='SYSTEMPRIVILEGE' AND GRANTEE='%s' ORDER BY PRIVILEGE LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM SYS.GRANTED_PRIVILEGES WHERE OBJECT_TYPE='SYSTEMPRIVILEGE' AND GRANTEE='%s'"/>
+        </privileges>
+        <roles>
+            <inband query="SELECT GRANTEE,ROLE_NAME FROM SYS.GRANTED_ROLES" condition="grantee"/>
+            <blind query="SELECT ROLE_NAME FROM SYS.GRANTED_ROLES WHERE GRANTEE='%s' ORDER BY ROLE_NAME LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM SYS.GRANTED_ROLES WHERE GRANTEE='%s'"/>
+        </roles>
+        <statements>
+            <inband query="SELECT STATEMENT_STRING FROM SYS.M_SQL_PLAN_CACHE"/>
+            <blind query="SELECT STATEMENT_STRING FROM SYS.M_SQL_PLAN_CACHE ORDER BY LAST_EXECUTION_TIMESTAMP DESC LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM SYS.M_SQL_PLAN_CACHE"/>
+        </statements>
+        <dbs>
+            <inband query="SELECT SCHEMA_NAME FROM SYS.SCHEMAS"/>
+            <blind query="SELECT SCHEMA_NAME FROM SYS.SCHEMAS ORDER BY SCHEMA_NAME LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM SYS.SCHEMAS"/>
+        </dbs>
+        <tables>
+            <inband query="SELECT SCHEMA_NAME,TABLE_NAME FROM SYS.TABLES" condition="schema_name"/>
+            <blind query="SELECT TABLE_NAME FROM SYS.TABLES WHERE SCHEMA_NAME='%s' ORDER BY TABLE_NAME LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM SYS.TABLES WHERE SCHEMA_NAME='%s'"/>
+        </tables>
+        <columns>
+            <inband query="SELECT COLUMN_NAME,DATA_TYPE_NAME FROM SYS.TABLE_COLUMNS WHERE TABLE_NAME='%s' AND SCHEMA_NAME='%s' ORDER BY POSITION" condition="column_name"/>
+            <blind query="SELECT COLUMN_NAME FROM SYS.TABLE_COLUMNS WHERE TABLE_NAME='%s' AND SCHEMA_NAME='%s' ORDER BY POSITION" query2="SELECT DATA_TYPE_NAME FROM SYS.TABLE_COLUMNS WHERE TABLE_NAME='%s' AND COLUMN_NAME='%s' AND SCHEMA_NAME='%s'" count="SELECT COUNT(*) FROM SYS.TABLE_COLUMNS WHERE TABLE_NAME='%s' AND SCHEMA_NAME='%s'" condition="column_name"/>
+        </columns>
+        <dump_table>
+            <inband query="SELECT %s FROM %s.%s"/>
+            <blind query="SELECT %s FROM %s.%s LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM %s.%s"/>
+        </dump_table>
+        <search_db>
+            <inband query="SELECT SCHEMA_NAME FROM SYS.SCHEMAS WHERE %s" condition="schema_name"/>
+            <blind query="SELECT DISTINCT(SCHEMA_NAME) FROM SYS.SCHEMAS WHERE %s ORDER BY SCHEMA_NAME" count="SELECT COUNT(DISTINCT(SCHEMA_NAME)) FROM SYS.SCHEMAS WHERE %s" condition="schema_name"/>
+        </search_db>
+        <search_table>
+            <inband query="SELECT SCHEMA_NAME,TABLE_NAME FROM SYS.TABLES WHERE %s" condition="table_name" condition2="schema_name"/>
+            <blind query="SELECT DISTINCT(SCHEMA_NAME) FROM SYS.TABLES WHERE %s ORDER BY SCHEMA_NAME" query2="SELECT TABLE_NAME FROM SYS.TABLES WHERE SCHEMA_NAME='%s'" count="SELECT COUNT(DISTINCT(SCHEMA_NAME)) FROM SYS.TABLES WHERE %s" count2="SELECT COUNT(*) FROM SYS.TABLES WHERE SCHEMA_NAME='%s'" condition="table_name" condition2="schema_name"/>
+        </search_table>
+        <search_column>
+            <inband query="SELECT SCHEMA_NAME,TABLE_NAME FROM SYS.TABLE_COLUMNS WHERE %s" condition="column_name" condition2="schema_name" condition3="table_name"/>
+            <blind query="SELECT DISTINCT(SCHEMA_NAME) FROM SYS.TABLE_COLUMNS WHERE %s ORDER BY SCHEMA_NAME" query2="SELECT DISTINCT(TABLE_NAME) FROM SYS.TABLE_COLUMNS WHERE SCHEMA_NAME='%s'" count="SELECT COUNT(DISTINCT(SCHEMA_NAME)) FROM SYS.TABLE_COLUMNS WHERE %s" count2="SELECT COUNT(DISTINCT(TABLE_NAME)) FROM SYS.TABLE_COLUMNS WHERE SCHEMA_NAME='%s'" condition="column_name" condition2="schema_name" condition3="table_name"/>
+        </search_column>
+    </dbms>
 </root>
