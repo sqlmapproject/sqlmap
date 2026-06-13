@@ -62,6 +62,7 @@ class DBMS(object):
     VIRTUOSO = "Virtuoso"
     SNOWFLAKE = "Snowflake"
     SPANNER = "Spanner"
+    HANA = "SAP HANA"
 
 class DBMS_DIRECTORY_NAME(object):
     ACCESS = "access"
@@ -94,6 +95,7 @@ class DBMS_DIRECTORY_NAME(object):
     VIRTUOSO = "virtuoso"
     SNOWFLAKE = "snowflake"
     SPANNER = "spanner"
+    HANA = "hana"
 
 class FORK(object):
     MARIADB = "MariaDB"
