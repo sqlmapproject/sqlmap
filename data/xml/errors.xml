@@ -16,7 +16,8 @@
         <error regexp="Zend_Db_(Adapter|Statement)_Mysqli_Exception"/>
         <error regexp="Pdo[./_\\]Mysql"/>
         <error regexp="MySqlException"/>
-        <error regexp="\bpymysql\."/>
+        <error regexp="pymysql\.err\."/>
+        <error regexp="MySQLdb\.(_exceptions\.|\w+Error)"/>
         <error regexp="MemSQL does not support this type of query" fork="MemSQL"/>
         <error regexp="is not supported by MemSQL" fork="MemSQL"/>
         <error regexp="unsupported nested scalar subselect" fork="MemSQL"/>
@@ -35,8 +36,8 @@
         <error regexp="org\.postgresql\.jdbc"/>
         <error regexp="Pdo[./_\\]Pgsql"/>
         <error regexp="PSQLException"/>
-        <error regexp="psycopg2?\."/>
-        <error regexp="asyncpg\."/>
+        <error regexp="psycopg2?\.(errors\.|\w+Error)"/>
+        <error regexp="asyncpg\.(exceptions\.|\w+Error)"/>
     </dbms>
 
     <dbms value="Microsoft SQL Server">
@@ -81,6 +82,8 @@
         <error regexp="Zend_Db_(Adapter|Statement)_Oracle_Exception"/>
         <error regexp="Pdo[./_\\](Oracle|OCI)"/>
         <error regexp="OracleException"/>
+        <error regexp="cx_Oracle\.\w+Error"/>
+        <error regexp="oracledb\.(exceptions\.|\w+Error)"/>
     </dbms>
 
     <dbms value="IBM DB2">
