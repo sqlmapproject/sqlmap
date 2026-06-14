@@ -185,8 +185,13 @@ def dirtyPatches():
             # Note: allowlist (not blacklist) - a module blacklist is bypassable (e.g. importlib/ctypes/operator), so only
             # explicitly-safe builtin data types and sqlmap's own (and bundled) classes are permitted to be unpickled
             def find_class(self, module, name):
+                # Note: protocol-2 pickling of a 'bytes' value on Python 3 emits a _codecs.encode global; allow that one
+                # (it only runs a codec, e.g. latin1 - it cannot execute arbitrary code) so serialized values containing
+                # bytes round-trip. Everything else from _codecs (e.g. lookup) stays blocked by the rule below.
+                if module == "_codecs" and name == "encode":
+                    pass
                 # safe builtin data types only (blocks eval/exec/__import__/getattr/etc.)
-                if module in ("builtins", "__builtin__"):
+                elif module in ("builtins", "__builtin__"):
                     if name not in ("set", "frozenset", "dict", "list", "tuple", "int", "float", "bool", "str", "bytes", "bytearray", "object", "NoneType", "complex"):
                         raise ValueError("unpickling of '%s.%s' is forbidden" % (module, name))
                 # everything else must be one of sqlmap's own (or bundled) classes (e.g. lib.core.datatype.AttribDict)
