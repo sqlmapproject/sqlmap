@@ -82,7 +82,7 @@ class SQLAlchemy(GenericConnector):
                     engine = _sqlalchemy.create_engine(self.address, connect_args={})
 
                 self.connector = engine.connect()
-            except (TypeError, ValueError):
+            except (TypeError, ValueError) as ex:
                 if "_get_server_version_info" in traceback.format_exc():
                     try:
                         import pymssql
@@ -90,10 +90,14 @@ class SQLAlchemy(GenericConnector):
                             raise SqlmapConnectionException("SQLAlchemy connection issue (obsolete version of pymssql ('%s') is causing problems)" % pymssql.__version__)
                     except ImportError:
                         pass
+                    # Note: surface (as a proper SqlmapConnectionException) instead of silently continuing with self.connector left None
+                    raise SqlmapConnectionException("SQLAlchemy connection issue ('%s')" % getSafeExString(ex))
                 elif "invalid literal for int() with base 10: '0b" in traceback.format_exc():
                     raise SqlmapConnectionException("SQLAlchemy connection issue ('https://bitbucket.org/zzzeek/sqlalchemy/issues/3975')")
                 else:
-                    pass
+                    # Note: raise as SqlmapConnectionException (like the generic handler below) so the caller's native-connector
+                    # fallback engages and no raw TypeError/ValueError can reach sqlmap's top-level handler
+                    raise SqlmapConnectionException("SQLAlchemy connection issue ('%s')" % getSafeExString(ex))
             except SqlmapFilePathException:
                 raise
             except Exception as ex:

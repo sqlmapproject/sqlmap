@@ -45,6 +45,8 @@ def base64pickle(value):
 
     >>> base64unpickle(base64pickle([1, 2, 3])) == [1, 2, 3]
     True
+    >>> isinstance(base64unpickle(base64pickle(BigArray([1, 2, 3]))), BigArray)
+    True
     """
 
     retVal = None

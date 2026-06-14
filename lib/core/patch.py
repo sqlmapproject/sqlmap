@@ -182,14 +182,16 @@ def dirtyPatches():
     import pickle
     if not getattr(pickle, "_patched", False):
         class RestrictedUnpickler(pickle.Unpickler):
+            # Note: allowlist (not blacklist) - a module blacklist is bypassable (e.g. importlib/ctypes/operator), so only
+            # explicitly-safe builtin data types and sqlmap's own (and bundled) classes are permitted to be unpickled
             def find_class(self, module, name):
-                # blacklist for OS-level execution modules
-                if module in ("os", "subprocess", "sys", "posix", "nt", "pty", "commands", "shutil"):
+                # safe builtin data types only (blocks eval/exec/__import__/getattr/etc.)
+                if module in ("builtins", "__builtin__"):
+                    if name not in ("set", "frozenset", "dict", "list", "tuple", "int", "float", "bool", "str", "bytes", "bytearray", "object", "NoneType", "complex"):
+                        raise ValueError("unpickling of '%s.%s' is forbidden" % (module, name))
+                # everything else must be one of sqlmap's own (or bundled) classes (e.g. lib.core.datatype.AttribDict)
+                elif (module or "").split(".")[0] not in ("lib", "plugins", "thirdparty"):
                     raise ValueError("unpickling of module '%s' is forbidden" % module)
-
-                # partial whitelist for builtins to allow safe data types but block eval/exec/__import__
-                if module in ("builtins", "__builtin__") and name not in ("set", "frozenset", "dict", "list", "tuple", "int", "float", "bool", "str", "bytes", "bytearray", "object", "NoneType"):
-                    raise ValueError("unpickling of '%s.%s' is forbidden" % (module, name))
 
                 # Python 2/3 method resolution
                 if hasattr(pickle.Unpickler, "find_class"):

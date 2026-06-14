@@ -13,11 +13,9 @@ import stat
 import string
 
 from lib.core.common import getSafeExString
-from lib.core.common import openFile
-from lib.core.compat import xrange
 from lib.core.convert import getUnicode
 from lib.core.data import logger
-from thirdparty.six import unichr as _unichr
+from lib.core.settings import PURGE_BLOCK_SIZE
 
 def purge(directory):
     """
@@ -46,12 +44,25 @@ def purge(directory):
         except:
             pass
 
-    logger.debug("writing random data to files")
+    logger.debug("overwriting file contents")
     for filepath in filepaths:
         try:
             filesize = os.path.getsize(filepath)
-            with openFile(filepath, "w+") as f:
-                f.write("".join(_unichr(random.randint(0, 255)) for _ in xrange(filesize)))
+            if filesize:
+                # Note: NIST SP 800-88 ("Clear") / DoD 5220.22-M style multi-pass in-place overwrite
+                # (zeros, ones, random) forcing each pass to disk; performed BEFORE the truncation below
+                # so the original bytes are actually overwritten and not just released to free blocks.
+                # Written in bounded blocks so peak memory stays O(PURGE_BLOCK_SIZE), not O(filesize)
+                with open(filepath, "r+b") as f:
+                    for getBlock in (lambda n: b"\x00" * n, lambda n: b"\xff" * n, lambda n: os.urandom(n)):
+                        f.seek(0)
+                        remaining = filesize
+                        while remaining > 0:
+                            count = min(PURGE_BLOCK_SIZE, remaining)
+                            f.write(getBlock(count))
+                            remaining -= count
+                        f.flush()
+                        os.fsync(f.fileno())
         except:
             pass
 

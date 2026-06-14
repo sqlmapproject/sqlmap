@@ -284,6 +284,8 @@ def decodePage(page, contentEncoding, contentType, percentDecode=True):
     '\\t'
     >>> getText(decodePage(b"&#x4A;", None, "text/html; charset=utf-8"))
     'J'
+    >>> decodePage(b"&#x2122;", None, "text/html; charset=utf-8") == u"\u2122"
+    True
     """
 
     if not page or (conf.nullConnection and len(page) < 2):
@@ -378,6 +380,16 @@ def decodePage(page, contentEncoding, contentType, percentDecode=True):
                         pass
                     return retVal
                 page = re.sub(r"&#(\d+);", _, page)
+
+                # e.g. &#x2019;&#x2026;&#x2122; (hex numeric refs >= U+0100; smaller ones already handled at byte-level)
+                def _(match):
+                    retVal = match.group(0)
+                    try:
+                        retVal = _unichr(int(match.group(1), 16))
+                    except (ValueError, OverflowError):
+                        pass
+                    return retVal
+                page = re.sub(r"(?i)&#x([0-9a-f]+);", _, page)
 
             # e.g. &zeta;
             page = re.sub(r"&([^;]+);", lambda _: _unichr(HTML_ENTITIES[_.group(1)]) if HTML_ENTITIES.get(_.group(1), 0) > 255 else _.group(0), page)

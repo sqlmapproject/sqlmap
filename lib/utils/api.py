@@ -327,10 +327,10 @@ def check_authentication():
     except:
         request.environ["PATH_INFO"] = "/error/401"
     else:
-        if creds.count(':') != 1:
+        if ':' not in creds:
             request.environ["PATH_INFO"] = "/error/401"
         else:
-            username, password = creds.split(':')
+            username, password = creds.split(':', 1)
             if username.strip() != (DataStore.username or "") or password.strip() != (DataStore.password or ""):
                 request.environ["PATH_INFO"] = "/error/401"
 

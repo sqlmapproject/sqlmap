@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.6.99"
+VERSION = "1.10.6.100"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -680,6 +680,9 @@ TRIM_STDOUT_DUMP_SIZE = 256
 # Reference: http://stackoverflow.com/a/3168436
 # Reference: https://web.archive.org/web/20150407141500/https://support.microsoft.com/en-us/kb/899149
 DUMP_FILE_BUFFER_SIZE = 1024
+
+# Block size used for the in-place secure-overwrite passes of '--purge' (bounds peak memory regardless of file size)
+PURGE_BLOCK_SIZE = 1024 * 1024
 
 # Parse response headers only first couple of times
 PARSE_HEADERS_LIMIT = 3
