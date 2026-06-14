@@ -246,7 +246,7 @@ def smokeTest():
     count, length = 0, 0
 
     for root, _, files in os.walk(paths.SQLMAP_ROOT_PATH):
-        if any(_ in root for _ in ("thirdparty", "extra", "interbase")):
+        if any(_ in root for _ in ("thirdparty", "extra", "interbase", "tests")):
             continue
 
         for filename in files:
@@ -254,7 +254,7 @@ def smokeTest():
                 length += 1
 
     for root, _, files in os.walk(paths.SQLMAP_ROOT_PATH):
-        if any(_ in root for _ in ("thirdparty", "extra", "interbase")):
+        if any(_ in root for _ in ("thirdparty", "extra", "interbase", "tests")):
             continue
 
         for filename in files:
