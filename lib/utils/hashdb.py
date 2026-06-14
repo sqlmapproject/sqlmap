@@ -16,6 +16,7 @@ from lib.core.common import getSafeExString
 from lib.core.common import serializeObject
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import unserializeObject
+from lib.core.compat import RecursionError
 from lib.core.compat import xrange
 from lib.core.convert import getBytes
 from lib.core.convert import getUnicode

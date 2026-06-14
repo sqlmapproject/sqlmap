@@ -280,6 +280,12 @@ else:
     xrange = xrange
     buffer = buffer
 
+try:
+    RecursionError = RecursionError
+except NameError:
+    # Note: patch for Python < 3.5 (RecursionError, a subclass of RuntimeError, was introduced in Python 3.5)
+    RecursionError = RuntimeError
+
 def LooseVersion(version):
     """
     >>> LooseVersion("1.0") == LooseVersion("1.0")
