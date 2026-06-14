@@ -711,7 +711,8 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
         if finalValue is not None:
             finalValue = decodeDbmsHexValue(finalValue) if conf.hexConvert else finalValue
-            hashDBWrite(expression, finalValue)
+            if not (conf.firstChar or conf.lastChar):  # Note: --first/--last give a range-limited (non-complete) output; caching it unmarked would let a later resume serve the truncated value as the full one
+                hashDBWrite(expression, finalValue)
         elif partialValue:
             hashDBWrite(expression, "%s%s" % (PARTIAL_VALUE_MARKER if not conf.hexConvert else PARTIAL_HEX_VALUE_MARKER, partialValue))
 

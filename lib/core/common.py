@@ -5267,10 +5267,21 @@ def zeroDepthSearch(expression, value):
     retVal = []
 
     depth = 0
-    for index in xrange(len(expression)):
-        if expression[index] == '(':
+    quote = None
+    index = 0
+    while index < len(expression):
+        char = expression[index]
+        if quote:  # Note: content inside a single/double quoted string literal is data, not structure - a delimiter/keyword there must not be matched (e.g. ',' or ' FROM ' inside 'a,b'/'x FROM y')
+            if char == quote:
+                if index + 1 < len(expression) and expression[index + 1] == quote:  # escaped quote (e.g. '')
+                    index += 1
+                else:
+                    quote = None
+        elif char in ('"', "'"):
+            quote = char
+        elif char == '(':
             depth += 1
-        elif expression[index] == ')':
+        elif char == ')':
             depth -= 1
         elif depth == 0:
             if value.startswith('[') and value.endswith(']'):
@@ -5278,6 +5289,7 @@ def zeroDepthSearch(expression, value):
                     retVal.append(index)
             elif expression[index:index + len(value)] == value:
                 retVal.append(index)
+        index += 1
 
     return retVal
 

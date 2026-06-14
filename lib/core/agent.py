@@ -1117,7 +1117,7 @@ class Agent(object):
             limitedQuery = safeStringFormat(limitedQuery, (fromFrom,))
             limitedQuery += "=%d" % (num + 1)
 
-        elif Backend.isDbms(DBMS.MSSQL):
+        elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
             forgeNotIn = True
 
             if " ORDER BY " in limitedQuery:
