@@ -1713,6 +1713,7 @@
         <concatenate query="%s||%s"/>
         <case query="SELECT (IF(%s,1,0))"/>
         <inference query="UNICODE(SUBSTRING((%s),%d,1))>%d"/>
+        <substring query="SUBSTRING((%s),%d,%d)"/>
         <banner/>
         <current_user/>
         <current_db/>
@@ -1752,6 +1753,7 @@
         <concatenate query="%s||%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
         <inference query="ASCII(SUBSTRING((%s),%d,1))>%d"/>
+        <substring query="SUBSTRING((%s),%d,%d)"/>
         <banner query="sys_stat('st_dbms_name')||' - '||sys_stat('st_dbms_ver')"/>
         <current_user query="USERNAME()"/>
         <current_db query="UPPER(USERNAME())"/>
@@ -1803,6 +1805,7 @@
         <concatenate query="%s||%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
         <inference query="ASCII(SUBSTR((%s),%d,1))>%d"/>
+        <substring query="SUBSTR((%s),%d,%d)"/>
         <banner query="CURRENT_VERSION()"/>
         <current_user query="CURRENT_USER()"/>
         <current_db query="CURRENT_SCHEMA()"/>
