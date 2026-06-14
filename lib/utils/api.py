@@ -331,7 +331,7 @@ def check_authentication():
             request.environ["PATH_INFO"] = "/error/401"
         else:
             username, password = creds.split(':', 1)
-            if username.strip() != (DataStore.username or "") or password.strip() != (DataStore.password or ""):
+            if not (safeCompareStrings(username.strip(), DataStore.username or "") and safeCompareStrings(password.strip(), DataStore.password or "")):  # Note: constant-time comparison (mirrors is_admin) to avoid a timing side-channel on the credentials
                 request.environ["PATH_INFO"] = "/error/401"
 
 @hook("after_request")

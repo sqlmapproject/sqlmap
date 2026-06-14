@@ -1626,10 +1626,7 @@ class Connect(object):
                         if payload is None:
                             value = value.replace(kb.customInjectionMark, "")
                         else:
-                            try:
-                                value = re.sub(r"\w*%s" % re.escape(kb.customInjectionMark), payload, value)
-                            except re.error:
-                                value = re.sub(r"\w*%s" % re.escape(kb.customInjectionMark), re.escape(payload), value)
+                            value = re.sub(r"\w*%s" % re.escape(kb.customInjectionMark), lambda _: payload, value)  # Note: function replacement inserts payload literally - avoids re.sub interpreting backslashes / group refs (e.g. \1, \g<...>) in the payload
                     return value
                 page, headers, code = Connect.getPage(url=_(kb.secondReq[0]), post=_(kb.secondReq[2]), method=kb.secondReq[1], cookie=kb.secondReq[3], silent=silent, auxHeaders=dict(auxHeaders, **dict(kb.secondReq[4])), response=response, raise404=False, ignoreTimeout=timeBasedCompare, refreshing=True)
 
