@@ -20,4 +20,9 @@ def tamper(payload, **kwargs):
     '1\\\\" AND SLEEP(5)#'
     """
 
-    return payload.replace("'", "\\'").replace('"', '\\"')
+    retVal = payload
+
+    if payload:
+        retVal = payload.replace("'", "\\'").replace('"', '\\"')
+
+    return retVal

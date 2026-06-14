@@ -35,6 +35,8 @@ def tamper(payload, **kwargs):
     '%S%E%L%E%C%T %F%I%E%L%D %F%R%O%M %T%A%B%L%E'
     """
 
+    retVal = payload
+
     if payload:
         retVal = ""
         i = 0
