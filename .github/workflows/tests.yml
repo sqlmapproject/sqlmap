@@ -40,6 +40,9 @@ jobs:
       - name: Basic import test
         run: python -c "import sqlmap; import sqlmapapi"
 
+      - name: Unit tests
+        run: python -m unittest discover -s tests -p "test_*.py"
+
       - name: Smoke test
         run: python sqlmap.py --smoke
 
