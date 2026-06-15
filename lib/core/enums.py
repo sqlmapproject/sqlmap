@@ -238,6 +238,7 @@ class DUMP_FORMAT(object):
     CSV = "CSV"
     HTML = "HTML"
     SQLITE = "SQLITE"
+    JSONL = "JSONL"
 
 class HTTP_HEADER(object):
     ACCEPT = "Accept"

@@ -6,6 +6,7 @@ See the file 'LICENSE' for copying permission
 """
 
 import hashlib
+import json
 import os
 import re
 import shutil
@@ -61,6 +62,7 @@ from lib.core.settings import WINDOWS_RESERVED_NAMES
 from lib.utils.safe2bin import safechardecode
 from thirdparty import six
 from thirdparty.magic import magic
+from thirdparty.odict import OrderedDict
 
 class Dump(object):
     """
@@ -461,7 +463,7 @@ class Dump(object):
 
         if conf.dumpFormat == DUMP_FORMAT.SQLITE:
             replication = Replication(os.path.join(conf.dumpPath, "%s.sqlite3" % safeDb))
-        elif conf.dumpFormat in (DUMP_FORMAT.CSV, DUMP_FORMAT.HTML):
+        elif conf.dumpFormat in (DUMP_FORMAT.CSV, DUMP_FORMAT.HTML, DUMP_FORMAT.JSONL):
             if not os.path.isdir(dumpDbPath):
                 try:
                     os.makedirs(dumpDbPath)
@@ -624,6 +626,7 @@ class Dump(object):
             console = (i >= count - TRIM_STDOUT_DUMP_SIZE)
             field = 1
             values = []
+            record = OrderedDict()
 
             if i == 0 and count > TRIM_STDOUT_DUMP_SIZE:
                 self._write(" ...")
@@ -674,6 +677,11 @@ class Dump(object):
                             dataToDumpFile(dumpFP, "%s%s" % (safeCSValue(value), conf.csvDel))
                     elif conf.dumpFormat == DUMP_FORMAT.HTML:
                         dataToDumpFile(dumpFP, "<td>%s</td>" % getUnicode(htmlEscape(value).encode("ascii", "xmlcharrefreplace")))
+                    elif conf.dumpFormat == DUMP_FORMAT.JSONL:
+                        if len(info["values"]) <= i or info["values"][i] is None or info["values"][i] == " ":  # NULL
+                            record[unsafeSQLIdentificatorNaming(column)] = None
+                        else:
+                            record[unsafeSQLIdentificatorNaming(column)] = getUnicode(info["values"][i])
 
                     field += 1
 
@@ -686,6 +694,8 @@ class Dump(object):
                 dataToDumpFile(dumpFP, "\n")
             elif conf.dumpFormat == DUMP_FORMAT.HTML:
                 dataToDumpFile(dumpFP, "</tr>\n")
+            elif conf.dumpFormat == DUMP_FORMAT.JSONL:
+                dataToDumpFile(dumpFP, "%s\n" % getUnicode(json.dumps(record, ensure_ascii=False)))
 
             self._write("|", console=console)
 
@@ -695,10 +705,10 @@ class Dump(object):
             rtable.endTransaction()
             logger.info("table '%s.%s' dumped to SQLITE database '%s'" % (db, table, replication.dbpath))
 
-        elif conf.dumpFormat in (DUMP_FORMAT.CSV, DUMP_FORMAT.HTML):
+        elif conf.dumpFormat in (DUMP_FORMAT.CSV, DUMP_FORMAT.HTML, DUMP_FORMAT.JSONL):
             if conf.dumpFormat == DUMP_FORMAT.HTML:
                 dataToDumpFile(dumpFP, "</tbody>\n</table>\n<script>let lc=-1,ld=1;function sortTable(n,h){var t=document.querySelector(\"table\"),r=Array.from(t.tBodies[0].rows);ld=(lc==n?-ld:1);lc=n;r.sort((a,b)=>{var x=a.cells[n].innerText.trim(),y=b.cells[n].innerText.trim(),nx=parseFloat(x),ny=parseFloat(y);return(!isNaN(nx)&&!isNaN(ny)?(nx-ny)*ld:x.localeCompare(y)*ld)});r.forEach(e=>t.tBodies[0].appendChild(e));Array.from(t.tHead.rows[0].cells).forEach(c=>{c.innerText=c.innerText.replace(/[\u2191\u2193]/g,\"\")});h.innerText=h.innerText+ (ld==1?\"\u2191\":\"\u2193\");}</script>\n</body>\n</html>")
-            else:
+            elif conf.dumpFormat == DUMP_FORMAT.CSV:
                 dataToDumpFile(dumpFP, "\n")
             dumpFP.close()
 
