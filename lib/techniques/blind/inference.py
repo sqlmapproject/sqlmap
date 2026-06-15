@@ -127,10 +127,11 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             expression = match.group(2).strip()
 
     try:
-        # Set kb.partRun in case "common prediction" feature (a.k.a. "good samaritan") is used or the engine is called from the API
+        # Set kb.partRun in case "common prediction" feature (a.k.a. "good samaritan") is used, or the
+        # engine is called from the API, or a JSON report is being collected (so enumeration output is tagged)
         if conf.predictOutput:
             kb.partRun = getPartRun()
-        elif conf.api:
+        elif conf.api or conf.reportJson:
             kb.partRun = getPartRun(alias=False)
         else:
             kb.partRun = None

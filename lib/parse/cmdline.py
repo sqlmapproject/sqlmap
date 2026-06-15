@@ -727,6 +727,9 @@ def cmdLineParser(argv=None):
         general.add_argument("--repair", dest="repair", action="store_true",
             help="Redump entries having unknown character marker (%s)" % INFERENCE_UNKNOWN_CHAR)
 
+        general.add_argument("--report-json", dest="reportJson",
+            help="Store run results to a JSON file")
+
         general.add_argument("--save", dest="saveConfig",
             help="Save options to a configuration INI file")
 

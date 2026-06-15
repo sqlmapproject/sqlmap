@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.6.107"
+VERSION = "1.10.6.108"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -843,6 +843,15 @@ LIMITED_ROWS_TEST_NUMBER = 15
 # Default adapter to use for bottle server
 RESTAPI_DEFAULT_ADAPTER = "wsgiref"
 
+# REST API / scan-data contract version (semantic versioning), INDEPENDENT of the sqlmap version.
+# Bump MAJOR for breaking changes (removed/renamed field, changed type, restructured response),
+# MINOR for additive backward-compatible changes (new field/endpoint), PATCH for non-contract fixes.
+# Exposed at GET /version (as "api_version"), in the --report-json "meta", and as the OpenAPI
+# info.version (keep sqlmapapi.yaml in sync). Maintained by hand when the contract changes.
+# 2.0.0: first explicitly-versioned contract; a MAJOR break from the old implicit shape
+# (TECHNIQUES is now a named list, DUMP_TABLE restructured, internal fields dropped, type_name added).
+RESTAPI_VERSION = "2.0.0"
+
 # Default REST API server listen address
 RESTAPI_DEFAULT_ADDRESS = "127.0.0.1"
 
@@ -850,7 +859,7 @@ RESTAPI_DEFAULT_ADDRESS = "127.0.0.1"
 RESTAPI_DEFAULT_PORT = 8775
 
 # Unsupported options by REST API server
-RESTAPI_UNSUPPORTED_OPTIONS = ("sqlShell", "wizard", "evalCode", "alert")
+RESTAPI_UNSUPPORTED_OPTIONS = ("sqlShell", "wizard", "evalCode", "alert", "reportJson")
 
 # Use "Supplementary Private Use Area-A"
 INVALID_UNICODE_PRIVATE_AREA = False

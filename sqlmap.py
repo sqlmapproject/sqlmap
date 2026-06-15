@@ -176,6 +176,10 @@ def main():
 
         init()
 
+        if conf.get("reportJson"):
+            from lib.utils.api import setupReportCollector
+            conf.reportCollector = setupReportCollector()
+
         if not conf.updateAll:
             # Postponed imports (faster start)
             if conf.smokeTest:
@@ -567,6 +571,21 @@ def main():
         if (getDaysFromLastUpdate() or 0) > LAST_UPDATE_NAGGING_DAYS:
             warnMsg = "your sqlmap version is outdated"
             logger.warning(warnMsg)
+
+        # emit the JSON report BEFORE the closing banner, so it does not appear awkwardly after
+        # "[*] ending @ ..."
+        if conf.get("reportCollector") is not None:
+            try:
+                from lib.utils.api import writeReportJson
+                writeReportJson(conf.reportCollector, conf.reportJson)
+                logger.info("JSON report written to '%s'" % conf.reportJson)
+            except Exception as ex:
+                logger.error("unable to write JSON report to '%s' ('%s')" % (conf.reportJson, getSafeExString(ex)))
+            finally:
+                try:
+                    conf.reportCollector.disconnect()
+                except Exception as ex:
+                    logger.debug("problem occurred while closing the report collector ('%s')" % getSafeExString(ex))
 
         if conf.get("showTime"):
             dataToStdout("\n[*] ending @ %s\n\n" % time.strftime("%X /%Y-%m-%d/"), forceOutput=True)

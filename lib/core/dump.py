@@ -14,6 +14,7 @@ import threading
 
 from lib.core.common import Backend
 from lib.core.common import checkFile
+from lib.core.common import clearColors
 from lib.core.common import dataToDumpFile
 from lib.core.common import dataToStdout
 from lib.core.common import filterNone
@@ -30,6 +31,7 @@ from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.compat import xrange
 from lib.core.convert import getBytes
 from lib.core.convert import getConsoleLength
+from lib.core.convert import stdoutEncode
 from lib.core.convert import getText
 from lib.core.convert import getUnicode
 from lib.core.convert import htmlEscape
@@ -96,6 +98,19 @@ class Dump(object):
 
         kb.dataOutputFlag = True
 
+    def _reportData(self, data, content_type):
+        """
+        --report-json: capture a structured result exactly as the REST API would store it (the raw
+        value + COMPLETE status), independent of console/file rendering. No-op unless a report
+        collector is active - which is only ever the case for a CLI --report-json run, never under
+        --api - so this never double-captures alongside StdDbOut. A None content_type is resolved
+        via the kb.partRun fallback (e.g. the fingerprint line), mirroring the API exactly.
+        """
+
+        if conf.get("reportCollector") is not None:
+            from lib.utils.api import _storeData, REPORT_TASKID
+            _storeData(conf.reportCollector, REPORT_TASKID, stdoutEncode(clearColors(data)), CONTENT_STATUS.COMPLETE, content_type)
+
     def flush(self):
         if self._outputFP:
             try:
@@ -116,9 +131,12 @@ class Dump(object):
             raise SqlmapGenericException(errMsg)
 
     def singleString(self, data, content_type=None):
+        self._reportData(data, content_type)
         self._write(data, content_type=content_type)
 
     def string(self, header, data, content_type=None, sort=True):
+        self._reportData(data, content_type)
+
         if conf.api:
             self._write(data, content_type=content_type)
 
@@ -152,6 +170,8 @@ class Dump(object):
                 elements.sort(key=lambda _: _.lower() if hasattr(_, "lower") else _)
             except:
                 pass
+
+        self._reportData(elements, content_type)
 
         if conf.api:
             self._write(elements, content_type=content_type)
@@ -204,6 +224,8 @@ class Dump(object):
         users = [_ for _ in userSettings.keys() if _ is not None]
         users.sort(key=lambda _: _.lower() if hasattr(_, "lower") else _)
 
+        self._reportData(userSettings, content_type)
+
         if conf.api:
             self._write(userSettings, content_type=content_type)
 
@@ -237,6 +259,8 @@ class Dump(object):
 
     def dbTables(self, dbTables):
         if isinstance(dbTables, dict) and len(dbTables) > 0:
+            self._reportData(dbTables, CONTENT_TYPE.TABLES)
+
             if conf.api:
                 self._write(dbTables, content_type=CONTENT_TYPE.TABLES)
 
@@ -279,6 +303,8 @@ class Dump(object):
 
     def dbTableColumns(self, tableColumns, content_type=None):
         if isinstance(tableColumns, dict) and len(tableColumns) > 0:
+            self._reportData(tableColumns, content_type)
+
             if conf.api:
                 self._write(tableColumns, content_type=content_type)
 
@@ -352,6 +378,8 @@ class Dump(object):
 
     def dbTablesCount(self, dbTables):
         if isinstance(dbTables, dict) and len(dbTables) > 0:
+            self._reportData(dbTables, CONTENT_TYPE.COUNT)
+
             if conf.api:
                 self._write(dbTables, content_type=CONTENT_TYPE.COUNT)
 
@@ -412,6 +440,8 @@ class Dump(object):
 
         safeDb = re.sub(r"[^\w]", UNSAFE_DUMP_FILEPATH_REPLACEMENT, unsafeSQLIdentificatorNaming(db))
         safeTable = re.sub(r"[^\w]", UNSAFE_DUMP_FILEPATH_REPLACEMENT, unsafeSQLIdentificatorNaming(table))
+
+        self._reportData(tableValues, CONTENT_TYPE.DUMP_TABLE)
 
         if conf.api:
             self._write(tableValues, content_type=CONTENT_TYPE.DUMP_TABLE)
@@ -679,6 +709,8 @@ class Dump(object):
                 logger.warning(msg)
 
     def dbColumns(self, dbColumnsDict, colConsider, dbs):
+        self._reportData(dbColumnsDict, CONTENT_TYPE.COLUMNS)
+
         if conf.api:
             self._write(dbColumnsDict, content_type=CONTENT_TYPE.COLUMNS)
 

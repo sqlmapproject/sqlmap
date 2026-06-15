@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: sqlmap REST API
-  version: "1.0.0"
+  version: "2.0.0"
   description: |
     OpenAPI/Swagger specification for sqlmapapi.py, the sqlmap REST API server.
 
@@ -48,11 +48,13 @@ paths:
     get:
       tags: [Version]
       operationId: getVersion
-      summary: Fetch server version
-      description: Returns the sqlmap version string reported by the API server.
+      summary: Fetch server and API version
+      description: >-
+        Returns the sqlmap version string and the API contract version (api_version), which follows
+        semantic versioning independently of the sqlmap version so clients can check compatibility.
       responses:
         "200":
-          description: Server version returned.
+          description: Server and API version returned.
           content:
             application/json:
               schema:
@@ -62,6 +64,7 @@ paths:
                   value:
                     success: true
                     version: "1.10.6.51#dev"
+                    api_version: 2
         "401":
           $ref: "#/components/responses/Unauthorized"
 
@@ -459,8 +462,43 @@ paths:
                     success: true
                     data:
                       - status: 1
-                        type: 0
-                        value: []
+                        type: 2
+                        type_name: DBMS_FINGERPRINT
+                        value: "back-end DBMS: MySQL >= 5.1"
+                      - status: 1
+                        type: 4
+                        type_name: CURRENT_USER
+                        value: "root@%"
+                      - status: 1
+                        type: 12
+                        type_name: DBS
+                        value: ["information_schema", "mysql", "testdb"]
+                      - status: 1
+                        type: 1
+                        type_name: TECHNIQUES
+                        value:
+                          - place: GET
+                            parameter: id
+                            dbms: MySQL
+                            dbms_version: [">= 5.1"]
+                            os: null
+                            notes: []
+                            data:
+                              - technique: "boolean-based blind"
+                                title: "AND boolean-based blind - WHERE or HAVING clause"
+                                payload: "id=1 AND 7997=7997"
+                                vector: "AND [INFERENCE]"
+                                comment: ""
+                      - status: 1
+                        type: 17
+                        type_name: DUMP_TABLE
+                        value:
+                          db: testdb
+                          table: users
+                          count: 2
+                          columns:
+                            id: ["1", "2"]
+                            name: ["admin", null]
                     error: []
         "401":
           $ref: "#/components/responses/Unauthorized"
@@ -670,7 +708,7 @@ components:
 
     VersionResponse:
       type: object
-      required: [success, version]
+      required: [success, version, api_version]
       properties:
         success:
           type: boolean
@@ -679,6 +717,13 @@ components:
           type: string
           description: sqlmap version string without the `sqlmap/` prefix.
           example: "1.10.6.51#dev"
+        api_version:
+          type: integer
+          description: >-
+            MAJOR API-contract version (integer), independent of the sqlmap version. Only the major
+            is exposed at runtime because only a major bump breaks clients; the full semantic version
+            is this document's info.version. Clients compare e.g. api_version == 2.
+          example: 2
       additionalProperties: false
 
     TaskNewResponse:
@@ -811,16 +856,23 @@ components:
 
     ScanDataItem:
       type: object
-      required: [status, type, value]
+      required: [status, type, type_name, value]
       properties:
         status:
           type: integer
-          description: Numeric content status stored by sqlmap.
+          description: Numeric content status (0 = in progress, 1 = complete).
           example: 1
         type:
           type: integer
           description: Numeric content type stored by sqlmap.
-          example: 0
+          example: 2
+        type_name:
+          type: string
+          nullable: true
+          description: >-
+            Human-readable name of the content type (e.g. "DBMS_FINGERPRINT", "CURRENT_USER",
+            "DBS", "TECHNIQUES", "DUMP_TABLE"). null for any unmapped type.
+          example: DBMS_FINGERPRINT
         value:
           anyOf:
             - type: string
@@ -832,7 +884,13 @@ components:
               items: {}
             - type: object
               additionalProperties: true
-          description: JSON-decoded scan output value. Shape depends on the content type.
+          description: >-
+            JSON-decoded scan output value; its shape depends on the content type. Internal
+            plumbing is stripped: TECHNIQUES is a list of injection points whose "data" is a list of
+            techniques each named via a "technique" field (matchRatio/trueCode/falseCode/
+            templatePayload/where/conf are not exposed); DUMP_TABLE is
+            {db, table, count, columns: {column: [values]}} (the internal __infos__ wrapper and
+            per-column length are not exposed).
       additionalProperties: true
 
     ScanDataResponse:

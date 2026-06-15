@@ -235,6 +235,7 @@ optDict = {
         "postprocess": "string",
         "preprocess": "string",
         "repair": "boolean",
+        "reportJson": "string",
         "saveConfig": "string",
         "scope": "string",
         "skipHeuristics": "boolean",

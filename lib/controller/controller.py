@@ -181,6 +181,12 @@ def _showInjections():
         conf.dumper.string("", {"url": conf.url, "query": conf.parameters.get(PLACE.GET), "data": conf.parameters.get(PLACE.POST)}, content_type=CONTENT_TYPE.TARGET)
         conf.dumper.string("", kb.injections, content_type=CONTENT_TYPE.TECHNIQUES)
     else:
+        # --report-json: capture the same TARGET/TECHNIQUES structures the API emits, without
+        # printing them (the human-readable injection points are rendered just below)
+        if conf.reportJson:
+            conf.dumper._reportData({"url": conf.url, "query": conf.parameters.get(PLACE.GET), "data": conf.parameters.get(PLACE.POST)}, CONTENT_TYPE.TARGET)
+            conf.dumper._reportData(kb.injections, CONTENT_TYPE.TECHNIQUES)
+
         data = "".join(set(_formatInjection(_) for _ in kb.injections)).rstrip("\n")
         conf.dumper.string(header, data)
 

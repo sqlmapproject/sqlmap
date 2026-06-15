@@ -258,8 +258,8 @@ def unionUse(expression, unpack=True, dump=False):
 
     _, _, _, _, _, expressionFieldsList, expressionFields, _ = agent.getFields(origExpr)
 
-    # Set kb.partRun in case the engine is called from the API
-    kb.partRun = getPartRun(alias=False) if conf.api else None
+    # Set kb.partRun in case the engine is called from the API or a JSON report is being collected
+    kb.partRun = getPartRun(alias=False) if (conf.api or conf.reportJson) else None
 
     if expressionFieldsList and len(expressionFieldsList) > 1 and "ORDER BY" in expression.upper():
         # Removed ORDER BY clause because UNION does not play well with it
