@@ -6,12 +6,14 @@ See the file 'LICENSE' for copying permission
 """
 
 import doctest
+import json
 import logging
 import os
 import random
 import re
 import socket
 import sqlite3
+import subprocess
 import sys
 import tempfile
 import threading
@@ -20,17 +22,22 @@ import time
 from extra.vulnserver import vulnserver
 from lib.core.common import clearConsoleLine
 from lib.core.common import dataToStdout
+from lib.core.common import getSafeExString
 from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.common import shellExec
 from lib.core.compat import round
+from lib.core.compat import xrange
 from lib.core.convert import encodeBase64
+from lib.core.convert import getBytes
+from lib.core.convert import getText
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.patch import unisonRandom
 from lib.core.settings import IS_WIN
+from lib.core.settings import RESTAPI_VERSION
 
 def vulnTest():
     """
@@ -220,6 +227,156 @@ def vulnTest():
         try:
             os.remove(filename)
         except:
+            pass
+
+    return retVal
+
+def apiTest():
+    """
+    Runs a basic live test of the REST API: launches the server in a separate process
+    ('sqlmapapi.py -s') and drives the control-plane endpoints with an HTTP client - a real
+    server + client round-trip, without launching an actual scan. A separate process (rather
+    than an in-process thread) isolates the single-threaded server from the client's GIL and
+    from sqlmap's global HTTP machinery, which otherwise makes the round-trip flaky.
+    """
+
+    retVal = True
+
+    # pick a free port the same way vulnTest() does
+    while True:
+        address, port = "127.0.0.1", random.randint(10000, 65535)
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            if s.connect_ex((address, port)):
+                break
+            else:
+                time.sleep(1)
+        finally:
+            s.close()
+
+    username, password = "test", "test"
+    apipath = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmapapi.py"))
+
+    try:
+        devnull = subprocess.DEVNULL
+    except AttributeError:
+        devnull = open(os.devnull, "wb")
+
+    process = subprocess.Popen([sys.executable, apipath, "-s", "-H", address, "-p", str(port), "--username", username, "--password", password], stdout=devnull, stderr=devnull)
+
+    base = "http://%s:%d" % (address, port)
+
+    def _call(path, data=None, authorize=True):
+        # NOTE: a raw socket is used deliberately instead of urllib/http.client. The host sqlmap
+        # process installs a global keep-alive opener and patches http.client, which makes a
+        # library client flaky against the single-threaded server; a hand-rolled HTTP/1.0 request
+        # (Connection: close, read to EOF) is hermetic and immune to all of that.
+        method = "POST" if data is not None else "GET"
+        lines = ["%s %s HTTP/1.0" % (method, path), "Host: %s:%d" % (address, port)]
+        if authorize:
+            lines.append("Authorization: Basic %s" % encodeBase64("%s:%s" % (username, password), binary=False))
+        body = getBytes(json.dumps(data)) if data is not None else b""
+        if data is not None:
+            lines.append("Content-Type: application/json")
+            lines.append("Content-Length: %d" % len(body))
+        lines.append("Connection: close")
+        request = getBytes("\r\n".join(lines) + "\r\n\r\n") + body
+
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(10)
+        try:
+            s.connect((address, port))
+            s.sendall(request)
+            raw = b""
+            while True:
+                chunk = s.recv(8192)
+                if not chunk:
+                    break
+                raw += chunk
+        except Exception as ex:
+            logger.debug("API test: request to '%s' failed (%s)" % (path, getSafeExString(ex)))
+            return None, None
+        finally:
+            s.close()
+
+        head, _, payload = raw.partition(b"\r\n\r\n")
+        try:
+            code = int(head.split(b"\r\n")[0].split(b" ")[1])
+        except (IndexError, ValueError):
+            return None, None
+        try:
+            return code, json.loads(getText(payload))
+        except ValueError:
+            return code, None
+
+    try:
+        # wait for the server process to come up (or die trying)
+        for _ in xrange(200):
+            if process.poll() is not None:
+                logger.error("API test: server process exited prematurely (address: '%s')" % base)
+                return False
+            code, data = _call("/version")
+            if code == 200 and data and data.get("success"):
+                break
+            time.sleep(0.1)
+        else:
+            logger.error("API test: server did not come up (address: '%s')" % base)
+            return False
+
+        logger.info("REST API server running at '%s'..." % base)
+
+        results = []
+
+        def _check(name, condition):
+            results.append((name, bool(condition)))
+            if not condition:
+                logger.error("API test: check '%s' FAILED" % name)
+
+        # GET /version - success envelope + MAJOR-only integer api_version
+        code, data = _call("/version")
+        _check("version", code == 200 and data and data.get("success") is True and data.get("api_version") == int(RESTAPI_VERSION.split(".")[0]) and data.get("version"))
+
+        # the auth hook must reject an unauthenticated request
+        code, _ = _call("/version", authorize=False)
+        _check("auth-401", code == 401)
+
+        # GET /task/new - mint a task
+        code, data = _call("/task/new")
+        taskid = data.get("taskid") if data else None
+        _check("task-new", code == 200 and data and data.get("success") and taskid)
+
+        # POST /option/<taskid>/set then read it back via /get and /list (JSON round-trip + IPC)
+        code, data = _call("/option/%s/set" % taskid, {"flushSession": True})
+        _check("option-set", code == 200 and data and data.get("success"))
+
+        code, data = _call("/option/%s/get" % taskid, ["flushSession"])
+        _check("option-get", data and data.get("success") and (data.get("options") or {}).get("flushSession") is True)
+
+        code, data = _call("/option/%s/list" % taskid)
+        _check("option-list", data and data.get("success") and isinstance(data.get("options"), dict))
+
+        # GET /admin/list - the IP-bound listing (our client is the task's creator) must see it
+        code, data = _call("/admin/list")
+        _check("admin-list", data and data.get("success") and taskid in (data.get("tasks") or {}))
+
+        # a bogus task ID must produce a failure envelope (not a crash)
+        code, data = _call("/option/%s/list" % "nonexistent")
+        _check("invalid-task", data is not None and data.get("success") is False)
+
+        # GET /task/<taskid>/delete - tear the task down
+        code, data = _call("/task/%s/delete" % taskid)
+        _check("task-delete", data and data.get("success"))
+
+        if all(ok for _, ok in results):
+            logger.info("API test final result: PASSED")
+        else:
+            retVal = False
+            logger.error("API test final result: FAILED (%s)" % ", ".join(name for name, ok in results if not ok))
+    finally:
+        try:
+            process.terminate()
+            process.wait()
+        except Exception:
             pass
 
     return retVal

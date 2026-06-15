@@ -47,7 +47,10 @@ jobs:
         run: python -B -m unittest discover -s tests -p "test_*.py"
 
       - name: Smoke test
-        run: python sqlmap.py --smoke
+        run: python sqlmap.py --smoke-test
 
       - name: Vuln test
-        run: python sqlmap.py --vuln
+        run: python sqlmap.py --vuln-test
+
+      - name: API test
+        run: python sqlmap.py --api-test
