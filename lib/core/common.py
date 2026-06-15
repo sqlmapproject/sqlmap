@@ -1839,7 +1839,7 @@ def escapeJsonValue(value):
     retVal = ""
 
     for char in value:
-        if char < ' ' or char == '"':
+        if char < ' ' or char in ('"', '\\'):  # Note: backslash must be escaped too, otherwise a '\' in the value corrupts the surrounding JSON string
             retVal += json.dumps(char)[1:-1]
         else:
             retVal += char
@@ -3703,8 +3703,8 @@ def unArrayizeValue(value):
     if isListLike(value):
         if not value:
             value = None
-        elif len(value) == 1 and not isListLike(value[0]):
-            value = value[0]
+        elif len(value) == 1 and not isListLike(next(iter(value))):  # Note: next(iter(...)) not value[0] - a set/OrderedSet is list-like but not subscriptable
+            value = next(iter(value))
         else:
             value = [_ for _ in flattenValue(value) if _ is not None]
             value = value[0] if len(value) > 0 else None
