@@ -725,9 +725,13 @@ def start():
                         errMsg += "does not match exclusively True responses."
 
                     if not conf.tamper:
-                        errMsg += " If you suspect that there is some kind of protection mechanism "
-                        errMsg += "involved (e.g. WAF) maybe you could try to use "
-                        errMsg += "option '--tamper' (e.g. '--tamper=space2comment')"
+                        if kb.identifiedWafs:
+                            errMsg += " As a WAF/IPS ('%s') was identified during the run, " % ", ".join(kb.identifiedWafs)
+                            errMsg += "you are strongly advised to retry with option '--tamper' (e.g. '--tamper=space2comment')"
+                        else:
+                            errMsg += " If you suspect that there is some kind of protection mechanism "
+                            errMsg += "involved (e.g. WAF) maybe you could try to use "
+                            errMsg += "option '--tamper' (e.g. '--tamper=space2comment')"
 
                         if not conf.randomAgent:
                             errMsg += " and/or switch '--random-agent'"
