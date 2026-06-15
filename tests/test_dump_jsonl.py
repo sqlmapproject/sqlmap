@@ -15,6 +15,7 @@ marker (" ") mapped to JSON null exactly like --report-json, the empty string
 left intact (NOT collapsed to null), and a strict one-object-per-line layout.
 """
 
+import io
 import json
 import os
 import shutil
@@ -66,7 +67,9 @@ class _JsonlDumpCase(unittest.TestCase):
         self.d.dbTableValues(table_values)
         db = table_values["__infos__"]["db"] or "All"
         path = os.path.join(self.tmp, db, "%s.jsonl" % table_values["__infos__"]["table"])
-        with open(path) as f:
+        # sqlmap writes the dump file as UTF-8; read it the same way (not the platform default,
+        # which is cp1252 on Windows CI and would mojibake multibyte values)
+        with io.open(path, encoding="utf-8") as f:
             content = f.read()
         return content
 
@@ -145,7 +148,7 @@ class TestJsonlContract(_JsonlDumpCase):
         if os.path.exists(csv_path):
             os.remove(csv_path)
         self.d.dbTableValues(table())
-        with open(csv_path) as f:
+        with io.open(csv_path, encoding="utf-8") as f:
             csv_header = f.read().splitlines()[0]
         csv_order = [c.strip() for c in csv_header.split(conf.csvDel)]
 

@@ -15,6 +15,7 @@ A regression here is a divergence between the API and the report - the exact bug
 this design exists to prevent.
 """
 
+import io
 import json
 import os
 import sys
@@ -200,7 +201,8 @@ class TestWriteReportJson(_CollectorCase):
         os.close(fd)
         try:
             api.writeReportJson(self.c, path)
-            loaded = json.load(open(path))
+            with io.open(path, encoding="utf-8") as f:   # explicit UTF-8 + closed handle (no ResourceWarning, no cp1252 on Windows)
+                loaded = json.load(f)
             # core shape == API /scan/<id>/data, plus a meta wrapper
             self.assertEqual(sorted(loaded.keys()), ["data", "error", "meta", "success"])
             self.assertEqual(loaded["data"][0]["value"], "admin")
