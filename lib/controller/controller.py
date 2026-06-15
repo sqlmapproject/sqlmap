@@ -70,6 +70,7 @@ from lib.core.settings import CSRF_TOKEN_PARAMETER_INFIXES
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import EMPTY_FORM_FIELDS_REGEX
 from lib.core.settings import GOOGLE_ANALYTICS_COOKIE_REGEX
+from lib.core.settings import HASHDB_STALE_DAYS
 from lib.core.settings import HOST_ALIASES
 from lib.core.settings import IGNORE_PARAMETERS
 from lib.core.settings import LOW_TEXT_PERCENT
@@ -189,6 +190,20 @@ def _showInjections():
 
         data = "".join(set(_formatInjection(_) for _ in kb.injections)).rstrip("\n")
         conf.dumper.string(header, data)
+
+    # when results were resumed (no test requests this run), nudge if the session file is stale -
+    # this is the common "why is it showing old/unexpected results?" confusion
+    if kb.testQueryCount == 0 and not conf.freshQueries:
+        try:
+            days = int((time.time() - os.path.getmtime(conf.hashDBFile)) / (24 * 3600))
+        except (OSError, IOError, TypeError):
+            days = 0
+
+        if days >= HASHDB_STALE_DAYS:
+            warnMsg = "results above were resumed from a session file last updated %d days ago, " % days
+            warnMsg += "so they may be stale. Rerun with '--flush-session' to retest "
+            warnMsg += "or '--fresh-queries' to ignore cached query results"
+            logger.warning(warnMsg)
 
     if conf.tamper:
         warnMsg = "changes made by tampering scripts are not "
