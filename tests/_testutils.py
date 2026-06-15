@@ -87,3 +87,66 @@ def set_dbms(name):
     from lib.core.data import kb
     kb.stickyDBMS = False
     Backend.forceDbms(name)
+
+
+# --- property/fuzz testing harness (shared so individual test files don't each reinvent it) ---
+
+_PROPERTY_BASE = 0x51A1
+
+
+class Rng(object):
+    """Deterministic, cross-version-identical PRNG (a pure-integer LCG, no global state).
+
+    sqlmap runs on Python 2.7 and 3.x, whose stdlib `random` yield DIFFERENT sequences
+    for the same seed - and `random.Random` instance methods are not unified by
+    patch.unisonRandom() (which only patches the module-level random.choice/randint/
+    sample/seed). Property tests need inputs that are byte-for-byte identical on every
+    interpreter so a CI-only failure reproduces everywhere; integer math is identical
+    across versions, so this LCG (same constants as unisonRandom) guarantees it by
+    construction. Draw ONLY through these methods - never random.random()/shuffle()/etc.
+    """
+
+    def __init__(self, seed):
+        self.x = seed & 0xFFFFFF
+
+    def _next(self):
+        self.x = (1140671485 * self.x + 128201163) % (2 ** 24)
+        return self.x
+
+    def randint(self, a, b):
+        return a + self._next() % (b - a + 1)
+
+    def choice(self, seq):
+        return seq[self.randint(0, len(seq) - 1)]
+
+    def sample(self, seq, k):
+        # Note: with replacement (matches unisonRandom's _sample); fine for input generation
+        return [self.choice(seq) for _ in range(k)]
+
+    def blob(self, n):
+        return bytes(bytearray(self.randint(0, 255) for _ in range(n)))
+
+
+def _label_offset(label):
+    # stable across versions/runs (unlike hash(), which varies with PYTHONHASHSEED): just sum bytes
+    return sum(bytearray((label or "").encode("utf-8"))) * 7919
+
+
+def for_all(testcase, generator, prop, n=400, label=""):
+    """Property runner: draw `n` cases from generator(rng) and assert prop(case) holds.
+
+    `prop` passes by returning True/None, fails by returning False or raising. On any
+    failure the EXACT offending input and its case index are reported; the same input
+    is reproducible (and identical on every interpreter) via Rng(seed_for(label, i)).
+    """
+    base = _PROPERTY_BASE + _label_offset(label)
+    for i in range(n):
+        case = generator(Rng(base + i))
+        try:
+            ok = prop(case)
+        except Exception as ex:
+            testcase.fail("%s: raised %r on input %r (case %d)" % (label or "property", ex, case, i))
+            return
+        if ok is False:
+            testcase.fail("%s: property does not hold on input %r (case %d)" % (label or "property", case, i))
+            return
