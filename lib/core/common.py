@@ -4507,13 +4507,15 @@ def safeCSValue(value):
     '"foo, bar"'
     >>> safeCSValue('foobar')
     'foobar'
+    >>> safeCSValue('foo\\rbar')
+    '"foo\\rbar"'
     """
 
     retVal = value
 
     if retVal and isinstance(retVal, six.string_types):
         if not (retVal[0] == retVal[-1] == '"'):
-            if any(_ in retVal for _ in (conf.get("csvDel", defaults.csvDel), '"', '\n')):
+            if any(_ in retVal for _ in (conf.get("csvDel", defaults.csvDel), '"', '\n', '\r')):
                 retVal = '"%s"' % retVal.replace('"', '""')
 
     return retVal
@@ -5299,9 +5301,38 @@ def splitFields(fields, delimiter=','):
 
     >>> splitFields('foo, bar, max(foo, bar)')
     ['foo', 'bar', 'max(foo,bar)']
+    >>> splitFields("a, 'b, c', d")
+    ['a', "'b, c'", 'd']
     """
 
-    fields = fields.replace("%s " % delimiter, delimiter)
+    # collapse "<delimiter> " -> "<delimiter>" but only OUTSIDE quoted string literals, so a
+    # space inside e.g. 'b, c' survives (the quote handling mirrors zeroDepthSearch)
+    normalized = []
+    quote = None
+    index = 0
+    while index < len(fields):
+        char = fields[index]
+        if quote:
+            normalized.append(char)
+            if char == quote:
+                if index + 1 < len(fields) and fields[index + 1] == quote:  # escaped quote (e.g. '')
+                    normalized.append(fields[index + 1])
+                    index += 2
+                    continue
+                else:
+                    quote = None
+        elif char in ('"', "'"):
+            quote = char
+            normalized.append(char)
+        elif char == delimiter and index + 1 < len(fields) and fields[index + 1] == ' ':
+            normalized.append(char)  # keep the delimiter, drop the single trailing space
+            index += 2
+            continue
+        else:
+            normalized.append(char)
+        index += 1
+
+    fields = "".join(normalized)
     commas = [-1, len(fields)]
     commas.extend(zeroDepthSearch(fields, ','))
     commas = sorted(commas)

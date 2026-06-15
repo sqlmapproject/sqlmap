@@ -2074,6 +2074,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.cache.comparison = LRUDict(capacity=256)
     kb.cache.encoding = LRUDict(capacity=256)
     kb.cache.alphaBoundaries = None
+    kb.cache.charsetAsciiTbl = None
     kb.cache.hashRegex = None
     kb.cache.intBoundaries = None
     kb.cache.parsedDbms = {}

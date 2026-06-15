@@ -80,7 +80,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         return 0, None
 
     if charsetType is None and conf.charset:
-        asciiTbl = sorted(set(ord(_) for _ in conf.charset))
+        # conf.charset is fixed for the whole run; compute the table once, not per bisection() call
+        if kb.cache.charsetAsciiTbl is None:
+            kb.cache.charsetAsciiTbl = sorted(set(ord(_) for _ in conf.charset))
+        asciiTbl = kb.cache.charsetAsciiTbl
     else:
         asciiTbl = getCharset(charsetType)
 

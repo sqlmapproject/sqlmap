@@ -220,9 +220,19 @@ class TestRandomHelpers(unittest.TestCase):
 
 class TestSplitterInvariants(unittest.TestCase):
     def test_reconstruction(self):
-        # pure partition identity: rejoining the 0-depth split must reproduce the (space-normalized) input
-        for_all(self, gen_text, lambda s: u",".join(splitFields(s)) == s.replace(", ", ","), label="split-reconstruct-text")
-        for_all(self, gen_sql_fields, lambda s: u",".join(splitFields(s)) == s.replace(", ", ","), label="split-reconstruct-sql")
+        # Faithful partition: rejoining the 0-depth split reconstructs the input modulo the only
+        # transform splitFields applies - dropping a single space after an unquoted delimiter. So
+        # nothing other than spaces may be lost/added/reordered. (Space-insensitive so it survives
+        # the quote-aware normalization: spaces inside 'literals' are kept, comma-trailing ones are
+        # not; either way no non-space content changes.)
+        for_all(self, gen_text, lambda s: u",".join(splitFields(s)).replace(u" ", u"") == s.replace(u" ", u""), label="split-reconstruct-text")
+        for_all(self, gen_sql_fields, lambda s: u",".join(splitFields(s)).replace(u" ", u"") == s.replace(u" ", u""), label="split-reconstruct-sql")
+
+    def test_quoted_literal_spaces_preserved(self):
+        # the I3 contract: a ", " inside a quoted literal must NOT be collapsed (the whole literal
+        # survives intact as a single field)
+        for_all(self, lambda r: u"%s, '%s, %s', %s" % (r.choice([u"a", u"id"]), r.choice([u"x", u"p q"]), r.choice([u"y", u"z"]), r.choice([u"b", u"c"])),
+                lambda s: u"'%s'" % s.split(u"'")[1] in splitFields(s), label="split-quote-preserve")
 
     def test_never_cuts_inside_parens(self):
         # on well-formed input no field may carry unbalanced parens (i.e. a split never lands inside a group)
