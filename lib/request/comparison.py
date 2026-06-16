@@ -11,6 +11,7 @@ import re
 
 from lib.core.common import extractRegexResult
 from lib.core.common import getFilteredPageContent
+from lib.core.common import jsonMinimize
 from lib.core.common import listToStrValue
 from lib.core.common import removeDynamicContent
 from lib.core.common import getLastRequestHTTPError
@@ -20,6 +21,7 @@ from lib.core.convert import getBytes
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.enums import HTTP_HEADER
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.settings import DEFAULT_PAGE_ENCODING
 from lib.core.settings import DIFF_TOLERANCE
@@ -33,6 +35,20 @@ from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.settings import URI_HTTP_HEADER
 from lib.core.threads import getCurrentThreadData
 from thirdparty import six
+
+def _isJsonResponse(headers):
+    """
+    Returns True if the response Content-Type indicates a JSON document (e.g. 'application/json'
+    or a structured suffix like 'application/vnd.api+json')
+    """
+
+    retVal = False
+
+    if headers:
+        contentType = (headers.get(HTTP_HEADER.CONTENT_TYPE) or "").split(';')[0].strip().lower()
+        retVal = contentType == "application/json" or contentType.endswith("+json")
+
+    return retVal
 
 def comparison(page, headers, code=None, getRatioValue=False, pageLength=None):
     if not isinstance(page, (six.text_type, six.binary_type, type(None))):
@@ -97,6 +113,10 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
     seqMatcher = threadData.seqMatcher
     seqMatcher.set_seq1(kb.pageTemplate)
 
+    # raw (pre-dynamic-removal) body, kept for the structured (JSON) comparison path below;
+    # parsing the raw form avoids removeDynamicContent splicing JSON mid-token
+    rawPage = page
+
     if page:
         # In case of an DBMS error page return None
         if kb.errorIsNone and (wasLastResponseDBMSError() or wasLastResponseHTTPError()) and not kb.negativeLogic:
@@ -148,12 +168,22 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
         else:
             seq1, seq2 = None, None
 
-            if conf.titles:
-                seq1 = extractRegexResult(HTML_TITLE_REGEX, seqMatcher.a)
-                seq2 = extractRegexResult(HTML_TITLE_REGEX, page)
-            else:
-                seq1 = getFilteredPageContent(seqMatcher.a, True) if conf.textOnly else seqMatcher.a
-                seq2 = getFilteredPageContent(page, True) if conf.textOnly else page
+            # Structure-aware comparison for JSON responses: compare an order-independent
+            # projection of the parsed bodies instead of raw text, so key reordering/whitespace
+            # noise does not perturb the ratio while a changed value/array-length does. Engages
+            # only on a JSON Content-Type with both bodies parseable; any doubt (or an explicit
+            # --text-only/--titles) falls back to the exact text path below.
+            if _isJsonResponse(headers) and not (conf.titles or conf.textOnly or kb.nullConnection):
+                seq1 = jsonMinimize(kb.pageTemplate)
+                seq2 = jsonMinimize(rawPage)
+
+            if seq1 is None or seq2 is None:
+                if conf.titles:
+                    seq1 = extractRegexResult(HTML_TITLE_REGEX, seqMatcher.a)
+                    seq2 = extractRegexResult(HTML_TITLE_REGEX, page)
+                else:
+                    seq1 = getFilteredPageContent(seqMatcher.a, True) if conf.textOnly else seqMatcher.a
+                    seq2 = getFilteredPageContent(page, True) if conf.textOnly else page
 
             if seq1 is None or seq2 is None:
                 return None

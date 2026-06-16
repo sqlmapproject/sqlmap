@@ -1442,6 +1442,45 @@ def parseJson(content):
 
     return retVal
 
+def jsonMinimize(content):
+    """
+    Returns an order-independent canonical "leaf-path" projection of a JSON document, used for
+    structure-aware response comparison (so key reordering / whitespace / number formatting do
+    not perturb the comparison ratio, while a changed value or array length does). Returns None
+    (and only None) when content is not parseable JSON, so callers can fall back to text comparison
+
+    >>> jsonMinimize('{"b": 2, "a": 1}') == jsonMinimize('{"a":1,  "b":2}')
+    True
+    >>> jsonMinimize('{"a": {"b": 1}}') == '.a.b=1'
+    True
+    >>> jsonMinimize('not json') is None
+    True
+    >>> jsonMinimize('{}') == ''
+    True
+    """
+
+    try:
+        data = json.loads(content)
+    except (ValueError, TypeError):
+        return None
+
+    lines = []
+
+    def _walk(obj, path):
+        if isinstance(obj, dict):
+            for key in sorted(obj):                                # sorted keys -> key-order/whitespace immune
+                _walk(obj[key], "%s.%s" % (path, key))
+        elif isinstance(obj, (list, tuple)):
+            lines.append("%s.__len__=%d" % (path, len(obj)))       # length change always registers
+            for index in xrange(len(obj)):                         # index kept -> order-sensitive (correct for result sets)
+                _walk(obj[index], "%s[%d]" % (path, index))
+        else:
+            lines.append("%s=%s" % (path, obj))                    # scalar values kept (boolean detection flips values)
+
+    _walk(data, "")
+
+    return "\n".join(sorted(lines))
+
 def parsePasswordHash(password):
     """
     In case of Microsoft SQL Server password hash value is expanded to its components

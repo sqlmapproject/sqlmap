@@ -229,6 +229,7 @@ class ReqHandler(BaseHTTPRequestHandler):
                 self.wfile.write(b"<!DOCTYPE html><html><head><title>vulnserver</title></head><body><h3>GET:</h3><a href='/?id=1'>link</a><hr><h3>POST:</h3><form method='post'>ID: <input type='text' name='id'><input type='submit' value='Submit'></form></body></html>")
             else:
                 code, output = OK, "<body><html>"
+                contentType = "text/html"
 
                 try:
                     if self.params.get("echo", ""):
@@ -247,38 +248,48 @@ class ReqHandler(BaseHTTPRequestHandler):
                                 _cursor.execute("SELECT * FROM users WHERE id=%s LIMIT 0, 1" % self.params["id"])
                         results = _cursor.fetchall()
 
-                    output += "<b>SQL results:</b><br>\n"
-
-                    if self.params.get("code", ""):
-                        if not results:
+                    if self.params.get("json", ""):
+                        # JSON response mode: serialize the SAME query results as application/json
+                        # (exercises the structure-aware comparison oracle end to end). HTML branches
+                        # below are untouched, so existing tests are unaffected.
+                        if self.params.get("code", "") and not results:
                             code = INTERNAL_SERVER_ERROR
+                        else:
+                            contentType = "application/json"
+                            output = json.dumps({"results": [list(row) for row in results], "count": len(results)})
                     else:
-                        if results:
-                            output += "<table border=\"1\">\n"
+                        output += "<b>SQL results:</b><br>\n"
 
-                            for row in results:
-                                output += "<tr>"
-                                for value in row:
-                                    output += "<td>%s</td>" % value
-                                output += "</tr>\n"
-
-                            output += "</table>\n"
+                        if self.params.get("code", ""):
+                            if not results:
+                                code = INTERNAL_SERVER_ERROR
                         else:
-                            output += "no results found"
+                            if results:
+                                output += "<table border=\"1\">\n"
 
-                        if not results:
-                            output = "<title>No results</title>" + output
-                        else:
-                            output = "<title>Results</title>" + output
+                                for row in results:
+                                    output += "<tr>"
+                                    for value in row:
+                                        output += "<td>%s</td>" % value
+                                    output += "</tr>\n"
 
-                    output += "</body></html>"
+                                output += "</table>\n"
+                            else:
+                                output += "no results found"
+
+                            if not results:
+                                output = "<title>No results</title>" + output
+                            else:
+                                output = "<title>Results</title>" + output
+
+                        output += "</body></html>"
                 except Exception as ex:
                     code = INTERNAL_SERVER_ERROR
                     output = "%s: %s" % (re.search(r"'([^']+)'", str(type(ex))).group(1), ex)
 
                 self.send_response(code)
 
-                self.send_header("Content-type", "text/html")
+                self.send_header("Content-type", contentType)
                 self.send_header("Connection", "close")
 
                 if self.raw_requestline.startswith(b"HEAD"):
