@@ -2237,6 +2237,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.udfFail = False
     kb.unionDuplicates = False
     kb.unionTemplate = None
+    kb.wafBypass = None
     kb.webSocketRecvCount = None
     kb.wizardMode = False
     kb.xpCmdshellAvailable = False

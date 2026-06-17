@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.6.119"
+VERSION = "1.10.6.120"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -53,6 +53,33 @@ IPS_WAF_CHECK_RATIO = 0.5
 
 # Timeout used in heuristic check for WAF/IPS protected targets
 IPS_WAF_CHECK_TIMEOUT = 10
+
+# Candidate tamper scripts for automatic WAF-bypass, ordered by empirical WAF-bypass value
+# (structural token-substitution first, camouflage last; per identYwaf data). The back-end DBMS
+# is not pre-filtered here: semantics-preservation is verified at runtime by re-running detection
+# through each candidate, so a DBMS-incompatible script simply fails the trial and is discarded.
+WAF_BYPASS_TAMPERS = (
+    "equaltolike",
+    "between",
+    "greatest",
+    "charencode",
+    "randomcase",
+    "space2comment",
+    "versionedkeywords",
+    "space2hash",
+)
+
+# Maximum number of candidate tamper (chains) trialled during automatic WAF-bypass
+WAF_BYPASS_MAX_TRIALS = 8
+
+# Browser-like request headers applied alongside the random (non-scanner) User-Agent during
+# automatic WAF bypass: sqlmap's defaults ('Accept: */*', no 'Accept-Language') are themselves a
+# non-browser tell that header/behavioral WAFs key on, so the whole request fingerprint - not just
+# the UA - is made to look like a real browser. Kept standard so it cannot skew content negotiation.
+WAF_BYPASS_HTTP_HEADERS = (
+    ("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"),
+    ("Accept-Language", "en-US,en;q=0.5"),
+)
 
 # Timeout used in checking for existence of live-cookies file
 LIVE_COOKIES_TIMEOUT = 120

@@ -24,6 +24,7 @@ UNICODE_ENCODING = "utf-8"
 DEBUG = False
 
 if PY3:
+    from http.client import FORBIDDEN
     from http.client import INTERNAL_SERVER_ERROR
     from http.client import NOT_FOUND
     from http.client import OK
@@ -35,6 +36,7 @@ if PY3:
 else:
     from BaseHTTPServer import BaseHTTPRequestHandler
     from BaseHTTPServer import HTTPServer
+    from httplib import FORBIDDEN
     from httplib import INTERNAL_SERVER_ERROR
     from httplib import NOT_FOUND
     from httplib import OK
@@ -157,6 +159,53 @@ class ThreadingServer(ThreadingMixIn, HTTPServer):
             if DEBUG:
                 traceback.print_exc()
 
+# Primitive (CRS-style) WAF/IPS emulator used to exercise the automatic WAF/IPS bypass. The request
+# surface is normalized like a real WAF (lowercase, comments->space, whitespace compressed) BEFORE
+# a cumulative anomaly score is summed; when the score reaches the per-level threshold the request
+# is blocked (403 + marker). The rules are shaped so that camouflage tampers (case/whitespace/
+# comments) are normalized away and a *structural* substitution (e.g. 'between'/'equaltolike',
+# which removes the scored '=' operator) is the genuine bypass - matching real-world behavior.
+#
+# The emulator also models the OTHER real-world dimension: a scanner-fingerprint rule (mirroring
+# CRS 913100) adds a constant score for a recognizable scanner User-Agent that *stacks* with the
+# payload score. Its weight is below every threshold, so the scanner UA alone never blocks (benign
+# browsing passes), but it tips an otherwise-permitted payload over the threshold - so neutralizing
+# the request fingerprint (a non-scanner User-Agent) is itself a genuine bypass, with no SQL tamper.
+WAF_NUMERIC_COMPARISON = r"\d+\s*=\s*\d+"       # numeric self-comparison (boolean payloads); the structural lever 'between'/'equaltolike' removes it
+WAF_RULES = (
+    (r"\bunion\b.{0,40}\bselect\b", 6),
+    (r"\binformation_schema\b", 5),
+    (r"\b(sleep|benchmark|extractvalue|updatexml|xp_cmdshell|waitfor)\b", 5),
+    (r"\b(select|insert|update|delete|drop)\b", 3),
+    (WAF_NUMERIC_COMPARISON, 4),
+    (r"<script", 6),
+)
+WAF_THRESHOLD = {1: 6, 2: 4, 3: 2, 4: 8, 5: 5}      # security_level -> cumulative score that triggers a block
+WAF_SCANNER_UA = r"(?i)\b(?:sqlmap|nikto|nessus|acunetix|nmap|masscan|w3af|havij|wpscan|dirbuster|arachni)\b"
+WAF_SCANNER_UA_WEIGHT = 3       # CRS 913100-style: constant score for a scanner User-Agent, stacked with the payload score
+
+# Levels 4-5 model a libinjection-class WAF (e.g. OWASP CRS rule 942100): ANY boolean-comparison
+# fingerprint scores a flat amount REGARDLESS of operator, so '=','LIKE','BETWEEN','IN' are all
+# caught equally - structural tampers (between/equaltolike) do NOT help. There, neutralizing the
+# scanner fingerprint is the only payload-preserving bypass (level 4); when even that is not enough
+# the search must bail honestly (level 5). This mirrors the hardest real-world case.
+WAF_LIBINJECTION_LEVELS = (4, 5)
+WAF_LIBINJECTION_WEIGHT = 5
+WAF_LIBINJECTION = r"(?i)\b(?:and|or)\b.{0,40}(?:=|>|<|\blike\b|\bbetween\b|\bin\b|\brlike\b|\bregexp\b)"
+
+def waf_score(value, ua=None, level=0):
+    value = (value or "").lower()
+    value = re.sub(r"/\*.*?\*/", " ", value)        # t:replaceComments (note: -> single space, not empty)
+    value = re.sub(r"(?:--|#)[^\n]*", " ", value)   # t:removeComments (line comments)
+    value = re.sub(r"\s+", " ", value)              # t:compressWhitespace
+    libinjection = level in WAF_LIBINJECTION_LEVELS
+    retVal = sum(weight for (pattern, weight) in WAF_RULES if not (libinjection and pattern == WAF_NUMERIC_COMPARISON) and re.search(pattern, value))
+    if libinjection and re.search(WAF_LIBINJECTION, value):     # operator-agnostic comparison score (tampers cannot remove it)
+        retVal += WAF_LIBINJECTION_WEIGHT
+    if ua and re.search(WAF_SCANNER_UA, ua):        # scanner-fingerprint score, stacked with the payload score
+        retVal += WAF_SCANNER_UA_WEIGHT
+    return retVal
+
 class ReqHandler(BaseHTTPRequestHandler):
     def do_REQUEST(self):
         path, query = self.path.split('?', 1) if '?' in self.path else (self.path, "")
@@ -197,6 +246,22 @@ class ReqHandler(BaseHTTPRequestHandler):
                 params[key] = params[key][-1]
 
         self.url, self.params = path, params
+
+        # primitive WAF/IPS emulator (opt-in via 'security_level' param; 0/absent = off)
+        try:
+            level = int(self.params.get("security_level", 0) or 0)
+        except (TypeError, ValueError):
+            level = 0
+
+        if level > 0:
+            surface = "%s %s" % (unquote_plus(query), getattr(self, "data", "") or "")
+            if waf_score(surface, ua=self.params.get("user-agent"), level=level) >= WAF_THRESHOLD.get(level, 2):
+                self.send_response(FORBIDDEN)
+                self.send_header("Content-type", "text/html; charset=%s" % UNICODE_ENCODING)
+                self.send_header("Connection", "close")
+                self.end_headers()
+                self.wfile.write(b"<html><body>Request blocked: security policy violation (WAF)</body></html>")
+                return
 
         if self.url == "/csrf":
             if self.params.get("csrf_token") == _csrf_token:

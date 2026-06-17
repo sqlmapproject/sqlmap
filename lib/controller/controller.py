@@ -76,6 +76,7 @@ from lib.core.settings import IGNORE_PARAMETERS
 from lib.core.settings import LOW_TEXT_PERCENT
 from lib.core.settings import REFERER_ALIASES
 from lib.core.settings import USER_AGENT_ALIASES
+from lib.core.settings import WAF_BYPASS_MAX_TRIALS
 from lib.core.target import initTargetEnv
 from lib.core.target import setupTargetEnv
 from lib.utils.hash import crackHashFile
@@ -167,6 +168,57 @@ def _formatInjection(inj):
         data += "    Vector: %s\n\n" % vector if conf.verbose > 1 else "\n"
 
     return data
+
+def _autoWafBypass(place, parameter, value):
+    """
+    Automatic WAF/IPS bypass (offered interactively once a WAF/IPS is detected, cached in
+    kb.wafBypass). The request fingerprint has already been neutralized up-front (non-scanner
+    User-Agent, see checkWaf), so here the empirically-ranked candidate tamper scripts are trialled
+    and the first that RESTORES a confirmed injection is adopted. Re-running checkSqlInjection()
+    through a candidate is itself the validation - it succeeds only if the resulting payload both
+    passes the WAF and stays valid SQL, so junk/incompatible candidates are rejected automatically.
+    """
+
+    from lib.utils.wafbypass import candidateTampers, loadTamper
+
+    retVal = None
+
+    savedTamper = kb.tamperFunctions
+    savedTechnique = conf.technique
+    conf.technique = [PAYLOAD.TECHNIQUE.BOOLEAN]    # bound each trial to a quick boolean re-check
+
+    candidates = candidateTampers(identifiedWafs=kb.identifiedWafs)
+
+    try:
+        for count, name in enumerate(candidates):
+            if count >= WAF_BYPASS_MAX_TRIALS:
+                break
+
+            function = loadTamper(name)
+            if function is None:
+                continue
+
+            kb.tamperFunctions = [function]
+            logger.info("trying to bypass the WAF/IPS with tamper script '%s'" % name)
+
+            injection = checkSqlInjection(place, parameter, value)
+            if getattr(injection, "place", None) is not None and NOTE.FALSE_POSITIVE_OR_UNEXPLOITABLE not in injection.notes:
+                logger.info("bypassed the WAF/IPS by using tamper script '%s' (with a non-scanner User-Agent)" % name)
+                logger.info("the same result can be reproduced manually with switch '--random-agent' and tamper script '%s'" % name)
+                retVal = injection
+                return retVal
+
+            if kb.droppingRequests and count >= 2:
+                logger.warning("target keeps dropping requests; giving up on the WAF/IPS bypass")
+                break
+    finally:
+        conf.technique = savedTechnique
+        if retVal is None:      # nothing worked - leave tampering untouched
+            kb.tamperFunctions = savedTamper
+            # honest bail: say it could not be bypassed and what to try manually
+            logger.warning("unable to automatically bypass the WAF/IPS; it might be using behavioral or rate-based detection (consider a manual '--tamper' selection, '--delay', or '--proxy' rotation)")
+
+    return retVal
 
 def _showInjections():
     if conf.wizard and kb.wizardMode:
@@ -626,6 +678,14 @@ def start():
                                 logger.info(infoMsg)
 
                                 injection = checkSqlInjection(place, parameter, value)
+
+                                # WAF/IPS bypass accepted: the parameter looks injectable (heuristics) but
+                                # the standard payloads were blocked -> try to auto-bypass it (request
+                                # fingerprint neutralization and/or a tamper script)
+                                if getattr(injection, "place", None) is None and kb.wafBypass and check == HEURISTIC_TEST.POSITIVE \
+                                   and not conf.tamper and not kb.tamperFunctions:
+                                    injection = _autoWafBypass(place, parameter, value) or injection
+
                                 proceed = not kb.endDetection
                                 injectable = False
 
@@ -754,7 +814,12 @@ def start():
                     condition = True
 
                 if condition:
-                    action()
+                    try:
+                        action()
+                    finally:
+                        if conf.prove:
+                            from lib.utils.prove import proveExploitation
+                            proveExploitation()
 
         except KeyboardInterrupt:
             if kb.lastCtrlCTime and (time.time() - kb.lastCtrlCTime < 1):

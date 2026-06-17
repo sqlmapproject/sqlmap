@@ -100,6 +100,7 @@ optDict = {
         "prefix": "string",
         "suffix": "string",
         "tamper": "string",
+        "prove": "boolean",
     },
 
     "Detection": {

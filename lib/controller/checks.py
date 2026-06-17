@@ -1351,6 +1351,10 @@ def checkWaf():
             warnMsg = "previous heuristics detected that the target "
             warnMsg += "is protected by some kind of WAF/IPS"
             logger.critical(warnMsg)
+            if hashDBRetrieve(HASHDB_KEYS.CHECK_WAF_BYPASS, True):    # re-apply a previously accepted automatic bypass
+                from lib.utils.wafbypass import neutralizeFingerprint
+                kb.wafBypass = True
+                neutralizeFingerprint()
         return _
 
     if not kb.originalPage:
@@ -1393,6 +1397,7 @@ def checkWaf():
 
     hashDBWrite(HASHDB_KEYS.CHECK_WAF_RESULT, retVal, True)
 
+
     if retVal:
         if not kb.identifiedWafs:
             warnMsg = "heuristics detected that the target "
@@ -1406,9 +1411,19 @@ def checkWaf():
         if not choice:
             raise SqlmapUserQuitException
         else:
-            if not conf.tamper:
-                warnMsg = "please consider usage of tamper scripts (option '--tamper')"
-                singleTimeWarnMessage(warnMsg)
+            if not conf.tamper and not kb.tamperFunctions:
+                message = "do you want sqlmap to try to automatically bypass the WAF/IPS during "
+                message += "the run (e.g. by using a non-scanner User-Agent and tamper script(s))? [Y/n] "
+                kb.wafBypass = readInput(message, default='Y', boolean=True)
+                hashDBWrite(HASHDB_KEYS.CHECK_WAF_BYPASS, kb.wafBypass, True)
+                if kb.wafBypass:
+                    # apply it up-front so the whole run (detection included) avoids the scanner
+                    # fingerprint, instead of getting blocked first and only then retrying
+                    from lib.utils.wafbypass import neutralizeFingerprint
+                    neutralizeFingerprint()
+                    logger.info("using a random (non-scanner) User-Agent and browser-like headers to bypass the WAF/IPS")
+                else:
+                    singleTimeWarnMessage("please consider manual usage of tamper scripts (option '--tamper')")
 
     return retVal
 
