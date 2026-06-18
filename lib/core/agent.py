@@ -827,7 +827,7 @@ class Agent(object):
 
     def forgeUnionQuery(self, query, position, count, comment, prefix, suffix, char, where, multipleUnions=None, limited=False, fromTable=None):
         """
-        Take in input an query (pseudo query) string and return its
+        Take in input a query (pseudo query) string and return its
         processed UNION ALL SELECT query.
 
         Examples:

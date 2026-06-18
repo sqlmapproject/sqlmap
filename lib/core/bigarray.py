@@ -210,9 +210,9 @@ class BigArray(list):
         except (OSError, IOError) as ex:
             errMsg = "exception occurred while storing data "
             errMsg += "to a temporary file ('%s'). Please " % ex
-            errMsg += "make sure that there is enough disk space left. If problem persists, "
+            errMsg += "make sure that there is enough disk space left. If the problem persists, "
             errMsg += "try to set environment variable 'TEMP' to a location "
-            errMsg += "writeable by the current user"
+            errMsg += "writable by the current user"
             raise SqlmapSystemException(errMsg)
 
     def _checkcache(self, index):

@@ -104,12 +104,16 @@ def _signalArtifacts(expression):
         return None, None
 
 
-def _proveBoolean(injection):
+def _proveBoolean(injection, signal=None):
     """
     Demonstrates deterministic boolean control, rendered with the distinguishing signal sqlmap already
     auto-selected (--string / --code / --title), repeated to show it is stable (not a fluke). The signal
     line quotes the actual distinguishing artifact: the matched string, the two HTTP codes, or the two
     page titles - so a reader sees exactly what tells TRUE from FALSE.
+
+    When a mutable 'signal' dict is supplied it is filled with the distinguishing artifact (code-based?
+    and the TRUE/FALSE HTTP codes) so the caller can tell a genuine signal from a blocked-response (WAF)
+    artifact - a TRUE condition that yields an HTTP 4xx is a block, not a database answer.
     """
 
     retVal = []
@@ -127,6 +131,10 @@ def _proveBoolean(injection):
     if injection.conf.code or injection.conf.titles:           # fetch the real artifacts only when the signal needs them
         trueCode, trueTitle = _signalArtifacts("%d=%d" % (n, n))
         falseCode, falseTitle = _signalArtifacts("%d=%d" % (n, n + 1))
+
+    if signal is not None:
+        signal["codeBased"] = bool(injection.conf.code)
+        signal["trueCode"], signal["falseCode"] = trueCode, falseCode
 
     if injection.conf.string:
         retVal.append("the response contains %s only when the condition is TRUE" % repr(injection.conf.string).lstrip('u'))
@@ -277,7 +285,7 @@ def _retrieveProof():
 def proveExploitation():
     """
     Renders a report-grade, best-effort demonstration of exploitation for the confirmed injection point
-    (option '--prove'), in the same style as sqlmap's injection-point summary so it reads naturally: the
+    (option '--proof'), in the same style as sqlmap's injection-point summary so it reads naturally: the
     target URL and the confirmed injection point (parameter / type / title / payload), then the strongest
     proof first - an actual value read out of the back-end (drilling from the plain read to a more evasive
     one so a WAF/IPS does not stop it) - backed by a deterministic boolean differential (rendered with the
@@ -290,11 +298,12 @@ def proveExploitation():
 
     injection = kb.injection if getattr(kb.injection, "place", None) else kb.injections[0]
 
+    signal = {}
     saved = _activateInjection(injection)
     try:
         if PAYLOAD.TECHNIQUE.BOOLEAN in injection.data:
             stype = PAYLOAD.TECHNIQUE.BOOLEAN
-            proof = _proveBoolean(injection)
+            proof = _proveBoolean(injection, signal)
         elif PAYLOAD.TECHNIQUE.TIME in injection.data or PAYLOAD.TECHNIQUE.STACKED in injection.data:
             stype = PAYLOAD.TECHNIQUE.TIME if PAYLOAD.TECHNIQUE.TIME in injection.data else PAYLOAD.TECHNIQUE.STACKED
             proof = _proveTime(injection)
@@ -330,16 +339,40 @@ def proveExploitation():
         if sdata.payload:
             payload = urldecode(agent.adjustLateValues(sdata.payload), unsafe="&", spaceplus=(injection.place != PLACE.GET and kb.postSpaceToPlus))
             fields.append(_field("Payload", payload))
-    if proof:
-        fields.append(_field("Proof", proof))
-    if rungs:
+    # Reading a value back out of the back-end is the GATE, not a bonus: it is the only thing that
+    # distinguishes a real injection from a differential that merely correlates with the payload. A
+    # WAF/IPS that answers blocked payloads with a distinct HTTP status (e.g. 403 when TRUE, 200 when
+    # FALSE) reproduces a perfect, repeatable boolean differential WITHOUT any SQL ever executing - so
+    # the differential alone is exactly the signal detection already (mis)read. If nothing could be read
+    # back, exploitation is NOT proven; say so plainly instead of echoing the detection verdict.
+    proven = bool(rungs)
+
+    if proven:
+        if proof:
+            fields.append(_field("Proof", proof))
         for label, text in rungs:
             fields.append(_field(label, text))
+        header = "sqlmap proved exploitation of the following injection point"
     else:
-        fields.append(_field("Retrieved", "(no value could be read back; the proof above still confirms exploitation)"))
+        if proof:
+            fields.append(_field("Observed", proof))     # the differential is observed, but unconfirmed
+        suspectWaf = bool(signal.get("codeBased")) and (signal.get("trueCode") or 0) >= 400
+        wafInterfering = suspectWaf or kb.droppingRequests or bool(kb.identifiedWafs)
+        verdict = ["no value could be read back through the injection (tried a random arithmetic product and the DBMS banner)"]
+        if suspectWaf:
+            verdict.append("the TRUE/FALSE difference is only an HTTP %s (blocked) response - characteristic of a WAF/IPS, not a database answer" % signal.get("trueCode"))
+        if wafInterfering:
+            # behind a WAF, an unconfirmed read-back is ambiguous: a genuine injection whose data-retrieval
+            # payloads are being blocked looks the same as a pure WAF artifact - so don't assert "false
+            # positive", point the user at the way to disambiguate instead
+            verdict.append("a WAF/IPS is interfering: this may be a real injection whose data-retrieval is blocked, or a false positive")
+            verdict.append("=> exploitation is NOT proven; re-test directly (no WAF) or with --tamper, then re-prove")
+        else:
+            verdict.append("=> exploitation is NOT proven; the reported injection is likely a FALSE POSITIVE")
+        fields.append(_field("Verdict", verdict))
+        header = "sqlmap could NOT prove exploitation of the reported injection point"
 
     data = "\n".join(fields)
-    header = "sqlmap proved exploitation of the following injection point"
     conf.dumper.string(header, data)
 
     try:

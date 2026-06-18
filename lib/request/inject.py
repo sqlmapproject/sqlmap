@@ -162,8 +162,8 @@ def _goInferenceFields(expression, expressionFields, expressionFieldsList, paylo
 
 def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, charsetType=None, firstChar=None, lastChar=None, dump=False):
     """
-    Retrieve the output of a SQL query characted by character taking
-    advantage of an blind SQL injection vulnerability on the affected
+    Retrieve the output of a SQL query character by character taking
+    advantage of a blind SQL injection vulnerability on the affected
     parameter through a bisection algorithm.
     """
 
@@ -209,9 +209,11 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
                     test = False
 
             if test:
-                # Count the number of SQL query entries output
-                countFirstField = queries[Backend.getIdentifiedDbms()].count.query % expressionFieldsList[0]
-                countedExpression = expression.replace(expressionFields, countFirstField, 1)
+                # Count the number of SQL query entries output. NOTE: COUNT(*) (row count), not
+                # COUNT(<first field>) - the latter excludes NULLs and would drop NULL-valued rows from
+                # the dump (e.g. dumping a single column whose value is NULL on some rows).
+                countField = queries[Backend.getIdentifiedDbms()].count.query % '*'
+                countedExpression = expression.replace(expressionFields, countField, 1)
 
                 if " ORDER BY " in countedExpression.upper():
                     _ = countedExpression.upper().rindex(" ORDER BY ")

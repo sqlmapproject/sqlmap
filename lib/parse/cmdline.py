@@ -375,7 +375,7 @@ def cmdLineParser(argv=None):
         injection.add_argument("--tamper", dest="tamper",
             help="Use given script(s) for tampering injection data")
 
-        injection.add_argument("--prove", dest="prove", action="store_true",
+        injection.add_argument("--proof", dest="proof", action="store_true",
             help="Prove exploitation of the detected injection point(s)")
 
         # Detection options

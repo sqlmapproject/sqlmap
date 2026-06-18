@@ -817,7 +817,7 @@ def start():
                     try:
                         action()
                     finally:
-                        if conf.prove:
+                        if conf.proof:
                             from lib.utils.prove import proveExploitation
                             proveExploitation()
 

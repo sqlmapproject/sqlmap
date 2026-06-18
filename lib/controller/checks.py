@@ -94,6 +94,7 @@ from lib.core.settings import SUHOSIN_MAX_VALUE_LENGTH
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.settings import URI_HTTP_HEADER
+from lib.core.settings import WAF_BLOCK_HTTP_CODES
 from lib.core.threads import getCurrentThreadData
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
@@ -588,6 +589,18 @@ def checkSqlInjection(place, parameter, value):
                                                     break
 
                             if injectable:
+                                # WAF/IPS block-artifact guard: a TRUE condition (the always-true payload that
+                                # mimics a legitimate request) coming back with a blocked HTTP status (e.g. 403)
+                                # while the FALSE condition passes (2xx) is the WAF answering, not the database.
+                                # A real boolean injection's TRUE condition reproduces the normal page, so this
+                                # status-code asymmetry is the classic false positive - refuse it here.
+                                if not kb.negativeLogic and trueCode in WAF_BLOCK_HTTP_CODES and (falseCode or 0) < 400 and (kb.heuristicCode or 200) < 400:
+                                    warnMsg = "%sparameter '%s' TRUE/FALSE responses differ only by a blocked HTTP %d vs %d status, " % ("%s " % paramType if paramType != parameter else "", parameter, trueCode, falseCode)
+                                    warnMsg += "which is characteristic of a WAF/IPS block rather than a SQL injection; skipping as a likely false positive"
+                                    logger.warning(warnMsg)
+                                    injectable = False
+                                    continue
+
                                 if kb.pageStable and not any((conf.string, conf.notString, conf.regexp, conf.code, conf.titles, kb.nullConnection)):
                                     if all((falseCode, trueCode)) and falseCode != trueCode and trueCode != kb.heuristicCode:
                                         suggestion = conf.code = trueCode

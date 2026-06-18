@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.6.122"
+VERSION = "1.10.6.123"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -53,6 +53,11 @@ IPS_WAF_CHECK_RATIO = 0.5
 
 # Timeout used in heuristic check for WAF/IPS protected targets
 IPS_WAF_CHECK_TIMEOUT = 10
+
+# HTTP status codes a WAF/IPS typically returns when it blocks a request. Used to reject a boolean
+# "injection" whose only TRUE/FALSE difference is the always-true payload being blocked (a status-code
+# false positive) rather than the back-end actually answering.
+WAF_BLOCK_HTTP_CODES = (403, 406, 429, 451, 501, 503)
 
 # Candidate tamper scripts for automatic WAF-bypass, ordered by empirical WAF-bypass value
 # (structural token-substitution first, camouflage last; per identYwaf data). The back-end DBMS

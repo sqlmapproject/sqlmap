@@ -61,7 +61,7 @@ class Takeover(GenericTakeover):
                 break
 
         if not addrs:
-            errMsg = "sqlmap can not exploit the stored procedure buffer "
+            errMsg = "sqlmap cannot exploit the stored procedure buffer "
             errMsg += "overflow because it does not have a valid return "
             errMsg += "code for the underlying operating system (Windows "
             errMsg += "%s Service Pack %d)" % (Backend.getOsVersion(), Backend.getOsServicePack())

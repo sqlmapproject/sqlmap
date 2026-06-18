@@ -880,7 +880,7 @@
         <risk>1</risk>
         <clause>1,2,3,9</clause>
         <where>1</where>
-        <vector>AND [RANDNUM]=('[DELIMITER_START]'||CAST(([QUERY]) AS String)||'[DELIMITER_STOP]')</vector>
+        <vector>AND [RANDNUM]=('[DELIMITER_START]'||CAST(([QUERY]) AS Nullable(String))||'[DELIMITER_STOP]')</vector>
         <request>
             <payload>AND [RANDNUM]=('[DELIMITER_START]'||(CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END)||'[DELIMITER_STOP]')</payload>
         </request>
@@ -899,7 +899,7 @@
         <risk>3</risk>
         <clause>1,2,3,9</clause>
         <where>1</where>
-        <vector>OR [RANDNUM]=('[DELIMITER_START]'||CAST(([QUERY]) AS String)||'[DELIMITER_STOP]')</vector>
+        <vector>OR [RANDNUM]=('[DELIMITER_START]'||CAST(([QUERY]) AS Nullable(String))||'[DELIMITER_STOP]')</vector>
         <request>
             <payload>OR [RANDNUM]=('[DELIMITER_START]'||(CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END)||'[DELIMITER_STOP]')</payload>
         </request>

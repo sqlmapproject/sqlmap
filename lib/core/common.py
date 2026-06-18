@@ -2761,7 +2761,7 @@ def getPartRun(alias=True):
 
 def longestCommonPrefix(*sequences):
     """
-    Returns longest common prefix occuring in given sequences
+    Returns longest common prefix occurring in given sequences
 
     # Reference: http://boredzo.org/blog/archives/2007-01-06/longest-common-prefix-in-python-2
 
@@ -3158,7 +3158,7 @@ def getPublicTypeMembers(type_, onlyValues=False):
 
 def enumValueToNameLookup(type_, value_):
     """
-    Returns name of a enum member with a given value
+    Returns name of an enum member with a given value
 
     >>> enumValueToNameLookup(SORT_ORDER, 100)
     'LAST'

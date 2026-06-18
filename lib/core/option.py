@@ -608,7 +608,7 @@ def _setMetasploit():
         else:
             warnMsg = "the provided Metasploit Framework path "
             warnMsg += "'%s' is not valid. The cause could " % conf.msfPath
-            warnMsg += "be that the path does not exists or that one "
+            warnMsg += "be that the path does not exist or that one "
             warnMsg += "or more of the needed Metasploit executables "
             warnMsg += "within msfcli, msfconsole, msfencode and "
             warnMsg += "msfpayload do not exist"
@@ -1675,9 +1675,9 @@ def _createTemporaryDirectory():
         except Exception as ex:
             warnMsg = "there has been a problem while accessing "
             warnMsg += "system's temporary directory location(s) ('%s'). Please " % getSafeExString(ex)
-            warnMsg += "make sure that there is enough disk space left. If problem persists, "
+            warnMsg += "make sure that there is enough disk space left. If the problem persists, "
             warnMsg += "try to set environment variable 'TEMP' to a location "
-            warnMsg += "writeable by the current user"
+            warnMsg += "writable by the current user"
             logger.warning(warnMsg)
 
     if "sqlmap" not in (tempfile.tempdir or "") or conf.tmpDir and tempfile.tempdir == conf.tmpDir:

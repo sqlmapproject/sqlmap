@@ -295,8 +295,10 @@ def unionUse(expression, unpack=True, dump=False):
         expression, limitCond, topLimit, startLimit, stopLimit = agent.limitCondition(expression, dump)
 
         if limitCond:
-            # Count the number of SQL query entries output
-            countedExpression = expression.replace(expressionFields, queries[Backend.getIdentifiedDbms()].count.query % ('*' if len(expressionFieldsList) > 1 else expressionFields), 1)
+            # Count the number of SQL query entries output. NOTE: always COUNT(*) (row count); a single
+            # field must NOT use COUNT(field) as that excludes NULLs and would drop NULL-valued rows from
+            # the dump (e.g. a column whose value is NULL on some rows).
+            countedExpression = expression.replace(expressionFields, queries[Backend.getIdentifiedDbms()].count.query % '*', 1)
 
             if " ORDER BY " in countedExpression.upper():
                 _ = countedExpression.upper().rindex(" ORDER BY ")
