@@ -1136,9 +1136,9 @@
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
         <hex query="TO_HEX(%s)"/>
         <inference query="CODEPOINT(SUBSTR((%s),%d,1))>%d" dbms_version="&gt;=0.178" query2="SUBSTR((%s),%d,1)>'%c'"/>/>
-        <banner/>
+        <banner query="version()"/>
         <current_user query="CURRENT_USER"/>
-        <current_db/>
+        <current_db query="current_schema"/>
         <hostname/>
         <table_comment query="SELECT table_comment FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='%s' AND table_name='%s'"/>
         <column_comment query="SELECT column_comment FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema='%s' AND table_name='%s' AND column_name='%s'"/>
@@ -1424,7 +1424,7 @@
         <passwords/>
         <privileges>
             <inband query="SELECT grantee,type FROM sys.privileges" condition="grantee"/>
-            <blind query="SELECT DISTINCT(type) FROM sys.privileges WHERE grantee %s '%s' LIMIT 1 OFFSET %d" count="SELECT COUNT(DISTINCT(type)) FROM sys.privileges WHERE grantee %s '%s'"/>
+            <blind query="SELECT DISTINCT(type) FROM sys.privileges WHERE grantee='%s' ORDER BY 1 LIMIT 1 OFFSET %d" count="SELECT COUNT(DISTINCT(type)) FROM sys.privileges WHERE grantee='%s'"/>
         </privileges>
         <roles/>
         <statements>

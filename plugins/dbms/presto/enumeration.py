@@ -9,15 +9,8 @@ from lib.core.data import logger
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
 class Enumeration(GenericEnumeration):
-    def getBanner(self):
-        warnMsg = "on Presto it is not possible to get the banner"
-        logger.warning(warnMsg)
-
-        return None
-
-    def getCurrentDb(self):
-        warnMsg = "on Presto it is not possible to get name of the current database (schema)"
-        logger.warning(warnMsg)
+    # NOTE: getBanner()/getCurrentDb() are intentionally NOT overridden - modern Presto/Trino expose
+    # version() and current_schema (wired in queries.xml), so the generic implementations work.
 
     def isDba(self, user=None):
         warnMsg = "on Presto it is not possible to test if current user is DBA"

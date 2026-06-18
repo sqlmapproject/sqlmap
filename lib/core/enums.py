@@ -114,6 +114,7 @@ class FORK(object):
     DM8 = "DM8"
     DORIS = "Doris"
     STARROCKS = "StarRocks"
+    TRINO = "Trino"
 
 class CUSTOM_LOGGING(object):
     PAYLOAD = 9
