@@ -100,6 +100,7 @@ from lib.request.connect import Connect as Request
 from lib.request.comparison import comparison
 from lib.request.inject import checkBooleanExpression
 from lib.request.templates import getPageTemplate
+from lib.utils.dialect import dialectCheckDbms
 from lib.techniques.union.test import unionTest
 from lib.techniques.union.use import configUnion
 from thirdparty import six
@@ -148,6 +149,13 @@ def checkSqlInjection(place, parameter, value):
                 if not injection.dbms and PAYLOAD.TECHNIQUE.BOOLEAN in injection.data:
                     if not Backend.getIdentifiedDbms() and kb.heuristicDbms is None and not kb.droppingRequests:
                         kb.heuristicDbms = heuristicCheckDbms(injection)
+
+                    # keyword-free fallback: heuristicCheckDbms() above uses SELECT/quote payloads
+                    # and is skipped when the WAF/IPS is dropping requests; the operator-dialect
+                    # probes carry no SELECT/quote/schema name, so they can still narrow the DBMS in
+                    # that case (or when it was inconclusive), using the now-calibrated boolean oracle
+                    if not Backend.getIdentifiedDbms() and kb.heuristicDbms is None:
+                        kb.heuristicDbms = dialectCheckDbms(injection)
 
                 # If the DBMS has already been fingerprinted (via DBMS-specific
                 # error message, simple heuristic check or via DBMS-specific

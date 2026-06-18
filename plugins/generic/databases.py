@@ -304,7 +304,7 @@ class Databases(object):
                         if conf.excludeSysDbs:
                             infoMsg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(db) for db in self.excludeDbsList))
                             logger.info(infoMsg)
-                            query += " IN (%s)" % ','.join("'%s'" % unsafeSQLIdentificatorNaming(db) for db in sorted(dbs) if db not in self.excludeDbsList)
+                            query += " IN (%s)" % ','.join("'%s'" % unsafeSQLIdentificatorNaming(db) for db in sorted(dbs) if unsafeSQLIdentificatorNaming(db) not in self.excludeDbsList)
                         else:
                             query += " IN (%s)" % ','.join("'%s'" % unsafeSQLIdentificatorNaming(db) for db in sorted(dbs))
 
@@ -356,7 +356,7 @@ class Databases(object):
 
         if not kb.data.cachedTables and isInferenceAvailable() and not conf.direct:
             for db in dbs:
-                if conf.excludeSysDbs and db in self.excludeDbsList:
+                if conf.excludeSysDbs and unsafeSQLIdentificatorNaming(db) in self.excludeDbsList:
                     infoMsg = "skipping system database '%s'" % unsafeSQLIdentificatorNaming(db)
                     logger.info(infoMsg)
                     continue

@@ -1321,7 +1321,7 @@
     </dbms>
 
     <dbms value="ClickHouse">
-        <cast query="CAST(%s AS String)"/>
+        <cast query="CAST(%s AS Nullable(String))"/>
         <length query="length(%s)"/>
         <isnull query="ifNull(%s, '')"/>
         <delimiter query="||"/>
