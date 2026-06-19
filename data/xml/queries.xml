@@ -61,7 +61,8 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s.%s ORDER BY %s"/>
-            <blind query="SELECT %s FROM %s.%s ORDER BY %s LIMIT %d,1" count="SELECT COUNT(*) FROM %s.%s"/>
+            <blind query="SELECT %s FROM %s.%s ORDER BY %s LIMIT %d,1" count="SELECT COUNT(*) FROM %s.%s" keyset_first="SELECT MIN(%s) FROM %s" keyset_next="SELECT MIN(%s) FROM %s WHERE %s>'%s'" keyset_by="SELECT MAX(%s) FROM %s WHERE %s='%s'" keyset_seed="SELECT %s FROM %s ORDER BY %s LIMIT 1 OFFSET %d" keyset_ordered="SELECT %s FROM %s WHERE %s ORDER BY %s LIMIT 1" keyset_where="SELECT MAX(%s) FROM %s WHERE %s"/>
+            <primary_key count="SELECT COUNT(*) FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE TABLE_SCHEMA='%s' AND TABLE_NAME='%s' AND CONSTRAINT_NAME='PRIMARY'" query="SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE TABLE_SCHEMA='%s' AND TABLE_NAME='%s' AND CONSTRAINT_NAME='PRIMARY' ORDER BY ORDINAL_POSITION LIMIT %d,1"/>
         </dump_table>
         <search_db>
             <inband query="SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA WHERE %s" query2="SELECT db FROM mysql.db WHERE %s" condition="schema_name" condition2="db"/>
@@ -136,7 +137,8 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s.%s ORDER BY %s"/>
-            <blind query="SELECT %s FROM %s.%s ORDER BY %s OFFSET %d LIMIT 1" count="SELECT COUNT(*) FROM %s.%s"/>
+            <blind query="SELECT %s FROM %s.%s ORDER BY %s OFFSET %d LIMIT 1" count="SELECT COUNT(*) FROM %s.%s" keyset_first="SELECT MIN(%s) FROM %s" keyset_next="SELECT MIN(%s) FROM %s WHERE %s>'%s'" keyset_by="SELECT MAX(%s) FROM %s WHERE %s='%s'" keyset_seed="SELECT %s FROM %s ORDER BY %s LIMIT 1 OFFSET %d" keyset_ordered="SELECT %s FROM %s WHERE %s ORDER BY %s LIMIT 1" keyset_where="SELECT MAX(%s) FROM %s WHERE %s"/>
+            <primary_key count="SELECT COUNT(*) FROM information_schema.table_constraints tc JOIN information_schema.key_column_usage kcu ON tc.constraint_name=kcu.constraint_name AND tc.table_schema=kcu.table_schema WHERE tc.constraint_type='PRIMARY KEY' AND tc.table_schema='%s' AND tc.table_name='%s'" query="SELECT kcu.column_name FROM information_schema.table_constraints tc JOIN information_schema.key_column_usage kcu ON tc.constraint_name=kcu.constraint_name AND tc.table_schema=kcu.table_schema WHERE tc.constraint_type='PRIMARY KEY' AND tc.table_schema='%s' AND tc.table_name='%s' ORDER BY kcu.ordinal_position OFFSET %d LIMIT 1"/>
         </dump_table>
         <search_db>
             <inband query="SELECT schemaname FROM pg_tables WHERE %s" condition="schemaname"/>
@@ -207,7 +209,8 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s.%s"/>
-            <blind query="SELECT MIN(%s) FROM %s WHERE CONVERT(NVARCHAR(4000),%s)>'%s'" query2="SELECT MAX(%s) FROM %s WHERE CONVERT(NVARCHAR(4000),%s) LIKE '%s'" query3="SELECT %s FROM (SELECT %s, ROW_NUMBER() OVER (ORDER BY (SELECT 1)) AS CAP FROM %s)x WHERE CAP=%d" count="SELECT LTRIM(STR(COUNT(*))) FROM %s" count2="SELECT LTRIM(STR(COUNT(DISTINCT(%s)))) FROM %s"/>
+            <blind query="SELECT MIN(%s) FROM %s WHERE CONVERT(NVARCHAR(4000),%s)>'%s'" query2="SELECT MAX(%s) FROM %s WHERE CONVERT(NVARCHAR(4000),%s) LIKE '%s'" query3="SELECT %s FROM (SELECT %s, ROW_NUMBER() OVER (ORDER BY (SELECT 1)) AS CAP FROM %s)x WHERE CAP=%d" count="SELECT LTRIM(STR(COUNT(*))) FROM %s" count2="SELECT LTRIM(STR(COUNT(DISTINCT(%s)))) FROM %s" keyset_first="SELECT MIN(%s) FROM %s" keyset_next="SELECT MIN(%s) FROM %s WHERE %s>'%s'" keyset_by="SELECT MAX(%s) FROM %s WHERE %s='%s'" keyset_seed="SELECT %s FROM %s ORDER BY %s OFFSET %d ROWS FETCH NEXT 1 ROWS ONLY" keyset_ordered="SELECT TOP 1 %s FROM %s WHERE %s ORDER BY %s" keyset_where="SELECT MAX(%s) FROM %s WHERE %s"/>
+            <primary_key count="SELECT COUNT(*) FROM sys.indexes i JOIN sys.index_columns ic ON i.object_id=ic.object_id AND i.index_id=ic.index_id WHERE i.is_primary_key=1 AND i.object_id=OBJECT_ID('%s.dbo.%s')" query="SELECT name FROM (SELECT c.name AS name, ROW_NUMBER() OVER (ORDER BY ic.key_ordinal) AS rn FROM sys.indexes i JOIN sys.index_columns ic ON i.object_id=ic.object_id AND i.index_id=ic.index_id JOIN sys.columns c ON ic.object_id=c.object_id AND c.column_id=ic.column_id WHERE i.is_primary_key=1 AND i.object_id=OBJECT_ID('%s.dbo.%s')) x WHERE rn=%d+1"/>
         </dump_table>
         <search_db>
             <inband query="SELECT name FROM master..sysdatabases WHERE %s" condition="name"/>
@@ -302,7 +305,8 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s ORDER BY ROWNUM"/>
-            <blind query="SELECT %s FROM (SELECT qq.*,ROWNUM AS CAP FROM %s qq ORDER BY ROWNUM) WHERE CAP=%d" count="SELECT COUNT(*) FROM %s"/>
+            <blind query="SELECT %s FROM (SELECT qq.*,ROWNUM AS CAP FROM %s qq ORDER BY ROWNUM) WHERE CAP=%d" count="SELECT COUNT(*) FROM %s" keyset_first="SELECT MIN(%s) FROM %s" keyset_next="SELECT MIN(%s) FROM %s WHERE %s>'%s'" keyset_by="SELECT MAX(%s) FROM %s WHERE %s='%s'" keyset_seed="SELECT %s FROM %s ORDER BY %s OFFSET %d ROWS FETCH NEXT 1 ROWS ONLY" keyset_ordered="SELECT c FROM (SELECT %s AS c FROM %s WHERE %s ORDER BY %s) WHERE ROWNUM=1" keyset_where="SELECT MAX(%s) FROM %s WHERE %s"/>
+            <primary_key count="SELECT COUNT(*) FROM all_cons_columns cols, all_constraints cons WHERE cons.constraint_type='P' AND cons.constraint_name=cols.constraint_name AND cons.owner=cols.owner AND UPPER(cols.owner)=UPPER('%s') AND UPPER(cols.table_name)=UPPER('%s')" query="SELECT column_name FROM (SELECT cols.column_name, ROW_NUMBER() OVER (ORDER BY cols.position) AS rn FROM all_cons_columns cols, all_constraints cons WHERE cons.constraint_type='P' AND cons.constraint_name=cols.constraint_name AND cons.owner=cols.owner AND UPPER(cols.owner)=UPPER('%s') AND UPPER(cols.table_name)=UPPER('%s')) WHERE rn=%d+1"/>
         </dump_table>
         <!-- NOTE: in Oracle schema names are the counterpart to database names on other DBMSes -->
         <search_db>
@@ -362,7 +366,7 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s"/>
-            <blind query="SELECT %s FROM %s LIMIT %d,1" count="SELECT COUNT(*) FROM %s"/>
+            <blind query="SELECT %s FROM %s LIMIT %d,1" count="SELECT COUNT(*) FROM %s" rowid="rowid" keyset_first="SELECT MIN(%s) FROM %s" keyset_next="SELECT MIN(%s) FROM %s WHERE %s>'%s'" keyset_by="SELECT MAX(%s) FROM %s WHERE %s='%s'" keyset_seed="SELECT %s FROM %s ORDER BY %s LIMIT 1 OFFSET %d" keyset_ordered="SELECT %s FROM %s WHERE %s ORDER BY %s LIMIT 1" keyset_where="SELECT MAX(%s) FROM %s WHERE %s"/>
         </dump_table>
         <search_db/>
         <search_table>
@@ -726,7 +730,8 @@
             <inband query="SELECT column_name,type_name FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS WHERE table_name='%s' AND table_schem='%s' ORDER BY column_name" condition="column_name"/>
         </columns>
         <dump_table>
-            <blind query="SELECT %s FROM %s.%s ORDER BY %s LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM %s.%s"/>
+            <blind query="SELECT %s FROM %s.%s ORDER BY %s LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM %s.%s" keyset_first="SELECT MIN(%s) FROM %s" keyset_next="SELECT MIN(%s) FROM %s WHERE %s>'%s'" keyset_by="SELECT MAX(%s) FROM %s WHERE %s='%s'" keyset_seed="SELECT %s FROM %s ORDER BY %s LIMIT 1 OFFSET %d" keyset_ordered="SELECT %s FROM %s WHERE %s ORDER BY %s LIMIT 1" keyset_where="SELECT MAX(%s) FROM %s WHERE %s"/>
+            <primary_key count="SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu ON tc.CONSTRAINT_NAME=kcu.CONSTRAINT_NAME AND tc.TABLE_SCHEMA=kcu.TABLE_SCHEMA WHERE tc.CONSTRAINT_TYPE='PRIMARY KEY' AND UPPER(tc.TABLE_SCHEMA)=UPPER('%s') AND UPPER(tc.TABLE_NAME)=UPPER('%s')" query="SELECT kcu.COLUMN_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu ON tc.CONSTRAINT_NAME=kcu.CONSTRAINT_NAME AND tc.TABLE_SCHEMA=kcu.TABLE_SCHEMA WHERE tc.CONSTRAINT_TYPE='PRIMARY KEY' AND UPPER(tc.TABLE_SCHEMA)=UPPER('%s') AND UPPER(tc.TABLE_NAME)=UPPER('%s') ORDER BY kcu.ORDINAL_POSITION LIMIT 1 OFFSET %d"/>
             <inband query="SELECT %s FROM %s.%s ORDER BY %s"/>
         </dump_table>
         <search_db>
@@ -790,7 +795,8 @@
             <inband query="SELECT COLUMN_NAME,DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='%s' AND TABLE_SCHEMA='%s' ORDER BY COLUMN_NAME" condition="COLUMN_NAME" query2="SELECT COLUMN_NAME,TYPE_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='%s' AND TABLE_SCHEMA='%s' ORDER BY COLUMN_NAME" condition2="COLUMN_NAME"/>
         </columns>
         <dump_table>
-            <blind query="SELECT %s FROM %s.%s ORDER BY %s LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM %s.%s"/>
+            <blind query="SELECT %s FROM %s.%s ORDER BY %s LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM %s.%s" keyset_first="SELECT MIN(%s) FROM %s" keyset_next="SELECT MIN(%s) FROM %s WHERE %s>'%s'" keyset_by="SELECT MAX(%s) FROM %s WHERE %s='%s'" keyset_seed="SELECT %s FROM %s ORDER BY %s LIMIT 1 OFFSET %d" keyset_ordered="SELECT %s FROM %s WHERE %s ORDER BY %s LIMIT 1" keyset_where="SELECT MAX(%s) FROM %s WHERE %s"/>
+            <primary_key count="SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu ON tc.CONSTRAINT_NAME=kcu.CONSTRAINT_NAME AND tc.TABLE_SCHEMA=kcu.TABLE_SCHEMA WHERE tc.CONSTRAINT_TYPE='PRIMARY KEY' AND UPPER(tc.TABLE_SCHEMA)=UPPER('%s') AND UPPER(tc.TABLE_NAME)=UPPER('%s')" query="SELECT kcu.COLUMN_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu ON tc.CONSTRAINT_NAME=kcu.CONSTRAINT_NAME AND tc.TABLE_SCHEMA=kcu.TABLE_SCHEMA WHERE tc.CONSTRAINT_TYPE='PRIMARY KEY' AND UPPER(tc.TABLE_SCHEMA)=UPPER('%s') AND UPPER(tc.TABLE_NAME)=UPPER('%s') ORDER BY kcu.ORDINAL_POSITION LIMIT 1 OFFSET %d"/>
             <inband query="SELECT %s FROM %s.%s ORDER BY %s"/>
         </dump_table>
         <search_db>
@@ -1445,7 +1451,8 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s.%s ORDER BY %s"/>
-            <blind query="SELECT %s FROM %s.%s ORDER BY %s LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM %s.%s"/>
+            <blind query="SELECT %s FROM %s.%s ORDER BY %s LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM %s.%s" keyset_first="SELECT MIN(%s) FROM %s" keyset_next="SELECT MIN(%s) FROM %s WHERE %s>'%s'" keyset_by="SELECT MAX(%s) FROM %s WHERE %s='%s'" keyset_seed="SELECT %s FROM %s ORDER BY %s LIMIT 1 OFFSET %d" keyset_ordered="SELECT %s FROM %s WHERE %s ORDER BY %s LIMIT 1" keyset_where="SELECT MAX(%s) FROM %s WHERE %s"/>
+            <primary_key count="SELECT COUNT(*) FROM information_schema.table_constraints tc JOIN information_schema.key_column_usage kcu ON tc.constraint_name=kcu.constraint_name AND tc.table_schema=kcu.table_schema WHERE tc.constraint_type='PRIMARY KEY' AND tc.table_schema='%s' AND tc.table_name='%s'" query="SELECT kcu.column_name FROM information_schema.table_constraints tc JOIN information_schema.key_column_usage kcu ON tc.constraint_name=kcu.constraint_name AND tc.table_schema=kcu.table_schema WHERE tc.constraint_type='PRIMARY KEY' AND tc.table_schema='%s' AND tc.table_name='%s' ORDER BY kcu.ordinal_position LIMIT 1 OFFSET %d"/>
         </dump_table>
         <search_db>
             <inband query="SELECT schema_name FROM information_schema.schemata WHERE %s" condition="schema_name"/>

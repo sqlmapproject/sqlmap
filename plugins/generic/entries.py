@@ -42,12 +42,15 @@ from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.core.settings import CHECK_ZERO_COLUMNS_THRESHOLD
 from lib.core.settings import CURRENT_DB
+from lib.core.settings import KEYSET_MIN_ROWS
 from lib.core.settings import METADB_SUFFIX
 from lib.core.settings import NULL
 from lib.core.settings import PLUS_ONE_DBMSES
 from lib.core.settings import UPPER_CASE_DBMSES
 from lib.request import inject
 from lib.utils.hash import attackDumpedTable
+from lib.utils.keysetdump import keysetDumpTable
+from lib.utils.keysetdump import resolveKeysetCursor
 from lib.utils.pivotdumptable import pivotDumpTable
 from thirdparty import six
 from thirdparty.six.moves import zip as _zip
@@ -309,6 +312,9 @@ class Entries(object):
 
                     count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
+                    # keyset (seek) pagination: forced with --keyset, automatic for large tables, off with --no-keyset
+                    keysetCursor = resolveKeysetCursor(tbl, colList) if (not conf.noKeyset and isNumPosStrValue(count) and (conf.keyset or int(count) >= KEYSET_MIN_ROWS)) else None
+
                     lengths = {}
                     entries = {}
 
@@ -331,6 +337,19 @@ class Entries(object):
                         logger.warning(warnMsg)
 
                         continue
+
+                    elif keysetCursor:
+                        infoMsg = "using keyset (seek) pagination on column(s) '%s' " % ', '.join(keysetCursor)
+                        infoMsg += "for table '%s'" % unsafeSQLIdentificatorNaming(tbl)
+                        logger.info(infoMsg)
+
+                        try:
+                            entries, lengths = keysetDumpTable(tbl, colList, count, keysetCursor)
+                        except KeyboardInterrupt:
+                            kb.dumpKeyboardInterrupt = True
+                            clearConsoleLine()
+                            warnMsg = "Ctrl+C detected in dumping phase"
+                            logger.warning(warnMsg)
 
                     elif Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.SYBASE, DBMS.MAXDB, DBMS.MSSQL, DBMS.INFORMIX, DBMS.MCKOI, DBMS.RAIMA):
                         if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.RAIMA):
@@ -411,17 +430,17 @@ class Entries(object):
                                         entries[column] = BigArray()
 
                                     if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2, DBMS.VERTICA, DBMS.PRESTO, DBMS.CRATEDB, DBMS.CACHE, DBMS.CLICKHOUSE, DBMS.SNOWFLAKE, DBMS.SPANNER):
-                                        query = rootQuery.blind.query % (agent.preprocessField(tbl, column), conf.db, conf.tbl, sorted(colList, key=len)[0], index)
+                                        query = rootQuery.blind.query % (agent.preprocessField(tbl, column), conf.db, conf.tbl, prioritySortColumns(colList)[0], index)
                                     elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE,):
                                         query = rootQuery.blind.query % (agent.preprocessField(tbl, column), tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())), index)
                                     elif Backend.getIdentifiedDbms() in (DBMS.MIMERSQL,):
-                                        query = rootQuery.blind.query % (agent.preprocessField(tbl, column), tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())), sorted(colList, key=len)[0], index)
+                                        query = rootQuery.blind.query % (agent.preprocessField(tbl, column), tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())), prioritySortColumns(colList)[0], index)
                                     elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.EXTREMEDB):
                                         query = rootQuery.blind.query % (agent.preprocessField(tbl, column), tbl, index)
                                     elif Backend.isDbms(DBMS.FIREBIRD):
                                         query = rootQuery.blind.query % (index, agent.preprocessField(tbl, column), tbl)
                                     elif Backend.getIdentifiedDbms() in (DBMS.INFORMIX, DBMS.VIRTUOSO):
-                                        query = rootQuery.blind.query % (index, agent.preprocessField(tbl, column), conf.db, tbl, sorted(colList, key=len)[0])
+                                        query = rootQuery.blind.query % (index, agent.preprocessField(tbl, column), conf.db, tbl, prioritySortColumns(colList)[0])
                                     elif Backend.isDbms(DBMS.FRONTBASE):
                                         query = rootQuery.blind.query % (index, agent.preprocessField(tbl, column), conf.db, tbl)
                                     else:
