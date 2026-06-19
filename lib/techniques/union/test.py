@@ -235,7 +235,7 @@ def _unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYLO
             randQueryUnescaped = unescaper.escape(randQueryProcessed)
 
             # Forge the union SQL injection request
-            query = agent.forgeUnionQuery(randQueryUnescaped, position, count, comment, prefix, suffix, kb.uChar, where)
+            query = agent.forgeUnionQuery(randQueryUnescaped, position, count, comment, prefix, suffix, kb.uChar, where, collate=True)
             payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
 
             # Perform the request
@@ -255,7 +255,7 @@ def _unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYLO
                     randQueryUnescaped2 = unescaper.escape(randQueryProcessed2)
 
                     # Confirm that it is a full union SQL injection
-                    query = agent.forgeUnionQuery(randQueryUnescaped, position, count, comment, prefix, suffix, kb.uChar, where, multipleUnions=randQueryUnescaped2)
+                    query = agent.forgeUnionQuery(randQueryUnescaped, position, count, comment, prefix, suffix, kb.uChar, where, multipleUnions=randQueryUnescaped2, collate=True)
                     payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
 
                     # Perform the request
@@ -268,7 +268,7 @@ def _unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYLO
                         fromTable = " FROM (%s) AS %s" % (" UNION ".join("SELECT %d%s%s" % (_, FROM_DUMMY_TABLE.get(Backend.getIdentifiedDbms(), ""), " AS %s" % randomStr() if _ == 0 else "") for _ in xrange(LIMITED_ROWS_TEST_NUMBER)), randomStr())
 
                         # Check for limited row output
-                        query = agent.forgeUnionQuery(randQueryUnescaped, position, count, comment, prefix, suffix, kb.uChar, where, fromTable=fromTable)
+                        query = agent.forgeUnionQuery(randQueryUnescaped, position, count, comment, prefix, suffix, kb.uChar, where, fromTable=fromTable, collate=True)
                         payload = agent.payload(place=place, parameter=parameter, newValue=query, where=where)
 
                         # Perform the request

@@ -51,6 +51,7 @@ from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import GENERIC_SQL_COMMENT
 from lib.core.settings import GENERIC_SQL_COMMENT_MARKER
 from lib.core.settings import INFERENCE_MARKER
+from lib.core.settings import MYSQL_UNION_VALUE_CAST
 from lib.core.settings import NULL
 from lib.core.settings import PAYLOAD_DELIMITER
 from lib.core.settings import REPLACEMENT_MARKER
@@ -825,7 +826,7 @@ class Agent(object):
 
         return concatenatedQuery
 
-    def forgeUnionQuery(self, query, position, count, comment, prefix, suffix, char, where, multipleUnions=None, limited=False, fromTable=None):
+    def forgeUnionQuery(self, query, position, count, comment, prefix, suffix, char, where, multipleUnions=None, limited=False, fromTable=None, collate=False):
         """
         Take in input a query (pseudo query) string and return its
         processed UNION ALL SELECT query.
@@ -867,10 +868,21 @@ class Agent(object):
         if query.startswith("SELECT "):
             query = query[len("SELECT "):]
 
+        # On MySQL 8+ the retrieved value (connection collation) cannot be merged in a
+        # UNION column with a table column of a different collation (e.g. utf8mb4_0900_ai_ci),
+        # raising "Illegal mix of collations". Normalizing the charset and forcing an explicit
+        # collation (highest coercibility) wins the merge (Note: skipped for NULL/numeric values).
+        # Note: requires the utf8mb4 charset (MySQL >= 5.5.3) used in MYSQL_UNION_VALUE_CAST; on
+        # older versions there is no such collation clash to begin with (unknown version => assumed recent).
+        collateField = collate and Backend.isDbms(DBMS.MYSQL) and isDBMSVersionAtLeast('5.5.3') is not False
+
+        def _collate(value):
+            return MYSQL_UNION_VALUE_CAST % value if collateField and value and value != NULL and not value.isdigit() else value
+
         unionQuery = self.prefixQuery("UNION ALL SELECT ", prefix=prefix)
 
         if limited:
-            unionQuery += ','.join(char if _ != position else '(SELECT %s)' % query for _ in xrange(0, count))
+            unionQuery += ','.join(char if _ != position else _collate('(SELECT %s)' % query) for _ in xrange(0, count))
             unionQuery += fromTable
             unionQuery = self.suffixQuery(unionQuery, comment, suffix)
 
@@ -900,6 +912,9 @@ class Agent(object):
         else:
             infoFile = None
 
+        if not infoFile:
+            query = _collate(query)
+
         for element in xrange(0, count):
             if element > 0:
                 unionQuery += ','
@@ -928,7 +943,7 @@ class Agent(object):
                     unionQuery += ','
 
                 if element == position:
-                    unionQuery += multipleUnions
+                    unionQuery += _collate(multipleUnions)
                 else:
                     unionQuery += char
 

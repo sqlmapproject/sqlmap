@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.6.125"
+VERSION = "1.10.6.126"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -510,6 +510,9 @@ SENSITIVE_OPTIONS = ("hostname", "answers", "data", "dnsDomain", "googleDork", "
 
 # Maximum number of threads (avoiding connection issues and/or DoS)
 MAX_NUMBER_OF_THREADS = 10
+
+# Wrapper applied to MySQL UNION-based retrieval values to neutralize "Illegal mix of collations" errors (e.g. utf8mb4_0900_ai_ci tables vs a utf8mb4_general_ci connection on MySQL 8+). CONVERT normalizes the (possibly binary) charset to utf8mb4 and the explicit COLLATE then wins the UNION column merge (highest coercibility)
+MYSQL_UNION_VALUE_CAST = "CONVERT(%s USING utf8mb4) COLLATE utf8mb4_bin"
 
 # Minimum range between minimum and maximum of statistical set
 MIN_STATISTICAL_RANGE = 0.01
