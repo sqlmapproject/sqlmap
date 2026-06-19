@@ -270,6 +270,7 @@ optDict = {
     "Hidden": {
         "dummy": "boolean",
         "disablePrecon": "boolean",
+        "noHuffman": "boolean",
         "profile": "boolean",
         "forceDns": "boolean",
         "murphyRate": "integer",

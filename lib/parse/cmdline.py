@@ -848,6 +848,9 @@ def cmdLineParser(argv=None):
         parser.add_argument("--disable-precon", dest="disablePrecon", action="store_true",
             help=SUPPRESS)
 
+        parser.add_argument("--no-huffman", dest="noHuffman", action="store_true",
+            help=SUPPRESS)  # "Disable adaptive (Huffman) set-membership retrieval used by default to speed up blind table dumps"
+
         parser.add_argument("--profile", dest="profile", action="store_true",
             help=SUPPRESS)
 
@@ -864,6 +867,16 @@ def cmdLineParser(argv=None):
             help=SUPPRESS)
 
         parser.add_argument("--force-pivoting", dest="forcePivoting", action="store_true",
+            help=SUPPRESS)
+
+        # Experimental: dump table rows via keyset (seek) pagination on a detected indexed
+        # primary key instead of ORDER BY ... LIMIT/OFFSET (much cheaper on huge tables).
+        # --keyset forces it for any table size; --no-keyset disables it (incl. the automatic
+        # use on large tables), falling back to the plain LIMIT/OFFSET dump.
+        parser.add_argument("--keyset", dest="keyset", action="store_true",
+            help=SUPPRESS)
+
+        parser.add_argument("--no-keyset", dest="noKeyset", action="store_true",
             help=SUPPRESS)
 
         parser.add_argument("--ignore-stdin", dest="ignoreStdin", action="store_true",
