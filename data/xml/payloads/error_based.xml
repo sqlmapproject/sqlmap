@@ -271,7 +271,7 @@
     </test>
 
     <test>
-        <title>MySQL &gt;= 5.0 (inline) error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (FLOOR)</title>
+        <title>MySQL &gt;= 5.0 (inline) error-based - Table name clause (FLOOR)</title>
         <stype>2</stype>
         <level>5</level>
         <risk>1</risk>
