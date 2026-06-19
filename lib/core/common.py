@@ -2077,7 +2077,7 @@ def getFileType(filePath):
     """
     Returns "magic" file type for given file path
 
-    >>> getFileType(__file__)
+    >>> getFileType(paths.SQL_KEYWORDS)
     'text'
     >>> getFileType(sys.executable)
     'binary'
