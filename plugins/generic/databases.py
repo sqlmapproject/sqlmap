@@ -1051,6 +1051,11 @@ class Databases(object):
 
         rootQuery = queries[Backend.getIdentifiedDbms()].statements
 
+        if "inband" not in rootQuery and "blind" not in rootQuery:
+            warnMsg = "on %s it is not possible to enumerate the SQL statements" % Backend.getIdentifiedDbms()
+            logger.warning(warnMsg)
+            return kb.data.cachedStatements
+
         if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
             if Backend.isDbms(DBMS.MYSQL) and Backend.isFork(FORK.DRIZZLE):
                 query = rootQuery.inband.query2
