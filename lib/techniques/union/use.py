@@ -255,15 +255,37 @@ def _chunkedJsonAggUse(expression, expressionFields, expressionFieldsList, count
     caps. K is halved adaptively if a chunk response still gets truncated. Returns a BigArray of
     rows, or None to let the caller fall back to the regular per-row UNION path.
 
-    NOTE: MySQL only for now (windowed 'LIMIT offset,K' + JSON_ARRAYAGG); other DBMSes return None.
+    Same DBMS coverage as the single-shot JSON-agg (per-DBMS aggregate + windowing); others -> None.
     """
-    if not Backend.isDbms(DBMS.MYSQL) or not expressionFields or not expressionFieldsList:
+    dbms = Backend.getIdentifiedDbms()
+
+    if dbms not in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE, DBMS.H2, DBMS.HSQLDB, DBMS.FIREBIRD) or not expressionFields or not expressionFieldsList:
         return None
+
+    start, stop, delimiter = kb.chars.start, kb.chars.stop, kb.chars.delimiter
 
     # a stable total ordering (all output columns) so the LIMIT/OFFSET windows never overlap or drop rows
     base = re.sub(r"(?i)\s+ORDER BY\s+.+\Z", "", expression)
     orderBy = "ORDER BY %s" % ','.join(str(_ + 1) for _ in range(len(expressionFieldsList)))
-    aggFields = "CONCAT_WS('%s',%s)" % (kb.chars.delimiter, ','.join(agent.nullAndCastField(_) for _ in expressionFieldsList))
+    nulled = [agent.nullAndCastField(_) for _ in expressionFieldsList]
+
+    # per-DBMS: aggregate-over-windowed-columns expression (mirrors the single-shot branches) plus
+    # the "K rows at offset" window clause appended to the inner derived table
+    if dbms == DBMS.MYSQL:
+        aggExpr = "CONCAT('%s',JSON_ARRAYAGG(CONCAT_WS('%s',%s)),'%s')" % (start, delimiter, ','.join(nulled), stop)
+        window = lambda o, k: "%s LIMIT %d,%d" % (orderBy, o, k)
+    elif dbms == DBMS.PGSQL:
+        aggExpr = "STRING_AGG('%s'||%s||'%s','')" % (start, ("||'%s'||" % delimiter).join("COALESCE(%s::text,' ')" % _ for _ in expressionFieldsList), stop)
+        window = lambda o, k: "%s LIMIT %d OFFSET %d" % (orderBy, k, o)
+    elif dbms == DBMS.SQLITE:
+        aggExpr = "'%s'||JSON_GROUP_ARRAY(%s)||'%s'" % (start, ("||'%s'||" % delimiter).join("COALESCE(%s,' ')" % _ for _ in expressionFieldsList), stop)
+        window = lambda o, k: "%s LIMIT %d OFFSET %d" % (orderBy, k, o)
+    elif dbms in (DBMS.H2, DBMS.HSQLDB):
+        aggExpr = "GROUP_CONCAT('%s'||%s||'%s' SEPARATOR '')" % (start, ("||'%s'||" % delimiter).join(nulled), stop)
+        window = lambda o, k: "%s LIMIT %d OFFSET %d" % (orderBy, k, o)
+    elif dbms == DBMS.FIREBIRD:
+        aggExpr = "LIST('%s'||%s||'%s','')" % (start, ("||'%s'||" % delimiter).join(nulled), stop)
+        window = lambda o, k: "%s ROWS %d TO %d" % (orderBy, o + 1, o + k)
 
     debugMsg = "single-shot UNION dump output was too large; switching to "
     debugMsg += "chunked (windowed) JSON aggregation of %d entries" % count
@@ -274,8 +296,7 @@ def _chunkedJsonAggUse(expression, expressionFields, expressionFieldsList, count
     offset = 0
 
     while offset < count:
-        inner = "%s %s LIMIT %d,%d" % (base, orderBy, offset, chunk)
-        query = "SELECT CONCAT('%s',JSON_ARRAYAGG(%s),'%s') FROM (%s) AS sqmapx" % (kb.chars.start, aggFields, kb.chars.stop, inner)
+        query = "SELECT %s FROM (%s %s) sqmapx" % (aggExpr, base, window(offset, chunk))
 
         kb.jsonAggMode = True
         output = _oneShotUnionUse(query, False)
@@ -348,6 +369,18 @@ def unionUse(expression, unpack=True, dump=False):
             value = parseUnionPage(output)
             kb.jsonAggMode = False
 
+            # If the single-shot aggregate failed (typically too large for the DBMS packet limit /
+            # response cap) and the table is large, retrieve the rows in bounded windows (chunked
+            # JSON aggregation) before the slow per-row fallback. Done here (independent of the
+            # detected UNION where-clause) so it engages for any dumpable FROM-table query.
+            if value is None and " FROM " in expression.upper() and not re.search(SQL_SCALAR_REGEX, expression, re.I) and not any((kb.forcePartialUnion, conf.forcePartial, conf.disableJson, conf.binaryFields, conf.limitStart, conf.limitStop)):
+                chunkCountExpr = expression.replace(expressionFields, queries[Backend.getIdentifiedDbms()].count.query % '*', 1)
+                if " ORDER BY " in chunkCountExpr.upper():
+                    chunkCountExpr = chunkCountExpr[:chunkCountExpr.upper().rindex(" ORDER BY ")]
+                chunkCount = unArrayizeValue(parseUnionPage(_oneShotUnionUse(chunkCountExpr, unpack)))
+                if isNumPosStrValue(chunkCount) and (int(chunkCount) >= JSON_AGG_CHUNK_ROWS or kb.respTruncated):
+                    value = _chunkedJsonAggUse(expression, expressionFields, expressionFieldsList, int(chunkCount))
+
     # We have to check if the SQL query might return multiple entries
     # if the technique is partial UNION query and in such case forge the
     # SQL limiting the query output one entry at a time
@@ -398,14 +431,6 @@ def unionUse(expression, unpack=True, dump=False):
                 return value
 
             if isNumPosStrValue(count) and int(count) > 1:
-                # The single-shot full UNION dump failed and the table is large (or its oversized
-                # response was detected as truncated): retrieve the rows in bounded windows via
-                # chunked JSON aggregation (K rows/request) instead of the slow per-row path below.
-                if Backend.isDbms(DBMS.MYSQL) and not any((kb.forcePartialUnion, conf.forcePartial, conf.disableJson, conf.binaryFields, conf.limitStart, conf.limitStop)) and (int(count) >= JSON_AGG_CHUNK_ROWS or kb.respTruncated):
-                    chunked = _chunkedJsonAggUse(expression, expressionFields, expressionFieldsList, int(count))
-                    if chunked is not None:
-                        return chunked
-
                 threadData = getCurrentThreadData()
 
                 try:
