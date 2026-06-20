@@ -2146,6 +2146,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.hintValue = ""
     kb.htmlFp = []
     kb.huffmanModel = {}
+    kb.respTruncated = False
     kb.huffmanValidated = False
     kb.disableHuffman = False
     kb.huffmanProbes = 0

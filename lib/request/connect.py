@@ -229,6 +229,7 @@ class Connect(object):
     @staticmethod
     def _connReadProxy(conn):
         parts = []
+        kb.respTruncated = False
 
         if not kb.dnsMode and conn:
             headers = conn.info()
@@ -255,6 +256,7 @@ class Connect(object):
                         singleTimeWarnMessage(warnMsg)
                         part = re.sub(getBytes(r"(?si)%s.+?%s" % (kb.chars.stop, kb.chars.start)), getBytes("%s%s%s" % (kb.chars.stop, LARGE_READ_TRIM_MARKER, kb.chars.start)), part)
                         parts.append(part)
+                        kb.respTruncated = True  # response exceeded the read cap and was trimmed (signal for chunked UNION dumping)
                     else:
                         parts.append(part)
                         break
@@ -262,6 +264,7 @@ class Connect(object):
                     if sum(len(_) for _ in parts) > MAX_CONNECTION_TOTAL_SIZE:
                         warnMsg = "too large response detected. Automatically trimming it"
                         singleTimeWarnMessage(warnMsg)
+                        kb.respTruncated = True
                         break
 
         if conf.yuge:
