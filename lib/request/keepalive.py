@@ -144,6 +144,12 @@ class _KeepAliveHandler(object):
         if not hasattr(response, "getcode"):
             response.getcode = lambda response=response: response.status
 
+        # Note: Python 2's httplib.HTTPResponse lacks readline()/readlines(), which urllib2's
+        # error wrapping (addinfourl, for any non-2xx response) requires; provide them over read()
+        if not hasattr(response, "readline"):
+            response.readline = _makeReadline(response)
+            response.readlines = _makeReadlines(response)
+
         # Note: must come last as on Python 3 'msg' initially aliases the headers
         response.msg = response.reason
 
@@ -264,3 +270,38 @@ def _sendRequest(conn, req):
 
     if data is not None:
         conn.send(data)
+
+def _makeReadline(response):
+    """
+    A buffered readline() over response.read() (Python 2 httplib.HTTPResponse lacks one)
+    """
+
+    buffer = {"data": b""}
+
+    def readline(*args, **kwargs):
+        while b"\n" not in buffer["data"]:
+            chunk = response.read(8192)
+            if not chunk:
+                break
+            buffer["data"] += chunk
+        data = buffer["data"]
+        index = data.find(b"\n")
+        if index == -1:
+            buffer["data"] = b""
+            return data
+        buffer["data"] = data[index + 1:]
+        return data[:index + 1]
+
+    return readline
+
+def _makeReadlines(response):
+    def readlines(*args, **kwargs):
+        result = []
+        while True:
+            line = response.readline()
+            if not line:
+                break
+            result.append(line)
+        return result
+
+    return readlines

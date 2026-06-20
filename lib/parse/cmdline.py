@@ -315,8 +315,9 @@ def cmdLineParser(argv=None):
         optimization.add_argument("--predict-output", dest="predictOutput", action="store_true",
             help="Predict common queries output")
 
-        optimization.add_argument("--keep-alive", dest="keepAlive", action="store_true",
-            help="Use persistent HTTP(s) connections")
+        # Note: persistent (Keep-Alive) connections are used by default; this opts out
+        optimization.add_argument("--no-keep-alive", dest="noKeepAlive", action="store_true",
+            help="Disable persistent HTTP(s) connections (Keep-Alive)")
 
         optimization.add_argument("--null-connection", dest="nullConnection", action="store_true",
             help="Retrieve page length without actual HTTP response body")

@@ -3614,7 +3614,7 @@ def setOptimize():
     """
 
     # conf.predictOutput = True
-    conf.keepAlive = True
+    # Note: persistent (Keep-Alive) connections are now used by default (see _setHTTPHandlers)
     conf.threads = 3 if conf.threads < 3 and cmdLineOptions.threads is None else conf.threads
     conf.nullConnection = not any((conf.data, conf.textOnly, conf.titles, conf.string, conf.notString, conf.regexp, conf.tor))
 

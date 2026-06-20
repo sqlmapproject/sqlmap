@@ -1241,23 +1241,22 @@ def _setHTTPHandlers():
             handlers.append(_urllib.request.HTTPCookieProcessor(conf.cj))
 
         # Reference: http://www.w3.org/Protocols/rfc2616/rfc2616-sec8.html
-        if conf.keepAlive:
-            warnMsg = "persistent HTTP(s) connections, Keep-Alive, has "
-            warnMsg += "been disabled because of its incompatibility "
+        # Note: persistent (Keep-Alive) connections are used by default; '--no-keep-alive' opts out,
+        # and they are automatically disabled when incompatible (HTTP(s) proxy, authentication methods,
+        # or chunked transfer-encoding of the request body - handled by a dedicated, non-pooling handler)
+        conf.keepAlive = not conf.noKeepAlive and not conf.proxy and not conf.authType and not conf.chunked
 
-            if conf.proxy:
-                warnMsg += "with HTTP(s) proxy"
-                logger.warning(warnMsg)
-            elif conf.authType:
-                warnMsg += "with authentication methods"
-                logger.warning(warnMsg)
-            else:
-                # Note: persistent connections for both HTTP and HTTPS; the keep-alive
-                # HTTPS handler supersedes the regular one (reusing its SSL connection)
-                if httpsHandler in handlers:
-                    handlers.remove(httpsHandler)
-                handlers.append(keepAliveHandler)
-                handlers.append(keepAliveHandlerHTTPS)
+        if conf.keepAlive:
+            # persistent connections for both HTTP and HTTPS; the keep-alive HTTPS
+            # handler supersedes the regular one (reusing its SSL connection)
+            if httpsHandler in handlers:
+                handlers.remove(httpsHandler)
+            handlers.append(keepAliveHandler)
+            handlers.append(keepAliveHandlerHTTPS)
+        elif not conf.noKeepAlive and (conf.proxy or conf.authType or conf.chunked):
+            reason = "an HTTP(s) proxy" if conf.proxy else ("authentication methods" if conf.authType else "chunked transfer-encoding")
+            debugMsg = "persistent (Keep-Alive) connections were disabled (incompatible with %s)" % reason
+            logger.debug(debugMsg)
 
         opener = _urllib.request.build_opener(*handlers)
         opener.addheaders = []  # Note: clearing default "User-Agent: Python-urllib/X.Y"

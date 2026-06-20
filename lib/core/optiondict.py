@@ -79,6 +79,7 @@ optDict = {
         "optimize": "boolean",
         "predictOutput": "boolean",
         "keepAlive": "boolean",
+        "noKeepAlive": "boolean",
         "nullConnection": "boolean",
         "threads": "integer",
     },
