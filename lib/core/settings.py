@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.6.132"
+VERSION = "1.10.6.133"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -832,6 +832,12 @@ MAX_CONNECTION_READ_SIZE = 10 * 1024 * 1024
 
 # Maximum response total page size (trimmed if larger)
 MAX_CONNECTION_TOTAL_SIZE = 100 * 1024 * 1024
+
+# Maximum number of requests served over a single persistent (Keep-Alive) connection before it is recycled
+KEEPALIVE_MAX_REQUESTS = 1000
+
+# Maximum idle time (in seconds) a pooled persistent (Keep-Alive) connection is considered reusable before being recycled
+KEEPALIVE_IDLE_TIMEOUT = 30
 
 # For preventing MemoryError exceptions (caused when using large sequences in difflib.SequenceMatcher)
 MAX_DIFFLIB_SEQUENCE_LENGTH = 10 * 1024 * 1024

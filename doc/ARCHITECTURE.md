@@ -68,7 +68,7 @@ Identifiers in the codebase are camelCase.
 | `data/xml/` | the data-driven engine: `boundaries.xml`, `payloads/*.xml`, `queries.xml`, `errors.xml` |
 | `data/` (other) | wordlists/common tables/columns (`txt/`), UDFs (`udf/`), stored procs (`procs/`), shells (`shell/`) |
 | `tests/` | stdlib-unittest suite (offline); see section 11 |
-| `thirdparty/` | vendored dependencies (six, bottle, keepalive, chardet, ...) - no pip at runtime |
+| `thirdparty/` | vendored dependencies (six, bottle, chardet, ...) - no pip at runtime |
 | `extra/` | auxiliary tools (e.g. `vulnserver` used by `--vuln-test`) |
 
 ---
@@ -179,7 +179,7 @@ Enumeration is DBMS-agnostic at the top and specialized underneath:
 
 `lib/request/connect.py` (`Connect.getPage`) is the single HTTP chokepoint. Around it:
 protocol handlers (`httpshandler`, `redirecthandler`, `chunkedhandler`, `rangehandler`,
-keep-alive via `thirdparty/keepalive`), response processing (`basic.py`), and the
+persistent connections via `lib/request/keepalive.py`), response processing (`basic.py`), and the
 comparison oracle (`comparison.py`).
 
 **Tamper scripts** (`tamper/`) mutate the payload just before sending to evade WAF/IPS.

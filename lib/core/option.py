@@ -145,6 +145,8 @@ from lib.request.chunkedhandler import ChunkedHandler
 from lib.request.connect import Connect as Request
 from lib.request.dns import DNSServer
 from lib.request.httpshandler import HTTPSHandler
+from lib.request.keepalive import HTTPKeepAliveHandler
+from lib.request.keepalive import HTTPSKeepAliveHandler
 from lib.request.pkihandler import HTTPSPKIAuthHandler
 from lib.request.rangehandler import HTTPRangeHandler
 from lib.request.redirecthandler import SmartRedirectHandler
@@ -154,7 +156,6 @@ from lib.utils.har import HTTPCollectorFactory
 from lib.utils.purge import purge
 from lib.utils.search import search
 from thirdparty import six
-from thirdparty.keepalive import keepalive
 from thirdparty.multipart import multipartpost
 from thirdparty.six.moves import collections_abc as _collections
 from thirdparty.six.moves import http_client as _http_client
@@ -166,7 +167,8 @@ from xml.etree.ElementTree import ElementTree
 authHandler = _urllib.request.BaseHandler()
 chunkedHandler = ChunkedHandler()
 httpsHandler = HTTPSHandler()
-keepAliveHandler = keepalive.HTTPHandler()
+keepAliveHandler = HTTPKeepAliveHandler()
+keepAliveHandlerHTTPS = HTTPSKeepAliveHandler()
 proxyHandler = _urllib.request.ProxyHandler()
 redirectHandler = SmartRedirectHandler()
 rangeHandler = HTTPRangeHandler()
@@ -1250,7 +1252,12 @@ def _setHTTPHandlers():
                 warnMsg += "with authentication methods"
                 logger.warning(warnMsg)
             else:
+                # Note: persistent connections for both HTTP and HTTPS; the keep-alive
+                # HTTPS handler supersedes the regular one (reusing its SSL connection)
+                if httpsHandler in handlers:
+                    handlers.remove(httpsHandler)
                 handlers.append(keepAliveHandler)
+                handlers.append(keepAliveHandlerHTTPS)
 
         opener = _urllib.request.build_opener(*handlers)
         opener.addheaders = []  # Note: clearing default "User-Agent: Python-urllib/X.Y"
