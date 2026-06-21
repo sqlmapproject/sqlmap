@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.6.134"
+VERSION = "1.10.6.135"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -808,6 +808,11 @@ MAX_STABILITY_DELAY = 0.5
 
 # Reference: http://www.tcpipguide.com/free/t_DNSLabelsNamesandSyntaxRules.htm
 MAX_DNS_LABEL = 63
+
+# Maximum number of (most recent) DNS resolution requests retained by the DNS server (bounded so
+# that unrelated/stray traffic to the listening :53 socket cannot grow memory without limit; the
+# value is popped right after it is triggered, so only recent entries ever matter)
+MAX_DNS_REQUESTS = 1000
 
 # Alphabet used for prefix and suffix strings of name resolution requests in DNS technique (excluding hexadecimal chars for not mixing with inner content)
 DNS_BOUNDARIES_ALPHABET = re.sub(r"[a-fA-F]", "", string.ascii_letters)

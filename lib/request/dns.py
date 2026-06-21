@@ -8,12 +8,18 @@ See the file 'LICENSE' for copying permission
 from __future__ import print_function
 
 import binascii
+import collections
 import os
 import re
 import socket
 import struct
 import threading
 import time
+
+try:
+    from lib.core.settings import MAX_DNS_REQUESTS
+except ImportError:
+    MAX_DNS_REQUESTS = 1000     # fallback so this module stays runnable standalone
 
 class DNSQuery(object):
     """
@@ -74,7 +80,7 @@ class DNSServer(object):
 
     def __init__(self):
         self._check_localhost()
-        self._requests = []
+        self._requests = collections.deque(maxlen=MAX_DNS_REQUESTS)
         self._lock = threading.Lock()
 
         try:
@@ -140,12 +146,28 @@ class DNSServer(object):
                 self._initialized = True
 
                 while True:
-                    data, addr = self._socket.recvfrom(1024)
-                    _ = DNSQuery(data)
-                    self._socket.sendto(_.response("127.0.0.1"), addr)
+                    try:
+                        data, addr = self._socket.recvfrom(1024)
+                    except KeyboardInterrupt:
+                        raise
+                    except Exception:
+                        break       # socket closed/broken - stop serving (e.g. program exit)
 
-                    with self._lock:
-                        self._requests.append(_._query)
+                    # Note: a single malformed packet or a transient send error must NOT kill the
+                    # server thread (otherwise all subsequent DNS exfiltration is silently lost).
+                    # The query is recorded BEFORE responding, so the exfiltrated data is captured
+                    # even if crafting/sending the (fake) resolution response fails.
+                    try:
+                        _ = DNSQuery(data)
+
+                        with self._lock:
+                            self._requests.append(_._query)
+
+                        self._socket.sendto(_.response("127.0.0.1"), addr)
+                    except KeyboardInterrupt:
+                        raise
+                    except Exception:
+                        pass
 
             except KeyboardInterrupt:
                 raise
