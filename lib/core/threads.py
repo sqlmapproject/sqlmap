@@ -27,7 +27,6 @@ from lib.core.exception import SqlmapThreadException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.exception import SqlmapValueException
 from lib.core.settings import MAX_NUMBER_OF_THREADS
-from lib.core.settings import PYVERSION
 
 shared = AttribDict()
 
@@ -93,7 +92,7 @@ def getCurrentThreadName():
     Returns current's thread name
     """
 
-    return threading.current_thread().getName()
+    return threading.current_thread().name
 
 def exceptionHandledFunction(threadFunction, silent=False):
     try:
@@ -107,17 +106,14 @@ def exceptionHandledFunction(threadFunction, silent=False):
 
         if not silent and kb.get("threadContinue") and not kb.get("multipleCtrlC") and not isinstance(ex, (SqlmapUserQuitException, SqlmapSkipTargetException)):
             errMsg = getSafeExString(ex) if isinstance(ex, SqlmapBaseException) else "%s: %s" % (type(ex).__name__, getSafeExString(ex))
-            logger.error("thread %s: '%s'" % (threading.currentThread().getName(), errMsg))
+            logger.error("thread %s: '%s'" % (threading.current_thread().name, errMsg))
 
             if conf.get("verbose") > 1 and not isinstance(ex, SqlmapConnectionException):
                 traceback.print_exc()
 
 def setDaemon(thread):
     # Reference: http://stackoverflow.com/questions/190010/daemon-threads-explanation
-    if PYVERSION >= "2.6":
-        thread.daemon = True
-    else:
-        thread.setDaemon(True)
+    thread.daemon = True
 
 def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardException=True, threadChoice=False, startThreadMsg=True):
     threads = []
@@ -233,7 +229,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
     except (SqlmapConnectionException, SqlmapValueException) as ex:
         print()
         kb.threadException = True
-        logger.error("thread %s: '%s'" % (threading.currentThread().getName(), ex))
+        logger.error("thread %s: '%s'" % (threading.current_thread().name, ex))
 
         if conf.get("verbose") > 1 and isinstance(ex, SqlmapValueException):
             traceback.print_exc()
@@ -249,7 +245,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
 
                 kb.threadException = True
                 errMsg = unhandledExceptionMessage()
-                logger.error("thread %s: %s" % (threading.currentThread().getName(), errMsg))
+                logger.error("thread %s: %s" % (threading.current_thread().name, errMsg))
                 traceback.print_exc()
 
     finally:
