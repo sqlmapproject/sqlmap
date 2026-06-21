@@ -213,9 +213,9 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
                 seqMatcher.set_seq1(repr(seq1))
                 seqMatcher.set_seq2(repr(seq2))
 
-            if key in kb.cache.comparison:
-                ratio = kb.cache.comparison[key]
-            else:
+            ratio = kb.cache.comparison.get(key) if key else None
+
+            if ratio is None:
                 try:
                     try:
                         ratio = seqMatcher.quick_ratio() if not kb.heavilyDynamic else seqMatcher.ratio()

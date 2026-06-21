@@ -2532,19 +2532,23 @@ def readCachedFileContent(filename, mode='r'):
     True
     """
 
-    if filename not in kb.cache.content:
+    content = kb.cache.content.get(filename)
+
+    if content is None:
         with kb.locks.cache:
-            if filename not in kb.cache.content:
+            content = kb.cache.content.get(filename)
+            if content is None:
                 checkFile(filename)
                 try:
                     with openFile(filename, mode) as f:
-                        kb.cache.content[filename] = f.read()
+                        content = f.read()
+                        kb.cache.content[filename] = content
                 except (IOError, OSError, MemoryError) as ex:
                     errMsg = "something went wrong while trying "
                     errMsg += "to read the content of file '%s' ('%s')" % (filename, getSafeExString(ex))
                     raise SqlmapSystemException(errMsg)
 
-    return kb.cache.content[filename]
+    return content
 
 def average(values):
     """
