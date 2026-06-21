@@ -94,9 +94,9 @@ class Dump(object):
             except IOError as ex:
                 errMsg = "error occurred while writing to log file ('%s')" % getSafeExString(ex)
                 raise SqlmapGenericException(errMsg)
-
-            if multiThreadMode:
-                self._lock.release()
+            finally:
+                if multiThreadMode:
+                    self._lock.release()
 
         kb.dataOutputFlag = True
 
