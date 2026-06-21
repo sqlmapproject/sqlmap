@@ -23,6 +23,8 @@ from _testutils import bootstrap
 bootstrap()
 
 from lib.core.replication import Replication
+from lib.core.exception import SqlmapConnectionException
+from lib.core.exception import SqlmapValueException
 
 
 class _ReplCase(unittest.TestCase):
@@ -81,6 +83,38 @@ class TestCreateInsertSelect(_ReplCase):
         # createTable drops-if-exists, so the table is fresh
         t2 = self.rep.createTable("dup", [("id", self.rep.INTEGER)])
         self.assertEqual(t2.select(), [])
+
+
+class TestInsertColumnMismatch(_ReplCase):
+    def test_wrong_column_count_raises(self):
+        t = self.rep.createTable("c", [("a", self.rep.INTEGER), ("b", self.rep.TEXT)])
+        # too few / too many values must be rejected (not silently mis-inserted)
+        self.assertRaises(SqlmapValueException, t.insert, [1])
+        self.assertRaises(SqlmapValueException, t.insert, [1, "x", "extra"])
+        # the matching count still works
+        t.insert([1, "x"])
+        self.assertEqual(t.select(), [(1, "x")])
+
+
+class TestInitFailure(unittest.TestCase):
+    """A failed open (e.g. unwritable path) must raise cleanly and the partially
+    constructed object must be safe to finalize (no AttributeError in __del__)."""
+
+    def _bad_path(self):
+        # a database file inside a directory that does not exist => connect fails
+        return os.path.join(tempfile.gettempdir(), "sqlmap_no_such_dir_%d" % os.getpid(), "x.sqlite")
+
+    def test_bad_path_raises(self):
+        self.assertRaises(SqlmapConnectionException, Replication, self._bad_path())
+
+    def test_del_safe_after_failed_init(self):
+        obj = Replication.__new__(Replication)
+        self.assertRaises(SqlmapConnectionException, obj.__init__, self._bad_path())
+        # connection/cursor must be initialized even when connect() fails ...
+        self.assertIsNone(obj.connection)
+        self.assertIsNone(obj.cursor)
+        # ... so finalization is a no-op rather than raising
+        obj.__del__()
 
 
 if __name__ == "__main__":
