@@ -172,6 +172,12 @@ class BigArray(list):
                 except OSError:
                     pass
 
+                # Note: the formerly on-disk chunk is now an in-memory list (and its file has been
+                # removed), so any cache entry still pointing at it is stale; dropping it prevents
+                # serving outdated data if that chunk index is later re-dumped (e.g. append after pop)
+                if isinstance(self.cache, Cache) and self.cache.index == idx:
+                    self.cache = None
+
         return self.chunks[-1].pop()
 
     def index(self, value):

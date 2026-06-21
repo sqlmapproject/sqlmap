@@ -80,6 +80,65 @@ class TestSpill(unittest.TestCase):
         self.assertEqual(restored[N - 1], "item-%d" % (N - 1))
 
 
+class TestCacheConsistency(unittest.TestCase):
+    """The on-disk chunk is served through a single-slot cache (read caching plus
+    dirty write-back). These check that the cache never serves stale data."""
+
+    def test_setitem_writeback_across_chunks(self):
+        ba = _make_spilled()
+        ref = ["item-%d" % i for i in range(N)]
+        # mutate elements spread across several different on-disk chunks
+        for i in (0, 1, 499, 500, 2500, N - 1):
+            ba[i] = ref[i] = "EDIT-%d" % i
+        try:
+            for i in (0, 1, 499, 500, 2500, N - 1):
+                self.assertEqual(ba[i], ref[i], msg="readback ba[%d]" % i)
+            self.assertEqual(list(ba), ref)            # full independent traversal agrees
+        finally:
+            ba.close()
+
+    def test_dirty_edit_survives_pickle(self):
+        ba = _make_spilled()
+        ba[10] = "EDITED-LOW"
+        ba[N - 10] = "EDITED-HIGH"
+        restored = pickle.loads(pickle.dumps(ba))
+        try:
+            self.assertEqual(restored[10], "EDITED-LOW")
+            self.assertEqual(restored[N - 10], "EDITED-HIGH")
+        finally:
+            restored.close()
+            ba.close()
+
+    def test_pop_then_append_then_direct_read(self):
+        # Regression: pop() reloads the last on-disk chunk into memory and deletes its
+        # file, but a non-dirty cache entry still pointing at that chunk index was left
+        # in place. A later append that re-dumps the chunk index then made the stale
+        # cache serve outdated data on a direct __getitem__ (silent data corruption).
+        ref = ["item-%d" % i for i in range(N)]
+        ba = _make_spilled()
+        try:
+            cl = ba.chunk_length
+            last = len(ba.chunks) - 2          # last on-disk chunk (tail is the in-memory list)
+            base = last * cl
+
+            ba[base]                           # populate cache at idx=last, NOT dirty
+
+            while len(ba) > base + 1:          # pop() reloads chunk 'last' from disk, removes its file
+                ba.pop()
+                ref.pop()
+
+            for i in range(cl):                # re-dump chunk 'last' to a brand new temp file
+                value = "NEW-%d" % i
+                ba.append(value)
+                ref.append(value)
+
+            # direct access to the re-dumped chunk, with no prior read to refresh the cache
+            for off in range(cl):
+                self.assertEqual(ba[base + off], ref[base + off], msg="offset %d" % off)
+        finally:
+            ba.close()
+
+
 class TestInMemorySmall(unittest.TestCase):
     def test_no_spill_for_small(self):
         ba = BigArray([1, 2, 3])
