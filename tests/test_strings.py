@@ -90,12 +90,24 @@ class TestMiscStrings(unittest.TestCase):
         self.assertEqual(longestCommonPrefix("abc", "xyz"), "")
 
     def test_decodeIntToUnicode(self):
-        # single-byte code points map to their char
-        self.assertEqual(decodeIntToUnicode(65), u"A")
-        self.assertEqual(decodeIntToUnicode(97), u"a")
-        # NOTE: >255 ints are interpreted as a multi-byte sequence (not a Unicode code point),
-        # e.g. 0x2122 -> bytes 0x21 0x22 -> '!"' (documents actual behavior, not an assumption)
-        self.assertEqual(decodeIntToUnicode(0x2122), u'!"')
+        from lib.core.common import Backend
+        from lib.core.data import kb
+
+        # decodeIntToUnicode() is back-end DBMS dependent (e.g. PostgreSQL/Oracle/SQLite
+        # treat >255 values as Unicode code points). Pin a clean, no-forced-DBMS state so
+        # the result is deterministic regardless of test execution order (a prior dialect
+        # test may otherwise leave a forced DBMS set); restore it afterwards.
+        _saved = (kb.get("forcedDbms"), kb.get("stickyDBMS"))
+        Backend.flushForcedDbms(force=True)
+        try:
+            # single-byte code points map to their char
+            self.assertEqual(decodeIntToUnicode(65), u"A")
+            self.assertEqual(decodeIntToUnicode(97), u"a")
+            # NOTE: with no identified DBMS, >255 ints are interpreted as a multi-byte
+            # sequence (not a Unicode code point), e.g. 0x2122 -> bytes 0x21 0x22 -> '!"'
+            self.assertEqual(decodeIntToUnicode(0x2122), u'!"')
+        finally:
+            kb.forcedDbms, kb.stickyDBMS = _saved
 
 
 if __name__ == "__main__":
