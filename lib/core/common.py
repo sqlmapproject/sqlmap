@@ -5346,6 +5346,8 @@ def splitFields(fields, delimiter=','):
     ['foo', 'bar', 'max(foo,bar)']
     >>> splitFields("a, 'b, c', d")
     ['a', "'b, c'", 'd']
+    >>> splitFields('a; b; max(c; d)', delimiter=';')
+    ['a', 'b', 'max(c;d)']
     """
 
     # collapse "<delimiter> " -> "<delimiter>" but only OUTSIDE quoted string literals, so a
@@ -5376,11 +5378,11 @@ def splitFields(fields, delimiter=','):
         index += 1
 
     fields = "".join(normalized)
-    commas = [-1, len(fields)]
-    commas.extend(zeroDepthSearch(fields, ','))
-    commas = sorted(commas)
+    splits = [-1, len(fields)]
+    splits.extend(zeroDepthSearch(fields, delimiter))
+    splits = sorted(splits)
 
-    return [fields[x + 1:y] for (x, y) in _zip(commas, commas[1:])]
+    return [fields[x + 1:y] for (x, y) in _zip(splits, splits[1:])]
 
 def pollProcess(process, suppress_errors=False):
     """
