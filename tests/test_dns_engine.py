@@ -52,8 +52,6 @@ from lib.request.dns import DNSServer
 import lib.techniques.dns.use as dnsmod
 import lib.techniques.dns.test as dnstestmod
 
-DNS_PORT = 5355
-
 def _build_query(name, tid=b"\x12\x34"):
     pkt = tid + b"\x01\x00" + b"\x00\x01" + b"\x00\x00" + b"\x00\x00" + b"\x00\x00"
     for label in name.split("."):
@@ -63,14 +61,22 @@ def _build_query(name, tid=b"\x12\x34"):
 
 class _HighPortDNSServer(DNSServer):
     # same logic as the real server (parse/pop/run), just bound high so no root is needed
-    def __init__(self, port):
+    def __init__(self, port=0):
         self._requests = []
         self._lock = threading.Lock()
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self._socket.bind(("127.0.0.1", port))
+        self.port = self._socket.getsockname()[1]
         self._running = False
         self._initialized = False
+
+    def close(self):
+        self._running = False
+        try:
+            self._socket.close()
+        except socket.error:
+            pass
 
 _CONF = {"dnsDomain": "exfil.test", "hexConvert": False, "api": False, "verbose": 0, "forceDns": False}
 _KB = {"dnsTest": True, "dnsMode": False, "bruteMode": False, "safeCharEncode": False}
@@ -81,10 +87,17 @@ class _DnsCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.server = _HighPortDNSServer(DNS_PORT)
+        cls.server = _HighPortDNSServer()
         cls.server.run()
         while not cls.server._initialized:
             time.sleep(0.02)
+
+    @classmethod
+    def tearDownClass(cls):
+        server = getattr(cls, "server", None)
+        if server is not None:
+            server.close()
+            cls.server = None
 
     def setUp(self):
         self._saved_conf = {k: conf.get(k) for k in _CONF}
@@ -156,7 +169,7 @@ class _DnsCase(unittest.TestCase):
                 host = "%s.%s.%s.%s" % (prefix, binascii.hexlify(chunk).decode(), suffix, conf.dnsDomain)
                 c = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
                 c.settimeout(3)
-                c.sendto(_build_query(host), ("127.0.0.1", DNS_PORT))
+                c.sendto(_build_query(host), ("127.0.0.1", self.server.port))
                 try:
                     c.recvfrom(512)
                 finally:
