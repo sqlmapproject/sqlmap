@@ -9,6 +9,7 @@ from __future__ import print_function
 
 import binascii
 import collections
+import errno
 import os
 import re
 import socket
@@ -34,41 +35,35 @@ class DNSQuery(object):
         self._query = b""
 
         try:
-            # Minimum DNS header length is 12 bytes, followed by at least a
-            # root label terminator. Shorter packets are malformed/no-op.
-            if len(raw) <= 12:
+            if len(raw) < 13:
                 return
 
             type_ = (ord(raw[2:3]) >> 3) & 15                   # Opcode bits
 
             if type_ == 0:                                      # Standard query
                 i = 12
-                parts = []
+                labels = []
 
-                while i < len(raw):
+                while True:
+                    if i >= len(raw):
+                        return
+
                     j = ord(raw[i:i + 1])
 
                     if j == 0:
                         break
 
-                    # Compression pointers are not expected in the question name
-                    # here. Treat them as malformed instead of walking arbitrary
-                    # offsets or creating a partial query.
-                    if j & 0xc0:
-                        parts = []
-                        break
+                    i += 1
 
-                    i = i + 1
                     if i + j > len(raw):
-                        parts = []
-                        break
+                        return
 
-                    parts.append(raw[i:i + j])
-                    i = i + j
+                    labels.append(raw[i:i + j])
+                    i += j
 
-                if parts:
-                    self._query = b".".join(parts) + b'.'
-        except Exception:
+                if labels:
+                    self._query = b".".join(labels) + b'.'
+        except (TypeError, ValueError, IndexError):
             self._query = b""
 
     def response(self, resolution):
@@ -79,19 +74,21 @@ class DNSQuery(object):
         retVal = b""
 
         if self._query:
-            offset = self._raw[12:].find(b"\x00")
+            end = self._raw[12:].find(b"\x00")
 
-            if offset >= 0:
-                retVal += self._raw[:2]                                                     # Transaction ID
-                retVal += b"\x85\x80"                                                       # Flags (Standard query response, No error)
-                retVal += self._raw[4:6] + self._raw[4:6] + b"\x00\x00\x00\x00"             # Questions and Answers Counts
-                retVal += self._raw[12:(12 + offset + 5)]                                   # Original Domain Name Query
-                retVal += b"\xc0\x0c"                                                       # Pointer to domain name
-                retVal += b"\x00\x01"                                                       # Type A
-                retVal += b"\x00\x01"                                                       # Class IN
-                retVal += b"\x00\x00\x00\x20"                                               # TTL (32 seconds)
-                retVal += b"\x00\x04"                                                       # Data length
-                retVal += b"".join(struct.pack('B', int(_)) for _ in resolution.split('.')) # 4 bytes of IP
+            if end < 0 or len(self._raw) < 12 + end + 5:
+                return retVal
+
+            retVal += self._raw[:2]                                                         # Transaction ID
+            retVal += b"\x85\x80"                                                           # Flags (Standard query response, No error)
+            retVal += self._raw[4:6] + self._raw[4:6] + b"\x00\x00\x00\x00"                 # Questions and Answers Counts
+            retVal += self._raw[12:(12 + end + 5)]                                          # Original Domain Name Query
+            retVal += b"\xc0\x0c"                                                           # Pointer to domain name
+            retVal += b"\x00\x01"                                                           # Type A
+            retVal += b"\x00\x01"                                                           # Class IN
+            retVal += b"\x00\x00\x00\x20"                                                   # TTL (32 seconds)
+            retVal += b"\x00\x04"                                                           # Data length
+            retVal += b"".join(struct.pack('B', int(_)) for _ in resolution.split('.'))     # 4 bytes of IP
 
         return retVal
 
@@ -168,15 +165,31 @@ class DNSServer(object):
         """
 
         def _():
+            def _is_udp_connreset(ex):
+                return getattr(ex, "winerror", None) == 10054 or getattr(ex, "errno", None) in (errno.ECONNRESET, 10054)
+
             try:
                 self._running = True
                 self._initialized = True
+
+                try:
+                    if hasattr(socket, "SIO_UDP_CONNRESET") and hasattr(self._socket, "ioctl"):
+                        # Windows reports ICMP "port unreachable" for UDP as WSAECONNRESET on
+                        # recvfrom(). DNS clients in tests and in the wild can disappear before
+                        # reading our fake response; that must not kill the server thread.
+                        self._socket.ioctl(socket.SIO_UDP_CONNRESET, False)
+                except Exception:
+                    pass
 
                 while True:
                     try:
                         data, addr = self._socket.recvfrom(1024)
                     except KeyboardInterrupt:
                         raise
+                    except socket.error as ex:
+                        if _is_udp_connreset(ex):
+                            continue
+                        break       # socket closed/broken - stop serving (e.g. program exit)
                     except Exception:
                         break       # socket closed/broken - stop serving (e.g. program exit)
 
@@ -194,6 +207,7 @@ class DNSServer(object):
                             self._requests.append(_._query)
 
                         response = _.response("127.0.0.1")
+
                         if response:
                             self._socket.sendto(response, addr)
                     except KeyboardInterrupt:
