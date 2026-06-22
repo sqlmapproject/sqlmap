@@ -221,7 +221,7 @@ class Agent(object):
         elif BOUNDED_INJECTION_MARKER in paramDict[parameter]:
             if base64Encoding:
                 retVal = paramString.replace("%s%s" % (_origValue, BOUNDED_INJECTION_MARKER), _newValue)
-                match = re.search(r"(%s)=([^&]*)" % re.sub(r" \(.+", "", parameter), retVal)
+                match = re.search(r"(%s)=([^&]*)" % re.escape(re.sub(r" \(.+", "", parameter)), retVal)
                 if match:
                     retVal = retVal.replace(match.group(0), "%s=%s" % (match.group(1), encodeBase64(match.group(2), binary=False, encoding=conf.encoding or UNICODE_ENCODING)))
             else:
@@ -677,6 +677,49 @@ class Agent(object):
             pass
         return retVal
 
+    @staticmethod
+    def _collapseFieldDelimiterSpace(query):
+        """
+        Collapses ", " into "," to normalize the column-list delimiter, but ONLY outside
+        single/double quoted string literals, so a comma-space inside a literal (e.g. in a
+        WHERE clause: name='John, Jr') is preserved verbatim. The quote/escape handling
+        mirrors splitFields()/zeroDepthSearch().
+
+        >>> Agent._collapseFieldDelimiterSpace("SELECT a, b FROM t")
+        'SELECT a,b FROM t'
+        >>> Agent._collapseFieldDelimiterSpace("SELECT a, b FROM t WHERE name='John, Jr'")
+        "SELECT a,b FROM t WHERE name='John, Jr'"
+        """
+
+        retVal = []
+        quote = None
+        index = 0
+        length = len(query)
+
+        while index < length:
+            char = query[index]
+            if quote:
+                retVal.append(char)
+                if char == quote:
+                    if index + 1 < length and query[index + 1] == quote:  # escaped quote (e.g. '')
+                        retVal.append(query[index + 1])
+                        index += 2
+                        continue
+                    else:
+                        quote = None
+            elif char in ('"', "'"):
+                quote = char
+                retVal.append(char)
+            elif char == ',' and index + 1 < length and query[index + 1] == ' ':
+                retVal.append(',')  # keep the delimiter, drop the single trailing space
+                index += 2
+                continue
+            else:
+                retVal.append(char)
+            index += 1
+
+        return "".join(retVal)
+
     def concatQuery(self, query, unpack=True):
         """
         Take in input a query string and return its processed nulled,
@@ -705,7 +748,7 @@ class Agent(object):
 
         if unpack:
             concatenatedQuery = ""
-            query = query.replace(", ", ',')
+            query = self._collapseFieldDelimiterSpace(query)
             fieldsSelectFrom, fieldsSelect, fieldsNoSelect, fieldsSelectTop, fieldsSelectCase, _, fieldsToCastStr, fieldsExists = self.getFields(query)
             castedFields = self.nullCastConcatFields(fieldsToCastStr)
             concatenatedQuery = query.replace(fieldsToCastStr, castedFields, 1)
@@ -979,7 +1022,9 @@ class Agent(object):
                         stopLimit = limitRegExp.group(int(limitGroupStop))
                     elif limitRegExp2:
                         startLimit = 0
-                        stopLimit = limitRegExp2.group(int(limitGroupStart))
+                        # Note: query2 (LIMIT without OFFSET) always has exactly one group (the
+                        # count); using limitGroupStart here would IndexError for H2 (groupstart=2)
+                        stopLimit = limitRegExp2.group(1)
                 limitCond = int(stopLimit) > 1
 
             elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
@@ -1281,7 +1326,10 @@ class Agent(object):
             if Backend.isDbms(DBMS.ORACLE) and re.search(r"qq ORDER BY \w+\)", query, re.I) is not None:
                 prefix, suffix = re.sub(r"(?i)(qq)( ORDER BY \w+\))", r"\g<1> WHERE %s\g<2>" % conf.dumpWhere, query), ""
             else:
-                match = re.search(r" (LIMIT|ORDER).+", query, re.I)
+                # Note: require a genuine trailing clause (ORDER BY / LIMIT word-bounded), so a
+                # column/identifier merely starting with "order"/"limit" (e.g. order_id) is not
+                # mistaken for the suffix and the WHERE is not spliced into the wrong place
+                match = re.search(r" (ORDER\s+BY\b|LIMIT\b).+", query, re.I)
                 if match:
                     suffix = match.group(0)
                     prefix = query[:-len(suffix)]

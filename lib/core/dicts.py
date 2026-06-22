@@ -427,6 +427,7 @@ PART_RUN_CONTENT_TYPES = {
     "dumpTable": CONTENT_TYPE.DUMP_TABLE,
     "search": CONTENT_TYPE.SEARCH,
     "sqlQuery": CONTENT_TYPE.SQL_QUERY,
+    "getStatements": CONTENT_TYPE.STATEMENTS,
     "tableExists": CONTENT_TYPE.COMMON_TABLES,
     "columnExists": CONTENT_TYPE.COMMON_COLUMNS,
     "readFile": CONTENT_TYPE.FILE_READ,

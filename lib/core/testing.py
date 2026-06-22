@@ -11,6 +11,7 @@ import logging
 import os
 import random
 import re
+import shutil
 import socket
 import sqlite3
 import subprocess
@@ -212,6 +213,7 @@ def vulnTest():
         if "<tmpfile>" in cmd:
             handle, tmp = tempfile.mkstemp()
             os.close(handle)
+            cleanups.append(tmp)
             cmd = cmd.replace("<tmpfile>", tmp)
 
         os.environ["SQLMAP_UNSAFE_EVAL"] = '1'
@@ -236,6 +238,11 @@ def vulnTest():
             os.remove(filename)
         except:
             pass
+
+    try:
+        shutil.rmtree(tmpdir)
+    except:
+        pass
 
     return retVal
 

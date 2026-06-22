@@ -226,8 +226,18 @@ class BigArray(list):
             self.cache = None
 
         if (self.cache and self.cache.index != index and self.cache.dirty):
+            old_filename = self.chunks[self.cache.index]
             filename = self._dump(self.cache.data)
             self.chunks[self.cache.index] = filename
+
+            # Note: remove the now-superseded chunk file (mirrors __getstate__); otherwise every
+            # cross-chunk dirty flush orphans one temp file on disk and in self.filenames
+            if isinstance(old_filename, STRING_TYPES):
+                try:
+                    self._os_remove(old_filename)
+                    self.filenames.discard(old_filename)
+                except OSError:
+                    pass
 
         if not (self.cache and self.cache.index == index):
             try:

@@ -50,6 +50,7 @@ from lib.core.bigarray import BigArray
 from lib.core.compat import cmp
 from lib.core.compat import codecs_open
 from lib.core.compat import LooseVersion
+from lib.core.compat import RecursionError
 from lib.core.compat import round
 from lib.core.compat import xrange
 from lib.core.convert import base64pickle
@@ -1459,11 +1460,6 @@ def jsonMinimize(content):
     True
     """
 
-    try:
-        data = json.loads(content)
-    except (ValueError, TypeError):
-        return None
-
     lines = []
 
     def _walk(obj, path):
@@ -1477,7 +1473,14 @@ def jsonMinimize(content):
         else:
             lines.append("%s=%s" % (path, obj))                    # scalar values kept (boolean detection flips values)
 
-    _walk(data, "")
+    # Note: both json.loads() and the _walk() recursion can hit RecursionError (RuntimeError on
+    # Python 2) on JSON nested past the interpreter limit; treat that as "not usable" and return
+    # None so callers fall back to text comparison, rather than crashing the comparison thread
+    try:
+        data = json.loads(content)
+        _walk(data, "")
+    except (ValueError, TypeError, RecursionError):
+        return None
 
     return "\n".join(sorted(lines))
 
@@ -1892,7 +1895,9 @@ def expandAsteriskForColumns(expression):
     the SQL query string (expression)
     """
 
-    match = re.search(r"(?i)\ASELECT(\s+TOP\s+[\d]+)?\s+\*\s+FROM\s+(([`'\"][^`'\"]+[`'\"]|[\w.]+)+)(\s|\Z)", expression)
+    # Note: the table-reference group consumes one char / quoted-chunk per repetition ([\w.] not
+    # [\w.]+) to avoid catastrophic backtracking on a 'SELECT * FROM <long.dotted.name>(' input
+    match = re.search(r"(?i)\ASELECT(\s+TOP\s+[\d]+)?\s+\*\s+FROM\s+(([`'\"][^`'\"]+[`'\"]|[\w.])+)(\s|\Z)", expression)
 
     if match:
         infoMsg = "you did not provide the fields in your query. "
@@ -2957,6 +2962,7 @@ def findLocalPort(ports):
     retVal = None
 
     for port in ports:
+        s = None
         try:
             try:
                 s = socket._orig_socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -2968,10 +2974,11 @@ def findLocalPort(ports):
         except socket.error:
             pass
         finally:
-            try:
-                s.close()
-            except socket.error:
-                pass
+            if s is not None:
+                try:
+                    s.close()
+                except socket.error:
+                    pass
 
     return retVal
 
@@ -4233,7 +4240,12 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
 
                     # Note: naive approach
                     retVal = content.replace(payload, REFLECTED_VALUE_MARKER)
-                    retVal = retVal.replace(re.sub(r"\A\w+", "", payload), REFLECTED_VALUE_MARKER)
+
+                    # Note: guard against an empty needle (payload composed solely of word chars), as
+                    # str.replace("", X) would insert X between every character and explode the page
+                    _stripped = re.sub(r"\A\w+", "", payload)
+                    if _stripped:
+                        retVal = retVal.replace(_stripped, REFLECTED_VALUE_MARKER)
 
                     if len(parts) > REFLECTED_MAX_REGEX_PARTS:  # preventing CPU hogs
                         regex = _("%s%s%s" % (REFLECTED_REPLACEMENT_REGEX.join(parts[:REFLECTED_MAX_REGEX_PARTS // 2]), REFLECTED_REPLACEMENT_REGEX, REFLECTED_REPLACEMENT_REGEX.join(parts[-REFLECTED_MAX_REGEX_PARTS // 2:])))
@@ -4552,14 +4564,18 @@ def safeCSValue(value):
     'foobar'
     >>> safeCSValue('foo\\rbar')
     '"foo\\rbar"'
+    >>> safeCSValue('foo"bar') == '"foo""bar"'
+    True
     """
 
     retVal = value
 
+    # Note: always RFC-4180 escape a value that contains the delimiter, a quote or a newline; an
+    # earlier "skip if it already begins and ends with a quote" heuristic corrupted cells whose
+    # content legitimately starts and ends with '"' (e.g. '"a","b"' or a lone '"')
     if retVal and isinstance(retVal, six.string_types):
-        if not (retVal[0] == retVal[-1] == '"'):
-            if any(_ in retVal for _ in (conf.get("csvDel", defaults.csvDel), '"', '\n', '\r')):
-                retVal = '"%s"' % retVal.replace('"', '""')
+        if any(_ in retVal for _ in (conf.get("csvDel", defaults.csvDel), '"', '\n', '\r')):
+            retVal = '"%s"' % retVal.replace('"', '""')
 
     return retVal
 
@@ -4591,8 +4607,6 @@ def randomizeParameterValue(value):
 
     retVal = value
 
-    retVal = re.sub(r"%[0-9a-fA-F]{2}", "", retVal)
-
     def _replace_upper(match):
         original = match.group()
         while True:
@@ -4614,9 +4628,15 @@ def randomizeParameterValue(value):
             if candidate != original:
                 return candidate
 
-    retVal = re.sub(r"[A-Z]+", _replace_upper, retVal)
-    retVal = re.sub(r"[a-z]+", _replace_lower, retVal)
-    retVal = re.sub(r"[0-9]+", _replace_digit, retVal)
+    def _randomize(segment):
+        segment = re.sub(r"[A-Z]+", _replace_upper, segment)
+        segment = re.sub(r"[a-z]+", _replace_lower, segment)
+        segment = re.sub(r"[0-9]+", _replace_digit, segment)
+        return segment
+
+    # Note: keep %XX percent-encoded bytes verbatim and randomize only the surrounding characters;
+    # deleting (or randomizing) the %XX would change the value's decoded content and byte length
+    retVal = "".join(part if re.match(r"\A%[0-9a-fA-F]{2}\Z", part) else _randomize(part) for part in re.split(r"(%[0-9a-fA-F]{2})", retVal))
 
     if re.match(r"\A[^@]+@.+\.[a-z]+\Z", value):
         parts = retVal.split('.')
@@ -4838,8 +4858,8 @@ def findPageForms(content, url, raiseException=False, addToTargets=False):
 
         data = ""
 
-        for name, value in re.findall(r"['\"]?(\w+)['\"]?\s*:\s*(['\"][^'\"]+)?", match.group(2)):
-            data += "%s=%s%s" % (name, value, DEFAULT_GET_POST_DELIMITER)
+        for name, value in re.findall(r"['\"]?(\w+)['\"]?\s*:\s*['\"]?([^'\",}]*)['\"]?", match.group(2)):
+            data += "%s=%s%s" % (name, value.strip(), DEFAULT_GET_POST_DELIMITER)
 
         data = data.rstrip(DEFAULT_GET_POST_DELIMITER)
         retVal.add((url, HTTPMETHOD.POST, data, conf.cookie, None))
@@ -4904,6 +4924,10 @@ def getHostHeader(url):
 
     >>> getHostHeader('http://www.target.com/vuln.php?id=1')
     'www.target.com'
+    >>> getHostHeader('http://[::1]:8080/vuln.php?id=1')
+    '[::1]:8080'
+    >>> getHostHeader('http://[::1]/vuln.php?id=1')
+    '[::1]'
     """
 
     retVal = url
@@ -4911,10 +4935,11 @@ def getHostHeader(url):
     if url:
         retVal = _urllib.parse.urlparse(url).netloc
 
-        if re.search(r"http(s)?://\[.+\]", url, re.I):
-            retVal = extractRegexResult(r"http(s)?://\[(?P<result>.+)\]", url)
-        elif any(retVal.endswith(':%d' % _) for _ in (80, 443)):
-            retVal = retVal.split(':')[0]
+        # Note: netloc keeps the IPv6 brackets (and any port), so only the default ports are
+        # stripped here - mirroring the hostname/IPv4 branch and preserving non-default ports
+        # (e.g. '[::1]:8080') as required by RFC 7230
+        if any(retVal.endswith(':%d' % _) for _ in (80, 443)):
+            retVal = retVal[:retVal.rfind(':')]
 
     if retVal and retVal.count(':') > 1 and not any(_ in retVal for _ in ('[', ']')):
         retVal = "[%s]" % retVal
@@ -5010,7 +5035,14 @@ def incrementCounter(technique):
     Increments query counter for a given technique
     """
 
-    kb.counters[technique] = getCounter(technique) + 1
+    # Note: the read-modify-write must be atomic since worker threads increment concurrently;
+    # guard with the shared 'count' lock when available (it is absent in isolated/doctest use)
+    lock = kb.locks.count if kb.get("locks") else None
+    if lock is not None:
+        with lock:
+            kb.counters[technique] = getCounter(technique) + 1
+    else:
+        kb.counters[technique] = getCounter(technique) + 1
 
 def getCounter(technique):
     """
@@ -5541,8 +5573,10 @@ def parseRequestFile(reqFile, checkParams=True):
                     key, value = line.split(":", 1)
                     value = value.strip().replace("\r", "").replace("\n", "")
 
-                    # Note: overriding values with --headers '...'
-                    match = re.search(r"(?i)\b(%s): ([^\n]*)" % re.escape(key), conf.headers or "")
+                    # Note: overriding values with --headers '...'; the lookbehind prevents the key
+                    # from matching the hyphen-suffix tail of a longer header name (e.g. 'Host'
+                    # matching inside 'X-Forwarded-Host'), which would corrupt the outgoing header
+                    match = re.search(r"(?i)(?<![\w-])(%s): ([^\n]*)" % re.escape(key), conf.headers or "")
                     if match:
                         key, value = match.groups()
 
@@ -5665,7 +5699,12 @@ def unsafeVariableNaming(value):
     """
 
     if value.startswith(EVALCODE_ENCODED_PREFIX):
-        value = decodeHex(value[len(EVALCODE_ENCODED_PREFIX):], binary=False)
+        # Note: the suffix is only hex when produced by safeVariableNaming(); a user-defined
+        # name that merely happens to start with the prefix (e.g. via --eval) is left intact
+        try:
+            value = decodeHex(value[len(EVALCODE_ENCODED_PREFIX):], binary=False)
+        except (binascii.Error, ValueError, TypeError):
+            pass
 
     return value
 

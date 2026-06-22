@@ -412,7 +412,7 @@ def _setRequestParams():
         raise SqlmapGenericException(errMsg)
 
     if conf.csrfToken:
-        if not any(re.search(conf.csrfToken, ' '.join(_), re.I) for _ in (conf.paramDict.get(PLACE.GET, {}), conf.paramDict.get(PLACE.POST, {}), conf.paramDict.get(PLACE.COOKIE, {}))) and not re.search(r"\b%s\b" % conf.csrfToken, conf.data or "") and conf.csrfToken not in set(_[0].lower() for _ in conf.httpHeaders) and conf.csrfToken not in conf.paramDict.get(PLACE.COOKIE, {}) and not all(re.search(conf.csrfToken, _, re.I) for _ in conf.paramDict.get(PLACE.URI, {}).values()):
+        if not any(re.search(conf.csrfToken, ' '.join(_), re.I) for _ in (conf.paramDict.get(PLACE.GET, {}), conf.paramDict.get(PLACE.POST, {}), conf.paramDict.get(PLACE.COOKIE, {}))) and not re.search(r"\b%s\b" % conf.csrfToken, conf.data or "") and conf.csrfToken not in set(_[0].lower() for _ in conf.httpHeaders) and conf.csrfToken not in conf.paramDict.get(PLACE.COOKIE, {}) and not any(re.search(conf.csrfToken, _, re.I) for _ in conf.paramDict.get(PLACE.URI, {}).values()):
             errMsg = "anti-CSRF token parameter '%s' not " % conf.csrfToken._original
             errMsg += "found in provided GET, POST, Cookie or header values"
             raise SqlmapGenericException(errMsg)
@@ -473,7 +473,9 @@ def _resumeHashDBValues():
     kb.brute.columns = hashDBRetrieve(HASHDB_KEYS.KB_BRUTE_COLUMNS, True) or kb.brute.columns
     kb.chars = hashDBRetrieve(HASHDB_KEYS.KB_CHARS, True) or kb.chars
     kb.dynamicMarkings = hashDBRetrieve(HASHDB_KEYS.KB_DYNAMIC_MARKINGS, True) or kb.dynamicMarkings
-    kb.xpCmdshellAvailable = hashDBRetrieve(HASHDB_KEYS.KB_XP_CMDSHELL_AVAILABLE) or kb.xpCmdshellAvailable
+    # Note: the value is stored as text ("True"/"False"); coerce back to bool, otherwise a resumed
+    # "False" is a truthy string and would wrongly mark xp_cmdshell as available
+    kb.xpCmdshellAvailable = (hashDBRetrieve(HASHDB_KEYS.KB_XP_CMDSHELL_AVAILABLE) == str(True)) or kb.xpCmdshellAvailable
 
     kb.errorChunkLength = hashDBRetrieve(HASHDB_KEYS.KB_ERROR_CHUNK_LENGTH)
     if isNumPosStrValue(kb.errorChunkLength):
@@ -619,7 +621,8 @@ def _createFilesDir():
     if not any((conf.fileRead, conf.commonFiles)):
         return
 
-    conf.filePath = paths.SQLMAP_FILES_PATH % conf.hostname
+    # Note: normalize the hostname consistently with conf.outputPath / conf.dumpPath (see _createDumpDir)
+    conf.filePath = paths.SQLMAP_FILES_PATH % normalizeUnicode(getUnicode(conf.hostname))
 
     if not os.path.isdir(conf.filePath):
         try:
@@ -641,7 +644,9 @@ def _createDumpDir():
     if not conf.dumpTable and not conf.dumpAll and not conf.search:
         return
 
-    conf.dumpPath = safeStringFormat(paths.SQLMAP_DUMP_PATH, conf.hostname)
+    # Note: normalize the hostname the same way _createTargetDirs() builds conf.outputPath, so a
+    # non-ASCII (IDN) target keeps its dump under the same per-host tree as the session/log/target.txt
+    conf.dumpPath = safeStringFormat(paths.SQLMAP_DUMP_PATH, normalizeUnicode(getUnicode(conf.hostname)))
 
     if not os.path.isdir(conf.dumpPath):
         try:

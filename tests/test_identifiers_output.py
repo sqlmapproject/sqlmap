@@ -60,15 +60,22 @@ class TestSafeCSValue(unittest.TestCase):
         ("foo,bar",  '"foo,bar"'),    # contains delimiter -> quoted
         ('he"y',     '"he""y"'),      # contains quote -> doubled + wrapped
         ("a\nb",     '"a\nb"'),       # contains newline -> quoted
+        ('"a","b"',  '"""a"",""b"""'),  # value that begins+ends with a quote must STILL be escaped
+        ('"',        '""""'),           # lone quote -> doubled + wrapped
     ]
 
     def test_table(self):
         for inp, expected in self.CASES:
             self.assertEqual(safeCSValue(inp), expected, msg="safeCSValue(%r)" % inp)
 
-    def test_idempotent_on_already_quoted(self):
-        once = safeCSValue("a,b")
-        self.assertEqual(safeCSValue(once), once)   # already starts+ends with quote -> unchanged
+    def test_csv_roundtrip(self):
+        # the real invariant: a dumped cell must come back as exactly ONE field with its original
+        # content (a value that begins+ends with '"' must not be emitted verbatim - that splits it)
+        import csv
+        for value in ("foobar", "foo,bar", 'he"y', '"a","b"', '"', 'a"b"c'):
+            line = safeCSValue(value)
+            fields = next(csv.reader([line]))   # csv.reader accepts any iterable of text lines (py2+py3)
+            self.assertEqual(fields, [value], msg="round-trip failed for %r -> %r" % (value, line))
 
 
 # (DUMP_REPLACEMENTS markers are covered in test_dicts.py - not duplicated here)

@@ -438,19 +438,27 @@ def _setStdinPipeTargets():
                 return self.next()
 
             def next(self):
-                try:
-                    line = next(conf.stdinPipe)
-                except (IOError, OSError, TypeError, UnicodeDecodeError):
-                    line = None
+                while True:
+                    try:
+                        line = next(conf.stdinPipe)
+                    except (IOError, OSError, TypeError, UnicodeDecodeError):
+                        line = None
+                    except StopIteration:
+                        line = None
 
-                if line:
-                    match = re.search(r"\b(https?://[^\s'\"]+|[\w.]+\.\w{2,3}[/\w+]*\?[^\s'\"]+)", line, re.I)
-                    if match:
-                        return (match.group(0), conf.method, conf.data, conf.cookie, None)
-                elif self.__rest:
-                    return self.__rest.pop()
+                    if line:
+                        match = re.search(r"\b(https?://[^\s'\"]+|[\w.]+\.\w{2,3}[/\w+]*\?[^\s'\"]+)", line, re.I)
+                        if match:
+                            return (match.group(0), conf.method, conf.data, conf.cookie, None)
+                        # Note: a non-empty line that is not a target (blank line, comment,
+                        # non-parameterized URL) must be skipped, not treated as end-of-input
+                        continue
 
-                raise StopIteration()
+                    # end-of-input (or read error): drain any queued targets, then stop
+                    if self.__rest:
+                        return self.__rest.pop()
+
+                    raise StopIteration()
 
             def add(self, elem):
                 self.__rest.add(elem)
@@ -1402,7 +1410,9 @@ def _setHTTPAuthentication():
             conf.httpHeaders.append((HTTP_HEADER.AUTHORIZATION, "Bearer %s" % conf.authCred.strip()))
             return
         elif authType == AUTH_TYPE.NTLM:
-            regExp = "^(.*\\\\.*):(.*?)$"
+            # Note: the DOMAIN\username part is colon-free, so the password group takes the full
+            # remainder (a greedy first group would otherwise swallow colons inside the password)
+            regExp = "^([^:]*\\\\[^:]*):(.*)$"
             errMsg = "HTTP NTLM authentication credentials value must "
             errMsg += "be in format 'DOMAIN\\username:password'"
         elif authType == AUTH_TYPE.PKI:
@@ -1460,14 +1470,14 @@ def _setHTTPExtraHeaders():
             if not headerValue.strip():
                 continue
 
-            if headerValue.count(':') >= 1:
+            if headerValue.startswith('@'):
+                checkFile(headerValue[1:])
+                kb.headersFile = headerValue[1:]
+            elif headerValue.count(':') >= 1:
                 header, value = (_.lstrip() for _ in headerValue.split(":", 1))
 
                 if header and value:
                     conf.httpHeaders.append((header, value))
-            elif headerValue.startswith('@'):
-                checkFile(headerValue[1:])
-                kb.headersFile = headerValue[1:]
             else:
                 errMsg = "invalid header value: %s. Valid header format is 'name:value'" % repr(headerValue).lstrip('u')
                 raise SqlmapSyntaxException(errMsg)
@@ -2520,9 +2530,11 @@ def _setProxyList():
         return
 
     conf.proxyList = []
-    for match in re.finditer(r"(?i)((http[^:]*|socks[^:]*)://)?([\w\-.]+):(\d+)", readCachedFileContent(conf.proxyFile)):
-        _, type_, address, port = match.groups()
-        conf.proxyList.append("%s://%s:%s" % (type_ or "http", address, port))
+    # Note: preserve an explicit scheme and any 'user:pass@' credentials (entries use the same format
+    # as --proxy); otherwise a SOCKS proxy is silently downgraded to HTTP and proxy auth is dropped
+    for match in re.finditer(r"(?i)((http[^:\s]*|socks[^:\s]*)://)?(?:([^:@\s/]+:[^@\s/]*)@)?([\w\-.]+):(\d+)", readCachedFileContent(conf.proxyFile)):
+        _, type_, cred, address, port = match.groups()
+        conf.proxyList.append("%s://%s%s:%s" % (type_ or "http", ("%s@" % cred) if cred else "", address, port))
 
 def _setTorProxySettings():
     if not conf.tor:
@@ -2845,7 +2857,7 @@ def _basicOptionValidation():
         raise SqlmapSyntaxException(errMsg)
 
     if conf.csrfToken and conf.threads > 1:
-        errMsg = "option '--csrf-url' is incompatible with option '--threads'"
+        errMsg = "option '--csrf-token' is incompatible with option '--threads'"
         raise SqlmapSyntaxException(errMsg)
 
     if conf.requestFile and conf.url and conf.url != DUMMY_URL:

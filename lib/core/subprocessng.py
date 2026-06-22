@@ -199,4 +199,9 @@ def send_all(p, data):
         sent = p.send(data)
         if not isinstance(sent, int):
             break
+        if sent == 0:
+            # Note: POSIX send() returns 0 when the child's stdin pipe is not currently writable;
+            # back off briefly instead of busy-spinning at 100% CPU until the child drains it
+            time.sleep(0.01)
+            continue
         data = buffer(data[sent:])

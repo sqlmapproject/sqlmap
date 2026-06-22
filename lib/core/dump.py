@@ -318,10 +318,13 @@ class Dump(object):
                     maxlength1 = 0
                     maxlength2 = 0
 
-                    colType = None
-
                     colList = list(columns.keys())
                     colList.sort(key=lambda _: _.lower() if hasattr(_, "lower") else _)
+
+                    # Note: decide the layout by whether ANY column carries a type, not by the last
+                    # column iterated; otherwise a mixed table (some columns typed, some not) whose
+                    # alphabetically-last column is type-less renders a header/body column mismatch
+                    hasType = any(columns[_] is not None for _ in colList)
 
                     for column in colList:
                         colType = columns[column]
@@ -333,7 +336,7 @@ class Dump(object):
                     maxlength1 = max(maxlength1, len("COLUMN"))
                     lines1 = "-" * (maxlength1 + 2)
 
-                    if colType is not None:
+                    if hasType:
                         maxlength2 = max(maxlength2, len("TYPE"))
                         lines2 = "-" * (maxlength2 + 2)
 
@@ -344,17 +347,15 @@ class Dump(object):
                     else:
                         self._write("[%d columns]" % len(columns))
 
-                    if colType is not None:
+                    if hasType:
                         self._write("+%s+%s+" % (lines1, lines2))
                     else:
                         self._write("+%s+" % lines1)
 
                     blank1 = " " * (maxlength1 - len("COLUMN"))
 
-                    if colType is not None:
+                    if hasType:
                         blank2 = " " * (maxlength2 - len("TYPE"))
-
-                    if colType is not None:
                         self._write("| Column%s | Type%s |" % (blank1, blank2))
                         self._write("+%s+%s+" % (lines1, lines2))
                     else:
@@ -367,13 +368,14 @@ class Dump(object):
                         column = unsafeSQLIdentificatorNaming(column)
                         blank1 = " " * (maxlength1 - getConsoleLength(column))
 
-                        if colType is not None:
+                        if hasType:
+                            colType = colType or ""
                             blank2 = " " * (maxlength2 - getConsoleLength(colType))
                             self._write("| %s%s | %s%s |" % (column, blank1, colType, blank2))
                         else:
                             self._write("| %s%s |" % (column, blank1))
 
-                    if colType is not None:
+                    if hasType:
                         self._write("+%s+%s+\n" % (lines1, lines2))
                     else:
                         self._write("+%s+\n" % lines1)
@@ -645,7 +647,13 @@ class Dump(object):
                         value = DUMP_REPLACEMENTS.get(value, value)
 
                     if conf.dumpFormat == DUMP_FORMAT.SQLITE:
-                        values.append(value)
+                        # Note: store a real NULL for the NULL sentinel (and the raw value otherwise),
+                        # mirroring the JSONL path below; appending the display-replaced 'NULL'/'<blank>'
+                        # text would corrupt the INTEGER/REAL-typed columns inferred above
+                        if len(info["values"]) <= i or info["values"][i] is None or info["values"][i] == " ":  # NULL
+                            values.append(None)
+                        else:
+                            values.append(getUnicode(info["values"][i]))
 
                     maxlength = int(info["length"])
                     blank = " " * (maxlength - getConsoleLength(value))
@@ -708,8 +716,8 @@ class Dump(object):
         elif conf.dumpFormat in (DUMP_FORMAT.CSV, DUMP_FORMAT.HTML, DUMP_FORMAT.JSONL):
             if conf.dumpFormat == DUMP_FORMAT.HTML:
                 dataToDumpFile(dumpFP, "</tbody>\n</table>\n<script>let lc=-1,ld=1;function sortTable(n,h){var t=document.querySelector(\"table\"),r=Array.from(t.tBodies[0].rows);ld=(lc==n?-ld:1);lc=n;r.sort((a,b)=>{var x=a.cells[n].innerText.trim(),y=b.cells[n].innerText.trim(),nx=parseFloat(x),ny=parseFloat(y);return(!isNaN(nx)&&!isNaN(ny)?(nx-ny)*ld:x.localeCompare(y)*ld)});r.forEach(e=>t.tBodies[0].appendChild(e));Array.from(t.tHead.rows[0].cells).forEach(c=>{c.innerText=c.innerText.replace(/[\u2191\u2193]/g,\"\")});h.innerText=h.innerText+ (ld==1?\"\u2191\":\"\u2193\");}</script>\n</body>\n</html>")
-            elif conf.dumpFormat == DUMP_FORMAT.CSV:
-                dataToDumpFile(dumpFP, "\n")
+            # Note: each CSV row already ends with '\n' (above); no extra close-newline, otherwise
+            # the file ends with a blank line and a later --start/--stop append injects an empty record
             dumpFP.close()
 
             msg = "table '%s.%s' dumped to %s file '%s'" % (db, table, conf.dumpFormat, dumpFileName)
