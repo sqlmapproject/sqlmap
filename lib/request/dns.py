@@ -34,18 +34,42 @@ class DNSQuery(object):
         self._query = b""
 
         try:
+            # Minimum DNS header length is 12 bytes, followed by at least a
+            # root label terminator. Shorter packets are malformed/no-op.
+            if len(raw) <= 12:
+                return
+
             type_ = (ord(raw[2:3]) >> 3) & 15                   # Opcode bits
 
             if type_ == 0:                                      # Standard query
                 i = 12
-                j = ord(raw[i:i + 1])
+                parts = []
 
-                while j != 0:
-                    self._query += raw[i + 1:i + j + 1] + b'.'
-                    i = i + j + 1
+                while i < len(raw):
                     j = ord(raw[i:i + 1])
-        except TypeError:
-            pass
+
+                    if j == 0:
+                        break
+
+                    # Compression pointers are not expected in the question name
+                    # here. Treat them as malformed instead of walking arbitrary
+                    # offsets or creating a partial query.
+                    if j & 0xc0:
+                        parts = []
+                        break
+
+                    i = i + 1
+                    if i + j > len(raw):
+                        parts = []
+                        break
+
+                    parts.append(raw[i:i + j])
+                    i = i + j
+
+                if parts:
+                    self._query = b".".join(parts) + b'.'
+        except Exception:
+            self._query = b""
 
     def response(self, resolution):
         """
@@ -55,16 +79,19 @@ class DNSQuery(object):
         retVal = b""
 
         if self._query:
-            retVal += self._raw[:2]                                                         # Transaction ID
-            retVal += b"\x85\x80"                                                           # Flags (Standard query response, No error)
-            retVal += self._raw[4:6] + self._raw[4:6] + b"\x00\x00\x00\x00"                 # Questions and Answers Counts
-            retVal += self._raw[12:(12 + self._raw[12:].find(b"\x00") + 5)]                 # Original Domain Name Query
-            retVal += b"\xc0\x0c"                                                           # Pointer to domain name
-            retVal += b"\x00\x01"                                                           # Type A
-            retVal += b"\x00\x01"                                                           # Class IN
-            retVal += b"\x00\x00\x00\x20"                                                   # TTL (32 seconds)
-            retVal += b"\x00\x04"                                                           # Data length
-            retVal += b"".join(struct.pack('B', int(_)) for _ in resolution.split('.'))     # 4 bytes of IP
+            offset = self._raw[12:].find(b"\x00")
+
+            if offset >= 0:
+                retVal += self._raw[:2]                                                     # Transaction ID
+                retVal += b"\x85\x80"                                                       # Flags (Standard query response, No error)
+                retVal += self._raw[4:6] + self._raw[4:6] + b"\x00\x00\x00\x00"             # Questions and Answers Counts
+                retVal += self._raw[12:(12 + offset + 5)]                                   # Original Domain Name Query
+                retVal += b"\xc0\x0c"                                                       # Pointer to domain name
+                retVal += b"\x00\x01"                                                       # Type A
+                retVal += b"\x00\x01"                                                       # Class IN
+                retVal += b"\x00\x00\x00\x20"                                               # TTL (32 seconds)
+                retVal += b"\x00\x04"                                                       # Data length
+                retVal += b"".join(struct.pack('B', int(_)) for _ in resolution.split('.')) # 4 bytes of IP
 
         return retVal
 
@@ -160,10 +187,15 @@ class DNSServer(object):
                     try:
                         _ = DNSQuery(data)
 
+                        if not _._query:
+                            continue
+
                         with self._lock:
                             self._requests.append(_._query)
 
-                        self._socket.sendto(_.response("127.0.0.1"), addr)
+                        response = _.response("127.0.0.1")
+                        if response:
+                            self._socket.sendto(response, addr)
                     except KeyboardInterrupt:
                         raise
                     except Exception:
