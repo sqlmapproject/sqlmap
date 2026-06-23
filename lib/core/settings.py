@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.6.151"
+VERSION = "1.10.6.152"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -522,6 +522,16 @@ KEYSET_MIN_ROWS = 1000
 
 # Number of consecutive Huffman (set-membership) character attempts allowed to decline/escape without a single validated success before the technique latches itself off (safety against trimmed/blocked long IN() payloads)
 HUFFMAN_PROBE_LIMIT = 8
+
+# Cold-start (prior) weights for the order-0 Huffman model used in adaptive blind retrieval. Gently
+# biases the initial tree toward bytes that dominate real DBMS output (lowercase text, digits, common
+# identifier punctuation) so SHORT extractions don't pay the full balanced-tree depth before the online
+# frequency model warms up. Magnitude is small so genuine learned counts overtake it within a few dozen
+# characters (kept low-risk for uniform/hex columns: hex digits 0-9a-f are themselves favored here).
+HUFFMAN_PRIOR_WEIGHTS = {}
+for _weight, _chars in ((6, " etaoinsrhldcumfgypwbvkxjqz"), (4, "0123456789"), (3, "_.-/@:,'")):
+    for _char in _chars:
+        HUFFMAN_PRIOR_WEIGHTS[ord(_char)] = _weight
 
 # Minimum range between minimum and maximum of statistical set
 MIN_STATISTICAL_RANGE = 0.01

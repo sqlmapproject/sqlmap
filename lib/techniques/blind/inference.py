@@ -43,6 +43,7 @@ from lib.core.exception import SqlmapThreadException
 from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.core.settings import CHAR_INFERENCE_MARK
 from lib.core.settings import HUFFMAN_PROBE_LIMIT
+from lib.core.settings import HUFFMAN_PRIOR_WEIGHTS
 from lib.core.settings import INFERENCE_BLANK_BREAK
 from lib.core.settings import INFERENCE_EQUALS_CHAR
 from lib.core.settings import INFERENCE_GREATER_CHAR
@@ -296,7 +297,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             heap = []
             for order, ordinal in enumerate(xrange(128)):
-                heapq.heappush(heap, (model.get(ordinal, 0) + 1, order, (ordinal,)))
+                heapq.heappush(heap, (model.get(ordinal, 0) + HUFFMAN_PRIOR_WEIGHTS.get(ordinal, 1), order, (ordinal,)))
             heapq.heappush(heap, (max(model.get(ESCAPE, 0), 1), 128, (ESCAPE,)))
 
             counter = 129
