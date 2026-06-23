@@ -44,6 +44,8 @@ from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.core.settings import CHAR_INFERENCE_MARK
 from lib.core.settings import HUFFMAN_PROBE_LIMIT
 from lib.core.settings import HUFFMAN_PRIOR_WEIGHTS
+from lib.core.settings import PREDICTION_FEEDBACK_MAX_ITEMS
+from lib.core.settings import PREDICTION_FEEDBACK_MAX_LENGTH
 from lib.core.settings import INFERENCE_BLANK_BREAK
 from lib.core.settings import INFERENCE_EQUALS_CHAR
 from lib.core.settings import INFERENCE_GREATER_CHAR
@@ -828,6 +830,15 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             finalValue = decodeDbmsHexValue(finalValue) if conf.hexConvert else finalValue
             if not (conf.firstChar or conf.lastChar):  # Note: --first/--last give a range-limited (non-complete) output; caching it unmarked would let a later resume serve the truncated value as the full one
                 hashDBWrite(expression, finalValue)
+
+            # Adaptive intra-run prediction (good samaritan / --predict-output): remember this extracted
+            # value for its enumeration context so later same-context items sharing structure are predicted
+            # faster. Length-capped (identifiers are short -> large data cells never bloat/pollute the pool);
+            # a wrong prediction only ever costs a probe and falls back to bisection.
+            if (conf.predictOutput and kb.partRun and kb.commonOutputs is not None
+                    and 0 < len(finalValue) <= PREDICTION_FEEDBACK_MAX_LENGTH
+                    and len(kb.commonOutputs.get(kb.partRun) or ()) < PREDICTION_FEEDBACK_MAX_ITEMS):
+                kb.commonOutputs.setdefault(kb.partRun, set()).add(finalValue)
         elif partialValue:
             hashDBWrite(expression, "%s%s" % (PARTIAL_VALUE_MARKER if not conf.hexConvert else PARTIAL_HEX_VALUE_MARKER, partialValue))
 

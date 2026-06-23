@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.6.152"
+VERSION = "1.10.6.153"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -532,6 +532,14 @@ HUFFMAN_PRIOR_WEIGHTS = {}
 for _weight, _chars in ((6, " etaoinsrhldcumfgypwbvkxjqz"), (4, "0123456789"), (3, "_.-/@:,'")):
     for _char in _chars:
         HUFFMAN_PRIOR_WEIGHTS[ord(_char)] = _weight
+
+# Bounds for feeding extracted values back into the "good samaritan" (--predict-output) common-output
+# pool for their enumeration context, so later same-context items that share structure (e.g.
+# wp_posts / wp_users / wp_options ...) are predicted faster. MAX_LENGTH keeps large data cells from
+# bloating/polluting the pool (identifiers are short); MAX_ITEMS bounds per-context growth so a huge
+# enumeration cannot make the per-character prediction scan costly. Misses always fall back to bisection.
+PREDICTION_FEEDBACK_MAX_LENGTH = 128
+PREDICTION_FEEDBACK_MAX_ITEMS = 10000
 
 # Minimum range between minimum and maximum of statistical set
 MIN_STATISTICAL_RANGE = 0.01

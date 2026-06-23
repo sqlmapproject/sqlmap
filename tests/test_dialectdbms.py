@@ -28,46 +28,68 @@ from lib.utils.dialect import _classify
 from lib.utils.dialect import dialectCheckDbms
 
 # measured 2026-06 across the sqli-platform (boolean form "id=2 AND <probe>", anchor value 2);
-# signature = (2^0=2, 2^3=8, 5/2=2, 2|0=2)
+# base signature = (2^0=2, 2^3=8, 5/2=2, 2|0=2). The 5th probe (1<<2=4, bit-shift) is the MonetDB-vs-
+# SQL Server disambiguator and is asserted separately (SHIFT_SENSITIVE); for every other engine the
+# shift flag does NOT change the classification, which the test proves by trying it both ways.
 MEASURED = {
     "mysql":      ((True,  False, False, True),  DBMS.MYSQL),
+    "mysql5":     ((True,  False, False, True),  DBMS.MYSQL),
     "tidb":       ((True,  False, False, True),  DBMS.MYSQL),    # MySQL wire-compatible
-    "mssql":      ((True,  False, True,  True),  DBMS.MSSQL),
     "postgres":   ((False, True,  True,  True),  DBMS.PGSQL),
     "cockroach":  ((False, True,  False, True),  DBMS.PGSQL),    # pgwire (exponent '^', decimal division)
+    "cratedb":    ((False, True,  True,  True),  DBMS.PGSQL),    # pgwire family
     "sqlite":     ((False, False, True,  True),  DBMS.SQLITE),
     # not distinctive enough -> deliberately no prior (operators alone can't safely separate these)
     "firebird":   ((False, False, True,  False), None),
     "hsqldb":     ((False, False, True,  False), None),          # collides with firebird/derby/h2
     "derby":      ((False, False, True,  False), None),
     "h2":         ((False, False, True,  False), None),
+    "trino":      ((False, False, True,  False), None),
+    "iris":       ((False, False, False, False), None),          # all-error, like Oracle/broken channel
     "clickhouse": ((False, False, False, False), None),          # all-error, like Oracle/broken channel
+}
+
+# engines whose full 5-probe signature (incl. 1<<2=4) is needed because they share base-4 (xor,intdiv)
+# and only the bit-shift probe separates them: SQL Server has no shift operator, MonetDB does.
+SHIFT_SENSITIVE = {
+    "mssql":   ((True, False, True, True, False), DBMS.MSSQL),
+    "monetdb": ((True, False, True, True, True),  DBMS.MONETDB),
 }
 
 
 class TestDialectClassification(unittest.TestCase):
-    def test_measured_engines_map_as_expected(self):
-        for engine, (signature, expected) in MEASURED.items():
+    def test_shift_sensitive_engines_split_correctly(self):
+        # MonetDB shared MSSQL's (xor, intdiv) signature exactly (a false positive before the shift
+        # probe); 1<<2=4 (MonetDB only) now separates them.
+        for engine, (signature, expected) in SHIFT_SENSITIVE.items():
             self.assertEqual(_classify(signature), expected, "engine %r misclassified" % engine)
 
+    def test_measured_engines_map_as_expected(self):
+        # for non-shift-sensitive engines the shift flag is irrelevant: assert BOTH values map to the
+        # expected DBMS (proves the new probe never perturbs the existing classifications).
+        for engine, (base, expected) in MEASURED.items():
+            for shift in (False, True):
+                self.assertEqual(_classify(base + (shift,)), expected, "engine %r misclassified (shift=%s)" % (engine, shift))
+
     def test_no_false_positive_across_measured_set(self):
-        # ambiguous engines must not borrow a major-DBMS identity; concrete ones must stay in range
-        for engine, (signature, expected) in MEASURED.items():
-            result = _classify(signature)
-            if expected is None:
-                self.assertIsNone(result, "ambiguous engine %r leaked a DBMS prior" % engine)
-            else:
-                self.assertIn(result, (DBMS.MYSQL, DBMS.MSSQL, DBMS.PGSQL, DBMS.SQLITE, DBMS.ORACLE))
+        for engine, (base, expected) in MEASURED.items():
+            for shift in (False, True):
+                result = _classify(base + (shift,))
+                if expected is None:
+                    self.assertIsNone(result, "ambiguous engine %r leaked a DBMS prior" % engine)
+                else:
+                    self.assertIn(result, (DBMS.MYSQL, DBMS.MSSQL, DBMS.PGSQL, DBMS.SQLITE, DBMS.MONETDB, DBMS.ORACLE))
 
     def test_all_error_signature_yields_no_prior(self):
-        # an all-error signature (Oracle, ClickHouse, or simply a WAF-blocked channel) is not
+        # an all-error signature (Oracle, ClickHouse, IRIS, or simply a WAF-blocked channel) is not
         # distinctive enough - it must NOT be guessed as any DBMS
-        self.assertIsNone(_classify((False, False, False, False)))
+        self.assertIsNone(_classify((False, False, False, False, False)))
+        self.assertIsNone(_classify((False, False, False, False, True)))
 
     def test_pgpow_dominates_as_postgres_marker(self):
         # exponentiation '^' is a positive PostgreSQL-family marker regardless of division flavour
-        self.assertEqual(_classify((False, True, True, True)), DBMS.PGSQL)
-        self.assertEqual(_classify((False, True, False, True)), DBMS.PGSQL)
+        self.assertEqual(_classify((False, True, True, True, False)), DBMS.PGSQL)
+        self.assertEqual(_classify((False, True, False, True, False)), DBMS.PGSQL)
 
 
 class TestDialectCheckDbmsGuard(unittest.TestCase):
