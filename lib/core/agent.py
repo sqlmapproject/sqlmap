@@ -70,9 +70,9 @@ class Agent(object):
         query = self.cleanupPayload(query)
 
         if query.upper().startswith("AND "):
-            query = re.sub(r"(?i)AND ", "SELECT ", query, 1)
+            query = re.sub(r"(?i)AND ", "SELECT ", query, count=1)
         elif query.upper().startswith(" UNION ALL "):
-            query = re.sub(r"(?i) UNION ALL ", "", query, 1)
+            query = re.sub(r"(?i) UNION ALL ", "", query, count=1)
         elif query.startswith("; "):
             query = query.replace("; ", "", 1)
 
@@ -1126,7 +1126,7 @@ class Agent(object):
                 original = query.split("SELECT ", 1)[1].split(" FROM", 1)[0]
                 for part in original.split(','):
                     if re.search(r"\b%s\b" % re.escape(field), part):
-                        _ = re.sub(r"SELECT.+?FROM", "SELECT %s AS z,row_number() over() AS y FROM" % part, query, 1)
+                        _ = re.sub(r"SELECT.+?FROM", "SELECT %s AS z,row_number() over() AS y FROM" % part, query, count=1)
                         replacement = "SELECT x.z FROM (%s)x WHERE x.y-1=%d" % (_, num)
                         limitedQuery = replacement
                         break

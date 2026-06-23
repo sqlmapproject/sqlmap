@@ -2271,7 +2271,7 @@ def safeStringFormat(format_, params):
                 if match:
                     try:
                         _ = getUnicode(params[count % len(params)])
-                        retVal = re.sub(r"(\A|[^A-Za-z0-9])(%s)([^A-Za-z0-9]|\Z)", r"\g<1>%s\g<3>" % _.replace('\\', r'\\'), retVal, 1)
+                        retVal = re.sub(r"(\A|[^A-Za-z0-9])(%s)([^A-Za-z0-9]|\Z)", r"\g<1>%s\g<3>" % _.replace('\\', r'\\'), retVal, count=1)
                     except re.error:
                         retVal = retVal.replace(match.group(0), match.group(0) % params[count % len(params)], 1)
                     count += 1
@@ -3884,6 +3884,13 @@ def openFile(filename, mode='r', encoding=UNICODE_ENCODING, errors="reversible",
     if 'b' in mode:
         buffering = 0
         encoding = None
+    elif buffering == 1 and codecs_open is codecs.open:
+        # codecs.open() always opens the underlying file in binary mode, where line buffering
+        # (buffering=1) is unsupported: on Python 3.12+ it emits a benign RuntimeWarning and is
+        # silently downgraded to the default buffer size anyway. Request that default explicitly
+        # so the warning never reaches users (the >=3.14 _codecs_open shim handles buffering=1
+        # itself, preserving flush-on-newline, so this only adjusts the legacy codecs.open path).
+        buffering = -1
 
     if filename == STDIN_PIPE_DASH:
         if filename not in kb.cache.content:

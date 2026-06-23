@@ -43,6 +43,7 @@ bootstrap()
 from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.data import conf, kb
+from lib.core.threads import getCurrentThreadData
 from lib.core.enums import DBMS
 from lib.core.exception import SqlmapNotVulnerableException
 from lib.core.settings import DNS_BOUNDARIES_ALPHABET
@@ -89,7 +90,12 @@ class _DnsCase(unittest.TestCase):
     def setUpClass(cls):
         cls.server = _HighPortDNSServer()
         cls.server.run()
+        # bounded wait: never spin indefinitely if the in-process server fails to bind/init
+        # (e.g. a taken port on CI) - fail loudly instead of hanging the whole suite
+        deadline = time.time() + 10
         while not cls.server._initialized:
+            if time.time() > deadline:
+                raise RuntimeError("in-process DNS test server failed to initialize within 10s")
             time.sleep(0.02)
 
     @classmethod
@@ -107,6 +113,11 @@ class _DnsCase(unittest.TestCase):
         self._saved_randomInt = dnstestmod.randomInt
         self._saved_dnsServer = conf.get("dnsServer")
         self._saved_hdbR, self._saved_hdbW = dnsmod.hashDBRetrieve, dnsmod.hashDBWrite
+        # the DNS exfil path prints its own "[INFO] retrieved: ..." progress straight to stdout
+        # via dataToStdout() (it bypasses the logger, so the suite's log-level silencing can't
+        # catch it); suppress it through sqlmap's own per-thread stdout gate so the run stays clean
+        self._saved_disableStdOut = getCurrentThreadData().disableStdOut
+        getCurrentThreadData().disableStdOut = True
         for k, v in _CONF.items():
             conf[k] = v
         for k, v in _KB.items():
@@ -125,6 +136,7 @@ class _DnsCase(unittest.TestCase):
         set_dbms(self.DBMS_NAME)
 
     def tearDown(self):
+        getCurrentThreadData().disableStdOut = self._saved_disableStdOut
         for k, v in self._saved_conf.items():
             conf[k] = v
         for k, v in self._saved_kb.items():

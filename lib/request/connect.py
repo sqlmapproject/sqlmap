@@ -1018,7 +1018,7 @@ class Connect(object):
             if conn and getattr(conn, "redurl", None):
                 _ = _urllib.parse.urlsplit(conn.redurl)
                 _ = ("%s%s" % (_.path or "/", ("?%s" % _.query) if _.query else ""))
-                requestMsg = re.sub(r"(\n[A-Z]+ ).+?( HTTP/\d)", r"\g<1>%s\g<2>" % getUnicode(_).replace("\\", "\\\\"), requestMsg, 1)
+                requestMsg = re.sub(r"(\n[A-Z]+ ).+?( HTTP/\d)", r"\g<1>%s\g<2>" % getUnicode(_).replace("\\", "\\\\"), requestMsg, count=1)
 
                 if kb.resendPostOnRedirect is False:
                     requestMsg = re.sub(r"(\[#\d+\]:\n)POST ", r"\g<1>GET ", requestMsg)
