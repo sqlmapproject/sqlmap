@@ -511,6 +511,9 @@ def cmdLineParser(argv=None):
         enumeration.add_argument("--statements", dest="getStatements", action="store_true",
             help="Retrieve SQL statements being run on DBMS")
 
+        enumeration.add_argument("--procs", dest="getProcs", action="store_true",
+            help="Retrieve stored procedures/functions and their source")
+
         enumeration.add_argument("-D", dest="db",
             help="DBMS database to enumerate")
 

@@ -409,6 +409,7 @@ class CONTENT_TYPE(object):
     OS_CMD = 24
     REG_READ = 25
     STATEMENTS = 26
+    PROCEDURES = 27
 
 class CONTENT_STATUS(object):
     IN_PROGRESS = 0

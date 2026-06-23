@@ -153,6 +153,7 @@ optDict = {
         "search": "boolean",
         "getComments": "boolean",
         "getStatements": "boolean",
+        "getProcs": "boolean",
         "db": "string",
         "tbl": "string",
         "col": "string",

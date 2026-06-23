@@ -70,6 +70,7 @@ class Databases(object):
         kb.data.cachedCounts = {}
         kb.data.dumpedTable = {}
         kb.data.cachedStatements = []
+        kb.data.cachedProcedures = []
 
     def getCurrentDb(self):
         infoMsg = "fetching current database"
@@ -1127,3 +1128,62 @@ class Databases(object):
             kb.data.cachedStatements = [_.replace(REFLECTED_VALUE_MARKER, "<payload>") for _ in kb.data.cachedStatements]
 
         return kb.data.cachedStatements
+
+    def getProcedures(self):
+        infoMsg = "fetching stored procedures"
+        logger.info(infoMsg)
+
+        rootQuery = queries[Backend.getIdentifiedDbms()].procedures
+
+        # Generic-first by design: a DBMS is supported iff it declares a <procedures> query block in
+        # queries.xml (INFORMATION_SCHEMA.ROUTINES / pg_proc / sys.sql_modules / ALL_SOURCE / RDB$PROCEDURES).
+        # Engines without stored procedures (or without a declared block) fall through with a clean
+        # warning - same model as getStatements() (uneven coverage is the established convention).
+        if "inband" not in rootQuery and "blind" not in rootQuery:
+            warnMsg = "on %s it is not possible to enumerate the stored procedures" % Backend.getIdentifiedDbms()
+            logger.warning(warnMsg)
+            return kb.data.cachedProcedures
+
+        if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
+            query = rootQuery.inband.query
+
+            values = inject.getValue(query, blind=False, time=False)
+
+            if not isNoneValue(values):
+                kb.data.cachedProcedures = []
+                for value in arrayizeValue(values):
+                    value = (unArrayizeValue(value) or "").strip()
+                    if not isNoneValue(value):
+                        kb.data.cachedProcedures.append(value.strip())
+
+        if not kb.data.cachedProcedures and isInferenceAvailable() and not conf.direct:
+            infoMsg = "fetching number of stored procedures"
+            logger.info(infoMsg)
+
+            count = inject.getValue(rootQuery.blind.count, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+
+            if count == 0:
+                return kb.data.cachedProcedures
+            elif not isNumPosStrValue(count):
+                errMsg = "unable to retrieve the number of stored procedures"
+                raise SqlmapNoneDataException(errMsg)
+
+            # every <procedures> blind query uses 0-based paging (MySQL "LIMIT %d,1", PostgreSQL/MSSQL/Oracle
+            # "OFFSET %d"), so the index range stays 0-based here regardless of PLUS_ONE_DBMSES (unlike
+            # getStatements(), whose MSSQL/Oracle idioms are 1-based)
+            indexRange = getLimitRange(count)
+
+            for index in indexRange:
+                query = rootQuery.blind.query % index
+                value = unArrayizeValue(inject.getValue(query, union=False, error=False))
+
+                if not isNoneValue(value):
+                    kb.data.cachedProcedures.append((value or "").strip())
+
+        if not kb.data.cachedProcedures:
+            errMsg = "unable to retrieve the stored procedures"
+            logger.error(errMsg)
+        else:
+            kb.data.cachedProcedures = [_.replace(REFLECTED_VALUE_MARKER, "<payload>") for _ in kb.data.cachedProcedures]
+
+        return kb.data.cachedProcedures

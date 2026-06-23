@@ -216,6 +216,9 @@ class Dump(object):
     def statements(self, statements):
         self.lister("SQL statements", statements, content_type=CONTENT_TYPE.STATEMENTS)
 
+    def procedures(self, procedures):
+        self.lister("stored procedures", procedures, content_type=CONTENT_TYPE.PROCEDURES)
+
     def userSettings(self, header, userSettings, subHeader, content_type=None):
         self._areAdmins = set()
 

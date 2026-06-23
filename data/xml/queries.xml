@@ -47,6 +47,10 @@
             <inband query="SELECT INFO FROM INFORMATION_SCHEMA.PROCESSLIST" query2="SELECT INFO FROM DATA_DICTIONARY.PROCESSLIST"/>
             <blind query="SELECT INFO FROM INFORMATION_SCHEMA.PROCESSLIST ORDER BY ID LIMIT %d,1" query2="SELECT INFO FROM INFORMATION_SCHEMA.PROCESSLIST WHERE ID=%d" query3="SELECT ID FROM INFORMATION_SCHEMA.PROCESSLIST LIMIT %d,1" count="SELECT COUNT(DISTINCT(INFO)) FROM INFORMATION_SCHEMA.PROCESSLIST"/>
         </statements>
+        <procedures>
+            <inband query="SELECT CONCAT(ROUTINE_NAME,' [',ROUTINE_TYPE,'] ',IFNULL(ROUTINE_DEFINITION,'')) FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_SCHEMA NOT IN ('mysql','sys','information_schema','performance_schema')"/>
+            <blind query="SELECT CONCAT(ROUTINE_NAME,' [',ROUTINE_TYPE,'] ',IFNULL(ROUTINE_DEFINITION,'')) FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_SCHEMA NOT IN ('mysql','sys','information_schema','performance_schema') ORDER BY ROUTINE_SCHEMA,ROUTINE_NAME LIMIT %d,1" count="SELECT COUNT(*) FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_SCHEMA NOT IN ('mysql','sys','information_schema','performance_schema')"/>
+        </procedures>
         <dbs>
             <inband query="SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA" query2="SELECT db FROM mysql.db"/>
             <blind query="SELECT DISTINCT(schema_name) FROM INFORMATION_SCHEMA.SCHEMATA LIMIT %d,1" query2="SELECT DISTINCT(db) FROM mysql.db LIMIT %d,1" count="SELECT COUNT(DISTINCT(schema_name)) FROM INFORMATION_SCHEMA.SCHEMATA" count2="SELECT COUNT(DISTINCT(db)) FROM mysql.db"/>
@@ -123,6 +127,10 @@
             <inband query="SELECT query FROM pg_stat_activity WHERE query != '&lt;IDLE&gt;'"/>
             <blind query="SELECT DISTINCT(query) FROM pg_stat_activity WHERE query != '&lt;IDLE&gt;' OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(query)) FROM pg_stat_activity WHERE query != '&lt;IDLE&gt;'"/>
         </statements>
+        <procedures>
+            <inband query="SELECT n.nspname||'.'||p.proname||': '||p.prosrc FROM pg_proc p JOIN pg_namespace n ON p.pronamespace=n.oid WHERE n.nspname NOT IN ('pg_catalog','information_schema')"/>
+            <blind query="SELECT n.nspname||'.'||p.proname||': '||p.prosrc FROM pg_proc p JOIN pg_namespace n ON p.pronamespace=n.oid WHERE n.nspname NOT IN ('pg_catalog','information_schema') ORDER BY n.nspname,p.proname OFFSET %d LIMIT 1" count="SELECT COUNT(*) FROM pg_proc p JOIN pg_namespace n ON p.pronamespace=n.oid WHERE n.nspname NOT IN ('pg_catalog','information_schema')"/>
+        </procedures>
         <dbs>
             <inband query="SELECT DISTINCT(schemaname) FROM pg_tables"/>
             <blind query="SELECT DISTINCT(schemaname) FROM pg_tables ORDER BY schemaname OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(schemaname)) FROM pg_tables"/>
@@ -195,6 +203,10 @@
             <inband query="SELECT st.text FROM sys.dm_exec_cached_plans cp CROSS APPLY sys.dm_exec_sql_text(cp.plan_handle) st"/>
             <blind query="SELECT TOP 1 a.text FROM sys.dm_exec_cached_plans cp CROSS APPLY sys.dm_exec_sql_text(cp.plan_handle) a WHERE a.text NOT IN (SELECT TOP %d b.text FROM sys.dm_exec_cached_plans cp CROSS APPLY sys.dm_exec_sql_text(cp.plan_handle) b ORDER BY b.text) ORDER BY a.text" count="SELECT LTRIM(STR(COUNT(st.text))) FROM sys.dm_exec_cached_plans cp CROSS APPLY sys.dm_exec_sql_text(cp.plan_handle) st"/>
         </statements>
+        <procedures>
+            <inband query="SELECT o.name COLLATE DATABASE_DEFAULT+' ['+o.type_desc COLLATE DATABASE_DEFAULT+'] '+m.definition FROM sys.sql_modules m INNER JOIN sys.objects o ON m.object_id=o.object_id WHERE o.is_ms_shipped=0 AND o.type IN ('P','FN','IF','TF')"/>
+            <blind query="SELECT o.name COLLATE DATABASE_DEFAULT+' ['+o.type_desc COLLATE DATABASE_DEFAULT+'] '+m.definition FROM sys.sql_modules m INNER JOIN sys.objects o ON m.object_id=o.object_id WHERE o.is_ms_shipped=0 AND o.type IN ('P','FN','IF','TF') ORDER BY o.name OFFSET %d ROWS FETCH NEXT 1 ROWS ONLY" count="SELECT LTRIM(STR(COUNT(*))) FROM sys.sql_modules m INNER JOIN sys.objects o ON m.object_id=o.object_id WHERE o.is_ms_shipped=0 AND o.type IN ('P','FN','IF','TF')"/>
+        </procedures>
         <dbs>
             <inband query="SELECT name FROM master..sysdatabases" query2="SELECT DB_NAME(%d)"/>
             <blind query="SELECT TOP 1 name FROM master..sysdatabases WHERE name NOT IN (SELECT TOP %d name FROM master..sysdatabases ORDER BY name) ORDER BY name" count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases"/>
@@ -290,6 +302,11 @@
             <inband query="SELECT SQL_TEXT FROM V$SQL"/>
             <blind query="SELECT SQL_TEXT FROM (SELECT SQL_TEXT,ROWNUM AS CAP FROM V$SQL WHERE SQL_TEXT NOT LIKE '%%SQL_TEXT%%') WHERE CAP=%d" count="SELECT COUNT(SQL_TEXT) FROM V$SQL WHERE SQL_TEXT NOT LIKE '%%SQL_TEXT%%'"/>
         </statements>
+        <!-- NOTE: ALL_SOURCE stores one row per source line, so LISTAGG reassembles them (subject to its 4000-char limit). ORACLE_MAINTAINED='N' (12.2+) cleanly excludes every Oracle built-in schema (SYS, WMSYS, LBACSYS, DVSYS, ...) instead of a hand-maintained blocklist. -->
+        <procedures>
+            <inband query="SELECT NAME||' ['||TYPE||'] '||(SELECT LISTAGG(TEXT) WITHIN GROUP (ORDER BY LINE) FROM ALL_SOURCE WHERE NAME=s.NAME AND OWNER=s.OWNER AND TYPE=s.TYPE) FROM (SELECT DISTINCT OWNER,NAME,TYPE FROM ALL_SOURCE WHERE TYPE IN ('PROCEDURE','FUNCTION') AND OWNER IN (SELECT USERNAME FROM ALL_USERS WHERE ORACLE_MAINTAINED='N')) s"/>
+            <blind query="SELECT NAME||' ['||TYPE||'] '||(SELECT LISTAGG(TEXT) WITHIN GROUP (ORDER BY LINE) FROM ALL_SOURCE WHERE NAME=s.NAME AND OWNER=s.OWNER AND TYPE=s.TYPE) FROM (SELECT DISTINCT OWNER,NAME,TYPE FROM ALL_SOURCE WHERE TYPE IN ('PROCEDURE','FUNCTION') AND OWNER IN (SELECT USERNAME FROM ALL_USERS WHERE ORACLE_MAINTAINED='N')) s ORDER BY NAME OFFSET %d ROWS FETCH NEXT 1 ROWS ONLY" count="SELECT COUNT(*) FROM (SELECT DISTINCT OWNER,NAME,TYPE FROM ALL_SOURCE WHERE TYPE IN ('PROCEDURE','FUNCTION') AND OWNER IN (SELECT USERNAME FROM ALL_USERS WHERE ORACLE_MAINTAINED='N'))"/>
+        </procedures>
         <!-- NOTE: in Oracle schema names are the counterpart to database names on other DBMSes -->
         <dbs>
             <inband query="SELECT OWNER FROM (SELECT DISTINCT(OWNER) FROM SYS.ALL_TABLES)"/>
