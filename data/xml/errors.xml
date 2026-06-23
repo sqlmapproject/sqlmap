@@ -179,6 +179,7 @@
         <error regexp="![0-9]{5}![^\n]+(failed|unexpected|error|syntax|expected|violation|exception)"/>
         <error regexp="\[MonetDB\]\[ODBC Driver"/>
         <error regexp="nl\.cwi\.monetdb\.jdbc"/>
+        <error regexp="org\.monetdb\.jdbc"/>
     </dbms>
 
     <dbms value="Apache Derby">
@@ -224,7 +225,7 @@
     </dbms>
 
     <dbms value="CrateDB">
-        <error regexp="io\.crate\.client\.jdbc"/>
+        <error regexp="io\.crate\."/>
     </dbms>
 
     <dbms value="Cache">
