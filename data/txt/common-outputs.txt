@@ -24,6 +24,34 @@
 9.2.
 9.3.
 
+# MariaDB (banner reported as e.g. '10.6.21-MariaDB-...')
+10.0.
+10.1.
+10.2.
+10.3.
+10.4.
+10.5.
+10.6.
+10.7.
+10.8.
+10.9.
+10.10.
+10.11.
+11.0.
+11.1.
+11.2.
+11.3.
+11.4.
+11.5.
+11.6.
+11.7.
+11.8.
+12.0.
+12.1.
+12.2.
+12.3.
+13.0.
+
 # PostgreSQL
 PostgreSQL 7.0
 PostgreSQL 7.1
@@ -51,6 +79,7 @@ PostgreSQL 14.
 PostgreSQL 15.
 PostgreSQL 16.
 PostgreSQL 17.
+PostgreSQL 18.
 
 # Oracle
 Oracle Database 9i Standard Edition Release
@@ -97,6 +126,9 @@ Microsoft SQL Server 2025
 'debian-sys-maint'@'localhost'
 'root'@'%'
 'root'@'localhost'
+'mysql.sys'@'localhost'
+'mysql.session'@'localhost'
+'mysql.infoschema'@'localhost'
 
 # MySQL < 5.0
 debian-sys-maint
@@ -420,6 +452,8 @@ XDBWEBSERVICES
 information_schema
 performance_schema
 mysql
+sys
+test
 phpmyadmin
 
 # PostgreSQL
