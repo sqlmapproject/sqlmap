@@ -1,5 +1,195 @@
 <?xml version="1.0" ?>
+<!--
+     Release/Service Pack anchors for SQL Server 2012-2022.
+     Each release leads with a coarse "major.minor" signature (matches any patch
+     level, so the product year is always resolved) followed by exact RTM/SP base
+     builds (last match wins, so the specific entry overrides the coarse fallback
+     and adds Service Pack identification). 2017+ use the CU servicing model (no SPs).
+     Reference: https://learn.microsoft.com/en-us/troubleshoot/sql/releases/download-and-install-latest-updates
+-->
 <root>
+    <signatures release="2022">
+        <signature>
+            <version>
+                16.0
+            </version>
+            <servicepack>
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                16.0.1000.6
+            </version>
+            <servicepack>
+                0
+            </servicepack>
+        </signature>
+    </signatures>
+    <signatures release="2019">
+        <signature>
+            <version>
+                15.0
+            </version>
+            <servicepack>
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                15.0.2000.5
+            </version>
+            <servicepack>
+                0
+            </servicepack>
+        </signature>
+    </signatures>
+    <signatures release="2017">
+        <signature>
+            <version>
+                14.0
+            </version>
+            <servicepack>
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                14.0.1000.169
+            </version>
+            <servicepack>
+                0
+            </servicepack>
+        </signature>
+    </signatures>
+    <signatures release="2016">
+        <signature>
+            <version>
+                13.0
+            </version>
+            <servicepack>
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                13.0.1601.5
+            </version>
+            <servicepack>
+                0
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                13.0.4001.0
+            </version>
+            <servicepack>
+                1
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                13.0.5026.0
+            </version>
+            <servicepack>
+                2
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                13.0.6300.2
+            </version>
+            <servicepack>
+                3
+            </servicepack>
+        </signature>
+    </signatures>
+    <signatures release="2014">
+        <signature>
+            <version>
+                12.0
+            </version>
+            <servicepack>
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                12.0.2000.8
+            </version>
+            <servicepack>
+                0
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                12.0.4100.1
+            </version>
+            <servicepack>
+                1
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                12.0.5000.0
+            </version>
+            <servicepack>
+                2
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                12.0.6024.0
+            </version>
+            <servicepack>
+                3
+            </servicepack>
+        </signature>
+    </signatures>
+    <signatures release="2012">
+        <signature>
+            <version>
+                11.0
+            </version>
+            <servicepack>
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                11.0.2100.60
+            </version>
+            <servicepack>
+                0
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                11.0.3000.0
+            </version>
+            <servicepack>
+                1
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                11.0.5058.0
+            </version>
+            <servicepack>
+                2
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                11.0.6020.0
+            </version>
+            <servicepack>
+                3
+            </servicepack>
+        </signature>
+        <signature>
+            <version>
+                11.0.7001.0
+            </version>
+            <servicepack>
+                4
+            </servicepack>
+        </signature>
+    </signatures>
     <signatures release="2008 R2">
         <signature>
             <version>

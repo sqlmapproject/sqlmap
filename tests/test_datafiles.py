@@ -83,6 +83,10 @@ class TestXmlWellFormed(unittest.TestCase):
             path = os.path.join(ROOT, "data", "xml", rel)
             ET.parse(path)  # raises on malformed
 
+    def test_banner_xml_parses(self):
+        for path in glob.glob(os.path.join(ROOT, "data", "xml", "banner", "*.xml")):
+            ET.parse(path)  # raises on malformed
+
 
 class TestSourceAsciiSafety(unittest.TestCase):
     # sqlmap source files carry NO coding header, so any non-ASCII byte breaks py2 parsing.

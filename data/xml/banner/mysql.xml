@@ -3,6 +3,7 @@
 <!--
      References:
      * https://en.wikipedia.org/wiki/Debian_version_history
+     * https://en.wikipedia.org/wiki/Ubuntu_version_history
 -->
 
 <root>
@@ -74,6 +75,32 @@
 
     <regexp value="^([\d\.]+)[\-\_]Debian[\-\_][\d\.]+testing">
         <info dbms_version="1" type="Linux" distrib="Debian" codename="testing"/>
+    </regexp>
+
+    <!-- Ubuntu (release embedded in the package version, e.g. 8.0.36-0ubuntu0.22.04.1) -->
+
+    <regexp value="^([\d\.]+)[\-\_].*ubuntu\d+\.14\.04">
+        <info dbms_version="1" type="Linux" distrib="Ubuntu" release="14.04" codename="trusty"/>
+    </regexp>
+
+    <regexp value="^([\d\.]+)[\-\_].*ubuntu\d+\.16\.04">
+        <info dbms_version="1" type="Linux" distrib="Ubuntu" release="16.04" codename="xenial"/>
+    </regexp>
+
+    <regexp value="^([\d\.]+)[\-\_].*ubuntu\d+\.18\.04">
+        <info dbms_version="1" type="Linux" distrib="Ubuntu" release="18.04" codename="bionic"/>
+    </regexp>
+
+    <regexp value="^([\d\.]+)[\-\_].*ubuntu\d+\.20\.04">
+        <info dbms_version="1" type="Linux" distrib="Ubuntu" release="20.04" codename="focal"/>
+    </regexp>
+
+    <regexp value="^([\d\.]+)[\-\_].*ubuntu\d+\.22\.04">
+        <info dbms_version="1" type="Linux" distrib="Ubuntu" release="22.04" codename="jammy"/>
+    </regexp>
+
+    <regexp value="^([\d\.]+)[\-\_].*ubuntu\d+\.24\.04">
+        <info dbms_version="1" type="Linux" distrib="Ubuntu" release="24.04" codename="noble"/>
     </regexp>
 
 </root>
