@@ -415,6 +415,9 @@ def cmdLineParser(argv=None):
         techniques.add_argument("--technique", dest="technique",
             help="SQL injection techniques to use (default \"%s\")" % defaults.technique)
 
+        techniques.add_argument("--nosql", dest="nosql", action="store_true",
+            help="Test for NoSQL injection (e.g. MongoDB, CouchDB, Neo4j)")
+
         techniques.add_argument("--time-sec", dest="timeSec", type=int,
             help="Seconds to delay the DBMS response (default %d)" % defaults.timeSec)
 

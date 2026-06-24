@@ -520,6 +520,11 @@ def start():
 
             checkWaf()
 
+            if conf.nosql:
+                from lib.techniques.nosql.inject import nosqlScan
+                nosqlScan()
+                continue
+
             if conf.nullConnection:
                 checkNullConnection()
 

@@ -122,6 +122,46 @@ SCHEMA = """
 LISTEN_ADDRESS = "localhost"
 LISTEN_PORT = 8440
 
+# Minimal MongoDB-style collection backing the NoSQL operator-injection endpoint ('/nosql'). The
+# 'password' field is the blind-extraction target, constrained by a sibling 'name' equality match.
+NOSQL_USERS = {
+    "luther": "s3cr3t",
+    "fluffy": "carrot",
+    "wu": "shanghai",
+}
+
+def nosql_match(params):
+    """Emulates a MongoDB find() on NOSQL_USERS: reconstructs the operator object for the 'password'
+    field (from bracket-notation 'password[$ne]=...' or a JSON sub-document) and evaluates it against
+    the record selected by 'name'. An invalid $regex raises re.error (surfaced as a driver error)."""
+
+    record = NOSQL_USERS.get(params.get("name"))
+
+    spec = params.get("password")
+    if isinstance(spec, dict):
+        op, value = next(iter(spec.items()), ("$eq", None))
+    else:
+        op, value = "$eq", spec
+        for key in params:
+            match = re.match(r"^password\[(\$\w+)\](?:\[\])?$", key)
+            if match:
+                op, value = match.group(1), params[key]
+                break
+
+    if isinstance(value, (tuple, list)):
+        value = value[-1] if value else None
+
+    if record is None:
+        return False
+    elif op == "$ne":
+        return record != value
+    elif op == "$gt":
+        return record > (value or "")
+    elif op == "$regex":
+        return re.search(value, record) is not None
+    else:           # $eq, $in (single-valued here) and any literal equality
+        return record == value
+
 _conn = None
 _cursor = None
 _lock = None
@@ -284,6 +324,20 @@ class ReqHandler(BaseHTTPRequestHandler):
 
                 self.wfile.write(form.encode(UNICODE_ENCODING))
                 return
+
+        if self.url == "/nosql":
+            self.send_response(OK)
+            self.send_header("Content-type", "text/html; charset=%s" % UNICODE_ENCODING)
+            self.send_header("Connection", "close")
+            self.end_headers()
+
+            try:
+                output = "<html><body><b>Welcome %s</b></body></html>" % self.params.get("name") if nosql_match(self.params) else "<html><body><b>Invalid credentials</b></body></html>"
+            except re.error:       # invalid $regex -> emulate a MongoDB driver error (drives fingerprinting)
+                output = "<html><body>MongoServerError: Regular expression is invalid: missing terminating ] for character class</body></html>"
+
+            self.wfile.write(output.encode(UNICODE_ENCODING))
+            return
 
         if self.url == '/':
             if not any(_ in self.params for _ in ("id", "query")):

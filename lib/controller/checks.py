@@ -87,6 +87,7 @@ from lib.core.settings import IPS_WAF_CHECK_TIMEOUT
 from lib.core.settings import MAX_DIFFLIB_SEQUENCE_LENGTH
 from lib.core.settings import MAX_STABILITY_DELAY
 from lib.core.settings import NON_SQLI_CHECK_PREFIX_SUFFIX_LENGTH
+from lib.core.settings import NOSQL_ERROR_REGEX
 from lib.core.settings import PRECONNECT_INCOMPATIBLE_SERVERS
 from lib.core.settings import SINGLE_QUOTE_MARKER
 from lib.core.settings import SLEEP_TIME_MARKER
@@ -1169,6 +1170,13 @@ def heuristicCheckSqlInjection(place, parameter):
                 break
     except (SystemError, RuntimeError) as ex:
         logger.debug("Skipping FI heuristic due to regex failure: %s", getSafeExString(ex))
+
+    if not conf.nosql and re.search(NOSQL_ERROR_REGEX, page or ""):
+        infoMsg = "heuristic (NoSQL) test shows that %sparameter '%s' might be vulnerable to NoSQL injection attacks (rerun with switch '--nosql')" % ("%s " % paramType if paramType != parameter else "", parameter)
+        logger.info(infoMsg)
+
+        if conf.beep:
+            beep()
 
     kb.disableHtmlDecoding = False
     kb.heuristicMode = False

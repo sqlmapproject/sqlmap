@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.6.159"
+VERSION = "1.10.6.160"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -466,7 +466,8 @@ ERROR_PARSING_REGEXES = (
     r"error '[0-9a-f]{8}'((<[^>]+>)|\s)+(?P<result>[^<>]+)",
     r"\[[^\n\]]{1,100}(ODBC|JDBC)[^\n\]]+\](\[[^\]]+\])?(?P<result>[^\n]+(in query expression|\(SQL| at /[^ ]+pdo)[^\n<]+)",
     r"(?P<result>query error: SELECT[^<>]+)",
-    r"(?P<result>(?:(?:ORA|PLS)-[0-9]{5}:|SQLCODE[ =:]+-?[0-9]+|SQLSTATE[ =:]+[0-9A-Z]{5}|Dynamic SQL Error|DB2 SQL error:|SAP DBTech JDBC:|SQLiteException:|You have an error in your SQL syntax;|Incorrect syntax near |Unclosed quotation mark after the character string|near \"[^\"]+\": syntax error)[^\n<]*)"
+    r"(?P<result>(?:(?:ORA|PLS)-[0-9]{5}:|SQLCODE[ =:]+-?[0-9]+|SQLSTATE[ =:]+[0-9A-Z]{5}|Dynamic SQL Error|DB2 SQL error:|SAP DBTech JDBC:|SQLiteException:|You have an error in your SQL syntax;|Incorrect syntax near |Unclosed quotation mark after the character string|near \"[^\"]+\": syntax error)[^\n<]*)",
+    r'"(?:errmsg|errorMessage|reason|msg)"\s*:\s*"(?P<result>[^"]+)"'      # generic JSON error-message field (NoSQL document/REST back-ends)
 )
 
 # Regular expression used for parsing charset info from meta html headers
@@ -846,6 +847,35 @@ DUMMY_NON_SQLI_CHECK_APPENDIX = "<'\">"
 
 # Regular expression used for recognition of file inclusion errors
 FI_ERROR_REGEX = r"(?i)[^\n]{0,100}(no such file|failed (to )?open)[^\n]{0,100}"
+
+# Regular expressions (per back-end, anchored to actual error-message structure - not product names) used for heuristic recognition of NoSQL injection
+NOSQL_ERRORS = (
+    ("MongoDB", r"Mongo(?:Server|Parse|Network|Runtime|Bulk|WriteConcern)?Error\b|\bBSON(?:Type)?Error\b|\bMongooseError\b|CastError: Cast to|unknown (?:top.level )?operator: ?\$|\$(?:regex|where|expr|in|nin|ne|gt|lt|elemMatch) (?:has to be|is not allowed|must be|not supported|requires)|Regular expression is invalid"),
+    ("CouchDB", r'"error"\s*:\s*"(?:bad_request|query_parse_error|missing_named_query)"|invalid operator: ?\$'),
+    ("Elasticsearch", r'"type"\s*:\s*"[a-z_]*?(?:query_shard|x_content_parse|parsing|search_phase_execution|illegal_argument|too_many_clauses|number_format|script)_exception"|Failed to parse query \['),
+    ("Solr", r"org\.apache\.solr\.[\w.]*(?:SyntaxError|SolrException)"),
+    ("Neo4j", r"Neo\.(?:ClientError|DatabaseError|TransientError|ClientNotification)\.|\bNeo4jError\b|even number of non-escaped quotes|Failed to parse string literal|expected an expression|'(?:UNWIND|OPTIONAL|DETACH|FOREACH|MERGE|LOAD CSV)'"),
+    ("ArangoDB", r"\bArangoError\b|AQL: (?:syntax|parse) error"),
+    ("Cassandra", r"line \d+:\d+ (?:no viable alternative at input|(?:mismatched|extraneous) input '.*?' expecting)|org\.apache\.cassandra|com\.datastax|\bInvalid(?:Request|Query)Exception\b"),
+    ("Redis", r"\bWRONGTYPE\b|ERR Error (?:compiling|running) script|@user_script|\bReplyError\b"),
+    ("Memcached", r"CLIENT_ERROR bad|SERVER_ERROR object too large"),
+    ("InfluxDB", r"error parsing query|unable to parse '[^']*': found"),
+    ("HBase/Phoenix", r"org\.apache\.phoenix|PhoenixParserException|org\.apache\.hadoop\.hbase"),
+)
+NOSQL_ERROR_REGEX = "(?:%s)" % '|'.join(regex for _, regex in NOSQL_ERRORS)
+
+# Printable-ASCII codepoint bounds bisected (via regexp character-class ranges) during NoSQL blind extraction
+NOSQL_CHAR_MIN = 0x20
+NOSQL_CHAR_MAX = 0x7e
+
+# Maximum number of document fields enumerated during a NoSQL ($where server-side JavaScript) document dump
+NOSQL_MAX_FIELDS = 64
+
+# Maximum number of records walked during a NoSQL blind multi-record (ordered key paging) collection dump
+NOSQL_MAX_RECORDS = 100
+
+# Upper bound for the length search during NoSQL blind extraction
+NOSQL_MAX_LENGTH = 1024
 
 # Length of prefix and suffix used in non-SQLI heuristic checks
 NON_SQLI_CHECK_PREFIX_SUFFIX_LENGTH = 6
