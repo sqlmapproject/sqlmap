@@ -260,6 +260,37 @@ class NcursesUI:
 
             x += len(tab_text) + 1
 
+    def _build_command(self):
+        """Assemble the equivalent sqlmap command line from the current field values"""
+        parts = ["sqlmap.py"]
+        for opt in self.all_options:
+            flag = opt['label'].split(',')[0].strip() if opt['label'] else ""
+            if not flag:
+                continue
+            value = opt['value']
+            if opt['type'] == 'bool':
+                if value:
+                    parts.append(flag)
+            elif value not in (None, "") and str(value) != str(opt.get('default') or ""):
+                text = str(value)
+                if ' ' in text or '"' in text:
+                    text = '"%s"' % text.replace('"', '\\"')
+                parts.append("%s %s" % (flag, text))
+        return " ".join(parts)
+
+    def _draw_command(self):
+        """Live preview of the command being built, just above the footer"""
+        height, width = self.stdscr.getmaxyx()
+        cmd = "$ " + self._build_command()
+        if len(cmd) > width - 2:
+            cmd = cmd[:width - 5] + "..."
+        try:
+            self.stdscr.attron(curses.color_pair(8) | curses.A_BOLD)
+            self.stdscr.addstr(height - 2, 1, cmd.ljust(width - 2)[:width - 2])
+            self.stdscr.attroff(curses.color_pair(8) | curses.A_BOLD)
+        except curses.error:
+            pass
+
     def _draw_footer(self):
         """Draw the footer with help text"""
         height, width = self.stdscr.getmaxyx()
@@ -303,12 +334,12 @@ class NcursesUI:
                     pass
             y += 1
 
-        # Draw options
+        # Draw options (leave height-2 for the command preview, height-1 for the footer)
         visible_start = self.scroll_offset
-        visible_end = visible_start + (height - y - 2)
+        visible_end = visible_start + (height - y - 3)
 
         for i, option in enumerate(tab['options'][visible_start:visible_end], visible_start):
-            if y >= height - 2:
+            if y >= height - 3:
                 break
 
             is_selected = (i == self.current_field)
@@ -374,7 +405,7 @@ class NcursesUI:
         if len(tab['options']) > visible_end - visible_start:
             try:
                 self.stdscr.attron(curses.color_pair(6))
-                self.stdscr.addstr(height - 2, width - 10, "[More...]")
+                self.stdscr.addstr(height - 3, width - 10, "[More...]")
                 self.stdscr.attroff(curses.color_pair(6))
             except:
                 pass
@@ -828,6 +859,7 @@ class NcursesUI:
             self._draw_header()
             self._draw_tabs()
             self._draw_current_tab()
+            self._draw_command()
             self._draw_footer()
 
             self.stdscr.refresh()

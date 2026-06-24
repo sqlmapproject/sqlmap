@@ -208,6 +208,8 @@ class SqlmapGui(object):
         self.inners = {}                 # name -> scrollable inner frame (populated lazily)
         self.builders = {}               # name -> callable that populates the inner frame
         self.built = set()               # names whose content has been built
+        self.badges = {}                 # name -> sidebar count badge label
+        self.sectionDests = {}           # name -> [option dests in that section]
         self.paneOrder = []              # nav order, for Up/Down navigation
         self.currentPane = None
         self.process = None
@@ -329,6 +331,7 @@ class SqlmapGui(object):
         cmdBar = self.ttk.Frame(self.window, style="Bar.TFrame", padding=(20, 8))
         cmdBar.pack(fill=tk.X)
         self.ttk.Label(cmdBar, text="Command:", style="Hint.TLabel").pack(side=tk.LEFT, padx=(0, 8))
+        self.ttk.Button(cmdBar, text="Copy", command=self._copyCommand, takefocus=False).pack(side=tk.RIGHT, padx=(8, 0))
         self.command = tk.StringVar(value="sqlmap.py")
         cmdEntry = tk.Entry(cmdBar, textvariable=self.command, font=self.fonts["mono"],
                             bg="#ffffff", fg=PALETTE["blue"], readonlybackground="#ffffff",
@@ -352,6 +355,12 @@ class SqlmapGui(object):
         self.window.bind("<Up>", lambda e: self._navKey(-1))
         for seq in ("<MouseWheel>", "<Button-4>", "<Button-5>"):
             self.window.bind_all(seq, self._onWheel)
+        self.window.bind("<F5>", lambda e: self.run())
+        self.window.bind("<Control-r>", lambda e: self.run())
+        self.window.bind("<Control-Return>", lambda e: self.run())
+        self.window.bind("<Control-l>", lambda e: self._focusTarget())
+        self.window.bind("<Control-s>", lambda e: self.saveConfigDialog())
+        self.window.bind("<Control-o>", lambda e: self.loadConfig())
         self._enableSelectAll()
         self._tickStats()
         self._prebuildPanes()
@@ -586,14 +595,17 @@ class SqlmapGui(object):
         icon = tk.Canvas(row, width=22, height=22, highlightthickness=0, borderwidth=0, background=p["mantle"])
         icon.pack(side=tk.LEFT, padx=(13, 0), pady=8)
         self._drawIcon(icon, name, self._iconColor(name))
+        badge = tk.Label(row, text="", background=p["mantle"], foreground=p["blue"], font=self.fonts["small"])
+        badge.pack(side=tk.RIGHT, padx=(0, 12))
+        self.badges[name] = badge
         lab = tk.Label(row, text=navText, background=p["mantle"], foreground=p["subtext"],
                        font=self.fonts["nav"], anchor="w", padx=10, pady=9)
         lab.pack(side=tk.LEFT, fill=tk.X, expand=True)
-        for w in (row, lab, strip, icon):
+        for w in (row, lab, strip, icon, badge):
             w.bind("<Button-1>", lambda e, n=name: self._selectPane(n))
             w.bind("<Enter>", lambda e, n=name: self._navHover(n, True))
             w.bind("<Leave>", lambda e, n=name: self._navHover(n, False))
-        self.navItems[name] = (row, strip, icon, lab)
+        self.navItems[name] = (row, strip, icon, lab, badge)
         self.paneOrder.append(name)
 
         outer = self.ttk.Frame(self.content, style="Card.TFrame")
@@ -618,8 +630,8 @@ class SqlmapGui(object):
         if name == self.currentPane:
             return
         bg = PALETTE["surface2"] if entering else PALETTE["mantle"]
-        row, strip, icon, lab = self.navItems[name]
-        for w in (row, strip, icon, lab):
+        row, strip, icon, lab, badge = self.navItems[name]
+        for w in (row, strip, icon, lab, badge):
             w.configure(background=bg)
 
     def _navKey(self, delta):
@@ -643,16 +655,18 @@ class SqlmapGui(object):
         p = PALETTE
         if self.currentPane:
             self.panes[self.currentPane].pack_forget()
-            row, strip, icon, lab = self.navItems[self.currentPane]
+            row, strip, icon, lab, badge = self.navItems[self.currentPane]
             for w in (row, strip, icon):
                 w.configure(background=p["mantle"])
             lab.configure(background=p["mantle"], foreground=p["text"], font=self.fonts["nav"])
+            badge.configure(background=p["mantle"], foreground=p["blue"])
             self._drawIcon(icon, self.currentPane, self._iconColor(self.currentPane))
         self.panes[name].pack(expand=True, fill=self.tk.BOTH)
-        row, strip, icon, lab = self.navItems[name]
+        row, strip, icon, lab, badge = self.navItems[name]
         for w in (row, strip, icon):
             w.configure(background=p["blue"])
         lab.configure(background=p["blue"], foreground="#ffffff", font=self.fonts["bodyBold"])
+        badge.configure(background=p["blue"], foreground="#ffffff")
         self._drawIcon(icon, name, "#ffffff")
         self.currentPane = name
         self._ensureNavVisible(name)
@@ -704,6 +718,7 @@ class SqlmapGui(object):
     def _buildQuickStartPane(self):
         name = "Quick start"
         self._addPane(name, name)
+        self.sectionDests[name] = [_ for _ in QUICK_START_DESTS if _ in self.optionByDest]
 
         def build(inner):
             self.ttk.Label(inner, text="Quick start", style="Pane.TLabel").grid(row=0, column=0, columnspan=2, sticky="w")
@@ -721,6 +736,7 @@ class SqlmapGui(object):
     def _buildGroupPane(self, group):
         title = _groupTitle(group)
         self._addPane(title, NAV_ALIASES.get(title, title))
+        self.sectionDests[title] = [_optDest(_) for _ in _groupOptions(group) if _optDest(_)]
 
         def build(inner, group=group, title=title):
             self.ttk.Label(inner, text=title, style="Pane.TLabel").grid(row=0, column=0, columnspan=2, sticky="w")
@@ -806,19 +822,25 @@ class SqlmapGui(object):
         window.geometry("%dx%d+%d+%d" % (width, height, x, y))
 
     def _updateStats(self):
-        count = 0
+        setDests = set()
         for dest, (otype, var) in self.widgets.items():
             try:
                 if otype == "bool":
                     if var.get():
-                        count += 1
+                        setDests.add(dest)
                 else:
                     raw = var.get()
                     if raw not in (None, "") and str(raw) != str(defaults.get(dest, "")):
-                        count += 1
+                        setDests.add(dest)
             except Exception:
                 pass
+        count = len(setDests)
         self.stat.set("%d option%s set" % (count, "" if count == 1 else "s"))
+        for name, dests in self.sectionDests.items():
+            badge = self.badges.get(name)
+            if badge is not None:
+                hits = sum(1 for _ in dests if _ in setDests)
+                badge.configure(text=(str(hits) if hits else ""))
 
     def _buildCommandString(self):
         parts = ["sqlmap.py"]
@@ -849,6 +871,22 @@ class SqlmapGui(object):
         self._updateStats()
         self.command.set(self._buildCommandString())
         self.window.after(1200, self._tickStats)
+
+    def _copyCommand(self):
+        try:
+            self.window.clipboard_clear()
+            self.window.clipboard_append(self.command.get())
+            self.hint.set("Command copied to clipboard")
+        except Exception:
+            pass
+
+    def _focusTarget(self):
+        try:
+            self.targetEntry.focus_set()
+            self.targetEntry.select_range(0, "end")
+        except Exception:
+            pass
+        return "break"
 
     def _collectConfig(self):
         config = {}
