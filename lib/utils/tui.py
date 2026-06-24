@@ -25,6 +25,75 @@ from lib.core.exception import SqlmapSystemException
 from lib.core.settings import IS_WIN
 from thirdparty.six.moves import configparser as _configparser
 
+# Options surfaced on the curated "Quick start" tab (by destination), in display order
+QUICK_START_DESTS = (
+    "url", "data", "cookie", "dbms", "level", "risk", "technique",
+    "getCurrentUser", "getCurrentDb", "getBanner", "isDba",
+    "getDbs", "getTables", "getColumns", "getPasswordHashes", "dumpTable",
+    "batch", "threads", "proxy", "tor",
+)
+
+# Short tab labels so the (sometimes verbose) option-group titles fit the top bar
+TAB_ALIASES = {
+    "Optimization": "Optimize",
+    "Enumeration": "Enumerate",
+    "Brute force": "Brute",
+    "User-defined function injection": "UDF",
+    "File system access": "Files",
+    "Operating system access": "OS",
+    "Windows registry access": "Registry",
+    "Miscellaneous": "Misc",
+}
+
+# --- parser-backend compatibility (works for both optparse and argparse objects) ---
+
+def _parserGroups(parser):
+    groups = getattr(parser, "option_groups", None)
+    if groups is None:
+        groups = [_ for _ in getattr(parser, "_action_groups", []) if getattr(_, "title", None) not in (None, "positional arguments", "optional arguments", "options")]
+    return groups or []
+
+def _groupOptions(group):
+    for attr in ("option_list", "_group_actions"):
+        if hasattr(group, attr):
+            return getattr(group, attr)
+    return []
+
+def _groupTitle(group):
+    return getattr(group, "title", "") or ""
+
+def _groupDescription(group):
+    if hasattr(group, "get_description"):
+        return group.get_description() or ""
+    return getattr(group, "description", "") or ""
+
+def _optStrings(option):
+    if hasattr(option, "option_strings"):
+        return list(option.option_strings)
+    return list(getattr(option, "_short_opts", None) or []) + list(getattr(option, "_long_opts", None) or [])
+
+def _optDest(option):
+    return getattr(option, "dest", None)
+
+def _optHelp(option):
+    return getattr(option, "help", "") or ""
+
+def _optTakesValue(option):
+    if hasattr(option, "takes_value"):
+        try:
+            return option.takes_value()
+        except Exception:
+            pass
+    return getattr(option, "nargs", 1) != 0
+
+def _optValueType(option):
+    kind = getattr(option, "type", None)
+    if kind in ("int", int):
+        return "int"
+    if kind in ("float", float):
+        return "float"
+    return "string"
+
 class NcursesUI:
     def __init__(self, stdscr, parser):
         self.stdscr = stdscr
@@ -38,61 +107,110 @@ class NcursesUI:
         self.process = None
 
         # Initialize colors
-        curses.start_color()
-        curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_CYAN)    # Header
-        curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_BLUE)    # Active tab
-        curses.init_pair(3, curses.COLOR_BLACK, curses.COLOR_WHITE)   # Inactive tab
-        curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK)  # Selected field
-        curses.init_pair(5, curses.COLOR_GREEN, curses.COLOR_BLACK)   # Help text
-        curses.init_pair(6, curses.COLOR_RED, curses.COLOR_BLACK)     # Error/Important
-        curses.init_pair(7, curses.COLOR_CYAN, curses.COLOR_BLACK)    # Label
+        self._init_colors()
 
         # Setup curses
-        curses.curs_set(1)
+        curses.curs_set(0)
         self.stdscr.keypad(1)
 
         # Parse option groups
         self._parse_options()
 
+    def _init_colors(self):
+        """Cohesive palette: a flat 256-color scheme with a graceful 8-color fallback"""
+        curses.start_color()
+        try:
+            curses.use_default_colors()
+            default_bg = -1
+        except curses.error:
+            default_bg = curses.COLOR_BLACK
+
+        if curses.COLORS >= 256:
+            accent, accent_fg, sel_bg = 75, 234, 237
+            text, muted, green, red = 252, 245, 114, 210
+            curses.init_pair(1, accent_fg, accent)     # header / footer bar
+            curses.init_pair(2, accent_fg, accent)     # active tab
+            curses.init_pair(3, muted, 236)            # inactive tab
+            curses.init_pair(4, accent, sel_bg)        # selected field row
+            curses.init_pair(5, muted, default_bg)     # help / description
+            curses.init_pair(6, red, default_bg)       # error / important
+            curses.init_pair(7, text, default_bg)      # label / value
+            curses.init_pair(8, green, default_bg)     # value that has been set
+            curses.init_pair(9, muted, sel_bg)         # help text on the highlighted row
+        else:
+            curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_CYAN)
+            curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_CYAN)
+            curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_BLUE)
+            curses.init_pair(4, curses.COLOR_BLACK, curses.COLOR_CYAN)
+            curses.init_pair(5, curses.COLOR_GREEN, default_bg)
+            curses.init_pair(6, curses.COLOR_RED, default_bg)
+            curses.init_pair(7, curses.COLOR_WHITE, default_bg)
+            curses.init_pair(8, curses.COLOR_GREEN, default_bg)
+            curses.init_pair(9, curses.COLOR_BLACK, curses.COLOR_CYAN)
+
     def _parse_options(self):
         """Parse command line options into tabs and fields"""
-        for group in self.parser.option_groups:
+        self.all_options = []
+        for group in _parserGroups(self.parser):
+            title = _groupTitle(group)
             tab_data = {
-                'title': group.title,
-                'description': group.get_description() if hasattr(group, 'get_description') and group.get_description() else "",
+                'title': title,
+                'description': _groupDescription(group),
                 'options': []
             }
 
-            for option in group.option_list:
+            for option in _groupOptions(group):
+                dest = _optDest(option)
+                if not dest:
+                    continue
                 field_data = {
-                    'dest': option.dest,
+                    'dest': dest,
                     'label': self._format_option_strings(option),
-                    'help': option.help if option.help else "",
-                    'type': option.type if hasattr(option, 'type') and option.type else 'bool',
+                    'help': _optHelp(option),
+                    'type': _optValueType(option) if _optTakesValue(option) else 'bool',
                     'value': '',
-                    'default': defaults.get(option.dest) if defaults.get(option.dest) else None
+                    'default': defaults.get(dest) if defaults.get(dest) else None
                 }
                 tab_data['options'].append(field_data)
-                self.fields[(group.title, option.dest)] = field_data
+                self.fields[(title, dest)] = field_data
+                self.all_options.append(field_data)
 
             self.tabs.append(tab_data)
 
+        # curated "Quick start" tab; references the same field objects as the group tabs,
+        # so a value edited in either place stays in sync
+        seen = {}
+        for tab in self.tabs:
+            for option in tab['options']:
+                seen.setdefault(option['dest'], option)
+        quick = {
+            'title': 'Quick start',
+            'description': "The options people reach for most. Fill these in, then press F2 to run.",
+            'options': [seen[dest] for dest in QUICK_START_DESTS if dest in seen],
+        }
+        if quick['options']:
+            self.tabs.insert(0, quick)
+
     def _format_option_strings(self, option):
         """Format option strings for display"""
-        parts = []
-        if hasattr(option, '_short_opts') and option._short_opts:
-            parts.extend(option._short_opts)
-        if hasattr(option, '_long_opts') and option._long_opts:
-            parts.extend(option._long_opts)
-        return ', '.join(parts)
+        return ', '.join(_optStrings(option))
+
+    def _tab_title(self, tab):
+        return TAB_ALIASES.get(tab['title'], tab['title'])
 
     def _draw_header(self):
         """Draw the header bar"""
         height, width = self.stdscr.getmaxyx()
-        header = " sqlmap - ncurses TUI "
         self.stdscr.attron(curses.color_pair(1) | curses.A_BOLD)
-        self.stdscr.addstr(0, 0, header.center(width))
-        self.stdscr.attroff(curses.color_pair(1) | curses.A_BOLD)
+        self.stdscr.addstr(0, 0, " " * width)
+        self.stdscr.addstr(0, 1, "sqlmap")
+        self.stdscr.attroff(curses.A_BOLD)
+        right = "F2 Run  -  F10 Quit "
+        try:
+            self.stdscr.addstr(0, max(8, width - len(right)), right)
+        except:
+            pass
+        self.stdscr.attroff(curses.color_pair(1))
 
     def _get_tab_bar_height(self):
         """Calculate how many rows the tab bar uses"""
@@ -101,16 +219,12 @@ class NcursesUI:
         x = 0
 
         for i, tab in enumerate(self.tabs):
-            tab_text = " %s " % tab['title']
-
-            # Check if tab exceeds width, wrap to next line
+            tab_text = " %s " % self._tab_title(tab)
             if x + len(tab_text) >= width:
                 y += 1
                 x = 0
-                # Stop if we've used too many lines
-                if y >= 3:
+                if y >= 4:
                     break
-
             x += len(tab_text) + 1
 
         return y
@@ -122,14 +236,11 @@ class NcursesUI:
         x = 0
 
         for i, tab in enumerate(self.tabs):
-            tab_text = " %s " % tab['title']
-
-            # Check if tab exceeds width, wrap to next line
+            tab_text = " %s " % self._tab_title(tab)
             if x + len(tab_text) >= width:
                 y += 1
                 x = 0
-                # Stop if we've used too many lines
-                if y >= 3:
+                if y >= 4:
                     break
 
             if i == self.current_tab:
@@ -152,11 +263,11 @@ class NcursesUI:
     def _draw_footer(self):
         """Draw the footer with help text"""
         height, width = self.stdscr.getmaxyx()
-        footer = " [Tab] Next | [Arrows] Navigate | [Enter] Edit | [F2] Run | [F3] Export | [F4] Import | [F10] Quit "
+        footer = " Tab/<-/-> Section   Up/Down Field   Enter/Space Edit   F2 Run   F3 Export   F4 Import   F10 Quit "
 
         try:
             self.stdscr.attron(curses.color_pair(1))
-            self.stdscr.addstr(height - 1, 0, footer.ljust(width))
+            self.stdscr.addstr(height - 1, 0, footer.ljust(width)[:width - 1])
             self.stdscr.attroff(curses.color_pair(1))
         except:
             pass
@@ -202,51 +313,58 @@ class NcursesUI:
 
             is_selected = (i == self.current_field)
 
-            # Draw label
+            # full-width highlight bar for the selected row
+            if is_selected:
+                try:
+                    self.stdscr.attron(curses.color_pair(4))
+                    self.stdscr.addstr(y, 0, " " * (width - 1))
+                    self.stdscr.attroff(curses.color_pair(4))
+                except:
+                    pass
+
+            # label
             label = option['label'][:25].ljust(25)
+            label_attr = curses.color_pair(4) | curses.A_BOLD if is_selected else curses.color_pair(7)
             try:
-                if is_selected:
-                    self.stdscr.attron(curses.color_pair(4) | curses.A_BOLD)
-                else:
-                    self.stdscr.attron(curses.color_pair(7))
-
+                self.stdscr.attron(label_attr)
                 self.stdscr.addstr(y, 2, label)
-
-                if is_selected:
-                    self.stdscr.attroff(curses.color_pair(4) | curses.A_BOLD)
-                else:
-                    self.stdscr.attroff(curses.color_pair(7))
+                self.stdscr.attroff(label_attr)
             except:
                 pass
 
-            # Draw value
-            value_str = ""
+            # value (green once the user has set one, muted "(default)" otherwise)
+            has_value = option['value'] not in (None, "", False)
             if option['type'] == 'bool':
                 value = option['value'] if option['value'] is not None else option.get('default')
-                value_str = "[X]" if value else "[ ]"
+                value_str = "[x]" if value else "[ ]"
+                value_attr = curses.color_pair(8) if value else curses.color_pair(5)
+            elif has_value:
+                value_str = str(option['value'])
+                value_attr = curses.color_pair(8)
+            elif option['default'] not in (None, False):
+                value_str = "(%s)" % str(option['default'])
+                value_attr = curses.color_pair(5)
             else:
-                value_str = str(option['value']) if option['value'] else ""
-                if option['default'] and not option['value']:
-                    value_str = "(%s)" % str(option['default'])
+                value_str = ""
+                value_attr = curses.color_pair(5)
 
-            value_str = value_str[:30]
-
+            if is_selected:
+                value_attr = curses.color_pair(4) | curses.A_BOLD
             try:
-                if is_selected:
-                    self.stdscr.attron(curses.color_pair(4) | curses.A_BOLD)
-                self.stdscr.addstr(y, 28, value_str)
-                if is_selected:
-                    self.stdscr.attroff(curses.color_pair(4) | curses.A_BOLD)
+                self.stdscr.attron(value_attr)
+                self.stdscr.addstr(y, 28, value_str[:30])
+                self.stdscr.attroff(value_attr)
             except:
                 pass
 
-            # Draw help text
+            # help text (always shown, including on the highlighted row so it stays readable)
             if width > 65:
-                help_text = option['help'][:width-62] if option['help'] else ""
+                help_text = option['help'][:width - 62] if option['help'] else ""
+                help_attr = curses.color_pair(9) if is_selected else curses.color_pair(5)
                 try:
-                    self.stdscr.attron(curses.color_pair(5))
-                    self.stdscr.addstr(y, 60, help_text)
-                    self.stdscr.attroff(curses.color_pair(5))
+                    self.stdscr.attron(help_attr)
+                    self.stdscr.addstr(y, 60, help_text.ljust(width - 61)[:width - 61])
+                    self.stdscr.attroff(help_attr)
                 except:
                     pass
 
@@ -292,50 +410,57 @@ class NcursesUI:
             # Toggle boolean
             option['value'] = not option['value']
         else:
-            # Text input
+            # Text input (manual key loop so Esc can cancel and Enter can save)
             height, width = self.stdscr.getmaxyx()
-
-            # Create input window
             input_win = curses.newwin(5, width - 20, height // 2 - 2, 10)
+            input_win.keypad(True)
             input_win.box()
             input_win.attron(curses.color_pair(2))
             input_win.addstr(0, 2, " Edit %s " % option['label'][:20])
             input_win.attroff(curses.color_pair(2))
-            input_win.addstr(2, 2, "Value:")
-            input_win.refresh()
+            input_win.attron(curses.color_pair(5))
+            input_win.addstr(3, 2, "[Enter] save   [Esc] cancel")
+            input_win.attroff(curses.color_pair(5))
 
-            # Get input
-            curses.echo()
+            buffer = str(option['value']) if option['value'] not in (None, "") else ""
+            max_len = max(1, width - 34)
+            curses.noecho()
             curses.curs_set(1)
 
-            # Pre-fill with existing value
-            current_value = str(option['value']) if option['value'] else ""
-            input_win.addstr(2, 9, current_value)
-            input_win.move(2, 9)
+            while True:
+                shown = buffer[-max_len:]
+                input_win.addstr(2, 2, "Value: ")
+                input_win.addstr(2, 9, shown.ljust(max_len)[:max_len])
+                input_win.move(2, 9 + len(shown))
+                input_win.refresh()
 
-            try:
-                new_value = input_win.getstr(2, 9, width - 32).decode('utf-8')
+                ch = input_win.getch()
+                if ch == 27:                                    # Esc -> cancel, keep old value
+                    buffer = None
+                    break
+                elif ch in (curses.KEY_ENTER, 10, 13):          # Enter -> commit
+                    break
+                elif ch in (curses.KEY_BACKSPACE, 127, 8):
+                    buffer = buffer[:-1]
+                elif 32 <= ch <= 126:
+                    buffer += chr(ch)
 
-                # Validate and convert based on type
+            curses.curs_set(0)
+
+            if buffer is not None:
                 if option['type'] == 'int':
                     try:
-                        option['value'] = int(new_value) if new_value else None
+                        option['value'] = int(buffer) if buffer else None
                     except ValueError:
                         option['value'] = None
                 elif option['type'] == 'float':
                     try:
-                        option['value'] = float(new_value) if new_value else None
+                        option['value'] = float(buffer) if buffer else None
                     except ValueError:
                         option['value'] = None
                 else:
-                    option['value'] = new_value if new_value else None
-            except:
-                pass
+                    option['value'] = buffer if buffer else None
 
-            curses.noecho()
-            curses.curs_set(0)
-
-            # Clear input window
             input_win.clear()
             input_win.refresh()
             del input_win
@@ -378,9 +503,9 @@ class NcursesUI:
                             config[dest] = value
 
                 # Set defaults for unset options
-                for option in self.parser.option_list:
-                    if option.dest not in config or config[option.dest] is None:
-                        config[option.dest] = defaults.get(option.dest, None)
+                for field in self.all_options:
+                    if field['dest'] not in config or config[field['dest']] is None:
+                        config[field['dest']] = defaults.get(field['dest'], None)
 
                 # Save config
                 try:
@@ -537,9 +662,9 @@ class NcursesUI:
                     config[dest] = value
 
         # Set defaults for unset options
-        for option in self.parser.option_list:
-            if option.dest not in config or config[option.dest] is None:
-                config[option.dest] = defaults.get(option.dest, None)
+        for field in self.all_options:
+            if field['dest'] not in config or config[field['dest']] is None:
+                config[field['dest']] = defaults.get(field['dest'], None)
 
         # Create temp config file
         handle, configFile = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.CONFIG, text=True)
@@ -713,7 +838,7 @@ class NcursesUI:
             tab = self.tabs[self.current_tab]
 
             # Handle input
-            if key == curses.KEY_F10 or key == 27:  # F10 or ESC
+            if key == curses.KEY_F10:  # F10 quits; Esc intentionally does NOT (it only cancels field edits)
                 break
             elif key == ord('\t') or key == curses.KEY_RIGHT:  # Tab or Right arrow
                 self.current_tab = (self.current_tab + 1) % len(self.tabs)
@@ -755,9 +880,17 @@ def runTui(parser):
     # Check if ncurses is available
     if curses is None:
         raise SqlmapMissingDependence("missing 'curses' module (optional Python module). Use a Python build that includes curses/ncurses, or install the platform-provided equivalent (e.g. for Windows: pip install windows-curses)")
+    # ncurses waits ESCDELAY ms (default 1000) after Esc to disambiguate escape sequences, which
+    # makes Esc feel like it hangs for ~1s; shrink it so Esc reacts immediately
+    os.environ.setdefault("ESCDELAY", "25")
     try:
         # Initialize and run
         def main(stdscr):
+            if hasattr(curses, "set_escdelay"):
+                try:
+                    curses.set_escdelay(25)
+                except curses.error:
+                    pass
             ui = NcursesUI(stdscr, parser)
             ui.run()
 

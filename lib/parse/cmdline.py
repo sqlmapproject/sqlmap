@@ -443,7 +443,7 @@ def cmdLineParser(argv=None):
             help="Load second-order HTTP request from file")
 
         # Fingerprint options
-        fingerprint = parser.add_argument_group("Fingerprint")
+        fingerprint = parser.add_argument_group("Fingerprint", "These options can be used to perform a back-end database management system version fingerprint")
 
         fingerprint.add_argument("-f", "--fingerprint", dest="extensiveFp", action="store_true",
             help="Perform an extensive DBMS version fingerprint")
@@ -789,7 +789,7 @@ def cmdLineParser(argv=None):
             help="Disable hash analysis on table dumps")
 
         miscellaneous.add_argument("--gui", dest="gui", action="store_true",
-            help="Experimental Tkinter GUI")
+            help="Graphical user interface (Tkinter)")
 
         miscellaneous.add_argument("--list-tampers", dest="listTampers", action="store_true",
             help="Display list of available tamper scripts")
@@ -816,7 +816,7 @@ def cmdLineParser(argv=None):
             help="Local directory for storing temporary files")
 
         miscellaneous.add_argument("--tui", dest="tui", action="store_true",
-            help="Experimental ncurses TUI")
+            help="Textual user interface (ncurses)")
 
         miscellaneous.add_argument("--unstable", dest="unstable", action="store_true",
             help="Adjust options for unstable connections")
