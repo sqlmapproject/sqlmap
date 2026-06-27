@@ -79,6 +79,7 @@ from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DUMMY_NON_SQLI_CHECK_APPENDIX
 from lib.core.settings import FI_ERROR_REGEX
 from lib.core.settings import FORMAT_EXCEPTION_STRINGS
+from lib.core.settings import GRAPHQL_ERROR_REGEX
 from lib.core.settings import HEURISTIC_CHECK_ALPHABET
 from lib.core.settings import INFERENCE_EQUALS_CHAR
 from lib.core.settings import IPS_WAF_CHECK_PAYLOAD
@@ -1173,6 +1174,13 @@ def heuristicCheckSqlInjection(place, parameter):
 
     if not conf.nosql and re.search(NOSQL_ERROR_REGEX, page or ""):
         infoMsg = "heuristic (NoSQL) test shows that %sparameter '%s' might be vulnerable to NoSQL injection attacks (rerun with switch '--nosql')" % ("%s " % paramType if paramType != parameter else "", parameter)
+        logger.info(infoMsg)
+
+        if conf.beep:
+            beep()
+
+    if not conf.graphql and re.search(GRAPHQL_ERROR_REGEX, page or ""):
+        infoMsg = "heuristic (GraphQL) test shows that %sparameter '%s' appears to be a GraphQL endpoint (rerun with switch '--graphql')" % ("%s " % paramType if paramType != parameter else "", parameter)
         logger.info(infoMsg)
 
         if conf.beep:

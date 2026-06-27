@@ -119,6 +119,7 @@ optDict = {
     "Techniques": {
         "technique": "string",
         "nosql": "boolean",
+        "graphql": "boolean",
         "timeSec": "integer",
         "uCols": "string",
         "uChar": "string",

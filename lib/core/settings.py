@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.6.160"
+VERSION = "1.10.6.161"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -876,6 +876,68 @@ NOSQL_MAX_RECORDS = 100
 
 # Upper bound for the length search during NoSQL blind extraction
 NOSQL_MAX_LENGTH = 1024
+
+# GraphQL endpoint paths to probe when the user supplies a base URL with --graphql (no explicit /graphql)
+GRAPHQL_ENDPOINT_PATHS = ("/graphql", "/api/graphql", "/v1/graphql", "/graphql/api", "/graph", "/gql")
+
+# Canonical GraphQL introspection query (the one everyone copy-pastes). Returned schema carries the
+# full type system: query/mutation/subscription roots, OBJECT/INPUT_OBJECT/ENUM/SCALAR types, their
+# fields/arguments/inputFields with type chains, directives, and deprecation metadata.
+GRAPHQL_INTROSPECTION_QUERY = """query IntrospectionForSqlmap {
+  __schema {
+    queryType { name }
+    mutationType { name }
+    subscriptionType { name }
+    directives { name args { name type { kind name ofType { kind name ofType { kind name } } } } }
+    types {
+      kind
+      name
+      fields(includeDeprecated: true) {
+        name
+        args {
+          name
+          defaultValue
+          type { kind name ofType { kind name ofType { kind name ofType { kind name } } } }
+        }
+        type { kind name ofType { kind name ofType { kind name } } }
+      }
+      inputFields {
+        name
+        defaultValue
+        type { kind name ofType { kind name ofType { kind name ofType { kind name } } } }
+      }
+      enumValues(includeDeprecated: true) { name }
+      specifiedByURL
+    }
+  }
+}"""
+
+# GraphQL error patterns that identify the response as originating from a GraphQL layer (parse,
+# validation, execution, or APQ errors). Used by the heuristic in checks.py and for error-based
+# detection inside the GraphQL engine.
+GRAPHQL_PARSE_ERRORS = (
+    r'"code"\s*:\s*"GRAPHQL_PARSE_FAILED"',
+    r"\bSyntax Error:\s*[^\"]",
+    r"\bExpected Name,\s*found\b",
+    r"\bUnexpected\s+<EOF>\b",
+)
+GRAPHQL_VALIDATION_ERRORS = (
+    r'"code"\s*:\s*"GRAPHQL_VALIDATION_FAILED"',
+    r"\bCannot query field\s+\"[^\"]+\"\s+on type\s+\"[^\"]+\"",
+    r"\bUnknown argument\s+\"[^\"]+\"\s+on field\s+\"[^\"]+\"",
+    r"\bField\s+\"[^\"]+\"\s+argument\s+\"[^\"]+\"\s+of type\s+\"[^\"]+\"\s+is required\b",
+    r"\bVariable\s+\"\$[^\"]+\"\s+got invalid value\b",
+    r"\bExpected type\s+[^,]+,\s*found\b",
+    r"\bDid you mean\s+\"[^\"]+\"\b",
+)
+GRAPHQL_APQ_ERRORS = (
+    r"\bPersistedQueryNotFound\b",
+    r"\bPersistedQueryNotSupported\b",
+)
+GRAPHQL_RUNTIME_ERRORS = (
+    r"\bGraphQL\s+(?:resolver\s+)?error\b",
+)
+GRAPHQL_ERROR_REGEX = "(?:%s)" % '|'.join(GRAPHQL_PARSE_ERRORS + GRAPHQL_VALIDATION_ERRORS + GRAPHQL_APQ_ERRORS + GRAPHQL_RUNTIME_ERRORS)
 
 # Length of prefix and suffix used in non-SQLI heuristic checks
 NON_SQLI_CHECK_PREFIX_SUFFIX_LENGTH = 6

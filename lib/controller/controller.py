@@ -504,7 +504,20 @@ def start():
                     infoMsg = "testing URL '%s'" % targetUrl
                     logger.info(infoMsg)
 
+            if conf.graphql and PLACE.GET not in conf.parameters:
+                # graphqlScan() is self-contained and operates on the GraphQL
+                # document, not on HTTP parameters. A dummy GET parameter keeps
+                # _setRequestParams() from appending the URI injection marker ('*')
+                # to a bare endpoint URL (which would break detection under
+                # '--batch'); it is discarded by graphqlScan() on entry.
+                conf.parameters[PLACE.GET] = "x"
+
             setupTargetEnv()
+
+            if conf.graphql:
+                from lib.techniques.graphql.inject import graphqlScan
+                graphqlScan()
+                continue
 
             if not checkConnection(suppressOutput=conf.forms):
                 continue

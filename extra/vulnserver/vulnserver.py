@@ -246,6 +246,232 @@ def waf_score(value, ua=None, level=0):
         retVal += WAF_SCANNER_UA_WEIGHT
     return retVal
 
+# --- GraphQL endpoint (vulnerable Apollo-style, backed by the same SQLite database) ----------
+
+# Hard-coded introspection response matching the schema below. Every GraphQL tool (including
+# sqlmap's --graphql engine) uses this to discover fields, arguments, and types.
+def _graphql_introspection():
+    return {
+        "data": {
+            "__schema": {
+                "queryType": {"name": "Query"},
+                "mutationType": {"name": "Mutation"},
+                "subscriptionType": None,
+                "directives": [],
+                "types": [
+                    {"kind": "OBJECT", "name": "Query", "fields": [
+                        {"name": "user", "args": [
+                            {"name": "username", "defaultValue": None, "type": {"kind": "NON_NULL", "name": None, "ofType": {"kind": "SCALAR", "name": "String", "ofType": None}}}
+                        ], "type": {"kind": "OBJECT", "name": "User", "ofType": None}},
+                        {"name": "search", "args": [
+                            {"name": "term", "defaultValue": None, "type": {"kind": "SCALAR", "name": "String", "ofType": None}}
+                        ], "type": {"kind": "LIST", "name": None, "ofType": {"kind": "OBJECT", "name": "User", "ofType": None}}},
+                        {"name": "login", "args": [
+                            {"name": "username", "defaultValue": None, "type": {"kind": "NON_NULL", "name": None, "ofType": {"kind": "SCALAR", "name": "String", "ofType": None}}},
+                            {"name": "password", "defaultValue": None, "type": {"kind": "NON_NULL", "name": None, "ofType": {"kind": "SCALAR", "name": "String", "ofType": None}}}
+                        ], "type": {"kind": "OBJECT", "name": "AuthPayload", "ofType": None}},
+                    ], "inputFields": None, "enumValues": None},
+                    {"kind": "OBJECT", "name": "Mutation", "fields": [
+                        {"name": "updateUser", "args": [
+                            {"name": "id", "defaultValue": None, "type": {"kind": "NON_NULL", "name": None, "ofType": {"kind": "SCALAR", "name": "Int", "ofType": None}}},
+                            {"name": "email", "defaultValue": None, "type": {"kind": "NON_NULL", "name": None, "ofType": {"kind": "SCALAR", "name": "String", "ofType": None}}}
+                        ], "type": {"kind": "OBJECT", "name": "User", "ofType": None}},
+                    ], "inputFields": None, "enumValues": None},
+                    {"kind": "INPUT_OBJECT", "name": "UpdateUserInput", "inputFields": [
+                        {"name": "id", "defaultValue": None, "type": {"kind": "NON_NULL", "name": None, "ofType": {"kind": "SCALAR", "name": "Int", "ofType": None}}},
+                        {"name": "email", "defaultValue": None, "type": {"kind": "NON_NULL", "name": None, "ofType": {"kind": "SCALAR", "name": "String", "ofType": None}}}
+                    ]},
+                    {"kind": "SCALAR", "name": "Int"},
+                    {"kind": "SCALAR", "name": "String"},
+                    {"kind": "SCALAR", "name": "Boolean"},
+                    {"kind": "SCALAR", "name": "Float"},
+                    {"kind": "SCALAR", "name": "ID"},
+                    {"kind": "OBJECT", "name": "User", "fields": [
+                        {"name": "id", "args": [], "type": {"kind": "SCALAR", "name": "Int", "ofType": None}},
+                        {"name": "name", "args": [], "type": {"kind": "SCALAR", "name": "String", "ofType": None}},
+                        {"name": "surname", "args": [], "type": {"kind": "SCALAR", "name": "String", "ofType": None}},
+                    ], "inputFields": None, "enumValues": None},
+                    {"kind": "OBJECT", "name": "AuthPayload", "fields": [
+                        {"name": "token", "args": [], "type": {"kind": "SCALAR", "name": "String", "ofType": None}},
+                        {"name": "user", "args": [], "type": {"kind": "OBJECT", "name": "User", "ofType": None}},
+                    ], "inputFields": None, "enumValues": None},
+                ]
+            }
+        }
+    }
+
+
+def _graphql_arg(raw):
+    """Parse a single GraphQL argument value: strip quotes from strings, keep numbers as-is"""
+    raw = raw.strip()
+    if raw.startswith('"') and raw.endswith('"'):
+        return raw[1:-1].replace('\\"', '"')
+    return raw
+
+
+def _graphql_match(text, start):
+    """Index just past the bracket matching the one at text[start] ('(' or '{'), skipping over
+    double-quoted strings so brackets inside argument literals (e.g. an injected SQL payload) and
+    nested selection sets do not throw off the balance."""
+
+    pairs = {'(': ')', '{': '}'}
+    opener, closer = text[start], pairs[text[start]]
+    depth, i, n = 0, start, len(text)
+    while i < n:
+        char = text[i]
+        if char == '"':
+            i += 1
+            while i < n and text[i] != '"':
+                i += 2 if text[i] == '\\' else 1
+        elif char == opener:
+            depth += 1
+        elif char == closer:
+            depth -= 1
+            if depth == 0:
+                return i + 1
+        i += 1
+    return n
+
+
+def _graphql_selections(body):
+    """Split a selection set into its top-level (alias, field, rawArgs) fields, tolerating aliasing,
+    argument literals carrying brackets/quotes, and nested selection sets (which are skipped over)."""
+
+    identifier = re.compile(r'[A-Za-z_]\w*')
+    selections, i, n = [], 0, len(body)
+    while i < n:
+        while i < n and body[i] in ' \t\r\n,':
+            i += 1
+        match = identifier.match(body, i)
+        if not match:
+            i += 1
+            continue
+        name, i = match.group(0), match.end()
+
+        j = i
+        while j < n and body[j] in ' \t\r\n':
+            j += 1
+        if j < n and body[j] == ':':                # 'name' was an alias; the real field follows
+            j += 1
+            while j < n and body[j] in ' \t\r\n':
+                j += 1
+            match = identifier.match(body, j)
+            if not match:
+                continue
+            alias, field, i = name, match.group(0), match.end()
+        else:
+            alias, field = None, name
+
+        while i < n and body[i] in ' \t\r\n':
+            i += 1
+        rawArgs = ""
+        if i < n and body[i] == '(':
+            end = _graphql_match(body, i)
+            rawArgs, i = body[i + 1:end - 1], end
+
+        while i < n and body[i] in ' \t\r\n':
+            i += 1
+        if i < n and body[i] == '{':                # skip this field's (possibly nested) selection set
+            i = _graphql_match(body, i)
+
+        selections.append((alias, field, rawArgs))
+    return selections
+
+
+def _graphql_resolve(query, variables):
+    """Minimal GraphQL resolver: parse the query, call the matching resolver for each top-level field,
+    and return (data_dict_or_None, errors_list). Multiple aliased fields are supported in one request
+    (alias:field(args){...} ...), so a client can batch independent probes into a single round-trip."""
+
+    variables = variables or {}
+    errors = []
+    data = {}
+
+    op = "query"
+    for keyword in ("mutation", "subscription"):
+        if query.strip().startswith(keyword):
+            op = keyword
+            break
+
+    start = query.find('{')
+    if start == -1:
+        errors.append({"message": "Cannot parse query", "extensions": {"code": "GRAPHQL_PARSE_FAILED"}})
+        return None, errors
+
+    for alias, field, rawArgs in _graphql_selections(query[start + 1:_graphql_match(query, start) - 1]):
+        key = alias or field
+
+        # Parse arguments
+        args = {}
+        for am in re.finditer(r'(\w+)\s*:\s*("(?:[^"\\]|\\.)*"|\$?\w+(?:\.\w+)?)', rawArgs):
+            name, val = am.group(1), am.group(2)
+            if val.startswith('$'):
+                args[name] = variables.get(val[1:], None)
+            else:
+                args[name] = _graphql_arg(val)
+
+        try:
+            if field in ("__typename", "__schema"):
+                data[key] = op.title()
+            elif field == "user":
+                data[key] = _resolver_user(args.get("username"))
+            elif field == "search":
+                data[key] = _resolver_search(args.get("term"))
+            elif field == "login":
+                data[key] = _resolver_login(args.get("username"), args.get("password"))
+            elif field == "updateUser":
+                data[key] = _resolver_updateUser(args.get("id"), args.get("email"))
+            else:
+                errors.append({"message": "Cannot query field '%s' on type '%s'. Did you mean 'user', 'search', 'login', or 'updateUser'?" % (field, op.title()),
+                               "extensions": {"code": "GRAPHQL_VALIDATION_FAILED"}})
+        except Exception as ex:
+            # Leak the backend error through the GraphQL error envelope (as many real servers do
+            # in development mode) -- this drives error-based detection
+            errors.append({"message": "%s: %s" % (re.search(r"'([^']+)'", str(type(ex))).group(1), ex),
+                           "path": [key], "extensions": {"exception": str(ex)}})
+
+    if not data and not errors:
+        return None, errors
+    return data, errors
+
+
+# --- Vulnerable resolvers (direct string concatenation into SQLite) ------------------------
+
+def _resolver_user(username):
+    if not username:
+        return None
+    with _lock:
+        _cursor.execute("SELECT id, name, surname FROM users WHERE name='%s'" % username)
+        row = _cursor.fetchone()
+    return {"id": row[0], "name": row[1], "surname": row[2]} if row else None
+
+
+def _resolver_search(term):
+    with _lock:
+        _cursor.execute("SELECT id, name, surname FROM users WHERE name LIKE '%%%s%%'" % (term or ""))
+        rows = _cursor.fetchall()
+    return [{"id": r[0], "name": r[1], "surname": r[2]} for r in (rows or [])]
+
+
+def _resolver_login(username, password):
+    if not username or not password:
+        return None
+    with _lock:
+        _cursor.execute("SELECT u.id, u.name, u.surname FROM users u JOIN creds c ON u.id=c.user_id WHERE u.name='%s' AND c.password_hash='%s'" % (username, password))
+        row = _cursor.fetchone()
+    if row:
+        return {"token": "tok_%d_%s" % (row[0], row[1]), "user": {"id": row[0], "name": row[1], "surname": row[2]}}
+    return None  # returns null in data (boolean oracle: true=object, false=null)
+
+
+def _resolver_updateUser(id_, email):
+    with _lock:
+        _cursor.execute("UPDATE users SET surname='%s' WHERE id=%s" % (email, id_))
+        _cursor.execute("SELECT id, name, surname FROM users WHERE id=%s" % id_)
+        row = _cursor.fetchone()
+    return {"id": row[0], "name": row[1], "surname": row[2]} if row else None
+
+
 class ReqHandler(BaseHTTPRequestHandler):
     def do_REQUEST(self):
         path, query = self.path.split('?', 1) if '?' in self.path else (self.path, "")
@@ -335,6 +561,35 @@ class ReqHandler(BaseHTTPRequestHandler):
                 output = "<html><body><b>Welcome %s</b></body></html>" % self.params.get("name") if nosql_match(self.params) else "<html><body><b>Invalid credentials</b></body></html>"
             except re.error:       # invalid $regex -> emulate a MongoDB driver error (drives fingerprinting)
                 output = "<html><body>MongoServerError: Regular expression is invalid: missing terminating ] for character class</body></html>"
+
+            self.wfile.write(output.encode(UNICODE_ENCODING))
+            return
+
+        if self.url == "/graphql":
+            self.send_response(OK)
+            self.send_header("Content-type", "application/json; charset=%s" % UNICODE_ENCODING)
+            self.send_header("Connection", "close")
+            self.end_headers()
+
+            query = self.params.get("query", "")
+            variables = self.params.get("variables") or {}
+
+            if not isinstance(variables, dict):
+                try:
+                    variables = json.loads(str(variables))
+                except Exception:
+                    variables = {}
+
+            if "__schema" in query:
+                output = json.dumps(_graphql_introspection())
+            else:
+                data, errors = _graphql_resolve(query, variables)
+                resp = {}
+                if errors:
+                    resp["errors"] = errors
+                if data:
+                    resp["data"] = data
+                output = json.dumps(resp, default=str)
 
             self.wfile.write(output.encode(UNICODE_ENCODING))
             return
