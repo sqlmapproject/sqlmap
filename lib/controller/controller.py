@@ -514,12 +514,7 @@ def start():
 
             setupTargetEnv()
 
-            if conf.graphql:
-                from lib.techniques.graphql.inject import graphqlScan
-                graphqlScan()
-                continue
-
-            if not checkConnection(suppressOutput=conf.forms):
+            if not any((conf.graphql,)) and not checkConnection(suppressOutput=conf.forms):
                 continue
 
             if conf.rParam and kb.originalPage:
@@ -533,9 +528,19 @@ def start():
 
             checkWaf()
 
+            if conf.graphql:
+                from lib.techniques.graphql.inject import graphqlScan
+                graphqlScan()
+                continue
+
             if conf.nosql:
                 from lib.techniques.nosql.inject import nosqlScan
                 nosqlScan()
+                continue
+
+            if conf.ldap:
+                from lib.techniques.ldap.inject import ldapScan
+                ldapScan()
                 continue
 
             if conf.nullConnection:

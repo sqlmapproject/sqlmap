@@ -117,6 +117,61 @@ SCHEMA = """
     INSERT INTO creds (user_id, password_hash) VALUES (28, '908f7e6d5c4b3a291807f6e5d4c3b2a1');
     INSERT INTO creds (user_id, password_hash) VALUES (29, '3049b791fa83e2f42f37bae18634b92d');
     INSERT INTO creds (user_id, password_hash) VALUES (30, 'd59a348f90d757c7da30418773424b5e');
+
+    CREATE TABLE directory (
+        dn TEXT,
+        uid TEXT,
+        cn TEXT,
+        sn TEXT,
+        givenName TEXT,
+        displayName TEXT,
+        userPassword TEXT,
+        mail TEXT,
+        objectClass TEXT,
+        objectCategory TEXT,
+        ou TEXT,
+        title TEXT,
+        department TEXT,
+        company TEXT,
+        o TEXT,
+        telephoneNumber TEXT,
+        mobile TEXT,
+        manager TEXT,
+        description TEXT,
+        l TEXT,
+        st TEXT,
+        street TEXT,
+        postalCode TEXT,
+        c TEXT,
+        employeeNumber TEXT,
+        employeeType TEXT,
+        member TEXT
+    );
+    -- Column order: dn, uid, cn, sn, givenName, displayName, userPassword, mail,
+    --               objectClass, objectCategory, ou, title, department, company, o,
+    --               telephoneNumber, mobile, manager, description, l, st, street,
+    --               postalCode, c, employeeNumber, employeeType, member
+    INSERT INTO directory VALUES ('uid=luther,ou=users,dc=example,dc=com', 'luther', 'Luther Blisset', 'Blisset', 'Luther', 'Luther Blisset', 'db3a16990a0008a3b04707fdef6584a0', 'luther@example.com', 'inetOrgPerson', 'Person', 'users', 'System Administrator', 'IT Operations', 'Example Corp', 'Example', '+1 555 0100', '+1 555 0101', 'uid=ada,ou=users,dc=example,dc=com', 'System administrator', 'London', 'Greater London', '10 Downing Street', 'SW1A 2AA', 'GB', '1001', 'Employee', NULL);
+    INSERT INTO directory VALUES ('uid=fluffy,ou=users,dc=example,dc=com', 'fluffy', 'Fluffy Bunny', 'Bunny', 'Fluffy', 'Fluffy Bunny', '4db967ce67b15e7fb84c266a76684729', 'fluffy@example.com', 'inetOrgPerson', 'Person', 'users', 'Security Engineer', 'Security', 'Example Corp', 'Example', '+1 555 0102', '+1 555 0103', NULL, 'Security engineer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    INSERT INTO directory VALUES ('uid=wu,ou=users,dc=example,dc=com', 'wu', 'Wu Ming', 'Ming', 'Wu', 'Wu Ming', 'f5a2950eaa10f9e99896800eacbe8275', 'wu@example.com', 'inetOrgPerson', 'Person', 'users', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Developer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    INSERT INTO directory VALUES ('uid=mark,ou=users,dc=example,dc=com', 'mark', 'Mark Lewis', 'Lewis', 'Mark', 'Mark Lewis', '179ad45c6ce2cb97cf1029e212046e81', 'mark@example.com', 'inetOrgPerson', 'Person', 'users', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Project manager', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    INSERT INTO directory VALUES ('uid=ada,ou=users,dc=example,dc=com', 'ada', 'Ada Lovelace', 'Lovelace', 'Ada', 'Ada Lovelace', '0f1e2d3c4b5a69788796a5b4c3d2e1f0', 'ada@example.com', 'inetOrgPerson', 'Person', 'users', 'Mathematician', 'Research', 'Example Corp', 'Example', '+1 555 0104', NULL, NULL, 'Mathematician', 'Cambridge', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    INSERT INTO directory VALUES ('uid=grace,ou=users,dc=example,dc=com', 'grace', 'Grace Hopper', 'Hopper', 'Grace', 'Grace Hopper', 'a1b2c3d4e5f60718293a4b5c6d7e8f90', 'grace@example.com', 'inetOrgPerson', 'Person', 'users', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Computer scientist', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    INSERT INTO directory VALUES ('uid=alan,ou=users,dc=example,dc=com', 'alan', 'Alan Turing', 'Turing', 'Alan', 'Alan Turing', '1a2b3c4d5e6f708192a3b4c5d6e7f809', 'alan@example.com', 'inetOrgPerson', 'Person', 'users', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Cryptanalyst', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    INSERT INTO directory VALUES ('uid=margaret,ou=users,dc=example,dc=com', 'margaret', 'Margaret Hamilton', 'Hamilton', 'Margaret', 'Margaret Hamilton', '9f8e7d6c5b4a3928170605f4e3d2c1b0', 'margaret@example.com', 'inetOrgPerson', 'Person', 'users', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Software engineer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    INSERT INTO directory VALUES ('uid=donald,ou=users,dc=example,dc=com', 'donald', 'Donald Knuth', 'Knuth', 'Donald', 'Donald Knuth', '3c2d1e0f9a8b7c6d5e4f30291807f6e5', 'donald@example.com', 'inetOrgPerson', 'Person', 'users', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Computer scientist', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    INSERT INTO directory VALUES ('uid=tim,ou=users,dc=example,dc=com', 'tim', 'Tim Berners-Lee', 'Berners-Lee', 'Tim', 'Tim Berners-Lee', 'b0c1d2e3f405162738495a6b7c8d9eaf', 'tim@example.com', 'inetOrgPerson', 'Person', 'users', 'Inventor', 'Research', 'Example Corp', 'Example', '+1 555 0105', NULL, NULL, 'Inventor of the Web', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    INSERT INTO directory VALUES ('uid=linus,ou=users,dc=example,dc=com', 'linus', 'Linus Torvalds', 'Torvalds', 'Linus', 'Linus Torvalds', '6e5d4c3b2a190807f6e5d4c3b2a1908f', 'linus@example.com', 'inetOrgPerson', 'Person', 'users', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Kernel developer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    INSERT INTO directory VALUES ('uid=ken,ou=users,dc=example,dc=com', 'ken', 'Ken Thompson', 'Thompson', 'Ken', 'Ken Thompson', '11223344556677889900aabbccddeeff', 'ken@example.com', 'inetOrgPerson', 'Person', 'users', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Unix co-creator', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    INSERT INTO directory VALUES ('uid=dennis,ou=users,dc=example,dc=com', 'dennis', 'Dennis Ritchie', 'Ritchie', 'Dennis', 'Dennis Ritchie', 'ffeeddccbbaa00998877665544332211', 'dennis@example.com', 'inetOrgPerson', 'Person', 'users', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'C language creator', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    INSERT INTO directory VALUES ('uid=barbara,ou=users,dc=example,dc=com', 'barbara', 'Barbara Liskov', 'Liskov', 'Barbara', 'Barbara Liskov', '1234567890abcdef1234567890abcdef', 'barbara@example.com', 'inetOrgPerson', 'Person', 'users', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Turing Award winner', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    INSERT INTO directory VALUES ('uid=edsger,ou=users,dc=example,dc=com', 'edsger', 'Edsger Dijkstra', 'Dijkstra', 'Edsger', 'Edsger Dijkstra', 'abcdef1234567890abcdef1234567890', 'edsger@example.com', 'inetOrgPerson', 'Person', 'users', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Computer scientist', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    INSERT INTO directory VALUES ('ou=users,dc=example,dc=com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'organizationalUnit', NULL, 'users', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'User accounts', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    INSERT INTO directory VALUES ('ou=groups,dc=example,dc=com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'organizationalUnit', NULL, 'groups', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Group entries', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    INSERT INTO directory VALUES ('cn=admins,ou=groups,dc=example,dc=com', NULL, 'admins', NULL, NULL, NULL, NULL, NULL, 'groupOfNames', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Administrators group', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uid=luther,ou=users,dc=example,dc=com');
+    INSERT INTO directory VALUES ('cn=admins,ou=groups,dc=example,dc=com', NULL, 'admins', NULL, NULL, NULL, NULL, NULL, 'groupOfNames', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Administrators group', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uid=ada,ou=users,dc=example,dc=com');
+    INSERT INTO directory VALUES ('cn=developers,ou=groups,dc=example,dc=com', NULL, 'developers', NULL, NULL, NULL, NULL, NULL, 'groupOfNames', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Developers group', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uid=wu,ou=users,dc=example,dc=com');
+    INSERT INTO directory VALUES ('cn=developers,ou=groups,dc=example,dc=com', NULL, 'developers', NULL, NULL, NULL, NULL, NULL, 'groupOfNames', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Developers group', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'uid=linus,ou=users,dc=example,dc=com');
 """
 
 LISTEN_ADDRESS = "localhost"
@@ -245,6 +300,201 @@ def waf_score(value, ua=None, level=0):
     if ua and re.search(WAF_SCANNER_UA, ua):        # scanner-fingerprint score, stacked with the payload score
         retVal += WAF_SCANNER_UA_WEIGHT
     return retVal
+
+# --- LDAP endpoint (vulnerable search and login, backed by the directory table) ------------------
+
+def _ldap_escape_like(value):
+    """Escape a value for safe embedding in a SQLite LIKE pattern: backslash, percent,
+    and underscore are the only characters with special meaning in LIKE."""
+    if value is None:
+        return None
+    return value.replace('\\', '\\\\').replace('%', '\\%').replace('_', '\\_')
+
+def _ldap_attr(attr):
+    """Map an LDAP attribute name to the directory table column, or None if unknown."""
+    valid = {"dn", "uid", "cn", "sn", "givenName", "displayName", "userPassword", "mail", "objectClass", "objectCategory", "ou", "title", "department", "company", "o", "telephoneNumber", "mobile", "manager", "description", "l", "st", "street", "postalCode", "c", "employeeNumber", "employeeType", "member"}
+    return attr if attr in valid else None
+
+def _ldap_match(text, start):
+    """Find the closing ')' that balances the opening '(' at `start`. Skip escaped
+    hex sequences (e.g. \\28 for literal '(' inside a value) but treat every raw ')'
+    as a structural closer."""
+    depth = 0
+    i = start
+    while i < len(text):
+        ch = text[i]
+        if ch == '(':
+            depth += 1
+        elif ch == ')':
+            depth -= 1
+            if depth == 0:
+                return i + 1
+        elif ch == '\\':
+            i += 1
+        i += 1
+    return len(text)
+
+def _ldap_parse_value(text, start):
+    """Parse an assertion value from filter text at position `start`, handling escape sequences.
+    Returns (value, end_pos)."""
+    retVal = []
+    i = start
+    while i < len(text) and text[i] not in (')',):
+        if text[i] == '\\' and i + 2 < len(text):
+            retVal.append(chr(int(text[i+1:i+3], 16)))
+            i += 3
+        else:
+            retVal.append(text[i])
+            i += 1
+    return ''.join(retVal), i
+
+def _ldap_filter_to_sql(text, start=0):
+    """Convert an LDAP filter substring starting at `start` to a parameterized
+    SQLite WHERE clause. Returns (sql_template, params, end_pos) or (None, [], end_pos)
+    on parse failure. Values are passed as parameters so that user-controlled
+    characters (apostrophe, backslash, etc.) cannot break the SQL string literal."""
+
+    if start >= len(text) or text[start] != '(':
+        return None, [], start
+
+    i = start + 1
+    if i >= len(text):
+        return None, [], start
+
+    op = text[i]
+    i += 1
+
+    if op in ('&', '|'):
+        # Compound filter: collect all sub-filters
+        sub_clauses = []
+        sub_params = []
+        while i < len(text) and text[i] == '(':
+            clause, params, i = _ldap_filter_to_sql(text, i)
+            if clause:
+                sub_clauses.append(clause)
+                sub_params.extend(params)
+        # Always use bracket-matched end so nested compounds don't shift the
+        # parent's notion of where this child ends (reviewer blocker 3)
+        end = _ldap_match(text, start)
+        if not sub_clauses:
+            return None, [], end
+        if len(sub_clauses) == 1:
+            return sub_clauses[0], sub_params, end
+        joiner = " AND " if op == '&' else " OR "
+        return "(%s)" % joiner.join(sub_clauses), sub_params, end
+
+    elif op == '!':
+        # NOT filter
+        clause, params, i = _ldap_filter_to_sql(text, i)
+        end = _ldap_match(text, start)
+        if clause:
+            return "(NOT (%s))" % clause, params, end
+        return None, [], end
+
+    else:
+        # Simple filter: attr OP value
+        # Re-read from start+1 to get the full attr name
+        j = start + 1
+        while j < len(text) and text[j] not in ('=', '>', '<', '~', ')'):
+            j += 1
+        attr = text[start+1:j].strip()
+        if not attr:
+            return None, [], _ldap_match(text, start)
+
+        col = _ldap_attr(attr)
+        if col is None:
+            return None, [], _ldap_match(text, start)
+
+        if j >= len(text):
+            return None, [], start
+
+        # Check for approx match (~=)
+        if text[j] == '~' and j + 1 < len(text) and text[j+1] == '=':
+            op_type = '~='
+            j += 2
+        elif text[j] == '>' and j + 1 < len(text) and text[j+1] == '=':
+            op_type = '>='
+            j += 2
+        elif text[j] == '<' and j + 1 < len(text) and text[j+1] == '=':
+            op_type = '<='
+            j += 2
+        elif text[j] == '=':
+            op_type = '='
+            j += 1
+        else:
+            return None, [], _ldap_match(text, start)
+
+        value, _ = _ldap_parse_value(text, j)
+        end = _ldap_match(text, start)
+
+        if op_type == '=':
+            if value == '*':
+                return "(%s IS NOT NULL AND %s != '')" % (col, col), [], end
+            elif '*' in value:
+                parts = value.split('*')
+                if len(parts) == 2 and not parts[0] and not parts[1]:
+                    # Just '*' -> presence
+                    return "(%s IS NOT NULL AND %s != '')" % (col, col), [], end
+                elif len(parts) == 2 and parts[0] and not parts[1]:
+                    # 'prefix*' -> anchored prefix match (LDAP semantics)
+                    return "(%s LIKE ? ESCAPE '\\')" % col, ["%s%%" % _ldap_escape_like(parts[0])], end
+                elif len(parts) == 2 and not parts[0] and parts[1]:
+                    # '*suffix' -> anchored suffix match (LDAP semantics)
+                    return "(%s LIKE ? ESCAPE '\\')" % col, ["%%%s" % _ldap_escape_like(parts[1])], end
+                else:
+                    # '*mid*', 'pre*mid*suf', etc. -- split('*') already
+                    # partitions the value into literal segments; joining
+                    # them with '%' naturally produces the correct anchored
+                    # LIKE pattern: empty first/last elements from surrounding
+                    # wildcards become leading/trailing '%' automatically.
+                    pattern = '%'.join(_ldap_escape_like(p) for p in parts)
+                    return "(%s LIKE ? ESCAPE '\\')" % col, [pattern], end
+            else:
+                return "(%s = ?)" % col, [value], end
+        elif op_type == '>=':
+            return "(%s >= ?)" % col, [value], end
+        elif op_type == '<=':
+            return "(%s <= ?)" % col, [value], end
+        elif op_type == '~=':
+            return "(%s = ?)" % col, [value], end
+
+        return None, [], end
+
+
+def _ldap_execute(filter_str):
+    """Execute an LDAP filter against the directory table. Returns (rows, error_msg)."""
+    if not filter_str or not filter_str.strip():
+        return None, "Bad search filter"
+
+    # Simple bracket validation
+    if filter_str.count('(') != filter_str.count(')'):
+        return None, "Bad search filter (-7)"
+
+    try:
+        clause, params, _ = _ldap_filter_to_sql(filter_str)
+        if not clause:
+            return None, "Bad search filter (-7)"
+
+        sql = "SELECT * FROM directory WHERE %s" % clause
+        with _lock:
+            _cursor.execute(sql, params)
+            rows = _cursor.fetchall()
+        return rows, None
+    except Exception as ex:
+        msg = str(ex)
+        # Emulate different back-end error messages
+        if "no such column" in msg.lower():
+            return None, "Bad search filter"
+        if "unrecognized" in msg.lower() or "syntax" in msg.lower():
+            return None, "Bad search filter (-7)"
+        return None, "Bad search filter (%s)" % msg.split(':')[0]
+
+def _ldap_row_to_obj(row):
+    """Convert a SQLite row to a dict with non-None attributes."""
+    if not row:
+        return None
+    keys = ("dn", "uid", "cn", "sn", "givenName", "displayName", "userPassword", "mail", "objectClass", "objectCategory", "ou", "title", "department", "company", "o", "telephoneNumber", "mobile", "manager", "description", "l", "st", "street", "postalCode", "c", "employeeNumber", "employeeType", "member")
+    return dict((k, row[i]) for i, k in enumerate(keys) if row[i] is not None)
 
 # --- GraphQL endpoint (vulnerable Apollo-style, backed by the same SQLite database) ----------
 
@@ -590,6 +840,51 @@ class ReqHandler(BaseHTTPRequestHandler):
                 if data:
                     resp["data"] = data
                 output = json.dumps(resp, default=str)
+
+            self.wfile.write(output.encode(UNICODE_ENCODING))
+            return
+
+        if self.url in ("/ldap", "/ldap/search"):
+            self.send_response(OK)
+            self.send_header("Content-type", "application/json; charset=%s" % UNICODE_ENCODING)
+            self.send_header("Connection", "close")
+            self.end_headers()
+
+            q = self.params.get("q", "")
+            if q:
+                filter_str = "(|(cn=*%s*)(sn=*%s*)(mail=*%s*)(uid=*%s*)(description=*%s*))" % (q, q, q, q, q)
+                rows, error = _ldap_execute(filter_str)
+                if error:
+                    output = json.dumps({"resultCode": 1, "errorMessage": error})
+                else:
+                    entries = [_ldap_row_to_obj(r) for r in (rows or [])]
+                    output = json.dumps({"resultCode": 0, "entries": entries, "count": len(entries)}, default=str)
+            else:
+                output = json.dumps({"resultCode": 0, "entries": [], "count": 0})
+
+            self.wfile.write(output.encode(UNICODE_ENCODING))
+            return
+
+        if self.url == "/ldap/login":
+            self.send_response(OK)
+            self.send_header("Content-type", "application/json; charset=%s" % UNICODE_ENCODING)
+            self.send_header("Connection", "close")
+            self.end_headers()
+
+            user = self.params.get("user", "")
+            password = self.params.get("pass", "")
+            if user and password:
+                filter_str = "(&(uid=%s)(userPassword=%s))" % (user, password)
+                rows, error = _ldap_execute(filter_str)
+                if error:
+                    output = json.dumps({"resultCode": 49, "errorMessage": error})
+                elif rows:
+                    entry = _ldap_row_to_obj(rows[0])
+                    output = json.dumps({"resultCode": 0, "authenticated": True, "user": entry}, default=str)
+                else:
+                    output = json.dumps({"resultCode": 49, "authenticated": False, "errorMessage": "Invalid credentials"})
+            else:
+                output = json.dumps({"resultCode": 49, "authenticated": False, "errorMessage": "Missing credentials"})
 
             self.wfile.write(output.encode(UNICODE_ENCODING))
             return

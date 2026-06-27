@@ -421,6 +421,9 @@ def cmdLineParser(argv=None):
         techniques.add_argument("--graphql", dest="graphql", action="store_true",
             help="Test for GraphQL injection (introspection, field/argument fuzzing, SQL/NoSQL payload families)")
 
+        techniques.add_argument("--ldap", dest="ldap", action="store_true",
+            help="Test for LDAP injection (filter breakout, boolean blind, auth bypass)")
+
         techniques.add_argument("--time-sec", dest="timeSec", type=int,
             help="Seconds to delay the DBMS response (default %d)" % defaults.timeSec)
 

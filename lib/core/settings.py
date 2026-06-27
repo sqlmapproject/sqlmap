@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.6.163"
+VERSION = "1.10.6.164"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -843,7 +843,7 @@ HEURISTIC_CHECK_ALPHABET = ('"', '\'', ')', '(', ',', '.')
 BANNER = re.sub(r"\[.\]", lambda _: "[\033[01;41m%s\033[01;49m]" % random.sample(HEURISTIC_CHECK_ALPHABET, 1)[0], BANNER)
 
 # String used for dummy non-SQLi (e.g. XSS) heuristic checks of a tested parameter value
-DUMMY_NON_SQLI_CHECK_APPENDIX = "<'\">"
+DUMMY_NON_SQLI_CHECK_APPENDIX = "<'\">)"
 
 # Regular expression used for recognition of file inclusion errors
 FI_ERROR_REGEX = r"(?i)[^\n]{0,100}(no such file|failed (to )?open)[^\n]{0,100}"
@@ -938,6 +938,44 @@ GRAPHQL_RUNTIME_ERRORS = (
     r"\bGraphQL\s+(?:resolver\s+)?error\b",
 )
 GRAPHQL_ERROR_REGEX = "(?:%s)" % '|'.join(GRAPHQL_PARSE_ERRORS + GRAPHQL_VALIDATION_ERRORS + GRAPHQL_APQ_ERRORS + GRAPHQL_RUNTIME_ERRORS)
+
+# LDAP error signatures per back-end for error-based detection and fingerprinting (matched against
+# HTTP response bodies). Each tuple is (backend_name, regex_fragment).
+LDAP_ERROR_SIGNATURES = (
+    ("Microsoft Active Directory", r"AcceptSecurityContext error, data [0-9a-fA-F]+"),
+    ("Microsoft Active Directory", r"LdapErr: DSID-[0-9a-fA-F]+"),
+    ("Microsoft Active Directory", r"80090308:\s*LdapErr"),
+    ("OpenLDAP", r"(?:Bad search filter|ldap_search_ext:\s*Bad search filter)(?:\s*\(-7\))?"),
+    ("OpenLDAP", r"Invalid DN syntax(?:\s*\(34\))?"),
+    ("ApacheDS", r"javax\.naming\.(?:directory\.)?(?:Naming|Authentication|InvalidName|InvalidSearchFilter|OperationNotSupported)Exception"),
+    ("ApacheDS", r"org\.apache\.directory\.api\.ldap\.model\.exception\.Ldap(?:InvalidSearchFilter|InvalidDn|SchemaViolation)?Exception"),
+    ("ApacheDS", r"LDAPException=\d+\s+msg=ERR_\d+"),
+    ("Oracle Directory Server", r"(?:attribute syntax error:|ACL parsing error:|Oracle (?:Unified )?Directory)"),
+    ("389 Directory Server", r"(?:Filter Syntax Verification|389[- ]Directory(?:[ /]Server)?)"),
+    ("Java JNDI", r"javax\.naming\.(?:InvalidNameException|InvalidSearchFilterException)"),
+    ("python-ldap", r"ldap\.(?:INVALID_DN_SYNTAX|FILTER_ERROR|NO_SUCH_OBJECT)"),
+)
+
+# Combined LDAP error regex used for heuristic detection (checks.py) and for recognising
+# that an error response originates from an LDAP back-end rather than a generic HTTP 500
+LDAP_ERROR_REGEX = r"(?i)(?:%s)" % '|'.join(regex for _, regex in LDAP_ERROR_SIGNATURES)
+
+# Printable-ASCII codepoint bounds bisected during LDAP blind extraction via >= lexicographic comparison
+LDAP_CHAR_MIN = 0x20
+LDAP_CHAR_MAX = 0x7e
+
+# Upper bound for the value-length search during LDAP blind extraction
+LDAP_MAX_LENGTH = 256
+
+# Attributes that definitively identify the backend vendor when probed on the RootDSE or
+# a well-known directory entry. Each tuple is (attribute, expected_value_substring, backend).
+LDAP_FINGERPRINT_ATTRIBUTES = (
+    ("objectGUID", None, "Microsoft Active Directory"),
+    ("vendorName", "OpenLDAP", "OpenLDAP"),
+    ("vendorName", "Apache Software Foundation", "ApacheDS"),
+    ("vendorName", "Oracle Corporation", "Oracle Directory Server"),
+    ("vendorName", "Red Hat", "389 Directory Server"),
+)
 
 # Length of prefix and suffix used in non-SQLI heuristic checks
 NON_SQLI_CHECK_PREFIX_SUFFIX_LENGTH = 6

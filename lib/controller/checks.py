@@ -82,6 +82,7 @@ from lib.core.settings import FORMAT_EXCEPTION_STRINGS
 from lib.core.settings import GRAPHQL_ERROR_REGEX
 from lib.core.settings import HEURISTIC_CHECK_ALPHABET
 from lib.core.settings import INFERENCE_EQUALS_CHAR
+from lib.core.settings import LDAP_ERROR_REGEX
 from lib.core.settings import IPS_WAF_CHECK_PAYLOAD
 from lib.core.settings import IPS_WAF_CHECK_RATIO
 from lib.core.settings import IPS_WAF_CHECK_TIMEOUT
@@ -1181,6 +1182,13 @@ def heuristicCheckSqlInjection(place, parameter):
 
     if not conf.graphql and re.search(GRAPHQL_ERROR_REGEX, page or ""):
         infoMsg = "heuristic (GraphQL) test shows that %sparameter '%s' appears to be a GraphQL endpoint (rerun with switch '--graphql')" % ("%s " % paramType if paramType != parameter else "", parameter)
+        logger.info(infoMsg)
+
+        if conf.beep:
+            beep()
+
+    if not conf.ldap and re.search(LDAP_ERROR_REGEX, page or ""):
+        infoMsg = "heuristic (LDAP) test shows that %sparameter '%s' might be vulnerable to LDAP injection (rerun with switch '--ldap')" % ("%s " % paramType if paramType != parameter else "", parameter)
         logger.info(infoMsg)
 
         if conf.beep:
