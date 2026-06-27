@@ -13,11 +13,13 @@ import time
 from collections import namedtuple
 from collections import OrderedDict
 
+from lib.core.common import beep
 from lib.core.common import randomStr
 from lib.core.convert import getUnicode
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import POST_HINT
 from lib.core.settings import ERROR_PARSING_REGEXES
 from lib.core.settings import GRAPHQL_ENDPOINT_PATHS
@@ -234,6 +236,13 @@ def _gqlSend(endpoint, query, variables=None):
     body = {"query": query}
     if variables:
         body["variables"] = variables
+
+    if conf.delay:
+        time.sleep(conf.delay)
+
+    if conf.verbose >= 3:
+        logger.log(CUSTOM_LOGGING.PAYLOAD, query[:200])
+
     oldPostHint = getattr(kb, "postHint", None)
     try:
         kb.postHint = POST_HINT.JSON
@@ -974,6 +983,8 @@ def _testSlot(slot, endpoint):
     report = "---\nParameter: %s.%s(%s:) (%s)\n    Type: GraphQL injection\n    Title: %s\n    Payload: %s\n---" % (
         slot.parentType, slot.fieldName, slot.targetArg, slot.strategy, title, _escapeGraphQLString(payload))
     conf.dumper.singleString(report)
+    if conf.beep:
+        beep()
 
     # In-band exposure: the always-true payload reflecting extra records directly
     if kind == "boolean" and templatePage:

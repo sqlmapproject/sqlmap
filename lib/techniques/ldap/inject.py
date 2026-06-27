@@ -7,9 +7,11 @@ See the file 'LICENSE' for copying permission
 
 import difflib
 import re
+import time
 
 from collections import namedtuple
 
+from lib.core.common import beep
 from lib.core.common import randomStr
 from lib.core.convert import getUnicode
 from lib.core.data import conf
@@ -154,12 +156,16 @@ def _send(place, parameter, value):
     skipUrlEncode = conf.skipUrlEncode
     conf.skipUrlEncode = True
 
+    if conf.delay:
+        time.sleep(conf.delay)
+
     try:
         kwargs = {"raise404": False, "silent": True}
         payload = _replaceSegment(place, parameter, value)
         kwargs["post" if place in (PLACE.POST, PLACE.CUSTOM_POST) else "get"] = payload
 
-        logger.log(CUSTOM_LOGGING.PAYLOAD, payload)
+        if conf.verbose >= 3:
+            logger.log(CUSTOM_LOGGING.PAYLOAD, payload)
         page, _, _ = Request.getPage(**kwargs)
         return page or ""
     except Exception as ex:
@@ -671,6 +677,8 @@ def ldapScan():
                 found += 1
                 backend = backendHint or None
                 logger.info("%s parameter '%s' is vulnerable to LDAP injection (back-end: '%s')" % (place, parameter, backend or "Generic"))
+                if conf.beep:
+                    beep()
 
                 oracle = _makeOracle(place, parameter, template)
                 slots.append(Slot(place=place, parameter=parameter, backend=backend, oracle=oracle, template=template, payload=payload, breakout=breakout))
@@ -681,6 +689,8 @@ def ldapScan():
             if bypass:
                 found += 1
                 logger.info("%s parameter '%s' allows LDAP wildcard auth bypass (password=*)" % (place, parameter))
+                if conf.beep:
+                    beep()
                 slots.append(Slot(place=place, parameter=parameter, bypass=bypass))
                 continue
 

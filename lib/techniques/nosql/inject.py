@@ -13,6 +13,7 @@ import time
 from collections import namedtuple
 from collections import OrderedDict
 
+from lib.core.common import beep
 from lib.core.common import randomStr
 from lib.core.data import conf
 from lib.core.data import kb
@@ -133,6 +134,9 @@ def _send(place, parameter, segment=None, jsonValue=_UNSET):
 
     skipUrlEncode = conf.skipUrlEncode
     conf.skipUrlEncode = True
+
+    if conf.delay:
+        time.sleep(conf.delay)
 
     try:
         kwargs = {"raise404": False, "silent": True}
@@ -705,6 +709,8 @@ def nosqlScan():
             found += 1
             infoMsg = "%s parameter '%s' is vulnerable to NoSQL injection (back-end: '%s')" % (place, key, vector.dbms)
             logger.info(infoMsg)
+            if conf.beep:
+                beep()
 
             # standard sqlmap-style injection-point summary (reproducible vector)
             if vector.bypass == '{"$ne": null}':
