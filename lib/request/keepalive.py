@@ -9,7 +9,6 @@ import socket
 import threading
 import time
 
-from lib.core.data import conf
 from lib.core.settings import KEEPALIVE_IDLE_TIMEOUT
 from lib.core.settings import KEEPALIVE_MAX_REQUESTS
 from thirdparty.six.moves import http_client as _http_client

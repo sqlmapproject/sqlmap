@@ -6,7 +6,6 @@ See the file 'LICENSE' for copying permission
 """
 
 import codecs
-import collections
 import difflib
 import inspect
 import logging

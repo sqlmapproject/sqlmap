@@ -16,14 +16,13 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _testutils import bootstrap, set_dbms
+from _testutils import bootstrap
 bootstrap()
 
 from lib.core.convert import (decodeHex, encodeHex, decodeBase64, encodeBase64,
                               getBytes, getText, getUnicode, getOrds,
                               jsonize, dejsonize, base64pickle, base64unpickle)
 from lib.core.common import decodeDbmsHexValue
-from lib.core.enums import DBMS
 
 RND = random.Random(0xC0FFEE)
 

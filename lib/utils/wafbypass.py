@@ -13,7 +13,6 @@ import sys
 
 from lib.core.common import fetchRandomAgent
 from lib.core.data import conf
-from lib.core.data import kb
 from lib.core.data import paths
 from lib.core.enums import HTTP_HEADER
 from lib.core.enums import PLACE

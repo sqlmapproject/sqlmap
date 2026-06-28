@@ -14,7 +14,6 @@ byte-for-byte; randomizeParameterValue is asserted via its invariants.
 """
 
 import os
-import re
 import sys
 import unittest
 
