@@ -70,7 +70,8 @@ def dirtyPatches():
 
     # add support for inet_pton() on Windows OS
     if IS_WIN:
-        from thirdparty.wininetpton import win_inet_pton
+        from thirdparty.wininetpton.win_inet_pton import inject_into_socket
+        inject_into_socket()
 
     # Reference: https://github.com/nodejs/node/issues/12786#issuecomment-298652440
     codecs.register(lambda name: codecs.lookup("utf-8") if name == "cp65001" else None)
