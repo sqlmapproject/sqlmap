@@ -40,9 +40,50 @@ jobs:
       - name: Pyflakes lint
         shell: bash
         run: |
-          set +e
-          python -m pip install pyflakes
-          python -c 'import subprocess, sys; files = subprocess.check_output(["git", "ls-files", "*.py"]).decode().splitlines(); files = [f for f in files if not f.startswith("thirdparty/")]; p = subprocess.Popen([sys.executable, "-m", "pyflakes"] + files, stdout=subprocess.PIPE, stderr=subprocess.STDOUT); out, _ = p.communicate(); lines = [l for l in out.decode().splitlines() if " redefines " not in l]; sys.exit(1) if lines else None; print("pyflakes: clean")'
+          python - <<'PY'
+          from __future__ import print_function
+
+          import subprocess
+          import sys
+
+          subprocess.check_call([
+              sys.executable, "-m", "pip", "install", "pyflakes"
+          ])
+
+          files = subprocess.check_output(
+              ["git", "ls-files", "*.py"]
+          ).decode("utf-8").splitlines()
+
+          files = [
+              f for f in files
+              if not f.startswith("thirdparty/")
+          ]
+
+          proc = subprocess.Popen(
+              [sys.executable, "-m", "pyflakes"] + files,
+              stdout=subprocess.PIPE,
+              stderr=subprocess.STDOUT,
+          )
+          out, _ = proc.communicate()
+
+          text = out.decode("utf-8", "replace")
+          lines = [
+              line for line in text.splitlines()
+              if " redefines " not in line
+          ]
+
+          if lines:
+              print("\n".join(lines))
+              sys.exit(1)
+
+          if proc.returncode not in (0, 1):
+              if text:
+                  print(text)
+              print("pyflakes failed unexpectedly with status %s" % proc.returncode)
+              sys.exit(proc.returncode or 1)
+
+          print("pyflakes: clean")
+          PY
 
       - name: Basic import test
         run: python -c "import sqlmap; import sqlmapapi"
