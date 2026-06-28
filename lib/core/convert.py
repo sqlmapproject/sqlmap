@@ -35,9 +35,11 @@ from thirdparty.six.moves import html_parser
 from thirdparty.six.moves import collections_abc as _collections
 
 try:
-    from html import escape as htmlEscape
+    from html import escape as _escape
 except ImportError:
-    from cgi import escape as htmlEscape
+    from cgi import escape as _escape
+
+htmlEscape = _escape
 
 def base64pickle(value):
     """
