@@ -4,14 +4,15 @@
 Copyright (c) 2006-2026 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 
-Unit tests for plugins/generic/search.py (Search) and plugins/generic/entries.py
-(Entries), exercising searchDb / searchTable / searchColumn and dumpTable by
-MOCKING the injection layer (lib.request.inject.getValue) and the dumper.
+Unit tests for plugins/generic/search.py (Search), exercising searchDb /
+searchTable / searchColumn by MOCKING the injection layer
+(lib.request.inject.getValue) and the dumper.
 
 No network and no DBMS are involved: conf.direct=True selects the simple inband
-branches, inject.getValue is patched to return canned rows in the exact shape the
-methods parse, and conf.dumper is replaced with a recording stub so we can assert
-on what each method produced (kb.data caches / returned dicts).
+branches (TestSearch), or conf.direct=False with a BOOLEAN injection state selects
+the inference branches (TestSearchInference); inject.getValue is patched to return
+canned rows in the exact shape the methods parse, and conf.dumper is replaced with
+a recording stub so we can assert on what each method produced.
 """
 
 import os
@@ -24,10 +25,30 @@ from _testutils import bootstrap, set_dbms
 bootstrap()
 
 from lib.core.data import conf, kb
+from lib.core.enums import EXPECTED, PAYLOAD
 import plugins.generic.search as smod
 import plugins.generic.entries as emod
 from plugins.generic.search import Search
-from plugins.generic.entries import Entries
+
+
+def _inference_gv(count, sequence):
+    """Build an inject.getValue stub for blind inference branches.
+
+    Returns `count` (as str) whenever the caller asks for EXPECTED.INT, otherwise
+    yields the next item from `sequence` wrapped as a single-cell row ([value]),
+    cycling if exhausted. This mirrors the count-then-per-row contract of every
+    isInferenceAvailable() branch.
+    """
+    state = {"i": 0}
+
+    def gv(query, *a, **k):
+        if k.get("expected") == EXPECTED.INT:
+            return str(count)
+        val = sequence[state["i"] % len(sequence)]
+        state["i"] += 1
+        return [val]
+
+    return gv
 
 
 class _RecordingDumper(object):
@@ -100,29 +121,6 @@ class _TestSearch(Search):
         if db and tbl:
             kb.data.cachedColumns.setdefault(db, {}).setdefault(tbl, {})
             kb.data.cachedColumns[db][tbl][col] = "varchar"
-
-
-class _TestEntries(Entries):
-    """Entries with cross-mixin collaborators stubbed (forceDbmsEnum/getCurrentDb/getColumns/getTables)."""
-
-    def __init__(self):
-        Entries.__init__(self)
-        self.getColumnsResult = {}    # {db: {tbl: {col: type}}}
-        self.getTablesResult = {}     # value assigned to kb.data.cachedTables
-        self.getColumnsCalls = []
-
-    def forceDbmsEnum(self):
-        pass
-
-    def getCurrentDb(self):
-        return "testdb"
-
-    def getColumns(self, onlyColNames=False, colTuple=None, bruteForce=None, dumpMode=False):
-        self.getColumnsCalls.append((conf.db, conf.tbl))
-        kb.data.cachedColumns = dict(self.getColumnsResult)
-
-    def getTables(self, bruteForce=None):
-        kb.data.cachedTables = dict(self.getTablesResult)
 
 
 class _SearchEnumBase(unittest.TestCase):
@@ -362,113 +360,190 @@ class TestSearch(_SearchEnumBase):
         self.assertRaises(SqlmapMissingMandatoryOptionException, s.search)
 
 
-class TestEntries(_SearchEnumBase):
-    def _entries_with_cols(self, db="testdb", tbl="users", cols=("id", "name")):
-        e = _TestEntries()
-        e.getColumnsResult = {db: {tbl: {c: "varchar" for c in cols}}}
-        return e
+# --------------------------------------------------------------------------- #
+# search.py - inference (blind) paths
+# --------------------------------------------------------------------------- #
 
-    # --- dumpTable: inband (conf.direct) ------------------------------------
+class _TestSearchInf(Search):
+    excludeDbsList = ["information_schema", "mysql"]
 
-    def test_dump_table_inband_rows(self):
-        e = self._entries_with_cols(cols=("id", "name"))
+    def __init__(self):
+        Search.__init__(self)
+        self.like = ('2', "='%s'")     # exact match (colConsider '2')
+        self.dumpFoundTablesCalls = []
+        self.dumpFoundColumnCalls = []
+
+    def likeOrExact(self, what):
+        return self.like
+
+    def forceDbmsEnum(self):
+        pass
+
+    def getCurrentDb(self):
+        return "testdb"
+
+    def dumpFoundTables(self, tables):
+        self.dumpFoundTablesCalls.append(tables)
+
+    def dumpFoundColumn(self, dbs, foundCols, colConsider):
+        self.dumpFoundColumnCalls.append((dbs, foundCols, colConsider))
+
+    def getColumns(self, onlyColNames=False, colTuple=None, bruteForce=None, dumpMode=False):
+        db, tbl, col = conf.db, conf.tbl, conf.col
+        if db and tbl:
+            kb.data.cachedColumns.setdefault(db, {}).setdefault(tbl, {})
+            kb.data.cachedColumns[db][tbl][col] = "varchar"
+
+
+class _RecDumper(object):
+    def __init__(self):
+        self.listed = []
+        self.dbTablesArg = None
+        self.dbColumnsArg = None
+
+    def lister(self, header, elements, content_type=None, sort=True):
+        self.listed.append((header, list(elements) if elements else []))
+
+    def dbTables(self, dbTables):
+        self.dbTablesArg = dbTables
+
+    def dbColumns(self, dbColumnsDict, colConsider, dbs):
+        self.dbColumnsArg = (dbColumnsDict, colConsider, dbs)
+
+
+class _SearchBase(unittest.TestCase):
+    _CONF_KEYS = ("db", "tbl", "col", "direct", "technique", "excludeSysDbs",
+                  "exclude", "search")
+
+    def setUp(self):
+        self._saved_conf = {k: conf.get(k) for k in self._CONF_KEYS}
+        self._saved_dumper = conf.get("dumper")
+        self._gv = smod.inject.getValue
+        self._readInput = smod.readInput
+        self._saved_has_is = kb.data.get("has_information_schema")
+        self._saved_cachedColumns = kb.data.get("cachedColumns")
+        self._saved_hintValue = kb.get("hintValue")
+        self._saved_injection_data = kb.injection.data
+
+        set_dbms("MySQL")
+        conf.direct = False
+        conf.technique = None
+        conf.excludeSysDbs = False
+        conf.exclude = None
+        conf.search = True
+        conf.dumper = _RecDumper()
+
+        kb.data.has_information_schema = True
+        kb.data.cachedColumns = {}
+        kb.injection.data = {PAYLOAD.TECHNIQUE.BOOLEAN: {"title": "AND boolean-based blind"}}
+
+    def tearDown(self):
+        for k, v in self._saved_conf.items():
+            conf[k] = v
+        conf.dumper = self._saved_dumper
+        smod.inject.getValue = self._gv
+        smod.readInput = self._readInput
+        kb.data.has_information_schema = self._saved_has_is
+        kb.data.cachedColumns = self._saved_cachedColumns
+        kb.hintValue = self._saved_hintValue
+        kb.injection.data = self._saved_injection_data
+
+
+class TestSearchInference(_SearchBase):
+    def test_search_db_inference(self):
+        # Blind searchDb: count of matching dbs, then one db name per index.
+        s = _TestSearchInf()
         conf.db = "testdb"
+        smod.inject.getValue = _inference_gv(2, ["testdb", "testdb2"])
+        s.searchDb()
+        self.assertEqual(conf.dumper.listed[-1][0], "found databases")
+        self.assertEqual(sorted(conf.dumper.listed[-1][1]), ["testdb", "testdb2"])
+
+    def test_search_db_inference_no_match(self):
+        # Count fails (non-numeric) => no databases appended, empty listing.
+        s = _TestSearchInf()
+        conf.db = "ghost"
+        smod.inject.getValue = lambda query, *a, **k: (None if k.get("expected") == EXPECTED.INT else self.fail("must not page when count fails"))
+        s.searchDb()
+        self.assertEqual(conf.dumper.listed[-1][1], [])
+
+    def test_search_table_inference_grouped(self):
+        # Blind searchTable, no conf.db: outer count of dbs holding the table, then
+        # per-db a name, then per-db a count of matching tables, then table names.
+        s = _TestSearchInf()
         conf.tbl = "users"
-        conf.col = None
-        # MySQL inband dump returns a list of [colVal, colVal] rows.
-        emod.inject.getValue = lambda *a, **k: [["1", "alice"], ["2", "bob"]]
+        conf.db = None
 
-        e.dumpTable()
+        # Sequencing by the EXPECTED.INT counts + the per-index string results.
+        # 1st count: number of databases with the table -> 1
+        # 1st db name -> "testdb"
+        # 2nd count: number of tables in testdb -> 1
+        # table name -> "users"
+        seq = {"counts": ["1", "1"], "ci": 0, "vals": ["testdb", "users"], "vi": 0}
 
-        dumped = conf.dumper.tableValues[-1]
-        self.assertEqual(dumped["__infos__"]["count"], 2)
-        self.assertEqual(dumped["__infos__"]["table"], "users")
-        self.assertEqual(dumped["__infos__"]["db"], "testdb")
-        self.assertEqual(list(dumped["id"]["values"]), ["1", "2"])
-        self.assertEqual(list(dumped["name"]["values"]), ["alice", "bob"])
+        def gv(query, *a, **k):
+            if k.get("expected") == EXPECTED.INT:
+                v = seq["counts"][seq["ci"] % len(seq["counts"])]
+                seq["ci"] += 1
+                return v
+            v = seq["vals"][seq["vi"] % len(seq["vals"])]
+            seq["vi"] += 1
+            return [v]
 
-    def test_dump_table_uses_foundData(self):
-        e = _TestEntries()
-        conf.db = "testdb"
+        smod.inject.getValue = gv
+        s.searchTable()
+        self.assertEqual(conf.dumper.dbTablesArg, {"testdb": ["users"]})
+        self.assertEqual(s.dumpFoundTablesCalls[-1], {"testdb": ["users"]})
+
+    def test_search_table_mysql_lt5_bruteforce_decline(self):
+        # MySQL < 5 forces the bruteforce path; declining the prompt returns None
+        # without any injection.
+        s = _TestSearchInf()
         conf.tbl = "users"
-        conf.col = None
-        emod.inject.getValue = lambda *a, **k: [["x"]]
-        foundData = {"testdb": {"users": {"id": "int"}}}
+        conf.db = None
+        kb.data.has_information_schema = False
+        smod.readInput = lambda *a, **k: "N"
+        smod.inject.getValue = lambda *a, **k: self.fail("bruteforce decline must not query")
+        self.assertIsNone(s.searchTable())
 
-        e.dumpTable(foundData=foundData)
-
-        # foundData short-circuits column discovery: getColumns must not run.
-        self.assertEqual(e.getColumnsCalls, [])
-        self.assertIn("id", conf.dumper.tableValues[-1])
-
-    def test_dump_table_no_columns_skips(self):
-        e = _TestEntries()
-        e.getColumnsResult = {}     # discovery yields nothing
-        conf.db = "testdb"
-        conf.tbl = "ghost"
-        conf.col = None
-        emod.inject.getValue = lambda *a, **k: self.fail("should not fetch entries")
-
-        e.dumpTable()
-        # No columns => no values dumped.
-        self.assertEqual(conf.dumper.tableValues, [])
-
-    def test_dump_table_empty_entries(self):
-        e = self._entries_with_cols(cols=("id",))
-        conf.db = "testdb"
-        conf.tbl = "users"
-        conf.col = None
-        emod.inject.getValue = lambda *a, **k: None     # no rows
-
-        e.dumpTable()
-        # Nothing retrieved => dumpedTable empty => dbTableValues not called.
-        self.assertEqual(conf.dumper.tableValues, [])
-
-    def test_dump_table_current_db(self):
-        e = self._entries_with_cols(db="testdb", tbl="users", cols=("id",))
-        conf.db = None              # triggers getCurrentDb() -> "testdb"
-        conf.tbl = "users"
-        conf.col = None
-        emod.inject.getValue = lambda *a, **k: [["7"]]
-
-        e.dumpTable()
-        self.assertEqual(conf.db, "testdb")
-        self.assertEqual(list(conf.dumper.tableValues[-1]["id"]["values"]), ["7"])
-
-    def test_dump_table_multiple_db_error(self):
-        e = _TestEntries()
-        conf.db = "a,b"
-        conf.tbl = "users"
-        conf.col = None
-        from lib.core.exception import SqlmapMissingMandatoryOptionException
-        self.assertRaises(SqlmapMissingMandatoryOptionException, e.dumpTable)
-
-    def test_dump_table_get_tables_when_no_tbl(self):
-        e = _TestEntries()
-        e.getTablesResult = {"testdb": ["users"]}
-        e.getColumnsResult = {"testdb": {"users": {"id": "int"}}}
-        conf.db = "testdb"
+    def test_search_column_inference(self):
+        # Blind searchColumn, no db/tbl: count of dbs with the column, then db name;
+        # then per-db count of tables with the column, then table name -> getColumns
+        # folds the column into dbs.
+        s = _TestSearchInf()
+        conf.col = "password"
+        conf.db = None
         conf.tbl = None
-        conf.col = None
-        emod.inject.getValue = lambda *a, **k: [["42"]]
 
-        e.dumpTable()
-        # Tables were discovered via getTables, then the row dumped.
-        self.assertEqual(list(conf.dumper.tableValues[-1]["id"]["values"]), ["42"])
+        seq = {"counts": ["1", "1"], "ci": 0, "vals": ["testdb", "users"], "vi": 0}
 
-    # --- dumpAll: single-db delegation --------------------------------------
+        def gv(query, *a, **k):
+            if k.get("expected") == EXPECTED.INT:
+                v = seq["counts"][seq["ci"] % len(seq["counts"])]
+                seq["ci"] += 1
+                return v
+            v = seq["vals"][seq["vi"] % len(seq["vals"])]
+            seq["vi"] += 1
+            return [v]
 
-    def test_dump_all_single_db_delegates(self):
-        e = self._entries_with_cols(db="testdb", tbl="users", cols=("id",))
-        # dumpAll with db set & tbl None must delegate straight to dumpTable.
-        conf.db = "testdb"
+        smod.inject.getValue = gv
+        s.searchColumn()
+        dbs = conf.dumper.dbColumnsArg[2]
+        self.assertIn("testdb", dbs)
+        self.assertIn("users", dbs["testdb"])
+        self.assertIn("password", dbs["testdb"]["users"])
+
+    def test_search_column_mysql_lt5_bruteforce_decline(self):
+        s = _TestSearchInf()
+        conf.col = "password"
+        conf.db = None
         conf.tbl = None
-        conf.col = None
-        e.getTablesResult = {"testdb": ["users"]}
-        emod.inject.getValue = lambda *a, **k: [["9"]]
-
-        e.dumpAll()
-        self.assertTrue(conf.dumper.tableValues)
+        kb.data.has_information_schema = False
+        smod.readInput = lambda *a, **k: "N"
+        smod.inject.getValue = lambda *a, **k: self.fail("bruteforce decline must not query")
+        # Declining returns None and never reaches dbColumns.
+        self.assertIsNone(s.searchColumn())
+        self.assertIsNone(conf.dumper.dbColumnsArg)
 
 
 if __name__ == "__main__":

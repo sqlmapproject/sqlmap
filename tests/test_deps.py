@@ -56,7 +56,7 @@ class TestCheckDependencies(unittest.TestCase):
         # 'kinterbasdb' (Firebird driver) is essentially never installed, so the
         # probe must hit the except branch and emit a warning naming the library.
         try:
-            import kinterbasdb  # noqa: F401
+            __import__("kinterbasdb")
             self.skipTest("kinterbasdb is unexpectedly installed")
         except ImportError:
             pass

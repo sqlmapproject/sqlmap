@@ -21,8 +21,7 @@ bootstrap()
 
 from lib.core.compat import (WichmannHill, patchHeaders, cmp, choose_boundary,
                               round, cmp_to_key, LooseVersion, _is_write_mode,
-                              MixedWriteTextIO, _codecs_open, codecs_open)
-from lib.core.compat import xrange
+                              MixedWriteTextIO, _codecs_open)
 
 
 class TestWichmannHill(unittest.TestCase):

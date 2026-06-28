@@ -20,7 +20,7 @@ from _testutils import bootstrap
 bootstrap()
 
 from lib.core.settings import (JSON_RECOGNITION_REGEX, JSON_LIKE_RECOGNITION_REGEX,
-                               XML_RECOGNITION_REGEX, PAYLOAD_DELIMITER, DEFAULT_GET_POST_DELIMITER,
+                               XML_RECOGNITION_REGEX, PAYLOAD_DELIMITER,
                                CUSTOM_INJECTION_MARK_CHAR)
 
 # The real source marks injection points with kb.customInjectionMark, which defaults to

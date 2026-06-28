@@ -33,7 +33,6 @@ bootstrap()
 
 from lib.core.data import conf, kb
 from lib.core.convert import encodeHex, encodeBase64, getText
-from lib.core.enums import PAYLOAD
 
 
 # --------------------------------------------------------------------------- #

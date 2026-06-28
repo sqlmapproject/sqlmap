@@ -474,7 +474,7 @@ class TestCreateDirs(_TargetTestBase):
         self.assertIn("example.com", conf.filePath)
 
     def test_target_dir_and_target_txt(self):
-        out = self._outdir("t_out")
+        self._outdir("t_out")
         conf.hostname = "example.com"
         conf.url = "http://example.com/?id=1"
         conf.data = None

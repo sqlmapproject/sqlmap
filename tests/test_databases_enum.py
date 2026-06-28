@@ -36,6 +36,26 @@ from plugins.generic.databases import Databases
 _NOOP = lambda self: None
 
 
+def _inference_gv(count, sequence):
+    """Build an inject.getValue stub for blind inference branches.
+
+    Returns `count` (as str) whenever the caller asks for EXPECTED.INT, otherwise
+    yields the next item from `sequence` wrapped as a single-cell row ([value]),
+    cycling if exhausted. This mirrors the count-then-per-row contract of every
+    isInferenceAvailable() branch.
+    """
+    state = {"i": 0}
+
+    def gv(query, *a, **k):
+        if k.get("expected") == EXPECTED.INT:
+            return str(count)
+        val = sequence[state["i"] % len(sequence)]
+        state["i"] += 1
+        return [val]
+
+    return gv
+
+
 class _BaseEnumTest(unittest.TestCase):
     """Shared setup/teardown that snapshots and restores all touched global state."""
 
@@ -505,6 +525,242 @@ class TestGetProcedures(_BaseEnumTest):
         dbmod.inject.getValue = gv
         result = d.getProcedures()
         self.assertEqual(sorted(result), sorted(procs))
+
+
+# --------------------------------------------------------------------------- #
+# Inference / brute-force branches (relocated from test_generic_enum_more.py)
+# --------------------------------------------------------------------------- #
+
+class _DbBase(unittest.TestCase):
+    _CONF_KEYS = ("direct", "technique", "db", "tbl", "col", "exclude",
+                  "getComments", "excludeSysDbs", "search", "freshQueries")
+
+    def setUp(self):
+        self._saved_conf = {k: conf.get(k) for k in self._CONF_KEYS}
+        self._saved_getValue = dbmod.inject.getValue
+        self._saved_checkBool = dbmod.inject.checkBooleanExpression
+        self._saved_injection_data = kb.injection.data
+        self._saved_has_is = kb.data.get("has_information_schema")
+        self._saved_hintValue = kb.get("hintValue")
+        self._saved_choices = dict(kb.choices)
+        self._saved_readInput = dbmod.readInput
+        self._saved_forceDbmsEnum = getattr(Databases, "forceDbmsEnum", None)
+        Databases.forceDbmsEnum = _NOOP
+
+        conf.getComments = False
+        conf.excludeSysDbs = False
+        conf.exclude = None
+        conf.search = False
+        conf.freshQueries = False
+        conf.col = None
+        kb.data.has_information_schema = True
+
+    def tearDown(self):
+        for k, v in self._saved_conf.items():
+            conf[k] = v
+        dbmod.inject.getValue = self._saved_getValue
+        dbmod.inject.checkBooleanExpression = self._saved_checkBool
+        dbmod.readInput = self._saved_readInput
+        kb.injection.data = self._saved_injection_data
+        kb.data.has_information_schema = self._saved_has_is
+        kb.hintValue = self._saved_hintValue
+        kb.choices.clear()
+        kb.choices.update(self._saved_choices)
+        if self._saved_forceDbmsEnum is not None:
+            Databases.forceDbmsEnum = self._saved_forceDbmsEnum
+        else:
+            try:
+                del Databases.forceDbmsEnum
+            except AttributeError:
+                pass
+
+    def _fresh(self):
+        d = Databases()
+        kb.data.currentDb = ""
+        kb.data.cachedDbs = []
+        kb.data.cachedTables = {}
+        kb.data.cachedColumns = {}
+        kb.data.cachedCounts = {}
+        kb.data.cachedStatements = []
+        kb.data.cachedProcedures = []
+        return d
+
+    def _inference(self):
+        conf.direct = False
+        conf.technique = None
+        kb.injection.data = {PAYLOAD.TECHNIQUE.BOOLEAN: {"title": "AND boolean-based blind"}}
+
+
+class TestDatabasesInference(_DbBase):
+    def test_get_columns_inference_pgsql_types(self):
+        # Blind column enumeration on PostgreSQL: a count, then for each index a
+        # column name followed by its type. Assert the {db:{tbl:{col:type}}} parse.
+        set_dbms("PostgreSQL")
+        self._inference()
+        d = self._fresh()
+        conf.db = "public"
+        conf.tbl = "users"
+
+        names = ["id", "email"]
+        state = {"i": 0, "name": True}
+
+        def gv(query, *a, **k):
+            if k.get("expected") == EXPECTED.INT:
+                return str(len(names))
+            if state["name"]:
+                val = names[state["i"] % len(names)]
+                state["i"] += 1
+                state["name"] = False
+                return [val]
+            state["name"] = True
+            return ["integer"]
+
+        dbmod.inject.getValue = gv
+        result = d.getColumns()
+        cols = result["public"]["users"]
+        self.assertEqual(len(cols), 2)
+        self.assertEqual(cols.get("id"), "integer")
+
+    def test_get_columns_inference_dump_mode_collist(self):
+        # dumpMode with an explicit conf.col list: in the inference branch the
+        # columns are taken straight from colList (no count/type queries at all)
+        # and stored with value None. Asserting no getValue ran proves the
+        # dump-mode shortcut, not a network round-trip.
+        set_dbms("MySQL")
+        self._inference()
+        d = self._fresh()
+        conf.db = "testdb"
+        conf.tbl = "users"
+        conf.col = "id,name"
+
+        def boom(*a, **k):
+            raise AssertionError("dumpMode+colList must not query in inference branch")
+
+        dbmod.inject.getValue = boom
+        result = d.getColumns(dumpMode=True)
+        cols = result["testdb"]["users"]
+        # "name" is a reserved word -> safeSQLIdentificatorNaming backtick-quotes it;
+        # both columns must be present (count, since exact key varies by quoting).
+        self.assertEqual(len(cols), 2)
+        self.assertIn("id", cols)
+        self.assertIsNone(cols.get("id"))
+
+    def test_get_count_over_cached_tables_inference(self):
+        # getCount with no conf.tbl: it calls getTables() then per-table _tableGetCount.
+        # Drive the inband table fetch + per-table count and assert the
+        # {db:{count:[tables]}} grouping (tables sharing a count are grouped).
+        set_dbms("MySQL")
+        conf.direct = True
+        d = self._fresh()
+        conf.db = "testdb"
+        conf.tbl = None
+        kb.data.cachedTables = {"testdb": ["users", "posts"]}
+
+        counts = {"users": "5", "posts": "5"}
+
+        def gv(query, *a, **k):
+            for t, c in counts.items():
+                if t in query:
+                    return c
+            return "0"
+
+        dbmod.inject.getValue = gv
+        result = d.getCount()
+        # both tables have count 5 -> grouped under the same key
+        self.assertEqual(sorted(result["testdb"][5]), ["posts", "users"])
+
+    def test_get_statements_count_zero_returns_empty(self):
+        # Inference path: a zero count short-circuits to the (empty) cache.
+        set_dbms("PostgreSQL")
+        self._inference()
+        d = self._fresh()
+        # getStatements compares the count with the int literal 0 (count == 0), so
+        # the count stub must return an int 0 (not "0") to take the empty branch.
+        dbmod.inject.getValue = lambda query, *a, **k: 0 if k.get("expected") == EXPECTED.INT else self.fail("must not fetch rows when count is 0")
+        result = d.getStatements()
+        self.assertEqual(result, [])
+
+    def test_get_procedures_inference(self):
+        set_dbms("PostgreSQL")
+        self._inference()
+        d = self._fresh()
+        dbmod.inject.getValue = _inference_gv(2, ["sp_a", "sp_b"])
+        result = d.getProcedures()
+        self.assertEqual(sorted(result), ["sp_a", "sp_b"])
+
+    def test_get_dbs_mssql_inband_paging(self):
+        # MSSQL with no rows from the primary query falls into the query2 paging
+        # loop (one indexed query per db until a blank value stops it).
+        set_dbms("Microsoft SQL Server")
+        conf.direct = True
+        d = self._fresh()
+        dbs = ["master", "model"]
+
+        def gv(query, *a, **k):
+            # The primary inband query is 'SELECT name FROM master..sysdatabases'
+            # (no DB_NAME); make it return nothing so getDbs falls into the
+            # 'SELECT DB_NAME(<index>)' paging loop (query2).
+            if "DB_NAME" not in query:
+                return None
+            import re as _re
+            idx = int(_re.findall(r"DB_NAME\((\d+)\)", query)[0])
+            return dbs[idx] if idx < len(dbs) else ""
+
+        dbmod.inject.getValue = gv
+        result = d.getDbs()
+        self.assertEqual(sorted(result), ["master", "model"])
+
+    def test_get_tables_inference_grouped_per_db(self):
+        # Blind table enumeration: count for the db, then one table name per index.
+        set_dbms("MySQL")
+        self._inference()
+        d = self._fresh()
+        conf.db = "shop"
+        conf.tbl = None
+        dbmod.inject.getValue = _inference_gv(2, ["orders", "items"])
+        result = d.getTables()
+        self.assertIn("shop", result)
+        self.assertEqual(sorted(result["shop"]), ["items", "orders"])
+
+
+class TestDatabasesBruteForce(_DbBase):
+    def test_get_columns_mysql_lt5_bruteforce_decline(self):
+        # MySQL < 5 (no information_schema) forces bruteForce in getColumns; with
+        # the common-column-existence prompt answered 'N' it returns None without
+        # issuing any column query.
+        set_dbms("MySQL")
+        conf.direct = True
+        d = self._fresh()
+        conf.db = "testdb"
+        conf.tbl = "users"
+        kb.data.has_information_schema = False
+        kb.choices.columnExists = None
+        dbmod.readInput = lambda *a, **k: "N"
+
+        def boom(*a, **k):
+            raise AssertionError("bruteForce decline must not query columns")
+
+        dbmod.inject.getValue = boom
+        result = d.getColumns()
+        self.assertIsNone(result)
+
+    def test_get_columns_bruteforce_dumpmode_collist_on_decline(self):
+        # bruteForce + decline + dumpMode + colList: the columns from colList are
+        # stored with None type (the dump-mode salvage branch), not dropped.
+        set_dbms("MySQL")
+        conf.direct = True
+        d = self._fresh()
+        conf.db = "testdb"
+        conf.tbl = "users"
+        conf.col = "a,b"
+        kb.data.has_information_schema = False
+        kb.choices.columnExists = None
+        dbmod.readInput = lambda *a, **k: "N"
+        dbmod.inject.getValue = lambda *a, **k: None
+        result = d.getColumns(dumpMode=True)
+        cols = result["testdb"]["users"]
+        self.assertEqual(sorted(cols.keys()), ["a", "b"])
+        self.assertIsNone(cols.get("a"))
 
 
 if __name__ == "__main__":
