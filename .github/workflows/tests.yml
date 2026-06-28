@@ -42,18 +42,7 @@ jobs:
         run: |
           set +e
           python -m pip install pyflakes
-          python -c "
-import subprocess, sys
-files = subprocess.check_output(['git', 'ls-files', '*.py']).decode().splitlines()
-files = [f for f in files if not f.startswith('thirdparty/')]
-p = subprocess.Popen([sys.executable, '-m', 'pyflakes'] + files, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-out, _ = p.communicate()
-lines = [l for l in out.decode().splitlines() if ' redefines ' not in l]
-if lines:
-    print('\n'.join(lines))
-    sys.exit(1)
-print('pyflakes: clean')
-"
+          python -c 'import subprocess, sys; files = subprocess.check_output(["git", "ls-files", "*.py"]).decode().splitlines(); files = [f for f in files if not f.startswith("thirdparty/")]; p = subprocess.Popen([sys.executable, "-m", "pyflakes"] + files, stdout=subprocess.PIPE, stderr=subprocess.STDOUT); out, _ = p.communicate(); lines = [l for l in out.decode().splitlines() if " redefines " not in l]; sys.exit(1) if lines else None; print("pyflakes: clean")'
 
       - name: Basic import test
         run: python -c "import sqlmap; import sqlmapapi"
