@@ -40,11 +40,20 @@ jobs:
       - name: Pyflakes lint
         shell: bash
         run: |
+          set +e
           python -m pip install pyflakes
-          OUT=$(git ls-files '*.py' | grep -v '^thirdparty/' | xargs python -m pyflakes 2>&1) || true
-          OUT=$(echo "$OUT" | grep -v ' redefines ')
-          if [ -n "$OUT" ]; then echo "$OUT"; exit 1; fi
-          echo "pyflakes: clean"
+          python -c "
+import subprocess, sys
+files = subprocess.check_output(['git', 'ls-files', '*.py']).decode().splitlines()
+files = [f for f in files if not f.startswith('thirdparty/')]
+p = subprocess.Popen([sys.executable, '-m', 'pyflakes'] + files, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+out, _ = p.communicate()
+lines = [l for l in out.decode().splitlines() if ' redefines ' not in l]
+if lines:
+    print('\n'.join(lines))
+    sys.exit(1)
+print('pyflakes: clean')
+"
 
       - name: Basic import test
         run: python -c "import sqlmap; import sqlmapapi"
