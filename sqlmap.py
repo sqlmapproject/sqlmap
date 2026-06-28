@@ -32,6 +32,7 @@ try:
     import traceback
     import warnings
 
+    from io import *
     try:
         ResourceWarning
     except NameError:
