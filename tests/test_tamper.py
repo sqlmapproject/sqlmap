@@ -46,6 +46,20 @@ KNOWN_FRAGILE = set()  # percentage/escapequotes empty/None crashes were FIXED b
 # WAFs) -> ~6s/call. NOT a bug; excluded from execution to keep the unit suite fast.
 HEAVY = {"luanginxmore"}
 
+# Project contract for falsy input: tamper("") == "" and tamper(None) is None
+# (the common idiom `if payload: ...; return payload` passes "" and None through unchanged).
+# These tampers legitimately deviate for None: they initialize `retVal = ""` and only reassign
+# it inside `if payload:`, so any falsy payload (both "" AND None) returns "" -- i.e. None is
+# normalized to "" instead of being passed through. tamper("") == "" still holds for them.
+NONE_RETURNS_EMPTY = {
+    "sp_password",        # retVal = ""; reassigned only inside `if payload:`
+    "space2dash",         # retVal = ""; reassigned only inside `if payload:`
+    "space2hash",         # retVal = ""; reassigned only inside `if payload:`
+    "space2morehash",     # retVal = ""; reassigned only inside `if payload:`
+    "space2mssqlhash",    # retVal = ""; reassigned only inside `if payload:`
+    "space2mysqldash",    # retVal = ""; reassigned only inside `if payload:`
+}
+
 
 class TestTamperRobustness(unittest.TestCase):
     def test_no_crash_returns_string(self):
@@ -64,15 +78,31 @@ class TestTamperRobustness(unittest.TestCase):
 
 class TestTamperEmptyNoneHandling(unittest.TestCase):
     def test_graceful_on_empty_and_none(self):
+        # Assert the actual return contract on falsy input, not merely "does not raise":
+        #   tamper("") == ""  and  tamper(None) is None
+        # (NONE_RETURNS_EMPTY tampers normalize None to "" -- see comment on that set.)
         for name in TAMPERS:
             if name in KNOWN_FRAGILE or name in HEAVY:
                 continue
             mod = importlib.import_module("tamper.%s" % name)
-            for p in ("", None):
-                try:
-                    mod.tamper(p)
-                except Exception as ex:
-                    self.fail("tamper '%s' crashed on %r: %s" % (name, p, ex))
+
+            try:
+                empty_result = mod.tamper("")
+            except Exception as ex:
+                self.fail("tamper '%s' crashed on %r: %s" % (name, "", ex))
+            self.assertEqual(empty_result, "",
+                             msg="tamper '%s' returned %r for '' (expected '')" % (name, empty_result))
+
+            try:
+                none_result = mod.tamper(None)
+            except Exception as ex:
+                self.fail("tamper '%s' crashed on %r: %s" % (name, None, ex))
+            if name in NONE_RETURNS_EMPTY:
+                self.assertEqual(none_result, "",
+                                 msg="tamper '%s' returned %r for None (expected '' per NONE_RETURNS_EMPTY)" % (name, none_result))
+            else:
+                self.assertIsNone(none_result,
+                                  msg="tamper '%s' returned %r for None (expected None)" % (name, none_result))
 
     def test_previously_fragile_now_fixed(self):
         # regression pin: percentage/escapequotes used to crash on empty/None; now must be graceful

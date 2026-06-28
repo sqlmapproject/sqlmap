@@ -448,16 +448,67 @@ class TestGraphqlDialects(unittest.TestCase):
         self.assertIsNone(gi.DIALECTS["SQLite"].delay)
 
 
+def _dbmsTruth(dbms):
+    """A truth() oracle that behaves like a real `dbms` back-end: it answers each
+    dialect's fingerprint predicate by the SQL *semantics* a genuine instance would
+    exhibit, keyed on the function tokens the predicate emits - never on the
+    fingerprint constant itself. A predicate referencing a function the back-end does
+    not implement raises an error on a real server and is therefore falsy here."""
+
+    # Which vendor-specific tokens each back-end actually understands. A predicate is
+    # true only if every vendor token it mentions belongs to this back-end (mirroring
+    # an unknown function being a hard error rather than a false comparison).
+    knows = {
+        "SQLite": ("SQLITE_VERSION()",),
+        "Microsoft SQL Server": ("@@VERSION",),
+        "PostgreSQL": ("version()",),
+        "MySQL": ("@@VERSION_COMMENT", "@@VERSION"),
+    }
+    # @@VERSION exists on both MSSQL and MySQL; the distinguishing factor is the
+    # '%Microsoft%' banner match, which only an actual Microsoft server satisfies.
+    vendorTokens = ("SQLITE_VERSION()", "@@VERSION_COMMENT", "@@VERSION", "version()")
+    owned = knows[dbms]
+
+    def truth(cond):
+        # Any vendor token the predicate names must be implemented by this back-end,
+        # else the probe errors out (falsy).
+        for token in vendorTokens:
+            if token in cond and token not in owned:
+                # @@VERSION is shared; let the banner clause below decide instead.
+                if token == "@@VERSION" and "@@VERSION_COMMENT" not in cond:
+                    continue
+                return False
+        if not any(token in cond for token in vendorTokens):
+            return False
+        # @@VERSION LIKE '%Microsoft%' is only true on a real Microsoft server.
+        if "@@VERSION" in cond and "Microsoft" in cond:
+            return dbms == "Microsoft SQL Server"
+        # version() LIKE 'PostgreSQL%' is only true on a real PostgreSQL server.
+        if "version()" in cond and "PostgreSQL" in cond:
+            return dbms == "PostgreSQL"
+        return True
+
+    return truth
+
+
 class TestGraphqlFingerprint(unittest.TestCase):
     """DBMS fingerprinting drives off the universal truth() predicate"""
 
     def test_identifies_sqlite(self):
-        truth = lambda cond: cond == gi.DIALECTS["SQLite"].fingerprint
-        self.assertEqual(gi._fingerprint(truth), "SQLite")
+        # A SQLite-modelled oracle answers only SQLite's own probe; _fingerprint must
+        # discriminate to land on SQLite rather than echo the asserted constant.
+        self.assertEqual(gi._fingerprint(_dbmsTruth("SQLite")), "SQLite")
 
     def test_identifies_mysql(self):
-        truth = lambda cond: cond == gi.DIALECTS["MySQL"].fingerprint
-        self.assertEqual(gi._fingerprint(truth), "MySQL")
+        self.assertEqual(gi._fingerprint(_dbmsTruth("MySQL")), "MySQL")
+
+    def test_identifies_mssql(self):
+        # @@VERSION is shared with MySQL; only the '%Microsoft%' banner match resolves it.
+        self.assertEqual(gi._fingerprint(_dbmsTruth("Microsoft SQL Server")),
+                         "Microsoft SQL Server")
+
+    def test_identifies_postgresql(self):
+        self.assertEqual(gi._fingerprint(_dbmsTruth("PostgreSQL")), "PostgreSQL")
 
     def test_unknown_backend(self):
         self.assertIsNone(gi._fingerprint(lambda cond: False))

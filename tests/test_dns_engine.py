@@ -29,6 +29,7 @@ character-based and a chunk could split a code point, need the real-DBMS run.
 
 import binascii
 import os
+import re
 import socket
 import struct
 import sys
@@ -251,16 +252,114 @@ class TestDnsExfilEngineMssql(TestDnsExfilEngine):
     DBMS_NAME = "Microsoft SQL Server"
 
 
-class TestDnsLabelInvariant(unittest.TestCase):
-    """The exfil chunk is hex-encoded into ONE DNS label, so 2*chunk_length must never exceed the
-    63-octet DNS label limit - otherwise the query carries an invalid (over-long) label and exfil
-    silently breaks. Guards the chunk_length arithmetic in dnsUse for every supported DBMS."""
-    def test_hex_label_within_max_dns_label(self):
-        for dbms in (DBMS.MYSQL, DBMS.ORACLE, DBMS.PGSQL, DBMS.MSSQL):
-            chunk_length = MAX_DNS_LABEL // 2 if dbms in (DBMS.ORACLE, DBMS.MYSQL, DBMS.PGSQL) else MAX_DNS_LABEL // 4 - 2
-            self.assertGreater(chunk_length, 0, "%s: non-positive chunk_length" % dbms)
-            self.assertLessEqual(2 * chunk_length, MAX_DNS_LABEL,
-                                 "%s: hex label (%d) exceeds MAX_DNS_LABEL (%d)" % (dbms, 2 * chunk_length, MAX_DNS_LABEL))
+class TestDnsLabelInvariant(_DnsCase):
+    """The exfil chunk is hex-encoded into ONE DNS label, so the label dnsUse emits must never
+    exceed the 63-octet DNS label limit - otherwise the query carries an invalid (over-long) label
+    and exfil silently breaks.
+
+    Unlike a static formula check, this drives the REAL dnsUse() chunking through the REAL DNSServer
+    and asserts the invariant on the ACTUAL labels that reach the wire. The mock oracle does NOT
+    re-derive the chunk size: it slices each chunk to exactly the length dnsUse itself rendered into
+    its SUBSTRING call (captured live from agent.hexConvertField, whose input is the source's
+    substring expression). So if the chunk_length arithmetic in dnsUse regresses, the emitted hex
+    label grows past 63 octets and this test goes red - it observes the source's output, it does not
+    recompute it.
+    """
+
+    def _drive_and_collect_labels(self, secret):
+        """
+        Runs dnsUse for L{secret} end-to-end against the real DNS server, slicing each chunk to the
+        length the SOURCE asked for (parsed from the live SUBSTRING expression dnsUse builds), and
+        returns (every label seen in every emitted query name, list of source chunk_lengths seen).
+        """
+        secret_bytes = secret.encode("utf-8")
+        boundaries = []
+        served = [0]
+        source_chunk_lengths = []
+        # Snapshot the names the REAL DNSServer parsed off the wire, captured the moment they land
+        # in _requests - dnsUse's own .pop() consumes them, so we must grab them before that.
+        captured_names = []
+
+        real_randomStr = self._saved_randomStr
+        def spy_randomStr(length=4, alphabet=None, **kw):
+            if alphabet == DNS_BOUNDARIES_ALPHABET and length == 3:
+                out = real_randomStr(length=length, alphabet=alphabet, **kw)
+                boundaries.append(out)
+                return out
+            return real_randomStr(length=length, alphabet=alphabet, **kw) if alphabet is not None else real_randomStr(length=length, **kw)
+        dnsmod.randomStr = spy_randomStr
+
+        # agent.hexConvertField receives the rendered SUBSTRING call, e.g. "MID((...),1,31)" /
+        # "SUBSTRING((...) FROM 1 FOR 13)"; the substring LENGTH argument (the source's real
+        # chunk_length) is the last integer literal in it. Capture it per iteration so the oracle
+        # emits a chunk of exactly that size - the source's arithmetic, not a copy of it.
+        saved_hexConvertField = agent.hexConvertField
+        def spy_hexConvertField(field):
+            source_chunk_lengths.append(int(re.findall(r"\d+", field)[-1]))
+            return saved_hexConvertField(field)
+        agent.hexConvertField = spy_hexConvertField
+
+        def oracle(payload=None, *args, **kwargs):
+            prefix, suffix = boundaries[-2], boundaries[-1]
+            chunk_length = source_chunk_lengths[-1]
+            chunk = secret_bytes[served[0]:served[0] + chunk_length]
+            if chunk:
+                host = "%s.%s.%s.%s" % (prefix, binascii.hexlify(chunk).decode(), suffix, conf.dnsDomain)
+                c = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                c.settimeout(3)
+                c.sendto(_build_query(host), ("127.0.0.1", self.server.port))
+                try:
+                    c.recvfrom(512)
+                finally:
+                    c.close()
+                served[0] += len(chunk)
+                for _ in range(100):
+                    with self.server._lock:
+                        matched = [r for r in self.server._requests if host.encode() in r]
+                        if matched:
+                            captured_names.extend(r.decode() if isinstance(r, bytes) else r for r in matched)
+                            break
+                    time.sleep(0.01)
+            return None
+
+        Connect.queryPage = staticmethod(oracle)
+        dnsmod.Request.queryPage = staticmethod(oracle)
+
+        try:
+            result = dnsmod.dnsUse("%s AND %d=%d", "user()")
+        finally:
+            agent.hexConvertField = saved_hexConvertField
+
+        # round-trip must still work (the source must actually reassemble what it chunked)
+        self.assertEqual(result, secret)
+
+        labels = []
+        for name in captured_names:
+            labels.extend(label for label in name.split(".") if label)
+        return labels, source_chunk_lengths
+
+    def test_emitted_dns_labels_within_max_dns_label(self):
+        # long enough that every supported dialect's chunk_length forces several chunks (>1 label of
+        # hex payload), so the chunking loop - not just a single-shot path - is what we measure
+        secret = ("The quick brown fox jumps over the lazy dog "
+                  "0123456789 ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz") * 3
+        for dbms_name in ("MySQL", "Oracle", "PostgreSQL", "Microsoft SQL Server"):
+            self.DBMS_NAME = dbms_name
+            set_dbms(dbms_name)
+            labels, source_chunk_lengths = self._drive_and_collect_labels(secret)
+
+            # the source must have actually chunked (multiple SUBSTRING iterations), otherwise we
+            # would not be testing the chunking output at all
+            self.assertGreater(len(source_chunk_lengths), 1,
+                               "%s: payload did not force multiple chunks (got %d)" % (dbms_name, len(source_chunk_lengths)))
+            self.assertTrue(all(cl > 0 for cl in source_chunk_lengths),
+                            "%s: non-positive chunk_length from source: %r" % (dbms_name, source_chunk_lengths))
+
+            self.assertTrue(labels, "%s: no DNS query labels were captured" % dbms_name)
+            for label in labels:
+                self.assertLessEqual(len(label), MAX_DNS_LABEL,
+                                     "%s: emitted DNS label %r is %d octets, exceeds MAX_DNS_LABEL (%d)"
+                                     % (dbms_name, label, len(label), MAX_DNS_LABEL))
 
 
 class TestDnsChannelDetection(_DnsCase):

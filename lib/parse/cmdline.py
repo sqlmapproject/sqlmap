@@ -898,7 +898,7 @@ def cmdLineParser(argv=None):
         parser.add_argument("--non-interactive", dest="nonInteractive", action="store_true",
             help=SUPPRESS)
 
-        parser.add_argument("--smoke-test", dest="smokeTest", action="store_true",
+        parser.add_argument("--smoke-test", "--doc-test", dest="smokeTest", action="store_true",
             help=SUPPRESS)
 
         parser.add_argument("--vuln-test", dest="vulnTest", action="store_true",

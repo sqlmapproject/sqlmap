@@ -36,17 +36,68 @@ def build_query(name, tid=b"\x12\x34", qtype=1):
 
 
 class _HighPortDNSServer(DNSServer):
-    """Real DNSServer logic, bound on a high port (no root, no :53 probe)"""
-    def __init__(self, port, sock=None, maxlen=MAX_DNS_REQUESTS):
+    """Real DNSServer logic, bound on an ephemeral high port (no root, no :53 probe).
+
+    Binds to port 0 and reads the kernel-chosen port back via getsockname() (same pattern
+    as tests/test_dns_engine.py) so concurrent/repeated runs never collide on a hardcoded
+    port. The actual port is exposed as L{self.port}.
+    """
+    def __init__(self, sock=None, maxlen=MAX_DNS_REQUESTS):
         self._requests = collections.deque(maxlen=maxlen)
         self._lock = threading.Lock()
         if sock is None:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            sock.bind(("127.0.0.1", port))
+            sock.bind(("127.0.0.1", 0))
         self._socket = sock
+        self.port = self._socket.getsockname()[1]
         self._running = False
         self._initialized = False
+
+    def close(self):
+        self._running = False
+        try:
+            self._socket.close()
+        except socket.error:
+            pass
+
+
+# Maximum time (seconds) to wait for the daemon server thread to come up, or for a sent
+# query to be recorded, before failing loudly instead of spinning/sleeping forever.
+WAIT_TIMEOUT = 5.0
+
+
+def _wait_initialized(srv, timeout=WAIT_TIMEOUT):
+    """Bounded wait for the server thread to flip _initialized; fail fast if it never does."""
+    deadline = time.time() + timeout
+    while not srv._initialized:
+        if time.time() > deadline:
+            raise RuntimeError("DNS server failed to initialize within %.1fs" % timeout)
+        time.sleep(0.01)
+
+
+def _wait_recorded(srv, token, timeout=WAIT_TIMEOUT):
+    """Bounded wait until L{token} appears in a recorded request; False on timeout."""
+    if hasattr(token, "encode"):
+        token = token.encode()
+    deadline = time.time() + timeout
+    while time.time() <= deadline:
+        with srv._lock:
+            if any(token in r for r in srv._requests):
+                return True
+        time.sleep(0.01)
+    return False
+
+
+def _wait_popped(srv, prefix, suffix, timeout=WAIT_TIMEOUT):
+    """Bounded wait until pop(prefix, suffix) yields a value; returns it or None on timeout."""
+    deadline = time.time() + timeout
+    while time.time() <= deadline:
+        popped = srv.pop(prefix, suffix)
+        if popped:
+            return popped
+        time.sleep(0.01)
+    return None
 
 
 class _SendFailOnceSocket(object):
@@ -95,31 +146,30 @@ class TestDNSQuery(unittest.TestCase):
 
 
 class TestDNSServerRoundTrip(unittest.TestCase):
-    PORT = 5471
-
     @classmethod
     def setUpClass(cls):
-        cls.srv = _HighPortDNSServer(cls.PORT)
+        cls.srv = _HighPortDNSServer()
         cls.srv.run()
-        while not cls.srv._initialized:
-            time.sleep(0.02)
+        _wait_initialized(cls.srv)
+
+    @classmethod
+    def tearDownClass(cls):
+        srv = getattr(cls, "srv", None)
+        if srv is not None:
+            srv.close()
+            cls.srv = None
 
     def _send(self, name):
         c = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         c.settimeout(3)
-        c.sendto(build_query(name), ("127.0.0.1", self.PORT))
+        c.sendto(build_query(name), ("127.0.0.1", self.srv.port))
         try:
             c.recvfrom(512)
         except socket.timeout:
             pass
         finally:
             c.close()
-        for _ in range(100):
-            with self.srv._lock:
-                if any(name.encode() in r for r in self.srv._requests):
-                    return True
-            time.sleep(0.01)
-        return False
+        return _wait_recorded(self.srv, name)
 
     def test_roundtrip_and_pop(self):
         self.assertTrue(self._send("aaa.cafe.bbb.exfil.test"))
@@ -132,49 +182,40 @@ class TestDNSServerRoundTrip(unittest.TestCase):
         # labels regardless of qtype, and the server records before crafting the (A) response
         c = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         c.settimeout(2)
-        c.sendto(build_query("ggg.beef.hhh.exfil.test", qtype=28), ("127.0.0.1", self.PORT))
+        c.sendto(build_query("ggg.beef.hhh.exfil.test", qtype=28), ("127.0.0.1", self.srv.port))
         try:
             c.recvfrom(512)
         except socket.timeout:
             pass
         finally:
             c.close()
-        for _ in range(200):
-            if self.srv.pop("ggg", "hhh"):
-                return
-            time.sleep(0.01)
-        self.fail("AAAA-type query was not recorded (exfil would be lost for AAAA-resolving DBMSes)")
+        if not _wait_popped(self.srv, "ggg", "hhh"):
+            self.fail("AAAA-type query was not recorded (exfil would be lost for AAAA-resolving DBMSes)")
 
 
 class TestDNSServerMemoryBound(unittest.TestCase):
     """The server records every received query (it listens on :53); only matching ones are
     popped. Unrelated/stray traffic and resolver retries must not grow memory without bound."""
-    PORT = 5475
 
     def test_requests_are_bounded_and_recent_kept(self):
-        srv = _HighPortDNSServer(self.PORT, maxlen=50)
+        srv = _HighPortDNSServer(maxlen=50)
+        self.addCleanup(srv.close)
         srv.run()
-        while not srv._initialized:
-            time.sleep(0.02)
+        _wait_initialized(srv)
         c = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         for i in range(200):                      # flood well past the bound
-            c.sendto(build_query("noise%d.unrelated.test" % i), ("127.0.0.1", self.PORT))
+            c.sendto(build_query("noise%d.unrelated.test" % i), ("127.0.0.1", srv.port))
         c.close()
         # a legit exfil query right after the flood must still be capturable
         c2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM); c2.settimeout(2)
-        c2.sendto(build_query("ppp.d00d.qqq.exfil.test"), ("127.0.0.1", self.PORT))
+        c2.sendto(build_query("ppp.d00d.qqq.exfil.test"), ("127.0.0.1", srv.port))
         try:
             c2.recvfrom(512)
         except socket.timeout:
             pass
         finally:
             c2.close()
-        popped = None
-        for _ in range(200):
-            popped = srv.pop("ppp", "qqq")
-            if popped:
-                break
-            time.sleep(0.01)
+        popped = _wait_popped(srv, "ppp", "qqq")
         with srv._lock:
             n = len(srv._requests)
         self.assertLessEqual(n, 50, "request buffer exceeded its bound (%d)" % n)
@@ -182,11 +223,11 @@ class TestDNSServerMemoryBound(unittest.TestCase):
 
 
 class TestDNSServerResilience(unittest.TestCase):
-    def _make(self, port, sock=None):
-        srv = _HighPortDNSServer(port, sock=sock)
+    def _make(self, sock=None):
+        srv = _HighPortDNSServer(sock=sock)
+        self.addCleanup(srv.close)
         srv.run()
-        while not srv._initialized:
-            time.sleep(0.02)
+        _wait_initialized(srv)
         return srv
 
     def _query(self, port, name):
@@ -200,34 +241,28 @@ class TestDNSServerResilience(unittest.TestCase):
         finally:
             c.close()
 
-    def _recorded(self, srv, token, tries=120):
-        for _ in range(tries):
-            with srv._lock:
-                if any(token.encode() in r for r in srv._requests):
-                    return True
-            time.sleep(0.01)
-        return False
+    def _recorded(self, srv, token):
+        return _wait_recorded(srv, token)
 
     def test_survives_transient_send_error(self):
-        port = 5472
+        # ephemeral bind, then wrap the bound socket so its first sendto() raises
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        s.bind(("127.0.0.1", port))
-        srv = self._make(port, sock=_SendFailOnceSocket(s))
-        self._query(port, "aaa.11.bbb.exfil.test")   # first sendto raises
-        self._query(port, "ccc.22.ddd.exfil.test")   # must still be served
+        s.bind(("127.0.0.1", 0))
+        srv = self._make(sock=_SendFailOnceSocket(s))
+        self._query(srv.port, "aaa.11.bbb.exfil.test")   # first sendto raises
+        self._query(srv.port, "ccc.22.ddd.exfil.test")   # must still be served
         self.assertTrue(self._recorded(srv, "ccc.22.ddd"),
                         "DNS server died after one failing sendto (lost subsequent exfil)")
         self.assertTrue(srv._running)
 
     def test_survives_malformed_packets(self):
-        port = 5473
-        srv = self._make(port)
+        srv = self._make()
         c = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         for junk in (b"", b"\x00", b"\xff" * 7, b"\x12\x34\x01\x00\x00\x01" + b"\x20abc"):
-            c.sendto(junk, ("127.0.0.1", port))
+            c.sendto(junk, ("127.0.0.1", srv.port))
         c.close()
-        self._query(port, "ok.33.fine.exfil.test")
+        self._query(srv.port, "ok.33.fine.exfil.test")
         self.assertTrue(self._recorded(srv, "ok.33.fine"),
                         "DNS server died on a malformed packet")
 
@@ -235,14 +270,19 @@ class TestDNSServerResilience(unittest.TestCase):
 class TestDNSServerConcurrency(unittest.TestCase):
     """Under --threads, many workers fire DNS queries and call pop() while the server thread
     appends - all guarded by one lock. Each worker must get back exactly its own data."""
-    PORT = 5474
 
     @classmethod
     def setUpClass(cls):
-        cls.srv = _HighPortDNSServer(cls.PORT)
+        cls.srv = _HighPortDNSServer()
         cls.srv.run()
-        while not cls.srv._initialized:
-            time.sleep(0.02)
+        _wait_initialized(cls.srv)
+
+    @classmethod
+    def tearDownClass(cls):
+        srv = getattr(cls, "srv", None)
+        if srv is not None:
+            srv.close()
+            cls.srv = None
 
     def test_concurrent_send_and_pop_no_crosstalk(self):
         import binascii, re
@@ -258,19 +298,14 @@ class TestDNSServerConcurrency(unittest.TestCase):
             c = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             c.settimeout(2)
             try:
-                c.sendto(build_query(host), ("127.0.0.1", self.PORT))
+                c.sendto(build_query(host), ("127.0.0.1", self.srv.port))
                 try:
                     c.recvfrom(512)
                 except socket.timeout:
                     pass
             finally:
                 c.close()
-            got = None
-            for _ in range(200):
-                got = self.srv.pop(prefix, suffix)
-                if got:
-                    break
-                time.sleep(0.01)
+            got = _wait_popped(self.srv, prefix, suffix)
             if not got:
                 errors.append("worker %d: never popped its query" % i); return
             m = re.search(r"%s\.(?P<r>.+?)\.%s" % (prefix, suffix), got, re.I)

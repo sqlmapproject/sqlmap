@@ -109,10 +109,21 @@ class TestSerialized(_HashDBCase):
 
     def test_bytes_containing_value_survives(self):
         # REGRESSION (base64-pickle bytes fix): silently failed to restore on py3 before the fix.
+        # Must round-trip through SQLite, not the in-memory caches: write+flush here, then open a
+        # FRESH HashDB on the same file (empty read/write caches) so retrieve() hits the disk path.
         value = {"raw": b"\x00\x01\xff", "items": [b"ab", "s", 1]}
         self.db.write("bytesval", value, True)
         self.db.flush()
-        self.assertEqual(self.db.retrieve("bytesval", True), value)
+
+        fresh = HashDB(self.path)
+        try:
+            # sanity: the value is genuinely not in the fresh in-memory caches
+            self.assertFalse(fresh._write_cache)
+            hash_ = HashDB.hashKey("bytesval")
+            self.assertIsNone(fresh._read_cache.get(hash_))
+            self.assertEqual(fresh.retrieve("bytesval", True), value)
+        finally:
+            fresh.closeAll()
 
 
 class TestKeyHashing(_HashDBCase):

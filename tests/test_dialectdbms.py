@@ -72,13 +72,16 @@ class TestDialectClassification(unittest.TestCase):
                 self.assertEqual(_classify(base + (shift,)), expected, "engine %r misclassified (shift=%s)" % (engine, shift))
 
     def test_no_false_positive_across_measured_set(self):
+        # non-collision property: every measured engine maps to EXACTLY its expected DBMS (or None),
+        # never to some other back-end. The shift flag is irrelevant for these (non-shift-sensitive)
+        # engines, so assert it both ways.
         for engine, (base, expected) in MEASURED.items():
             for shift in (False, True):
                 result = _classify(base + (shift,))
-                if expected is None:
-                    self.assertIsNone(result, "ambiguous engine %r leaked a DBMS prior" % engine)
-                else:
-                    self.assertIn(result, (DBMS.MYSQL, DBMS.MSSQL, DBMS.PGSQL, DBMS.SQLITE, DBMS.MONETDB, DBMS.ORACLE))
+                self.assertEqual(result, expected, "engine %r misclassified (shift=%s): got %r, expected %r" % (engine, shift, result, expected))
+        # the only non-None DBMS priors the measured set can yield (sanity on the mapping itself)
+        produced = set(expected for _, expected in MEASURED.values() if expected is not None)
+        self.assertEqual(produced, {DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE})
 
     def test_all_error_signature_yields_no_prior(self):
         # an all-error signature (Oracle, ClickHouse, IRIS, or simply a WAF-blocked channel) is not

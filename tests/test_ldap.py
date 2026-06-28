@@ -102,32 +102,56 @@ class TestHelpers(unittest.TestCase):
 
 
 class TestFingerprinting(unittest.TestCase):
+    # The mapping branches recognise a distinctive vendor substring *anywhere* inside
+    # a realistic error banner and normalise it to a canonical backend name. Feeding
+    # an embedded substring (not the bare canonical name) proves the source performs
+    # real substring discrimination rather than echoing its input.
     def test_fingerprintByError_ad(self):
-        self.assertEqual(ldap._fingerprintByError("Microsoft Active Directory"),
-                         "Microsoft Active Directory")
+        self.assertEqual(
+            ldap._fingerprintByError("LDAP error from Microsoft Active Directory server"),
+            "Microsoft Active Directory")
 
     def test_fingerprintByError_openldap(self):
-        self.assertEqual(ldap._fingerprintByError("OpenLDAP"), "OpenLDAP")
+        self.assertEqual(ldap._fingerprintByError("OpenLDAP 2.4.57 SERVER_DOWN"),
+                         "OpenLDAP")
 
     def test_fingerprintByError_apacheds(self):
-        self.assertEqual(ldap._fingerprintByError("ApacheDS"), "ApacheDS")
+        self.assertEqual(ldap._fingerprintByError("org.apache.directory.ApacheDS 2.0"),
+                         "ApacheDS")
 
     def test_fingerprintByError_oracle(self):
-        self.assertEqual(ldap._fingerprintByError("Oracle Directory Server"),
+        self.assertEqual(ldap._fingerprintByError("Oracle Internet Directory / Oracle stack"),
                          "Oracle Directory Server")
 
     def test_fingerprintByError_389(self):
-        self.assertEqual(ldap._fingerprintByError("389 Directory Server"),
+        self.assertEqual(ldap._fingerprintByError("Red Hat 389 ns-slapd"),
                          "389 Directory Server")
 
-    def test_fingerprintByError_generic(self):
-        self.assertEqual(ldap._fingerprintByError("Generic LDAP"), "Generic LDAP")
+    def test_fingerprintByError_precedence_ad_over_oracle(self):
+        # A banner carrying two recognised substrings resolves to the earlier branch
+        # (Active Directory), proving the result is driven by branch order, not by an
+        # echo of whichever name happens to appear.
+        self.assertEqual(
+            ldap._fingerprintByError("Microsoft Active Directory bridged to Oracle"),
+            "Microsoft Active Directory")
 
-    def test_fingerprintByError_jndi(self):
-        self.assertEqual(ldap._fingerprintByError("Java JNDI"), "Java JNDI")
+    def test_fingerprintByError_none_and_empty(self):
+        # The only real branch reachable by non-mapping banners: the falsy guard.
+        self.assertIsNone(ldap._fingerprintByError(None))
+        self.assertIsNone(ldap._fingerprintByError(""))
 
-    def test_fingerprintByError_pythonldap(self):
-        self.assertEqual(ldap._fingerprintByError("python-ldap"), "python-ldap")
+    def test_fingerprintByError_passthrough_when_unmatched(self):
+        # Banners that match no vendor branch (including the "python-ldap"/"Java JNDI"
+        # case, whose source branch is observationally identical to the catch-all) are
+        # returned verbatim. This single test documents that pass-through contract and,
+        # crucially, asserts such banners are NOT misclassified into a specific backend.
+        for banner in ("Generic LDAP", "python-ldap 3.4.0", "Caused by: Java JNDI",
+                       "some unrecognised directory service"):
+            result = ldap._fingerprintByError(banner)
+            self.assertEqual(result, banner)
+            self.assertNotIn(result, ("Microsoft Active Directory", "OpenLDAP",
+                                      "ApacheDS", "Oracle Directory Server",
+                                      "389 Directory Server"))
 
 
 class TestGrid(unittest.TestCase):
@@ -367,53 +391,40 @@ class TestCookiePlace(unittest.TestCase):
 
 
 class TestNestedFilterParsing(unittest.TestCase):
+    def setUp(self):
+        # Import the REAL vulnserver parser (same technique as
+        # tests/test_graphql.py :: TestVulnserverGraphqlParser). `extra` and
+        # `extra/vulnserver` are packages, so a plain import works.
+        from extra.vulnserver import vulnserver
+        self.vs = vulnserver
+
     def test_nested_compound_parses_all_siblings(self):
         """Blockers 3: nested (&) inside (|) must parse all siblings."""
-        # Inline copies of the vulnserver helpers so the test is self-contained
-        def _ldap_match(text, start):
-            depth = 0
-            i = start
-            while i < len(text):
-                ch = text[i]
-                if ch == '(':
-                    depth += 1
-                elif ch == ')':
-                    depth -= 1
-                    if depth == 0:
-                        return i + 1
-                elif ch == '\\':
-                    i += 1
-                i += 1
-            return len(text)
-
-        def _ldap_parse_value(text, start):
-            retVal = []
-            i = start
-            while i < len(text) and text[i] not in (')',):
-                if text[i] == '\\' and i + 2 < len(text):
-                    retVal.append(chr(int(text[i+1:i+3], 16)))
-                    i += 3
-                else:
-                    retVal.append(text[i])
-                    i += 1
-            return ''.join(retVal), i
-
-        # Minimum reproduction of the fixed _ldap_filter_to_sql
-        # (the real function is in extra/vulnserver/vulnserver.py)
-        import sys, os
-        sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'extra', 'vulnserver'))
-        # Can't cleanly import vulnserver because of the __main__ guard.
-        # Instead we verify the fixed _ldap_match returns the correct end
-        # position for a nested compound filter, which was the root cause.
         f = '(|(&(uid=a)(cn=b))(mail=*))'
-        # The outer (| ... ) starts at 0 and should end at len(f)
-        outer_end = _ldap_match(f, 0)
+
+        # The REAL _ldap_match must balance brackets across nested compounds.
+        # Outer (| ... ) starts at 0 and ends at len(f).
+        outer_end = self.vs._ldap_match(f, 0)
         self.assertEqual(outer_end, len(f))
-        # The inner (& ... ) compound's opening '(' is at position 2
-        # (f[2] == '(').  _ldap_match must return the position after the
-        # matching ')' that closes the compound, i.e. right before (mail=*).
-        inner_end = _ldap_match(f, 2)
+        # Inner (& ... )'s opening '(' is at position 2; _ldap_match must
+        # return the position right before the (mail=*) sibling.
+        inner_end = self.vs._ldap_match(f, 2)
         self.assertEqual(f[inner_end:inner_end+8], '(mail=*)')
+
+        # The REAL filter->SQL conversion must surface EVERY sibling condition:
+        # both members of the nested (&) AND the (mail=*) sibling of the (|).
+        clause, params, end = self.vs._ldap_filter_to_sql(f)
+        self.assertEqual(end, len(f))
+        self.assertIsNotNone(clause)
+        # nested-(&) siblings -> AND-joined, both columns present
+        self.assertIn(" AND ", clause)
+        self.assertIn("uid", clause)
+        self.assertIn("cn", clause)
+        # outer-(|) sibling must NOT be dropped
+        self.assertIn(" OR ", clause)
+        self.assertIn("mail", clause)
+        # the two equality values are parameterized in order
+        self.assertEqual(params, ["a", "b"])
 
 
 if __name__ == "__main__":

@@ -99,6 +99,14 @@ jobs:
         # 'binary' instead of 'text'. Keeping this step byte-compile-free leaves --smoke clean.
         run: python -B -m unittest discover -s tests -p "test_*.py"
 
+      - name: Coverage
+        if: matrix.python-version != 'pypy-2.7'
+        run: |
+          python -m pip install coverage
+          python -m coverage run --source=lib,plugins,tamper -m unittest discover -s tests -p "test_*.py"
+          python -m coverage run -a --source=lib,plugins,tamper sqlmap.py --doc-test
+          python -m coverage report --fail-under=50
+
       - name: Smoke test
         run: python sqlmap.py --smoke-test
 

@@ -15,3 +15,4 @@ lib/.DS_Store
 plugins/.DS_Store
 thirdparty/.DS_Store
 CLAUDE.md
+.coverage
