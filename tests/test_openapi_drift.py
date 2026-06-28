@@ -26,7 +26,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _testutils import bootstrap
 bootstrap()
 
-import lib.utils.api  # noqa: F401  (importing registers every route on Bottle's default app)
+__import__("lib.utils.api")   # registers Bottle routes (side-effect import)
 from lib.core.settings import RESTAPI_VERSION
 from thirdparty.bottle.bottle import default_app
 
