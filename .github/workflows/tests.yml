@@ -41,8 +41,7 @@ jobs:
         shell: bash
         run: |
           python -m pip install pyflakes
-          OUT=$(python -m pyflakes $(git ls-files '*.py' | grep -v '^thirdparty/'))
-          if [ -n "$OUT" ]; then echo "$OUT"; exit 1; fi
+          python -m pyflakes $(git ls-files '*.py' | grep -v '^thirdparty/')
           echo "pyflakes: clean"
 
       - name: Basic import test
