@@ -37,6 +37,13 @@ jobs:
       - name: Python sanity
         run: python -VV
 
+      - name: Pyflakes lint
+        run: |
+          python -m pip install pyflakes
+          OUT=$(python -m pyflakes $(git ls-files '*.py' | grep -v '^thirdparty/'))
+          if [ -n "$OUT" ]; then echo "$OUT"; exit 1; fi
+          echo "pyflakes: clean"
+
       - name: Basic import test
         run: python -c "import sqlmap; import sqlmapapi"
 
