@@ -38,6 +38,7 @@ jobs:
         run: python -VV
 
       - name: Pyflakes lint
+        shell: bash
         run: |
           python -m pip install pyflakes
           OUT=$(python -m pyflakes $(git ls-files '*.py' | grep -v '^thirdparty/'))
