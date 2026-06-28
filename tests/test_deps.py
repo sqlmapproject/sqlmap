@@ -74,7 +74,10 @@ class TestCheckDependencies(unittest.TestCase):
     def test_all_present_emits_all_installed_info(self):
         # force every __import__ to succeed so no library is ever recorded as
         # missing; the empty-missing-set branch must emit the summary info line.
-        import builtins
+        try:
+            import __builtin__ as builtins  # py2 real builtin module
+        except ImportError:
+            import builtins  # py3
 
         class _FakeModule(object):
             __version__ = "999.0.0"

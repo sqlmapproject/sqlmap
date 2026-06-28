@@ -75,7 +75,7 @@ class TestBasicDecodePage(unittest.TestCase):
     def test_unicode_entity(self):
         from lib.request.basic import decodePage
         conf.encoding = None
-        self.assertEqual(decodePage(b"&#x2122;", None, "text/html; charset=utf-8"), u"™")
+        self.assertEqual(decodePage(b"&#x2122;", None, "text/html; charset=utf-8"), u"\u2122")
 
     def test_empty_page(self):
         from lib.request.basic import decodePage

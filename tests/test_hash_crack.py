@@ -30,7 +30,10 @@ from lib.utils import hash as H
 from lib.core.data import conf, kb
 from lib.core.enums import MKSTEMP_PREFIX
 
-SCRATCH = "/tmp/claude-1000/-tmp-tmp-oUnlQJzlQN/fcd55d25-6313-49ed-817e-dcbe7fc2bf22/scratchpad"
+import atexit
+import shutil
+SCRATCH = tempfile.mkdtemp(prefix="sqlmap_test_hashcrack_")
+atexit.register(lambda: shutil.rmtree(SCRATCH, ignore_errors=True))
 
 # known plaintext / hashes shared across tests
 PW = "testpass"

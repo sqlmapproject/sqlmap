@@ -208,7 +208,8 @@ def _drive_hpp(payload, name="id"):
         kb.postSpaceToPlus = False
         value = "%s=%s%s%s" % (name, PAYLOAD_DELIMITER, payload, PAYLOAD_DELIMITER)
         try:
-            Connect.queryPage(value=value, place=PLACE.GET, disableTampering=True)
+            _qp = getattr(Connect.queryPage, "__func__", Connect.queryPage)
+            _qp(value=value, place=PLACE.GET, disableTampering=True)
         except _Sentinel:
             pass
     finally:

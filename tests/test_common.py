@@ -455,6 +455,7 @@ class TestParseRequestFileBurp(unittest.TestCase):
         self._method = conf.method
         self._headers = conf.headers
         conf.scope = None
+        conf.method = None  # avoid a leaked conf.method overriding the parsed verb
 
     def tearDown(self):
         conf.scope = self._scope
@@ -974,7 +975,7 @@ class TestGetPageWordSet(unittest.TestCase):
 class TestNormalizeUnicode(unittest.TestCase):
     def test_accents_stripped(self):
         # normalizeUnicode collapses accented chars to their ASCII base
-        self.assertEqual(normalizeUnicode(u"éè"), "ee")
+        self.assertEqual(normalizeUnicode(u"\xe9\xe8"), "ee")
 
     def test_plain_ascii_unchanged(self):
         self.assertEqual(normalizeUnicode(u"abc123"), "abc123")
@@ -1342,7 +1343,7 @@ class TestCommonDecodeIntToUnicode(unittest.TestCase):
         from lib.core.common import decodeIntToUnicode
         set_dbms(DBMS.PGSQL)
         # value > 255 on PGSQL takes the _unichr(value) branch
-        self.assertEqual(decodeIntToUnicode(0x2122), u"™")
+        self.assertEqual(decodeIntToUnicode(0x2122), u"\u2122")
 
 
 class TestCommonDecodeDbmsHex(unittest.TestCase):

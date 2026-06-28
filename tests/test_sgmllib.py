@@ -9,8 +9,6 @@ sqlmap for page content analysis. Exercises the parser with valid SGML/HTML
 constructs and verifies the event stream.
 """
 
-import contextlib
-import io
 import os
 import sys
 import unittest
@@ -241,11 +239,23 @@ class TestVerbose(unittest.TestCase):
     def _run(self, verbose):
         p = self._Parser()
         p.verbose = verbose
-        buf = io.StringIO()
-        with contextlib.redirect_stdout(buf):
+        _captured = []
+
+        class _Cap(object):
+            def write(self, s):
+                _captured.append(s)
+
+            def flush(self):
+                pass
+
+        _saved = sys.stdout
+        sys.stdout = _Cap()
+        try:
             p.feed("</b>")  # unbalanced end tag -> report_unbalanced()
             p.close()
-        return buf.getvalue()
+        finally:
+            sys.stdout = _saved
+        return "".join(_captured)
 
     def test_verbose_mode_emits_debug(self):
         out = self._run(1)

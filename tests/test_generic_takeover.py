@@ -328,6 +328,7 @@ class TestMisc(_GenericBase):
         # An explicit Windows-style drive path flips Backend OS to Windows.
         set_dbms("MySQL")
         conf.tmpPath = "C:\\Temp"
+        kb.os = None  # let getRemoteTempPath detect Windows from the drive path
         m = _TestMisc()
         out = m.getRemoteTempPath()
         self.assertTrue(Backend.isOs(OS.WINDOWS))

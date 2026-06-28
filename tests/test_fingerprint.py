@@ -153,7 +153,7 @@ class TestFingerprint(unittest.TestCase):
 
     def test_fingerprint_extensive(self):
         # conf.extensiveFp drives the deeper comment-/version-/dbms-check cascades
-        # (getFingerprint past the early return) — much more code per dialect.
+        # (getFingerprint past the early return) - much more code per dialect.
         # In this mode every dialect's output is built around an
         # "active fingerprint: <Format.getDbms()>" line, so that header is the
         # real content proof; the version "1.0" rides along for the ACTVER set.
