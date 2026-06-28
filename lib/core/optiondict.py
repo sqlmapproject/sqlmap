@@ -120,6 +120,8 @@ optDict = {
         "technique": "string",
         "nosql": "boolean",
         "graphql": "boolean",
+        "ldap": "boolean",
+        "xpath": "boolean",
         "timeSec": "integer",
         "uCols": "string",
         "uChar": "string",

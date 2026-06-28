@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.6.188"
+VERSION = "1.10.6.189"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -976,6 +976,44 @@ LDAP_FINGERPRINT_ATTRIBUTES = (
     ("vendorName", "Oracle Corporation", "Oracle Directory Server"),
     ("vendorName", "Red Hat", "389 Directory Server"),
 )
+
+# XPath error signatures per parser implementation for error-based detection and
+# fingerprinting (matched against HTTP response bodies). Each tuple is
+# (backend_name, regex_fragment).
+XPATH_ERROR_SIGNATURES = (
+    ("Java JAXP / Xalan", r"(?:javax\.xml\.(?:xpath\.XPathExpressionException|transform\.Transformer(?:Configuration)?Exception)|com\.sun\.org\.apache\.xpath\.(?:XPathException|XPathProcessorException)|org\.apache\.xpath|org\.xml\.sax\.SAX(?:Parse)?Exception)"),
+    ("Java JAXP / Xalan", r"XPath (?:expression|syntax) error"),
+    ("Java JAXP / Saxon", r"net\.sf\.saxon\.(?:trans\.XPathException|s9api\.SaxonApiException)"),
+    ("Java JAXP / Saxon", r"(?:XPST|XPTY|XPDY|XQST|XTDE)\d{4}:"),
+    (".NET XPathNavigator", r"System\.Xml\.(?:XPath\.XPathException|XmlException)"),
+    (".NET XPathNavigator", r"Expression must evaluate to a node-set"),
+    (".NET XPathNavigator", r"has an invalid (?:token|qualified name)"),
+    ("lxml / libxml2", r"(?:lxml\.etree\.(?:XPath(?:Eval|Document|Syntax)?Error)|libxml2|xmlXPath(?:CompOp|Eval|Err))"),
+    ("lxml / libxml2", r"(?:XPath error|Invalid (?:expression|predicate))"),
+    ("PHP SimpleXML / DOMXPath", r"(?:SimpleXMLElement::xpath\(\)|DOMXPath::(?:query|evaluate)\(\))"),
+    ("PHP SimpleXML / DOMXPath", r"Invalid expression|xmlXPathEval"),
+    ("Saxon (standalone)", r"(?:net\.sf\.saxon\.(?:s9api\.SaxonApiException|trans\.XPathException)|Saxon error)"),
+    ("Saxon (standalone)", r"Static error\(s\) in query"),
+    ("BaseX", r"org\.basex\.(?:query\.QueryException|core\.BaseXException)"),
+    ("BaseX", r"\[(?:XPST|XPTY|XPDY)\d{4}\]"),
+    ("eXist", r"org\.exist\.xquery\.(?:XPathException|XQueryException)"),
+    ("eXist", r"exerr:ERROR"),
+    ("Python ElementTree", r"xml\.etree\.ElementTree\.(?:ParseError|Element)"),
+    ("Generic XPath", r"(?:XPath|XSLT).*?(?:error|exception|syntax)"),
+    ("Generic XPath", r"Invalid XPath|XPath evaluation failed"),
+)
+
+XPATH_ERROR_REGEX = r"(?i)(?:%s)" % '|'.join(regex for _, regex in XPATH_ERROR_SIGNATURES)
+
+# Printable-ASCII codepoint bounds bisected during XPath blind character extraction
+XPATH_CHAR_MIN = 0x20
+XPATH_CHAR_MAX = 0x7e
+
+# Maximum tree depth for recursive XML walking during XPath blind extraction
+XPATH_MAX_DEPTH = 32
+
+# Upper bound for the value-length search during XPath blind extraction
+XPATH_MAX_LENGTH = 256
 
 # Length of prefix and suffix used in non-SQLI heuristic checks
 NON_SQLI_CHECK_PREFIX_SUFFIX_LENGTH = 6

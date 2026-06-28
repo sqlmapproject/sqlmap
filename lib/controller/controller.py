@@ -543,6 +543,11 @@ def start():
                 ldapScan()
                 continue
 
+            if conf.xpath:
+                from lib.techniques.xpath.inject import xpathScan
+                xpathScan()
+                continue
+
             if conf.nullConnection:
                 checkNullConnection()
 

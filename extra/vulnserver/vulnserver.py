@@ -217,6 +217,84 @@ def nosql_match(params):
     else:           # $eq, $in (single-valued here) and any literal equality
         return record == value
 
+# --- XPath endpoint (vulnerable search and login, backed by an in-memory XML document) ------------
+
+XPATH_XML = """<?xml version="1.0" encoding="UTF-8"?>
+<directory>
+  <department name="IT Operations">
+    <user id="1">
+      <username>luther</username>
+      <realname>Luther Blisset</realname>
+      <email>luther@example.com</email>
+      <password>db3a16990a0008a3b04707fdef6584a0</password>
+      <role>System Administrator</role>
+      <location>London</location>
+      <phone>+1 555 0100</phone>
+    </user>
+    <user id="2">
+      <username>fluffy</username>
+      <realname>Fluffy Bunny</realname>
+      <email>fluffy@example.com</email>
+      <password>4db967ce67b15e7fb84c266a76684729</password>
+      <role>Security Engineer</role>
+      <location>Amsterdam</location>
+      <phone>+1 555 0102</phone>
+    </user>
+    <user id="3">
+      <username>wu</username>
+      <realname>Wu Ming</realname>
+      <email>wu@example.com</email>
+      <password>f5a2950eaa10f9e99896800eacbe8275</password>
+      <role>Network Administrator</role>
+      <location>Shanghai</location>
+      <phone>+86 21 555 0103</phone>
+    </user>
+  </department>
+  <department name="Engineering">
+    <user id="4">
+      <username>linus</username>
+      <realname>Linus Torvalds</realname>
+      <email>linus@example.com</email>
+      <password>8e7b6a5c4d321908f7e6d5c4b3a2910f</password>
+      <role>Kernel Developer</role>
+      <location>Portland</location>
+      <phone>+1 555 0200</phone>
+    </user>
+    <user id="5">
+      <username>ada</username>
+      <realname>Ada Lovelace</realname>
+      <email>ada@example.com</email>
+      <password>1a2b3c4d5e6f7081920a1b2c3d4e5f60</password>
+      <role>Algorithm Designer</role>
+      <location>London</location>
+      <phone>+44 20 555 0201</phone>
+    </user>
+  </department>
+  <department name="Management">
+    <user id="6">
+      <username>grace</username>
+      <realname>Grace Hopper</realname>
+      <email>grace@example.com</email>
+      <password>9e8d7c6b5a493827160e9d8c7b6a5948</password>
+      <role>CTO</role>
+      <location>New York</location>
+      <phone>+1 555 0300</phone>
+    </user>
+  </department>
+</directory>"""
+
+def _xpath_element_to_dict(el):
+    """Convert an lxml element to a dict for JSON serialization."""
+    retVal = dict(el.attrib)
+    retVal["tag"] = el.tag
+    retVal["text"] = (el.text or "").strip()
+    children = []
+    for child in el:
+        children.append(_xpath_element_to_dict(child))
+    if children:
+        retVal["children"] = children
+    return retVal
+
 _conn = None
 _cursor = None
 _lock = None
@@ -886,6 +964,58 @@ class ReqHandler(BaseHTTPRequestHandler):
             else:
                 output = json.dumps({"resultCode": 49, "authenticated": False, "errorMessage": "Missing credentials"})
 
+            self.wfile.write(output.encode(UNICODE_ENCODING))
+            return
+
+        if self.url == "/xpath/search":
+            self.send_response(OK)
+            self.send_header("Content-type", "application/json; charset=%s" % UNICODE_ENCODING)
+            self.send_header("Connection", "close")
+            self.end_headers()
+
+            q = self.params.get("q", "")
+            entries = []
+            error = None
+
+            if q:
+                try:
+                    from lxml import etree
+                    root = etree.fromstring(XPATH_XML.encode("utf-8"))
+                    # VULNERABLE: unsanitized user input directly interpolated into XPath
+                    xpath_expr = "/directory/department/user[contains(username,'%s') or contains(realname,'%s')]" % (q, q)
+                    elements = root.xpath(xpath_expr)
+                    entries = [_xpath_element_to_dict(el) for el in elements]
+                except Exception as ex:
+                    error = "%s: %s" % (type(ex).__name__, getUnicode(ex))
+
+            output = json.dumps({"entries": entries, "count": len(entries), "error": error}, default=str)
+            self.wfile.write(output.encode(UNICODE_ENCODING))
+            return
+
+        if self.url == "/xpath/login":
+            self.send_response(OK)
+            self.send_header("Content-type", "application/json; charset=%s" % UNICODE_ENCODING)
+            self.send_header("Connection", "close")
+            self.end_headers()
+
+            username = self.params.get("username", "")
+            password = self.params.get("password", "")
+            error = None
+            authenticated = False
+
+            if username and password:
+                try:
+                    from lxml import etree
+                    root = etree.fromstring(XPATH_XML.encode("utf-8"))
+                    # VULNERABLE: unsanitized interpolation into XPath login expression
+                    xpath_expr = "/directory/department/user[username='%s' and password='%s']" % (username, password)
+                    results = root.xpath(xpath_expr)
+                    if results:
+                        authenticated = True
+                except Exception as ex:
+                    error = "%s: %s" % (type(ex).__name__, getUnicode(ex))
+
+            output = json.dumps({"authenticated": authenticated, "error": error}, default=str)
             self.wfile.write(output.encode(UNICODE_ENCODING))
             return
 

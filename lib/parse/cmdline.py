@@ -424,6 +424,9 @@ def cmdLineParser(argv=None):
         techniques.add_argument("--ldap", dest="ldap", action="store_true",
             help="Test for LDAP injection (filter breakout, boolean blind, auth bypass)")
 
+        techniques.add_argument("--xpath", dest="xpath", action="store_true",
+            help="Test for XPath injection (error-based, boolean-blind, blind XML tree-walking)")
+
         techniques.add_argument("--time-sec", dest="timeSec", type=int,
             help="Seconds to delay the DBMS response (default %d)" % defaults.timeSec)
 
