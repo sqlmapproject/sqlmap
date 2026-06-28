@@ -2604,6 +2604,7 @@ def _setHttpOptions():
     if conf.url and (conf.url.startswith("ws:/") or conf.url.startswith("wss:/")):
         try:
             from websocket import ABNF
+            ABNF # require websocket-client, not any 'websocket' module
         except ImportError:
             errMsg = "sqlmap requires third-party module 'websocket-client' "
             errMsg += "in order to use WebSocket functionality"
