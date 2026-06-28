@@ -24,6 +24,11 @@ from lib.core.convert import (decodeHex, encodeHex, decodeBase64, encodeBase64,
                               jsonize, dejsonize, base64pickle, base64unpickle)
 from lib.core.common import decodeDbmsHexValue
 
+try:
+    unichr = unichr
+except NameError:
+    unichr = chr
+
 RND = random.Random(0xC0FFEE)
 
 
@@ -79,7 +84,7 @@ class TestDecodeDbmsHexValue(unittest.TestCase):
 class TestByteTextConversion(unittest.TestCase):
     def test_ascii_roundtrip(self):
         for _ in range(1000):
-            s = u"".join(unichr(RND.randint(0x20, 0x7e)) if sys.version_info[0] < 3 else chr(RND.randint(0x20, 0x7e)) for _ in range(RND.randint(0, 30)))
+            s = u"".join(unichr(RND.randint(0x20, 0x7e)) for _ in range(RND.randint(0, 30)))
             self.assertEqual(getUnicode(getBytes(s)), s)
 
     def test_unicode_roundtrip(self):
