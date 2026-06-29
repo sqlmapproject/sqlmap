@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.6.189"
+VERSION = "1.10.6.190"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -1014,6 +1014,25 @@ XPATH_MAX_DEPTH = 32
 
 # Upper bound for the value-length search during XPath blind extraction
 XPATH_MAX_LENGTH = 256
+
+# SSTI error signatures per template engine for detection and fingerprinting.
+# Each tuple is (engine_name, regex_fragment).
+SSTI_ERROR_SIGNATURES = (
+    ("Jinja2", r"jinja2\.exceptions\.\w+|TemplateSyntaxError|UndefinedError|TemplateNotFound|TemplateAssertionError"),
+    ("Twig", r"Twig[\\_]Error|Twig[\\_]Environment|Unknown (?:filter|function|test|tag)"),
+    ("Freemarker", r"freemarker\.(?:core|template|extract|cache)\.\w+|ParseException|InvalidReferenceException|TemplateException"),
+    ("Velocity", r"org\.apache\.velocity\.(?:runtime|exception)\.\w+|ParseErrorException|MethodInvocationException|ResourceNotFoundException"),
+    ("Spring EL / Thymeleaf", r"org\.springframework\.expression\.\w+|org\.thymeleaf\.\w+|SpelEvaluationException|TemplateProcessingException|ExpressionParsingException"),
+    ("ERB", r"\(erb\):\d+|NameError.*undefined local variable"),
+    ("Pug/Jade", r"pug|jade|ParseError"),
+    ("Handlebars", r"handlebars|Handlebars|Parse error on line"),
+    ("Generic SSTI", r"template.*?(?:error|syntax|exception)"),
+)
+
+SSTI_ERROR_REGEX = r"(?i)(?:%s)" % '|'.join(regex for _, regex in SSTI_ERROR_SIGNATURES)
+
+# Upper bound for SSTI value extraction (reserved for future use)
+SSTI_MAX_LENGTH = 256
 
 # Length of prefix and suffix used in non-SQLI heuristic checks
 NON_SQLI_CHECK_PREFIX_SUFFIX_LENGTH = 6

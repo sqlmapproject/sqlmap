@@ -1019,6 +1019,31 @@ class ReqHandler(BaseHTTPRequestHandler):
             self.wfile.write(output.encode(UNICODE_ENCODING))
             return
 
+        if self.url == "/ssti/search":
+            self.send_response(OK)
+            self.send_header("Content-type", "text/html; charset=%s" % UNICODE_ENCODING)
+            self.send_header("Connection", "close")
+            self.end_headers()
+
+            q = self.params.get("q", "")
+            output = "<html><body>"
+
+            if q:
+                try:
+                    from jinja2 import Template
+                    # VULNERABLE: unsanitized user input passed to Jinja2 template engine
+                    template = Template("Hello " + q)
+                    output += template.render()
+                except Exception as ex:
+                    # Leak template engine error for error-based detection
+                    output += "<b>%s: %s</b>" % (type(ex).__name__, getUnicode(ex))
+            else:
+                output += "Hello"
+
+            output += "</body></html>"
+            self.wfile.write(output.encode(UNICODE_ENCODING))
+            return
+
         if self.url == '/':
             if not any(_ in self.params for _ in ("id", "query")):
                 self.send_response(OK)

@@ -122,6 +122,7 @@ optDict = {
         "graphql": "boolean",
         "ldap": "boolean",
         "xpath": "boolean",
+        "ssti": "boolean",
         "timeSec": "integer",
         "uCols": "string",
         "uChar": "string",
@@ -172,6 +173,8 @@ optDict = {
         "lastChar": "integer",
         "sqlQuery": "string",
         "sqlShell": "boolean",
+        "sstiQuery": "string",
+        "sstiShell": "boolean",
         "sqlFile": "string",
     },
 

@@ -415,18 +415,6 @@ def cmdLineParser(argv=None):
         techniques.add_argument("--technique", dest="technique",
             help="SQL injection techniques to use (default \"%s\")" % defaults.technique)
 
-        techniques.add_argument("--nosql", dest="nosql", action="store_true",
-            help="Test for NoSQL injection (e.g. MongoDB, CouchDB, Neo4j)")
-
-        techniques.add_argument("--graphql", dest="graphql", action="store_true",
-            help="Test for GraphQL injection (introspection, field/argument fuzzing, SQL/NoSQL payload families)")
-
-        techniques.add_argument("--ldap", dest="ldap", action="store_true",
-            help="Test for LDAP injection (filter breakout, boolean blind, auth bypass)")
-
-        techniques.add_argument("--xpath", dest="xpath", action="store_true",
-            help="Test for XPath injection (error-based, boolean-blind, blind XML tree-walking)")
-
         techniques.add_argument("--time-sec", dest="timeSec", type=int,
             help="Seconds to delay the DBMS response (default %d)" % defaults.timeSec)
 
@@ -453,6 +441,21 @@ def cmdLineParser(argv=None):
 
         techniques.add_argument("--second-req", dest="secondReq",
             help="Load second-order HTTP request from file")
+
+        techniques.add_argument("--graphql", dest="graphql", action="store_true",
+            help="Test for GraphQL injection")
+
+        techniques.add_argument("--ldap", dest="ldap", action="store_true",
+            help="Test for LDAP injection")
+
+        techniques.add_argument("--nosql", dest="nosql", action="store_true",
+            help="Test for NoSQL injection")
+
+        techniques.add_argument("--xpath", dest="xpath", action="store_true",
+            help="Test for XPath injection")
+
+        techniques.add_argument("--ssti", dest="ssti", action="store_true",
+            help="Test for server-side template injection")
 
         # Fingerprint options
         fingerprint = parser.add_argument_group("Fingerprint", "These options can be used to perform a back-end database management system version fingerprint")
@@ -567,6 +570,12 @@ def cmdLineParser(argv=None):
 
         enumeration.add_argument("--sql-shell", dest="sqlShell", action="store_true",
             help="Prompt for an interactive SQL shell")
+
+        enumeration.add_argument("--ssti-query", dest="sstiQuery",
+            help="SSTI expression to evaluate in-band on the vulnerable parameter")
+
+        enumeration.add_argument("--ssti-shell", dest="sstiShell", action="store_true",
+            help="Prompt for an interactive SSTI expression shell")
 
         enumeration.add_argument("--sql-file", dest="sqlFile",
             help="Execute SQL statements from given file(s)")

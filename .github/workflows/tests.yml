@@ -109,7 +109,7 @@ jobs:
 
       - name: Smoke test
         run: |
-          python -m pip install -q lxml
+          python -m pip install -q lxml jinja2
           python sqlmap.py --smoke-test
 
       - name: Vuln test

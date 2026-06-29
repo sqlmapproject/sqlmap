@@ -83,6 +83,7 @@ from lib.core.settings import GRAPHQL_ERROR_REGEX
 from lib.core.settings import HEURISTIC_CHECK_ALPHABET
 from lib.core.settings import INFERENCE_EQUALS_CHAR
 from lib.core.settings import LDAP_ERROR_REGEX
+from lib.core.settings import SSTI_ERROR_REGEX
 from lib.core.settings import XPATH_ERROR_REGEX
 from lib.core.settings import IPS_WAF_CHECK_PAYLOAD
 from lib.core.settings import IPS_WAF_CHECK_RATIO
@@ -1197,6 +1198,13 @@ def heuristicCheckSqlInjection(place, parameter):
 
     if not conf.xpath and re.search(XPATH_ERROR_REGEX, page or ""):
         infoMsg = "heuristic (XPath) test shows that %sparameter '%s' might be vulnerable to XPath injection (rerun with switch '--xpath')" % ("%s " % paramType if paramType != parameter else "", parameter)
+        logger.info(infoMsg)
+
+        if conf.beep:
+            beep()
+
+    if not conf.ssti and re.search(SSTI_ERROR_REGEX, page or ""):
+        infoMsg = "heuristic (SSTI) test shows that %sparameter '%s' might be vulnerable to server-side template injection (rerun with switch '--ssti')" % ("%s " % paramType if paramType != parameter else "", parameter)
         logger.info(infoMsg)
 
         if conf.beep:

@@ -548,6 +548,11 @@ def start():
                 xpathScan()
                 continue
 
+            if conf.ssti:
+                from lib.techniques.ssti.inject import sstiScan
+                sstiScan()
+                continue
+
             if conf.nullConnection:
                 checkNullConnection()
 

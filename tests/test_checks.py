@@ -49,7 +49,7 @@ from lib.parse.html import htmlParser
 # test never leaks state into another test or the rest of the suite.
 _CONF_KEYS = (
     "paramDict", "parameters", "url", "hostname", "method", "skipHeuristics",
-    "prefix", "suffix", "nosql", "graphql", "ldap", "beep", "string",
+    "prefix", "suffix", "nosql", "graphql", "ldap", "xpath", "ssti", "beep", "string",
     "notString", "regexp", "regex", "dummy", "offline", "skipWaf", "data",
     "hashDB", "cj", "cookie", "dropSetCookie", "httpHeaders", "proxy", "tor",
     "tamper", "timeout", "retries", "textOnly", "ignoreCode", "disablePrecon",
@@ -177,7 +177,7 @@ class TestHeuristicCheckSqlInjection(_ChecksTestBase):
         conf.parameters = {PLACE.GET: "id=1"}
         conf.url = "http://test.invalid/index.php?id=1"
         conf.method = None
-        conf.nosql = conf.graphql = conf.ldap = False
+        conf.nosql = conf.graphql = conf.ldap = conf.xpath = conf.ssti = False
         conf.beep = False
         kb.heavilyDynamic = False
         kb.dynamicParameter = False
