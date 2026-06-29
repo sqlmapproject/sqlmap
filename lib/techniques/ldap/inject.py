@@ -24,14 +24,10 @@ from lib.core.settings import LDAP_ERROR_REGEX
 from lib.core.settings import LDAP_ERROR_SIGNATURES
 from lib.core.settings import LDAP_FINGERPRINT_ATTRIBUTES
 from lib.core.settings import LDAP_MAX_LENGTH
+from lib.core.settings import LDAP_MAX_RECORDS
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.request.connect import Connect as Request
 from lib.utils.xrange import xrange
-
-try:
-    from lib.core.settings import LDAP_MAX_RECORDS
-except ImportError:
-    LDAP_MAX_RECORDS = 20
 
 
 SENTINEL = randomStr(length=10, lowercase=True)
@@ -644,10 +640,10 @@ def ldapScan():
     global SENTINEL
     SENTINEL = randomStr(length=10, lowercase=True)
 
-    infoMsg = "'--ldap' is self-contained: it detects LDAP injection in HTTP "
-    infoMsg += "parameters and dumps reachable directory entries. SQL enumeration "
-    infoMsg += "switches (--banner, --dbs, --tables, --users, --sql-query) are ignored"
-    logger.info(infoMsg)
+    debugMsg = "'--ldap' is self-contained: it detects LDAP injection in HTTP "
+    debugMsg += "parameters and dumps reachable directory entries. SQL enumeration "
+    debugMsg += "switches (--banner, --dbs, --tables, --users, --sql-query) are ignored"
+    logger.debug(debugMsg)
 
     if not conf.paramDict:
         logger.error("no request parameters to test (use --data, GET params, or similar)")

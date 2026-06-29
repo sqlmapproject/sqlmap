@@ -684,10 +684,10 @@ def nosqlScan():
     # NoSQL injection from an application-scoped point is confined to the back-end's single query
     # (one collection/label) - it confirms and dumps what that query can reach, with no analog to the
     # SQL database/table/user/banner enumeration, so those switches do not apply here
-    infoMsg = "'--nosql' is self-contained: it confirms the injection and dumps the reachable "
-    infoMsg += "collection/document. SQL enumeration switches (e.g. --banner, --dbs, --tables, "
-    infoMsg += "--users, --sql-query) do not map to a NoSQL back-end and are ignored"
-    logger.info(infoMsg)
+    debugMsg = "'--nosql' is self-contained: it confirms the injection and dumps the reachable "
+    debugMsg += "collection/document. SQL enumeration switches (e.g. --banner, --dbs, --tables, "
+    debugMsg += "--users, --sql-query) do not map to a NoSQL back-end and are ignored"
+    logger.debug(debugMsg)
 
     tested = found = 0
 

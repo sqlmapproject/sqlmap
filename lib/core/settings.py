@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.6.190"
+VERSION = "1.10.6.191"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -878,7 +878,15 @@ NOSQL_MAX_RECORDS = 100
 NOSQL_MAX_LENGTH = 1024
 
 # GraphQL endpoint paths to probe when the user supplies a base URL with --graphql (no explicit /graphql)
-GRAPHQL_ENDPOINT_PATHS = ("/graphql", "/api/graphql", "/v1/graphql", "/graphql/api", "/graph", "/gql")
+GRAPHQL_ENDPOINT_PATHS = ("/graphql", "/api/graphql", "/v1/graphql", "/api/v1/graphql", "/graphql/api", "/graphql/console", "/graphql.php", "/graphiql", "/graph", "/gql", "/query")
+
+# Seed field/argument names used to recover a GraphQL schema from "Did you mean" suggestion error
+# messages when introspection is disabled (the field-suggestion / "Clairvoyance" technique)
+GRAPHQL_FIELD_WORDLIST = ("user", "users", "me", "search", "login", "node", "post", "posts",
+    "account", "accounts", "profile", "product", "products", "order", "orders", "item", "items",
+    "customer", "find", "get", "list", "comment", "comments", "message", "messages", "updateUser")
+GRAPHQL_ARG_WORDLIST = ("id", "username", "user", "name", "term", "query", "q", "search",
+    "email", "input", "password", "key", "filter", "slug", "title", "uid")
 
 # Canonical GraphQL introspection query (the one everyone copy-pastes). Returned schema carries the
 # full type system: query/mutation/subscription roots, OBJECT/INPUT_OBJECT/ENUM/SCALAR types, their
@@ -966,6 +974,9 @@ LDAP_CHAR_MAX = 0x7e
 
 # Upper bound for the value-length search during LDAP blind extraction
 LDAP_MAX_LENGTH = 256
+
+# Maximum number of directory entries enumerated during LDAP blind dumping
+LDAP_MAX_RECORDS = 20
 
 # Attributes that definitively identify the backend vendor when probed on the RootDSE or
 # a well-known directory entry. Each tuple is (attribute, expected_value_substring, backend).

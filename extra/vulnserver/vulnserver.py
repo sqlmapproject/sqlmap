@@ -986,7 +986,7 @@ class ReqHandler(BaseHTTPRequestHandler):
                     elements = root.xpath(xpath_expr)
                     entries = [_xpath_element_to_dict(el) for el in elements]
                 except Exception as ex:
-                    error = "%s: %s" % (type(ex).__name__, getUnicode(ex))
+                    error = "%s: %s" % (type(ex).__name__, str(ex))
 
             output = json.dumps({"entries": entries, "count": len(entries), "error": error}, default=str)
             self.wfile.write(output.encode(UNICODE_ENCODING))
@@ -1013,7 +1013,7 @@ class ReqHandler(BaseHTTPRequestHandler):
                     if results:
                         authenticated = True
                 except Exception as ex:
-                    error = "%s: %s" % (type(ex).__name__, getUnicode(ex))
+                    error = "%s: %s" % (type(ex).__name__, str(ex))
 
             output = json.dumps({"authenticated": authenticated, "error": error}, default=str)
             self.wfile.write(output.encode(UNICODE_ENCODING))
@@ -1036,7 +1036,7 @@ class ReqHandler(BaseHTTPRequestHandler):
                     output += template.render()
                 except Exception as ex:
                     # Leak template engine error for error-based detection
-                    output += "<b>%s: %s</b>" % (type(ex).__name__, getUnicode(ex))
+                    output += "<b>%s: %s</b>" % (type(ex).__name__, str(ex))
             else:
                 output += "Hello"
 

@@ -727,5 +727,67 @@ class TestGraphqlUnicodeSafety(unittest.TestCase):
         self.assertIn("caf", gi._cell(u"caf\xe9"))
 
 
+class TestGraphqlSuggestionRecovery(unittest.TestCase):
+    """G1: schema recovery from 'Did you mean' suggestions when introspection is disabled."""
+
+    def setUp(self):
+        self._gql = gi._gqlSend
+
+    def tearDown(self):
+        gi._gqlSend = self._gql
+
+    def test_harvest_suggestions_both_quote_styles(self):
+        # graphql-js uses double quotes; some servers use single quotes + Oxford 'or'
+        self.assertEqual(
+            gi._harvestSuggestions('Cannot query field "x" on type "Query". Did you mean "user" or "search"?'),
+            ["user", "search"])
+        self.assertEqual(
+            gi._harvestSuggestions("Cannot query field 'x' on type 'Query'. Did you mean 'user', 'me', or 'node'?"),
+            ["user", "me", "node"])
+        self.assertEqual(gi._harvestSuggestions("no suggestion here"), [])
+
+    def test_suggest_fields_from_validation_errors(self):
+        # An unknown field elicits the closest real field names (graphql-js phrasing)
+        def fake(endpoint, query, variables=None):
+            if "{ user }" in query or "{user}" in query:
+                return '{"data":{"user":null}}', 200          # 'user' is a real (resolving) field
+            return ('{"errors":[{"message":"Cannot query field \\"%s\\" on type \\"Query\\". '
+                    'Did you mean \\"user\\", \\"search\\" or \\"login\\"?"}]}'
+                    % "zz", 200)
+        gi._gqlSend = fake
+        fields = gi._suggestFields("http://t/graphql", "query")
+        for expected in ("user", "search", "login"):
+            self.assertIn(expected, fields)
+
+    def test_suggest_args_from_unknown_argument(self):
+        def fake(endpoint, query, variables=None):
+            return ('{"errors":[{"message":"Unknown argument \\"zz\\" on field \\"Query.user\\". '
+                    'Did you mean \\"username\\"?"}]}', 200)
+        gi._gqlSend = fake
+        self.assertIn("username", gi._suggestArgs("http://t/graphql", "query", "user"))
+
+    def test_introspect_via_suggestions_builds_slots(self):
+        def fake(endpoint, query, variables=None):
+            # introspection-style queries already filtered upstream; here every unknown field
+            # yields the same suggestion set, and 'search' resolves as a real field
+            if "{ search }" in query or "{search}" in query:
+                return '{"data":{"search":[]}}', 200
+            if "Unknown argument" in query:   # never matches; args fall back to wordlist
+                return '{}', 200
+            return ('{"errors":[{"message":"Cannot query field \\"zz\\" on type \\"Query\\". '
+                    'Did you mean \\"search\\"?"}]}', 200)
+        gi._gqlSend = fake
+        slots = gi._introspectViaSuggestions("http://t/graphql")
+        self.assertIsNotNone(slots)
+        self.assertTrue(any(s.fieldName == "search" for s in slots))
+        self.assertTrue(all(s.strategy == "string" for s in slots))
+
+    def test_introspect_via_suggestions_none_without_suggestions(self):
+        def fake(endpoint, query, variables=None):
+            return '{"errors":[{"message":"Syntax Error: unexpected token"}]}', 200
+        gi._gqlSend = fake
+        self.assertIsNone(gi._introspectViaSuggestions("http://t/graphql"))
+
+
 if __name__ == "__main__":
     unittest.main()

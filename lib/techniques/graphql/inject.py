@@ -22,8 +22,10 @@ from lib.core.data import logger
 from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import POST_HINT
 from lib.core.settings import ERROR_PARSING_REGEXES
+from lib.core.settings import GRAPHQL_ARG_WORDLIST
 from lib.core.settings import GRAPHQL_ENDPOINT_PATHS
 from lib.core.settings import GRAPHQL_ERROR_REGEX
+from lib.core.settings import GRAPHQL_FIELD_WORDLIST
 from lib.core.settings import GRAPHQL_INTROSPECTION_QUERY
 from lib.core.settings import NOSQL_ERROR_REGEX
 from lib.core.settings import UPPER_RATIO_BOUND
@@ -352,6 +354,90 @@ def _introspect(endpoint):
         if isinstance(data, dict) and "__schema" in data:
             return data["__schema"]
     return None
+
+
+# --- Schema recovery via field suggestions (introspection disabled) ---------
+
+def _gqlErrors(page):
+    # GraphQL error-envelope messages as a list of strings
+    doc = _parseJSON(page)
+    if not isinstance(doc, dict):
+        return []
+    return [getUnicode(e.get("message", "")) for e in (doc.get("errors") or []) if isinstance(e, dict)]
+
+
+def _harvestSuggestions(message):
+    # Pull suggested identifiers out of a "Did you mean ..." GraphQL validation message,
+    # handling both single- and double-quoted phrasings ('a', 'b', or 'c' / "a" or "b")
+    idx = message.find("Did you mean")
+    if idx < 0:
+        return []
+    return re.findall(r"""['"]([A-Za-z_][A-Za-z0-9_]*)['"]""", message[idx:])
+
+
+def _suggestFields(endpoint, op):
+    # Recover root field names for an operation via suggestion harvesting: probe a random
+    # (guaranteed-unknown) field to collect the closest matches, then confirm/expand using a
+    # seed wordlist. A seed that does NOT come back as "Cannot query field" is itself a real field.
+    prefix = "" if op == "query" else "mutation "
+    found = set()
+    probes = [randomStr(length=10, lowercase=True)] + list(GRAPHQL_FIELD_WORDLIST)
+
+    for seed in probes:
+        page, _ = _gqlSend(endpoint, "%s{ %s }" % (prefix, seed))
+        doc = _parseJSON(page) or {}
+        for entry in (doc.get("errors") or []):
+            message = getUnicode(entry.get("message", "")) if isinstance(entry, dict) else ""
+            if "Did you mean" in message and "on type" in message:
+                found.update(_harvestSuggestions(message))
+        # a seeded name counts as a real field only if it actually resolved (appears in `data`);
+        # "no unknown-field error" alone is too weak (lenient servers accept anything)
+        data = doc.get("data")
+        if seed in GRAPHQL_FIELD_WORDLIST and isinstance(data, dict) and seed in data:
+            found.add(seed)
+
+    return sorted(found)
+
+
+def _suggestArgs(endpoint, op, field):
+    # Recover an argument name for `field` from an "Unknown argument ... Did you mean ..." message
+    prefix = "" if op == "query" else "mutation "
+    bogus = randomStr(length=10, lowercase=True)
+    page, _ = _gqlSend(endpoint, '%s{ %s(%s: 1) }' % (prefix, field, bogus))
+    found = set()
+    for message in _gqlErrors(page):
+        if "Unknown argument" in message:
+            found.update(_harvestSuggestions(message))
+    return sorted(found)
+
+
+def _introspectViaSuggestions(endpoint):
+    # Fallback schema recovery when introspection is disabled but the server still leaks field/argument
+    # names through "Did you mean" validation errors. Builds best-effort Slots: known scalar arg types
+    # are unavailable here, so we default to the 'string' strategy (the most broadly injectable) and let
+    # the per-slot injection oracle confirm which (field, argument) pairs are actually vulnerable.
+
+    probe = randomStr(length=10, lowercase=True)
+    page, _ = _gqlSend(endpoint, "{ %s }" % probe)
+    if not any("Did you mean" in m for m in _gqlErrors(page)):
+        return None
+
+    logger.info("introspection is disabled; recovering the schema from field-suggestion errors")
+
+    slots = []
+    for op, parentName in (("query", "Query"), ("mutation", "Mutation")):
+        fields = _suggestFields(endpoint, op)
+        if not fields:
+            continue
+        logger.info("recovered %d %s field(s) via suggestions: %s" % (
+            len(fields), op, ", ".join(fields)))
+        for field in fields:
+            args = _suggestArgs(endpoint, op, field) or list(GRAPHQL_ARG_WORDLIST)
+            for arg in args:
+                # returnSel="" renders as "{ __typename }" (valid on any OBJECT); strategy="string"
+                slots.append(Slot(op, parentName, field, [(arg, {}, None)],
+                                  arg, "string", "OBJECT", "", ""))
+    return slots or None
 
 
 # --- Schema walking ---------------------------------------------------------
@@ -1087,11 +1173,11 @@ def graphqlScan():
     global SENTINEL
     SENTINEL = randomStr(length=10, lowercase=True)
 
-    infoMsg = "'--graphql' is self-contained: it discovers the GraphQL endpoint, "
-    infoMsg += "enumerates the schema, and injects SQL/NoSQL payloads into reachable "
-    infoMsg += "argument slots. SQL enumeration switches (e.g. --banner, --dbs, "
-    infoMsg += "--tables) are ignored"
-    logger.info(infoMsg)
+    debugMsg = "'--graphql' is self-contained: it discovers the GraphQL endpoint, "
+    debugMsg += "enumerates the schema, and injects SQL/NoSQL payloads into reachable "
+    debugMsg += "argument slots. SQL enumeration switches (e.g. --banner, --dbs, "
+    debugMsg += "--tables) are ignored"
+    logger.debug(debugMsg)
 
     url = conf.url.rstrip("/") if conf.url else ""
 
@@ -1120,19 +1206,22 @@ def graphqlScan():
     # 2. Schema introspection
     logger.info("introspecting the GraphQL schema")
     schema = _introspect(endpoint)
-    if not schema:
-        logger.error("introspection failed (disabled or the endpoint rejected the query)")
-        return
 
-    types = schema.get("types") or []
-    logger.info("introspection returned %d types" % len(types))
-
-    # 3. Slot enumeration
-    slots = _extractSlots(schema)
-    if not slots:
-        logger.warning("no injectable argument slots found in the schema")
-        _dumpSchema(schema, endpoint)
-        return
+    if schema:
+        types = schema.get("types") or []
+        logger.info("introspection returned %d types" % len(types))
+        slots = _extractSlots(schema)
+        if not slots:
+            logger.warning("no injectable argument slots found in the schema")
+            _dumpSchema(schema, endpoint)
+            return
+    else:
+        # Introspection blocked: try to recover the schema from field-suggestion errors
+        logger.warning("introspection failed (disabled or rejected); trying suggestion-based recovery")
+        slots = _introspectViaSuggestions(endpoint)
+        if not slots:
+            logger.error("could not recover the schema (introspection disabled and no field suggestions)")
+            return
 
     querySlots = [_ for _ in slots if _.operation == "query"]
     mutationSlots = [_ for _ in slots if _.operation == "mutation"]
@@ -1141,8 +1230,10 @@ def graphqlScan():
         len(slots), len(querySlots), len(mutationSlots)))
 
     # 4. Schema dump (before detection -- matches regular sqlmap table/column
-    # enumeration preceding data retrieval)
-    _dumpSchema(schema, endpoint)
+    # enumeration preceding data retrieval). Only when introspection succeeded; the
+    # suggestion-recovered path has no full schema document to render.
+    if schema:
+        _dumpSchema(schema, endpoint)
 
     if mutationSlots:
         names = sorted(set("%s(%s:)" % (_.fieldName, _.targetArg) for _ in mutationSlots))
