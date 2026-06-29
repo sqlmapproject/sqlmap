@@ -100,6 +100,20 @@ def vulnTest():
         ("--purge -v 3", ("~ERROR", "~CRITICAL", "deleting the whole directory tree")),
     )
 
+    # The vulnserver's XPath endpoint renders with lxml and its SSTI endpoint with jinja2; where those
+    # optional third-party engines are not importable (e.g. PyPy 2.7, which has no lxml wheel), skip
+    # just those entries instead of failing the whole run - the rest of the suite is unaffected.
+    try:
+        import lxml  # noqa
+    except ImportError:
+        TESTS = tuple(_ for _ in TESTS if "--xpath" not in _[0])
+        logger.warning("skipping the XPath vuln-test entry ('lxml' not available)")
+    try:
+        import jinja2  # noqa
+    except ImportError:
+        TESTS = tuple(_ for _ in TESTS if "--ssti" not in _[0])
+        logger.warning("skipping the SSTI vuln-test entry ('jinja2' not available)")
+
     retVal = True
     count = 0
     cleanups = []

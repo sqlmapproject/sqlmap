@@ -73,6 +73,15 @@ def bootstrap():
     import logging
     logging.getLogger("sqlmapLog").setLevel(logging.CRITICAL + 1)
 
+    # Some console output bypasses the logger entirely and goes straight through dataToStdout():
+    # the \r-progress lines ("[INFO] retrieved: ...", "[INFO] cracked password ..."), and the echo
+    # of batch-auto-answered readInput() prompts (the fingerprint-mismatch prompt, the LIKE/exact
+    # and common-wordlist choices, ...). dataToStdout() only writes forced output or when
+    # kb.wizardMode is False, and readInput() echoes with forceOutput=not kb.wizardMode - so setting
+    # wizardMode keeps the unittest report to just dots. wizardMode is read ONLY by dataToStdout/
+    # readInput (plus the interactive wizard flow, unused here), so this has no effect on results.
+    kb.wizardMode = True
+
     sys.argv = _orig_argv          # restore so unittest's arg parsing works
     _BOOTSTRAPPED = True
 

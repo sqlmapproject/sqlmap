@@ -77,7 +77,18 @@ class _CrackBase(unittest.TestCase):
         conf.hashDB = None
         kb.wordlists = [self.wordlist]
 
+        # cracking prints "[INFO] cracked password ..." via dataToStdout(forceOutput=True), which
+        # bypasses both the logger and kb.wizardMode suppression; redirect stdout so the unittest
+        # report stays clean (these tests assert on return values/kb, never on console output).
+        self._saved_stdout = sys.stdout
+        sys.stdout = open(os.devnull, "w")
+
     def tearDown(self):
+        if getattr(self, "_saved_stdout", None) is not None:
+            try:
+                sys.stdout.close()
+            finally:
+                sys.stdout = self._saved_stdout
         conf.disableMulti = self._saved["disableMulti"]
         conf.hashDB = self._saved["hashDB"]
         conf.hashFile = self._saved["hashFile"]

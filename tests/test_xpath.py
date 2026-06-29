@@ -435,6 +435,8 @@ class TestRealXPathSyntax(unittest.TestCase):
             payload = xpath._makePayload(original, boundary, "true()")
             try:
                 count = self._count(template, payload)
+            except unittest.SkipTest:
+                raise  # lxml unavailable -> skip cleanly; SkipTest is an Exception, so the broad except below would otherwise mask it into a failure
             except Exception as e:
                 self.fail("Boundary '%s' in '%s' with orig='%s' invalid: %s\n  payload: %s" % (bk, tkey, original, e, payload))
             self.assertIsInstance(count, int,
