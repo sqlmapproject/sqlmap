@@ -97,7 +97,9 @@ jobs:
         # -B: do not write .pyc files. On Python 2 / PyPy a cached .pyc makes a module's __file__
         # point at the .pyc, which would make the later --smoke getFileType(__file__) doctest see
         # 'binary' instead of 'text'. Keeping this step byte-compile-free leaves --smoke clean.
-        run: python -B -m unittest discover -s tests -p "test_*.py"
+        run: |
+          python -m pip install -q lxml jinja2
+          python -B -m unittest discover -s tests -p "test_*.py"
 
       - name: Coverage
         if: matrix.python-version != 'pypy-2.7'
