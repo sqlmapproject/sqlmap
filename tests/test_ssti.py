@@ -275,39 +275,6 @@ class TestCrossEngineDisambiguation(unittest.TestCase):
         self.assertIn("Twig", engine.name)
 
 
-class TestExpressionEvaluation(unittest.TestCase):
-    def setUp(self):
-        self.original_send = ssti._send
-
-    def tearDown(self):
-        ssti._send = self.original_send
-
-    def test_eval_uses_expressionFmt(self):
-        engine = ssti._ENGINE_TABLE[0]  # Jinja2: expressionFmt = "{{ %s }}"
-        results = []
-
-        def mock(place, parameter, value):
-            results.append(value)
-            return "Hello __marker__ 49 __marker2__"
-
-        ssti._send = mock
-        ssti._evalExpression("GET", "q", engine, "7*7")
-        # Payload must use expressionFmt, not raw delimiter concatenation
-        self.assertIn("{{ ", results[0])
-        self.assertIn(" }}", results[0])
-
-    def test_eval_falls_back_when_no_expressionFmt(self):
-        engine = [e for e in ssti._ENGINE_TABLE if e.name == "Handlebars"][0]
-        self.assertEqual(engine.expressionFmt, "")
-
-        def mock(place, parameter, value):
-            return "irrelevant"
-
-        ssti._send = mock
-        # Should not raise; just logs error
-        ssti._evalExpression("GET", "q", engine, "7*7")
-
-
 class TestBooleanUniqueness(unittest.TestCase):
     def test_jinja2_boolean_unique_among_curlies(self):
         jinja2 = ssti._ENGINE_TABLE[0]

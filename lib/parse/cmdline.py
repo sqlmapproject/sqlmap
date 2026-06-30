@@ -133,7 +133,7 @@ def cmdLineParser(argv=None):
             help="Parse target(s) from Burp or WebScarab proxy log file")
 
         target.add_argument("-m", dest="bulkFile",
-            help="Scan multiple targets given in a textual file ")
+            help="Scan multiple targets given in a textual file")
 
         target.add_argument("-r", dest="requestFile",
             help="Load HTTP request from a file")
@@ -335,7 +335,7 @@ def cmdLineParser(argv=None):
             help="Skip testing for given parameter(s)")
 
         injection.add_argument("--skip-static", dest="skipStatic", action="store_true",
-            help="Skip testing parameters that not appear to be dynamic")
+            help="Skip testing parameters that do not appear to be dynamic")
 
         injection.add_argument("--param-exclude", dest="paramExclude",
             help="Regexp to exclude parameters from testing (e.g. \"ses\")")
@@ -442,21 +442,6 @@ def cmdLineParser(argv=None):
         techniques.add_argument("--second-req", dest="secondReq",
             help="Load second-order HTTP request from file")
 
-        techniques.add_argument("--graphql", dest="graphql", action="store_true",
-            help="Test for GraphQL injection")
-
-        techniques.add_argument("--ldap", dest="ldap", action="store_true",
-            help="Test for LDAP injection")
-
-        techniques.add_argument("--nosql", dest="nosql", action="store_true",
-            help="Test for NoSQL injection")
-
-        techniques.add_argument("--xpath", dest="xpath", action="store_true",
-            help="Test for XPath injection")
-
-        techniques.add_argument("--ssti", dest="ssti", action="store_true",
-            help="Test for server-side template injection")
-
         # Fingerprint options
         fingerprint = parser.add_argument_group("Fingerprint", "These options can be used to perform a back-end database management system version fingerprint")
 
@@ -515,7 +500,7 @@ def cmdLineParser(argv=None):
             help="Dump DBMS database table entries")
 
         enumeration.add_argument("--dump-all", dest="dumpAll", action="store_true",
-            help="Dump all DBMS databases tables entries")
+            help="Dump entries of all DBMS database tables")
 
         enumeration.add_argument("--search", dest="search", action="store_true",
             help="Search column(s), table(s) and/or database name(s)")
@@ -571,12 +556,6 @@ def cmdLineParser(argv=None):
         enumeration.add_argument("--sql-shell", dest="sqlShell", action="store_true",
             help="Prompt for an interactive SQL shell")
 
-        enumeration.add_argument("--ssti-query", dest="sstiQuery",
-            help="SSTI expression to evaluate in-band on the vulnerable parameter")
-
-        enumeration.add_argument("--ssti-shell", dest="sstiShell", action="store_true",
-            help="Prompt for an interactive SSTI expression shell")
-
         enumeration.add_argument("--sql-file", dest="sqlFile",
             help="Execute SQL statements from given file(s)")
 
@@ -626,11 +605,10 @@ def cmdLineParser(argv=None):
             help="Prompt for an OOB shell, Meterpreter or VNC")
 
         takeover.add_argument("--os-smbrelay", dest="osSmb", action="store_true",
-            help="One click prompt for an OOB shell, Meterpreter or VNC")
+            help="One-click prompt for an OOB shell, Meterpreter or VNC")
 
         takeover.add_argument("--os-bof", dest="osBof", action="store_true",
-            help="Stored procedure buffer overflow "
-                                 "exploitation")
+            help="Stored procedure buffer overflow exploitation")
 
         takeover.add_argument("--priv-esc", dest="privEsc", action="store_true",
             help="Database process user privilege escalation")
@@ -787,6 +765,24 @@ def cmdLineParser(argv=None):
 
         general.add_argument("--web-root", dest="webRoot",
             help="Web server document root directory (e.g. \"/var/www\")")
+
+        # Non-SQL injection options
+        nonsql = parser.add_argument_group("Non-SQL injection", "These options can be used to test for non-SQL injection types")
+
+        nonsql.add_argument("--graphql", dest="graphql", action="store_true",
+            help="Test for GraphQL injection")
+
+        nonsql.add_argument("--ldap", dest="ldap", action="store_true",
+            help="Test for LDAP injection")
+
+        nonsql.add_argument("--nosql", dest="nosql", action="store_true",
+            help="Test for NoSQL injection")
+
+        nonsql.add_argument("--xpath", dest="xpath", action="store_true",
+            help="Test for XPath injection")
+
+        nonsql.add_argument("--ssti", dest="ssti", action="store_true",
+            help="Test for server-side template injection")
 
         # Miscellaneous options
         miscellaneous = parser.add_argument_group("Miscellaneous", "These options do not fit into any other category")

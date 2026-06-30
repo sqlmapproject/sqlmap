@@ -173,8 +173,6 @@ optDict = {
         "lastChar": "integer",
         "sqlQuery": "string",
         "sqlShell": "boolean",
-        "sstiQuery": "string",
-        "sstiShell": "boolean",
         "sqlFile": "string",
     },
 

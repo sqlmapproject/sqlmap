@@ -59,12 +59,6 @@ def _arithmeticPayload(fmt, a, b):
     return fmt.replace("%d", str(a), 1).replace("%d", str(b), 1)
 
 
-def _expressionPayload(fmt, value):
-    # Same rationale as _arithmeticPayload(): literal %s substitution so '%'-delimited engines
-    # (notably ERB) can wrap expressions instead of crashing on fmt % value.
-    return fmt.replace("%s", value, 1)
-
-
 def _degroup(text):
     # Strip digit-group (thousands) separators so an arithmetic result still matches when the
     # engine formats large numbers with grouping (e.g. FreeMarker renders 234*567 as "132,678").
@@ -642,7 +636,7 @@ def sstiScan():
         place, parameter, engine, evidence = slot
         from lib.core.common import readInput
 
-        wantsTakeover = any(conf.get(_) for _ in ("osCmd", "osShell", "sstiQuery", "sstiShell"))
+        wantsTakeover = any(conf.get(_) for _ in ("osCmd", "osShell"))
 
         # If the user did not ask for exploitation, confirm (benignly) whether OS command
         # execution is reachable and, if so, advise the relevant switches.
@@ -650,20 +644,6 @@ def sstiScan():
             logger.info("the back-end '%s' allows OS command execution via this injection; "
                         "you are advised to try '--os-shell' (interactive) or "
                         "'--os-cmd=<command>' (single command)" % engine.name)
-
-        # --ssti-query: user-provided expression evaluated in-band
-        if conf.get("sstiQuery"):
-            _evalExpression(place, parameter, engine, conf.sstiQuery)
-
-        # --ssti-shell: interactive expression evaluation loop (interactive even under --batch,
-        # like sqlmap's SQL --sql-shell/--os-shell, which read straight from the terminal)
-        if conf.get("sstiShell"):
-            logger.info("calling SSTI shell. Enter expressions (e.g. 7*7) or 'exit'/'quit' to leave")
-            while True:
-                expr = readInput("ssti-shell> ", checkBatch=False)
-                if not expr or expr.strip().lower() in ("exit", "quit"):
-                    break
-                _evalExpression(place, parameter, engine, expr.strip())
 
         # --os-cmd / --os-shell: RCE via SSTI (reuses existing SQL takeover flags)
         if conf.get("osCmd") or conf.get("osShell"):
@@ -690,56 +670,6 @@ def sstiScan():
 def _escapeSingleQuoted(value):
     """Escape backslashes and single quotes for embedding in a single-quoted string."""
     return value.replace("\\", "\\\\").replace("'", "\\'")
-
-
-def _evalExpression(place, parameter, engine, expr):
-    """Wrap expr in the engine's expression format, extract result between
-    random markers for deterministic output, fall back to baseline diff."""
-
-    if not engine.expressionFmt:
-        logger.error("expression evaluation not supported for engine '%s'" % engine.name)
-        return
-
-    original = _originalValue(place, parameter) or ""
-    startMarker = randomStr(length=8, lowercase=True)
-    endMarker = randomStr(length=8, lowercase=True)
-
-    # Three-part payload: marker, expression, marker -- each in its own template tag
-    # so the expression is evaluated independently of the markers
-    payload = original + _expressionPayload(engine.expressionFmt, "'%s'" % startMarker)
-    payload += " " + _expressionPayload(engine.expressionFmt, expr)
-    payload += " " + _expressionPayload(engine.expressionFmt, "'%s'" % endMarker)
-    page = _send(place, parameter, payload)
-
-    if not page:
-        logger.warning("no response for SSTI expression '%s'" % expr)
-        return
-
-    text = getUnicode(page)
-    result = None
-
-    # Extract content between the random markers
-    if startMarker in text and endMarker in text:
-        start = text.index(startMarker) + len(startMarker)
-        end = text.index(endMarker, start)
-        result = text[start:end].strip()
-
-    # Fallback: diff against baseline
-    if not result:
-        baseline = _send(place, parameter, original)
-        if baseline:
-            sm = difflib.SequenceMatcher(None, getUnicode(baseline), text)
-            parts = []
-            for tag, i1, i2, j1, j2 in sm.get_opcodes():
-                if tag in ("insert", "replace"):
-                    parts.append(text[j1:j2])
-            if parts:
-                result = "".join(parts).strip()
-
-    if result:
-        conf.dumper.singleString("SSTI expression result: %s" % result)
-    else:
-        logger.warning("could not extract expression result from response")
 
 
 def _canTakeover(engine, evidence):
