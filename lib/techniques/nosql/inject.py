@@ -692,6 +692,9 @@ def nosqlScan():
     tested = found = 0
 
     for place in (_ for _ in NOSQL_PLACES if _ in conf.paramDict):
+        # mirror sqlmap's SQL place level-gating: Cookie parameters are only tested at --level >= 2
+        if place == PLACE.COOKIE and conf.level < 2:
+            continue
         for parameter in list(conf.paramDict[place].keys()):
             key = _jsonKey(parameter)
 

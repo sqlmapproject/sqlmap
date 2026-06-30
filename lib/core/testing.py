@@ -32,6 +32,7 @@ from lib.core.compat import xrange
 from lib.core.convert import encodeBase64
 from lib.core.convert import getBytes
 from lib.core.convert import getText
+from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
@@ -113,6 +114,20 @@ def vulnTest():
     except ImportError:
         TESTS = tuple(_ for _ in TESTS if "--ssti" not in _[0])
         logger.warning("skipping the SSTI vuln-test entry ('jinja2' not available)")
+
+    # --test-filter / --test-skip narrow a (slow) full run to just the entries touching a change:
+    # the needle is matched case-insensitively against each entry's command line and its expected
+    # checks (e.g. '--vuln-test --test-filter=ssti' runs only the SSTI entry).
+    def _entryMatches(entry, needle):
+        needle = needle.lower()
+        return needle in entry[0].lower() or any(needle in getText(_).lower() for _ in entry[1])
+
+    if conf.get("testFilter"):
+        TESTS = tuple(_ for _ in TESTS if _entryMatches(_, conf.testFilter))
+        logger.info("'--test-filter' selected %d vuln-test entr%s" % (len(TESTS), "y" if len(TESTS) == 1 else "ies"))
+    if conf.get("testSkip"):
+        TESTS = tuple(_ for _ in TESTS if not _entryMatches(_, conf.testSkip))
+        logger.info("'--test-skip' left %d vuln-test entr%s" % (len(TESTS), "y" if len(TESTS) == 1 else "ies"))
 
     retVal = True
     count = 0
