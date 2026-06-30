@@ -93,6 +93,8 @@ from lib.core.settings import MAX_DIFFLIB_SEQUENCE_LENGTH
 from lib.core.settings import MAX_STABILITY_DELAY
 from lib.core.settings import NON_SQLI_CHECK_PREFIX_SUFFIX_LENGTH
 from lib.core.settings import NOSQL_ERROR_REGEX
+from lib.core.settings import NULL_CONNECTION_LENGTH_TOLERANCE_HIGH
+from lib.core.settings import NULL_CONNECTION_LENGTH_TOLERANCE_LOW
 from lib.core.settings import NULL_CONNECTION_SKIP_READ_MIN_LENGTH
 from lib.core.settings import PRECONNECT_INCOMPATIBLE_SERVERS
 from lib.core.settings import SINGLE_QUOTE_MARKER
@@ -1533,44 +1535,79 @@ def checkNullConnection():
         pushValue(kb.pageCompress)
         kb.pageCompress = False
 
+        # A method is accepted only if the length it reports tracks the real GET response. The
+        # original page length (len(kb.originalPage)) is the reference; a method whose length is
+        # grossly off (e.g. HEAD returning 'Content-Length: 0', HEAD served from a different code
+        # path, or sneaked-in compression) would otherwise make every page look identical and
+        # silently break detection. The band is coarse on purpose (byte-vs-character size and
+        # moderate page dynamism are expected); a false reject just forgoes the optimization
+        def _plausibleLength(length):
+            reference = len(kb.originalPage or "")
+            if not reference:
+                return True
+            return NULL_CONNECTION_LENGTH_TOLERANCE_LOW * reference <= length <= NULL_CONNECTION_LENGTH_TOLERANCE_HIGH * reference
+
         try:
             page, headers, _ = Request.getPage(method=HTTPMETHOD.HEAD, raise404=False)
 
             if not page and HTTP_HEADER.CONTENT_LENGTH in (headers or {}):
-                kb.nullConnection = NULLCONNECTION.HEAD
+                try:
+                    length = int(headers[HTTP_HEADER.CONTENT_LENGTH].split(',')[0])
+                except ValueError:
+                    length = None
 
-                infoMsg = "NULL connection is supported with HEAD method ('Content-Length')"
-                logger.info(infoMsg)
-            else:
+                if length is not None and _plausibleLength(length):
+                    kb.nullConnection = NULLCONNECTION.HEAD
+
+                    infoMsg = "NULL connection is supported with HEAD method ('Content-Length')"
+                    logger.info(infoMsg)
+                elif length is not None:
+                    debugMsg = "HEAD method reports an implausible 'Content-Length' (%d B vs ~%d B for the original page); skipping it" % (length, len(kb.originalPage or ""))
+                    logger.debug(debugMsg)
+
+            if kb.nullConnection is None:
                 page, headers, _ = Request.getPage(auxHeaders={HTTP_HEADER.RANGE: "bytes=-1"})
 
                 if page and len(page) == 1 and HTTP_HEADER.CONTENT_RANGE in (headers or {}):
-                    kb.nullConnection = NULLCONNECTION.RANGE
+                    try:
+                        length = int(headers[HTTP_HEADER.CONTENT_RANGE][headers[HTTP_HEADER.CONTENT_RANGE].find('/') + 1:])
+                    except ValueError:
+                        length = None
 
-                    infoMsg = "NULL connection is supported with GET method ('Range')"
-                    logger.info(infoMsg)
-                else:
-                    _, headers, _ = Request.getPage(skipRead=True)
+                    if length is not None and _plausibleLength(length):
+                        kb.nullConnection = NULLCONNECTION.RANGE
 
-                    if HTTP_HEADER.CONTENT_LENGTH in (headers or {}):
-                        try:
-                            length = int(headers[HTTP_HEADER.CONTENT_LENGTH].split(',')[0])
-                        except ValueError:
-                            length = len(kb.originalPage or "")
+                        infoMsg = "NULL connection is supported with GET method ('Range')"
+                        logger.info(infoMsg)
+                    elif length is not None:
+                        debugMsg = "'Range' method reports an implausible total length (%d B vs ~%d B for the original page); skipping it" % (length, len(kb.originalPage or ""))
+                        logger.debug(debugMsg)
 
-                        # Unlike HEAD/Range, 'skip-read' leaves the body unread and must close the
-                        # connection (an unread body cannot be reused), paying a fresh TCP/TLS handshake
-                        # per request. That only outweighs the avoided body transfer for large responses;
-                        # for small ones it is a net slowdown, so it is gated by the response size here
-                        if length >= NULL_CONNECTION_SKIP_READ_MIN_LENGTH:
-                            kb.nullConnection = NULLCONNECTION.SKIP_READ
+            if kb.nullConnection is None:
+                _, headers, _ = Request.getPage(skipRead=True)
 
-                            infoMsg = "NULL connection is supported with 'skip-read' method"
-                            logger.info(infoMsg)
-                        else:
-                            debugMsg = "'skip-read' NULL connection method is available but skipped because the "
-                            debugMsg += "response (%d B) is too small for it to outweigh the per-request reconnect cost" % length
-                            logger.debug(debugMsg)
+                if HTTP_HEADER.CONTENT_LENGTH in (headers or {}):
+                    try:
+                        length = int(headers[HTTP_HEADER.CONTENT_LENGTH].split(',')[0])
+                    except ValueError:
+                        length = len(kb.originalPage or "")
+
+                    if not _plausibleLength(length):
+                        debugMsg = "'skip-read' method reports an implausible 'Content-Length' (%d B vs ~%d B for the original page); skipping it" % (length, len(kb.originalPage or ""))
+                        logger.debug(debugMsg)
+                    # Unlike HEAD/Range, 'skip-read' leaves the body unread and must close the
+                    # connection (an unread body cannot be reused), paying a fresh TCP/TLS handshake
+                    # per request. That only outweighs the avoided body transfer for large responses;
+                    # for small ones it is a net slowdown, so it is gated by the response size here
+                    elif length >= NULL_CONNECTION_SKIP_READ_MIN_LENGTH:
+                        kb.nullConnection = NULLCONNECTION.SKIP_READ
+
+                        infoMsg = "NULL connection is supported with 'skip-read' method"
+                        logger.info(infoMsg)
+                    else:
+                        debugMsg = "'skip-read' NULL connection method is available but skipped because the "
+                        debugMsg += "response (%d B) is too small for it to outweigh the per-request reconnect cost" % length
+                        logger.debug(debugMsg)
 
         except SqlmapConnectionException:
             pass

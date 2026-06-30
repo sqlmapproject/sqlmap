@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.6.200"
+VERSION = "1.10.6.201"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -193,6 +193,15 @@ STRUCTURAL_ID_REGEX = r"""(?si)\bid\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'<>]+))""
 # avoiding the body transfer outweighs the reconnect - i.e. for large responses; for small ones it
 # is a net slowdown, so it is gated by this size
 NULL_CONNECTION_SKIP_READ_MIN_LENGTH = 256 * 1024
+
+# Coarse plausibility band for a NULL connection method's reported length, relative to the known
+# original page length (len(kb.originalPage)). A method is accepted only if its length falls within
+# it; this rejects a method whose length does not track the real GET response (e.g. HEAD returning
+# 'Content-Length: 0', HEAD served from a different code path, or sneaked-in compression). The band
+# is deliberately generous (byte-vs-character size and moderate page dynamism are expected, and a
+# false reject merely forgoes the optimization, which is safe) - it only catches gross mismatches
+NULL_CONNECTION_LENGTH_TOLERANCE_LOW = 0.5
+NULL_CONNECTION_LENGTH_TOLERANCE_HIGH = 4.0
 
 # Regular expression used for recognition of IP addresses
 IP_ADDRESS_REGEX = r"\b(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\b"
