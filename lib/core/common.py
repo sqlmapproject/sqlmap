@@ -176,6 +176,9 @@ from lib.core.settings import REPLACEMENT_MARKER
 from lib.core.settings import SENSITIVE_DATA_REGEX
 from lib.core.settings import SENSITIVE_OPTIONS
 from lib.core.settings import STDIN_PIPE_DASH
+from lib.core.settings import STRUCTURAL_CLASS_REGEX
+from lib.core.settings import STRUCTURAL_ID_REGEX
+from lib.core.settings import STRUCTURAL_TAG_REGEX
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import TEXT_TAG_REGEX
 from lib.core.settings import TIME_STDEV_COEFF
@@ -3226,6 +3229,45 @@ def extractTextTagContent(page):
             page = page.replace(REFLECTED_VALUE_MARKER, "")
 
     return filterNone(_.group("result").strip() for _ in re.finditer(TEXT_TAG_REGEX, page))
+
+def extractStructuralTokens(page):
+    """
+    Returns a set of value-free structural tokens (tag names and class/id attribute hooks) of a
+    (HTML) page, discarding all textual content. Used for structure-aware page comparison when the
+    page is byte-unstable but structurally stable (e.g. dynamic result rows in a fixed layout), so
+    that dynamic text does not perturb the comparison while a structural change (e.g. a results
+    table appearing or disappearing) still does. HTML counterpart of jsonMinimize()
+
+    >>> sorted(extractStructuralTokens(u'<div id="g" class="a b"><span>x</span></div>')) == [u'cls:div.a', u'cls:div.b', u'id:div#g', u'tag:div', u'tag:span']
+    True
+    >>> extractStructuralTokens(u'<table><tr><td>1</td></tr></table>') == set([u'tag:table', u'tag:tr', u'tag:td'])
+    True
+    >>> extractStructuralTokens(u'') == set()
+    True
+    """
+
+    page = page or ""
+
+    if REFLECTED_VALUE_MARKER in page:
+        page = re.sub(r"(?i)<[^>]*%s[^>]*>" % REFLECTED_VALUE_MARKER, " ", page)
+
+    page = re.sub(r"(?si)<script.+?</script>|<!--.+?-->|<style.+?</style>", " ", page)
+
+    retVal = set()
+
+    for match in re.finditer(STRUCTURAL_TAG_REGEX, page):
+        tag = match.group(1).lower()
+        attrs = match.group(2) or ""
+        retVal.add("tag:%s" % tag)
+        for _ in re.finditer(STRUCTURAL_CLASS_REGEX, attrs):
+            for value in (_.group(1) or _.group(2) or _.group(3) or "").split():
+                retVal.add("cls:%s.%s" % (tag, value))
+        for _ in re.finditer(STRUCTURAL_ID_REGEX, attrs):
+            value = (_.group(1) or _.group(2) or _.group(3) or "").strip()
+            if value:
+                retVal.add("id:%s#%s" % (tag, value))
+
+    return retVal
 
 def trimAlphaNum(value):
     """

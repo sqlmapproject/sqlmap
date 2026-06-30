@@ -16,6 +16,7 @@ from extra.beep.beep import beep
 from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import extractRegexResult
+from lib.core.common import extractStructuralTokens
 from lib.core.common import extractTextTagContent
 from lib.core.common import filterNone
 from lib.core.common import findDynamicContent
@@ -1390,7 +1391,26 @@ def checkStability():
                 raise SqlmapNoneDataException(errMsg)
 
         else:
-            checkDynamicContent(firstPage, secondPage)
+            # Before engaging the (lossy) dynamic-content removal / '--text-only' escalation, check
+            # whether the page is structurally stable (identical tag/class/id skeleton across the two
+            # requests) despite differing text. If so, base the comparison on that value-free structure
+            # so that dynamic content (e.g. per-render result rows) does not mask an injection. This is
+            # the HTML counterpart of the structure-aware JSON comparison
+            if firstPage and secondPage and extractStructuralTokens(firstPage) == extractStructuralTokens(secondPage):
+                kb.pageStructurallyStable = True
+
+                if kb.nullConnection:
+                    debugMsg = "turning off NULL connection "
+                    debugMsg += "support because of structural page comparison"
+                    logger.debug(debugMsg)
+
+                    kb.nullConnection = None
+
+                infoMsg = "target URL content is not byte-stable but structurally stable; sqlmap "
+                infoMsg += "will base the page comparison on the page structure"
+                logger.info(infoMsg)
+            else:
+                checkDynamicContent(firstPage, secondPage)
 
     return kb.pageStable
 

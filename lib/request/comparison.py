@@ -10,6 +10,7 @@ from __future__ import division
 import re
 
 from lib.core.common import extractRegexResult
+from lib.core.common import extractStructuralTokens
 from lib.core.common import getFilteredPageContent
 from lib.core.common import jsonMinimize
 from lib.core.common import listToStrValue
@@ -176,6 +177,15 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
             if _isJsonResponse(headers) and not (conf.titles or conf.textOnly or kb.nullConnection):
                 seq1 = jsonMinimize(kb.pageTemplate)
                 seq2 = jsonMinimize(rawPage)
+
+            # Structure-aware comparison for a structurally-stable (but byte-unstable) HTML page:
+            # compare the value-free tag/class/id skeleton so dynamic text does not perturb the ratio
+            # while a structural change (e.g. a results table appearing/disappearing) still does
+            if seq1 is None and kb.pageStructurallyStable and not (conf.titles or conf.textOnly or kb.nullConnection):
+                _ = "\n".join(sorted(extractStructuralTokens(kb.pageTemplate)))
+                if _:   # only engage when the page actually exposes structure (HTML tags); tagless content falls back to text
+                    seq1 = _
+                    seq2 = "\n".join(sorted(extractStructuralTokens(rawPage)))
 
             if seq1 is None or seq2 is None:
                 if conf.titles:

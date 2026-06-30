@@ -2210,6 +2210,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.pageTemplates = dict()
     kb.pageEncoding = DEFAULT_PAGE_ENCODING
     kb.pageStable = None
+    kb.pageStructurallyStable = None
     kb.partRun = None
     kb.permissionFlag = False
     kb.place = None
