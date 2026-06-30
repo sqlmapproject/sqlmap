@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.6.199"
+VERSION = "1.10.6.200"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -186,6 +186,13 @@ TEXT_TAG_REGEX = r"(?si)<(abbr|acronym|b|blockquote|br|center|cite|code|dt|em|fo
 STRUCTURAL_TAG_REGEX = r"(?si)<\s*([a-z][a-z0-9]*)((?:\s+[^<>]*)?)/?>"
 STRUCTURAL_CLASS_REGEX = r"""(?si)\bclass\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'<>]+))"""
 STRUCTURAL_ID_REGEX = r"""(?si)\bid\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'<>]+))"""
+
+# Minimum response size (in bytes) for the 'skip-read' NULL connection method to be used. Unlike
+# HEAD/Range, 'skip-read' leaves the body unread and must therefore close the connection (an unread
+# body cannot be reused), paying a fresh TCP/TLS handshake per request. That only pays off when
+# avoiding the body transfer outweighs the reconnect - i.e. for large responses; for small ones it
+# is a net slowdown, so it is gated by this size
+NULL_CONNECTION_SKIP_READ_MIN_LENGTH = 256 * 1024
 
 # Regular expression used for recognition of IP addresses
 IP_ADDRESS_REGEX = r"\b(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\b"

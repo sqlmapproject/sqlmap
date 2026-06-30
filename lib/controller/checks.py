@@ -93,6 +93,7 @@ from lib.core.settings import MAX_DIFFLIB_SEQUENCE_LENGTH
 from lib.core.settings import MAX_STABILITY_DELAY
 from lib.core.settings import NON_SQLI_CHECK_PREFIX_SUFFIX_LENGTH
 from lib.core.settings import NOSQL_ERROR_REGEX
+from lib.core.settings import NULL_CONNECTION_SKIP_READ_MIN_LENGTH
 from lib.core.settings import PRECONNECT_INCOMPATIBLE_SERVERS
 from lib.core.settings import SINGLE_QUOTE_MARKER
 from lib.core.settings import SLEEP_TIME_MARKER
@@ -1552,10 +1553,24 @@ def checkNullConnection():
                     _, headers, _ = Request.getPage(skipRead=True)
 
                     if HTTP_HEADER.CONTENT_LENGTH in (headers or {}):
-                        kb.nullConnection = NULLCONNECTION.SKIP_READ
+                        try:
+                            length = int(headers[HTTP_HEADER.CONTENT_LENGTH].split(',')[0])
+                        except ValueError:
+                            length = len(kb.originalPage or "")
 
-                        infoMsg = "NULL connection is supported with 'skip-read' method"
-                        logger.info(infoMsg)
+                        # Unlike HEAD/Range, 'skip-read' leaves the body unread and must close the
+                        # connection (an unread body cannot be reused), paying a fresh TCP/TLS handshake
+                        # per request. That only outweighs the avoided body transfer for large responses;
+                        # for small ones it is a net slowdown, so it is gated by the response size here
+                        if length >= NULL_CONNECTION_SKIP_READ_MIN_LENGTH:
+                            kb.nullConnection = NULLCONNECTION.SKIP_READ
+
+                            infoMsg = "NULL connection is supported with 'skip-read' method"
+                            logger.info(infoMsg)
+                        else:
+                            debugMsg = "'skip-read' NULL connection method is available but skipped because the "
+                            debugMsg += "response (%d B) is too small for it to outweigh the per-request reconnect cost" % length
+                            logger.debug(debugMsg)
 
         except SqlmapConnectionException:
             pass
