@@ -41,6 +41,7 @@ from lib.core.common import readInput
 from lib.core.common import removePostHintPrefix
 from lib.core.common import safeCSValue
 from lib.core.common import showHttpErrorCodes
+from lib.core.common import singleTimeWarnMessage
 from lib.core.common import urldecode
 from lib.core.common import urlencode
 from lib.core.compat import xrange
@@ -527,6 +528,9 @@ def start():
                         kb.randomPool[name] = options
 
             checkWaf()
+
+            if any((conf.graphql, conf.nosql, conf.ldap, conf.xpath, conf.ssti)) and (conf.reportJson or conf.resultsFile):
+                singleTimeWarnMessage("'--report-json'/'--results-file' do not (yet) capture non-SQL technique (--graphql/--nosql/--ldap/--xpath/--ssti) findings; these are reported on the console only")
 
             if conf.graphql:
                 from lib.techniques.graphql.inject import graphqlScan

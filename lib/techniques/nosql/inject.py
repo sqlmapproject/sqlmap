@@ -769,3 +769,5 @@ def nosqlScan():
     if not found:
         warnMsg = "no parameter appears to be injectable via NoSQL injection (%d tested)" % tested
         logger.warning(warnMsg)
+
+    logger.info("NoSQL scan complete")
