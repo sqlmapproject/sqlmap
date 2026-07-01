@@ -154,6 +154,11 @@ FLAG_PRIORITY = 0x20
 CONNECTION_PREFACE = b"PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n"
 
 def encode_frame(ftype, flags, stream_id, payload=b""):
+    """Serialize an HTTP/2 frame (RFC 7540 s4.1): 24-bit length + type + flags + 31-bit stream id.
+
+    >>> decode_frame_header(encode_frame(HEADERS, FLAG_END_HEADERS, 1, b'abc')[:9])
+    (3, 1, 4, 1)
+    """
     if len(payload) > 0xffffff:
         raise ValueError("frame payload exceeds 24-bit length")
     header = struct.pack("!I", len(payload))[1:]                     # 24-bit length (drop MSB of the 32-bit pack)
@@ -161,6 +166,11 @@ def encode_frame(ftype, flags, stream_id, payload=b""):
     return header + payload
 
 def decode_frame_header(nine):
+    """Parse the 9-byte frame header into (length, type, flags, stream_id); the reserved high bit of the stream id is masked off.
+
+    >>> decode_frame_header(encode_frame(DATA, 0, 0x80000001, b'')[:9])
+    (0, 0, 0, 1)
+    """
     if len(nine) != 9:
         raise ValueError("frame header must be exactly 9 bytes")
     length = struct.unpack("!I", b"\x00" + nine[:3])[0]
@@ -169,6 +179,13 @@ def decode_frame_header(nine):
 
 # ---------- Huffman ----------
 def huffman_encode(data):
+    """Huffman-encode a byte string per the RFC 7541 static table (s5.2), padding with EOS 1-bits.
+
+    >>> huffman_decode(huffman_encode(b'www.example.com')) == b'www.example.com'
+    True
+    >>> huffman_encode(b'') == b''
+    True
+    """
     if not data:
         return b""
     acc = 0
@@ -224,6 +241,13 @@ def huffman_decode(data):
 
 # ---------- integer / string (RFC 7541 5.1 / 5.2) ----------
 def encode_integer(value, prefix_bits, first_byte=0):
+    """Encode an integer with an N-bit prefix (RFC 7541 s5.1); the C.1.2 example is 1337 / 5-bit prefix.
+
+    >>> list(encode_integer(10, 5))
+    [10]
+    >>> list(encode_integer(1337, 5))
+    [31, 154, 10]
+    """
     mask = (1 << prefix_bits) - 1
     if value < mask:
         return bytearray([first_byte | value])
@@ -236,6 +260,11 @@ def encode_integer(value, prefix_bits, first_byte=0):
     return out
 
 def decode_integer(data, pos, prefix_bits):
+    """Decode an N-bit-prefixed integer, returning (value, new_pos) (RFC 7541 s5.1).
+
+    >>> decode_integer(bytearray([31, 154, 10]), 0, 5)
+    (1337, 3)
+    """
     mask = (1 << prefix_bits) - 1
     value = data[pos] & mask
     pos += 1
@@ -296,6 +325,11 @@ class Decoder(object):
         return self.dynamic[index]
 
     def decode(self, data):
+        """Decode an HPACK header block into a list of (name, value) byte pairs (RFC 7541 s6).
+
+        >>> Decoder().decode(bytes(bytearray([0x82, 0x86, 0x84]))) == [(b':method', b'GET'), (b':scheme', b'http'), (b':path', b'/')]
+        True
+        """
         data = bytearray(data)
         pos = 0
         headers = []
@@ -469,7 +503,14 @@ def h2_request(host, port=443, method="GET", path="/", authority=None, headers=N
 
 class H2Response(object):
     """A urllib-response-compatible wrapper around a native HTTP/2 response, so the rest of sqlmap's
-    request pipeline can consume it exactly like a urllib response (code/msg/info()/read()/geturl())."""
+    request pipeline can consume it exactly like a urllib response (code/msg/info()/read()/geturl()).
+
+    >>> r = H2Response('https://x/', 200, [(b':status', b'200'), (b'content-type', b'text/html')], b'body')
+    >>> (r.code, r.msg, r.read() == b'body', r.geturl())
+    (200, 'OK', True, 'https://x/')
+    >>> ':status' in r.info()
+    False
+    """
 
     def __init__(self, url, status, headers, body):
         self.url = url
