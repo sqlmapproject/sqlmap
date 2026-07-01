@@ -63,7 +63,6 @@ from lib.core.common import unsafeVariableNaming
 from lib.core.common import urldecode
 from lib.core.common import urlencode
 from lib.core.common import wasLastResponseDelayed
-from lib.core.compat import LooseVersion
 from lib.core.compat import patchHeaders
 from lib.core.compat import xrange
 from lib.core.convert import encodeBase64
@@ -111,7 +110,6 @@ from lib.core.settings import IS_WIN
 from lib.core.settings import JAVASCRIPT_HREF_REGEX
 from lib.core.settings import LARGE_READ_TRIM_MARKER
 from lib.core.settings import LIVE_COOKIES_TIMEOUT
-from lib.core.settings import MIN_HTTPX_VERSION
 from lib.core.settings import MAX_CONNECTION_READ_SIZE
 from lib.core.settings import MAX_CONNECTIONS_REGEX
 from lib.core.settings import MAX_CONNECTION_TOTAL_SIZE
@@ -632,30 +630,22 @@ class Connect(object):
                                 cookie.value = re.sub(r"(%s)([^ \t])" % char, r"\g<1>\t\g<2>", cookie.value)
 
                 if conf.http2:
-                    try:
-                        import httpx
-                    except ImportError:
-                        raise SqlmapMissingDependence("httpx[http2] not available (e.g. 'pip%s install httpx[http2]')" % ('3' if six.PY3 else ""))
+                    from lib.request.http2 import open_url as http2OpenUrl
 
-                    if LooseVersion(httpx.__version__) < LooseVersion(MIN_HTTPX_VERSION):
-                        raise SqlmapMissingDependence("outdated version of httpx detected (%s<%s)" % (httpx.__version__, MIN_HTTPX_VERSION))
+                    h2proxy = None
+                    if conf.proxy:
+                        _proxyParts = _urllib.parse.urlsplit(conf.proxy if "://" in conf.proxy else "http://%s" % conf.proxy)
+                        if (_proxyParts.scheme or "").lower().startswith("socks"):
+                            raise SqlmapMissingDependence("native HTTP/2 client does not support SOCKS proxies (omit '--http2' or use an HTTP proxy)")
+                        h2proxy = (_proxyParts.hostname, _proxyParts.port or 8080, conf.proxyCred or None)
 
                     try:
-                        proxy_mounts = dict(("%s://" % key, httpx.HTTPTransport(proxy="%s%s" % ("http://" if "://" not in kb.proxies[key] else "", kb.proxies[key]))) for key in kb.proxies) if kb.proxies else None
-                        with httpx.Client(verify=False, http2=True, timeout=timeout, follow_redirects=True, cookies=conf.cj, mounts=proxy_mounts) as client:
-                            conn = client.request(method or (HTTPMETHOD.POST if post is not None else HTTPMETHOD.GET), url, headers=headers, data=post)
-                    except (httpx.HTTPError, httpx.InvalidURL, httpx.CookieConflict, httpx.StreamError) as ex:
+                        conn = http2OpenUrl(url, method or (HTTPMETHOD.POST if post is not None else HTTPMETHOD.GET), headers, post, timeout, follow_redirects=kb.choices.redirect != REDIRECTION.NO, proxy=h2proxy)
+                    except IOError as ex:
                         raise _http_client.HTTPException(getSafeExString(ex))
                     else:
-                        if conn.status_code >= 400:
-                            raise _urllib.error.HTTPError(url, conn.status_code, conn.reason_phrase, conn.headers, io.BytesIO(conn.read()))
-
-                        conn.code = conn.status_code
-                        conn.msg = conn.reason_phrase
-                        conn.info = lambda c=conn: c.headers
-
-                        conn._read_buffer = conn.read()
-                        conn._read_offset = 0
+                        if conn.code >= 400:
+                            raise _urllib.error.HTTPError(url, conn.code, conn.msg, conn.info(), io.BytesIO(conn.read()))
 
                         requestMsg = re.sub(r" HTTP/[0-9.]+\r\n", " %s\r\n" % conn.http_version, requestMsg, count=1)
 
@@ -663,18 +653,6 @@ class Connect(object):
                             threadData.lastRequestMsg = requestMsg
 
                             logger.log(CUSTOM_LOGGING.TRAFFIC_OUT, requestMsg)
-
-                        def _read(count=None):
-                            offset = conn._read_offset
-                            if count is None:
-                                result = conn._read_buffer[offset:]
-                                conn._read_offset = len(conn._read_buffer)
-                            else:
-                                result = conn._read_buffer[offset: offset + count]
-                                conn._read_offset += len(result)
-                            return result
-
-                        conn.read = _read
                 else:
                     if not multipart:
                         threadData.lastRequestMsg = requestMsg
