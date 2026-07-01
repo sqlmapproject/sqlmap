@@ -57,7 +57,7 @@ from lib.parse.html import htmlParser
 from thirdparty import six
 from thirdparty.chardet import detect
 from thirdparty.identywaf import identYwaf
-from thirdparty.odict import OrderedDict
+from collections import OrderedDict
 from thirdparty.six import unichr as _unichr
 from thirdparty.six.moves import http_client as _http_client
 

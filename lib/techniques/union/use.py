@@ -62,7 +62,7 @@ from lib.request.connect import Connect as Request
 from lib.utils.progress import ProgressBar
 from lib.utils.safe2bin import safecharencode
 from thirdparty import six
-from thirdparty.odict import OrderedDict
+from collections import OrderedDict
 
 def _oneShotUnionUse(expression, unpack=True, limited=False):
     retVal = hashDBRetrieve("%s%s" % (conf.hexConvert or False, expression), checkConf=True)  # as UNION data is stored raw unconverted

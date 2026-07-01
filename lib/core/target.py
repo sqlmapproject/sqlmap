@@ -79,7 +79,7 @@ from lib.core.settings import XML_RECOGNITION_REGEX
 from lib.core.threads import getCurrentThreadData
 from lib.utils.hashdb import HashDB
 from thirdparty import six
-from thirdparty.odict import OrderedDict
+from collections import OrderedDict
 from thirdparty.six.moves import urllib as _urllib
 
 def _setRequestParams():

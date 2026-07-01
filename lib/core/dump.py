@@ -62,7 +62,7 @@ from lib.core.settings import WINDOWS_RESERVED_NAMES
 from lib.utils.safe2bin import safechardecode
 from thirdparty import six
 from thirdparty.magic import magic
-from thirdparty.odict import OrderedDict
+from collections import OrderedDict
 
 class Dump(object):
     """

@@ -8,7 +8,7 @@ See the file 'LICENSE' for copying permission
 import copy
 import threading
 
-from thirdparty.odict import OrderedDict
+from collections import OrderedDict
 from thirdparty.six.moves import collections_abc as _collections
 
 class AttribDict(dict):

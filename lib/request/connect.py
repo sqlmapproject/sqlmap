@@ -140,7 +140,7 @@ from lib.request.direct import direct
 from lib.request.methodrequest import MethodRequest
 from lib.utils.safe2bin import safecharencode
 from thirdparty import six
-from thirdparty.odict import OrderedDict
+from collections import OrderedDict
 from thirdparty.six import unichr as _unichr
 from thirdparty.six.moves import http_client as _http_client
 from thirdparty.six.moves import urllib as _urllib

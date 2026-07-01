@@ -200,7 +200,7 @@ from thirdparty.clientform.clientform import ParseResponse
 from thirdparty.clientform.clientform import ParseError
 from thirdparty.colorama.initialise import init as coloramainit
 from thirdparty.magic import magic
-from thirdparty.odict import OrderedDict
+from collections import OrderedDict
 from thirdparty.six import unichr as _unichr
 from thirdparty.six.moves import collections_abc as _collections
 from thirdparty.six.moves import configparser as _configparser
