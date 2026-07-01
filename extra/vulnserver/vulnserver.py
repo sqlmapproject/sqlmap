@@ -17,6 +17,7 @@ import sqlite3
 import string
 import sys
 import threading
+import time
 import traceback
 
 PY3 = sys.version_info >= (3, 0)
@@ -1041,6 +1042,57 @@ class ReqHandler(BaseHTTPRequestHandler):
                 output += "Hello"
 
             output += "</body></html>"
+            self.wfile.write(output.encode(UNICODE_ENCODING))
+            return
+
+        if self.url == "/fp":
+            # False-positive battery traps (exercised on demand by '--fp-test'). Every trap is
+            # deliberately NON-injectable but baits a specific FP defense; sqlmap must report "not
+            # injectable" for all of them (each is paired, in FP_TESTS, with a real injectable twin).
+            trap = self.params.get("trap", "reflect")
+            idv = self.params.get("id", "1")
+
+            def _rnd(n=8):
+                return "".join(random.choice("0123456789abcdef") for _ in range(n))
+
+            if trap == "intcast":
+                # parameterized int lookup: id=1 -> row, non-int (e.g. "1 AND 1=1") -> empty. A boolean
+                # payload yields a differential yet it is NOT SQLi -> the false-positive check must reject it.
+                try:
+                    hit = int(idv) in (1, 2, 3)
+                except ValueError:
+                    hit = False
+                output = "<html><body><b>SQL results:</b><table border=\"1\">%s</table></body></html>" % ("<tr><td>%s</td><td>luther</td><td>blisset</td></tr>" % idv if hit else "")
+            elif trap == "structrand":
+                # heavy dynamic TEXT (defeats dynamic-content removal) + STABLE structure; id is not
+                # reflected into the structure -> stresses the structure-aware comparison oracle.
+                rows = "".join("<tr><td>%s</td><td>%s</td></tr>" % (_rnd(), _rnd()) for _ in range(3))
+                output = ("<html><head><title>Report</title></head><body><div class=\"csrf\">%s</div>"
+                          "<nav class=\"top\">token %s</nav><table id=\"grid\" class=\"res\">%s</table>"
+                          "<div class=\"foot\">%s</div></body></html>" % (_rnd(), _rnd(), rows, _rnd()))
+            elif trap == "acceptall":
+                # 200 + identical content for EVERYTHING incl. garbage -> the reads-everything-true channel.
+                output = "<html><body><b>OK</b> welcome to the portal</body></html>"
+            elif trap == "reflect":
+                # echoes the parameter verbatim (reflection) with no SQL sink.
+                output = "<html><body>you searched for: %s</body></html>" % idv
+            elif trap == "errors":
+                # DB-error-looking text for any non-baseline input -> baits error-based detection.
+                output = "<html><body>Warning: mysql_fetch_array(): supplied argument is not a valid MySQL result</body></html>" if idv != "1" else "<html><body><b>SQL results:</b><table><tr><td>1</td><td>luther</td></tr></table></body></html>"
+            elif trap == "lengthrand":
+                # response length varies at random (not with the payload) -> baits length-based heuristics.
+                output = "<html><body>ok %s</body></html>" % _rnd(random.choice([4, 40, 400]))
+            elif trap == "slowrand":
+                # random latency, uncorrelated with the payload -> baits time-based detection.
+                time.sleep(random.choice([0, 0, 0, 1]))
+                output = "<html><body>ok %s</body></html>" % _rnd()
+            else:
+                output = "<html><body>?</body></html>"
+
+            self.send_response(OK)
+            self.send_header("Content-type", "text/html; charset=%s" % UNICODE_ENCODING)
+            self.send_header("Connection", "close")
+            self.end_headers()
             self.wfile.write(output.encode(UNICODE_ENCODING))
             return
 

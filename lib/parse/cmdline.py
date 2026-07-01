@@ -912,6 +912,9 @@ def cmdLineParser(argv=None):
         parser.add_argument("--vuln-test", dest="vulnTest", action="store_true",
             help=SUPPRESS)
 
+        parser.add_argument("--fp-test", dest="fpTest", action="store_true",
+            help=SUPPRESS)
+
         parser.add_argument("--api-test", dest="apiTest", action="store_true",
             help=SUPPRESS)
 
@@ -1169,7 +1172,7 @@ def cmdLineParser(argv=None):
         else:
             args.stdinPipe = None
 
-        if not any((args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, args.requestFile, args.updateAll, args.smokeTest, args.vulnTest, args.apiTest, args.wizard, args.dependencies, args.purge, args.listTampers, args.hashFile, args.stdinPipe)):
+        if not any((args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, args.requestFile, args.updateAll, args.smokeTest, args.vulnTest, args.fpTest, args.apiTest, args.wizard, args.dependencies, args.purge, args.listTampers, args.hashFile, args.stdinPipe)):
             errMsg = "missing a mandatory option (-d, -u, -l, -m, -r, -g, -c, --wizard, --shell, --update, --purge, --list-tampers or --dependencies). "
             errMsg += "Use -h for basic and -hh for advanced help\n"
             parser.error(errMsg)

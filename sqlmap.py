@@ -192,6 +192,9 @@ def main():
             elif conf.vulnTest:
                 from lib.core.testing import vulnTest
                 os._exitcode = 1 - (vulnTest() or 0)
+            elif conf.fpTest:
+                from lib.core.testing import fpTest
+                os._exitcode = 1 - (fpTest() or 0)
             elif conf.apiTest:
                 from lib.core.testing import apiTest
                 os._exitcode = 1 - (apiTest() or 0)
@@ -607,7 +610,7 @@ def main():
                     except OSError:
                         pass
 
-            if any((conf.vulnTest, conf.smokeTest, conf.apiTest)) or not filterNone(filepath for filepath in glob.glob(os.path.join(tempDir, '*')) if not any(filepath.endswith(_) for _ in (".lock", ".exe", ".so", '_'))):  # ignore junk files
+            if any((conf.vulnTest, conf.fpTest, conf.smokeTest, conf.apiTest)) or not filterNone(filepath for filepath in glob.glob(os.path.join(tempDir, '*')) if not any(filepath.endswith(_) for _ in (".lock", ".exe", ".so", '_'))):  # ignore junk files
                 try:
                     shutil.rmtree(tempDir, ignore_errors=True)
                 except OSError:

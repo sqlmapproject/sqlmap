@@ -41,12 +41,12 @@ from lib.core.patch import unisonRandom
 from lib.core.settings import IS_WIN
 from lib.core.settings import RESTAPI_VERSION
 
-def vulnTest():
+def vulnTest(tests=None, label="vuln"):
     """
-    Runs the testing against 'vulnserver'
+    Runs the testing against 'vulnserver' (default suite, or a caller-supplied one e.g. FP_TESTS)
     """
 
-    TESTS = (
+    TESTS = tests if tests is not None else (
         ("-h", ("to see full list of options run with '-hh'",)),
         ("--dependencies", ("sqlmap requires", "third-party library")),
         ("-u <url> --data=\"reflect=1\" --flush-session --wizard --disable-coloring", ("Please choose:", "back-end DBMS: SQLite", "current user is DBA: True", "banner: '3.")),
@@ -63,7 +63,7 @@ def vulnTest():
         ("-u <url> --data=\"security_level=3\" -p id --flush-session --technique=B", ("bypassed the WAF/IPS by using tamper script", "Type: boolean-based blind")),   # automatic WAF-bypass: SQL-tamper dimension at a stricter signature threshold
         ("-u <url> --data=\"security_level=4\" -p id --flush-session --technique=B --banner", ("random (non-scanner) User-Agent and browser-like headers to bypass the WAF/IPS", "Type: boolean-based blind", "banner: '3.")),   # automatic WAF-bypass against a libinjection-class WAF: tampers cannot help, only the non-scanner User-Agent does
         ("-u <url> --data=\"security_level=5\" -p id --flush-session --technique=B", ("unable to automatically bypass the WAF/IPS", "does not seem to be injectable")),   # automatic WAF-bypass honest bail: a libinjection-class WAF that no User-Agent or tamper can defeat
-        ("-u <url> -p id --flush-session --proof", ("sqlmap proved exploitation of the following injection point", "Parameter: id (GET)", "Technique: boolean-based blind", "TRUE (5/5)", "repeatably", "Retrieved: back-end DBMS banner '3.")),   # --proof: report-grade proof in the injection-point style - forces the boolean technique (so a multi-technique point still proves), and actively reads a value out as the strongest proof
+        ("-u <url> -p id --flush-session --technique=B --proof", ("sqlmap proved exploitation of the following injection point", "Parameter: id (GET)", "Technique: boolean-based blind", "TRUE (5/5)", "repeatably", "Retrieved: back-end DBMS banner '3.")),   # --proof: report-grade proof in the injection-point style - forces the boolean technique (so a multi-technique point still proves), and actively reads a value out as the strongest proof
         ("-r <request> --flush-session -v 5 --test-skip=\"heavy\" --save=<config>", ("CloudFlare", "web application technology: Express", "possible DBMS: 'SQLite'", "User-Agent: foobar", "~Type: time-based blind", "saved command line options to the configuration file")),
         ("-c <config>", ("CloudFlare", "possible DBMS: 'SQLite'", "User-Agent: foobar", "~Type: time-based blind")),
         ("-l <log> --flush-session --skip-waf -vvvvv --technique=U --union-from=users --banner --parse-errors", ("banner: '3.", "ORDER BY term out of range", "~xp_cmdshell", "Connection: keep-alive")),
@@ -73,7 +73,7 @@ def vulnTest():
         ("-u <base64> -p id --base64=id --data=\"base64=true\" --flush-session --tables --technique=U", (" users ",)),
         ("-u <url> --flush-session --banner --technique=B --disable-precon --not-string \"no results\"", ("banner: '3.",)),
         ("-u <url> --flush-session --encoding=gbk --banner --technique=B --first=1 --last=2", ("banner: '3.'",)),
-        ("-u <url> --flush-session --encoding=ascii --forms --crawl=2 --threads=2 --banner", ("total of 2 targets", "might be injectable", "Type: UNION query", "banner: '3.")),
+        ("-u <url> --flush-session --technique=BU --encoding=ascii --forms --crawl=2 --threads=2 --banner", ("total of 2 targets", "might be injectable", "Type: UNION query", "banner: '3.")),
         ("-u <base> --flush-session --technique=BU --data=\"{\\\"id\\\": 1}\" --banner", ("might be injectable", "3 columns", "Payload: {\"id\"", "Type: boolean-based blind", "Type: UNION query", "banner: '3.")),
         ("-u <base> --flush-session -H \"Foo: Bar\" -H \"Sna: Fu\" --data=\"<root><param name=\\\"id\\\" value=\\\"1*\\\"/></root>\" --union-char=1 --mobile --answers=\"smartphone=3\" --banner --smart -v 5", ("might be injectable", "Payload: <root><param name=\"id\" value=\"1", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "banner: '3.", "Nexus", "Sna: Fu", "Foo: Bar")),
         ("-u <base> --flush-session --technique=BU --method=PUT --data=\"a=1;id=1;b=2\" --param-del=\";\" --skip-static --har=<tmpfile> --dump -T users --start=1 --stop=2", ("might be injectable", "Parameter: id (PUT)", "Type: boolean-based blind", "Type: UNION query", "2 entries")),
@@ -83,7 +83,7 @@ def vulnTest():
         ("-u <url> --flush-session --null-connection --technique=B --tamper=between,randomcase --banner --count -T users", ("NULL connection is supported with HEAD method", "banner: '3.", "users | 30")),
         ("-u <base> --data=\"aWQ9MQ==\" --flush-session --base64=POST -v 6", ("aWQ9MTtXQUlURk9SIERFTEFZICcwOjA",)),
         ("-u <url> --flush-session --parse-errors --test-filter=\"subquery\" --eval=\"import hashlib; id2=2; id3=hashlib.md5(id.encode()).hexdigest()\" --referer=\"localhost\"", ("might be injectable", ": syntax error", "back-end DBMS: SQLite", "WHERE or HAVING clause (subquery")),
-        ("-u <url> --banner --schema --dump -T users --binary-fields=surname --where \"id>3\"", ("banner: '3.", "INTEGER", "TEXT", "id", "name", "surname", "27 entries", "6E616D6569736E756C6C")),
+        ("-u <url> --technique=BU --banner --schema --dump -T users --binary-fields=surname --where \"id>3\"", ("banner: '3.", "INTEGER", "TEXT", "id", "name", "surname", "27 entries", "6E616D6569736E756C6C")),
         ("-u <url> --technique=U --fresh-queries --force-partial --dump -T users --dump-format=HTML --answers=\"crack=n\" -v 3", ("performed 31 queries", "nameisnull", "~using default dictionary", "dumped to HTML file")),
         ("-u <url> --flush-session --technique=BU --all", ("30 entries", "Type: boolean-based blind", "Type: UNION query", "luther", "blisset", "fluffy", "179ad45c6ce2cb97cf1029e212046e81", "NULL", "nameisnull", "testpass")),
         ("-u <url> --flush-session --technique=B --keyset --dump -T users", ("using keyset (seek) pagination", "30 entries", "luther", "nameisnull")),   # keyset/seek dump via the SQLite rowid cursor
@@ -97,7 +97,7 @@ def vulnTest():
         ("-u \"<url>&query=*\" --flush-session --technique=Q --banner", ("Title: SQLite inline queries", "banner: '3.")),
         ("-d \"<direct>\" --flush-session --dump -T creds --dump-format=SQLITE --binary-fields=password_hash --where \"user_id=5\"", ("3137396164343563366365326362393763663130323965323132303436653831", "dumped to SQLITE database")),
         ("-d \"<direct>\" --flush-session --banner --schema --sql-query=\"UPDATE users SET name='foobar' WHERE id=4; SELECT * FROM users; SELECT 987654321\"", ("banner: '3.", "INTEGER", "TEXT", "id", "name", "surname", "4,foobar,nameisnull", "'987654321'",)),
-        ("-u <base>csrf --data=\"id=1&csrf_token=1\" --banner --answers=\"update=y\" --flush-session", ("back-end DBMS: SQLite", "banner: '3.")),
+        ("-u <base>csrf --data=\"id=1&csrf_token=1\" --banner --answers=\"update=y\" --flush-session --technique=B", ("back-end DBMS: SQLite", "banner: '3.")),
         ("--purge -v 3", ("~ERROR", "~CRITICAL", "deleting the whole directory tree")),
     )
 
@@ -263,9 +263,9 @@ def vulnTest():
 
     clearConsoleLine()
     if retVal:
-        logger.info("vuln test final result: PASSED")
+        logger.info("%s test final result: PASSED" % label)
     else:
-        logger.error("vuln test final result: FAILED")
+        logger.error("%s test final result: FAILED" % label)
 
     for filename in cleanups:
         try:
@@ -279,6 +279,31 @@ def vulnTest():
         pass
 
     return retVal
+
+def fpTest():
+    """
+    On-demand false-positive battery ('--fp-test'): a set of deliberately NON-injectable traps that
+    each bait a specific FP defense (boolean confirmation, dynamic-content removal, structure-aware
+    comparison, canary/sanity gate, reflection, error-regex specificity, length and time heuristics),
+    paired with real injectable twins. An A+ engine rejects every trap AND still detects every twin.
+    Kept out of the default '--vuln-test' (CI budget); run explicitly against 'vulnserver'.
+    """
+
+    FP_TESTS = (
+        # false-positive traps -> sqlmap MUST NOT flag these as injectable
+        ("-u \"<base>fp?trap=intcast&id=1\" -p id --technique=BEU --level=3 --risk=2 --flush-session", ("~identified the following injection point", "do not appear to be injectable")),      # boolean confirmation / checkFalsePositives
+        ("-u \"<base>fp?trap=structrand&id=1\" -p id --technique=BEU --level=3 --risk=2 --flush-session", ("~identified the following injection point", "do not appear to be injectable")),    # structure-aware comparison
+        ("-u \"<base>fp?trap=acceptall&id=1\" -p id --technique=BEU --level=3 --risk=2 --flush-session", ("~identified the following injection point", "do not appear to be injectable")),      # canary / sanity gate (reads-everything-true)
+        ("-u \"<base>fp?trap=reflect&id=1\" -p id --technique=BEU --level=3 --risk=2 --flush-session", ("~identified the following injection point", "do not appear to be injectable")),        # reflection handling
+        ("-u \"<base>fp?trap=errors&id=1\" -p id --technique=BE --level=3 --risk=2 --flush-session", ("~identified the following injection point", "do not appear to be injectable")),          # error-regex specificity
+        ("-u \"<base>fp?trap=lengthrand&id=1\" -p id --technique=BEU --level=3 --risk=2 --flush-session", ("~identified the following injection point", "do not appear to be injectable")),     # length heuristics
+        ("-u \"<base>fp?trap=slowrand&id=1\" -p id --technique=T --flush-session", ("~identified the following injection point", "do not appear to be injectable")),                           # time-based statistical model
+        # true-positive twins -> sqlmap MUST still detect real injection (the discrimination that makes it A+)
+        ("-u <url> -p id --technique=B --flush-session", ("identified the following injection point", "Type: boolean-based blind")),
+        ("-u \"<url>&json=1\" -p id --technique=B --flush-session", ("identified the following injection point",)),
+    )
+
+    return vulnTest(tests=FP_TESTS, label="fp")
 
 def apiTest():
     """
