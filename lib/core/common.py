@@ -3310,7 +3310,16 @@ def isNumPosStrValue(value):
 
     return retVal
 
-@cachedmethod
+# DBMS_DICT is static, so the alias -> enum resolution is precomputed once into a
+# lookup table (replacing a per-call @cachedmethod + linear scan). aliasToDbmsEnum()
+# is a hot path (Backend.getIdentifiedDbms() calls it constantly). Building via
+# setdefault in dict order preserves the original first-match-wins semantics.
+_DBMS_ALIAS_MAP = {}
+for _dbmsKey, _dbmsItem in DBMS_DICT.items():
+    for _dbmsAlias in _dbmsItem[0]:
+        _DBMS_ALIAS_MAP.setdefault(_dbmsAlias, _dbmsKey)
+    _DBMS_ALIAS_MAP.setdefault(_dbmsKey.lower(), _dbmsKey)
+
 def aliasToDbmsEnum(dbms):
     """
     Returns major DBMS name from a given alias
@@ -3319,15 +3328,7 @@ def aliasToDbmsEnum(dbms):
     'Microsoft SQL Server'
     """
 
-    retVal = None
-
-    if dbms:
-        for key, item in DBMS_DICT.items():
-            if dbms.lower() in item[0] or dbms.lower() == key.lower():
-                retVal = key
-                break
-
-    return retVal
+    return _DBMS_ALIAS_MAP.get(dbms.lower()) if dbms else None
 
 def findDynamicContent(firstPage, secondPage, merge=False):
     """
@@ -4414,7 +4415,11 @@ def safeSQLIdentificatorNaming(name, isTable=False):
 
     if isinstance(name, six.string_types):
         retVal = getUnicode(name)
-        _ = isTable and Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE)
+        # Resolve the identified DBMS once; it is invariant within this call and
+        # Backend.getIdentifiedDbms() (which scans DBMS_DICT) was otherwise
+        # re-evaluated several times below.
+        dbms = Backend.getIdentifiedDbms()
+        _ = isTable and dbms in (DBMS.MSSQL, DBMS.SYBASE)
 
         if _:
             retVal = re.sub(r"(?i)\A\[?%s\]?\." % DEFAULT_MSSQL_SCHEMA, "%s." % DEFAULT_MSSQL_SCHEMA, retVal)
@@ -4424,13 +4429,13 @@ def safeSQLIdentificatorNaming(name, isTable=False):
             if not conf.noEscape:
                 retVal = unsafeSQLIdentificatorNaming(retVal)
 
-                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS, DBMS.CUBRID, DBMS.SQLITE, DBMS.SPANNER, DBMS.CLICKHOUSE):  # Note: in SQLite double-quotes are treated as string if column/identifier is non-existent (e.g. SELECT "foobar" FROM users)
+                if dbms in (DBMS.MYSQL, DBMS.ACCESS, DBMS.CUBRID, DBMS.SQLITE, DBMS.SPANNER, DBMS.CLICKHOUSE):  # Note: in SQLite double-quotes are treated as string if column/identifier is non-existent (e.g. SELECT "foobar" FROM users)
                     retVal = "`%s`" % retVal
-                elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2, DBMS.HSQLDB, DBMS.H2, DBMS.INFORMIX, DBMS.MONETDB, DBMS.VERTICA, DBMS.MCKOI, DBMS.PRESTO, DBMS.CRATEDB, DBMS.CACHE, DBMS.EXTREMEDB, DBMS.FRONTBASE, DBMS.RAIMA, DBMS.VIRTUOSO, DBMS.SNOWFLAKE, DBMS.FIREBIRD, DBMS.DERBY, DBMS.MAXDB):
+                elif dbms in (DBMS.PGSQL, DBMS.DB2, DBMS.HSQLDB, DBMS.H2, DBMS.INFORMIX, DBMS.MONETDB, DBMS.VERTICA, DBMS.MCKOI, DBMS.PRESTO, DBMS.CRATEDB, DBMS.CACHE, DBMS.EXTREMEDB, DBMS.FRONTBASE, DBMS.RAIMA, DBMS.VIRTUOSO, DBMS.SNOWFLAKE, DBMS.FIREBIRD, DBMS.DERBY, DBMS.MAXDB):
                     retVal = "\"%s\"" % retVal
-                elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.ALTIBASE, DBMS.MIMERSQL):
+                elif dbms in (DBMS.ORACLE, DBMS.ALTIBASE, DBMS.MIMERSQL):
                     retVal = "\"%s\"" % retVal.upper()
-                elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
+                elif dbms in (DBMS.MSSQL, DBMS.SYBASE):
                     if isTable:
                         parts = retVal.split('.', 1)
                         for i in xrange(len(parts)):
@@ -4463,16 +4468,21 @@ def unsafeSQLIdentificatorNaming(name):
     retVal = name
 
     if isinstance(name, six.string_types):
-        if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ACCESS, DBMS.CUBRID, DBMS.SQLITE, DBMS.SPANNER, DBMS.CLICKHOUSE):
+        # Resolve the identified DBMS once; it is invariant within this call, and
+        # Backend.getIdentifiedDbms() is not cheap (it scans DBMS_DICT). Previously
+        # it was re-evaluated up to five times per call.
+        dbms = Backend.getIdentifiedDbms()
+
+        if dbms in (DBMS.MYSQL, DBMS.ACCESS, DBMS.CUBRID, DBMS.SQLITE, DBMS.SPANNER, DBMS.CLICKHOUSE):
             retVal = name.replace("`", "")
-        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.DB2, DBMS.HSQLDB, DBMS.H2, DBMS.INFORMIX, DBMS.MONETDB, DBMS.VERTICA, DBMS.MCKOI, DBMS.PRESTO, DBMS.CRATEDB, DBMS.CACHE, DBMS.EXTREMEDB, DBMS.FRONTBASE, DBMS.RAIMA, DBMS.VIRTUOSO, DBMS.SNOWFLAKE, DBMS.FIREBIRD, DBMS.DERBY, DBMS.MAXDB):
+        elif dbms in (DBMS.PGSQL, DBMS.DB2, DBMS.HSQLDB, DBMS.H2, DBMS.INFORMIX, DBMS.MONETDB, DBMS.VERTICA, DBMS.MCKOI, DBMS.PRESTO, DBMS.CRATEDB, DBMS.CACHE, DBMS.EXTREMEDB, DBMS.FRONTBASE, DBMS.RAIMA, DBMS.VIRTUOSO, DBMS.SNOWFLAKE, DBMS.FIREBIRD, DBMS.DERBY, DBMS.MAXDB):
             retVal = name.replace("\"", "")
-        elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.ALTIBASE, DBMS.MIMERSQL):
+        elif dbms in (DBMS.ORACLE, DBMS.ALTIBASE, DBMS.MIMERSQL):
             retVal = name.replace("\"", "").upper()
-        elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
+        elif dbms in (DBMS.MSSQL, DBMS.SYBASE):
             retVal = name.replace("[", "").replace("]", "")
 
-        if Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
+        if dbms in (DBMS.MSSQL, DBMS.SYBASE):
             retVal = re.sub(r"(?i)\A\[?%s\]?\." % DEFAULT_MSSQL_SCHEMA, "", retVal)
 
     return retVal
