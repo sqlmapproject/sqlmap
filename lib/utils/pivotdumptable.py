@@ -45,6 +45,7 @@ def pivotDumpTable(table, colList, count=None, blind=True, alias=None):
 
     validColumnList = False
     validPivotValue = False
+    compositePivot = None
 
     if count is None:
         query = dumpNode.count % table
@@ -119,6 +120,26 @@ def pivotDumpTable(table, colList, count=None, blind=True, alias=None):
             raise SqlmapNoneDataException(errMsg)
 
         if not validPivotValue:
+            # No single column holds all-distinct values. Fall back to a COMPOSITE pivot (a
+            # concatenation of every column) whose combined value is unique per row, so rows sharing
+            # a value in every individual column are no longer silently dropped (ref: #1545).
+            _composite = agent.concatQuery(','.join(colList))
+            query = dumpNode.count2 % (_composite, table)
+            query = agent.whereQuery(query)
+            value = inject.getValue(query, blind=blind, union=not blind, error=not blind, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+
+            if isNumPosStrValue(value) and int(value) == count:
+                infoMsg = "using a concatenation of all columns as a "
+                infoMsg += "composite pivot for retrieving row data"
+                logger.info(infoMsg)
+
+                compositePivot = _composite
+                lengths[compositePivot] = 0
+                entries[compositePivot] = BigArray()
+                colList.insert(0, compositePivot)
+                validPivotValue = True
+
+        if not validPivotValue:
             warnMsg = "no proper pivot column provided (with unique values)."
             warnMsg += " It won't be possible to retrieve all rows"
             logger.warning(warnMsg)
@@ -185,5 +206,10 @@ def pivotDumpTable(table, colList, count=None, blind=True, alias=None):
         errMsg += "will display partial output"
 
         logger.critical(errMsg)
+
+    # The composite pivot is a synthetic paging key, not a real column - drop it from the output
+    if compositePivot is not None:
+        entries.pop(compositePivot, None)
+        lengths.pop(compositePivot, None)
 
     return entries, lengths
