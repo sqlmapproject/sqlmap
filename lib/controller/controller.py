@@ -561,9 +561,10 @@ def start():
                 checkNullConnection()
 
             if (len(kb.injections) == 0 or (len(kb.injections) == 1 and kb.injections[0].place is None)) and (kb.injection.place is None or kb.injection.parameter is None):
-                if not any((conf.string, conf.notString, conf.regexp)) and PAYLOAD.TECHNIQUE.BOOLEAN in conf.technique:
-                    # NOTE: this is not needed anymore, leaving only to display
-                    # a warning message to the user in case the page is not stable
+                if not any((conf.string, conf.notString, conf.regexp)) and any(_ in conf.technique for _ in (PAYLOAD.TECHNIQUE.BOOLEAN, PAYLOAD.TECHNIQUE.UNION)):
+                    # NOTE: besides the not-stable warning, this marks dynamic content for removal, which
+                    # UNION column-count detection relies on too (it compares pages) - so it must run when
+                    # UNION is tested even if BOOLEAN is excluded (e.g. '--technique=U' on a dynamic page)
                     checkStability()
 
                 # Do a little prioritization reorder of a testable parameter list

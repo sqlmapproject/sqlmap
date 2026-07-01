@@ -38,6 +38,7 @@ from lib.core.enums import FUZZ_UNION_COLUMN
 from lib.core.enums import PAYLOAD
 from lib.core.settings import FUZZ_UNION_ERROR_REGEX
 from lib.core.settings import FUZZ_UNION_MAX_COLUMNS
+from lib.core.settings import FUZZ_UNION_MAX_REQUESTS
 from lib.core.settings import LIMITED_ROWS_TEST_NUMBER
 from lib.core.settings import MAX_RATIO
 from lib.core.settings import MIN_RATIO
@@ -190,12 +191,14 @@ def _fuzzUnionCols(place, parameter, prefix, suffix):
         choices = getPublicTypeMembers(FUZZ_UNION_COLUMN, True)
         random.shuffle(choices)
 
+        attempts = 0
         for candidate in itertools.product(choices, repeat=kb.orderByColumns):
-            if retVal:
+            if retVal or attempts >= FUZZ_UNION_MAX_REQUESTS:  # bound the exponential type-combination search
                 break
             elif FUZZ_UNION_COLUMN.STRING not in candidate:
                 continue
             else:
+                attempts += 1
                 candidate = [_.replace(FUZZ_UNION_COLUMN.INTEGER, str(randomInt())).replace(FUZZ_UNION_COLUMN.STRING, "'%s'" % randomStr(20)) for _ in candidate]
 
             query = agent.prefixQuery("UNION ALL SELECT %s%s" % (','.join(candidate), FROM_DUMMY_TABLE.get(Backend.getIdentifiedDbms(), "")), prefix=prefix)
@@ -332,16 +335,21 @@ def _unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix)
             if Backend.getIdentifiedDbms() and kb.orderByColumns and kb.orderByColumns < FUZZ_UNION_MAX_COLUMNS:
                 if kb.fuzzUnionTest is None:
                     msg = "do you want to (re)try to find proper "
-                    msg += "UNION column types with fuzzy test? [y/N] "
+                    msg += "UNION column types with a fuzzy test? [Y/n] "
 
-                    kb.fuzzUnionTest = readInput(msg, default='N', boolean=True)
+                    kb.fuzzUnionTest = readInput(msg, default='Y', boolean=True)
                     if kb.fuzzUnionTest:
                         kb.unionTemplate = _fuzzUnionCols(place, parameter, prefix, suffix)
+
+                        # apply the discovered per-column type template through a normal confirmation so
+                        # the resulting vector (and later extraction) is built with type-compatible columns
+                        if kb.unionTemplate:
+                            validPayload, vector = _unionConfirm(comment, place, parameter, prefix, suffix, len(kb.unionTemplate))
 
             warnMsg = "if UNION based SQL injection is not detected, "
             warnMsg += "please consider "
 
-            if not conf.uChar and count > 1 and kb.uChar == NULL and conf.uValues is None:
+            if not all((validPayload, vector)) and not conf.uChar and count > 1 and kb.uChar == NULL and conf.uValues is None:
                 message = "injection not exploitable with NULL values. Do you want to try with a random integer value for option '--union-char'? [Y/n] "
 
                 if not readInput(message, default='Y', boolean=True):
@@ -379,6 +387,8 @@ def unionTest(comment, place, parameter, value, prefix, suffix):
 
     negativeLogic = kb.negativeLogic
     setTechnique(PAYLOAD.TECHNIQUE.UNION)
+
+    kb.unionTemplate = None  # reset any per-column type template carried over from a previous parameter
 
     try:
         if negativeLogic:

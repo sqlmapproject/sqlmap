@@ -958,12 +958,19 @@ class Agent(object):
         if not infoFile:
             query = _collate(query)
 
+        # A fuzzy-discovered per-column type template (kb.unionTemplate, e.g. ['1234', '%s', '5678'])
+        # forces type-compatible fillers on strict DBMSes (e.g. Apache Derby, which rejects bare NULL
+        # and demands UNION column-type parity); '%s' marks the slot carrying the injected expression.
+        template = kb.unionTemplate if isinstance(kb.unionTemplate, (list, tuple)) and len(kb.unionTemplate) == count else None
+
         for element in xrange(0, count):
             if element > 0:
                 unionQuery += ','
 
             if conf.uValues and conf.uValues.count(',') + 1 == count:
                 unionQuery += conf.uValues.split(',')[element]
+            elif template is not None:
+                unionQuery += query if template[element] == "%s" else template[element]
             elif element == position:
                 unionQuery += query
             else:
@@ -985,7 +992,9 @@ class Agent(object):
                 if element > 0:
                     unionQuery += ','
 
-                if element == position:
+                if template is not None:
+                    unionQuery += _collate(multipleUnions) if template[element] == "%s" else template[element]
+                elif element == position:
                     unionQuery += _collate(multipleUnions)
                 else:
                     unionQuery += char

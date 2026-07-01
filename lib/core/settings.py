@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.7.8"
+VERSION = "1.10.7.9"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -140,6 +140,9 @@ FUZZ_UNION_ERROR_REGEX = r"(?i)data\s?type|mismatch|comparable|compatible|conver
 
 # Upper threshold for starting the fuzz(y) UNION test
 FUZZ_UNION_MAX_COLUMNS = 10
+
+# Maximum number of probe requests the fuzz(y) UNION test may issue (bounds its otherwise exponential type-combination search when run automatically)
+FUZZ_UNION_MAX_REQUESTS = 80
 
 # Regular expression used for recognition of generic maximum connection messages
 MAX_CONNECTIONS_REGEX = r"\bmax.{1,100}\bconnection"
