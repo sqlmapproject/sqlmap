@@ -1289,6 +1289,27 @@ def checkDynamicContent(firstPage, secondPage):
             count += 1
 
             if count > conf.retries:
+                # Last resort before the (lossy) '--text-only' fallback: if the page is byte-unstable
+                # but STRUCTURALLY stable - an identical, non-empty tag/class/id skeleton across
+                # requests - base the comparison on that value-free structure instead. Dynamic text
+                # (e.g. per-render result rows) then no longer masks an injection whose signal is
+                # structural (the HTML counterpart of the structure-aware JSON comparison). Content
+                # with no usable structure (empty skeleton, e.g. random/binary bodies) falls through
+                # to '--text-only' as before.
+                skeleton = extractStructuralTokens(firstPage)
+                if skeleton and skeleton == extractStructuralTokens(secondPage):
+                    kb.pageStructurallyStable = True
+
+                    if kb.nullConnection:
+                        debugMsg = "turning off NULL connection support because of structural page comparison"
+                        logger.debug(debugMsg)
+                        kb.nullConnection = None
+
+                    infoMsg = "target URL content is not byte-stable but structurally stable; sqlmap "
+                    infoMsg += "will base the page comparison on the page structure"
+                    logger.info(infoMsg)
+                    return
+
                 warnMsg = "target URL content appears to be too dynamic. "
                 warnMsg += "Switching to '--text-only' "
                 logger.warning(warnMsg)
@@ -1394,26 +1415,7 @@ def checkStability():
                 raise SqlmapNoneDataException(errMsg)
 
         else:
-            # Before engaging the (lossy) dynamic-content removal / '--text-only' escalation, check
-            # whether the page is structurally stable (identical tag/class/id skeleton across the two
-            # requests) despite differing text. If so, base the comparison on that value-free structure
-            # so that dynamic content (e.g. per-render result rows) does not mask an injection. This is
-            # the HTML counterpart of the structure-aware JSON comparison
-            if firstPage and secondPage and extractStructuralTokens(firstPage) == extractStructuralTokens(secondPage):
-                kb.pageStructurallyStable = True
-
-                if kb.nullConnection:
-                    debugMsg = "turning off NULL connection "
-                    debugMsg += "support because of structural page comparison"
-                    logger.debug(debugMsg)
-
-                    kb.nullConnection = None
-
-                infoMsg = "target URL content is not byte-stable but structurally stable; sqlmap "
-                infoMsg += "will base the page comparison on the page structure"
-                logger.info(infoMsg)
-            else:
-                checkDynamicContent(firstPage, secondPage)
+            checkDynamicContent(firstPage, secondPage)
 
     return kb.pageStable
 
