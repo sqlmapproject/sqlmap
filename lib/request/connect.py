@@ -508,7 +508,10 @@ class Connect(object):
 
             for key, value in list(headers.items()):
                 if key.upper() == HTTP_HEADER.ACCEPT_ENCODING.upper():
-                    value = ','.join(_ for _ in re.split(r"\s*,\s*", value) if _.split(';', 1)[0].lower() != "br") or "identity"
+                    # keep only content-codings sqlmap can actually decode (see decodePage): a browser-pasted
+                    # 'Accept-Encoding' (e.g. "gzip, deflate, br, zstd") must not make the server return a body
+                    # we cannot read. Anything else (br, zstd, *, ...) is dropped, falling back to "identity".
+                    value = ','.join(_ for _ in re.split(r"\s*,\s*", value) if _.split(';', 1)[0].strip().lower() in ("gzip", "x-gzip", "deflate", "identity")) or "identity"
 
                 del headers[key]
                 if isinstance(value, six.string_types):

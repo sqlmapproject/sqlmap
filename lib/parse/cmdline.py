@@ -153,7 +153,7 @@ def cmdLineParser(argv=None):
         request.add_argument("-H", "--header", dest="header",
             help="Extra header (e.g. \"X-Forwarded-For: 127.0.0.1\")")
 
-        request.add_argument("--method", dest="method",
+        request.add_argument("-X", "--method", dest="method",
             help="Force usage of given HTTP method (e.g. PUT)")
 
         request.add_argument("--data", dest="data",
@@ -523,7 +523,7 @@ def cmdLineParser(argv=None):
         enumeration.add_argument("-C", dest="col",
             help="DBMS database table column(s) to enumerate")
 
-        enumeration.add_argument("-X", dest="exclude",
+        enumeration.add_argument("--exclude", dest="exclude",
             help="DBMS database identifier(s) to not enumerate")
 
         enumeration.add_argument("-U", dest="user",
