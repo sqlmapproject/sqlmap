@@ -60,6 +60,22 @@ class _KeepAliveHandler(object):
     def _give_back(self, key, conn, count):
         self._pool.conns[key] = [conn, count, time.time()]
 
+    @staticmethod
+    def _takeTunnelHeaders(req):
+        """
+        Pops the Proxy-Authorization header off L{req} (returning it as a dict) so it rides on the
+        CONNECT request only and is never forwarded through the tunnel to the origin server, mirroring
+        the stock C{urllib.request.AbstractHTTPHandler.do_open} tunnel setup
+        """
+
+        result = {}
+        for store in (getattr(req, "unredirected_hdrs", None), getattr(req, "headers", None)):
+            if store:
+                for name in list(store):
+                    if name.lower() == "proxy-authorization":
+                        result[name] = store.pop(name)
+        return result
+
     def do_open(self, req):
         # Note: 'selector'/'host' attributes on Python 3 (Request.get_host() was deprecated since
         # 3.3 and removed in 3.12); the get_*() fallbacks are only reachable under Python 2
@@ -68,7 +84,14 @@ class _KeepAliveHandler(object):
         if not host:
             raise _urllib.error.URLError("no host given")
 
-        key = "%s://%s" % (self._scheme, host)
+        # When routed through an HTTP(s) proxy, ProxyHandler has already rewritten the request: for a
+        # plain-HTTP target 'host' is the proxy and the selector is absolute; for an HTTPS target
+        # '_tunnel_host' holds the origin reached via a CONNECT tunnel. Pool by the tunnel origin when
+        # tunneling (each origin needs its own tunnelled socket) and by 'host' otherwise (one HTTP-proxy
+        # socket serves many origins, and a direct connection is keyed by its own host exactly as before).
+        tunnelHost = getattr(req, "_tunnel_host", None)
+        tunnelHeaders = self._takeTunnelHeaders(req) if tunnelHost else None
+        key = "%s://%s" % (self._scheme, tunnelHost or host)
 
         conn, count = self._take(key)
         reused = conn is not None
@@ -93,6 +116,8 @@ class _KeepAliveHandler(object):
 
             if conn is None:
                 conn = self._get_connection(host)
+                if tunnelHost:
+                    conn.set_tunnel(tunnelHost, headers=tunnelHeaders or {})
                 count = 0
                 self._send_request(conn, req)
                 response = conn.getresponse()

@@ -1249,10 +1249,12 @@ def _setHTTPHandlers():
             handlers.append(_urllib.request.HTTPCookieProcessor(conf.cj))
 
         # Reference: http://www.w3.org/Protocols/rfc2616/rfc2616-sec8.html
-        # Note: persistent (Keep-Alive) connections are used by default; '--no-keep-alive' opts out,
-        # and they are automatically disabled when incompatible (HTTP(s) proxy, authentication methods,
-        # or chunked transfer-encoding of the request body - handled by a dedicated, non-pooling handler)
-        conf.keepAlive = not conf.noKeepAlive and not conf.proxy and not conf.authType and not conf.chunked
+        # Note: persistent (Keep-Alive) connections are used by default (including through an HTTP(s)
+        # proxy - the keep-alive handler pools the proxy socket for plain HTTP and the CONNECT-tunnelled
+        # socket per origin for HTTPS); '--no-keep-alive' opts out, and they are automatically disabled
+        # when incompatible (authentication methods, or chunked transfer-encoding of the request body -
+        # handled by a dedicated, non-pooling handler)
+        conf.keepAlive = not conf.noKeepAlive and not conf.authType and not conf.chunked
 
         if conf.keepAlive:
             # persistent connections for both HTTP and HTTPS; the keep-alive HTTPS
@@ -1261,8 +1263,8 @@ def _setHTTPHandlers():
                 handlers.remove(httpsHandler)
             handlers.append(keepAliveHandler)
             handlers.append(keepAliveHandlerHTTPS)
-        elif not conf.noKeepAlive and (conf.proxy or conf.authType or conf.chunked):
-            reason = "an HTTP(s) proxy" if conf.proxy else ("authentication methods" if conf.authType else "chunked transfer-encoding")
+        elif not conf.noKeepAlive and (conf.authType or conf.chunked):
+            reason = "authentication methods" if conf.authType else "chunked transfer-encoding"
             debugMsg = "persistent (Keep-Alive) connections were disabled (incompatible with %s)" % reason
             logger.debug(debugMsg)
 
