@@ -2624,6 +2624,17 @@ def initCommonOutputs():
                     if line not in kb.commonOutputs[key]:
                         kb.commonOutputs[key].add(line)
 
+    # The curated '--common-tables'/'--common-columns' brute-force wordlists are far larger and much
+    # more app-focused than the built-in [Tables]/[Columns] prediction sections (which are mostly
+    # system objects), so fold them into the good-samaritan prediction to raise its real-world hit rate.
+    # The mechanism only reorders the charset, so extra coverage never penalizes a miss.
+    for _key, _path in (("Tables", paths.COMMON_TABLES), ("Columns", paths.COMMON_COLUMNS)):
+        try:
+            for _ in getFileItems(_path):
+                kb.commonOutputs.setdefault(_key, set()).add(_)
+        except SqlmapSystemException:
+            pass
+
 def getFileItems(filename, commentPrefix='#', unicoded=True, lowercase=False, unique=False):
     """
     Returns newline delimited items contained inside file
