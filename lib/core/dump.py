@@ -627,11 +627,25 @@ class Dump(object):
         elif conf.dumpFormat == DUMP_FORMAT.SQLITE:
             rtable.beginTransaction()
 
+        # Precompute the per-column layout once. These values are invariant across
+        # every row, so resolving them per cell (dict lookup, int() conversion and
+        # identifier normalization) wasted count x ncols work on large dumps.
+        dumpColumns = []
+        for column in columns:
+            if column != "__infos__":
+                info = tableValues[column]
+                dumpColumns.append((unsafeSQLIdentificatorNaming(column), info["values"], int(info["length"])))
+
         for i in xrange(count):
             console = (i >= count - TRIM_STDOUT_DUMP_SIZE)
             field = 1
-            values = []
-            record = OrderedDict()
+
+            # Only the SQLITE and JSONL paths accumulate a per-row container; the
+            # others left these unused, wasting an allocation on every single row
+            if conf.dumpFormat == DUMP_FORMAT.SQLITE:
+                values = []
+            elif conf.dumpFormat == DUMP_FORMAT.JSONL:
+                record = OrderedDict()
 
             if i == 0 and count > TRIM_STDOUT_DUMP_SIZE:
                 self._write(" ...")
@@ -639,62 +653,58 @@ class Dump(object):
             if conf.dumpFormat == DUMP_FORMAT.HTML:
                 dataToDumpFile(dumpFP, "<tr>")
 
-            for column in columns:
-                if column != "__infos__":
-                    info = tableValues[column]
+            for safeColumn, colValues, maxlength in dumpColumns:
+                if len(colValues) <= i or colValues[i] is None:
+                    value = u''
+                else:
+                    value = getUnicode(colValues[i])
+                    value = DUMP_REPLACEMENTS.get(value, value)
 
-                    if len(info["values"]) <= i or info["values"][i] is None:
-                        value = u''
+                if conf.dumpFormat == DUMP_FORMAT.SQLITE:
+                    # Note: store a real NULL for the NULL sentinel (and the raw value otherwise),
+                    # mirroring the JSONL path below; appending the display-replaced 'NULL'/'<blank>'
+                    # text would corrupt the INTEGER/REAL-typed columns inferred above
+                    if len(colValues) <= i or colValues[i] is None or colValues[i] == " ":  # NULL
+                        values.append(None)
                     else:
-                        value = getUnicode(info["values"][i])
-                        value = DUMP_REPLACEMENTS.get(value, value)
+                        values.append(getUnicode(colValues[i]))
 
-                    if conf.dumpFormat == DUMP_FORMAT.SQLITE:
-                        # Note: store a real NULL for the NULL sentinel (and the raw value otherwise),
-                        # mirroring the JSONL path below; appending the display-replaced 'NULL'/'<blank>'
-                        # text would corrupt the INTEGER/REAL-typed columns inferred above
-                        if len(info["values"]) <= i or info["values"][i] is None or info["values"][i] == " ":  # NULL
-                            values.append(None)
-                        else:
-                            values.append(getUnicode(info["values"][i]))
+                blank = " " * (maxlength - getConsoleLength(value))
+                self._write("| %s%s" % (value, blank), newline=False, console=console)
 
-                    maxlength = int(info["length"])
-                    blank = " " * (maxlength - getConsoleLength(value))
-                    self._write("| %s%s" % (value, blank), newline=False, console=console)
+                if len(value) > MIN_BINARY_DISK_DUMP_SIZE and r'\x' in value:
+                    try:
+                        mimetype = getText(magic.from_buffer(getBytes(value), mime=True))
+                        if any(mimetype.startswith(_) for _ in ("application", "image")):
+                            if not os.path.isdir(dumpDbPath):
+                                os.makedirs(dumpDbPath)
 
-                    if len(value) > MIN_BINARY_DISK_DUMP_SIZE and r'\x' in value:
-                        try:
-                            mimetype = getText(magic.from_buffer(getBytes(value), mime=True))
-                            if any(mimetype.startswith(_) for _ in ("application", "image")):
-                                if not os.path.isdir(dumpDbPath):
-                                    os.makedirs(dumpDbPath)
+                            _ = re.sub(r"[^\w]", UNSAFE_DUMP_FILEPATH_REPLACEMENT, normalizeUnicode(safeColumn))
+                            filepath = os.path.join(dumpDbPath, "%s-%d.bin" % (_, randomInt(8)))
+                            warnMsg = "writing binary ('%s') content to file '%s' " % (mimetype, filepath)
+                            logger.warning(warnMsg)
 
-                                _ = re.sub(r"[^\w]", UNSAFE_DUMP_FILEPATH_REPLACEMENT, normalizeUnicode(unsafeSQLIdentificatorNaming(column)))
-                                filepath = os.path.join(dumpDbPath, "%s-%d.bin" % (_, randomInt(8)))
-                                warnMsg = "writing binary ('%s') content to file '%s' " % (mimetype, filepath)
-                                logger.warning(warnMsg)
+                            with openFile(filepath, "w+b", None) as f:
+                                _ = safechardecode(value, True)
+                                f.write(_)
 
-                                with openFile(filepath, "w+b", None) as f:
-                                    _ = safechardecode(value, True)
-                                    f.write(_)
+                    except Exception as ex:
+                        logger.debug(getSafeExString(ex))
 
-                        except Exception as ex:
-                            logger.debug(getSafeExString(ex))
+                if conf.dumpFormat == DUMP_FORMAT.CSV:
+                    if field == fields:
+                        dataToDumpFile(dumpFP, "%s" % safeCSValue(value))
+                    else:
+                        dataToDumpFile(dumpFP, "%s%s" % (safeCSValue(value), conf.csvDel))
+                elif conf.dumpFormat == DUMP_FORMAT.HTML:
+                    dataToDumpFile(dumpFP, "<td>%s</td>" % getUnicode(htmlEscape(value).encode("ascii", "xmlcharrefreplace")))
+                elif conf.dumpFormat == DUMP_FORMAT.JSONL:
+                    if len(colValues) <= i or colValues[i] is None or colValues[i] == " ":  # NULL
+                        record[safeColumn] = None
+                    else:
+                        record[safeColumn] = getUnicode(colValues[i])
 
-                    if conf.dumpFormat == DUMP_FORMAT.CSV:
-                        if field == fields:
-                            dataToDumpFile(dumpFP, "%s" % safeCSValue(value))
-                        else:
-                            dataToDumpFile(dumpFP, "%s%s" % (safeCSValue(value), conf.csvDel))
-                    elif conf.dumpFormat == DUMP_FORMAT.HTML:
-                        dataToDumpFile(dumpFP, "<td>%s</td>" % getUnicode(htmlEscape(value).encode("ascii", "xmlcharrefreplace")))
-                    elif conf.dumpFormat == DUMP_FORMAT.JSONL:
-                        if len(info["values"]) <= i or info["values"][i] is None or info["values"][i] == " ":  # NULL
-                            record[unsafeSQLIdentificatorNaming(column)] = None
-                        else:
-                            record[unsafeSQLIdentificatorNaming(column)] = getUnicode(info["values"][i])
-
-                    field += 1
+                field += 1
 
             if conf.dumpFormat == DUMP_FORMAT.SQLITE:
                 try:

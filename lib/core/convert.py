@@ -464,6 +464,9 @@ def stdoutEncode(value):
 
     return retVal
 
+# str.isascii() is available on Python 3.7+ only (sqlmap still supports 2.7)
+_HAS_ISASCII = hasattr(str, "isascii")
+
 def getConsoleLength(value):
     """
     Returns console width of unicode values
@@ -475,7 +478,15 @@ def getConsoleLength(value):
     """
 
     if isinstance(value, six.text_type):
-        retVal = len(value) + sum(ord(_) >= 0x3000 for _ in value)
+        # Fast path: ASCII values have no wide (>= U+3000) characters, so their
+        # console width is simply their length. str.isascii() (Python 3.7+) is a
+        # C-level scan, far cheaper than the per-character generator below (which
+        # stays for the rare wide-character case and for Python 2). This runs
+        # once per dumped cell, so it dominates large table dumps.
+        if _HAS_ISASCII and value.isascii():
+            retVal = len(value)
+        else:
+            retVal = len(value) + sum(ord(_) >= 0x3000 for _ in value)
     else:
         retVal = len(value)
 
