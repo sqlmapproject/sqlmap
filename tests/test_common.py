@@ -1320,10 +1320,9 @@ class TestCommonChunkSplit(unittest.TestCase):
             random.choice, random.randint, random.sample, random.seed = _saved
 
     def test_chunk_split_terminator(self):
-        import random
         from lib.core.common import chunkSplitPostData
-        random.seed(123)
         # regardless of content, the chunked stream must end with the zero-length terminator
+        # (assertion is seed-independent, so don't touch the global RNG)
         self.assertTrue(chunkSplitPostData("abc").endswith("0\r\n\r\n"))
 
 

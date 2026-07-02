@@ -25,6 +25,7 @@ logic fails the test. No live target / network / DBMS involved.
 
 import os
 import sys
+import tempfile
 import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -108,7 +109,7 @@ class TestGenericFilesystem(_FsBase):
     def test_fileEncode_reads_then_encodes(self):
         # fileEncode must read the file bytes and delegate to fileContentEncode
         path = os.path.join(
-            os.environ.get("TMPDIR", "/tmp"), "sqlmap_fe_%d.bin" % os.getpid())
+            tempfile.gettempdir(), "sqlmap_fe_%d.bin" % os.getpid())
         with open(path, "wb") as f:
             f.write(b"hello")
         try:
@@ -138,7 +139,7 @@ class TestGenericFilesystem(_FsBase):
         # MySQL builds LENGTH(LOAD_FILE('<remote>')) and compares to local size.
         set_dbms("MySQL")
         path = os.path.join(
-            os.environ.get("TMPDIR", "/tmp"), "sqlmap_cl_%d.bin" % os.getpid())
+            tempfile.gettempdir(), "sqlmap_cl_%d.bin" % os.getpid())
         with open(path, "wb") as f:
             f.write(b"12345")  # 5 bytes
         captured = {}
@@ -159,7 +160,7 @@ class TestGenericFilesystem(_FsBase):
     def test_checkFileLength_size_differs(self):
         set_dbms("MySQL")
         path = os.path.join(
-            os.environ.get("TMPDIR", "/tmp"), "sqlmap_cl2_%d.bin" % os.getpid())
+            tempfile.gettempdir(), "sqlmap_cl2_%d.bin" % os.getpid())
         with open(path, "wb") as f:
             f.write(b"12345")  # local 5
         self.patch(self.module.inject, "getValue", lambda q, *a, **k: "9")
@@ -176,7 +177,7 @@ class TestGenericFilesystem(_FsBase):
         # OPENROWSET-building branch runs in isolation.
         set_dbms("Microsoft SQL Server")
         path = os.path.join(
-            os.environ.get("TMPDIR", "/tmp"), "sqlmap_cl3_%d.bin" % os.getpid())
+            tempfile.gettempdir(), "sqlmap_cl3_%d.bin" % os.getpid())
         with open(path, "wb") as f:
             f.write(b"ABCD")  # 4 bytes
         stacked = []
@@ -205,7 +206,7 @@ class TestGenericFilesystem(_FsBase):
         # non-positive remote size -> treated as "not written" -> sameFile False
         set_dbms("MySQL")
         path = os.path.join(
-            os.environ.get("TMPDIR", "/tmp"), "sqlmap_cl4_%d.bin" % os.getpid())
+            tempfile.gettempdir(), "sqlmap_cl4_%d.bin" % os.getpid())
         with open(path, "wb") as f:
             f.write(b"x")
         self.patch(self.module.inject, "getValue", lambda q, *a, **k: None)
@@ -282,7 +283,7 @@ class TestGenericFilesystem(_FsBase):
         # stackedWriteFile and return its result.
         set_dbms("MySQL")
         path = os.path.join(
-            os.environ.get("TMPDIR", "/tmp"), "sqlmap_wf_%d.bin" % os.getpid())
+            tempfile.gettempdir(), "sqlmap_wf_%d.bin" % os.getpid())
         with open(path, "wb") as f:
             f.write(b"data")
         calls = {}

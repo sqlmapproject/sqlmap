@@ -83,7 +83,10 @@ class TestPurge(unittest.TestCase):
         nonempty = [p for p in survivors if os.path.getsize(p) > 0]
         self.assertEqual(nonempty, [], msg="files were not truncated to zero: %r" % nonempty)
 
-        blob = b"".join(open(p, "rb").read() for p in survivors)
+        blob = b""
+        for p in survivors:
+            with open(p, "rb") as fh:
+                blob += fh.read()
         for secret in plaintexts.values():
             self.assertNotIn(secret.encode("utf-8"), blob,
                              msg="original plaintext %r survived the purge" % secret)

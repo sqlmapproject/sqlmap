@@ -28,12 +28,24 @@ from lib.core.bigarray import BigArray
 N = 5000
 
 
+_SPILLED = []
+
 def _make_spilled():
     # tiny chunk_size guarantees many on-disk chunks for N items
     ba = BigArray(chunk_size=1024)
     for i in range(N):
         ba.append("item-%d" % i)
+    _SPILLED.append(ba)   # tracked so tearDownModule closes it (release the on-disk chunk files)
     return ba
+
+
+def tearDownModule():
+    for ba in _SPILLED:
+        try:
+            ba.close()
+        except Exception:
+            pass
+    del _SPILLED[:]
 
 
 class TestSpill(unittest.TestCase):

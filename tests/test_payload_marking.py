@@ -28,6 +28,24 @@ from lib.core.settings import (JSON_RECOGNITION_REGEX, JSON_LIKE_RECOGNITION_REG
 # change there is reflected here too.
 MARK = CUSTOM_INJECTION_MARK_CHAR
 
+# the _drive_* helpers set sticky conf/kb flags (notably conf.hpp, which changes queryPage
+# behaviour) without restoring them; snapshot/restore at the module boundary so they can't leak
+_PM_CONF_KEYS = ("hpp", "skipUrlEncode", "method", "paramDel", "url", "data", "parameters", "paramDict")
+_PM_KB_KEYS = ("tamperFunctions", "postHint", "customInjectionMark", "postUrlEncode", "postSpaceToPlus", "processUserMarks")
+_pm_saved = {}
+
+def setUpModule():
+    from lib.core.data import conf, kb
+    for k in _PM_CONF_KEYS:
+        _pm_saved[("conf", k)] = conf.get(k)
+    for k in _PM_KB_KEYS:
+        _pm_saved[("kb", k)] = kb.get(k)
+
+def tearDownModule():
+    from lib.core.data import conf, kb
+    for (scope, k), v in _pm_saved.items():
+        (conf if scope == "conf" else kb)[k] = v
+
 
 def classify(d):
     if re.search(JSON_RECOGNITION_REGEX, d):

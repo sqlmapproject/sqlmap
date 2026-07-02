@@ -53,9 +53,10 @@ _CONF_KEYS = (
     "notString", "regexp", "regex", "dummy", "offline", "skipWaf", "data",
     "hashDB", "cj", "cookie", "dropSetCookie", "httpHeaders", "proxy", "tor",
     "tamper", "timeout", "retries", "textOnly", "ignoreCode", "disablePrecon",
-    "ipv6", "multipleTargets", "level", "base64Parameter", "batch",
+    "ipv6", "multipleTargets", "level", "base64Parameter", "batch", "code", "titles",
 )
 _KB_KEYS = (
+    "pageTemplate", "negativeLogic",
     "heavilyDynamic", "dynamicParameter", "originalPage", "originalPageTime",
     "originalCode", "ignoreCasted", "heuristicMode", "disableHtmlDecoding",
     "heuristicTest", "heuristicPage", "heuristicCode", "pageStable",

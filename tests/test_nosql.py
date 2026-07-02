@@ -18,6 +18,21 @@ bootstrap()
 
 import lib.techniques.nosql.inject as ni
 
+# several setUps here write these conf keys without restoring them; snapshot/restore at the module
+# boundary so they can't leak into later test modules (order-dependent flakiness)
+_NOSQL_CONF_KEYS = ("parameters", "paramDict", "timeSec", "cookieDel")
+_saved_conf = {}
+
+def setUpModule():
+    from lib.core.data import conf
+    for k in _NOSQL_CONF_KEYS:
+        _saved_conf[k] = conf.get(k)
+
+def tearDownModule():
+    from lib.core.data import conf
+    for k, v in _saved_conf.items():
+        conf[k] = v
+
 SECRET = "S3cr3t_9"
 MATCH = "<html><body>Welcome user; rows: alpha, bravo, charlie</body></html>"
 NOMATCH = "<html><body>Invalid credentials; no rows</body></html>"

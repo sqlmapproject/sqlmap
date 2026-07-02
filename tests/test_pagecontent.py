@@ -60,6 +60,7 @@ class TestExtractTextTagContent(unittest.TestCase):
 
 class TestParseSqliteTableSchema(unittest.TestCase):
     def setUp(self):
+        self.addCleanup(setattr, kb.data, "cachedColumns", kb.data.get("cachedColumns"))
         kb.data.cachedColumns = {}
 
     def _cols(self):

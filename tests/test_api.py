@@ -86,6 +86,7 @@ class _ApiServerCase(unittest.TestCase):
     """
 
     def setUp(self):
+        self._saved_batch = conf.batch
         conf.batch = True
 
         # snapshot mutated globals
@@ -122,6 +123,7 @@ class _ApiServerCase(unittest.TestCase):
         api.DataStore.username = self._saved["username"]
         api.DataStore.password = self._saved["password"]
         api.Database.filepath = self._saved["filepath"]
+        conf.batch = self._saved_batch
 
     def _new_task(self):
         code, parsed, _ = _wsgi_call("GET", "/task/new")

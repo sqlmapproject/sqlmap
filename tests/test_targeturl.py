@@ -26,6 +26,20 @@ bootstrap()
 from lib.core.common import parseTargetUrl
 from lib.core.data import conf
 
+_TARGETURL_KEYS = ("url", "hostname", "port", "scheme", "path")
+_saved = {}
+
+
+def setUpModule():
+    for k in _TARGETURL_KEYS:
+        _saved[k] = conf.get(k)
+
+
+def tearDownModule():
+    # parseTargetUrl() writes these onto the global conf singleton; restore so it can't leak to later modules
+    for k, v in _saved.items():
+        conf[k] = v
+
 
 def _parse(url):
     conf.url = url

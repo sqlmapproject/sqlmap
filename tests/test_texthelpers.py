@@ -46,6 +46,7 @@ class TestFilterStringValue(unittest.TestCase):
 
 class TestParseFilePaths(unittest.TestCase):
     def setUp(self):
+        self.addCleanup(setattr, kb, "absFilePaths", kb.get("absFilePaths"))
         kb.absFilePaths = set()
 
     def test_unix_paths_from_php_error(self):

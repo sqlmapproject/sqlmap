@@ -2099,7 +2099,9 @@ def getFileType(filePath):
         desc = getText(desc)
 
     if desc == getText(magic.MAGIC_UNKNOWN_FILETYPE):
-        content = openFile(filePath, "rb", encoding=None).read()
+        _ = openFile(filePath, "rb", encoding=None)
+        content = _.read()
+        _.close()
 
         try:
             content.decode()

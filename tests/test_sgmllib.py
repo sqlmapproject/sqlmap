@@ -191,6 +191,7 @@ class TestEntityConversion(unittest.TestCase):
 class TestCustomEntitydefs(unittest.TestCase):
     def test_custom_entity(self):
         p = RecordingParser()
+        p.entitydefs = dict(p.entitydefs)   # shadow the shared SGMLParser class dict so 'copy' doesn't leak process-wide
         p.entitydefs["copy"] = "\xa9"
         p.feed("&copy;")
         p.close()

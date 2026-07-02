@@ -393,8 +393,7 @@ class TestExecuteCommand(unittest.TestCase):
 
     def tearDown(self):
         ssti._send = self.original_send
-        if self.original_dumper is not None:
-            ssti.conf.dumper = self.original_dumper
+        ssti.conf.dumper = self.original_dumper   # restore unconditionally (was None -> don't leak the mock dumper)
 
     def test_error_page_skipped(self):
         """RCE payload that triggers a template error is skipped; next payload tried."""

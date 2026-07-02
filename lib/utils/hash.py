@@ -1225,6 +1225,7 @@ def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc
         pass
 
     finally:
+        wordlist.closeFP()   # release the wordlist file handle (else it leaks; Windows can't rmtree an open file)
         if hasattr(proc_count, "value"):
             with proc_count.get_lock():
                 proc_count.value -= 1
@@ -1304,6 +1305,7 @@ def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found
         pass
 
     finally:
+        wordlist.closeFP()   # release the wordlist file handle (else it leaks; Windows can't rmtree an open file)
         if hasattr(proc_count, "value"):
             with proc_count.get_lock():
                 proc_count.value -= 1

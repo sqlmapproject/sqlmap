@@ -75,6 +75,8 @@ def configFileParser(configFile):
     except Exception as ex:
         errMsg = "you have provided an invalid and/or unreadable configuration file ('%s')" % getSafeExString(ex)
         raise SqlmapSyntaxException(errMsg)
+    finally:
+        configFP.close()
 
     if not config.has_section("Target"):
         errMsg = "missing a mandatory section 'Target' in the configuration file"

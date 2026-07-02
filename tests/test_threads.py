@@ -38,6 +38,7 @@ class TestThreadData(unittest.TestCase):
         # ATTRIBUTE STATE is per-thread. Verify both: same object, independent state.
         main = T.getCurrentThreadData()
         self.assertIs(main, T.getCurrentThreadData())      # stable within a thread
+        self.addCleanup(main.reset)                        # don't leak the main thread's mutated state to later tests
 
         main.retriesCount = 111
 
