@@ -144,6 +144,9 @@ def cmdLineParser(argv=None):
         target.add_argument("-c", dest="configFile",
             help="Load options from a configuration INI file")
 
+        target.add_argument("--openapi", dest="openApiFile",
+            help="Derive targets from an OpenAPI/Swagger specification (file or URL)")
+
         # Request options
         request = parser.add_argument_group("Request", "These options can be used to specify how to connect to the target URL")
 
@@ -1172,7 +1175,7 @@ def cmdLineParser(argv=None):
         else:
             args.stdinPipe = None
 
-        if not any((args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, args.requestFile, args.updateAll, args.smokeTest, args.vulnTest, args.fpTest, args.apiTest, args.wizard, args.dependencies, args.purge, args.listTampers, args.hashFile, args.stdinPipe)):
+        if not any((args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, args.requestFile, args.openApiFile, args.updateAll, args.smokeTest, args.vulnTest, args.fpTest, args.apiTest, args.wizard, args.dependencies, args.purge, args.listTampers, args.hashFile, args.stdinPipe)):
             errMsg = "missing a mandatory option (-d, -u, -l, -m, -r, -g, -c, --wizard, --shell, --update, --purge, --list-tampers or --dependencies). "
             errMsg += "Use -h for basic and -hh for advanced help\n"
             parser.error(errMsg)

@@ -492,6 +492,65 @@ def _setBulkMultipleTargets():
         warnMsg = "no usable links found (with GET parameters)"
         logger.warning(warnMsg)
 
+def _setOpenApiTargets():
+    if not conf.openApiFile:
+        return
+
+    from lib.parse.openapi import openApiTargets
+
+    if conf.method:
+        warnMsg = "option '--method' will override the HTTP method(s) derived from the OpenAPI/Swagger specification"
+        logger.warning(warnMsg)
+
+    origin = None
+    if re.match(r"(?i)\Ahttps?://", conf.openApiFile):
+        infoMsg = "fetching OpenAPI/Swagger specification from '%s'" % conf.openApiFile
+        logger.info(infoMsg)
+        from lib.request.connect import Connect as Request
+        content = Request.getPage(url=conf.openApiFile, raise404=True)[0]
+        match = re.match(r"(?i)(https?://[^/]+)", conf.openApiFile)
+        origin = match.group(1) if match else None
+    else:
+        conf.openApiFile = safeExpandUser(conf.openApiFile)
+        checkFile(conf.openApiFile)
+        infoMsg = "parsing OpenAPI/Swagger specification from '%s'" % conf.openApiFile
+        logger.info(infoMsg)
+        content = openFile(conf.openApiFile).read()
+
+    try:
+        targets = openApiTargets(content, origin)
+    except ValueError as ex:
+        errMsg = "unable to parse the OpenAPI/Swagger specification ('%s')" % getSafeExString(ex)
+        raise SqlmapSyntaxException(errMsg)
+
+    if re.search(r"(?i)securitySchemes|securityDefinitions", content) and not any((conf.authType, conf.authCred, conf.authFile)) and not any((_[0] or "").lower() == HTTP_HEADER.AUTHORIZATION.lower() for _ in (conf.httpHeaders or [])):
+        warnMsg = "the OpenAPI/Swagger specification declares authentication (security schemes) but no credentials were provided. "
+        warnMsg += "If the API requires authentication, requests are likely to be rejected. Provide credentials with "
+        warnMsg += "'--auth-type'/'--auth-cred' or a header (e.g. --headers=\"Authorization: Bearer ...\")"
+        logger.warning(warnMsg)
+
+    before = len(kb.targets)                               # openapi carries per-target bodies -> no conf.data fallback
+    mutating = 0
+    for url, method, data, headers in targets:
+        if conf.scope and not re.search(conf.scope, url, re.I):
+            continue
+        if method not in ("GET", "HEAD", "OPTIONS"):
+            mutating += 1
+        kb.targets.add((url, method, data, conf.cookie, tuple(headers) if headers else None))
+
+    added = len(kb.targets) - before
+    if added:
+        conf.multipleTargets = True
+        infoMsg = "derived %d target(s) from the OpenAPI/Swagger specification" % added
+        logger.info(infoMsg)
+        if mutating:
+            warnMsg = "%d of the derived target(s) use state-changing HTTP methods (e.g. POST/PUT/PATCH/DELETE). " % mutating
+            warnMsg += "Scanning them may create, modify or delete server-side data"
+            logger.warning(warnMsg)
+    else:
+        warnMsg = "no usable targets derived from the OpenAPI/Swagger specification"
+        logger.warning(warnMsg)
+
 def _findPageForms():
     if not conf.forms or conf.crawlDepth:
         return
@@ -1852,7 +1911,7 @@ def _cleanupOptions():
     if conf.tmpPath:
         conf.tmpPath = ntToPosixSlashes(normalizePath(conf.tmpPath))
 
-    if any((conf.googleDork, conf.logFile, conf.bulkFile, conf.forms, conf.crawlDepth, conf.stdinPipe)):
+    if any((conf.googleDork, conf.logFile, conf.bulkFile, conf.forms, conf.crawlDepth, conf.stdinPipe, conf.openApiFile)):
         conf.multipleTargets = True
 
     if conf.optimize:
@@ -2728,8 +2787,8 @@ def _basicOptionValidation():
         errMsg += "'SQLMAP_UNSAFE_EVAL=1' to be explicitly set"
         raise SqlmapSystemException(errMsg)
 
-    if conf.chunked and not any((conf.data, conf.requestFile, conf.forms)):
-        errMsg = "switch '--chunked' requires usage of (POST) options/switches '--data', '-r' or '--forms'"
+    if conf.chunked and not any((conf.data, conf.requestFile, conf.forms, conf.openApiFile)):
+        errMsg = "switch '--chunked' requires usage of (POST) options/switches '--data', '-r', '--forms' or '--openapi'"
         raise SqlmapSyntaxException(errMsg)
 
     if conf.api and not conf.configFile:
@@ -3022,7 +3081,7 @@ def init():
 
     parseTargetDirect()
 
-    if any((conf.url, conf.logFile, conf.bulkFile, conf.requestFile, conf.googleDork, conf.stdinPipe)):
+    if any((conf.url, conf.logFile, conf.bulkFile, conf.requestFile, conf.googleDork, conf.stdinPipe, conf.openApiFile)):
         _setHostname()
         _setHTTPTimeout()
         _setHTTPExtraHeaders()
@@ -3038,6 +3097,7 @@ def init():
         _doSearch()
         _setStdinPipeTargets()
         _setBulkMultipleTargets()
+        _setOpenApiTargets()
         _checkTor()
         _setCrawler()
         _findPageForms()
