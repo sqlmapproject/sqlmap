@@ -107,5 +107,27 @@ class TestLibraryFacade(unittest.TestCase):
         self.assertRaises(sqlmap.SqlmapError, sqlmap.scan, "http://target/?id=1")
 
 
+class TestReportErrorCapture(unittest.TestCase):
+    """
+    The library tells failure modes apart (unreachable vs nothing-found) because a CLI --report-json
+    run now records error/critical log messages into the report 'error' array, like the REST API.
+    """
+
+    def test_errors_reach_the_report(self):
+        from lib.core.data import logger
+        from lib.utils.api import setupReportCollector, _assembleData, ReportErrorRecorder, REPORT_TASKID
+
+        collector = setupReportCollector()
+        try:
+            logger.error("boom %s", "here")
+            result = _assembleData(collector, REPORT_TASKID)
+            self.assertTrue(any("boom here" in _ for _ in result["error"]))
+        finally:
+            for handler in list(logger.handlers):
+                if isinstance(handler, ReportErrorRecorder):
+                    logger.removeHandler(handler)
+            collector.disconnect()
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

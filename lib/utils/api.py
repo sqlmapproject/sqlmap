@@ -253,6 +253,12 @@ def setupReportCollector():
     collector = Database(":memory:")
     collector.connect("report")
     collector.init()
+
+    # record error/critical log messages into the collector so that a CLI --report-json report carries
+    # the same 'error' content the REST API exposes via /scan/<id>/data - letting consumers tell a
+    # failed/unreachable run apart from a clean "nothing found" one (both otherwise have empty 'data')
+    logger.addHandler(ReportErrorRecorder(collector))
+
     return collector
 
 def writeReportJson(collector, filepath):
@@ -448,6 +454,22 @@ class LogRecorder(logging.StreamHandler):
         communication with the parent process
         """
         conf.databaseCursor.execute("INSERT INTO logs VALUES(NULL, ?, ?, ?, ?)", (conf.taskid, time.strftime("%X"), record.levelname, str(record.msg % record.args if record.args else record.msg)))
+
+class ReportErrorRecorder(logging.Handler):
+    def __init__(self, collector):
+        """
+        Records error/critical log messages into a report collector's 'errors' table (the counterpart
+        of StdDbOut's stderr branch for CLI --report-json runs)
+        """
+        logging.Handler.__init__(self)
+        self.setLevel(logging.ERROR)
+        self.collector = collector
+
+    def emit(self, record):
+        try:
+            self.collector.execute("INSERT INTO errors VALUES(NULL, ?, ?)", (REPORT_TASKID, str(record.msg % record.args if record.args else record.msg)))
+        except Exception:
+            pass
 
 def setRestAPILog():
     if conf.api:
