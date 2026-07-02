@@ -870,6 +870,15 @@ def _setTamperingFunctions():
             warnMsg += "a good idea"
             logger.warning(warnMsg)
 
+        # tamper scripts rewrite SQL injection payloads; the self-contained non-SQL engines
+        # (--graphql/--nosql/--ldap/--xpath/--ssti) do not run payloads through the tampering hook, so
+        # warn instead of silently ignoring the user's '--tamper'
+        if kb.tamperFunctions and any((conf.graphql, conf.nosql, conf.ldap, conf.xpath, conf.ssti)):
+            engine = next(_ for _ in ("graphql", "nosql", "ldap", "xpath", "ssti") if conf.get(_))
+            warnMsg = "tamper scripts are applied to SQL injection payloads only and "
+            warnMsg += "will be ignored by the '--%s' engine" % engine
+            logger.warning(warnMsg)
+
         if resolve_priorities and priorities:
             priorities.sort(key=functools.cmp_to_key(lambda a, b: cmp(a[0], b[0])), reverse=True)
             kb.tamperFunctions = []

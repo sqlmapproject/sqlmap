@@ -19,19 +19,27 @@ except:
     from thirdparty.pydes.pyDes import CBC
     from thirdparty.pydes.pyDes import des
 
+try:
+    from hashlib import scrypt as _scrypt  # not available on Python 2 (added in 3.6)
+except ImportError:
+    _scrypt = None
+
 _multiprocessing = None
 
 import base64
 import binascii
 import gc
+import hmac
 import math
 import os
 import re
+import struct
 import tempfile
 import time
 import zipfile
 
 from hashlib import md5
+from hashlib import pbkdf2_hmac
 from hashlib import sha1
 from hashlib import sha224
 from hashlib import sha256
@@ -145,6 +153,21 @@ def postgres_passwd(password, username, uppercase=False):
     retVal = "md5%s" % md5(password + username).hexdigest()
 
     return retVal.upper() if uppercase else retVal.lower()
+
+def postgres_scram_passwd(password, salt, iterations, **kwargs):  # since version '10'
+    """
+    Reference(s):
+        https://www.rfc-editor.org/rfc/rfc5803
+
+    >>> postgres_scram_passwd(password='testpass', salt='c2FsdHNhbHRzYWx0', iterations=4096)
+    'SCRAM-SHA-256$4096:c2FsdHNhbHRzYWx0$AzDKnszrCJPfdiFrFLbdoiqdocK4KWksHHcs3Jx7R5w=:lmWF1kOl/PbOyhpnGuBGzKyuP3XYMK6whWukBxHiHLc='
+    """
+
+    salted = pbkdf2_hmac("sha256", getBytes(password), decodeBase64(salt, binary=True), iterations)
+    stored_key = sha256(hmac.new(salted, b"Client Key", sha256).digest()).digest()
+    server_key = hmac.new(salted, b"Server Key", sha256).digest()
+
+    return "SCRAM-SHA-256$%d:%s$%s:%s" % (iterations, salt, getText(base64.b64encode(stored_key)), getText(base64.b64encode(server_key)))
 
 def mssql_new_passwd(password, salt, uppercase=False):  # since version '2012'
     """
@@ -439,6 +462,243 @@ def unix_md5_passwd(password, salt, magic="$1$", **kwargs):
 
     return getText(magic + salt + b'$' + getBytes(hash_))
 
+# SHA-crypt (Drepper) final-permutation byte orders for the 32/64-byte digests
+_SHA256_CRYPT_ORDER = ((0, 10, 20), (21, 1, 11), (12, 22, 2), (3, 13, 23), (24, 4, 14), (15, 25, 5), (6, 16, 26), (27, 7, 17), (18, 28, 8), (9, 19, 29), (31, 30))
+_SHA512_CRYPT_ORDER = ((0, 21, 42), (22, 43, 1), (44, 2, 23), (3, 24, 45), (25, 46, 4), (47, 5, 26), (6, 27, 48), (28, 49, 7), (50, 8, 29), (9, 30, 51), (31, 52, 10), (53, 11, 32), (12, 33, 54), (34, 55, 13), (56, 14, 35), (15, 36, 57), (37, 58, 16), (59, 17, 38), (18, 39, 60), (40, 61, 19), (62, 20, 41), (63,))
+
+def _shaCryptDigest(password, salt, rounds, digestmod, order):
+    dsize = digestmod().digest_size
+
+    B = digestmod(password + salt + password).digest()
+
+    ctx = digestmod(password + salt)
+    cnt = len(password)
+    while cnt > dsize:
+        ctx.update(B)
+        cnt -= dsize
+    ctx.update(B[:cnt])
+
+    i = len(password)
+    while i:
+        ctx.update(B if i & 1 else password)
+        i >>= 1
+    A = ctx.digest()
+
+    dp = digestmod()
+    for _ in xrange(len(password)):
+        dp.update(password)
+    DP = dp.digest()
+    P = DP * (len(password) // dsize) + DP[:len(password) % dsize]
+
+    ds = digestmod()
+    for _ in xrange(16 + (A[0] if isinstance(A[0], int) else ord(A[0]))):
+        ds.update(salt)
+    DS = ds.digest()
+    S = DS * (len(salt) // dsize) + DS[:len(salt) % dsize]
+
+    C = A
+    for i in xrange(rounds):
+        c = digestmod()
+        c.update(P if i & 1 else C)
+        if i % 3:
+            c.update(S)
+        if i % 7:
+            c.update(P)
+        c.update(C if i & 1 else P)
+        C = c.digest()
+
+    retVal = ""
+    for group in order:
+        value = 0
+        for idx in group:
+            value = (value << 8) | (C[idx] if isinstance(C[idx], int) else ord(C[idx]))
+        for _ in xrange((len(group) * 8 + 5) // 6):
+            retVal += ITOA64[value & 0x3f]
+            value >>= 6
+
+    return retVal
+
+def sha2_crypt_passwd(password, salt, magic="$5$", **kwargs):
+    """
+    Reference(s):
+        https://www.akkadia.org/drepper/SHA-crypt.txt
+
+    >>> sha2_crypt_passwd(password='testpass', salt='saltstring', magic='$5$')
+    '$5$saltstring$rn/td51LeVLXb2RR8WT672g4QhAuobh1gQQFGFiRCT.'
+    >>> sha2_crypt_passwd(password='testpass', salt='saltstring', magic='$6$')
+    '$6$saltstring$Oxduy3vBZ8CEBR5mER96ach5GlbbBT1Oz5g1UNdPqomx5bB1.IwS1ZFoW8fpb0xvz/BCS7.LzpkW7GAFOW9yC.'
+    """
+
+    rounds, saltstr = 5000, salt
+    if salt.startswith("rounds="):
+        prefix, saltstr = salt.split('$', 1)
+        rounds = int(prefix[len("rounds="):])
+
+    order, digestmod = (_SHA256_CRYPT_ORDER, sha256) if magic == "$5$" else (_SHA512_CRYPT_ORDER, sha512)
+    digest = _shaCryptDigest(getBytes(password), getBytes(saltstr)[:16], rounds, digestmod, order)
+
+    return "%s%s$%s" % (magic, salt, digest)
+
+def mysql_sha2_passwd(password, salt, rounds, prefix, **kwargs):  # MySQL 8 'caching_sha2_password' (sha256crypt, 20-byte salt)
+    """
+    Reference(s):
+        https://hashcat.net/wiki/doku.php?id=example_hashes
+
+    >>> mysql_sha2_passwd(password='hashcat', salt=decodeHex('F9CC98CE08892924F50A213B6BC571A2C11778C5'), rounds=5000, prefix='$mysql$A$005*F9CC98CE08892924F50A213B6BC571A2C11778C5*')
+    '$mysql$A$005*F9CC98CE08892924F50A213B6BC571A2C11778C5*625479393559393965414D45316477456B484F41316E64484742577A2E3162785353526B7554584647562F'
+    """
+
+    digest = _shaCryptDigest(getBytes(password), bytes(salt), rounds, sha256, _SHA256_CRYPT_ORDER)
+
+    return "%s%s" % (prefix, getText(encodeHex(getBytes(digest), binary=False)).upper())
+
+# bcrypt (Provos-Mazieres EksBlowfish); the Blowfish P/S init constants are the fractional hex digits of pi
+BCRYPT_ITOA64 = "./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+
+_bcryptState = None
+
+def _bcryptInitState():
+    global _bcryptState
+
+    if _bcryptState is None:
+        count = 18 + 4 * 256
+        ndigits = count * 8
+        prec = ndigits + 16
+        one = 1 << (4 * prec)
+
+        def _arctan(inv):
+            total = term = one // inv
+            square = inv * inv
+            i = 1
+            while term:
+                term //= square
+                total += (term // (2 * i + 1)) * (-1 if i % 2 else 1)
+                i += 1
+            return total
+
+        frac = (16 * _arctan(5) - 4 * _arctan(239) - 3 * one) >> (4 * (prec - ndigits))
+        hexstr = "%0*x" % (ndigits, frac)
+        words = [int(hexstr[i * 8:(i + 1) * 8], 16) for i in xrange(count)]
+        _bcryptState = (words[:18], [words[18 + i * 256:18 + (i + 1) * 256] for i in xrange(4)])
+
+    return _bcryptState
+
+def _bcryptEncipher(P, S, L, R):
+    for i in xrange(16):
+        L ^= P[i]
+        R ^= (((S[0][(L >> 24) & 0xff] + S[1][(L >> 16) & 0xff]) & 0xffffffff) ^ S[2][(L >> 8) & 0xff]) + S[3][L & 0xff] & 0xffffffff
+        L, R = R, L
+    L, R = R, L
+    return (L ^ P[17]) & 0xffffffff, (R ^ P[16]) & 0xffffffff
+
+def _bcryptStream(data, offset):
+    word = 0
+    for _ in xrange(4):
+        word = ((word << 8) | data[offset[0]]) & 0xffffffff
+        offset[0] = (offset[0] + 1) % len(data)
+    return word
+
+def _bcryptExpand(P, S, data, key):
+    koffset = [0]
+    for i in xrange(18):
+        P[i] ^= _bcryptStream(key, koffset)
+
+    doffset = [0]
+    L = R = 0
+    for i in xrange(0, 18, 2):
+        if data:
+            L ^= _bcryptStream(data, doffset)
+            R ^= _bcryptStream(data, doffset)
+        L, R = _bcryptEncipher(P, S, L, R)
+        P[i], P[i + 1] = L, R
+
+    for b in xrange(4):
+        for k in xrange(0, 256, 2):
+            if data:
+                L ^= _bcryptStream(data, doffset)
+                R ^= _bcryptStream(data, doffset)
+            L, R = _bcryptEncipher(P, S, L, R)
+            S[b][k], S[b][k + 1] = L, R
+
+def _bcryptBase64(data):
+    retVal = ""
+    i = 0
+    while i < len(data):
+        c = data[i]; i += 1
+        retVal += BCRYPT_ITOA64[(c >> 2) & 0x3f]
+        c = (c & 3) << 4
+        if i >= len(data):
+            retVal += BCRYPT_ITOA64[c & 0x3f]; break
+        d = data[i]; i += 1
+        retVal += BCRYPT_ITOA64[(c | (d >> 4) & 0x0f) & 0x3f]
+        c = (d & 0x0f) << 2
+        if i >= len(data):
+            retVal += BCRYPT_ITOA64[c & 0x3f]; break
+        e = data[i]; i += 1
+        retVal += BCRYPT_ITOA64[(c | (e >> 6) & 3) & 0x3f]
+        retVal += BCRYPT_ITOA64[e & 0x3f]
+    return retVal
+
+def _bcryptUnbase64(value, length):
+    retVal = bytearray()
+    positions = [BCRYPT_ITOA64.index(_) for _ in value]
+    i = 0
+    while i < len(positions) and len(retVal) < length:
+        c1 = positions[i]
+        c2 = positions[i + 1] if i + 1 < len(positions) else 0
+        retVal.append(((c1 << 2) | (c2 >> 4)) & 0xff)
+        if len(retVal) >= length:
+            break
+        c3 = positions[i + 2] if i + 2 < len(positions) else 0
+        retVal.append((((c2 & 0x0f) << 4) | (c3 >> 2)) & 0xff)
+        if len(retVal) >= length:
+            break
+        c4 = positions[i + 3] if i + 3 < len(positions) else 0
+        retVal.append((((c3 & 3) << 6) | c4) & 0xff)
+        i += 4
+    return retVal[:length]
+
+def bcrypt_passwd(password, salt, magic="$2a$", cost=5, **kwargs):
+    """
+    Reference(s):
+        https://www.openwall.com/crypt/
+
+    >>> bcrypt_passwd(password='U*U', salt='CCCCCCCCCCCCCCCCCCCCC.', magic='$2a$', cost=5)
+    '$2a$05$CCCCCCCCCCCCCCCCCCCCC.E5YPO9kmyuRGyh0XouQYb4YMJKvyOeW'
+    """
+
+    P0, S0 = _bcryptInitState()
+    P, S = list(P0), [list(_) for _ in S0]
+
+    key = bytearray(getBytes(password) + b"\0")
+    saltbytes = _bcryptUnbase64(salt, 16)
+
+    _bcryptExpand(P, S, saltbytes, key)
+    for _ in xrange(1 << cost):
+        _bcryptExpand(P, S, b"", key)
+        _bcryptExpand(P, S, b"", saltbytes)
+
+    ctext = list(struct.unpack(">6I", b"OrpheanBeholderScryDoubt"))
+    for _ in xrange(64):
+        for j in xrange(0, 6, 2):
+            ctext[j], ctext[j + 1] = _bcryptEncipher(P, S, ctext[j], ctext[j + 1])
+
+    digest = bytearray(struct.pack(">6I", *ctext))[:23]
+
+    return "%s%02d$%s%s" % (magic, cost, salt, _bcryptBase64(digest))
+
+def wordpress_bcrypt_passwd(password, salt, magic="$2y$", cost=10, **kwargs):  # WordPress 6.8+ 'bcrypt(base64(hmac-sha384(pass)))'
+    """
+    Reference: https://make.wordpress.org/core/2025/02/17/wordpress-6-8-will-use-bcrypt-for-password-hashing/
+
+    >>> wordpress_bcrypt_passwd(password='hashcat', salt='lzlQrRRhLSjz486bA9CKHu', magic='$2y$', cost=10)
+    '$wp$2y$10$lzlQrRRhLSjz486bA9CKHuZRPoKz4uviT251Sq/r5OzKUBbrXwnQW'
+    """
+
+    prehashed = getText(base64.b64encode(hmac.new(b"wp-sha384", getBytes(password.strip()), sha384).digest()))
+
+    return "$wp%s" % bcrypt_passwd(prehashed, salt, magic, cost)
+
 def joomla_passwd(password, salt, **kwargs):
     """
     Reference: https://stackoverflow.com/a/10428239
@@ -468,6 +728,56 @@ def django_sha1_passwd(password, salt, **kwargs):
     """
 
     return "sha1$%s$%s" % (salt, sha1(getBytes(salt) + getBytes(password)).hexdigest())
+
+def django_pbkdf2_sha256_passwd(password, salt, iterations, **kwargs):
+    """
+    Reference: https://github.com/django/django/blob/main/django/contrib/auth/hashers.py
+
+    >>> django_pbkdf2_sha256_passwd(password='testpass', salt='salt', iterations=1000)
+    'pbkdf2_sha256$1000$salt$N3DLJstEJ6mIjp0fq/KRcHmJ/4FtMzHYmW9fBHci/aI='
+    """
+
+    dk = pbkdf2_hmac("sha256", getBytes(password), getBytes(salt), iterations)
+
+    return "pbkdf2_sha256$%d$%s$%s" % (iterations, salt, getText(base64.b64encode(dk)))
+
+def werkzeug_pbkdf2_passwd(password, salt, iterations, digestmod="sha256", **kwargs):
+    """
+    Reference: https://github.com/pallets/werkzeug/blob/main/src/werkzeug/security.py
+
+    >>> werkzeug_pbkdf2_passwd(password='testpass', salt='salt', iterations=1000, digestmod='sha256')
+    'pbkdf2:sha256:1000$salt$3770cb26cb4427a9888e9d1fabf291707989ff816d3331d8996f5f047722fda2'
+    """
+
+    dk = pbkdf2_hmac(digestmod, getBytes(password), getBytes(salt), iterations)
+
+    return "pbkdf2:%s:%d$%s$%s" % (digestmod, iterations, salt, getText(encodeHex(dk, binary=False)))
+
+def werkzeug_scrypt_passwd(password, salt, N, r, p, **kwargs):
+    """
+    Reference: https://github.com/pallets/werkzeug/blob/main/src/werkzeug/security.py
+
+    >>> werkzeug_scrypt_passwd(password='testpass', salt='saltsalt', N=32768, r=8, p=1) if _scrypt else 'scrypt:32768:8:1$saltsalt$1e0f97c3f6609024022fbe698da29c2fe53ef1087a8e396dc6d5d2a041e886dee09ea922781f2c2a1c85e46c77060147e43487f8fe6226bcb635915af9b0518b'
+    'scrypt:32768:8:1$saltsalt$1e0f97c3f6609024022fbe698da29c2fe53ef1087a8e396dc6d5d2a041e886dee09ea922781f2c2a1c85e46c77060147e43487f8fe6226bcb635915af9b0518b'
+    """
+
+    dk = _scrypt(getBytes(password), salt=getBytes(salt), n=N, r=r, p=p, dklen=64, maxmem=132 * N * r + 1024)
+
+    return "scrypt:%d:%d:%d$%s$%s" % (N, r, p, salt, getText(encodeHex(dk, binary=False)))
+
+def aspnet_identity_passwd(password, salt, iterations, prf, dklen, **kwargs):
+    """
+    Reference(s):
+        https://github.com/dotnet/AspNetCore/blob/main/src/Identity/Extensions.Core/src/PasswordHasher.cs
+
+    >>> aspnet_identity_passwd(password='cutecats', salt=decodeBase64('AQAAAAEAACcQAAAAEFWLthQDW2xiWaS3vLgY4ItJdModbW0kzKtb8IVuXBY3fFaIntkbbdqTj8mTXH4mmA==', binary=True)[13:29], iterations=10000, prf=1, dklen=32)
+    'AQAAAAEAACcQAAAAEFWLthQDW2xiWaS3vLgY4ItJdModbW0kzKtb8IVuXBY3fFaIntkbbdqTj8mTXH4mmA=='
+    """
+
+    subkey = pbkdf2_hmac({0: "sha1", 1: "sha256", 2: "sha512"}[prf], getBytes(password), bytes(salt), iterations, dklen)
+    blob = struct.pack(">BIII", 1, prf, iterations, len(salt)) + bytes(salt) + subkey
+
+    return getText(base64.b64encode(blob))
 
 def vbulletin_passwd(password, salt, **kwargs):
     """
@@ -560,6 +870,8 @@ __functions__ = {
     HASH.MYSQL: mysql_passwd,
     HASH.MYSQL_OLD: mysql_old_passwd,
     HASH.POSTGRES: postgres_passwd,
+    HASH.POSTGRES_SCRAM: postgres_scram_passwd,
+    HASH.MYSQL_SHA2: mysql_sha2_passwd,
     HASH.MSSQL: mssql_passwd,
     HASH.MSSQL_OLD: mssql_old_passwd,
     HASH.MSSQL_NEW: mssql_new_passwd,
@@ -572,9 +884,16 @@ __functions__ = {
     HASH.SHA384_GENERIC: sha384_generic_passwd,
     HASH.SHA512_GENERIC: sha512_generic_passwd,
     HASH.CRYPT_GENERIC: crypt_generic_passwd,
+    HASH.SHA256_UNIX_CRYPT: sha2_crypt_passwd,
+    HASH.SHA512_UNIX_CRYPT: sha2_crypt_passwd,
+    HASH.BCRYPT: bcrypt_passwd,
+    HASH.WORDPRESS_BCRYPT: wordpress_bcrypt_passwd,
     HASH.JOOMLA: joomla_passwd,
     HASH.DJANGO_MD5: django_md5_passwd,
     HASH.DJANGO_SHA1: django_sha1_passwd,
+    HASH.DJANGO_PBKDF2_SHA256: django_pbkdf2_sha256_passwd,
+    HASH.ASPNET_IDENTITY: aspnet_identity_passwd,
+    HASH.WERKZEUG_PBKDF2: werkzeug_pbkdf2_passwd,
     HASH.PHPASS: phpass_passwd,
     HASH.APACHE_MD5_CRYPT: unix_md5_passwd,
     HASH.UNIX_MD5_CRYPT: unix_md5_passwd,
@@ -589,6 +908,14 @@ __functions__ = {
     HASH.SHA1_BASE64: sha1_generic_passwd,
     HASH.SHA256_BASE64: sha256_generic_passwd,
     HASH.SHA512_BASE64: sha512_generic_passwd,
+}
+
+if _scrypt is not None:
+    __functions__[HASH.WERKZEUG_SCRYPT] = werkzeug_scrypt_passwd
+
+# Recognized-only formats with no pure-Python/stdlib crack path; identified and pointed to dedicated tools
+HASH_TOOL_HINTS = {
+    HASH.ARGON2: "an Argon2 hash (e.g. 'hashcat -m 34000' or 'john --format=argon2')",
 }
 
 def _finalize(retVal, results, processes, attack_info=None):
@@ -1023,9 +1350,14 @@ def dictionaryAttack(attack_dict):
             regex = hashRecognition(hash_)
 
             if regex and regex not in hash_regexes:
-                hash_regexes.append(regex)
-                infoMsg = "using hash method '%s'" % __functions__[regex].__name__
-                logger.info(infoMsg)
+                if regex in __functions__:
+                    hash_regexes.append(regex)
+                    infoMsg = "using hash method '%s'" % __functions__[regex].__name__
+                    logger.info(infoMsg)
+                else:
+                    warnMsg = "sqlmap identified %s that cannot be cracked with the " % HASH_TOOL_HINTS.get(regex, "a hash")
+                    warnMsg += "built-in dictionary attack"
+                    singleTimeWarnMessage(warnMsg)
 
     for hash_regex in hash_regexes:
         keys = set()
@@ -1043,7 +1375,7 @@ def dictionaryAttack(attack_dict):
                     try:
                         item = None
 
-                        if hash_regex not in (HASH.CRYPT_GENERIC, HASH.JOOMLA, HASH.PHPASS, HASH.UNIX_MD5_CRYPT, HASH.APACHE_MD5_CRYPT, HASH.APACHE_SHA1, HASH.VBULLETIN, HASH.VBULLETIN_OLD, HASH.SSHA, HASH.SSHA256, HASH.SSHA512, HASH.DJANGO_MD5, HASH.DJANGO_SHA1, HASH.MD5_BASE64, HASH.SHA1_BASE64, HASH.SHA256_BASE64, HASH.SHA512_BASE64):
+                        if hash_regex not in (HASH.CRYPT_GENERIC, HASH.JOOMLA, HASH.PHPASS, HASH.UNIX_MD5_CRYPT, HASH.APACHE_MD5_CRYPT, HASH.APACHE_SHA1, HASH.VBULLETIN, HASH.VBULLETIN_OLD, HASH.SSHA, HASH.SSHA256, HASH.SSHA512, HASH.DJANGO_MD5, HASH.DJANGO_SHA1, HASH.DJANGO_PBKDF2_SHA256, HASH.POSTGRES_SCRAM, HASH.MYSQL_SHA2, HASH.WERKZEUG_PBKDF2, HASH.WERKZEUG_SCRYPT, HASH.SHA256_UNIX_CRYPT, HASH.SHA512_UNIX_CRYPT, HASH.BCRYPT, HASH.WORDPRESS_BCRYPT, HASH.ASPNET_IDENTITY, HASH.MD5_BASE64, HASH.SHA1_BASE64, HASH.SHA256_BASE64, HASH.SHA512_BASE64):
                             hash_ = hash_.lower()
 
                         if hash_regex in (HASH.MD5_BASE64, HASH.SHA1_BASE64, HASH.SHA256_BASE64, HASH.SHA512_BASE64):
@@ -1068,10 +1400,32 @@ def dictionaryAttack(attack_dict):
                             item = [(user, hash_), {"salt": hash_[0:2]}]
                         elif hash_regex in (HASH.UNIX_MD5_CRYPT, HASH.APACHE_MD5_CRYPT):
                             item = [(user, hash_), {"salt": hash_.split('$')[2], "magic": "$%s$" % hash_.split('$')[1]}]
+                        elif hash_regex in (HASH.SHA256_UNIX_CRYPT, HASH.SHA512_UNIX_CRYPT):
+                            item = [(user, hash_), {"salt": '$'.join(hash_.split('$')[2:-1]), "magic": "$%s$" % hash_.split('$')[1]}]
+                        elif hash_regex in (HASH.BCRYPT,):
+                            item = [(user, hash_), {"salt": hash_[7:29], "magic": hash_[:4], "cost": int(hash_[4:6])}]
+                        elif hash_regex in (HASH.WORDPRESS_BCRYPT,):
+                            item = [(user, hash_), {"salt": hash_[10:32], "magic": hash_[3:7], "cost": int(hash_[7:9])}]
+                        elif hash_regex in (HASH.ASPNET_IDENTITY,):
+                            _ = decodeBase64(hash_, binary=True)
+                            prf, iterations, saltlen = struct.unpack(">III", _[1:13])
+                            item = [(user, hash_), {"salt": _[13:13 + saltlen], "iterations": iterations, "prf": prf, "dklen": len(_) - 13 - saltlen}]
+                        elif hash_regex in (HASH.MYSQL_SHA2,):
+                            _ = hash_.split('*')
+                            item = [(user, hash_), {"salt": decodeHex(_[1]), "rounds": int(_[0].split('$')[-1], 16) * 1000, "prefix": hash_[:hash_.rindex('*') + 1]}]
                         elif hash_regex in (HASH.JOOMLA, HASH.VBULLETIN, HASH.VBULLETIN_OLD, HASH.OSCOMMERCE_OLD):
                             item = [(user, hash_), {"salt": hash_.split(':')[-1]}]
                         elif hash_regex in (HASH.DJANGO_MD5, HASH.DJANGO_SHA1):
                             item = [(user, hash_), {"salt": hash_.split('$')[1]}]
+                        elif hash_regex in (HASH.DJANGO_PBKDF2_SHA256,):
+                            item = [(user, hash_), {"salt": hash_.split('$')[2], "iterations": int(hash_.split('$')[1])}]
+                        elif hash_regex in (HASH.POSTGRES_SCRAM,):
+                            item = [(user, hash_), {"salt": hash_.split('$')[1].split(':')[1], "iterations": int(hash_.split('$')[1].split(':')[0])}]
+                        elif hash_regex in (HASH.WERKZEUG_PBKDF2,):
+                            item = [(user, hash_), {"salt": hash_.split('$')[1], "iterations": int(hash_.split('$')[0].split(':')[2]), "digestmod": hash_.split('$')[0].split(':')[1]}]
+                        elif hash_regex in (HASH.WERKZEUG_SCRYPT,):
+                            _ = hash_.split('$')[0].split(':')
+                            item = [(user, hash_), {"salt": hash_.split('$')[1], "N": int(_[1]), "r": int(_[2]), "p": int(_[3])}]
                         elif hash_regex in (HASH.PHPASS,):
                             if ITOA64.index(hash_[3]) < 32:
                                 item = [(user, hash_), {"salt": hash_[4:12], "count": 1 << ITOA64.index(hash_[3]), "prefix": hash_[:3]}]
@@ -1102,7 +1456,7 @@ def dictionaryAttack(attack_dict):
             while not kb.wordlists:
 
                 # the slowest of all methods hence smaller default dict
-                if hash_regex in (HASH.ORACLE_OLD, HASH.PHPASS):
+                if hash_regex in (HASH.ORACLE_OLD, HASH.PHPASS, HASH.SHA256_UNIX_CRYPT, HASH.SHA512_UNIX_CRYPT, HASH.WERKZEUG_SCRYPT, HASH.BCRYPT, HASH.WORDPRESS_BCRYPT, HASH.MYSQL_SHA2):
                     dictPaths = [paths.SMALL_DICT]
                 else:
                     dictPaths = [paths.WORDLIST]

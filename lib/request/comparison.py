@@ -39,15 +39,18 @@ from thirdparty import six
 
 def _isJsonResponse(headers):
     """
-    Returns True if the response Content-Type indicates a JSON document (e.g. 'application/json'
-    or a structured suffix like 'application/vnd.api+json')
+    Returns True if the response Content-Type plausibly indicates a JSON document - i.e. the canonical
+    'application/json', the common misservings ('text/json', 'application/javascript', ...), or a
+    structured suffix like 'application/vnd.api+json'. Being liberal here is safe: jsonMinimize() returns
+    None for anything that is not actually parseable JSON, so a mislabelled body simply falls back to the
+    normal text comparison.
     """
 
     retVal = False
 
     if headers:
         contentType = (headers.get(HTTP_HEADER.CONTENT_TYPE) or "").split(';')[0].strip().lower()
-        retVal = contentType == "application/json" or contentType.endswith("+json")
+        retVal = contentType in ("application/json", "text/json", "application/javascript", "text/javascript", "application/x-javascript") or contentType.endswith("+json")
 
     return retVal
 
