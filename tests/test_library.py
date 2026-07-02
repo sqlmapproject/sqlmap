@@ -114,15 +114,21 @@ class TestReportErrorCapture(unittest.TestCase):
     """
 
     def test_errors_reach_the_report(self):
+        import logging
         from lib.core.data import logger
         from lib.utils.api import setupReportCollector, _assembleData, ReportErrorRecorder, REPORT_TASKID
 
+        # represent a normal run: the shared test bootstrap silences the logger (CRITICAL+1), which would
+        # otherwise gate the ERROR record before it reaches the recorder (order-dependent flakiness)
+        saved_level = logger.level
+        logger.setLevel(logging.ERROR)
         collector = setupReportCollector()
         try:
             logger.error("boom %s", "here")
             result = _assembleData(collector, REPORT_TASKID)
             self.assertTrue(any("boom here" in _ for _ in result["error"]))
         finally:
+            logger.setLevel(saved_level)
             for handler in list(logger.handlers):
                 if isinstance(handler, ReportErrorRecorder):
                     logger.removeHandler(handler)
