@@ -14,6 +14,7 @@ import base64
 import socket
 import ssl
 import struct
+import threading
 
 try:
     from http.client import responses as _HTTP_RESPONSES
@@ -431,44 +432,86 @@ def _connect_socket(host, port, proxy, timeout):
             pass
         raise
 
-def h2_request(host, port=443, method="GET", path="/", authority=None, headers=None, body=None, timeout=30, proxy=None):
-    authority = authority or host
-    ctx = ssl._create_unverified_context()
-    ctx.set_alpn_protocols(["h2"])
-    sock = ctx.wrap_socket(_connect_socket(host, port, proxy, timeout), server_hostname=host)
-    try:
-        if sock.selected_alpn_protocol() != "h2":
-            raise IOError("server did not negotiate h2 (ALPN=%r)" % sock.selected_alpn_protocol())
-        sock.settimeout(timeout)
+class _UnprocessedStream(IOError):
+    """Raised when the server made it clear our stream was NOT processed (GOAWAY with last-stream-id below
+    ours), so the request is always safe to retry on a fresh connection."""
 
-        # connection preface + client SETTINGS (advertise a large per-stream window) + bump conn window
-        sock.sendall(CONNECTION_PREFACE)
-        sock.sendall(encode_frame(SETTINGS, 0, 0, struct.pack("!HI", SETTINGS_INITIAL_WINDOW_SIZE, BIG_WINDOW)))
-        sock.sendall(encode_frame(WINDOW_UPDATE, 0, 0, struct.pack("!I", BIG_WINDOW - 65535)))
+class _H2Connection(object):
+    """A single HTTP/2 connection reused for sequential (one-stream-at-a-time) requests within a thread.
+
+    Multiplexing is intentionally NOT used - one stream is fully consumed before the next is opened - which
+    preserves request<->response isolation (clean time-based latency, no desync), exactly like the
+    thread-local HTTP/1.1 keep-alive pool. Reuse amortizes the TCP+TLS+preface cost across all of a thread's
+    requests to a host. Correctness note: only the HPACK Decoder (server->client dynamic table) is stateful,
+    so it is kept per-connection and fed responses in order; the Encoder is literal-without-indexing
+    (stateless), hence a fresh one per request is safe on a reused socket."""
+
+    def __init__(self, host, port, proxy, timeout):
+        self.host, self.port, self.proxy = host, port, proxy
+        self.dec = Decoder()                                  # persistent server->client HPACK table
+        self.next_sid = 1                                     # odd, strictly increasing per RFC 7540
+        self.usable = True
+        ctx = ssl._create_unverified_context()
+        ctx.set_alpn_protocols(["h2"])
+        self.sock = ctx.wrap_socket(_connect_socket(host, port, proxy, timeout), server_hostname=host)
+        try:
+            if self.sock.selected_alpn_protocol() != "h2":
+                raise IOError("server did not negotiate h2 (ALPN=%r)" % self.sock.selected_alpn_protocol())
+            self.sock.settimeout(timeout)
+            # connection preface + client SETTINGS (advertise a large per-stream window) + bump conn window
+            self.sock.sendall(CONNECTION_PREFACE)
+            self.sock.sendall(encode_frame(SETTINGS, 0, 0, struct.pack("!HI", SETTINGS_INITIAL_WINDOW_SIZE, BIG_WINDOW)))
+            self.sock.sendall(encode_frame(WINDOW_UPDATE, 0, 0, struct.pack("!I", BIG_WINDOW - 65535)))
+        except Exception:
+            self.close()
+            raise
+
+    def close(self):
+        self.usable = False
+        try:
+            self.sock.close()
+        except Exception:
+            pass
+
+    def __del__(self):
+        self.close()
+
+    def exchange(self, method, path, authority, headers, body, timeout):
+        if not self.usable:
+            raise IOError("HTTP/2 connection no longer usable")
+
+        sid = self.next_sid
+        self.next_sid += 2
+        if self.next_sid >= BIG_WINDOW:                       # stream-id space nearly exhausted -> retire after this
+            self.usable = False
+        self.sock.settimeout(timeout)
 
         req = [(b":method", _tob(method)), (b":scheme", b"https"), (b":path", _tob(path)), (b":authority", _tob(authority))]
         for k, v in (headers or {}).items():
             req.append((_tob(k).lower(), _tob(v)))
         hblock = Encoder().encode(req)
-        sock.sendall(encode_frame(HEADERS, FLAG_END_HEADERS | (0 if body else FLAG_END_STREAM), 1, hblock))
+        self.sock.sendall(encode_frame(HEADERS, FLAG_END_HEADERS | (0 if body else FLAG_END_STREAM), sid, hblock))
         if body:
-            sock.sendall(encode_frame(DATA, FLAG_END_STREAM, 1, _tob(body)))
+            self.sock.sendall(encode_frame(DATA, FLAG_END_STREAM, sid, _tob(body)))
 
-        dec = Decoder()
         header_block, resp_headers, resp_body, done = b"", None, bytearray(), False
         while not done:
-            ftype, flags, sid, payload = _read_frame(sock)
+            ftype, flags, fsid, payload = _read_frame(self.sock)
             if ftype == SETTINGS:
                 if not (flags & FLAG_ACK):
-                    sock.sendall(encode_frame(SETTINGS, FLAG_ACK, 0, b""))
+                    self.sock.sendall(encode_frame(SETTINGS, FLAG_ACK, 0, b""))
             elif ftype == PING:
                 if not (flags & FLAG_ACK):
-                    sock.sendall(encode_frame(PING, FLAG_ACK, 0, payload))
+                    self.sock.sendall(encode_frame(PING, FLAG_ACK, 0, payload))
             elif ftype == GOAWAY:
-                done = True
-            elif ftype == RST_STREAM and sid == 1:
+                self.usable = False                           # server won't accept new streams -> retire connection
+                last_sid = (struct.unpack("!I", payload[4:8])[0] & 0x7fffffff) if len(payload) >= 8 else 0
+                if sid > last_sid:                            # our stream was not processed -> safe to retry fresh
+                    raise _UnprocessedStream("GOAWAY (last stream %d) before stream %d was processed" % (last_sid, sid))
+            elif ftype == RST_STREAM and fsid == sid:
+                self.usable = False
                 raise IOError("stream reset by server (error %d)" % struct.unpack("!I", payload[:4])[0])
-            elif ftype in (HEADERS, CONTINUATION) and sid == 1:
+            elif ftype in (HEADERS, CONTINUATION) and fsid == sid:
                 p = payload
                 if ftype == HEADERS:
                     if flags & FLAG_PADDED:
@@ -477,17 +520,17 @@ def h2_request(host, port=443, method="GET", path="/", authority=None, headers=N
                         p = p[5:]
                 header_block += p
                 if flags & FLAG_END_HEADERS:
-                    resp_headers = dec.decode(header_block)
+                    resp_headers = self.dec.decode(header_block)
                 if flags & FLAG_END_STREAM:
                     done = True
-            elif ftype == DATA and sid == 1:
+            elif ftype == DATA and fsid == sid:
                 p = payload
                 if flags & FLAG_PADDED:
                     p = p[1:len(p) - bytearray(payload)[0]]
                 resp_body += p
                 if payload:                                   # replenish stream + connection windows
-                    sock.sendall(encode_frame(WINDOW_UPDATE, 0, 1, struct.pack("!I", len(payload))))
-                    sock.sendall(encode_frame(WINDOW_UPDATE, 0, 0, struct.pack("!I", len(payload))))
+                    self.sock.sendall(encode_frame(WINDOW_UPDATE, 0, sid, struct.pack("!I", len(payload))))
+                    self.sock.sendall(encode_frame(WINDOW_UPDATE, 0, 0, struct.pack("!I", len(payload))))
                 if flags & FLAG_END_STREAM:
                     done = True
         status = None
@@ -496,9 +539,50 @@ def h2_request(host, port=443, method="GET", path="/", authority=None, headers=N
                 status = int(v)
                 break
         return status, resp_headers, bytes(resp_body)
+
+# Thread-local pool: one live connection per (host, port, proxy) per thread. Mirrors keepalive.py's model
+# (one connection per host per thread) so streams never interleave across threads and time-based
+# measurements stay clean.
+_h2_pool = threading.local()
+
+def _pooledExchange(host, port, proxy, method, path, authority, headers, body, timeout):
+    pool = getattr(_h2_pool, "connections", None)
+    if pool is None:
+        pool = _h2_pool.connections = {}
+    key = (host, port, proxy)
+
+    conn = pool.get(key)
+    reused = conn is not None and conn.usable
+    if not reused:
+        if conn is not None:
+            conn.close()
+        conn = pool[key] = _H2Connection(host, port, proxy, timeout)
+
+    try:
+        result = conn.exchange(method, path, authority, headers, body, timeout)
+    except _UnprocessedStream:                                # explicitly not processed -> always safe to retry fresh
+        conn.close(); pool.pop(key, None)
+        conn = pool[key] = _H2Connection(host, port, proxy, timeout)
+        result = conn.exchange(method, path, authority, headers, body, timeout)
+    except (socket.error, ssl.SSLError, IOError):
+        conn.close(); pool.pop(key, None)
+        if reused:                                            # stale keep-alive socket (server closed idle conn) -> reopen once
+            conn = pool[key] = _H2Connection(host, port, proxy, timeout)
+            result = conn.exchange(method, path, authority, headers, body, timeout)
+        else:
+            raise
+    if not conn.usable:                                       # GOAWAY / id-exhaustion mid-exchange -> don't keep it pooled
+        conn.close(); pool.pop(key, None)
+    return result
+
+def h2_request(host, port=443, method="GET", path="/", authority=None, headers=None, body=None, timeout=30, proxy=None):
+    """One-shot request on a throwaway connection (kept for direct/back-compat callers; the engine path
+    goes through open_url -> the reusing pool)."""
+    conn = _H2Connection(host, port, proxy, timeout)
+    try:
+        return conn.exchange(method, path, authority or host, headers, body, timeout)
     finally:
-        try: sock.close()
-        except Exception: pass
+        conn.close()
 
 
 class H2Response(object):
@@ -567,8 +651,8 @@ def open_url(url, method="GET", headers=None, body=None, timeout=30, follow_redi
         path = parts.path or "/"
         if parts.query:
             path += "?" + parts.query
-        status, resp_headers, resp_body = h2_request(parts.hostname, parts.port or 443, method=method, path=path,
-                                                     authority=parts.netloc.split("@")[-1], headers=req_headers, body=body, timeout=timeout, proxy=proxy)
+        status, resp_headers, resp_body = _pooledExchange(parts.hostname, parts.port or 443, proxy, method, path,
+                                                          parts.netloc.split("@")[-1], req_headers, body, timeout)
         if follow_redirects and status in REDIRECT_CODES:
             location = None
             for name, value in (resp_headers or []):
