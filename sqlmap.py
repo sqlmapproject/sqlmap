@@ -664,3 +664,9 @@ if __name__ == "__main__":
 else:
     # cancelling postponed imports (because of CI/CD checks)
     __import__("lib.controller.controller")
+
+    # exposing the programmatic library facade as 'sqlmap.scan()' / 'sqlmap.scanFromRequest()'
+    from lib.utils.library import scan, scanFromRequest, SqlmapError
+
+# public library API (also marks the re-exported names above as intentional for pyflakes)
+__all__ = ["scan", "scanFromRequest", "SqlmapError"]
