@@ -20,6 +20,7 @@ optDict = {
         "googleDork": "string",
         "configFile": "string",
         "openApiFile": "string",
+        "openApiBase": "string",
     },
 
     "Request": {

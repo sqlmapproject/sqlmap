@@ -502,14 +502,17 @@ def _setOpenApiTargets():
         warnMsg = "option '--method' will override the HTTP method(s) derived from the OpenAPI/Swagger specification"
         logger.warning(warnMsg)
 
-    origin = None
+    # origin resolves a spec's relative 'servers' to absolute target URLs: an explicit '--openapi-base'
+    # (needed for a host-less local spec) or, when fetched by URL, the fetch URL itself.
+    origin = conf.openApiBase.rstrip('/') if conf.openApiBase else None
     if re.match(r"(?i)\Ahttps?://", conf.openApiFile):
         infoMsg = "fetching OpenAPI/Swagger specification from '%s'" % conf.openApiFile
         logger.info(infoMsg)
         from lib.request.connect import Connect as Request
         content = Request.getPage(url=conf.openApiFile, raise404=True)[0]
-        match = re.match(r"(?i)(https?://[^/]+)", conf.openApiFile)
-        origin = match.group(1) if match else None
+        if not origin:
+            match = re.match(r"(?i)(https?://[^/]+)", conf.openApiFile)
+            origin = match.group(1) if match else None
     else:
         conf.openApiFile = safeExpandUser(conf.openApiFile)
         checkFile(conf.openApiFile)
@@ -549,6 +552,8 @@ def _setOpenApiTargets():
             logger.warning(warnMsg)
     else:
         warnMsg = "no usable targets derived from the OpenAPI/Swagger specification"
+        if not conf.openApiBase:
+            warnMsg += " (if it uses relative 'servers', provide a base with '--openapi-base' or fetch it by URL)"
         logger.warning(warnMsg)
 
 def _findPageForms():

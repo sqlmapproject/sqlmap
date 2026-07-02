@@ -145,7 +145,10 @@ def cmdLineParser(argv=None):
             help="Load options from a configuration INI file")
 
         target.add_argument("--openapi", dest="openApiFile",
-            help="Derive targets from an OpenAPI/Swagger specification (file or URL)")
+            help="Derive targets from OpenAPI/Swagger (file/URL)")
+
+        target.add_argument("--openapi-base", dest="openApiBase",
+            help="Base URL for a host-less OpenAPI/Swagger spec")
 
         # Request options
         request = parser.add_argument_group("Request", "These options can be used to specify how to connect to the target URL")
