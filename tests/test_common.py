@@ -19,14 +19,16 @@ irrelevant. Temp files go to the session scratchpad and are removed.
 stdlib unittest only (no pytest / no pip); works on Python 2.7 and 3.x.
 """
 
+import atexit
 import base64
 import os
+import shutil
 import sys
 import tempfile
 import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _testutils import bootstrap, set_dbms
+from _testutils import bootstrap, set_dbms, reset_dbms
 bootstrap()
 
 from lib.core.data import conf, kb, paths
@@ -119,7 +121,8 @@ from lib.core.common import (
     zeroDepthSearch,
 )
 
-SCRATCH = "/tmp/claude-1000/-tmp-tmp-oUnlQJzlQN/fcd55d25-6313-49ed-817e-dcbe7fc2bf22/scratchpad"
+SCRATCH = tempfile.mkdtemp(prefix="sqlmap-tests-")   # per-run temp dir (portable; replaces a stale hardcoded path)
+atexit.register(lambda: shutil.rmtree(SCRATCH, ignore_errors=True))
 
 
 def _write_temp(content, suffix):
@@ -1714,3 +1717,7 @@ class TestCheckOldOptions(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+def tearDownModule():
+    reset_dbms()   # clear any DBMS forced via set_dbms() so it can't leak into later test modules

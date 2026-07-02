@@ -246,6 +246,7 @@ class TestGraphqlBooleanDetection(unittest.TestCase):
 
     def setUp(self):
         self._gql = gi._gqlSend
+        self._conf = gi.conf
         gi.conf = type("C", (), {"url": "http://test/graphql"})()
 
         pages = {"true": MATCH, "false": NOMATCH}
@@ -259,6 +260,7 @@ class TestGraphqlBooleanDetection(unittest.TestCase):
 
     def tearDown(self):
         gi._gqlSend = self._gql
+        gi.conf = self._conf
 
     def test_boolean_detected(self):
         slot = _slot("query", "Query", "user", "username", "string")
@@ -277,6 +279,7 @@ class TestGraphqlErrorDetection(unittest.TestCase):
 
     def setUp(self):
         self._gql = gi._gqlSend
+        self._conf = gi.conf
         gi.conf = type("C", (), {"url": "http://test/graphql"})()
 
         def fakeSend(endpoint, query, variables=None):
@@ -287,6 +290,7 @@ class TestGraphqlErrorDetection(unittest.TestCase):
 
     def tearDown(self):
         gi._gqlSend = self._gql
+        gi.conf = self._conf
 
     def test_error_detected(self):
         slot = _slot("query", "Query", "user", "username", "string")
@@ -372,10 +376,12 @@ class TestGraphqlIntrospectionFallback(unittest.TestCase):
 
     def setUp(self):
         self._gql = gi._gqlSend
+        self._conf = gi.conf
         gi.conf = type("C", (), {"url": "http://test/graphql"})()
 
     def tearDown(self):
         gi._gqlSend = self._gql
+        gi.conf = self._conf
 
     def test_fallback_without_specifiedByURL(self):
         calls = []

@@ -38,7 +38,7 @@ import time
 import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _testutils import bootstrap, set_dbms
+from _testutils import bootstrap, set_dbms, reset_dbms
 bootstrap()
 
 from lib.core.agent import agent
@@ -188,7 +188,7 @@ class _DnsCase(unittest.TestCase):
                 finally:
                     c.close()
                 served[0] += len(chunk)
-                for _ in range(100):
+                for _ in range(500):   # ~5s deadline (was ~1s) - loopback packet can lag on a loaded CI runner
                     with self.server._lock:
                         if any(host.encode() in r for r in self.server._requests):
                             break
@@ -313,7 +313,7 @@ class TestDnsLabelInvariant(_DnsCase):
                 finally:
                     c.close()
                 served[0] += len(chunk)
-                for _ in range(100):
+                for _ in range(500):   # ~5s deadline (was ~1s) - loopback packet can lag on a loaded CI runner
                     with self.server._lock:
                         matched = [r for r in self.server._requests if host.encode() in r]
                         if matched:
@@ -394,3 +394,7 @@ class TestDnsChannelDetection(_DnsCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+def tearDownModule():
+    reset_dbms()   # clear any DBMS forced via set_dbms() so it can't leak into later test modules

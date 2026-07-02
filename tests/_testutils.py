@@ -98,6 +98,22 @@ def set_dbms(name):
     Backend.forceDbms(name)
 
 
+def reset_dbms():
+    """Clear any DBMS forced via set_dbms()/Backend, restoring the clean post-bootstrap state.
+
+    A forced DBMS lives on the global `kb` singleton and is read by every dialect/agent path, so a
+    module that forces one without clearing it would leak that back-end into later test modules
+    (order-dependent flakiness). Modules that call set_dbms() should expose this as their
+    `tearDownModule` so the leak can never cross a module boundary.
+    """
+    from lib.core.common import Backend
+    from lib.core.data import kb
+    from lib.core.settings import UNKNOWN_DBMS_VERSION
+    Backend.flushForcedDbms(force=True)   # kb.forcedDbms = None; kb.stickyDBMS = False
+    kb.resolutionDbms = None
+    kb.dbmsVersion = [UNKNOWN_DBMS_VERSION]
+
+
 # --- property/fuzz testing harness (shared so individual test files don't each reinvent it) ---
 
 _PROPERTY_BASE = 0x51A1

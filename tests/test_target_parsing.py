@@ -22,6 +22,7 @@ respect to the network, so they are exercised here against real temp dirs.
 All expected values below were probed from actual output, not assumed.
 """
 
+import atexit
 import os
 import shutil
 import sys
@@ -29,7 +30,7 @@ import tempfile
 import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _testutils import bootstrap
+from _testutils import bootstrap, reset_dbms
 bootstrap()
 
 from lib.core.data import conf
@@ -62,7 +63,8 @@ from lib.core.target import _setRequestParams
 from lib.core.target import _setResultsFile
 from lib.core.target import initTargetEnv
 
-SCRATCH = "/tmp/claude-1000/-tmp-tmp-oUnlQJzlQN/fcd55d25-6313-49ed-817e-dcbe7fc2bf22/scratchpad"
+SCRATCH = tempfile.mkdtemp(prefix="sqlmap-tests-")   # per-run temp dir (portable; replaces a stale hardcoded path)
+atexit.register(lambda: shutil.rmtree(SCRATCH, ignore_errors=True))
 
 # conf/kb keys that the tests below mutate; saved in setUp, restored in tearDown so
 # one test can never leak global state into another (or into the rest of the suite).
@@ -519,3 +521,7 @@ class TestSetResultsFile(_TargetTestBase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+def tearDownModule():
+    reset_dbms()   # clear any DBMS forced via set_dbms() so it can't leak into later test modules

@@ -18,7 +18,7 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _testutils import bootstrap, set_dbms
+from _testutils import bootstrap, set_dbms, reset_dbms
 bootstrap()
 
 from lib.core.data import conf, kb
@@ -93,12 +93,18 @@ class TestFingerprint(unittest.TestCase):
         conf.batch = True
         conf.extensiveFp = False
         conf.api = False
+        # _drive() stubs the SHARED lib.request.inject module (plugins do `from lib.request import inject`),
+        # so snapshot the originals and restore them, else stubbed getValue/checkBooleanExpression leak process-wide
+        import lib.request.inject as _inject
+        self._inject = _inject
+        self._inject_saved = (_inject.getValue, _inject.checkBooleanExpression)
 
     def tearDown(self):
         for k, v in self._saved.items():
             conf[k] = v
         for k, v in self._kb.items():
             kb[k] = v
+        self._inject.getValue, self._inject.checkBooleanExpression = self._inject_saved
 
     def _drive(self, name, modpath, pkg, oracle):
         set_dbms(name)
@@ -201,3 +207,7 @@ for _name, _mod, _pkg in TARGETS:
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def tearDownModule():
+    reset_dbms()   # clear any DBMS forced via set_dbms() so it can't leak into later test modules

@@ -17,6 +17,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
 
+    env:
+      # deterministic dict/set iteration order run-to-run (guards against hash-order flakiness in CI)
+      PYTHONHASHSEED: "0"
+
     strategy:
       matrix:
         include:

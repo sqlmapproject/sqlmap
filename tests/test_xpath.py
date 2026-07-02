@@ -9,8 +9,11 @@ HTTP/lxml layer so detection, fingerprinting, blind inference, payload building,
 formatting can be exercised without a live target.
 """
 
+import os
+import sys
 import unittest
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _testutils import bootstrap
 bootstrap()
 

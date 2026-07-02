@@ -38,6 +38,12 @@ class _CollectorCase(unittest.TestCase):
 
     def tearDown(self):
         kb.partRun = self._saved_partRun
+        # setupReportCollector() attaches a ReportErrorRecorder to the GLOBAL logger; drop it so it does
+        # not leak a handler bound to a now-closed collector into later tests
+        from lib.core.data import logger
+        for handler in list(logger.handlers):
+            if isinstance(handler, api.ReportErrorRecorder):
+                logger.removeHandler(handler)
         try:
             self.c.disconnect()
         except Exception:

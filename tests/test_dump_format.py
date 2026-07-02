@@ -27,7 +27,7 @@ import unittest
 from collections import OrderedDict as _PlainOrderedDict
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _testutils import bootstrap
+from _testutils import bootstrap, reset_dbms
 bootstrap()
 
 from lib.core.common import Backend
@@ -408,3 +408,7 @@ class TestReplication(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+def tearDownModule():
+    reset_dbms()   # clear any DBMS forced via set_dbms() so it can't leak into later test modules

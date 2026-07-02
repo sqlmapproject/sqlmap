@@ -24,7 +24,7 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _testutils import bootstrap, set_dbms
+from _testutils import bootstrap, set_dbms, reset_dbms
 bootstrap()
 
 from lib.core.common import Backend
@@ -720,3 +720,7 @@ class TestHSQLDBEnum(_EnumBaseB):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def tearDownModule():
+    reset_dbms()   # clear any DBMS forced via set_dbms() so it can't leak into later test modules
