@@ -979,11 +979,12 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
     DataStore.username = username
     DataStore.password = password
 
+    auth = ' --user "%s:%s"' % (username, password) if (username or password) else ""  # REST API requires HTTP Basic auth
     dbgMsg = "Example client access from command line:"
-    dbgMsg += "\n\t$ taskid=$(curl http://%s:%d/task/new 2>1 | grep -o -I '[a-f0-9]\\{16\\}') && echo $taskid" % (host, port)
-    dbgMsg += "\n\t$ curl -H \"Content-Type: application/json\" -X POST -d '{\"url\": \"https://sekumart.sekuripy.hr/product.php?id=1\"}' http://%s:%d/scan/$taskid/start" % (host, port)
-    dbgMsg += "\n\t$ curl http://%s:%d/scan/$taskid/data" % (host, port)
-    dbgMsg += "\n\t$ curl http://%s:%d/scan/$taskid/log" % (host, port)
+    dbgMsg += "\n\t$ taskid=$(curl -s%s http://%s:%d/task/new | grep -o -I '[a-f0-9]\\{16\\}') && echo $taskid" % (auth, host, port)
+    dbgMsg += "\n\t$ curl%s -H \"Content-Type: application/json\" -X POST -d '{\"url\": \"https://sekumart.sekuripy.hr/product.php?id=1\"}' http://%s:%d/scan/$taskid/start" % (auth, host, port)
+    dbgMsg += "\n\t$ curl%s http://%s:%d/scan/$taskid/data" % (auth, host, port)
+    dbgMsg += "\n\t$ curl%s http://%s:%d/scan/$taskid/log" % (auth, host, port)
     logger.debug(dbgMsg)
 
     addr = "http://%s:%d" % (host, port)
