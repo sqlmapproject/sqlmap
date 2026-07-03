@@ -216,7 +216,7 @@ paths:
                   value:
                     success: true
                     options:
-                      url: "http://testasp.vulnweb.com/showforum.asp?id=1"
+                      url: "https://sekumart.sekuripy.hr/product.php?id=1"
                       batch: true
                       threads: 1
                 invalidTask:
@@ -257,7 +257,7 @@ paths:
                   value:
                     success: true
                     options:
-                      url: "http://testasp.vulnweb.com/showforum.asp?id=1"
+                      url: "https://sekumart.sekuripy.hr/product.php?id=1"
                       cookie: "id=1"
                 unknownOption:
                   value:
@@ -290,7 +290,7 @@ paths:
                   cookie: "id=1"
               setTarget:
                 value:
-                  url: "http://testasp.vulnweb.com/showforum.asp?id=1"
+                  url: "https://sekumart.sekuripy.hr/product.php?id=1"
       responses:
         "200":
           description: Options set, or an API-level failure envelope.
@@ -341,7 +341,7 @@ paths:
             examples:
               basicUrlScan:
                 value:
-                  url: "http://testasp.vulnweb.com/showforum.asp?id=1"
+                  url: "https://sekumart.sekuripy.hr/product.php?id=1"
       responses:
         "200":
           description: Scan started, or an API-level failure envelope.
@@ -568,7 +568,7 @@ paths:
           description: Target output-directory name.
           schema:
             type: string
-            example: testasp.vulnweb.com
+            example: sekumart.sekuripy.hr
         - name: filename
           in: path
           required: true
@@ -788,7 +788,7 @@ components:
       additionalProperties:
         $ref: "#/components/schemas/OptionValue"
       example:
-        url: "http://testasp.vulnweb.com/showforum.asp?id=1"
+        url: "https://sekumart.sekuripy.hr/product.php?id=1"
         cookie: "id=1"
         batch: true
         threads: 1

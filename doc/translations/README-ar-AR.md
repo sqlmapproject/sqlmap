@@ -65,4 +65,5 @@
 * الأسئلة الشائعة: https://github.com/sqlmapproject/sqlmap/wiki/FAQ
 * تويتر: [@sqlmap](https://x.com/sqlmap)
 * العروض التوضيحية: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
+* ساحة التدريب: https://sekumart.sekuripy.hr
 * لقطات الشاشة: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots 

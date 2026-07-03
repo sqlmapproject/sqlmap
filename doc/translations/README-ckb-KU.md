@@ -62,6 +62,7 @@ sqlmap لە دەرەوەی سندوق کاردەکات لەگەڵ [Python](https
 * پرسیارە زۆرەکان (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
 * X: [@sqlmap](https://x.com/sqlmap)
 * دیمۆ: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
+* گۆڕەپانی تاقیکردنەوە: https://sekumart.sekuripy.hr
 * وێنەی شاشە: https://github.com/sqlmapproject/sqlmap/wiki/وێنەی شاشە
 
 وەرگێڕانەکان

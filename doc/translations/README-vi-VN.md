@@ -49,4 +49,5 @@ Liên kết
 * Các câu hỏi thường gặp (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
 * X: [@sqlmap](https://x.com/sqlmap)
 * Demo: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
+* Sân tập: https://sekumart.sekuripy.hr
 * Ảnh chụp màn hình: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

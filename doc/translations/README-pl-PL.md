@@ -47,4 +47,5 @@ Odnośniki
 * Często zadawane pytania (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
 * X: [@sqlmap](https://x.com/sqlmap)
 * Dema: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
+* Piaskownica: https://sekumart.sekuripy.hr
 * Zrzuty ekranu: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

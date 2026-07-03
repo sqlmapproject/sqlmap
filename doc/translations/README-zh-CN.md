@@ -46,4 +46,5 @@ sqlmap 可以运行在 [Python](https://www.python.org/download/)  **2.7**  和 
 * 常见问题 (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
 * X: [@sqlmap](https://x.com/sqlmap)
 * 教程: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
+* 靶场: https://sekumart.sekuripy.hr
 * 截图: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

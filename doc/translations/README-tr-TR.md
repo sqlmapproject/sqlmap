@@ -50,4 +50,5 @@ Bağlantılar
 * Sıkça Sorulan Sorular(SSS): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
 * X: [@sqlmap](https://x.com/sqlmap)
 * Demolar: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
+* Deneme alanı: https://sekumart.sekuripy.hr
 * Ekran görüntüleri: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
