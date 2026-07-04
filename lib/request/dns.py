@@ -235,6 +235,9 @@ class InteractshDNSServer(object):
     is a drop-in for conf.dnsServer.
     """
 
+    _POLL_TRIES = 6      # a triggered lookup surfaces at interactsh within a couple of seconds;
+    _POLL_DELAY = 1.0    # poll up to ~6s per retrieval before treating the channel as silent
+
     def __init__(self, server=None):
         from lib.request.interactsh import Interactsh, hasCrypto
 
@@ -259,25 +262,30 @@ class InteractshDNSServer(object):
         """
         Returns a captured DNS lookup name matching the given prefix/suffix
         (prefix.<query result>.suffix.<correlation domain>), mirroring DNSServer.pop().
+
+        Unlike the synchronous local DNSServer (which reads a query captured during the
+        very request), interactsh is remote and eventually-consistent: a just-triggered
+        lookup takes a moment to reach the collector and surface via its poll API. So we
+        poll a few times before giving up, instead of reading once.
         """
 
-        retVal = None
+        for attempt in range(self._POLL_TRIES):
+            for name in self._client.dnsNames():
+                if name in self._seen:
+                    continue
 
-        for name in self._client.dnsNames():
-            if name in self._seen:
-                continue
+                if prefix is None and suffix is None:
+                    self._seen.add(name)
+                    return name
 
-            if prefix is None and suffix is None:
-                self._seen.add(name)
-                retVal = name
-                break
+                if prefix and suffix and re.search(r"%s\..+\.%s" % (re.escape(prefix), re.escape(suffix)), name, re.I):
+                    self._seen.add(name)
+                    return name
 
-            if prefix and suffix and re.search(r"%s\..+\.%s" % (re.escape(prefix), re.escape(suffix)), name, re.I):
-                self._seen.add(name)
-                retVal = name
-                break
+            if attempt < self._POLL_TRIES - 1:
+                time.sleep(self._POLL_DELAY)
 
-        return retVal
+        return None
 
 if __name__ == "__main__":
     server = None

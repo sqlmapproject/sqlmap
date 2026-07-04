@@ -342,6 +342,7 @@ class TestInteractshDNSServer(unittest.TestCase):
         srv._seen = set()
         srv._running = True
         srv._initialized = True
+        srv._POLL_TRIES = 1   # no real sleeps in unit tests
         return srv
 
     def test_pop_matches_prefix_suffix_and_dedups(self):
