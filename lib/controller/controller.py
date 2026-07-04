@@ -529,8 +529,8 @@ def start():
 
             checkWaf()
 
-            if any((conf.graphql, conf.nosql, conf.ldap, conf.xpath, conf.ssti)) and (conf.reportJson or conf.resultsFile):
-                singleTimeWarnMessage("'--report-json'/'--results-file' do not (yet) capture non-SQL technique (--graphql/--nosql/--ldap/--xpath/--ssti) findings; these are reported on the console only")
+            if any((conf.graphql, conf.nosql, conf.ldap, conf.xpath, conf.ssti, conf.xxe)) and (conf.reportJson or conf.resultsFile):
+                singleTimeWarnMessage("'--report-json'/'--results-file' do not (yet) capture non-SQL technique (--graphql/--nosql/--ldap/--xpath/--ssti/--xxe) findings; these are reported on the console only")
 
             if conf.graphql:
                 from lib.techniques.graphql.inject import graphqlScan
@@ -555,6 +555,11 @@ def start():
             if conf.ssti:
                 from lib.techniques.ssti.inject import sstiScan
                 sstiScan()
+                continue
+
+            if conf.xxe:
+                from lib.techniques.xxe.inject import xxeScan
+                xxeScan()
                 continue
 
             if conf.nullConnection:

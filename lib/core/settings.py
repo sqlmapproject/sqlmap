@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.7.23"
+VERSION = "1.10.7.24"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -1070,6 +1070,73 @@ SSTI_ERROR_SIGNATURES = (
 )
 
 SSTI_ERROR_REGEX = r"(?i)(?:%s)" % '|'.join(regex for _, regex in SSTI_ERROR_SIGNATURES)
+
+# XXE parser error signatures for detection and fingerprinting. Each tuple is
+# (parser_family, regex_fragment). A match means the XML surface reached a real
+# parser and the DOCTYPE/entity was processed (or rejected with a diagnostic) -
+# useful both as an error-based oracle and to fingerprint the back-end parser.
+XXE_ERROR_SIGNATURES = (
+    ("libxml2 (PHP/lxml)", r"(?:failed to load (?:external entity|\")|xmlParseEntityRef|Entity '[^']*' not defined|EntityRef: expecting|Detected an entity reference loop|String not started expecting|StartTag: invalid element name|Start tag expected|Extra content at the end of the document|Premature end of data|error parsing DTD|internal error: Huge input lookup)"),
+    ("PHP simplexml/DOM", r"(?:simplexml_load_string\(\)|DOMDocument::load(?:XML)?\(\)|SimpleXMLElement::__construct\(\))"),
+    ("Java (Xerces/JAXP)", r"(?:org\.xml\.sax\.SAXParseException|com\.sun\.org\.apache\.xerces|javax\.xml\.stream\.XMLStreamException|The (?:entity|element type) \"[^\"]*\" was referenced|DOCTYPE is disallowed when the feature|External (?:DTD|parsed entities|Entity): failed|must be declared|had to be read but the maximum)"),
+    (".NET System.Xml", r"(?:System\.Xml\.XmlException|For security reasons DTD is prohibited|Reference to undeclared entity|An error occurred while parsing EntityName|XmlTextReaderImpl)"),
+    ("Python expat", r"(?:xml\.parsers\.expat\.ExpatError|undefined entity|not well-formed \(invalid token\)|ExpatError)"),
+    ("Ruby Nokogiri/REXML", r"(?:Nokogiri::XML::SyntaxError|REXML::ParseException|Entity .* not defined)"),
+    ("Go encoding/xml", r"XML syntax error on line \d+"),
+    ("Generic XML", r"(?:XML (?:parsing|parse|syntax) error|malformed XML|unexpected (?:end of|<) )"),
+)
+
+XXE_ERROR_REGEX = r"(?i)(?:%s)" % '|'.join(regex for _, regex in XXE_ERROR_SIGNATURES)
+
+# Signatures indicating a hardened / XXE-safe parser posture (DTDs or external
+# entities explicitly refused). Reported as "reachable but protected" - never a hit.
+XXE_HARDENED_REGEX = r"(?i)(?:DOCTYPE is disallowed|DTD is prohibited|(?:external )?(?:DTD|entit(?:y|ies)) (?:are|is) (?:not (?:supported|allowed)|disabled|prohibited|forbidden)|loading of external|network access is not allowed|FEATURE_SECURE_PROCESSING|access to external)"
+
+# Benign, low-entropy files used only to demonstrate file-read impact once XXE is
+# confirmed. Deliberately NOT /etc/passwd (WAF honeypots key on "root:x:0:0") - a
+# short host-identity file is enough to prove the read without tripping decoys.
+# Out-of-band (interactsh) collector for blind XXE confirmation. Public default
+# pool (best-effort, may rotate/be blocklisted by WAFs); override with --oob-server
+# to point at a self-hosted interactsh-server. Correlation-id + nonce lengths match
+# the interactsh defaults (subdomain = <20-char id><13-char nonce>.<server>).
+OOB_INTERACTSH_SERVERS = ("oast.fun", "oast.pro", "oast.live", "oast.site", "oast.online", "oast.me")
+# Public content-hosting + request-logging endpoint for blind-XXE OOB exfiltration
+# (hosts the malicious external DTD and captures the file-bearing callback). Unlike
+# interactsh it can serve arbitrary content; HTTP-only. Default exfil target is benign.
+OOB_EXFIL_ENDPOINT = "https://webhook.site"
+OOB_EXFIL_DEFAULT_FILE = "/etc/hostname"
+OOB_CORRELATION_ID_LENGTH = 20
+OOB_NONCE_LENGTH = 13
+OOB_POLL_ATTEMPTS = 5
+OOB_POLL_DELAY = 2
+
+# Time-based blind tier: an external entity aimed at this non-routable RFC5737
+# TEST-NET-1 host makes a fetching parser stall on the connection, so a large,
+# reproducible response delay betrays otherwise-blind XXE with NO collector needed.
+# The delay must exceed a DTD-processing control baseline by this many seconds.
+XXE_BLACKHOLE_HOST = "192.0.2.1"
+XXE_TIME_THRESHOLD = 5
+
+XXE_IMPACT_FILES = (
+    ("file:///etc/os-release", r"(?i)^(?:NAME|ID|VERSION)="),                     # high-signal, tried first
+    ("file:///c:/windows/win.ini", r"(?i)\[(?:fonts|extensions|mci extensions|files)\]"),
+    ("file:///etc/hostname", r"^[\w.-]{1,255}$"),                                 # loosest pattern, tried last
+)
+
+# GoSecure dtd-finder local-DTD repurposing table for no-egress error-based XXE:
+# an on-disk DTD is loaded, one of its parameter entities is redefined to smuggle
+# an error/exfil primitive, so no outbound network is needed. (path, entity_name).
+# Windows paths are community-sourced and remain UNVERIFIED vendor-side.
+XXE_LOCAL_DTDS = (
+    ("file:///usr/share/yelp/dtd/docbookx.dtd", "ISOamso"),                       # GNOME yelp - reliably repurposable
+    ("file:///usr/share/xml/docbook/schema/dtd/4.5/docbookx.dtd", "ISOamso"),     # docbook package
+    ("file:///opt/IBM/WebSphere/AppServer/properties/sip-app_1_0.dtd", "connection"),
+    ("file:///usr/share/xml/fontconfig/fonts.dtd", "constant"),                   # widespread but gadget is version-fragile
+    ("file:///C:/Windows/System32/wbem/cim20.dtd", "SuperClass"),                 # Windows paths community-sourced, UNVERIFIED
+    ("file:///C:/Windows/System32/wbem/wmi20.dtd", "extension"),
+    ("file:///C:/Windows/System32/xwizards/xwizard.dtd", "ELEMENT"),
+    ("jar:file:///usr/share/java/lotus-domino.jar!/schema/domino.dtd", "abbr"),
+)
 
 # Upper bound for SSTI value extraction (reserved for future use)
 SSTI_MAX_LENGTH = 256

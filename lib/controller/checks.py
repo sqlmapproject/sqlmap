@@ -57,6 +57,7 @@ from lib.core.dicts import HEURISTIC_NULL_EVAL
 from lib.core.enums import DBMS
 from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import HEURISTIC_TEST
+from lib.core.enums import POST_HINT
 from lib.core.enums import HTTP_HEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import NOTE
@@ -86,6 +87,7 @@ from lib.core.settings import INFERENCE_EQUALS_CHAR
 from lib.core.settings import LDAP_ERROR_REGEX
 from lib.core.settings import SSTI_ERROR_REGEX
 from lib.core.settings import XPATH_ERROR_REGEX
+from lib.core.settings import XXE_ERROR_REGEX
 from lib.core.settings import IPS_WAF_CHECK_PAYLOAD
 from lib.core.settings import IPS_WAF_CHECK_RATIO
 from lib.core.settings import IPS_WAF_CHECK_TIMEOUT
@@ -1209,6 +1211,13 @@ def heuristicCheckSqlInjection(place, parameter):
 
     if not conf.ssti and re.search(SSTI_ERROR_REGEX, page or ""):
         infoMsg = "heuristic (SSTI) test shows that %sparameter '%s' might be vulnerable to server-side template injection (rerun with switch '--ssti')" % ("%s " % paramType if paramType != parameter else "", parameter)
+        logger.info(infoMsg)
+
+        if conf.beep:
+            beep()
+
+    if not conf.xxe and kb.postHint in (POST_HINT.XML, POST_HINT.SOAP) and re.search(XXE_ERROR_REGEX, page or ""):
+        infoMsg = "heuristic (XXE) test shows that the XML request body might be vulnerable to XML External Entity injection (rerun with switch '--xxe')"
         logger.info(infoMsg)
 
         if conf.beep:

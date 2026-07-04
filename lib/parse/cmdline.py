@@ -440,7 +440,7 @@ def cmdLineParser(argv=None):
             help="Column values to use for UNION query SQL injection")
 
         techniques.add_argument("--dns-domain", dest="dnsDomain",
-            help="Domain name used for DNS exfiltration attack")
+            help="Domain name used for DNS exfiltration attack (or 'interactsh' for zero-setup OOB)")
 
         techniques.add_argument("--second-url", dest="secondUrl",
             help="Resulting page URL searched for second-order response")
@@ -789,6 +789,15 @@ def cmdLineParser(argv=None):
 
         nonsql.add_argument("--ssti", dest="ssti", action="store_true",
             help="Test for server-side template injection")
+
+        nonsql.add_argument("--xxe", dest="xxe", action="store_true",
+            help="Test for XML External Entity (XXE) injection")
+
+        nonsql.add_argument("--oob-server", dest="oobServer",
+            help="Out-of-band server for blind '--xxe' (default: public interactsh; 'none' to disable OOB)")
+
+        nonsql.add_argument("--oob-token", dest="oobToken",
+            help="Authentication token for a self-hosted '--oob-server'")
 
         # Miscellaneous options
         miscellaneous = parser.add_argument_group("Miscellaneous", "These options do not fit into any other category")

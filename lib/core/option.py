@@ -144,6 +144,7 @@ from lib.request.basicauthhandler import SmartHTTPBasicAuthHandler
 from lib.request.chunkedhandler import ChunkedHandler
 from lib.request.connect import Connect as Request
 from lib.request.dns import DNSServer
+from lib.request.dns import InteractshDNSServer
 from lib.request.httpshandler import HTTPSHandler
 from lib.request.keepalive import HTTPKeepAliveHandler
 from lib.request.keepalive import HTTPSKeepAliveHandler
@@ -935,10 +936,10 @@ def _setTamperingFunctions():
             logger.warning(warnMsg)
 
         # tamper scripts rewrite SQL injection payloads; the self-contained non-SQL engines
-        # (--graphql/--nosql/--ldap/--xpath/--ssti) do not run payloads through the tampering hook, so
+        # (--graphql/--nosql/--ldap/--xpath/--ssti/--xxe) do not run payloads through the tampering hook, so
         # warn instead of silently ignoring the user's '--tamper'
-        if kb.tamperFunctions and any((conf.graphql, conf.nosql, conf.ldap, conf.xpath, conf.ssti)):
-            engine = next(_ for _ in ("graphql", "nosql", "ldap", "xpath", "ssti") if conf.get(_))
+        if kb.tamperFunctions and any((conf.graphql, conf.nosql, conf.ldap, conf.xpath, conf.ssti, conf.xxe)):
+            engine = next(_ for _ in ("graphql", "nosql", "ldap", "xpath", "ssti", "xxe") if conf.get(_))
             warnMsg = "tamper scripts are applied to SQL injection payloads only and "
             warnMsg += "will be ignored by the '--%s' engine" % engine
             logger.warning(warnMsg)
@@ -2579,6 +2580,26 @@ def _setupHTTPCollector():
 
 def _setDNSServer():
     if not conf.dnsDomain:
+        return
+
+    from lib.core.settings import OOB_INTERACTSH_SERVERS
+
+    _requested = conf.dnsDomain.strip().lower()
+    if _requested in ("interactsh", "oast", "oob") or _requested in OOB_INTERACTSH_SERVERS:
+        infoMsg = "setting up interactsh-backed DNS exfiltration collector"
+        logger.info(infoMsg)
+
+        try:
+            conf.dnsServer = InteractshDNSServer(server=_requested if _requested in OOB_INTERACTSH_SERVERS else None)
+            conf.dnsServer.run()
+            conf.dnsDomain = conf.dnsServer.domain
+        except socket.error as ex:
+            errMsg = "there was an error while setting up "
+            errMsg += "the interactsh DNS collector ('%s')" % getSafeExString(ex)
+            raise SqlmapGenericException(errMsg)
+
+        infoMsg = "using interactsh DNS collector (exfiltration domain '%s')" % conf.dnsDomain
+        logger.info(infoMsg)
         return
 
     infoMsg = "setting up DNS server instance"

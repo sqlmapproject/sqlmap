@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
 from lib.core.settings import MAX_DNS_REQUESTS
-from lib.request.dns import DNSQuery, DNSServer
+from lib.request.dns import DNSQuery, DNSServer, InteractshDNSServer
 
 
 def build_query(name, tid=b"\x12\x34", qtype=1):
@@ -324,3 +324,41 @@ class TestDNSServerConcurrency(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestInteractshDNSServer(unittest.TestCase):
+    """The interactsh-backed DNS collector must present the same pop(prefix, suffix)
+    accounting as DNSServer, matching only prefix.<result>.suffix names and never
+    returning the same captured lookup twice."""
+
+    def _collector(self, names):
+        class _FakeClient(object):
+            registered = True
+            def dnsDomain(self): return "corr0000000000000nnc.oast.fun"
+            def dnsNames(self): return list(names)
+        srv = InteractshDNSServer.__new__(InteractshDNSServer)
+        srv._client = _FakeClient()
+        srv.domain = srv._client.dnsDomain()
+        srv._seen = set()
+        srv._running = True
+        srv._initialized = True
+        return srv
+
+    def test_pop_matches_prefix_suffix_and_dedups(self):
+        names = ["aaa.5345435245540a.zzz.corr0000000000000nnc", "unrelated.corr0000000000000nnc"]
+        srv = self._collector(names)
+        got = srv.pop("aaa", "zzz")
+        self.assertEqual(got, "aaa.5345435245540a.zzz.corr0000000000000nnc")
+        self.assertIsNone(srv.pop("aaa", "zzz"))   # already consumed
+
+    def test_pop_no_match(self):
+        srv = self._collector(["aaa.deadbeef.qqq.corr0000000000000nnc"])
+        self.assertIsNone(srv.pop("aaa", "zzz"))
+
+    def test_pop_any(self):
+        srv = self._collector(["whatever.corr0000000000000nnc"])
+        self.assertEqual(srv.pop(), "whatever.corr0000000000000nnc")
+
+    def test_run_is_noop(self):
+        self._collector([]).run()   # must not raise
+
