@@ -794,7 +794,7 @@ def cmdLineParser(argv=None):
             help="Test for XML External Entity (XXE) injection")
 
         nonsql.add_argument("--oob-server", dest="oobServer",
-            help="Out-of-band server for blind '--xxe' (default: public interactsh; 'none' to disable OOB)")
+            help="Out-of-band server for blind '--xxe'")
 
         nonsql.add_argument("--oob-token", dest="oobToken",
             help="Authentication token for a self-hosted '--oob-server'")
