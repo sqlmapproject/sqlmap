@@ -618,7 +618,7 @@ def _createFilesDir():
     Create the file directory.
     """
 
-    if not any((conf.fileRead, conf.commonFiles)):
+    if not any((conf.fileRead, conf.commonFiles, conf.xxe)):
         return
 
     # Note: normalize the hostname consistently with conf.outputPath / conf.dumpPath (see _createDumpDir)

@@ -239,7 +239,35 @@ class TestReportMethod(unittest.TestCase):
             xxe._report("Title", "Payload")
         finally:
             conf.dumper, conf.method, conf.beep = old_dumper, old_method, old_beep
-        self.assertIn("PUT XML body", captured[0])
+        self.assertIn("Parameter: XML body (PUT)", captured[0])
+
+
+class TestHarvestFiles(unittest.TestCase):
+    def test_harvest_collects_dedups_and_skips_empty(self):
+        # simulate a target that returns real content for two files, an empty read for
+        # one (skipped), and an identical stub for the rest (deduped to a single entry)
+        def _fake(xml, rootName, path):
+            if path == "/etc/passwd":
+                return "root:x:0:0:root:/root:/bin/sh\n", "PAYLOAD-passwd"
+            if path == "/etc/hostname":
+                return "host01\n", "PAYLOAD-hostname"
+            if path == "/etc/hosts":
+                return "   ", "PAYLOAD-empty"   # whitespace-only -> skipped
+            return "same stub", "PAYLOAD-stub"  # identical for every other path -> deduped
+
+        old = xxe._tryInbandFileRead
+        xxe._tryInbandFileRead = _fake
+        try:
+            harvested = xxe._harvestFiles("<user><name>x</name></user>", "user")
+        finally:
+            xxe._tryInbandFileRead = old
+
+        paths = [p for p, _, _ in harvested]
+        self.assertIn("/etc/passwd", paths)
+        self.assertIn("/etc/hostname", paths)
+        self.assertNotIn("/etc/hosts", paths)          # empty read skipped
+        self.assertEqual(paths.count("/etc/passwd"), 1)
+        self.assertEqual(sum(1 for c in (c for _, c, _ in harvested) if c == "same stub"), 1)  # stub deduped
 
 
 class TestOobBase64Capture(unittest.TestCase):

@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.7.28"
+VERSION = "1.10.7.29"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -1119,6 +1119,32 @@ XXE_TIME_THRESHOLD = 5
 XXE_IMPACT_FILES = (
     ("file:///etc/os-release", r"(?i)^(?:NAME|ID|VERSION)="),                     # anchored, high-signal
     ("file:///c:/windows/win.ini", r"(?i)\[(?:fonts|extensions|mci extensions|files)\]"),
+)
+
+# Once an in-band XXE file-read primitive is CONFIRMED, sqlmap proactively harvests
+# this curated set of high-value, fixed-path files (host identity, process env/
+# secrets, key material) - the XXE analogue of the automatic dumping the other
+# non-SQL engines perform. Kept small and high-signal (each entry costs 1-2 requests);
+# best-effort, so unreadable/absent files are silently skipped. Unlike XXE_IMPACT_FILES
+# (a benign PRE-confirmation impact probe that avoids WAF-honeypot paths) this runs
+# only AFTER confirmation, so sensitive paths are appropriate. Skipped when the user
+# gave an explicit '--file-read' (that targeted request is honoured verbatim instead).
+XXE_FILE_HARVEST = (
+    "/etc/passwd",
+    "/etc/hostname",
+    "/etc/hosts",
+    "/etc/os-release",
+    "/etc/shadow",
+    "/etc/group",
+    "/proc/self/environ",
+    "/proc/self/cmdline",
+    "/proc/self/status",
+    "/proc/version",
+    "/root/.bash_history",
+    "/root/.ssh/id_rsa",
+    "c:/windows/win.ini",
+    "c:/windows/system32/drivers/etc/hosts",
+    "c:/inetpub/wwwroot/web.config",
 )
 
 # GoSecure dtd-finder local-DTD repurposing table for no-egress error-based XXE:

