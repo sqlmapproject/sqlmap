@@ -1283,7 +1283,9 @@ def checkDynamicContent(firstPage, secondPage):
             seqMatcher.set_seq1(firstPage)
             seqMatcher.set_seq2(secondPage)
             ratio = seqMatcher.quick_ratio()
-        except MemoryError:
+        except (MemoryError, TypeError, SystemError, ValueError, AttributeError):
+            # difflib can fail on pathological input or, rarely, with interpreter-level
+            # errors under heavy threading; degrade to "undetermined" instead of crashing
             ratio = None
 
     if ratio is None:

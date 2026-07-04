@@ -2344,9 +2344,14 @@ def showStaticWords(firstPage, secondPage, minLength=3):
     infoMsg = "static words: "
 
     if firstPage and secondPage:
-        match = SequenceMatcher(None, firstPage, secondPage).find_longest_match(0, len(firstPage), 0, len(secondPage))
-        commonText = firstPage[match[0]:match[0] + match[2]]
-        commonWords = getPageWordSet(commonText)
+        try:
+            match = SequenceMatcher(None, firstPage, secondPage).find_longest_match(0, len(firstPage), 0, len(secondPage))
+            commonText = firstPage[match[0]:match[0] + match[2]]
+            commonWords = getPageWordSet(commonText)
+        except (MemoryError, TypeError, SystemError, ValueError, AttributeError):
+            # difflib can fail on pathological input / interpreter-level hiccups; skip
+            # the static-word hint rather than abort (see findDynamicContent / comparison.py)
+            commonWords = None
     else:
         commonWords = None
 
@@ -3363,7 +3368,14 @@ def findDynamicContent(firstPage, secondPage, merge=False):
     infoMsg = "searching for dynamic content"
     singleTimeLogMessage(infoMsg)
 
-    blocks = list(SequenceMatcher(None, firstPage, secondPage).get_matching_blocks())
+    try:
+        blocks = list(SequenceMatcher(None, firstPage, secondPage).get_matching_blocks())
+    except (MemoryError, TypeError, SystemError, ValueError, AttributeError):
+        # difflib can blow up on pathological/oversized input (and, rarely, with
+        # interpreter-level errors under heavy threading); a failed dynamic-content
+        # search must degrade gracefully rather than abort the whole scan - mirrors the
+        # guard around the ratio computation in lib/request/comparison.py
+        return
 
     if not merge:
         kb.dynamicMarkings = []

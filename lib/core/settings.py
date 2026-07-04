@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.7.29"
+VERSION = "1.10.7.30"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -1123,12 +1123,13 @@ XXE_IMPACT_FILES = (
 
 # Once an in-band XXE file-read primitive is CONFIRMED, sqlmap proactively harvests
 # this curated set of high-value, fixed-path files (host identity, process env/
-# secrets, key material) - the XXE analogue of the automatic dumping the other
-# non-SQL engines perform. Kept small and high-signal (each entry costs 1-2 requests);
-# best-effort, so unreadable/absent files are silently skipped. Unlike XXE_IMPACT_FILES
-# (a benign PRE-confirmation impact probe that avoids WAF-honeypot paths) this runs
-# only AFTER confirmation, so sensitive paths are appropriate. Skipped when the user
-# gave an explicit '--file-read' (that targeted request is honoured verbatim instead).
+# secrets, key material, common application drop paths) - the XXE analogue of the
+# automatic dumping the other non-SQL engines perform. Kept small and high-signal (each
+# entry costs 1-2 requests); best-effort, so unreadable/absent files are silently
+# skipped. Unlike XXE_IMPACT_FILES (a benign PRE-confirmation impact probe that avoids
+# WAF-honeypot paths) this runs only AFTER confirmation, so sensitive paths are
+# appropriate. Skipped when the user gave an explicit '--file-read' (that targeted
+# request is honoured verbatim instead).
 XXE_FILE_HARVEST = (
     "/etc/passwd",
     "/etc/hostname",
@@ -1142,9 +1143,23 @@ XXE_FILE_HARVEST = (
     "/proc/version",
     "/root/.bash_history",
     "/root/.ssh/id_rsa",
+    "/flag",
+    "/flag.txt",
     "c:/windows/win.ini",
     "c:/windows/system32/drivers/etc/hosts",
     "c:/inetpub/wwwroot/web.config",
+)
+
+# Application web roots + source filenames used, once php://filter is available, to
+# disclose server-side SOURCE code (which is executed and never rendered, yet leaks its
+# literals - credentials, tokens, embedded secrets - verbatim through the base64 filter
+# wrapper). Combined with the running script derived from harvested /proc/self/{cmdline,
+# environ}. Best-effort and bounded.
+XXE_WEBROOTS = ("/var/www/html", "/var/www", "/app", "/usr/src/app", "/srv/app")
+XXE_SOURCE_NAMES = (
+    "index.php", "config.php", "config.inc.php", "secret.php",
+    "db.php", "database.php", "settings.php", "init.php", "functions.php",
+    "app.py", "server.py", "main.py", "wp-config.php", ".env",
 )
 
 # GoSecure dtd-finder local-DTD repurposing table for no-egress error-based XXE:
