@@ -7,11 +7,12 @@ See the file 'LICENSE' for copying permission
 
 import json
 
+from lib.core.data import conf
 from lib.core.data import logger
+from lib.core.convert import getBytes
 from lib.core.convert import getText
 from lib.core.enums import HTTP_HEADER
 from lib.core.settings import OOB_EXFIL_ENDPOINT
-from lib.request.connect import Connect as Request
 
 # webhook.site is used for blind-XXE OOB *exfiltration*: it can both serve a custom
 # response (our malicious external DTD) AND log the request the target then makes
@@ -21,8 +22,9 @@ from lib.request.connect import Connect as Request
 
 class WebhookSite(object):
     """Thin webhook.site client: mints tokens (optionally serving fixed content)
-    and reads back the requests captured on them. All calls go through sqlmap's
-    request stack (proxy/timeout honoured) straight to the service, not the target."""
+    and reads back the requests captured on them. Self-contained on urllib (like the
+    interactsh client): sqlmap's getPage caches by URL, which would make repeated
+    polls of the same /requests URL return a stale snapshot and miss the callback."""
 
     def __init__(self):
         # Exfil host is the public content-serving endpoint (its token API is
@@ -32,10 +34,28 @@ class WebhookSite(object):
 
     def _api(self, path, post=None):
         try:
+            import ssl
+            try:
+                from urllib.request import Request as _Request, build_opener, ProxyHandler, HTTPSHandler
+            except ImportError:
+                from urllib2 import Request as _Request, build_opener, ProxyHandler, HTTPSHandler
+
             headers = {HTTP_HEADER.CONTENT_TYPE: "application/json"} if post is not None else {HTTP_HEADER.ACCEPT: "application/json"}
-            page, _, code = Request.getPage(url="%s%s" % (self.endpoint, path), post=post,
-                                            auxHeaders=headers, direct=True, silent=True, raise404=False)
-            return page if (code is None or code in (200, 201)) else None
+            handlers = []
+            try:
+                context = ssl.create_default_context()
+                if conf.get("verifyCert") is False:
+                    context.check_hostname = False
+                    context.verify_mode = ssl.CERT_NONE
+                handlers.append(HTTPSHandler(context=context))
+            except Exception:
+                pass
+            if conf.get("proxy"):
+                handlers.append(ProxyHandler({"http": conf.proxy, "https": conf.proxy}))
+
+            request = _Request("%s%s" % (self.endpoint, path), data=getBytes(post) if post is not None else None, headers=headers)
+            response = build_opener(*handlers).open(request, timeout=conf.get("timeout") or 30)
+            return getText(response.read())
         except Exception as ex:
             logger.debug("webhook.site request to '%s' failed: %s" % (path, getText(ex)))
             return None

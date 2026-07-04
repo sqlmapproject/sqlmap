@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.7.24"
+VERSION = "1.10.7.25"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -1102,13 +1102,12 @@ XXE_HARDENED_REGEX = r"(?i)(?:DOCTYPE is disallowed|DTD is prohibited|(?:externa
 OOB_INTERACTSH_SERVERS = ("oast.fun", "oast.pro", "oast.live", "oast.site", "oast.online", "oast.me")
 # Public content-hosting + request-logging endpoint for blind-XXE OOB exfiltration
 # (hosts the malicious external DTD and captures the file-bearing callback). Unlike
-# interactsh it can serve arbitrary content; HTTP-only. Default exfil target is benign.
+# interactsh it can serve arbitrary content; HTTP-only. Used only on explicit consent.
 OOB_EXFIL_ENDPOINT = "https://webhook.site"
-OOB_EXFIL_DEFAULT_FILE = "/etc/hostname"
 OOB_CORRELATION_ID_LENGTH = 20
 OOB_NONCE_LENGTH = 13
-OOB_POLL_ATTEMPTS = 5
-OOB_POLL_DELAY = 2
+OOB_POLL_ATTEMPTS = 15     # generous: two-hop exfil (target fetches DTD, then calls back) over the
+OOB_POLL_DELAY = 2         # target's own link + webhook.site's eventually-consistent API (best-effort)
 
 # Time-based blind tier: an external entity aimed at this non-routable RFC5737
 # TEST-NET-1 host makes a fetching parser stall on the connection, so a large,
@@ -1118,9 +1117,8 @@ XXE_BLACKHOLE_HOST = "192.0.2.1"
 XXE_TIME_THRESHOLD = 5
 
 XXE_IMPACT_FILES = (
-    ("file:///etc/os-release", r"(?i)^(?:NAME|ID|VERSION)="),                     # high-signal, tried first
+    ("file:///etc/os-release", r"(?i)^(?:NAME|ID|VERSION)="),                     # anchored, high-signal
     ("file:///c:/windows/win.ini", r"(?i)\[(?:fonts|extensions|mci extensions|files)\]"),
-    ("file:///etc/hostname", r"^[\w.-]{1,255}$"),                                 # loosest pattern, tried last
 )
 
 # GoSecure dtd-finder local-DTD repurposing table for no-egress error-based XXE:

