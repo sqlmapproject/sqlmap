@@ -399,7 +399,7 @@ class Task(object):
             try:
                 self.process.kill()
                 return self.process.wait()
-            except:
+            except (OSError, ProcessLookupError):
                 pass
         return None
 
@@ -514,7 +514,7 @@ def check_authentication():
 
     try:
         creds = decodeBase64(match.group(1), binary=False)
-    except:
+    except (binascii.Error, ValueError, TypeError):
         request.environ["PATH_INFO"] = "/error/401"
     else:
         if ':' not in creds:
@@ -965,7 +965,7 @@ def _client(url, options=None):
         req = _urllib.request.Request(url, data, headers)
         response = _urllib.request.urlopen(req)
         text = getText(response.read())
-    except:
+    except (IOError, OSError, _urllib.error.URLError, _urllib.error.HTTPError):
         if options:
             logger.error("Failed to load and parse %s" % url)
         raise
@@ -1056,7 +1056,7 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
 
             try:
                 cmdLineOptions = cmdLineParser(argv).__dict__
-            except:
+            except (SystemExit, Exception):
                 taskid = None
                 continue
 

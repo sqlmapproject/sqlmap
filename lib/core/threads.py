@@ -258,7 +258,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
             if lock.locked():
                 try:
                     lock.release()
-                except:
+                except Exception:
                     pass
 
         if conf.get("hashDB"):

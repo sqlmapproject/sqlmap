@@ -90,7 +90,7 @@ def update():
                                 shutil.rmtree(_)
                             else:
                                 os.remove(_)
-                        except:
+                        except OSError:
                             pass
 
                 if glob.glob(os.path.join(directory, '*')):

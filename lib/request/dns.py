@@ -127,7 +127,7 @@ class DNSServer(object):
             s.connect(("", 53))
             s.send(binascii.unhexlify("6509012000010000000000010377777706676f6f676c6503636f6d00000100010000291000000000000000"))  # A www.google.com
             response = s.recv(512)
-        except:
+        except Exception:
             pass
         finally:
             if s:

@@ -331,12 +331,20 @@ def apiTest():
     username, password = "test", "test"
     apipath = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmapapi.py"))
 
-    try:
-        devnull = subprocess.DEVNULL
-    except AttributeError:
-        devnull = open(os.devnull, "wb")
+    # Use subprocess.DEVNULL when available (Python 3.3+), otherwise open /dev/null
+    # and ensure it's properly closed in a finally block
+    devnull = getattr(subprocess, 'DEVNULL', None)
+    devnull_fd = None
+    if devnull is None:
+        devnull_fd = open(os.devnull, "wb")
+        devnull = devnull_fd
 
-    process = subprocess.Popen([sys.executable, apipath, "-s", "-H", address, "-p", str(port), "--username", username, "--password", password], stdout=devnull, stderr=devnull)
+    try:
+        process = subprocess.Popen([sys.executable, apipath, "-s", "-H", address, "-p", str(port), "--username", username, "--password", password], stdout=devnull, stderr=devnull)
+    except Exception:
+        if devnull_fd is not None:
+            devnull_fd.close()
+        raise
 
     base = "http://%s:%d" % (address, port)
 
