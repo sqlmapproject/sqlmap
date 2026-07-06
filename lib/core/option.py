@@ -157,7 +157,7 @@ from lib.utils.har import HTTPCollectorFactory
 from lib.utils.purge import purge
 from lib.utils.search import search
 from thirdparty import six
-from thirdparty.multipart import multipartpost
+from lib.request.multiparthandler import MultipartPostHandler
 from thirdparty.six.moves import collections_abc as _collections
 from thirdparty.six.moves import http_client as _http_client
 from thirdparty.six.moves import http_cookiejar as _http_cookiejar
@@ -173,7 +173,7 @@ keepAliveHandlerHTTPS = HTTPSKeepAliveHandler()
 proxyHandler = _urllib.request.ProxyHandler()
 redirectHandler = SmartRedirectHandler()
 rangeHandler = HTTPRangeHandler()
-multipartPostHandler = multipartpost.MultipartPostHandler()
+multipartPostHandler = MultipartPostHandler()
 
 # Reference: https://mail.python.org/pipermail/python-list/2009-November/558615.html
 try:

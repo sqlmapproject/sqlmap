@@ -1586,7 +1586,6 @@ def setPaths(rootPath):
     paths.COMMON_COLUMNS = os.path.join(paths.SQLMAP_TXT_PATH, "common-columns.txt")
     paths.COMMON_FILES = os.path.join(paths.SQLMAP_TXT_PATH, "common-files.txt")
     paths.COMMON_TABLES = os.path.join(paths.SQLMAP_TXT_PATH, "common-tables.txt")
-    paths.DIGEST_FILE = os.path.join(paths.SQLMAP_TXT_PATH, "sha256sums.txt")
     paths.SQL_KEYWORDS = os.path.join(paths.SQLMAP_TXT_PATH, "keywords.txt")
     paths.SMALL_DICT = os.path.join(paths.SQLMAP_TXT_PATH, "smalldict.txt")
     paths.USER_AGENTS = os.path.join(paths.SQLMAP_TXT_PATH, "user-agents.txt")
@@ -5840,30 +5839,35 @@ def chunkSplitPostData(data):
 
     return "".join(retVal)
 
-def checkSums():
+def isGitRepository():
     """
-    Validate the content of the digest file (i.e. sha256sums.txt)
-    >>> checkSums()
+    Whether the running source tree is a git working copy (i.e. a clone / dev checkout, as opposed to a
+    pip/tarball install)
+    """
+
+    return os.path.isdir(os.path.join(paths.SQLMAP_ROOT_PATH, ".git"))
+
+def codeIsModified():
+    """
+    Best-effort check whether a git working copy has local modifications, used to avoid auto-reporting
+    crashes that stem from a user's OWN changes. Only meaningful for git checkouts (dev/clone); a
+    pip/tarball install is taken as shipped (returns False). A transient git error also yields False,
+    so a missing git binary never silences a legitimate report.
+
+    >>> codeIsModified() in (True, False)
     True
     """
 
-    retVal = True
+    retVal = False
 
-    if paths.get("DIGEST_FILE"):
-        for entry in getFileItems(paths.DIGEST_FILE):
-            match = re.search(r"([0-9a-f]+)\s+([^\s]+)", entry)
-            if match:
-                expected, filename = match.groups()
-                filepath = os.path.join(paths.SQLMAP_ROOT_PATH, filename).replace('/', os.path.sep)
-                if not checkFile(filepath, False):
-                    continue
-                with open(filepath, "rb") as f:
-                    content = f.read()
-                    if b'\0' not in content:
-                        content = content.replace(b"\r\n", b"\n")
-                if not hashlib.sha256(content).hexdigest() == expected:
-                    retVal &= False
-                    break
+    if isGitRepository():
+        try:
+            process = subprocess.Popen("git diff-index --quiet HEAD --", shell=True, cwd=paths.SQLMAP_ROOT_PATH, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            process.communicate()
+            if process.returncode == 1:             # 0 == clean, 1 == modified (anything else == git error)
+                retVal = True
+        except Exception:
+            pass
 
     return retVal
 

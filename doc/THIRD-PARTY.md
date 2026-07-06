@@ -46,8 +46,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 * The `Chardet` library located under `thirdparty/chardet/`.
   Copyright (C) 2008, Mark Pilgrim.
-* The `MultipartPost` library located under `thirdparty/multipart/`.
-  Copyright (C) 2006, Will Holcomb.
 * The `icmpsh` tool located under `extra/icmpsh/`.
   Copyright (C) 2010, Nico Leidecker, Bernardo Damele.
 

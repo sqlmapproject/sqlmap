@@ -55,7 +55,7 @@ try:
 
     from lib.core.common import banner
     from lib.core.common import checkPipedInput
-    from lib.core.common import checkSums
+    from lib.core.common import codeIsModified
     from lib.core.common import createGithubIssue
     from lib.core.common import dataToStdout
     from lib.core.common import extractRegexResult
@@ -282,7 +282,7 @@ def main():
         print()
         errMsg = unhandledExceptionMessage()
         excMsg = traceback.format_exc()
-        valid = checkSums()
+        valid = not codeIsModified()
 
         os._exitcode = 255
 
