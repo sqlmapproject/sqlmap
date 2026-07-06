@@ -524,31 +524,33 @@ class Connect(object):
 
             if webSocket:
                 ws = websocket.WebSocket()
-                ws.settimeout(WEBSOCKET_INITIAL_TIMEOUT if kb.webSocketRecvCount is None else timeout)
-                wsHeaders = tuple("%s: %s" % (getUnicode(key), getUnicode(value)) for key, value in headers.items() if getUnicode(key).upper() != HTTP_HEADER.HOST.upper())
-                ws.connect(url, header=wsHeaders, cookie=cookie)  # WebSocket will add Host field of headers automatically
-                ws.send(urldecode(post or ""))
+                try:
+                    ws.settimeout(WEBSOCKET_INITIAL_TIMEOUT if kb.webSocketRecvCount is None else timeout)
+                    wsHeaders = tuple("%s: %s" % (getUnicode(key), getUnicode(value)) for key, value in headers.items() if getUnicode(key).upper() != HTTP_HEADER.HOST.upper())
+                    ws.connect(url, header=wsHeaders, cookie=cookie)  # WebSocket will add Host field of headers automatically
+                    ws.send(urldecode(post or ""))
 
-                _page = []
+                    _page = []
 
-                if kb.webSocketRecvCount is None:
-                    while True:
-                        try:
-                            _page.append(ws.recv())
-                            if sum(len(_) for _ in _page) > MAX_CONNECTION_TOTAL_SIZE:
-                                warnMsg = "too large websocket response detected. Automatically trimming it"
-                                singleTimeWarnMessage(warnMsg)
+                    if kb.webSocketRecvCount is None:
+                        while True:
+                            try:
+                                _page.append(ws.recv())
+                                if sum(len(_) for _ in _page) > MAX_CONNECTION_TOTAL_SIZE:
+                                    warnMsg = "too large websocket response detected. Automatically trimming it"
+                                    singleTimeWarnMessage(warnMsg)
+                                    break
+                            except websocket.WebSocketTimeoutException:
+                                kb.webSocketRecvCount = len(_page)
                                 break
-                        except websocket.WebSocketTimeoutException:
-                            kb.webSocketRecvCount = len(_page)
-                            break
-                else:
-                    for i in xrange(max(1, kb.webSocketRecvCount)):
-                        _page.append(ws.recv())
+                    else:
+                        for i in xrange(max(1, kb.webSocketRecvCount)):
+                            _page.append(ws.recv())
 
-                page = "\n".join(_page)
+                    page = "\n".join(_page)
+                finally:
+                    ws.close()
 
-                ws.close()
                 code = ws.status
                 status = _http_client.responses.get(code, "")
 
