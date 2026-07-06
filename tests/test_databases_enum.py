@@ -61,7 +61,7 @@ class _BaseEnumTest(unittest.TestCase):
 
     # conf keys every test may read/write
     _CONF_KEYS = ("direct", "technique", "db", "tbl", "col", "exclude",
-                  "getComments", "excludeSysDbs", "search", "freshQueries")
+                  "getComments", "excludeSysDbs", "search", "freshQueries", "threads")
 
     def setUp(self):
         self._saved_conf = {k: conf.get(k) for k in self._CONF_KEYS}
@@ -117,6 +117,7 @@ class _BaseEnumTest(unittest.TestCase):
         """Take the blind inference branch: conf.direct off, a BOOLEAN technique present."""
         conf.direct = False
         conf.technique = None
+        conf.threads = 1   # exercise the serial getValue() path these tests mock (>1 takes the value-parallel branch)
         kb.injection.data = {PAYLOAD.TECHNIQUE.BOOLEAN: {"title": "AND boolean-based blind"}}
 
 
@@ -533,7 +534,7 @@ class TestGetProcedures(_BaseEnumTest):
 
 class _DbBase(unittest.TestCase):
     _CONF_KEYS = ("direct", "technique", "db", "tbl", "col", "exclude",
-                  "getComments", "excludeSysDbs", "search", "freshQueries")
+                  "getComments", "excludeSysDbs", "search", "freshQueries", "threads")
 
     def setUp(self):
         self._saved_conf = {k: conf.get(k) for k in self._CONF_KEYS}
@@ -588,6 +589,7 @@ class _DbBase(unittest.TestCase):
     def _inference(self):
         conf.direct = False
         conf.technique = None
+        conf.threads = 1   # exercise the serial getValue() path these tests mock (>1 takes the value-parallel branch)
         kb.injection.data = {PAYLOAD.TECHNIQUE.BOOLEAN: {"title": "AND boolean-based blind"}}
 
 

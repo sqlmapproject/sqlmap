@@ -424,7 +424,10 @@ def _threadedInferenceValues(exprBuilder, indices, context=None, charsetType=Non
 
     indices = list(indices)
 
-    savedTechnique = getTechnique()
+    # Snapshot the raw per-thread technique (may be None) so the finally can restore it verbatim -
+    # getTechnique() would fall back to kb.technique, and a None result there used to skip the restore
+    # entirely, leaking the BOOLEAN/TIME we set below onto the calling thread for every later caller.
+    savedTechnique = getCurrentThreadData().technique
 
     if isTechniqueAvailable(PAYLOAD.TECHNIQUE.BOOLEAN):
         setTechnique(PAYLOAD.TECHNIQUE.BOOLEAN)
@@ -433,8 +436,12 @@ def _threadedInferenceValues(exprBuilder, indices, context=None, charsetType=Non
     else:
         return None
 
-    initTechnique(getTechnique())
-    payload = agent.payload(newValue=agent.suffixQuery(agent.prefixQuery(getTechniqueData().vector)))
+    try:
+        initTechnique(getTechnique())
+        payload = agent.payload(newValue=agent.suffixQuery(agent.prefixQuery(getTechniqueData().vector)))
+    except:
+        setTechnique(savedTechnique)   # these run before the runThreads try/finally below, so restore here too
+        raise
 
     results = [None] * len(indices)
     cursor = iter(xrange(len(indices)))
@@ -501,8 +508,7 @@ def _threadedInferenceValues(exprBuilder, indices, context=None, charsetType=Non
         kb.partRun = savedPartRun
         mainThreadData.disableStdOut = savedStdOut
         mainThreadData.shared = savedShared
-        if savedTechnique is not None:
-            setTechnique(savedTechnique)
+        setTechnique(savedTechnique)
 
     # Robustness: any slot a worker could not retrieve (None, i.e. a transient per-cell failure) is
     # re-extracted serially via the classic getValue() path - full error handling, and a persistent error
