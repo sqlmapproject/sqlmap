@@ -1582,10 +1582,10 @@ def setPaths(rootPath):
     paths.SQLMAP_XML_PAYLOADS_PATH = os.path.join(paths.SQLMAP_XML_PATH, "payloads")
 
     # sqlmap files
+    paths.CATALOG_IDENTIFIERS = os.path.join(paths.SQLMAP_TXT_PATH, "catalog-identifiers.txt")
     paths.COMMON_COLUMNS = os.path.join(paths.SQLMAP_TXT_PATH, "common-columns.txt")
     paths.COMMON_FILES = os.path.join(paths.SQLMAP_TXT_PATH, "common-files.txt")
     paths.COMMON_TABLES = os.path.join(paths.SQLMAP_TXT_PATH, "common-tables.txt")
-    paths.COMMON_OUTPUTS = os.path.join(paths.SQLMAP_TXT_PATH, 'common-outputs.txt')
     paths.DIGEST_FILE = os.path.join(paths.SQLMAP_TXT_PATH, "sha256sums.txt")
     paths.SQL_KEYWORDS = os.path.join(paths.SQLMAP_TXT_PATH, "keywords.txt")
     paths.SMALL_DICT = os.path.join(paths.SQLMAP_TXT_PATH, "smalldict.txt")
@@ -2605,42 +2605,23 @@ def calculateDeltaSeconds(start):
 
 def initCommonOutputs():
     """
-    Initializes dictionary containing common output values used by "good samaritan" feature
+    Initializes the per-context dictionary of common identifier names used by the
+    predictive-inference feature to shortcut blind table/column name enumeration.
+    Sourced directly from the curated '--common-tables'/'--common-columns' wordlists
+    (real-world, app-focused names); prediction only ever reorders the charset or
+    confirms a whole value, so it never penalizes a miss.
 
-    >>> initCommonOutputs(); "information_schema" in kb.commonOutputs["Databases"]
+    >>> initCommonOutputs(); "users" in kb.commonOutputs["Tables"]
     True
     """
 
     kb.commonOutputs = {}
-    key = None
 
-    with openFile(paths.COMMON_OUTPUTS, 'r') as f:
-        for line in f:
-            if line.find('#') != -1:
-                line = line[:line.find('#')]
-
-            line = line.strip()
-
-            if len(line) > 1:
-                if line.startswith('[') and line.endswith(']'):
-                    key = line[1:-1]
-                elif key:
-                    if key not in kb.commonOutputs:
-                        kb.commonOutputs[key] = set()
-
-                    if line not in kb.commonOutputs[key]:
-                        kb.commonOutputs[key].add(line)
-
-    # The curated '--common-tables'/'--common-columns' brute-force wordlists are far larger and much
-    # more app-focused than the built-in [Tables]/[Columns] prediction sections (which are mostly
-    # system objects), so fold them into the good-samaritan prediction to raise its real-world hit rate.
-    # The mechanism only reorders the charset, so extra coverage never penalizes a miss.
-    for _key, _path in (("Tables", paths.COMMON_TABLES), ("Columns", paths.COMMON_COLUMNS)):
+    for key, path in (("Tables", paths.COMMON_TABLES), ("Columns", paths.COMMON_COLUMNS)):
         try:
-            for _ in getFileItems(_path):
-                kb.commonOutputs.setdefault(_key, set()).add(_)
+            kb.commonOutputs[key] = set(getFileItems(path))
         except SqlmapSystemException:
-            pass
+            kb.commonOutputs[key] = set()
 
 def getFileItems(filename, commentPrefix='#', unicoded=True, lowercase=False, unique=False):
     """
@@ -2684,19 +2665,17 @@ def getFileItems(filename, commentPrefix='#', unicoded=True, lowercase=False, un
 
     return retVal if not unique else list(retVal.keys())
 
-def goGoodSamaritan(prevValue, originalCharset):
+def predictValue(prevValue, originalCharset):
     """
-    Function for retrieving parameters needed for common prediction (good
-    samaritan) feature.
+    Predictive-inference helper: given the value retrieved so far (prefix), consult the
+    per-context common-identifier set (kb.commonOutputs[kb.partRun], from the common-
+    tables/common-columns wordlists) to shortcut blind extraction.
 
     prevValue: retrieved query output so far (e.g. 'i').
 
-    Returns commonValue if there is a complete single match (in kb.partRun
-    of txt/common-outputs.txt under kb.partRun) regarding parameter
-    prevValue. If there is no single value match, but multiple, commonCharset is
-    returned containing more probable characters (retrieved from matched
-    values in txt/common-outputs.txt) together with the rest of charset as
-    otherCharset.
+    Returns commonValue when a single wordlist entry matches the prefix (the whole value
+    can be confirmed in one request); otherwise commonCharset holds the more probable
+    next characters (reordered ahead of otherCharset) so the bisection converges faster.
     """
 
     if kb.commonOutputs is None:
@@ -2755,7 +2734,7 @@ def goGoodSamaritan(prevValue, originalCharset):
 def getPartRun(alias=True):
     """
     Goes through call stack and finds constructs matching
-    conf.dbmsHandler.*. Returns it or its alias used in 'txt/common-outputs.txt'
+    conf.dbmsHandler.*. Returns it or its predictive-inference context alias (e.g. 'Tables'/'Columns')
     """
 
     retVal = None
@@ -3692,8 +3671,8 @@ def setOptimize():
     Sets options turned on by switch '-o'
     """
 
-    # conf.predictOutput = True
-    # Note: persistent (Keep-Alive) connections are now used by default (see _setHTTPHandlers)
+    # Note: persistent (Keep-Alive) connections are now used by default (see _setHTTPHandlers); predictive
+    # inference is now an inherent, always-on part of blind name enumeration (no longer a switch)
     conf.threads = 3 if conf.threads < 3 and cmdLineOptions.threads is None else conf.threads
     conf.nullConnection = not any((conf.data, conf.textOnly, conf.titles, conf.string, conf.notString, conf.regexp, conf.tor))
 

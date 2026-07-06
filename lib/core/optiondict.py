@@ -79,7 +79,6 @@ optDict = {
 
     "Optimization": {
         "optimize": "boolean",
-        "predictOutput": "boolean",
         "keepAlive": "boolean",
         "noKeepAlive": "boolean",
         "nullConnection": "boolean",

@@ -401,26 +401,39 @@ class Databases(object):
                     plusOne = Backend.getIdentifiedDbms() in PLUS_ONE_DBMSES
                     indexRange = getLimitRange(count, plusOne=plusOne)
 
-                    for index in indexRange:
-                        if Backend.isDbms(DBMS.SYBASE):
-                            query = _query % (db, (kb.data.cachedTables[-1] if kb.data.cachedTables else " "))
-                        elif Backend.getIdentifiedDbms() in (DBMS.MAXDB, DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB):
-                            query = _query % (kb.data.cachedTables[-1] if kb.data.cachedTables else " ")
-                        elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD):
-                            query = _query % index
-                        elif Backend.getIdentifiedDbms() in (DBMS.HSQLDB, DBMS.INFORMIX, DBMS.FRONTBASE, DBMS.VIRTUOSO):
-                            query = _query % (index, unsafeSQLIdentificatorNaming(db))
-                        elif Backend.getIdentifiedDbms() in (DBMS.SPANNER,):
-                            query = _query % (unsafeSQLIdentificatorNaming(db), unsafeSQLIdentificatorNaming(db), index)
-                        else:
-                            query = _query % (unsafeSQLIdentificatorNaming(db), index)
+                    # Value-parallel, prediction-assisted name enumeration for the DBMSes using the
+                    # generic "<db>, <index>" blind template. Retrieves whole names concurrently (one per
+                    # worker, each decoded sequentially so wordlist prediction applies). Used only with
+                    # '--threads' (like getColumns below); single-thread stays on the classic getValue loop,
+                    # which still gets predictive inference via getPartRun. The special templates stay serial.
+                    genericTemplate = Backend.getIdentifiedDbms() not in (DBMS.SYBASE, DBMS.MAXDB, DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB, DBMS.SQLITE, DBMS.FIREBIRD, DBMS.HSQLDB, DBMS.INFORMIX, DBMS.FRONTBASE, DBMS.VIRTUOSO, DBMS.SPANNER)
 
-                        table = unArrayizeValue(inject.getValue(query, union=False, error=False))
+                    if genericTemplate and conf.threads > 1 and isTechniqueAvailable(PAYLOAD.TECHNIQUE.BOOLEAN):
+                        for table in (inject._threadedInferenceValues(lambda index: _query % (unsafeSQLIdentificatorNaming(db), index), indexRange, context="Tables") or []):
+                            if not isNoneValue(table):
+                                kb.hintValue = table
+                                tables.append(safeSQLIdentificatorNaming(table, True))
+                    else:
+                        for index in indexRange:
+                            if Backend.isDbms(DBMS.SYBASE):
+                                query = _query % (db, (kb.data.cachedTables[-1] if kb.data.cachedTables else " "))
+                            elif Backend.getIdentifiedDbms() in (DBMS.MAXDB, DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB):
+                                query = _query % (kb.data.cachedTables[-1] if kb.data.cachedTables else " ")
+                            elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD):
+                                query = _query % index
+                            elif Backend.getIdentifiedDbms() in (DBMS.HSQLDB, DBMS.INFORMIX, DBMS.FRONTBASE, DBMS.VIRTUOSO):
+                                query = _query % (index, unsafeSQLIdentificatorNaming(db))
+                            elif Backend.getIdentifiedDbms() in (DBMS.SPANNER,):
+                                query = _query % (unsafeSQLIdentificatorNaming(db), unsafeSQLIdentificatorNaming(db), index)
+                            else:
+                                query = _query % (unsafeSQLIdentificatorNaming(db), index)
 
-                        if not isNoneValue(table):
-                            kb.hintValue = table
-                            table = safeSQLIdentificatorNaming(table, True)
-                            tables.append(table)
+                            table = unArrayizeValue(inject.getValue(query, union=False, error=False))
+
+                            if not isNoneValue(table):
+                                kb.hintValue = table
+                                table = safeSQLIdentificatorNaming(table, True)
+                                tables.append(table)
 
                     if tables:
                         kb.data.cachedTables[db] = tables
@@ -841,7 +854,7 @@ class Databases(object):
                             logger.error(errMsg)
                             continue
 
-                for index in getLimitRange(count):
+                def columnNameQuery(index):
                     if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.VERTICA, DBMS.PRESTO, DBMS.CRATEDB, DBMS.CUBRID, DBMS.CACHE, DBMS.FRONTBASE, DBMS.VIRTUOSO):
                         query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
                         query += condQuery
@@ -880,8 +893,22 @@ class Databases(object):
                         query += condQuery
                         field = condition
 
-                    query = agent.limitQuery(index, query, field, field)
-                    column = unArrayizeValue(inject.getValue(query, union=False, error=False))
+                    return agent.limitQuery(index, query, field, field)
+
+                indexList = list(getLimitRange(count))
+
+                # Value-parallel column-NAME enumeration: the same axis/mechanism as getTables (one name per
+                # worker, decoded sequentially - no length probe, predictive inference applies, names stream
+                # live). Serial fallback for single-thread and when also fetching per-column comments.
+                columnNames = None
+                if conf.threads > 1 and not conf.getComments and isTechniqueAvailable(PAYLOAD.TECHNIQUE.BOOLEAN):
+                    columnNames = inject._threadedInferenceValues(columnNameQuery, indexList, context="Columns")
+
+                for position, index in enumerate(indexList):
+                    if columnNames is not None:
+                        column = unArrayizeValue(columnNames[position])
+                    else:
+                        column = unArrayizeValue(inject.getValue(columnNameQuery(index), union=False, error=False))
 
                     if not isNoneValue(column):
                         if conf.getComments:

@@ -2243,6 +2243,11 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.disableHuffman = False
     kb.huffmanProbes = 0
     kb.huffmanEscapes = 0
+    kb.lowCardCache = {}
+    kb.dumpCharset = {}
+    kb.dumpCharsetStable = {}
+    kb.litmusCounter = 0
+    kb.reliabilityAlarm = False
     kb.httpErrorCodes = {}
     kb.inferenceMode = False
     kb.ignoreCasted = None
@@ -2256,7 +2261,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.lastParserStatus = None
 
     kb.locks = AttribDict()
-    for _ in ("cache", "connError", "count", "handlers", "hint", "identYwaf", "index", "io", "limit", "liveCookies", "log", "socket", "redirect", "request", "value"):
+    for _ in ("cache", "connError", "count", "handlers", "hint", "identYwaf", "index", "io", "limit", "liveCookies", "log", "prediction", "socket", "redirect", "request", "value"):
         kb.locks[_] = threading.Lock()
 
     kb.matchRatio = None
@@ -2912,10 +2917,6 @@ def _basicOptionValidation():
 
     if conf.dumpTable and conf.dumpAll:
         errMsg = "switch '--dump' is incompatible with switch '--dump-all'"
-        raise SqlmapSyntaxException(errMsg)
-
-    if conf.predictOutput and (conf.threads > 1 or conf.optimize):
-        errMsg = "switch '--predict-output' is incompatible with option '--threads' and switch '-o'"
         raise SqlmapSyntaxException(errMsg)
 
     if conf.threads > MAX_NUMBER_OF_THREADS and not conf.get("skipThreadCheck"):

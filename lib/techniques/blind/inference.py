@@ -20,10 +20,12 @@ from lib.core.common import decodeIntToUnicode
 from lib.core.common import filterControlChars
 from lib.core.common import getCharset
 from lib.core.common import getCounter
+from lib.core.common import getFileItems
 from lib.core.common import getPartRun
 from lib.core.common import getTechnique
 from lib.core.common import getTechniqueData
-from lib.core.common import goGoodSamaritan
+from lib.core.common import openFile
+from lib.core.common import predictValue
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
 from lib.core.common import incrementCounter
@@ -34,6 +36,7 @@ from lib.core.common import singleTimeWarnMessage
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.data import paths
 from lib.core.data import queries
 from lib.core.enums import ADJUST_TIME_DELAY
 from lib.core.enums import CHARSET_TYPE
@@ -44,6 +47,13 @@ from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.core.settings import CHAR_INFERENCE_MARK
 from lib.core.settings import HUFFMAN_PROBE_LIMIT
 from lib.core.settings import HUFFMAN_PRIOR_WEIGHTS
+from lib.core.settings import CATALOG_IDENTIFIERS_PRIOR_PEAK
+from lib.core.settings import DUMP_CHARSET_STABLE_ROWS
+from lib.core.settings import LOW_CARDINALITY_MAX_GUESSES
+from lib.core.settings import LOW_CARDINALITY_THRESHOLD
+from lib.core.settings import NAME_PREDICTION_CONTEXTS
+from lib.core.settings import NAME_MARKOV_ORDER
+from lib.core.settings import ORACLE_LITMUS_CHECK_EVERY
 from lib.core.settings import PREDICTION_FEEDBACK_MAX_ITEMS
 from lib.core.settings import PREDICTION_FEEDBACK_MAX_LENGTH
 from lib.core.settings import INFERENCE_BLANK_BREAK
@@ -73,6 +83,174 @@ from thirdparty import six
 # outside the ASCII model (e.g. multi-byte/Unicode) - defer to the classic bisection".
 _HUFFMAN_FALLBACK = object()
 
+# Cache of character-level Markov priors keyed by (order, scale, dbms); built once per process
+_huffmanPriorCache = {}
+
+def normalizedExpression(expression):
+    """
+    Row-independent form of a per-row retrieval expression: the paginated offset/limit that varies
+    from row to row is masked so every row of the same column maps to a single key. Used to group a
+    column's values for low-cardinality guessing and for its per-column online Huffman model.
+
+    >>> normalizedExpression("SELECT name FROM users LIMIT 3,1") == normalizedExpression("SELECT name FROM users LIMIT 7,1")
+    True
+    """
+
+    retVal = expression
+
+    for pattern in (r"\bLIMIT\s+\d+\s*,\s*\d+", r"\bLIMIT\s+\d+\s+OFFSET\s+\d+", r"\bOFFSET\s+\d+", r"\bLIMIT\s+\d+", r"\bROWNUM\b\s*[<>=]+\s*\d+", r"\bTOP\s+\d+", r"\bFETCH\s+(?:FIRST|NEXT)\s+\d+"):
+        retVal = re.sub(pattern, lambda match: re.sub(r"\d+", "?", match.group(0)), retVal, flags=re.I)
+
+    return retVal
+
+def getHuffmanPrior(order, scale, dbms=None):
+    """
+    Character-level order-N Markov model {context: {ordinal: count}} used to warm the Huffman
+    set-membership tree during blind NAME enumeration (so it predicts from the first character rather
+    than cold). Trained on the app-identifier wordlists (common-tables/common-columns) plus, when the
+    back-end is fingerprinted, the system/catalog identifiers harvested for that DBMS (from the matching
+    [<DBMS>] section of catalog-identifiers.txt - a single global model dilutes across dialects).
+    Per-context counts are scaled to a peak of `scale`. Retrieval is correct regardless of this model.
+    """
+
+    if (order, scale, dbms) in _huffmanPriorCache:
+        return _huffmanPriorCache[(order, scale, dbms)]
+
+    prior = {}
+    names = []
+
+    for path in (paths.COMMON_COLUMNS, paths.COMMON_TABLES):
+        try:
+            names.extend(getFileItems(path))
+        except Exception:
+            pass
+
+    if dbms:
+        try:
+            with openFile(paths.CATALOG_IDENTIFIERS, "r", errors="ignore") as f:
+                section = None
+                for line in f:
+                    line = line.strip()
+                    if not line or line.startswith('#'):
+                        continue
+                    if line.startswith('[') and line.endswith(']'):
+                        section = line[1:-1]
+                    elif section == dbms:
+                        names.append(line)
+        except Exception:
+            pass
+
+    for name in names:
+        terminated = name + "\x00"
+        for i in xrange(len(terminated)):
+            ordinal = ord(terminated[i])
+            if ordinal < 128:
+                counts = prior.setdefault(terminated[max(0, i - order):i], {})
+                counts[ordinal] = counts.get(ordinal, 0) + 1
+
+    for counts in prior.values():
+        peak = max(counts.values()) or 1
+        for ordinal in counts:
+            counts[ordinal] = max(1, int(round(counts[ordinal] * float(scale) / peak)))
+
+    _huffmanPriorCache[(order, scale, dbms)] = prior
+    return prior
+
+def contextWeights(model, prior, order, prefix):
+    """
+    Combined next-character weights P(next | last `order` chars) from the per-run online `model` plus
+    the optional shipped Markov `prior`, backing off to shorter contexts (Katz-style) when the deepest
+    context has not been seen yet. The online model is snapshotted under kb.locks.prediction because
+    value-parallel workers may mutate it concurrently (a bare iteration could otherwise raise).
+    """
+
+    weights = {}
+    context = prefix[-order:] if order > 0 else ""
+
+    while True:
+        with kb.locks.prediction:
+            online = dict(model.get(context) or ())
+        for source in (online, prior.get(context) if prior is not None else None):
+            if source:
+                for symbol, count in source.items():
+                    weights[symbol] = weights.get(symbol, 0) + count
+
+        if weights or not context:
+            break
+
+        context = context[1:]
+
+    return weights
+
+def valueMatchCondition(expressionUnescaped, value):
+    """
+    Boolean SQL that is TRUE iff (expressionUnescaped) equals the whole `value` (extracted so far as a
+    string), or None when a whole-value equality cannot be trusted and the caller must fall back to
+    per-character extraction. Used by low-cardinality guessing and by the value-parallel self-verification.
+
+    Returns None for values containing non-ASCII characters: those are extracted correctly byte-wise by
+    the classic bisection, but a single quoted/CHAR()-encoded literal may not round-trip to the same
+    bytes on every back-end, so a whole-value "=" could spuriously miss (and, for verification, drive a
+    needless re-extraction). ASCII values compare reliably.
+
+    On SQLite (dynamically typed) the dump's COALESCE(col, ...) wrapper loses column affinity, so for a
+    numeric column "1 = '1'" is FALSE and the quoted form would never hit; there we ALSO test the bare-
+    number form. That extra form is emitted ONLY for SQLite: on strictly-typed engines (e.g. PostgreSQL)
+    "text = 1" is a hard type error that would abort the whole boolean, and there the expression is already
+    text-cast so the quoted form matches anyway. Correctness is unaffected either way - this only decides
+    whether a whole-value shortcut hits or falls back to per-character extraction.
+
+    >>> valueMatchCondition("q", "abc").count("OR")
+    0
+    >>> valueMatchCondition("q", u"caf\\xe9") is None
+    True
+    """
+
+    if value is None or any(ord(_) >= 128 for _ in value):
+        return None
+
+    quoted = unescaper.escape("'%s'" % value) if "'" not in value else unescaper.escape("%s" % value, quote=False)
+    condition = "(%s)%s%s" % (expressionUnescaped, INFERENCE_EQUALS_CHAR, quoted)
+
+    if re.match(r"\A-?\d+(\.\d+)?\Z", value) and Backend.getIdentifiedDbms() == DBMS.SQLITE:
+        condition = "(%s OR (%s)%s%s)" % (condition, expressionUnescaped, INFERENCE_EQUALS_CHAR, value)
+
+    return condition
+
+def oracleReliabilityLitmus(expressionUnescaped, value, timeBasedCompare):
+    """
+    Known-answer differential health-check on the inference oracle, using the value just extracted.
+    Fires TWO probes on the SAME cell: "(expr) = value" (must be TRUE) and "(expr) = <value with one
+    character corrupted>" (must be FALSE). A healthy oracle answers TRUE/FALSE; an always-true channel
+    (e.g. a WAF returning 200 for everything, a reads-everything-true endpoint) trips the FALSE probe,
+    and a flaky/degraded one trips either - so silent data corruption becomes a detectable signal.
+
+    Returns True if the oracle behaved consistently (or the check is not applicable), False on a detected
+    inconsistency. Skips (returns True) for values valueMatchCondition() cannot reliably compare (non-ASCII).
+    """
+
+    if not value or valueMatchCondition(expressionUnescaped, value) is None:
+        return True
+
+    # a definitely-different copy: flip the last character to a neighbour that cannot equal it
+    corrupt = value[:-1] + ("a" if value[-1] != "a" else "b")
+    corruptCondition = valueMatchCondition(expressionUnescaped, corrupt)
+    if corruptCondition is None:
+        return True
+
+    try:
+        truthy = agent.suffixQuery(agent.prefixQuery(getTechniqueData().vector.replace(INFERENCE_MARKER, valueMatchCondition(expressionUnescaped, value))))
+        mustBeTrue = Request.queryPage(agent.payload(newValue=truthy), timeBasedCompare=timeBasedCompare, raise404=False)
+        incrementCounter(getTechnique())
+
+        falsy = agent.suffixQuery(agent.prefixQuery(getTechniqueData().vector.replace(INFERENCE_MARKER, corruptCondition)))
+        mustBeFalse = Request.queryPage(agent.payload(newValue=falsy), timeBasedCompare=timeBasedCompare, raise404=False)
+        incrementCounter(getTechnique())
+    except Exception:
+        return True   # a transient hiccup is not evidence of an unreliable oracle
+
+    return bool(mustBeTrue) and not bool(mustBeFalse)
+
 def bisection(payload, expression, length=None, charsetType=None, firstChar=None, lastChar=None, dump=False):
     """
     Bisection algorithm that can be used to perform blind SQL injection
@@ -84,6 +262,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     partialValue = u""
     finalValue = None
     retrievedLength = 0
+    columnKey = None
 
     if payload is None:
         return 0, None
@@ -97,6 +276,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         asciiTbl = getCharset(charsetType)
 
     threadData = getCurrentThreadData()
+    threadData.lowCardHit = False  # set when this value is confirmed by the (self-verifying) low-card guess
     timeBasedCompare = (getTechnique() in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED))
     retVal = hashDBRetrieve(expression, checkConf=True)
 
@@ -139,14 +319,14 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             expression = match.group(2).strip()
 
     try:
-        # Set kb.partRun in case "common prediction" feature (a.k.a. "good samaritan") is used, or the
-        # engine is called from the API, or a JSON report is being collected (so enumeration output is tagged)
-        if conf.predictOutput:
-            kb.partRun = getPartRun()
-        elif conf.api or conf.reportJson:
-            kb.partRun = getPartRun(alias=False)
-        else:
-            kb.partRun = None
+        # kb.partRun tags the enumeration context so predictive inference (predictValue) fires for BOTH
+        # the value-parallel and the classic serial name-enumeration paths. It is derived from the call
+        # stack here (alias form for prediction; raw for API/JSON tagging); the derivation only overwrites
+        # when it finds a match, so it does NOT clobber the context the value-parallel helper set for its
+        # worker threads (whose call stack does not include the enumeration method -> getPartRun is None).
+        derivedPartRun = getPartRun(alias=not (conf.api or conf.reportJson))
+        if derivedPartRun is not None:
+            kb.partRun = derivedPartRun
 
         if partialValue:
             firstChar = len(partialValue)
@@ -180,6 +360,60 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         else:
             expressionUnescaped = unescaper.escape(expression)
 
+        # Row-independent key for this column (pagination offset masked), grouping all of a column's
+        # rows for low-cardinality guessing and for its own per-column online Huffman model.
+        columnKey = normalizedExpression(expression) if dump else None
+
+        # Low-cardinality whole-value guessing: when the distinct values already seen for this column are
+        # few (<= LOW_CARDINALITY_THRESHOLD), confirm the current cell by equality against each of them
+        # (one request on a hit) before per-character extraction - a large win on the enum/flag/status/
+        # category/type columns that dominate real tables. Self-verifying (a wrong candidate simply fails).
+        # Especially valuable for TIME-BASED blind: a hit confirms the whole value in a single delayed
+        # request instead of ~7 delays/char x N chars. The repetition gate below ensures it only ever fires
+        # on genuinely low-cardinality columns, so unique identifier names never pay a wasted probe/delay.
+        if columnKey is not None and not partialValue:
+            # Snapshot the shared cache under the lock (value-parallel workers may mutate it concurrently).
+            with kb.locks.prediction:
+                seen = dict(kb.lowCardCache.get(columnKey) or ())
+            # Arm only once SOME value has repeated (max count >= 2): that is the proof the column is
+            # low-cardinality, so an all-unique column (primary key, hash, free text) never spends a probe.
+            # Once armed, try at most LOW_CARDINALITY_MAX_GUESSES candidates (most frequent first), so a
+            # column that trips the threshold with many near-unique values wastes only a bounded number of
+            # probes. A wrong guess costs one probe (self-verifying); a right one confirms the whole value.
+            if seen and len(seen) <= LOW_CARDINALITY_THRESHOLD and max(seen.values()) >= 2:
+                for candidate in sorted(seen, key=lambda value: -seen[value])[:LOW_CARDINALITY_MAX_GUESSES]:
+                    matchCondition = valueMatchCondition(expressionUnescaped, candidate)
+                    if matchCondition is None:   # non-ASCII: no reliable whole-value equality, extract per-char
+                        continue
+                    forgedQuery = agent.suffixQuery(agent.prefixQuery(getTechniqueData().vector.replace(INFERENCE_MARKER, matchCondition)))
+                    hit = Request.queryPage(agent.payload(newValue=forgedQuery), timeBasedCompare=timeBasedCompare, raise404=False)
+                    incrementCounter(getTechnique())
+                    if hit and timeBasedCompare:
+                        # A single time-based boolean is noisy; confirm the whole-value hit with a
+                        # not-equals check (validateChar spirit) before trusting it, so timing jitter can
+                        # never ship a wrong low-cardinality value. Still ~2 delayed requests/value vs the
+                        # ~7-delays/char x N of full extraction.
+                        notEqualsQuery = agent.suffixQuery(agent.prefixQuery(getTechniqueData().vector.replace(INFERENCE_MARKER, "NOT(%s)" % matchCondition)))
+                        hit = not Request.queryPage(agent.payload(newValue=notEqualsQuery), timeBasedCompare=timeBasedCompare, raise404=False)
+                        incrementCounter(getTechnique())
+                    if hit:
+                        threadData.lowCardHit = True
+                        return getCounter(getTechnique()), candidate
+
+        # Model driving the Huffman set-membership tree. Name enumeration keys on the enumeration context
+        # and is seeded with the fingerprinted back-end's identifier prior, so the tree predicts a name
+        # from the first character (structured, low-entropy identifiers). A data dump uses a PER-COLUMN
+        # order-0 model: each column learns its own character distribution, so a column restricted to few
+        # characters (hex/uuid, digits, dates, a constant/NULL placeholder) is forced from those alone
+        # (e.g. ~4 requests/char on hex instead of ~6, ~1 on a constant) with no cross-column dilution.
+        # Order 0 needs no sequential prefix, so it works under the position-parallel (per-value) threads
+        # too; a higher-order per-column model was measured to lose to its own cold-start, so order 0 it is.
+        if kb.partRun in NAME_PREDICTION_CONTEXTS:
+            huffmanKey, huffmanOrder = kb.partRun, NAME_MARKOV_ORDER
+            huffmanPrior = getHuffmanPrior(NAME_MARKOV_ORDER, CATALOG_IDENTIFIERS_PRIOR_PEAK, Backend.getIdentifiedDbms())
+        else:
+            huffmanKey, huffmanOrder, huffmanPrior = columnKey, 0, None
+
         if isinstance(length, six.string_types) and isDigit(length) or isinstance(length, int):
             length = int(length)
         else:
@@ -211,7 +445,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             else:
                 numThreads = 1
 
-        if conf.threads == 1 and not any((timeBasedCompare, conf.predictOutput)):
+        if conf.threads == 1 and not timeBasedCompare:
             warnMsg = "running in a single-thread mode. Please consider "
             warnMsg += "usage of option '--threads' for faster data retrieval"
             singleTimeWarnMessage(warnMsg)
@@ -295,12 +529,21 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             back to the classic bisection. Returns the character, or None to fall back.
             """
             ESCAPE = -1
-            model = kb.huffmanModel
+            model = kb.huffmanModel.setdefault(huffmanKey, {})
+            threadData = getCurrentThreadData()
+
+            # Next-character weights P(next | last huffmanOrder chars) from this retrieval's own online
+            # model plus, for name enumeration, the shipped identifier prior (so the tree is warm from the
+            # first character); order 0 collapses to the classic single-context adaptive model. Retrieval
+            # is correct regardless of the weights (the tree spans the whole range plus an ESCAPE leaf), so
+            # the model - even raced under threads - only ever affects speed, never the returned value.
+            context = partialValue[-huffmanOrder:] if huffmanOrder > 0 else ""
+            weights = contextWeights(model, huffmanPrior, huffmanOrder, partialValue)
 
             heap = []
             for order, ordinal in enumerate(xrange(128)):
-                heapq.heappush(heap, (model.get(ordinal, 0) + HUFFMAN_PRIOR_WEIGHTS.get(ordinal, 1), order, (ordinal,)))
-            heapq.heappush(heap, (max(model.get(ESCAPE, 0), 1), 128, (ESCAPE,)))
+                heapq.heappush(heap, (weights.get(ordinal, 0) + HUFFMAN_PRIOR_WEIGHTS.get(ordinal, 1), order, (ordinal,)))
+            heapq.heappush(heap, (max(weights.get(ESCAPE, 0), 1), 128, (ESCAPE,)))
 
             counter = 129
             while len(heap) > 1:
@@ -337,12 +580,23 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
                 incrementCounter(getTechnique())
 
+                # Guard against target-side length limits / WAFs that reject the (potentially long)
+                # "IN (...)" list: an HTTP error code that is not the technique's own true/false code means
+                # this membership query was rejected (e.g. 414 URI Too Long, 413, 400, 403), so the walk
+                # cannot be trusted. Abandon it and hand the character to the classic short-query ('>' / '=')
+                # bisection, which re-extracts and validates it; the escape counter in getChar() latches
+                # Huffman off (kb.disableHuffman) if the rejection keeps happening. Gated on >= 400 so a
+                # normal content-based (200/200) response never trips it.
+                if not timeBasedCompare and threadData.lastCode is not None and threadData.lastCode >= 400 and (getTechniqueData() is None or threadData.lastCode not in (getTechniqueData().falseCode, getTechniqueData().trueCode)):
+                    return _HUFFMAN_FALLBACK
+
                 node = testNode if result else otherNode
 
             value = node[0]
 
             if value == ESCAPE:
-                model[ESCAPE] = model.get(ESCAPE, 0) + 1
+                with kb.locks.prediction:
+                    model.setdefault(context, {})[ESCAPE] = model.setdefault(context, {}).get(ESCAPE, 0) + 1
                 return _HUFFMAN_FALLBACK
 
             if value == 0:
@@ -365,13 +619,17 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     kb.disableHuffman = True
                     return _HUFFMAN_FALLBACK
 
-            model[value] = model.get(value, 0) + 1
+            with kb.locks.prediction:
+                model.setdefault(context, {})[value] = model.setdefault(context, {}).get(value, 0) + 1
             return decodeIntToUnicode(value)
 
-        def getChar(idx, charTbl=None, continuousOrder=True, expand=charsetType is None, shiftTable=None, retried=None):
+        def getChar(idx, charTbl=None, continuousOrder=True, expand=charsetType is None, shiftTable=None, retried=None, restricted=False):
             """
             continuousOrder means that distance between each two neighbour's
             numerical values is exactly 1
+
+            restricted means charTbl is a narrowed per-column observed range (time-based only): a character
+            landing outside it fails validateChar and is re-extracted over the full charset.
             """
 
             threadData = getCurrentThreadData()
@@ -381,7 +639,11 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             if result:
                 return result
 
-            if (not conf.noHuffman and not kb.disableHuffman and dump and continuousOrder and charsetType is None and not timeBasedCompare
+            # Huffman set-membership applies to boolean-based dumps and name enumeration. It stays off for
+            # time-based, where each membership step is timing-noisy and lacks per-character validation
+            # (measured to trade accuracy for little/no gain there); time-based relies on plain bisection
+            # plus low-cardinality whole-value guessing instead.
+            if (not conf.noHuffman and not kb.disableHuffman and (dump or kb.partRun in NAME_PREDICTION_CONTEXTS) and continuousOrder and charsetType is None and not timeBasedCompare
                     and ("%s%s" % (INFERENCE_GREATER_CHAR, "%d")) in payload
                     and ("'%s'" % CHAR_INFERENCE_MARK) not in payload):
                 kb.huffmanProbes = (kb.huffmanProbes or 0) + 1
@@ -545,6 +807,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
                             if retVal in originalTbl or (retVal == ord('\n') and CHAR_INFERENCE_MARK in payload):
                                 if (timeBasedCompare or unexpectedCode) and not validateChar(idx, retVal):
+                                    if restricted:
+                                        # the character fell outside this column's observed range - re-extract
+                                        # over the full charset (not timing noise, so no delay increase / retry count)
+                                        return getChar(idx, asciiTbl, True, retried=retried)
                                     if not kb.originalTimeDelay:
                                         kb.originalTimeDelay = conf.timeSec
 
@@ -625,6 +891,11 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             return None
                         else:
                             return decodeIntToUnicode(candidates[0])
+                    elif restricted:
+                        # the self-validating '=' failed: the character is outside this column's observed set
+                        # (or is end-of-string) - re-extract over the full charset, which validates the value
+                        # and detects end-of-string correctly
+                        return getChar(idx, asciiTbl, True, retried=retried)
 
         # Go multi-threading (--threads > 1)
         if numThreads > 1 and isinstance(length, int) and length > 1:
@@ -732,11 +1003,11 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 # Common prediction feature (a.k.a. "good samaritan")
                 # NOTE: to be used only when multi-threading is not set for
                 # the moment
-                if conf.predictOutput and len(partialValue) > 0 and kb.partRun is not None:
+                if kb.partRun in NAME_PREDICTION_CONTEXTS and len(partialValue) > 0:
                     val = None
-                    commonValue, commonPattern, commonCharset, otherCharset = goGoodSamaritan(partialValue, asciiTbl)
+                    commonValue, commonPattern, commonCharset, otherCharset = predictValue(partialValue, asciiTbl)
 
-                    # If there is one single output in common-outputs, check
+                    # If a single wordlist entry matches the prefix, confirm
                     # it via equal against the query output
                     if commonValue is not None:
                         # One-shot query containing equals commonValue
@@ -778,19 +1049,45 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             val = commonPattern[index - 1:]
                             index += len(val) - 1
 
-                    # Otherwise if there is no commonValue (single match from
-                    # txt/common-outputs.txt) and no commonPattern
-                    # (common pattern) use the returned common charset only
-                    # to retrieve the query output
-                    if not val and commonCharset:
-                        val = getChar(index, commonCharset, False)
-
-                    # If we had no luck with commonValue and common charset,
-                    # use the returned other charset
+                    # Char-by-char fallback. When Huffman is actually active it is driven over the full
+                    # (continuous) charset: the corpus-Markov-seeded tree puts the single likeliest next
+                    # character at its root (~1 request), subsuming the common/other charset split. When
+                    # Huffman is unavailable (--no-huffman, latched off after repeated escapes, or TIME-BASED
+                    # where getChar disables it) the classic reordered-charset bisection is used instead - so
+                    # the predicted commonCharset ordering is not thrown away (time-based would otherwise pay
+                    # full-charset bisection for every character).
                     if not val:
-                        val = getChar(index, otherCharset, otherCharset == asciiTbl)
+                        if not conf.noHuffman and not kb.disableHuffman and not timeBasedCompare:
+                            val = getChar(index, asciiTbl, True)
+                        else:
+                            if commonCharset:
+                                val = getChar(index, commonCharset, False)
+
+                            if not val:
+                                val = getChar(index, otherCharset, otherCharset == asciiTbl)
                 else:
-                    val = getChar(index, asciiTbl, not (charsetType is None and conf.charset))
+                    # Time-based dump: once a column's character set has proven closed (unchanged for
+                    # DUMP_CHARSET_STABLE_ROWS consecutive rows), search only those
+                    # observed ordinals via the bit-search (continuousOrder=False), whose final '=' equality
+                    # self-validates the character (no separate validateChar). A narrow-charset column (hex,
+                    # digits, dates, decimals) collapses from ~log2(full charset)+1 toward ~log2(set)+1
+                    # delayed requests/char. A character outside the observed set makes that '=' fail and is
+                    # re-extracted over the full charset (see the restricted escalation in getChar). Time-based
+                    # only: boolean has no per-character validation to catch such a miss (and uses Huffman).
+                    restrictedTbl = None
+                    if (dump and timeBasedCompare and columnKey is not None and charsetType is None and not conf.charset
+                            and kb.dumpCharsetStable.get(columnKey, 0) >= DUMP_CHARSET_STABLE_ROWS):
+                        with kb.locks.prediction:
+                            observed = set(kb.dumpCharset.get(columnKey) or ())   # snapshot (value-parallel safe)
+                        if observed and len(observed) <= 64:
+                            # include the 0 end-of-string sentinel so end is detected in-band (the bit-search
+                            # returns None on 0), avoiding a full-charset escalation at the end of every value
+                            restrictedTbl = sorted(observed | set((0,)))
+
+                    if restrictedTbl is not None:
+                        val = getChar(index, restrictedTbl, False, expand=False, restricted=True)
+                    else:
+                        val = getChar(index, asciiTbl, not (charsetType is None and conf.charset))
 
                 if val is None:
                     finalValue = partialValue
@@ -831,11 +1128,11 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             if not (conf.firstChar or conf.lastChar):  # Note: --first/--last give a range-limited (non-complete) output; caching it unmarked would let a later resume serve the truncated value as the full one
                 hashDBWrite(expression, finalValue)
 
-            # Adaptive intra-run prediction (good samaritan / --predict-output): remember this extracted
-            # value for its enumeration context so later same-context items sharing structure are predicted
-            # faster. Length-capped (identifiers are short -> large data cells never bloat/pollute the pool);
-            # a wrong prediction only ever costs a probe and falls back to bisection.
-            if (conf.predictOutput and kb.partRun and kb.commonOutputs is not None
+            # Adaptive intra-run prediction: remember this extracted name for its enumeration context so
+            # later same-context items sharing structure (e.g. wp_posts / wp_users ...) are predicted faster.
+            # Fed ONLY single-threaded (not kb.multiThreadMode) so it never mutates the pool while a
+            # value-parallel worker is iterating it. Length-capped; a wrong prediction only costs a probe.
+            if (kb.partRun in NAME_PREDICTION_CONTEXTS and not kb.multiThreadMode and kb.commonOutputs is not None
                     and 0 < len(finalValue) <= PREDICTION_FEEDBACK_MAX_LENGTH
                     and len(kb.commonOutputs.get(kb.partRun) or ()) < PREDICTION_FEEDBACK_MAX_ITEMS):
                 kb.commonOutputs.setdefault(kb.partRun, set()).add(finalValue)
@@ -860,6 +1157,42 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         raise KeyboardInterrupt
 
     _ = finalValue or partialValue
+
+    # Record this cell for the column's low-cardinality guessing cache (frequency-tracked so the most
+    # common values are probed first; bounded so a clearly high-cardinality column stops accumulating).
+    if columnKey is not None and finalValue:
+        # Track the column's low-cardinality cache and observed character set. Guarded by the prediction
+        # lock because value-parallel dump workers update these concurrently.
+        ordinals = set(ord(_c) for _c in finalValue if ord(_c) < 128)
+        with kb.locks.prediction:
+            seen = kb.lowCardCache.setdefault(columnKey, {})
+            if finalValue in seen or len(seen) <= LOW_CARDINALITY_THRESHOLD + 2:
+                seen[finalValue] = seen.get(finalValue, 0) + 1
+
+            if ordinals:
+                existing = kb.dumpCharset.setdefault(columnKey, set())
+                grew = not ordinals.issubset(existing)   # did this row introduce a never-seen character?
+                existing.update(ordinals)
+                # Trust the observed alphabet as closed only after it stays unchanged for several consecutive
+                # rows. A column that keeps growing (monotonic PK, high-entropy text) resets the counter and
+                # never triggers the restricted search, so it is never charged the miss-then-escalate cost.
+                kb.dumpCharsetStable[columnKey] = 0 if grew else kb.dumpCharsetStable.get(columnKey, 0) + 1
+
+    # Oracle-reliability litmus: on bulk extraction (dumps / name enumeration) periodically fire a
+    # known-answer differential so an always-true / flaky / degraded channel that would otherwise dump
+    # SILENT garbage instead raises a one-time "results may be unreliable" warning. First value is always
+    # checked (catch it before a whole bad dump), then every ORACLE_LITMUS_CHECK_EVERY-th.
+    if (ORACLE_LITMUS_CHECK_EVERY and finalValue and not kb.reliabilityAlarm and not kb.bruteMode
+            and (columnKey is not None or kb.partRun in NAME_PREDICTION_CONTEXTS)):
+        with kb.locks.prediction:
+            kb.litmusCounter += 1
+            due = (kb.litmusCounter == 1 or kb.litmusCounter % ORACLE_LITMUS_CHECK_EVERY == 0)
+        if due and not oracleReliabilityLitmus(expressionUnescaped, finalValue, timeBasedCompare):
+            kb.reliabilityAlarm = True
+            warnMsg = "the target's responses are inconsistent for known-true/known-false probes "
+            warnMsg += "(reads-everything-true, WAF, or a flaky/degraded channel); extracted data may "
+            warnMsg += "be unreliable. Consider raising '--time-sec', lowering '--threads', or retrying"
+            singleTimeWarnMessage(warnMsg)
 
     return getCounter(getTechnique()), safecharencode(_) if kb.safeCharEncode else _
 

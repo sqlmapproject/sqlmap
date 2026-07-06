@@ -318,9 +318,6 @@ def cmdLineParser(argv=None):
         optimization.add_argument("-o", dest="optimize", action="store_true",
             help="Turn on all optimization switches")
 
-        optimization.add_argument("--predict-output", dest="predictOutput", action="store_true",
-            help="Predict common queries output")
-
         # Note: persistent (Keep-Alive) connections are used by default; this opts out
         optimization.add_argument("--no-keep-alive", dest="noKeepAlive", action="store_true",
             help="Disable persistent HTTP(s) connections (Keep-Alive)")

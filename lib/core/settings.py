@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.7.30"
+VERSION = "1.10.7.31"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -560,11 +560,52 @@ for _weight, _chars in ((6, " etaoinsrhldcumfgypwbvkxjqz"), (4, "0123456789"), (
     for _char in _chars:
         HUFFMAN_PRIOR_WEIGHTS[ord(_char)] = _weight
 
-# Bounds for feeding extracted values back into the "good samaritan" (--predict-output) common-output
-# pool for their enumeration context, so later same-context items that share structure (e.g.
-# wp_posts / wp_users / wp_options ...) are predicted faster. MAX_LENGTH keeps large data cells from
-# bloating/polluting the pool (identifiers are short); MAX_ITEMS bounds per-context growth so a huge
-# enumeration cannot make the per-character prediction scan costly. Misses always fall back to bisection.
+# Enumeration contexts (kb.partRun) for which predictive inference is active by default: the identifier
+# names retrieved here are drawn from a known, skewed distribution captured by the common-tables/
+# common-columns wordlists, so whole-value prediction / charset reordering pays off. Deliberately NOT
+# applied to arbitrary dumped data (unknown distribution) or one-shot values (banner, current-user).
+NAME_PREDICTION_CONTEXTS = ("Tables", "Columns")
+
+# Order of the character-level Markov model used to seed the Huffman set-membership tree during blind
+# name enumeration: warmed from the shipped identifier corpus so it predicts a name from the first
+# character (identifiers are short, structured and low-entropy). CATALOG_IDENTIFIERS_PRIOR_PEAK is the
+# weight the corpus prior is scaled to (higher -> the predicted next character sits nearer the tree
+# root -> closer to one request per character). Data dumps keep the classic order-0 adaptive model.
+NAME_MARKOV_ORDER = 3
+CATALOG_IDENTIFIERS_PRIOR_PEAK = 20
+
+# Maximum number of distinct values a dumped column may show before it is treated as high-cardinality
+# and whole-value guessing is abandoned for it. At or below this, each new cell is first confirmed by
+# equality against the values already seen for that column (one request on a hit) before per-character
+# extraction. Self-verifying, so it never returns a wrong value; the bound keeps misses cheap.
+LOW_CARDINALITY_THRESHOLD = 32
+
+# Oracle-reliability litmus: during bulk blind extraction (dumps / name enumeration) a known-answer
+# differential is fired every this-many extracted values - one probe that MUST be TRUE (the value we just
+# read equals itself) and one that MUST be FALSE (it equals a deliberately corrupted copy). A healthy
+# oracle always answers T/F; an always-true channel (WAF/200-for-everything, reads-everything-true) or a
+# flaky/degraded one (timing jitter, lease near end-of-life) trips it - converting SILENT data corruption
+# into a one-time "results may be unreliable" warning. The first value is always checked (catch it before
+# a whole garbage dump), then every Nth. Cheap and amortized; set to 0 to disable.
+ORACLE_LITMUS_CHECK_EVERY = 25
+
+# Whole-value guessing only starts once some value has repeated (proof the column is low-cardinality), so
+# an all-unique column - primary key, hash, free text - never wastes a probe. Once armed, at most this
+# many candidates (most-frequent first) are tried per cell, so even a column that trips the threshold with
+# many near-unique values can only ever waste a small, bounded number of probes before falling back.
+LOW_CARDINALITY_MAX_GUESSES = 8
+
+# Number of consecutive dumped rows a column's observed character set must stay unchanged before it is
+# trusted as closed and used to restrict the time-based bisection alphabet. A column whose alphabet keeps
+# growing (e.g. a monotonic primary key or high-entropy text) never reaches this, so it is never charged
+# the speculative restricted-search-then-escalate cost.
+DUMP_CHARSET_STABLE_ROWS = 3
+
+# Bounds for feeding extracted values back into the predictive-inference pool for their enumeration
+# context, so later same-context items that share structure (e.g. wp_posts / wp_users / wp_options ...)
+# are predicted faster. MAX_LENGTH keeps large data cells from bloating/polluting the pool (identifiers
+# are short); MAX_ITEMS bounds per-context growth so a huge enumeration cannot make the per-character
+# prediction scan costly. Only fed single-threaded (never mutated under value-parallel enumeration).
 PREDICTION_FEEDBACK_MAX_LENGTH = 128
 PREDICTION_FEEDBACK_MAX_ITEMS = 10000
 
