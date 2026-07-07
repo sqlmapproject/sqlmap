@@ -128,6 +128,7 @@ optDict = {
         "oobServer": "string",
         "oobToken": "string",
         "timeSec": "integer",
+        "timeless": "boolean",
         "uCols": "string",
         "uChar": "string",
         "uFrom": "string",

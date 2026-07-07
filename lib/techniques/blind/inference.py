@@ -806,7 +806,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             retVal = minValue + 1
 
                             if retVal in originalTbl or (retVal == ord('\n') and CHAR_INFERENCE_MARK in payload):
-                                if (timeBasedCompare or unexpectedCode) and not validateChar(idx, retVal):
+                                if (timeBasedCompare or unexpectedCode) and kb.get("timeless") is None and not validateChar(idx, retVal):
                                     if restricted:
                                         # the character fell outside this column's observed range - re-extract
                                         # over the full charset (not timing noise, so no delay increase / retry count)

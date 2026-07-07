@@ -31,6 +31,15 @@ def action():
     if possible
     """
 
+    # HTTP/2 timeless timing ('--timeless'): detection is done and the back-end DBMS is known, so engage
+    # the oracle for this target's extraction (swaps the time-based vector for a tuned heavy one, so all
+    # subsequent extraction reads bits by response order instead of delay). Guarded + calibrated - a no-op
+    # unless '--timeless' is set and the target is usable; disengage() first clears any prior target's.
+    from lib.request import timeless
+    timeless.disengage()
+    if not timeless.autoEngage():          # engages if '--timeless' was given and the target is usable
+        timeless.hintTimeless()            # otherwise nudge the user toward '--timeless' if the target fits
+
     # First of all we have to identify the back-end database management
     # system to be able to go ahead with the injection
     # automatic WAF-bypass: if a WAF/IPS is present and the back-end DBMS is already indicated by the error

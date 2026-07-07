@@ -453,7 +453,12 @@ class _H2Connection(object):
         self.usable = True
         ctx = ssl._create_unverified_context()
         ctx.set_alpn_protocols(["h2"])
-        self.sock = ctx.wrap_socket(_connect_socket(host, port, proxy, timeout), server_hostname=host)
+        raw = _connect_socket(host, port, proxy, timeout)
+        try:
+            raw.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)  # coalesced-pair writes must not be Nagle-buffered
+        except (OSError, socket.error):
+            pass
+        self.sock = ctx.wrap_socket(raw, server_hostname=host)
         try:
             if self.sock.selected_alpn_protocol() != "h2":
                 raise IOError("server did not negotiate h2 (ALPN=%r)" % self.sock.selected_alpn_protocol())
@@ -539,6 +544,89 @@ class _H2Connection(object):
                 status = int(v)
                 break
         return status, resp_headers, bytes(resp_body)
+
+    def exchange_pair(self, requests, timeout):
+        """Timeless-timing primitive (Van Goethem et al., USENIX Security 2020). Send TWO requests
+        multiplexed and COALESCED into a single TCP write, then read frames until BOTH streams reach
+        END_STREAM, recording the order in which they finished. Because both requests ride the same
+        packet on the same connection, network jitter hits them equally and cancels - only the server's
+        relative processing time decides which END_STREAM lands first, so a sub-millisecond server-side
+        delta is readable that absolute wall-clock timing (drowned by jitter) cannot resolve.
+
+        `requests` is a 2-list of dicts {method, path, authority, headers, body}. Returns
+        (finish_order, results) where finish_order is the list of stream ids in completion order and
+        results maps sid -> (status, headers, body). Requires the server to process the two streams
+        CONCURRENTLY; a serializing front-proxy defeats it (callers must calibrate - see h2_timeless_probe)."""
+        if not self.usable:
+            raise IOError("HTTP/2 connection no longer usable")
+        self.sock.settimeout(timeout)
+
+        sids, out = [], b""
+        for r in requests:
+            sid = self.next_sid
+            self.next_sid += 2
+            sids.append(sid)
+            req = [(b":method", _tob(r.get("method", "GET"))), (b":scheme", b"https"),
+                   (b":path", _tob(r["path"])), (b":authority", _tob(r.get("authority") or self.host))]
+            for k, v in (r.get("headers") or {}).items():
+                req.append((_tob(k).lower(), _tob(v)))
+            body = r.get("body")
+            out += encode_frame(HEADERS, FLAG_END_HEADERS | (0 if body else FLAG_END_STREAM), sid, Encoder().encode(req))
+            if body:
+                out += encode_frame(DATA, FLAG_END_STREAM, sid, _tob(body))
+        if self.next_sid >= BIG_WINDOW:
+            self.usable = False
+        self.sock.sendall(out)                                 # THE crux: one write -> one TCP segment -> simultaneous arrival
+
+        state = dict((sid, {"hb": b"", "headers": None, "body": bytearray()}) for sid in sids)
+        finish_order = []
+        remaining = set(sids)
+        while remaining:
+            ftype, flags, fsid, payload = _read_frame(self.sock)
+            if ftype == SETTINGS:
+                if not (flags & FLAG_ACK):
+                    self.sock.sendall(encode_frame(SETTINGS, FLAG_ACK, 0, b""))
+            elif ftype == PING:
+                if not (flags & FLAG_ACK):
+                    self.sock.sendall(encode_frame(PING, FLAG_ACK, 0, payload))
+            elif ftype == GOAWAY:
+                self.usable = False
+                raise IOError("GOAWAY during timeless pair")
+            elif ftype == RST_STREAM and fsid in state:
+                self.usable = False
+                raise IOError("stream reset during timeless pair")
+            elif ftype in (HEADERS, CONTINUATION) and fsid in state:
+                p = payload
+                if ftype == HEADERS:
+                    if flags & FLAG_PADDED:
+                        p = p[1:len(p) - bytearray(payload)[0]]
+                    if flags & FLAG_PRIORITY:
+                        p = p[5:]
+                state[fsid]["hb"] += p
+                if flags & FLAG_END_HEADERS:
+                    state[fsid]["headers"] = self.dec.decode(state[fsid]["hb"])
+                if flags & FLAG_END_STREAM and fsid in remaining:
+                    finish_order.append(fsid); remaining.discard(fsid)
+            elif ftype == DATA and fsid in state:
+                p = payload
+                if flags & FLAG_PADDED:
+                    p = p[1:len(p) - bytearray(payload)[0]]
+                state[fsid]["body"] += p
+                if payload:
+                    self.sock.sendall(encode_frame(WINDOW_UPDATE, 0, fsid, struct.pack("!I", len(payload))))
+                    self.sock.sendall(encode_frame(WINDOW_UPDATE, 0, 0, struct.pack("!I", len(payload))))
+                if flags & FLAG_END_STREAM and fsid in remaining:
+                    finish_order.append(fsid); remaining.discard(fsid)
+
+        results = {}
+        for sid in sids:
+            status = None
+            for n, v in (state[sid]["headers"] or []):
+                if _tob(n) == b":status":
+                    status = int(v); break
+            results[sid] = (status, state[sid]["headers"], bytes(state[sid]["body"]))
+        return finish_order, results
+
 
 # Thread-local pool: one live connection per (host, port, proxy) per thread. Mirrors keepalive.py's model
 # (one connection per host per thread) so streams never interleave across threads and time-based

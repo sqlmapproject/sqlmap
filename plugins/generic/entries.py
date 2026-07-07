@@ -442,9 +442,11 @@ class Entries(object):
                             # Value-parallel dumping: one whole cell per worker, decoded sequentially, so there
                             # is NO per-cell LENGTH() probe (the position-parallel path needs one to split a
                             # value's characters across threads) and the per-column Huffman model + low-cardinality
-                            # guessing engage under concurrency. Used for the boolean channel with '--threads'; the
-                            # classic per-character-parallel loop stays for single-thread and time-based.
-                            if conf.threads > 1 and not conf.dnsDomain and isTechniqueAvailable(PAYLOAD.TECHNIQUE.BOOLEAN):
+                            # guessing engage under concurrency. Used for the boolean channel with '--threads', and
+                            # for the HTTP/2 timeless oracle (its per-thread connections make concurrency safe and
+                            # deterministic - unlike classic time-based, whose char-parallel loop interleaves its
+                            # per-thread output). Single-thread and classic time-based keep the char-parallel loop.
+                            if conf.threads > 1 and not conf.dnsDomain and (isTechniqueAvailable(PAYLOAD.TECHNIQUE.BOOLEAN) or kb.get("timeless") is not None):
                                 # One value-parallel pass over every (non-empty) cell, so there is a single
                                 # thread pool and values stream live as they complete - out of order, exactly
                                 # like the error/union dumps - instead of a silent progress counter.

@@ -634,6 +634,12 @@ class Connect(object):
                             for char in (r"\r", r"\n"):
                                 cookie.value = re.sub(r"(%s)([^ \t])" % char, r"\g<1>\t\g<2>", cookie.value)
 
+                # Build-only capture: return the fully-assembled request instead of sending it, so the
+                # HTTP/2 timeless-timing oracle (lib/request/timeless.py) can coalesce two of these into a
+                # single multiplexed pair rather than issue them as independent single-stream requests.
+                if kwargs.get("buildOnly"):
+                    return (url, method or (HTTPMETHOD.POST if post is not None else HTTPMETHOD.GET), headers, post)
+
                 if conf.http2:
                     from lib.request.http2 import open_url as http2OpenUrl
 
@@ -1029,7 +1035,7 @@ class Connect(object):
 
     @staticmethod
     @stackedmethod
-    def queryPage(value=None, place=None, content=False, getRatioValue=False, silent=False, method=None, timeBasedCompare=False, noteResponseTime=True, auxHeaders=None, response=False, raise404=None, removeReflection=True, disableTampering=False, ignoreSecondOrder=False):
+    def queryPage(value=None, place=None, content=False, getRatioValue=False, silent=False, method=None, timeBasedCompare=False, noteResponseTime=True, auxHeaders=None, response=False, raise404=None, removeReflection=True, disableTampering=False, ignoreSecondOrder=False, buildOnly=False):
         """
         This method calls a function to get the target URL page content
         and returns its page ratio (0 <= ratio <= 1) or a boolean value
@@ -1038,6 +1044,10 @@ class Connect(object):
 
         if conf.direct:
             return direct(value, content)
+
+        # Snapshot the pristine payload for the timeless oracle before placement/tampering rewrites it,
+        # so its sentinel-bracketed comparison can be negated to build the symmetric-oracle pair.
+        timelessOrigValue = value if (timeBasedCompare and kb.get("timeless") is not None) else None
 
         get = None
         post = None
@@ -1515,6 +1525,22 @@ class Connect(object):
             elif postUrlEncode:
                 post = urlencode(post, spaceplus=kb.postSpaceToPlus)
 
+        # When the timeless oracle is engaged (by action() at the start of extraction, so the heavy vector
+        # is in place before any payload is built), a boolean comparison is answered by relative HTTP/2
+        # response order instead of wall-clock timing - orders of magnitude faster and jitter-immune, and
+        # it skips the time-based statistical warm-up entirely. The comparison request is assembled exactly
+        # as it would be sent (buildOnly) and the bit is read from a coalesced pair. Not engaged -> timing.
+        if timeBasedCompare and kb.get("timeless") is not None:
+            from lib.request.timeless import negatePayload
+            # Build the condition and negation requests through the SAME path (queryPage buildOnly on the
+            # raw pre-placement value) so the pair differs ONLY by the negated comparison - building cond
+            # from the already-placed uri/get/post while neg goes through fresh placement would make them
+            # non-corresponding and flip the order.
+            negValue = negatePayload(timelessOrigValue)
+            condSpec = Connect.queryPage(timelessOrigValue, place=place, buildOnly=True)
+            negSpec = Connect.queryPage(negValue, place=place, buildOnly=True) if negValue is not None else None
+            return kb.timeless.readBitFromSpecs(condSpec, negSpec)
+
         if timeBasedCompare and not conf.disableStats:
             if len(kb.responseTimes.get(kb.responseTimeMode, [])) < MIN_TIME_RESPONSES:
                 clearConsoleLine()
@@ -1591,6 +1617,12 @@ class Connect(object):
                         pass
             finally:
                 kb.pageCompress = popValue()
+
+        # Timeless-timing oracle: after all placement/tampering, hand back the fully-assembled request
+        # (url, method, headers, post) instead of sending it, so two payloads can be coalesced into one
+        # multiplexed HTTP/2 pair (lib/request/timeless.py).
+        if buildOnly:
+            return Connect.getPage(url=uri, get=get, post=post, method=method, cookie=cookie, ua=ua, referer=referer, host=host, silent=True, auxHeaders=auxHeaders, buildOnly=True)
 
         if pageLength is None:
             try:
