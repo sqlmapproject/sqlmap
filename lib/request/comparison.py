@@ -132,7 +132,7 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
             page = removeDynamicContent(page)
             if threadData.lastPageTemplate != kb.pageTemplate:
                 threadData.lastPageTemplateCleaned = removeDynamicContent(kb.pageTemplate)
-                # Same template-identity memoization for the structure-aware projections (§below): the
+                # Same template-identity memoization for the structure-aware projections (see below): the
                 # template is constant across an extraction, so it must not be re-parsed/re-tokenized on
                 # every inference request - only seq2 (from the live page) is recomputed per response
                 threadData.lastPageTemplateJsonMinimized = jsonMinimize(kb.pageTemplate)
