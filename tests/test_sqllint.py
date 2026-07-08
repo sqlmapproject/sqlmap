@@ -79,6 +79,28 @@ BAD = (
     "1 UNION SELECT NULL,,NULL",                                 # empty list item
     "1 AND (1=1)(2=2)",                                          # adjacent groups
     "SELECT count() FROM t WHERE id=)",                          # operator before ')'
+    "SELECT a,b, FROM t",                                        # dangling comma before clause
+    "1 AND (SELECT [DELIMITER_START]x[DELIMITER_STOP] FROM t)",   # leftover templating marker
+    "1 [ORIGVALUE] AND 1=1",                                     # leftover ORIGVALUE marker
+    "1 UNI1ON ALL SELECT NULL,NULL",                             # digit-corrupted UNION
+    "1 UrNION ALL SELECT NULL",                                  # char-inserted UNION
+    "SEL2ECT x.z FROM t",                                        # digit-corrupted SELECT
+    "1 ORD2ER BY 1",                                             # digit-corrupted ORDER
+    "1 UNIN ALL SELECT NULL",                                    # deletion-typo UNION
+    "1 UNOIN ALL SELECT NULL",                                   # transposition-typo UNION
+    "SELCT a FROM t",                                            # deletion-typo SELECT
+    "1 UNION ALLSELECT NULL",                                    # glued keyword after UNION
+    "1 AND ORD(MID((SELECT COUNT(x FROM t),1,1))>64",            # unbalanced parentheses (dropped ')')
+    "1 UNION ALL SELECT ,CONCAT(0x71,a,0x71) FROM t",            # comma right after SELECT
+)
+
+# cross-dialect valid constructs the near-keyword / comma / digit-glue rules must
+# NOT flag (regression guards for false positives the real-identifier stress found)
+DIALECT_GOOD_HARD = (
+    "SELECT 4images_users FROM t",                              # digit-STARTED identifier (not '1UNION')
+    "SELECT a,group,b FROM t",                                  # column literally named 'group'
+    "SELECT a,order FROM t",                                    # column literally named 'order'
+    "1 UNION SELECT orders FROM t",                             # 'orders' near ORDER but a real table
 )
 
 # queries.xml: attributes that carry SQL (not regexes/markers)
@@ -142,12 +164,16 @@ def _payload_atoms():
 
 class TestLinterSelf(unittest.TestCase):
     def test_well_formed_pass(self):
-        for sql in GOOD + DIALECT_GOOD:
+        for sql in GOOD + DIALECT_GOOD + DIALECT_GOOD_HARD:
             self.assertEqual(checkSanity(sql), [], "false positive on valid SQL: %r" % sql)
 
     def test_malformed_flag(self):
         for sql in BAD:
             self.assertTrue(checkSanity(sql), "missed malformed SQL: %r" % sql)
+
+    def test_nonascii_identifier(self):
+        # a non-ASCII column name (Turkish dotless-i U+0131) must lex as an identifier, not stray
+        self.assertEqual(checkSanity(u"SELECT \u0131d,ad FROM users"), [])
 
 
 # module-level coverage accounting (printed in tearDownModule)

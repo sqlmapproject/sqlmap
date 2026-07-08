@@ -122,6 +122,11 @@ jobs:
       - name: Smoke test
         run: python sqlmap.py --smoke-test
 
+      - name: Payload lint
+        # offline: emulates blind + UNION enumeration across all DBMSes and checks
+        # every payload agent.py builds with lib/utils/sqllint (structural sanity)
+        run: python sqlmap.py --payload-lint
+
       - name: Vuln test
         run: python sqlmap.py --vuln-test
 

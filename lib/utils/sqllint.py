@@ -42,7 +42,7 @@ _LEXER = re.compile(r"""
     | (?P<%s>'(?:''|[^'])*'|"(?:""|[^"])*")
     | (?P<%s>`[^`]*`|\[[^\]]*\])
     | (?P<%s>0[xX][0-9A-Fa-f]+|(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?)
-    | (?P<%s>[A-Za-z_@$][A-Za-z0-9_@$]*)
+    | (?P<%s>(?:[A-Za-z_@$]|[^\x00-\x7f])(?:[A-Za-z0-9_@$]|[^\x00-\x7f])*)
     | (?P<%s><=|>=|<>|!=|==|<<|>>|\|\||&&|::|:=|[-+*/%%=<>!~&|^:])
     | (?P<%s>,)
     | (?P<%s>\.)
@@ -69,6 +69,39 @@ _BINARY_KEYWORDS = frozenset(("AND", "OR", "XOR", "LIKE", "RLIKE", "REGEXP", "DI
 # as the SELECT/COUNT wildcard)
 _BINARY_SYMBOLS = frozenset(("=", "<>", "!=", "<", ">", "<=", ">=", "/", "%", "||", "&&", "|", "&", "^"))
 
+# clause-introducing keywords that signal a dangling list item when they sit
+# right after a comma ("SELECT a,b, FROM t"). GROUP/ORDER/LIMIT/OFFSET are
+# excluded on purpose - they double as very common column names, so a bare
+# "a,limit,b" would false-positive.
+_CLAUSE_KEYWORDS = frozenset(("FROM", "WHERE", "HAVING", "INTO"))
+
+# sqlmap's own templating markers. If any survives into a *final* outbound payload
+# a substitution failed upstream (agent.py / cleanupPayload / queries.xml) - always
+# a bug. Matched on the raw payload because a marker can leak anywhere (bare, inside
+# a string, or where the lexer would otherwise read it as an MSSQL [identifier]).
+_LEFTOVER_MARKER = re.compile(
+    r"\[(?:RANDNUM\d*|RANDSTR\d*|INFERENCE|SLEEPTIME|DELAYED|DELIMITER_START|DELIMITER_STOP"
+    r"|ORIGVALUE|ORIGINAL|GENERIC_SQL_COMMENT|QUERY|UNION|CHAR|COLSTART|COLSTOP|DB"
+    r"|SINGLE_QUOTE|DOUBLE_QUOTE|AT_REPLACE|SPACE_REPLACE|DOLLAR_REPLACE|HASH_REPLACE)\]")
+
+# SQL words whose near-miss spelling in a structural position is almost always a
+# broken payload, not a legitimate identifier (deliberately smaller than the full
+# keyword list): catches payload-builder typos like UNI1ON/SEL2ECT/ORD2ER without
+# flagging arbitrary application identifiers.
+# only length>=5 structural keywords: short ones (ON/NOT/IN/IS/BY/OR/AND/ALL/
+# FROM/LIKE/NULL/...) are too easily near-missed by real column names (note->NOT,
+# ono->ON), which the real-identifier stress test proved would false-positive.
+_NEAR_KEYWORD_TARGETS = frozenset((
+    "SELECT", "UNION", "DISTINCT", "GROUP", "ORDER", "HAVING", "LIMIT",
+    "OFFSET", "WHERE", "INNER", "RIGHT", "OUTER", "CROSS", "REGEXP", "RLIKE"))
+
+# single-char substitutions seen in accidental mutation/test edits
+_DIGIT_KEYWORD_ALIASES = {"0": "O", "1": "I", "2": "E", "3": "E", "4": "A", "5": "S", "7": "T", "8": "B"}
+
+_CLAUSE_STARTERS = frozenset((
+    "SELECT", "UNION", "FROM", "WHERE", "GROUP", "ORDER", "HAVING", "LIMIT",
+    "OFFSET", "INTO", "JOIN", "ON", "AND", "OR"))
+
 _KEYWORDS_CACHE = None
 
 
@@ -80,6 +113,96 @@ class Token(object):
         self.value = value
         self.start = start
         self.end = end
+
+
+def _word(token):
+    if token is not None and token.type in (T_IDENT, T_KEYWORD):
+        return token.value.upper()
+    return None
+
+
+def _atClauseBoundary(prev):
+    return prev is None or prev.type in (T_LPAREN, T_RPAREN, T_SEMI, T_COMMA) or \
+           (prev.type == T_OP and prev.value not in (".",)) or \
+           (prev.type == T_KEYWORD and prev.value.upper() in _CLAUSE_STARTERS)
+
+
+def _editWithin1(a, b):
+    """Damerau-Levenshtein distance <= 1 (one insertion, deletion, substitution
+    or adjacent transposition). Catches every single-char keyword typo class."""
+    la, lb = len(a), len(b)
+    if a == b or abs(la - lb) > 1:
+        return a == b
+    if la == lb:
+        diff = [i for i in range(la) if a[i] != b[i]]
+        if len(diff) == 1:                                                   # substitution
+            return True
+        if len(diff) == 2 and diff[1] == diff[0] + 1 and \
+           a[diff[0]] == b[diff[1]] and a[diff[1]] == b[diff[0]]:            # transposition
+            return True
+        return False
+    shorter, longer = (a, b) if la < lb else (b, a)                          # deletion/insertion
+    for i in range(len(longer)):
+        if shorter == longer[:i] + longer[i + 1:]:
+            return True
+    return False
+
+
+def _nearKeywordCandidates(value):
+    """
+    Structural SQL keywords one single-char typo away from an identifier
+    (Damerau distance 1; NOT generic fuzzy matching over the whole keyword file).
+
+    >>> sorted(_nearKeywordCandidates("UNI1ON"))
+    ['UNION']
+    >>> sorted(_nearKeywordCandidates("SEL2ECT"))
+    ['SELECT']
+    >>> sorted(_nearKeywordCandidates("UrNION"))
+    ['UNION']
+    >>> sorted(_nearKeywordCandidates("UNIN"))
+    ['UNION']
+    >>> sorted(_nearKeywordCandidates("UNOIN"))
+    ['UNION']
+    """
+    upper = value.upper()
+    if upper in _NEAR_KEYWORD_TARGETS or len(upper) < 4:
+        return set()
+    return set(target for target in _NEAR_KEYWORD_TARGETS if _editWithin1(upper, target))
+
+
+def _nearKeywordIsStructural(sig, index, keyword):
+    """True when a near-keyword identifier sits where that keyword is expected."""
+    prev = sig[index - 1] if index > 0 else None
+    nxt = sig[index + 1] if index + 1 < len(sig) else None
+    prevWord = _word(prev)
+    nextWord = _word(nxt)
+
+    if keyword == "UNION":
+        return nextWord in ("ALL", "DISTINCT", "SELECT") and \
+               prevWord not in ("SELECT", "FROM", "WHERE", "GROUP", "ORDER", "BY", "HAVING", "LIMIT", "OFFSET", "JOIN", "ON", "AS")
+
+    if keyword == "SELECT":
+        return prev is None or prev.type in (T_LPAREN, T_SEMI) or prevWord in ("UNION", "ALL", "DISTINCT", "EXCEPT", "INTERSECT")
+
+    if keyword in ("ORDER", "GROUP"):
+        return nextWord == "BY"
+
+    if keyword == "BY":
+        return prevWord in ("ORDER", "GROUP")
+
+    if keyword in ("AND", "OR", "LIKE", "REGEXP", "RLIKE", "IN", "IS"):
+        return prev is not None and nxt is not None and prev.type in _OPERANDS and nxt.type in _OPERANDS.union((T_LPAREN,))
+
+    if keyword in ("FROM", "WHERE", "HAVING", "LIMIT", "OFFSET", "INTO", "JOIN", "ON"):
+        return _atClauseBoundary(prev) or prevWord in ("SELECT", "UPDATE", "DELETE", "INSERT", "FROM", "WHERE", "HAVING")
+
+    if keyword in ("ALL", "DISTINCT"):
+        return prevWord in ("UNION", "SELECT")
+
+    if keyword in ("NULL", "NOT"):
+        return _atClauseBoundary(prev)
+
+    return False
 
 
 def _keywords():
@@ -194,6 +317,11 @@ def checkSanity(sql, keywords=None):
         keywords = _keywords()
 
     issues = []
+
+    # -- residual templating markers (upstream substitution failed) --------
+    for match in _LEFTOVER_MARKER.finditer(sql):
+        issues.append("leftover marker '%s' at offset %d" % (match.group(0), match.start()))
+
     tokens = tokenize(sql, keywords)
 
     # -- edge tolerance for unterminated strings ---------------------------
@@ -201,6 +329,7 @@ def checkSanity(sql, keywords=None):
     # that opens *inside* a group (depth > 0) has swallowed a needed ')', i.e.
     # an odd quote count within an owned scope (the classic "users'" abomination).
     depth = 0
+    unterminated = False
     for token in tokens:
         if token.type == T_LPAREN:
             depth += 1
@@ -209,7 +338,13 @@ def checkSanity(sql, keywords=None):
         elif token.type == T_UNTERM:
             if depth > 0:
                 issues.append("odd quote inside a parenthesized scope at offset %d" % token.start)
+            unterminated = True
             break
+
+    # unclosed '(' (a dropped ')'): well-formed payloads NEVER end paren-positive
+    # (leading break-out ')' only ever makes depth negative), so this is 0-FP.
+    if not unterminated and depth > 0:
+        issues.append("unbalanced parentheses (%d unclosed '(')" % depth)
 
     sig = _significant(tokens)
 
@@ -223,9 +358,23 @@ def checkSanity(sql, keywords=None):
         curIsFunc = cur.type == T_KEYWORD and nxt is not None and nxt.type == T_LPAREN
         curBinary = _isBinary(cur) and not curIsFunc
 
-        # -- glued number/keyword boundary: '1UNION', '1AND' ---------------
-        if cur.type == T_NUM and nxt is not None and nxt.start == cur.end and nxt.type in (T_IDENT, T_KEYWORD):
-            issues.append("digit glued to a word ('%s%s') at offset %d" % (cur.value, nxt.value, cur.start))
+        # -- keyword near-miss in a structural position: UNI1ON/SEL2ECT/ORD2ER
+        if cur.type == T_IDENT:
+            for keyword in sorted(_nearKeywordCandidates(cur.value)):
+                if _nearKeywordIsStructural(sig, i, keyword):
+                    issues.append("keyword typo '%s' (near '%s') at offset %d" % (cur.value, keyword, cur.start))
+                    break
+
+        # -- UNION must continue with SELECT/ALL/DISTINCT/'(' (catches a glued or
+        #    corrupted continuation like 'UNION ALLSELECT' -> UNION <identifier>)
+        if cur.type == T_KEYWORD and cur.value.upper() == "UNION" and nxt is not None:
+            if not (nxt.type == T_LPAREN or (nxt.type == T_KEYWORD and nxt.value.upper() in ("SELECT", "ALL", "DISTINCT"))):
+                issues.append("UNION not followed by SELECT/ALL/DISTINCT at offset %d" % cur.start)
+
+        # -- digit glued to a keyword: '1UNION', '5108AND' (a digit-started
+        #    identifier like '4images' is legitimate and must NOT trip this)
+        if cur.type == T_NUM and nxt is not None and nxt.start == cur.end and nxt.type == T_KEYWORD:
+            issues.append("digit glued to a keyword ('%s%s') at offset %d" % (cur.value, nxt.value, cur.start))
 
         # -- operand directly followed by a bare number: 'id 1' ------------
         # a numeric literal can never be an alias, so this is always broken
@@ -241,6 +390,14 @@ def checkSanity(sql, keywords=None):
                 issues.append("comma right after '(' at offset %d" % cur.start)
             elif pair == (T_COMMA, T_RPAREN):
                 issues.append("comma right before ')' at offset %d" % cur.start)
+            elif prev.type == T_KEYWORD and prev.value.upper() == "SELECT" and cur.type == T_COMMA:
+                issues.append("comma right after SELECT at offset %d" % cur.start)
+            elif prev.type == T_COMMA and cur.type == T_KEYWORD and cur.value.upper() in _CLAUSE_KEYWORDS \
+                    and nxt is not None and nxt.type not in (T_COMMA, T_RPAREN):
+                # a clause keyword right after a comma AND followed by real content is a
+                # dangling list item ("a,b, FROM t"); if it is a bare list item itself
+                # ("a,group,b" - a column named 'group') the next token is a comma/paren/end
+                issues.append("dangling comma before '%s' at offset %d" % (cur.value, cur.start))
             elif pair == (T_RPAREN, T_LPAREN):
                 issues.append("adjacent groups ')(' at offset %d" % cur.start)
             elif pair == (T_LPAREN, T_RPAREN) and (i < 2 or sig[i - 2].type in (T_OP, T_COMMA, T_LPAREN)):

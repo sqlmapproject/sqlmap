@@ -139,6 +139,7 @@ from lib.request.comparison import comparison
 from lib.request.direct import direct
 from lib.request.methodrequest import MethodRequest
 from lib.utils.safe2bin import safecharencode
+from lib.utils.sqllint import checkSanity
 from thirdparty import six
 from collections import OrderedDict
 from thirdparty.six import unichr as _unichr
@@ -1087,6 +1088,15 @@ class Connect(object):
         value = agent.adjustLateValues(value)
         payload = agent.extractPayload(value)
         threadData = getCurrentThreadData()
+
+        # Opt-in sanity lint of the outbound (pre-tamper) payload. Skipped during
+        # detection (kb.testMode) where deliberately-invalid probes are expected;
+        # for operational payloads a structural defect is a genuine bug worth a
+        # heads-up. Enabled via SQLMAP_LINT_PAYLOADS (e.g. CI/--vuln-test runs).
+        if payload and not kb.testMode and os.environ.get("SQLMAP_LINT_PAYLOADS"):
+            for issue in checkSanity(agent.removePayloadDelimiters(value)):
+                singleTimeWarnMessage("potentially malformed SQL payload emitted (%s): %s" % (issue, payload))
+                break
 
         if conf.httpHeaders:
             headers = OrderedDict(conf.httpHeaders)

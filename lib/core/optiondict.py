@@ -288,6 +288,7 @@ optDict = {
         "murphyRate": "integer",
         "smokeTest": "boolean",
         "fpTest": "boolean",
+        "payloadLint": "boolean",
         "apiTest": "boolean",
     },
 

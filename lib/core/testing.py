@@ -547,3 +547,239 @@ def smokeTest():
         logger.error("smoke test final result: FAILED")
 
     return retVal
+
+def payloadLintTest():
+    """
+    Offline payload-sanity coverage test.
+
+    For every supported back-end DBMS an emulation oracle drives the blind
+    enumeration handlers (no live target), so agent.py builds the full range of
+    inference payloads it would emit while dumping a schema, and each one is
+    checked with lib.utils.sqllint. A planted-malformation self-check first
+    proves the pipeline actually catches a defect, so the gate can never pass
+    vacuously.
+    """
+
+    import lib.core.common as common_module
+
+    from lib.controller.handler import setHandler
+    from lib.core.agent import agent
+    from lib.core.common import Backend
+    from lib.core.datatype import AttribDict
+    from lib.core.datatype import InjectionDict
+    from lib.core.enums import PAYLOAD
+    from lib.core.enums import PLACE
+    from lib.core.threads import getCurrentThreadData
+    from lib.request.connect import Connect
+    from lib.utils.sqllint import checkSanity
+
+    unisonRandom()
+
+    collected = []
+    guard = {"count": 0}
+    CAP_PER_METHOD = 600
+
+    # A "consistent liar": parse the injected char comparison in whatever form the
+    # dialect uses (bare int / CHAR(n) / quoted 'x') and answer so counts->'2',
+    # lengths->small, names->'a'. This keeps every dialect's enumeration walking a
+    # few shallow levels, exercising the payload builders without a real backend.
+    def _oracle(value=None, **kwargs):
+        if value is None:
+            return None
+        sql = agent.removePayloadDelimiters(agent.adjustLateValues(value))
+        collected.append(sql)
+        guard["count"] += 1
+        if guard["count"] > CAP_PER_METHOD:
+            raise KeyboardInterrupt
+        # UNION/inband path reads the response body: hand back a page carrying the
+        # delimited marker value so extraction "succeeds" and keeps producing payloads
+        if kwargs.get("content"):
+            start, stop, delim = kb.chars.start, kb.chars.stop, kb.chars.delimiter
+            return ("x%s%s%s%s%sx" % (start, "1", delim, "1", stop), None, 200)
+        upper = sql.upper()
+        match = re.search(r">\s*'(.?)'", sql)
+        if match:
+            return True if match.group(1) == "" else (50 if "COUNT(" in upper else 97) > ord(match.group(1))
+        match = re.search(r">\s*(?:N?CHAR|CHR|NCHR)\s*\(\s*(\d+)", sql, re.I)
+        if match:
+            return (50 if "COUNT(" in upper else 97) > int(match.group(1))
+        match = re.search(r">\s*(\d+)", sql)
+        if match:
+            value_ = int(match.group(1))
+            target = 1 if "COUNT(" in upper else (3 if any(_ in upper for _ in ("LENGTH(", "LEN(", "DATALENGTH(")) else 2)
+            return target > value_
+        match = re.search(r"(\d+)\s*(=|<|>=|<=|<>|!=)\s*(\d+)", sql)
+        if match:
+            left, operator, right = int(match.group(1)), match.group(2), int(match.group(3))
+            return {"=": left == right, "<": left < right, ">=": left >= right, "<=": left <= right, "<>": left != right, "!=": left != right}[operator]
+        return False
+
+    def _injection(dbms):
+        injection = InjectionDict()
+        injection.place = PLACE.GET
+        injection.parameter = "id"
+        injection.ptype = 1
+        injection.prefix = ""
+        injection.suffix = ""
+        injection.clause = [1]
+        injection.dbms = dbms
+        boolean = AttribDict()
+        boolean.title = "AND boolean-based blind"
+        boolean.vector = "AND [INFERENCE]"
+        boolean.comment = ""
+        boolean.payload = "x"
+        boolean.where = 1
+        boolean.templatePayload = None
+        boolean.matchRatio = None
+        boolean.trueCode = None
+        boolean.falseCode = None
+        injection.data = AttribDict()
+        injection.data[PAYLOAD.TECHNIQUE.BOOLEAN] = boolean
+        return injection
+
+    def _unionInjection(dbms):
+        injection = InjectionDict()
+        injection.place = PLACE.GET
+        injection.parameter = "id"
+        injection.ptype = 1
+        injection.prefix = ""
+        injection.suffix = ""
+        injection.clause = [1]
+        injection.dbms = dbms
+        union = AttribDict()
+        union.title = "Generic UNION query"
+        # vector = (position, count, comment, prefix, suffix, char, where,
+        #           unionDuplicates, forcePartial, tableFrom, unionTemplate)
+        union.vector = (0, 3, "-- -", "", "", "NULL", PAYLOAD.WHERE.ORIGINAL, False, False, None, None)
+        union.comment = "-- -"
+        union.prefix = ""
+        union.suffix = ""
+        union.where = PAYLOAD.WHERE.ORIGINAL
+        union.templatePayload = None
+        union.matchRatio = None
+        union.trueCode = None
+        union.falseCode = None
+        injection.data = AttribDict()
+        injection.data[PAYLOAD.TECHNIQUE.UNION] = union
+        return injection
+
+    methods = ("getBanner", "getCurrentDb", "getCurrentUser", "getHostname", "isDba",
+               "getDbs", "getTables", "getColumns", "getSchema", "getUsers",
+               "getPasswordHashes", "getPrivileges", "getRoles", "getStatements",
+               "getComments", "getProcedures")
+
+    _stdout = sys.stdout
+
+    def _progress(dbms, count, bad):
+        # write to the real stdout (sqlmap's is redirected to a sink during the walk)
+        _stdout.write("[payload-lint] %-26s %7d payloads  %s\n" % (dbms, count, ("%d FLAGGED" % bad) if bad else "ok"))
+        _stdout.flush()
+
+    class _Sink(object):
+        def write(self, *args, **kwargs): pass
+        def flush(self, *args, **kwargs): pass
+
+    _queryPage = Connect.queryPage
+    _getPageTemplate = common_module.getPageTemplate
+    _level = logger.level
+    _threads = conf.threads
+    threadData = getCurrentThreadData()
+
+    retVal = True
+    total = walked = 0
+    flagged = []
+    allDbms = sorted(queries.keys())
+
+    try:
+        conf.batch = True
+        conf.threads = 1                    # deterministic, single-threaded (clean output)
+        conf.disableHashing = True
+        if not conf.base64Parameter:
+            conf.base64Parameter = []
+        common_module.getPageTemplate = lambda *args, **kwargs: ("<html>x</html>", False)
+        Connect.queryPage = staticmethod(_oracle)
+        logger.setLevel(logging.CRITICAL)   # mute the emulated walk's "unable to retrieve" noise
+        threadData.disableStdOut = True     # mute dataToStdout at its gate
+        sys.stdout = _Sink()                # and mute everything else (readInput prompts, tables, ...)
+
+        def _runMethods():
+            found = set()
+            for name in methods:
+                method = getattr(conf.dbmsHandler, name, None)
+                if method is None:
+                    continue
+                del collected[:]
+                guard["count"] = 0
+                try:
+                    method()
+                except (KeyboardInterrupt, Exception):
+                    pass
+                found.update(collected)
+            return found
+
+        for dbms in allDbms:
+            try:
+                Backend.flushForcedDbms(force=True)
+                kb.stickyDBMS = False
+                Backend.forceDbms(dbms)
+                conf.forceDbms = conf.dbms = dbms
+                conf.parameters = {PLACE.GET: "id=1"}
+                conf.paramDict = {PLACE.GET: {"id": "1"}}
+                # a user/column so user-filtered and column-specific query variants
+                # (WHERE grantee='...', per-column extraction) are exercised too
+                conf.db, conf.tbl, conf.col, conf.user = "testdb", "testtbl", "testcol", "testuser"
+                setHandler()
+            except Exception:
+                _progress(dbms, 0, 0)
+                continue
+
+            seen = set()
+            # (a) boolean-based blind pass, then (b) UNION-query (inband) pass -
+            # two techniques exercise two distinct payload-builder families in agent.py
+            for technique, injector in ((PAYLOAD.TECHNIQUE.BOOLEAN, _injection),
+                                        (PAYLOAD.TECHNIQUE.UNION, _unionInjection)):
+                for key in list(kb.data.keys()):
+                    if key.startswith("cached"):
+                        kb.data[key] = None
+                kb.jsonAggMode = False
+                kb.injection = injector(dbms)
+                kb.injections = [kb.injection]
+                kb.technique = technique
+                seen.update(_runMethods())
+
+            bad = [(dbms, p, checkSanity(p)) for p in seen if checkSanity(p)]
+            flagged.extend(bad)
+            total += len(seen)
+            if seen:
+                walked += 1
+            _progress(dbms, len(seen), len(bad))
+    finally:
+        sys.stdout = _stdout
+        Connect.queryPage = _queryPage
+        common_module.getPageTemplate = _getPageTemplate
+        Backend.flushForcedDbms(force=True)
+        logger.setLevel(_level)
+        conf.threads = _threads
+        threadData.disableStdOut = False
+
+    # self-check: the linter must flag a known-malformed payload, and the walk
+    # must have actually produced payloads (guards against a vacuous pass)
+    if not checkSanity("1 AND (SELECT id 1 FROM users)"):
+        logger.error("payload-lint self-check failed: a known-malformed payload was not flagged")
+        retVal = False
+    if total < 1000:
+        logger.error("payload-lint self-check failed: only %d payloads generated (walk did not run)" % total)
+        retVal = False
+
+    for dbms, payload, issues in flagged[:20]:
+        retVal = False
+        logger.error("[%s] malformed payload: %s -> %s" % (dbms, payload, "; ".join(issues)))
+
+    clearConsoleLine()
+    logger.info("payload-lint: %d payloads across %d/%d DBMSes checked, %d malformed" % (total, walked, len(allDbms), len(flagged)))
+    if retVal:
+        logger.info("payload-lint final result: PASSED")
+    else:
+        logger.error("payload-lint final result: FAILED")
+
+    return retVal
