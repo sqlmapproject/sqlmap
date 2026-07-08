@@ -176,14 +176,9 @@ class TestLinterSelf(unittest.TestCase):
         self.assertEqual(checkSanity(u"SELECT \u0131d,ad FROM users"), [])
 
 
-# module-level coverage accounting (printed in tearDownModule)
-_COVERAGE = {"queries_dbms": 0, "queries_atoms": 0, "payload_atoms": 0}
-
-
 class TestCatalogCoverage(unittest.TestCase):
     def test_queries_xml_clean(self):
         atoms = _queries_atoms()
-        _COVERAGE["queries_dbms"] = len(atoms)
         total = 0
         for dbms, items in atoms.items():
             for raw in items:
@@ -191,26 +186,15 @@ class TestCatalogCoverage(unittest.TestCase):
                 issues = checkSanity(_materialize(raw))
                 self.assertEqual(issues, [],
                                  "queries.xml [%s] malformed atom: %r -> %s" % (dbms, raw, issues))
-        _COVERAGE["queries_atoms"] = total
         self.assertGreater(total, 1000)   # sanity: the catalog was actually walked
 
     def test_payloads_xml_clean(self):
         items = _payload_atoms()
-        _COVERAGE["payload_atoms"] = len(items)
         for name, title, raw in items:
             issues = checkSanity(_materialize(raw))
             self.assertEqual(issues, [],
                              "%s malformed payload atom (%s): %r -> %s" % (name, title, raw, issues))
         self.assertGreater(len(items), 500)
-
-
-def tearDownModule():
-    q = _COVERAGE
-    total = q["queries_atoms"] + q["payload_atoms"]
-    sys.stderr.write(
-        "\n[sqllint coverage] atom-level: %d SQL atoms linted clean "
-        "(%d queries.xml across %d/30 DBMSes + %d payloads.xml vectors)\n"
-        % (total, q["queries_atoms"], q["queries_dbms"], q["payload_atoms"]))
 
 
 if __name__ == "__main__":

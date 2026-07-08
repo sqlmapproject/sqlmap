@@ -122,6 +122,11 @@ class TestReportErrorCapture(unittest.TestCase):
         # otherwise gate the ERROR record before it reaches the recorder (order-dependent flakiness)
         saved_level = logger.level
         logger.setLevel(logging.ERROR)
+        # mute the existing console handler(s) so the deliberate ERROR below does not leak to the
+        # unittest output; the recorder added by setupReportCollector next still captures it
+        muted = [(handler, handler.level) for handler in logger.handlers]
+        for handler, _ in muted:
+            handler.setLevel(logging.CRITICAL + 1)
         collector = setupReportCollector()
         try:
             logger.error("boom %s", "here")
@@ -129,6 +134,8 @@ class TestReportErrorCapture(unittest.TestCase):
             self.assertTrue(any("boom here" in _ for _ in result["error"]))
         finally:
             logger.setLevel(saved_level)
+            for handler, level in muted:
+                handler.setLevel(level)
             for handler in list(logger.handlers):
                 if isinstance(handler, ReportErrorRecorder):
                     logger.removeHandler(handler)
