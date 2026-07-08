@@ -185,7 +185,11 @@ class _KeepAliveHandler(object):
         a connection is never reused.
         """
 
-        state = {"handled": False}
+        # 'eof' is raised only on a genuine end-of-body (observed while reading), never
+        # merely because close() nulled the file object; the socket is handed back to the
+        # pool solely on that signal, so a half-read response can never be reused (which
+        # would splice its leftover bytes onto the next request - response desynchronization)
+        state = {"handled": False, "reading": False, "eof": False}
         _read = response.read
         _close = response.close
 
@@ -200,7 +204,7 @@ class _KeepAliveHandler(object):
 
         def settle():
             # Once (and only once) the body is fully drained, decide the socket's fate
-            if state["handled"] or not drained():
+            if state["handled"] or not state["eof"]:
                 return
             state["handled"] = True
             if keep:
@@ -212,12 +216,23 @@ class _KeepAliveHandler(object):
                     pass
 
         def read(*args, **kwargs):
-            data = _read(*args, **kwargs)
+            state["reading"] = True
+            try:
+                data = _read(*args, **kwargs)
+            finally:
+                state["reading"] = False
+            if drained():
+                state["eof"] = True
             settle()
             return data
 
         def close():
-            # Note: on Python 2 httplib.read() calls close() itself upon EOF
+            # Note: on Python 2 httplib.read() calls close() itself upon EOF, i.e. from inside
+            # our read(); such an in-read close marks a real end-of-body. An external close()
+            # on a not-yet-drained body means the caller abandoned it (e.g. sqlmap hitting a
+            # size cap), so the socket must be dropped rather than returned to the pool.
+            if state["reading"]:
+                state["eof"] = True
             _close()
             settle()
             if not state["handled"]:
@@ -228,6 +243,7 @@ class _KeepAliveHandler(object):
                 except Exception:
                     pass
 
+        response._keepaliveManaged = True
         response.read = read
         response.close = close
 

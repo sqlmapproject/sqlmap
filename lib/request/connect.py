@@ -760,6 +760,17 @@ class Connect(object):
                     warnMsg = "problem occurred during connection closing ('%s')" % getSafeExString(ex)
                     logger.warning(warnMsg)
 
+            # Keep-alive: dispose the response explicitly. Its wrapped close() hands the socket
+            # back to the pool when the body was fully drained, otherwise drops it (a size-capped
+            # partial read must not be reused). This avoids leaning on GC to reclaim it (delayed on
+            # non-refcounting runtimes like PyPy). Guarded by the handler's marker so the HTTP/2
+            # reuse pool is left untouched.
+            elif conn is not None and getattr(conn, "_keepaliveManaged", False):
+                try:
+                    conn.close()
+                except Exception:
+                    pass
+
         except SqlmapConnectionException as ex:
             if conf.proxyList and not kb.threadException:
                 warnMsg = "unable to connect to the target URL ('%s')" % getSafeExString(ex)
