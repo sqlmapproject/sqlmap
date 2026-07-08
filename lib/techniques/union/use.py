@@ -31,6 +31,7 @@ from lib.core.common import isNoneValue
 from lib.core.common import isNumPosStrValue
 from lib.core.common import listToStrValue
 from lib.core.common import parseUnionPage
+from lib.core.common import randomStr
 from lib.core.common import removeReflectiveValues
 from lib.core.common import singleTimeDebugMessage
 from lib.core.common import singleTimeWarnMessage
@@ -296,7 +297,7 @@ def _chunkedJsonAggUse(expression, expressionFields, expressionFieldsList, count
     offset = 0
 
     while offset < count:
-        query = "SELECT %s FROM (%s %s) sqmapx" % (aggExpr, base, window(offset, chunk))
+        query = "SELECT %s FROM (%s %s) %s" % (aggExpr, base, window(offset, chunk), randomStr())
 
         kb.jsonAggMode = True
         output = _oneShotUnionUse(query, False)
