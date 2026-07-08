@@ -377,6 +377,12 @@ class Encoder(object):
 SETTINGS_INITIAL_WINDOW_SIZE = 0x4
 BIG_WINDOW = (1 << 31) - 1
 
+# Upper bound on the response bytes (body or header block) buffered per stream. The client advertises a
+# ~2GB flow-control window, so without this a large (or hostile) server would drive the whole body into
+# memory and OOM the process. Mirrors the HTTP/1.1 path's MAX_CONNECTION_TOTAL_SIZE (100MB) cap in
+# connect.py; a stream that exceeds it is truncated (body) or abandoned (headers) and its connection retired.
+MAX_RESPONSE_SIZE = 100 * 1024 * 1024
+
 def _recv_exact(sock, n):
     buf = b""
     while len(buf) < n:
@@ -524,6 +530,9 @@ class _H2Connection(object):
                     if flags & FLAG_PRIORITY:
                         p = p[5:]
                 header_block += p
+                if len(header_block) > MAX_RESPONSE_SIZE:     # hostile/endless header block -> bail rather than OOM
+                    self.usable = False
+                    raise IOError("oversized HTTP/2 header block")
                 if flags & FLAG_END_HEADERS:
                     resp_headers = self.dec.decode(header_block)
                 if flags & FLAG_END_STREAM:
@@ -533,6 +542,9 @@ class _H2Connection(object):
                 if flags & FLAG_PADDED:
                     p = p[1:len(p) - bytearray(payload)[0]]
                 resp_body += p
+                if len(resp_body) > MAX_RESPONSE_SIZE:        # cap like the HTTP/1.1 path; stop reading and retire the
+                    self.usable = False                       # connection (leftover frames abandoned) instead of OOM
+                    break
                 if payload:                                   # replenish stream + connection windows
                     self.sock.sendall(encode_frame(WINDOW_UPDATE, 0, sid, struct.pack("!I", len(payload))))
                     self.sock.sendall(encode_frame(WINDOW_UPDATE, 0, 0, struct.pack("!I", len(payload))))
@@ -603,6 +615,9 @@ class _H2Connection(object):
                     if flags & FLAG_PRIORITY:
                         p = p[5:]
                 state[fsid]["hb"] += p
+                if len(state[fsid]["hb"]) > MAX_RESPONSE_SIZE:
+                    self.usable = False
+                    raise IOError("oversized HTTP/2 header block during timeless pair")
                 if flags & FLAG_END_HEADERS:
                     state[fsid]["headers"] = self.dec.decode(state[fsid]["hb"])
                 if flags & FLAG_END_STREAM and fsid in remaining:
@@ -612,6 +627,9 @@ class _H2Connection(object):
                 if flags & FLAG_PADDED:
                     p = p[1:len(p) - bytearray(payload)[0]]
                 state[fsid]["body"] += p
+                if len(state[fsid]["body"]) > MAX_RESPONSE_SIZE:  # cap the buffered body (mirrors exchange())
+                    self.usable = False
+                    raise IOError("oversized response during timeless pair")
                 if payload:
                     self.sock.sendall(encode_frame(WINDOW_UPDATE, 0, fsid, struct.pack("!I", len(payload))))
                     self.sock.sendall(encode_frame(WINDOW_UPDATE, 0, 0, struct.pack("!I", len(payload))))
