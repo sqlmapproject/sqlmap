@@ -5,11 +5,6 @@ Copyright (c) 2006-2026 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
-try:
-    import cPickle as pickle
-except:
-    import pickle
-
 import itertools
 import os
 import shutil
@@ -86,7 +81,7 @@ class BigArray(list):
     >>> _[0] = [None]
     >>> _.index(0)
     20
-    >>> import pickle; __ = pickle.loads(pickle.dumps(_))
+    >>> import copy; __ = copy.deepcopy(_)
     >>> __.append(1)
     >>> len(_)
     100001
@@ -158,9 +153,10 @@ class BigArray(list):
                     self.chunks[-1] = self.cache.data
                     self.cache.dirty = False
                 else:
+                    from lib.core.convert import deserializeValue
                     try:
                         with open(filename, "rb") as f:
-                            self.chunks[-1] = pickle.loads(zlib.decompress(f.read()))
+                            self.chunks[-1] = deserializeValue(zlib.decompress(f.read()))
                     except IOError as ex:
                         errMsg = "exception occurred while retrieving data "
                         errMsg += "from a temporary file ('%s')" % ex
@@ -207,11 +203,13 @@ class BigArray(list):
         self.close()
 
     def _dump(self, chunk):
+        from lib.core.convert import getBytes, serializeValue
         try:
             handle, filename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.BIG_ARRAY)
             self.filenames.add(filename)
             with os.fdopen(handle, "w+b") as f:
-                f.write(zlib.compress(pickle.dumps(chunk, pickle.HIGHEST_PROTOCOL), BIGARRAY_COMPRESS_LEVEL))
+                # serializeValue() returns text; encode to bytes for the compressed on-disk chunk
+                f.write(zlib.compress(getBytes(serializeValue(chunk)), BIGARRAY_COMPRESS_LEVEL))
             return filename
         except (OSError, IOError) as ex:
             errMsg = "exception occurred while storing data "
@@ -240,9 +238,10 @@ class BigArray(list):
                     pass
 
         if not (self.cache and self.cache.index == index):
+            from lib.core.convert import deserializeValue
             try:
                 with open(self.chunks[index], "rb") as f:
-                    self.cache = Cache(index, pickle.loads(zlib.decompress(f.read())), False)
+                    self.cache = Cache(index, deserializeValue(zlib.decompress(f.read())), False)
             except Exception as ex:
                 errMsg = "exception occurred while retrieving data "
                 errMsg += "from a temporary file ('%s')" % ex
@@ -361,8 +360,9 @@ class BigArray(list):
                     if cache_index == idx and cache_data is not None:
                         data = cache_data
                     else:
+                        from lib.core.convert import deserializeValue
                         with open(chunk, "rb") as f:
-                            data = pickle.loads(zlib.decompress(f.read()))
+                            data = deserializeValue(zlib.decompress(f.read()))
                 except Exception as ex:
                     errMsg = "exception occurred while retrieving data "
                     errMsg += "from a temporary file ('%s')" % ex

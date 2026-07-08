@@ -178,52 +178,6 @@ def dirtyPatches():
         et.parse = _safe_parse
         et._patched = True
 
-    import io
-    import pickle
-    if not getattr(pickle, "_patched", False):
-        class RestrictedUnpickler(pickle.Unpickler):
-            # Note: allowlist (not blacklist) - a module blacklist is bypassable (e.g. importlib/ctypes/operator), so only
-            # explicitly-safe builtin data types and sqlmap's own (and bundled) classes are permitted to be unpickled
-            def find_class(self, module, name):
-                # Note: protocol-2 pickling of a 'bytes' value on Python 3 emits a _codecs.encode global; allow that one
-                # (it only runs a codec, e.g. latin1 - it cannot execute arbitrary code) so serialized values containing
-                # bytes round-trip. Everything else from _codecs (e.g. lookup) stays blocked by the rule below.
-                if module == "_codecs" and name == "encode":
-                    pass
-                # safe builtin data types only (blocks eval/exec/__import__/getattr/etc.)
-                elif module in ("builtins", "__builtin__"):
-                    if name not in ("set", "frozenset", "dict", "list", "tuple", "int", "float", "bool", "str", "bytes", "bytearray", "object", "NoneType", "complex"):
-                        raise ValueError("unpickling of '%s.%s' is forbidden" % (module, name))
-                # everything else must be one of sqlmap's own (or bundled) classes (e.g. lib.core.datatype.AttribDict)
-                elif (module or "").split(".")[0] not in ("lib", "plugins", "thirdparty"):
-                    raise ValueError("unpickling of module '%s' is forbidden" % module)
-
-                # Python 2/3 method resolution
-                if hasattr(pickle.Unpickler, "find_class"):
-                    return pickle.Unpickler.find_class(self, module, name)
-
-                __import__(module)
-                return getattr(sys.modules[module], name)
-
-        def _safe_loads(data):
-            try:
-                stream = io.BytesIO(data)
-            except TypeError:
-                stream = io.StringIO(data)
-
-            return RestrictedUnpickler(stream).load()
-
-        pickle.loads = _safe_loads
-        pickle._patched = True
-
-    try:
-        import cPickle
-        if not getattr(cPickle, "_patched", False):
-            cPickle.loads = pickle.loads
-            cPickle._patched = True
-    except ImportError:
-        pass
-
     try:
         import builtins
     except ImportError:

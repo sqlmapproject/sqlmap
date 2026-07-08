@@ -53,14 +53,14 @@ from lib.core.compat import LooseVersion
 from lib.core.compat import RecursionError
 from lib.core.compat import round
 from lib.core.compat import xrange
-from lib.core.convert import base64pickle
-from lib.core.convert import base64unpickle
 from lib.core.convert import decodeBase64
+from lib.core.convert import deserializeValue
 from lib.core.convert import decodeHex
 from lib.core.convert import getBytes
 from lib.core.convert import getText
 from lib.core.convert import getUnicode
 from lib.core.convert import htmlUnescape
+from lib.core.convert import serializeValue
 from lib.core.convert import stdoutEncode
 from lib.core.data import cmdLineOptions
 from lib.core.data import conf
@@ -5071,7 +5071,7 @@ def serializeObject(object_):
     True
     """
 
-    return base64pickle(object_)
+    return serializeValue(object_)
 
 def unserializeObject(value):
     """
@@ -5079,11 +5079,11 @@ def unserializeObject(value):
 
     >>> unserializeObject(serializeObject([1, 2, 3])) == [1, 2, 3]
     True
-    >>> unserializeObject('gAJVBmZvb2JhcnEBLg==')
-    'foobar'
+    >>> unserializeObject(serializeObject('foobar')) == 'foobar'
+    True
     """
 
-    return base64unpickle(value) if value else None
+    return deserializeValue(value) if value else None
 
 def resetCounter(technique):
     """

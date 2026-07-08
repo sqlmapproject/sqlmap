@@ -21,7 +21,7 @@ bootstrap()
 
 from lib.core.convert import (decodeHex, encodeHex, decodeBase64, encodeBase64,
                               getBytes, getText, getUnicode, getOrds,
-                              jsonize, dejsonize, base64pickle, base64unpickle)
+                              jsonize, dejsonize, serializeValue, deserializeValue)
 from lib.core.common import decodeDbmsHexValue
 
 try:
@@ -109,36 +109,31 @@ class TestJson(unittest.TestCase):
         self.assertEqual(jsonize(123), "123")          # int -> textual "123"
 
 
-class TestBase64Pickle(unittest.TestCase):
-    # Types sqlmap actually serializes (injection objects, cached values, BigArray).
+class TestSerialize(unittest.TestCase):
+    # Smoke coverage of the safe (JSON-based) session serializer; the exhaustive corner-case
+    # and security suite lives in tests/test_serialize.py.
     def test_roundtrip_allowed_types(self):
         for obj in [[1, 2, 3], {"a": 1}, (1, 2), "text", 42, 3.14, True, None, {"k": [1, {"n": "v"}]}]:
-            self.assertEqual(base64unpickle(base64pickle(obj)), obj)
+            self.assertEqual(deserializeValue(serializeValue(obj)), obj)
 
-    # REGRESSION: under Python 3 + PICKLE_PROTOCOL=2 a raw `bytes` value is pickled via the
-    # `_codecs.encode` global. The RestrictedUnpickler allowlist (patch.py) once rejected that,
-    # so any serialized session value containing bytes failed to load on py3. The fix allows
-    # exactly `_codecs.encode` (a benign codec call). Bytes MUST round-trip on both py2 and py3.
     def test_bytes_roundtrip(self):
         for raw in [b"x", b"\x00\x01\xff", b"\xde\xad\xbe\xef"]:
-            self.assertEqual(base64unpickle(base64pickle(raw)), raw, msg="bytes round-trip %r" % raw)
+            self.assertEqual(deserializeValue(serializeValue(raw)), raw, msg="bytes round-trip %r" % raw)
 
     def test_bytes_nested_in_container_roundtrip(self):
         for obj in [{"a": b"bytes"}, [b"ab", "s", 1, None], ("t", b"\xde\xad")]:
-            self.assertEqual(base64unpickle(base64pickle(obj)), obj, msg="nested-bytes round-trip %r" % (obj,))
+            self.assertEqual(deserializeValue(serializeValue(obj)), obj, msg="nested-bytes round-trip %r" % (obj,))
 
-    def test_dangerous_globals_still_blocked(self):
-        # bootstrap() installs sqlmap's RestrictedUnpickler over pickle.loads. These are VALID
-        # pickles that reference os.system / builtins.eval - stdlib would import them happily; the
-        # allowlist must reject them. Assert the SPECIFIC "forbidden" ValueError (not just any
-        # error) so the test proves the allowlist fired, not that the bytes failed to parse.
-        import pickle
-        for payload in (b"cos\nsystem\n.", b"c__builtin__\neval\n."):
-            try:
-                pickle.loads(payload)
-                self.fail("dangerous global was NOT blocked: %r" % payload)
-            except ValueError as ex:
-                self.assertIn("forbidden", str(ex), msg="unexpected error for %r: %s" % (payload, ex))
+    def test_output_is_plain_ascii_text_no_base64(self):
+        # the serialized form must be readable JSON text (not Base64 / binary) so it lands verbatim in
+        # the TEXT session column with zero wrapping overhead
+        out = serializeValue({"k": [1, (2, 3)]})
+        self.assertIsInstance(out, str)
+        self.assertTrue(out.startswith("{") and out.endswith("}"), out)
+
+    def test_deserialize_accepts_bytes(self):
+        # BigArray hands the serialized data back as bytes (off a compressed disk chunk)
+        self.assertEqual(deserializeValue(getBytes(serializeValue([1, (2, 3)]))), [1, (2, 3)])
 
 
 if __name__ == "__main__":

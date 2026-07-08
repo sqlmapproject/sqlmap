@@ -96,7 +96,6 @@ if py3k:
     from http.cookies import SimpleCookie, Morsel, CookieError
     from collections.abc import MutableMapping as DictMixin
     from types import ModuleType as new_module
-    import pickle
     from io import BytesIO
     import configparser
     from datetime import timezone
@@ -125,7 +124,6 @@ else:  # 2.x
     from urllib import urlencode, quote as urlquote, unquote as urlunquote
     from Cookie import SimpleCookie, Morsel, CookieError
     from itertools import imap
-    import cPickle as pickle
     from imp import new_module
     from StringIO import StringIO as BytesIO
     import ConfigParser as configparser
@@ -1226,7 +1224,7 @@ class BaseRequest(object):
                 sig, msg = map(tob, value[1:].split('?', 1))
                 hash = hmac.new(tob(secret), msg, digestmod=digestmod).digest()
                 if _lscmp(sig, base64.b64encode(hash)):
-                    dst = pickle.loads(base64.b64decode(msg))
+                    dst = json_loads(base64.b64decode(msg))
                     if dst and dst[0] == key:
                         return dst[1]
             return default
@@ -1839,14 +1837,13 @@ class BaseResponse(object):
             expire at the end of the browser session (as soon as the browser
             window is closed).
 
-            Signed cookies may store any pickle-able object and are
+            Signed cookies may store any JSON-serializable object and are
             cryptographically signed to prevent manipulation. Keep in mind that
             cookies are limited to 4kb in most browsers.
 
-            Warning: Pickle is a potentially dangerous format. If an attacker
-            gains access to the secret key, he could forge cookies that execute
-            code on server side if unpickled. Using pickle is discouraged and
-            support for it will be removed in later versions of bottle.
+            Warning: If an attacker gains access to the secret key, he could
+            forge arbitrary cookies. Prefer storing only plain strings and, if
+            possible, keep session data server-side instead of in cookies.
 
             Warning: Signed cookies are not encrypted (the client can still see
             the content) and not copy-protected (the client can restore an old
@@ -1863,10 +1860,10 @@ class BaseResponse(object):
 
         if secret:
             if not isinstance(value, basestring):
-                depr(0, 13, "Pickling of arbitrary objects into cookies is "
+                depr(0, 13, "Storing non-string objects into cookies is "
                             "deprecated.", "Only store strings in cookies. "
                             "JSON strings are fine, too.")
-            encoded = base64.b64encode(pickle.dumps([name, value], -1))
+            encoded = base64.b64encode(tob(json_dumps([name, value])))
             sig = base64.b64encode(hmac.new(tob(secret), encoded,
                                             digestmod=digestmod).digest())
             value = touni(tob('!') + sig + tob('?') + encoded)
@@ -2253,7 +2250,7 @@ class FormsDict(MultiDict):
             return default
 
     def __getattr__(self, name, default=unicode()):
-        # Without this guard, pickle generates a cryptic TypeError:
+        # Without this guard, dunder attribute probing generates a cryptic TypeError:
         if name.startswith('__') and name.endswith('__'):
             return super(FormsDict, self).__getattr__(name)
         return self.getunicode(name, default=default)
@@ -3069,11 +3066,11 @@ def _lscmp(a, b):
 
 
 def cookie_encode(data, key, digestmod=None):
-    """ Encode and sign a pickle-able object. Return a (byte) string """
+    """ Encode and sign a JSON-serializable object. Return a (byte) string """
     depr(0, 13, "cookie_encode() will be removed soon.",
                 "Do not use this API directly.")
     digestmod = digestmod or hashlib.sha256
-    msg = base64.b64encode(pickle.dumps(data, -1))
+    msg = base64.b64encode(tob(json_dumps(data)))
     sig = base64.b64encode(hmac.new(tob(key), msg, digestmod=digestmod).digest())
     return tob('!') + sig + tob('?') + msg
 
@@ -3088,7 +3085,7 @@ def cookie_decode(data, key, digestmod=None):
         digestmod = digestmod or hashlib.sha256
         hashed = hmac.new(tob(key), msg, digestmod=digestmod).digest()
         if _lscmp(sig[1:], base64.b64encode(hashed)):
-            return pickle.loads(base64.b64decode(msg))
+            return json_loads(base64.b64decode(msg))
     return None
 
 
