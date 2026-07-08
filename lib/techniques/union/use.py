@@ -131,7 +131,7 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
                         else:
                             retVal = getUnicode(retVal)
                 elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.H2, DBMS.HSQLDB, DBMS.FIREBIRD):
-                    output = extractRegexResult(r"(?P<result>%s.*%s)" % (kb.chars.start, kb.chars.stop), removeReflectiveValues(_page, payload))
+                    output = extractRegexResult(r"(?P<result>%s.*%s)" % (kb.chars.start, kb.chars.stop), removeReflectiveValues(_page, payload), re.DOTALL)
                     if output:
                         retVal = output
                 else:
