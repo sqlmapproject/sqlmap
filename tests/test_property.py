@@ -36,9 +36,9 @@ from lib.core.common import (escapeJsonValue, filterStringValue, flattenValue, i
                              prioritySortColumns, randomInt, randomRange, randomStr, safeSQLIdentificatorNaming,
                              sanitizeStr, splitFields, unArrayizeValue, unsafeSQLIdentificatorNaming, urldecode,
                              urlencode, zeroDepthSearch)
-from lib.core.convert import (base64pickle, base64unpickle, decodeBase64, decodeHex, dejsonize, encodeBase64,
+from lib.core.convert import (decodeBase64, decodeHex, dejsonize, deserializeValue, encodeBase64,
                               encodeHex, getBytes, getConsoleLength, getOrds, getText, htmlEscape, htmlUnescape,
-                              jsonize, stdoutEncode)
+                              jsonize, serializeValue, stdoutEncode)
 from lib.core.data import kb
 from lib.utils.safe2bin import safecharencode
 
@@ -71,17 +71,17 @@ def gen_json(rng):
     return rng.choice([0, 1, -1, 2 ** 31, 1.5, -0.25, True, False, None, u"", u"x", u"\u0107", u'a"b,c'])
 
 
-def gen_pickle(rng):
+def gen_serializable(rng):
     kind = rng.randint(0, 9)
     if kind < 5:
         return rng.choice([0, -7, 2 ** 40, 3.5, True, False, None, u"\u0107x", b"\x00\xff", u""])
     if kind < 7:
-        return [gen_pickle(rng) for _ in range(rng.randint(0, 3))]
+        return [gen_serializable(rng) for _ in range(rng.randint(0, 3))]
     if kind < 8:
-        return tuple(gen_pickle(rng) for _ in range(rng.randint(0, 3)))
+        return tuple(gen_serializable(rng) for _ in range(rng.randint(0, 3)))
     if kind < 9:
         return set(rng.choice([1, 2, 3, u"a", u"b"]) for _ in range(rng.randint(0, 3)))
-    return dict((u"k%d" % j, gen_pickle(rng)) for j in range(rng.randint(0, 2)))
+    return dict((u"k%d" % j, gen_serializable(rng)) for j in range(rng.randint(0, 2)))
 
 
 def gen_columns(rng):
@@ -131,8 +131,8 @@ class TestCodecRoundTrips(unittest.TestCase):
     def test_json(self):
         for_all(self, gen_json, lambda v: dejsonize(jsonize(v)) == v, label="json")
 
-    def test_pickle(self):
-        for_all(self, gen_pickle, lambda v: base64unpickle(base64pickle(v)) == v, label="pickle")
+    def test_serialize(self):
+        for_all(self, gen_serializable, lambda v: deserializeValue(serializeValue(v)) == v, label="serialize")
 
     def test_html_escape(self):
         for_all(self, gen_text, lambda s: htmlUnescape(htmlEscape(s)) == s, label="html")
@@ -144,11 +144,11 @@ class TestCodecRoundTrips(unittest.TestCase):
 class TestStructureTransforms(unittest.TestCase):
     def test_unarrayize_never_listlike(self):
         # the whole point of unArrayizeValue is that the result is a scalar, never a list/tuple
-        # (gen_pickle includes sets - they used to crash here; see test_unarrayize_set regression)
-        for_all(self, gen_pickle, lambda v: not isListLike(unArrayizeValue(v)), label="unarrayize")
+        # (gen_serializable includes sets - they used to crash here; see test_unarrayize_set regression)
+        for_all(self, gen_serializable, lambda v: not isListLike(unArrayizeValue(v)), label="unarrayize")
 
     def test_flatten_is_flat(self):
-        for_all(self, gen_pickle, lambda v: all(not isListLike(x) for x in flattenValue([v])), label="flatten")
+        for_all(self, gen_serializable, lambda v: all(not isListLike(x) for x in flattenValue([v])), label="flatten")
 
     def test_unarrayize_set(self):
         # regression: a 1-element set is list-like but not subscriptable; unArrayizeValue must
