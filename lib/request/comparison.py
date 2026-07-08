@@ -132,6 +132,11 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
             page = removeDynamicContent(page)
             if threadData.lastPageTemplate != kb.pageTemplate:
                 threadData.lastPageTemplateCleaned = removeDynamicContent(kb.pageTemplate)
+                # Same template-identity memoization for the structure-aware projections (§below): the
+                # template is constant across an extraction, so it must not be re-parsed/re-tokenized on
+                # every inference request - only seq2 (from the live page) is recomputed per response
+                threadData.lastPageTemplateJsonMinimized = jsonMinimize(kb.pageTemplate)
+                threadData.lastPageTemplateStructural = "\n".join(sorted(extractStructuralTokens(kb.pageTemplate)))
                 threadData.lastPageTemplate = kb.pageTemplate
 
             seqMatcher.set_seq1(threadData.lastPageTemplateCleaned)
@@ -178,14 +183,14 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
             # only on a JSON Content-Type with both bodies parseable; any doubt (or an explicit
             # --text-only/--titles) falls back to the exact text path below.
             if _isJsonResponse(headers) and not (conf.titles or conf.textOnly or kb.nullConnection):
-                seq1 = jsonMinimize(kb.pageTemplate)
+                seq1 = threadData.lastPageTemplateJsonMinimized  # memoized per template (see above)
                 seq2 = jsonMinimize(rawPage)
 
             # Structure-aware comparison for a structurally-stable (but byte-unstable) HTML page:
             # compare the value-free tag/class/id skeleton so dynamic text does not perturb the ratio
             # while a structural change (e.g. a results table appearing/disappearing) still does
             if seq1 is None and kb.pageStructurallyStable and not (conf.titles or conf.textOnly or kb.nullConnection):
-                _ = "\n".join(sorted(extractStructuralTokens(kb.pageTemplate)))
+                _ = threadData.lastPageTemplateStructural  # memoized per template (see above)
                 if _:   # only engage when the page actually exposes structure (HTML tags); tagless content falls back to text
                     seq1 = _
                     seq2 = "\n".join(sorted(extractStructuralTokens(rawPage)))
