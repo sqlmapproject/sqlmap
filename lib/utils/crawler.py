@@ -168,6 +168,8 @@ def crawl(target, post=None, cookie=None):
             finally:
                 if found:
                     if items:
+                        # keep sitemap-derived URLs on-scope, exactly like the HTML-crawl path above
+                        items = OrderedSet(_ for _ in items if (re.search(conf.scope, _, re.I) if conf.scope else checkSameHost(_, target)))
                         for item in items:
                             if re.search(r"(.*?)\?(.+)", item):
                                 threadData.shared.value.add(item)

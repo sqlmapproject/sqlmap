@@ -8,6 +8,7 @@ See the file 'LICENSE' for copying permission
 import re
 
 from lib.core.common import readInput
+from lib.core.convert import htmlUnescape
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.datatype import OrderedSet
@@ -47,7 +48,7 @@ def parseSitemap(url, retVal=None, visited=None):
                 if abortedFlag:
                     break
 
-                foundUrl = match.group(1).strip()
+                foundUrl = htmlUnescape(match.group(1).strip())
 
                 # Basic validation to avoid junk
                 if not foundUrl.startswith("http"):
