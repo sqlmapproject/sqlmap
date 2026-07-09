@@ -1951,7 +1951,7 @@
         <substring query="SUBSTRING(%s,%d,%d)"/>
         <concatenate query="%s||%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END) FROM DUMMY"/>
-        <hex query="HEX(%s)"/>
+        <hex query="BINTOHEX(TO_BINARY(%s))"/>
         <inference query="ASCII(SUBSTRING((%s),%d,1))>%d"/>
         <banner query="SELECT VERSION FROM SYS.M_DATABASE"/>
         <current_user query="SELECT CURRENT_USER FROM DUMMY"/>
