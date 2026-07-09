@@ -348,7 +348,7 @@ def unionUse(expression, unpack=True, dump=False):
         debugMsg += "it does not play well with UNION query SQL injection"
         singleTimeDebugMessage(debugMsg)
 
-    if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ORACLE, DBMS.PGSQL, DBMS.MSSQL, DBMS.SQLITE, DBMS.H2, DBMS.HSQLDB, DBMS.FIREBIRD) and expressionFields and not any((conf.binaryFields, conf.limitStart, conf.limitStop, conf.forcePartial, conf.disableJson)):
+    if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ORACLE, DBMS.PGSQL, DBMS.MSSQL, DBMS.SQLITE, DBMS.H2, DBMS.HSQLDB, DBMS.FIREBIRD) and expressionFields and not any((conf.binaryFields, conf.limitStart, conf.limitStop, conf.disableJson)):
         match = re.search(r"SELECT\s*(.+?)\bFROM", expression, re.I)
         if match and not (Backend.isDbms(DBMS.ORACLE) and FROM_DUMMY_TABLE[DBMS.ORACLE] in expression) and not re.search(r"\b(MIN|MAX|COUNT|EXISTS)\(", expression):
             kb.jsonAggMode = True
@@ -374,7 +374,7 @@ def unionUse(expression, unpack=True, dump=False):
             # response cap) and the table is large, retrieve the rows in bounded windows (chunked
             # JSON aggregation) before the slow per-row fallback. Done here (independent of the
             # detected UNION where-clause) so it engages for any dumpable FROM-table query.
-            if value is None and " FROM " in expression.upper() and not re.search(SQL_SCALAR_REGEX, expression, re.I) and not any((kb.forcePartialUnion, conf.forcePartial, conf.disableJson, conf.binaryFields, conf.limitStart, conf.limitStop)):
+            if value is None and " FROM " in expression.upper() and not re.search(SQL_SCALAR_REGEX, expression, re.I) and not any((conf.disableJson, conf.binaryFields, conf.limitStart, conf.limitStop)):
                 chunkCountExpr = expression.replace(expressionFields, queries[Backend.getIdentifiedDbms()].count.query % '*', 1)
                 if " ORDER BY " in chunkCountExpr.upper():
                     chunkCountExpr = chunkCountExpr[:chunkCountExpr.upper().rindex(" ORDER BY ")]
