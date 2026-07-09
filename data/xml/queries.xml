@@ -1837,7 +1837,7 @@
         <hostname query="PARSE_JSON(SYSTEM$ALLOWLIST())[0]:host"/>
         <table_comment/>
         <column_comment/>
-        <is_dba query="CURRENT_ROLE()='ACCOUNTADMIN'"/>
+        <is_dba query="CURRENT_ROLE()='ACCOUNTADMIN' OR ARRAY_CONTAINS('ACCOUNTADMIN'::VARIANT,PARSE_JSON(CURRENT_AVAILABLE_ROLES()))"/>
         <dbs>
             <inband query="SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA"/>
             <blind query="SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA ORDER BY SCHEMA_NAME LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM INFORMATION_SCHEMA.SCHEMATA"/>
