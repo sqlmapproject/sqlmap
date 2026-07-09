@@ -256,4 +256,11 @@
     <dbms value="Spanner">
         <error regexp="type.googleapis.com/zetasql.ErrorMessageModeForPayload"/>
     </dbms>
+
+    <dbms value="SAP HANA">
+        <error regexp="SAP DBTech JDBC"/>
+        <error regexp="invalid number: not a valid number string"/>
+        <error regexp="sql syntax error:.*?\(at pos \d+\)"/>
+        <error regexp="inserted value too large for column"/>
+    </dbms>
 </root>
