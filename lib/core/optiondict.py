@@ -21,6 +21,7 @@ optDict = {
         "configFile": "string",
         "openApiFile": "string",
         "openApiBase": "string",
+        "openApiTags": "string",
     },
 
     "Request": {

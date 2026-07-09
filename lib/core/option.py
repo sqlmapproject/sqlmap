@@ -521,8 +521,13 @@ def _setOpenApiTargets():
         logger.info(infoMsg)
         content = openFile(conf.openApiFile).read()
 
+    tags = [_.strip() for _ in re.split(PARAMETER_SPLITTING_REGEX, conf.openApiTags) if _.strip()] if conf.openApiTags else None
+    if tags:
+        infoMsg = "restricting extraction to OpenAPI/Swagger operations tagged: %s" % ", ".join(tags)
+        logger.info(infoMsg)
+
     try:
-        targets = openApiTargets(content, origin)
+        targets = openApiTargets(content, origin, tags)
     except ValueError as ex:
         errMsg = "unable to parse the OpenAPI/Swagger specification ('%s')" % getSafeExString(ex)
         raise SqlmapSyntaxException(errMsg)

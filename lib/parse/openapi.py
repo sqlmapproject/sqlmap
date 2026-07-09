@@ -206,14 +206,17 @@ def _baseUrl(spec, origin=None, servers=None):
 
 _METHODS = ("get", "post", "put", "delete", "patch", "options", "head")
 
-def openApiTargets(content, origin=None):
+def openApiTargets(content, origin=None, tags=None):
     """
     Returns a list of (url, method, data, headers) request tuples derived from an OpenAPI/Swagger
     specification. 'headers' is a list of (name, value) tuples (matching conf.httpHeaders). 'origin'
     (scheme://host[:port] of the specification's own location) is used only to resolve RELATIVE 'servers'
     entries - absolute server URLs are used as declared. Path parameters and header/cookie values carry
-    the custom injection mark so they become testable injection points.
+    the custom injection mark so they become testable injection points. 'tags' (list) restricts extraction
+    to operations declaring at least one of those OpenAPI tags (to scope a scan of a large API).
     """
+
+    tagSet = set(tags) if tags else None
 
     spec = _loadSpec(content)
     if not isinstance(spec, dict) or not isinstance(spec.get("paths"), dict) or not spec.get("paths"):
@@ -236,6 +239,8 @@ def openApiTargets(content, origin=None):
         for method, operation in item.items():
             if str(method).lower() not in _METHODS or not isinstance(operation, dict):   # str(): YAML keys can be non-string (e.g. 404, 'on'->bool)
                 continue
+            if tagSet is not None and not (tagSet & set(_ for _ in (operation.get("tags") or []) if isinstance(_, six.string_types))):
+                continue                                  # '--openapi-tags' filter: operation carries none of the requested tags
             try:
                 # effective base URL with OpenAPI precedence: operation 'servers' > path-item 'servers' > root
                 opServers = operation.get("servers") or item.get("servers")

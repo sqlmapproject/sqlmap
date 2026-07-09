@@ -150,6 +150,9 @@ def cmdLineParser(argv=None):
         target.add_argument("--openapi-base", dest="openApiBase",
             help="Base URL for a host-less OpenAPI/Swagger spec")
 
+        target.add_argument("--openapi-tags", dest="openApiTags",
+            help="Only derive targets from operations with these tag(s)")
+
         # Request options
         request = parser.add_argument_group("Request", "These options can be used to specify how to connect to the target URL")
 

@@ -134,6 +134,25 @@ class TestOpenApi(unittest.TestCase):
         self.assertEqual(headers["X-Api"], "k" + MARK)
         self.assertEqual(headers["Cookie"], "sess=v" + MARK)
 
+    def test_tag_filter_restricts_operations(self):
+        # '--openapi-tags' keeps only operations declaring at least one requested tag; untagged
+        # operations are dropped when a filter is active
+        spec = {"openapi": "3.0.0", "servers": [{"url": "https://api.test"}], "paths": {
+            "/users/{id}": {"get": {"tags": ["users"], "parameters": [{"name": "id", "in": "path", "schema": {"type": "integer"}}]}},
+            "/admin": {"post": {"tags": ["admin"], "parameters": [{"name": "q", "in": "query", "schema": {"type": "string"}}]}},
+            "/ping": {"get": {"parameters": [{"name": "x", "in": "query", "schema": {"type": "string"}}]}}}}
+        content = json.dumps(spec)
+
+        self.assertEqual(len(openApiTargets(content)), 3)                          # no filter -> everything
+        self.assertEqual(len(openApiTargets(content, tags=["nope"])), 0)          # no match -> nothing (incl. untagged)
+
+        users = openApiTargets(content, tags=["users"])
+        self.assertEqual(len(users), 1)
+        self.assertIn("/users/", users[0][0])
+
+        both = openApiTargets(content, tags=["users", "admin"])                    # union of tags
+        self.assertEqual(sorted(_[1] for _ in both), ["GET", "POST"])
+
     # --- graceful degradation: a broken/poorly-defined spec must never crash the parser ---
 
     def test_malformed_raises_valueerror(self):
