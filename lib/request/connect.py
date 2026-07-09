@@ -19,12 +19,8 @@ import sys
 import time
 import traceback
 
-try:
-    import websocket
-    from websocket import WebSocketException
-except ImportError:
-    class WebSocketException(Exception):
-        pass
+from lib.request import websocket
+from lib.request.websocket import WebSocketException
 
 from lib.core.agent import agent
 from lib.core.common import asciifyUrl
