@@ -623,6 +623,9 @@ Thierry Zoller, <thierry(at)zoller.lu>
 Zhen Zhou, <zhouzhenster(at)gmail.com>
 * for suggesting a feature
 
+Zakaria Zoulati, <https://github.com/zakaria-zoulati>
+* for contributing SAP HANA support
+
 -insane-, <insane_(at)gmx.de>
 * for reporting a minor bug
 
