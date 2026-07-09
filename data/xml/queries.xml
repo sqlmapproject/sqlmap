@@ -1952,13 +1952,13 @@
         <concatenate query="%s||%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END) FROM DUMMY"/>
         <hex query="BINTOHEX(TO_BINARY(%s))"/>
-        <inference query="ASCII(SUBSTRING((%s),%d,1))>%d"/>
+        <inference query="UNICODE(SUBSTRING((%s),%d,1))>%d"/>
         <banner query="SELECT VERSION FROM SYS.M_DATABASE"/>
         <current_user query="SELECT CURRENT_USER FROM DUMMY"/>
         <current_db query="SELECT CURRENT_SCHEMA FROM DUMMY"/>
         <hostname query="SELECT HOST FROM SYS.M_HOST_INFORMATION WHERE KEY='host_name'"/>
-        <table_comment query="SELECT COMMENTS FROM SYS.TABLES WHERE TABLE_NAME='%s' AND SCHEMA_NAME='%s'"/>
-        <column_comment query="SELECT COMMENTS FROM SYS.TABLE_COLUMNS WHERE TABLE_NAME='%s' AND COLUMN_NAME='%s' AND SCHEMA_NAME='%s'"/>
+        <table_comment query="SELECT COMMENTS FROM SYS.TABLES WHERE SCHEMA_NAME='%s' AND TABLE_NAME='%s'"/>
+        <column_comment query="SELECT COMMENTS FROM SYS.TABLE_COLUMNS WHERE SCHEMA_NAME='%s' AND TABLE_NAME='%s' AND COLUMN_NAME='%s'"/>
         <is_dba query="EXISTS(SELECT 1 FROM SYS.EFFECTIVE_PRIVILEGES WHERE USER_NAME=CURRENT_USER AND PRIVILEGE IN ('DATA ADMIN','USER ADMIN','ROLE ADMIN'))"/>
         <check_udf/>
         <users>

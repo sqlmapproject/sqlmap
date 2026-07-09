@@ -334,7 +334,7 @@ class Databases(object):
                         if conf.getComments:
                             _ = queries[Backend.getIdentifiedDbms()].table_comment
                             if hasattr(_, "query"):
-                                if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE):
+                                if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE, DBMS.HANA):
                                     query = _.query % (unsafeSQLIdentificatorNaming(db.upper()), unsafeSQLIdentificatorNaming(table.upper()))
                                 else:
                                     query = _.query % (unsafeSQLIdentificatorNaming(db), unsafeSQLIdentificatorNaming(table))
@@ -443,7 +443,7 @@ class Databases(object):
                             for table in tables:
                                 _ = queries[Backend.getIdentifiedDbms()].table_comment
                                 if hasattr(_, "query"):
-                                    if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE):
+                                    if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE, DBMS.HANA):
                                         query = _.query % (unsafeSQLIdentificatorNaming(db.upper()), unsafeSQLIdentificatorNaming(table.upper()))
                                     else:
                                         query = _.query % (unsafeSQLIdentificatorNaming(db), unsafeSQLIdentificatorNaming(table))
@@ -787,7 +787,7 @@ class Databases(object):
                     query = rootQuery.blind.count % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
                     query += condQuery
 
-                elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE, DBMS.MIMERSQL):
+                elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE, DBMS.MIMERSQL, DBMS.HANA):
                     query = rootQuery.blind.count % (unsafeSQLIdentificatorNaming(tbl.upper()), unsafeSQLIdentificatorNaming(conf.db.upper()))
                     query += condQuery
 
@@ -864,7 +864,7 @@ class Databases(object):
                         query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
                         query = query.replace(" ORDER BY ", "%s ORDER BY " % condQuery)
                         field = None
-                    elif Backend.isDbms(DBMS.MIMERSQL):
+                    elif Backend.getIdentifiedDbms() in (DBMS.MIMERSQL, DBMS.HANA):
                         query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(tbl.upper()), unsafeSQLIdentificatorNaming(conf.db.upper()))
                         query = query.replace(" ORDER BY ", "%s ORDER BY " % condQuery)
                         field = None
