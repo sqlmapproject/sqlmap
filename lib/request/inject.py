@@ -8,6 +8,7 @@ See the file 'LICENSE' for copying permission
 from __future__ import print_function
 
 import re
+import threading
 import time
 
 from lib.core.agent import agent
@@ -16,6 +17,7 @@ from lib.core.common import applyFunctionRecursively
 from lib.core.common import dataToStdout
 from lib.core.common import unArrayizeValue
 from lib.core.datatype import AttribDict
+from lib.utils.progress import ProgressBar
 from lib.utils.safe2bin import safecharencode
 from lib.core.common import Backend
 from lib.core.common import calculateDeltaSeconds
@@ -58,12 +60,14 @@ from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapNotVulnerableException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import GET_VALUE_UPPERCASE_KEYWORDS
+from lib.core.settings import IS_TTY
 from lib.core.settings import INFERENCE_MARKER
 from lib.core.settings import MAX_TECHNIQUES_PER_VALUE
 from lib.core.settings import SQL_SCALAR_REGEX
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.threads import getCurrentThreadData
 from lib.core.threads import runThreads
+from lib.core.threads import setDaemon
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.request.direct import direct
@@ -405,6 +409,25 @@ def _verifyInferredValue(expression, value):
     except Exception:
         return True
 
+def valueParallelEligible():
+    """
+    Whether blind enumeration/dumping should take the value-parallel path (one whole value per worker)
+    rather than the classic char loop. It is chosen for concurrency ('--threads') and, independently, to
+    render a single whole-job progress bar/ETA ('--eta'). A concurrency-safe channel - boolean or the
+    HTTP/2 timeless oracle - qualifies with either. Classic time-based qualifies only single-threaded under
+    '--eta': concurrent SLEEP measurements interfere, so it must stay sequential (where it is safe, and
+    still gets the whole-job ETA that matters most for the slowest channel). Callers add their own extra
+    guards (e.g. '--dns-domain', per-column comments).
+    """
+
+    concurrencySafe = isTechniqueAvailable(PAYLOAD.TECHNIQUE.BOOLEAN) or kb.get("timeless") is not None
+
+    if conf.threads > 1:
+        return concurrencySafe
+    if conf.eta:
+        return concurrencySafe or isTechniqueAvailable(PAYLOAD.TECHNIQUE.TIME)
+    return False
+
 def _threadedInferenceValues(exprBuilder, indices, context=None, charsetType=None, dump=False):
     """
     Value-parallel blind retrieval.
@@ -445,6 +468,13 @@ def _threadedInferenceValues(exprBuilder, indices, context=None, charsetType=Non
 
     results = [None] * len(indices)
     cursor = iter(xrange(len(indices)))
+
+    # With '--eta' show a single value-level bar (values completed / total) instead of the per-value
+    # stream: it is monotonic and carries a meaningful ETA across the whole set, and - unlike the
+    # per-char bar drawn inside bisection() - it survives the worker's disableStdOut (drawn forced,
+    # below), so '--eta' is honoured under '--threads' too. Skipped for trivial single-value sets.
+    etaProgress = ProgressBar(maxValue=len(indices)) if (conf.eta and len(indices) > 1) else None
+    completed = [0]
 
     def inferenceThread():
         threadData = getCurrentThreadData()
@@ -489,12 +519,35 @@ def _threadedInferenceValues(exprBuilder, indices, context=None, charsetType=Non
             with kb.locks.value:
                 results[slot] = value
 
+            if etaProgress is not None:
+                with kb.locks.io:
+                    completed[0] += 1
+                    threadData.disableStdOut = False        # let the value-level bar through (per-char streaming stays muted)
+                    try:
+                        etaProgress.progress(completed[0])
+                    finally:
+                        threadData.disableStdOut = True
+
             # Stream each retrieved value as it completes (they arrive out of order under threads, exactly
             # like the error/union dumps), so a dump shows its data live rather than a silent counter.
-            if conf.verbose >= 1 and not kb.bruteMode and not isNoneValue(value):
+            elif conf.verbose >= 1 and not kb.bruteMode and not isNoneValue(value):
                 with kb.locks.io:
                     rendered = safecharencode(unArrayizeValue(value))
                     dataToStdout("[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), "'%s'" % rendered if dump else rendered), forceOutput=True)
+
+    # Keep the '--eta' countdown live between value updates: a value (esp. time-based) can take many
+    # seconds, so a daemon redraws the bar every second with the ETA decremented by elapsed time (it runs
+    # on its own thread, so it is not muted by the workers' disableStdOut, and shares kb.locks.io with them).
+    etaTickerStop = threading.Event()
+    etaTicker = None
+    if etaProgress is not None and IS_TTY:
+        def _etaTicker():
+            while not etaTickerStop.wait(1.0):
+                with kb.locks.io:
+                    etaProgress.tick()
+        etaTicker = threading.Thread(target=_etaTicker, name="eta-ticker")
+        setDaemon(etaTicker)
+        etaTicker.start()
 
     # Save/restore the calling thread's state: with a single thread runThreads runs the worker
     # INLINE on this thread, so the worker's disableStdOut/shared mutations must not leak out.
@@ -505,6 +558,9 @@ def _threadedInferenceValues(exprBuilder, indices, context=None, charsetType=Non
     try:
         runThreads(min(conf.threads or 1, len(indices)) or 1, inferenceThread)
     finally:
+        etaTickerStop.set()
+        if etaTicker is not None:
+            etaTicker.join(timeout=2)
         kb.partRun = savedPartRun
         mainThreadData.disableStdOut = savedStdOut
         mainThreadData.shared = savedShared

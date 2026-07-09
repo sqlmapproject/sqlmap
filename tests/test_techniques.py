@@ -48,6 +48,7 @@ from lib.core.agent import agent
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect
 from lib.request.connect import Connect as Request
+from lib.request import inject
 from lib.utils.hashdb import HashDB
 
 import lib.techniques.union.use as uu
@@ -1514,6 +1515,47 @@ class TestConfigUnion(unittest.TestCase):
         kb.uChar = "SENTINEL"
         uu.configUnion(char=None, columns="1")
         self.assertEqual(kb.uChar, "SENTINEL")
+
+
+class TestValueParallelEligibility(unittest.TestCase):
+    """
+    inject.valueParallelEligible() picks the value-parallel path (job-level '--eta' bar / concurrency).
+    Safety invariant under test: classic time-based must never run concurrently (interfering SLEEP
+    measurements), so it qualifies only single-threaded under '--eta'; a concurrency-safe channel
+    (boolean or the timeless oracle) may run under either '--threads' or '--eta'.
+    """
+
+    def setUp(self):
+        self._avail = set()
+        self._realAvail = inject.isTechniqueAvailable
+        inject.isTechniqueAvailable = lambda t: t in self._avail
+        self._saved = (conf.threads, conf.eta, kb.get("timeless"))
+
+    def tearDown(self):
+        inject.isTechniqueAvailable = self._realAvail
+        conf.threads, conf.eta, kb.timeless = self._saved
+
+    def _elig(self, threads, eta, techniques, timeless=None):
+        conf.threads, conf.eta, kb.timeless = threads, eta, timeless
+        self._avail = set(techniques)
+        return inject.valueParallelEligible()
+
+    def test_single_thread_eta_time_based_qualifies(self):
+        self.assertTrue(self._elig(1, True, {PAYLOAD.TECHNIQUE.TIME}))
+
+    def test_multi_thread_time_based_never_parallel(self):
+        self.assertFalse(self._elig(8, True, {PAYLOAD.TECHNIQUE.TIME}))
+        self.assertFalse(self._elig(8, False, {PAYLOAD.TECHNIQUE.TIME}))
+
+    def test_boolean_qualifies_under_threads_or_eta(self):
+        self.assertTrue(self._elig(8, False, {PAYLOAD.TECHNIQUE.BOOLEAN}))
+        self.assertTrue(self._elig(1, True, {PAYLOAD.TECHNIQUE.BOOLEAN}))
+
+    def test_plain_single_thread_no_eta_stays_classic(self):
+        self.assertFalse(self._elig(1, False, {PAYLOAD.TECHNIQUE.BOOLEAN}))
+
+    def test_timeless_is_concurrency_safe(self):
+        self.assertTrue(self._elig(8, True, {PAYLOAD.TECHNIQUE.TIME}, timeless=object()))
 
 
 if __name__ == "__main__":

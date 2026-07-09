@@ -403,12 +403,13 @@ class Databases(object):
 
                     # Value-parallel, prediction-assisted name enumeration for the DBMSes using the
                     # generic "<db>, <index>" blind template. Retrieves whole names concurrently (one per
-                    # worker, each decoded sequentially so wordlist prediction applies). Used only with
-                    # '--threads' (like getColumns below); single-thread stays on the classic getValue loop,
-                    # which still gets predictive inference via getPartRun. The special templates stay serial.
+                    # worker, each decoded sequentially so wordlist prediction applies). Used with '--threads'
+                    # and under '--eta' (one whole-job bar/ETA) per valueParallelEligible(); plain single-thread
+                    # stays on the classic getValue loop, which still gets predictive inference via getPartRun.
+                    # The special templates stay serial.
                     genericTemplate = Backend.getIdentifiedDbms() not in (DBMS.SYBASE, DBMS.MAXDB, DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB, DBMS.SQLITE, DBMS.FIREBIRD, DBMS.HSQLDB, DBMS.INFORMIX, DBMS.FRONTBASE, DBMS.VIRTUOSO, DBMS.SPANNER)
 
-                    if genericTemplate and conf.threads > 1 and isTechniqueAvailable(PAYLOAD.TECHNIQUE.BOOLEAN):
+                    if genericTemplate and inject.valueParallelEligible():
                         for table in (inject._threadedInferenceValues(lambda index: _query % (unsafeSQLIdentificatorNaming(db), index), indexRange, context="Tables") or []):
                             if not isNoneValue(table):
                                 kb.hintValue = table
@@ -899,9 +900,11 @@ class Databases(object):
 
                 # Value-parallel column-NAME enumeration: the same axis/mechanism as getTables (one name per
                 # worker, decoded sequentially - no length probe, predictive inference applies, names stream
-                # live). Serial fallback for single-thread and when also fetching per-column comments.
+                # live, and under '--eta' a single whole-job bar/ETA is drawn). Eligibility is shared via
+                # valueParallelEligible(); serial fallback only when also fetching per-column comments (those
+                # need an extra per-column query).
                 columnNames = None
-                if conf.threads > 1 and not conf.getComments and isTechniqueAvailable(PAYLOAD.TECHNIQUE.BOOLEAN):
+                if not conf.getComments and inject.valueParallelEligible():
                     columnNames = inject._threadedInferenceValues(columnNameQuery, indexList, context="Columns")
 
                 for position, index in enumerate(indexList):

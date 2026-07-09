@@ -444,9 +444,11 @@ class Entries(object):
                             # value's characters across threads) and the per-column Huffman model + low-cardinality
                             # guessing engage under concurrency. Used for the boolean channel with '--threads', and
                             # for the HTTP/2 timeless oracle (its per-thread connections make concurrency safe and
-                            # deterministic - unlike classic time-based, whose char-parallel loop interleaves its
-                            # per-thread output). Single-thread and classic time-based keep the char-parallel loop.
-                            if conf.threads > 1 and not conf.dnsDomain and (isTechniqueAvailable(PAYLOAD.TECHNIQUE.BOOLEAN) or kb.get("timeless") is not None):
+                            # deterministic). Also used under '--eta' - including single-threaded time-based, the
+                            # slowest channel - to drive one whole-job progress bar/ETA (how long the dump takes)
+                            # instead of a per-cell counter. Eligibility (channel x threads/eta) is valueParallelEligible();
+                            # '--dns-domain' keeps the classic loop (its OOB fast path bypasses bisection).
+                            if not conf.dnsDomain and inject.valueParallelEligible():
                                 # One value-parallel pass over every (non-empty) cell, so there is a single
                                 # thread pool and values stream live as they complete - out of order, exactly
                                 # like the error/union dumps - instead of a silent progress counter.

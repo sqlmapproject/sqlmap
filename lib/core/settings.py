@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.7.55"
+VERSION = "1.10.7.56"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -248,6 +248,9 @@ THREAD_FINALIZATION_TIMEOUT = 1
 
 # Maximum number of techniques used in inject.py/getValue() per one value
 MAX_TECHNIQUES_PER_VALUE = 2
+
+# Fraction of the currently displayed progress-bar ETA kept when a fresh estimate arrives (eases the on-screen countdown toward the new value instead of snapping); 0 disables smoothing, higher is smoother but laggier
+ETA_DISPLAY_SMOOTHING = 0.5
 
 # In case of missing piece of partial union dump, buffered array must be flushed after certain size
 MAX_BUFFERED_PARTIAL_UNION_LENGTH = 1024
