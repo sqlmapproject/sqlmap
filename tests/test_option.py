@@ -37,7 +37,6 @@ from lib.core.settings import IGNORE_CODE_WILDCARD
 from lib.core.settings import MAX_CONNECT_RETRIES
 from lib.core.exception import SqlmapFilePathException
 from lib.core.exception import SqlmapGenericException
-from lib.core.exception import SqlmapMissingDependence
 from lib.core.exception import SqlmapMissingMandatoryOptionException
 from lib.core.exception import SqlmapSyntaxException
 from lib.core.exception import SqlmapSystemException
@@ -1491,12 +1490,9 @@ class TestOptionSetHTTPAuthentication(unittest.TestCase):
         conf.authFile = None
         conf.authUsername = None
         conf.authPassword = None
-        # The python-ntlm handler module is optional; credential parsing happens
-        # before the handler import, so the parsed creds are set regardless.
-        try:
-            option._setHTTPAuthentication()
-        except SqlmapMissingDependence:
-            pass
+        # The NTLM handler is now native (lib/request/ntlm.py), so no optional
+        # dependency is involved and credential parsing must succeed outright.
+        option._setHTTPAuthentication()
         self.assertEqual(conf.authUsername, "DOMAIN\\user")
         self.assertEqual(conf.authPassword, "pa:ss")
 

@@ -1515,15 +1515,8 @@ def _setHTTPAuthentication():
             authHandler = _urllib.request.HTTPDigestAuthHandler(kb.passwordMgr)
 
         elif authType == AUTH_TYPE.NTLM:
-            try:
-                from ntlm import HTTPNtlmAuthHandler
-            except ImportError:
-                errMsg = "sqlmap requires Python NTLM third-party library "
-                errMsg += "in order to authenticate via NTLM. Download from "
-                errMsg += "'https://github.com/mullender/python-ntlm'"
-                raise SqlmapMissingDependence(errMsg)
-
-            authHandler = HTTPNtlmAuthHandler.HTTPNtlmAuthHandler(kb.passwordMgr)
+            from lib.request.ntlm import HTTPNtlmAuthHandler
+            authHandler = HTTPNtlmAuthHandler(kb.passwordMgr)
     else:
         debugMsg = "setting the HTTP(s) authentication PEM private key"
         logger.debug(debugMsg)
