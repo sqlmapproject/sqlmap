@@ -40,6 +40,9 @@ try:
 except:
     readline._readline = None
 
+_atexitRegistered = False
+_activeCompletion = None
+
 def readlineAvailable():
     """
     Check if the readline is available. By default
@@ -148,4 +151,13 @@ def autoCompletion(completion=None, os=None, commands=None):
         readline.parse_and_bind("tab: complete")
 
     loadHistory(completion)
-    atexit.register(saveHistory, completion)
+
+    # Note: readline keeps a single global in-memory history; loadHistory() above swaps it to the
+    # currently active shell. Registering a fresh atexit handler per call would make every shell
+    # write that one global buffer to its own path at exit, clobbering the others. Instead register
+    # a single handler that saves only the shell active at exit.
+    global _atexitRegistered, _activeCompletion
+    _activeCompletion = completion
+    if not _atexitRegistered:
+        atexit.register(lambda: saveHistory(_activeCompletion))
+        _atexitRegistered = True

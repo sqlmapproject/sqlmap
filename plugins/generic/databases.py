@@ -70,6 +70,7 @@ class Databases(object):
         kb.data.cachedCounts = {}
         kb.data.dumpedTable = {}
         kb.data.cachedStatements = []
+        kb.data.cachedProcedures = []
 
     def getCurrentDb(self):
         infoMsg = "fetching current database"
@@ -304,7 +305,7 @@ class Databases(object):
                         if conf.excludeSysDbs:
                             infoMsg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(db) for db in self.excludeDbsList))
                             logger.info(infoMsg)
-                            query += " IN (%s)" % ','.join("'%s'" % unsafeSQLIdentificatorNaming(db) for db in sorted(dbs) if db not in self.excludeDbsList)
+                            query += " IN (%s)" % ','.join("'%s'" % unsafeSQLIdentificatorNaming(db) for db in sorted(dbs) if unsafeSQLIdentificatorNaming(db) not in self.excludeDbsList)
                         else:
                             query += " IN (%s)" % ','.join("'%s'" % unsafeSQLIdentificatorNaming(db) for db in sorted(dbs))
 
@@ -356,7 +357,7 @@ class Databases(object):
 
         if not kb.data.cachedTables and isInferenceAvailable() and not conf.direct:
             for db in dbs:
-                if conf.excludeSysDbs and db in self.excludeDbsList:
+                if conf.excludeSysDbs and unsafeSQLIdentificatorNaming(db) in self.excludeDbsList:
                     infoMsg = "skipping system database '%s'" % unsafeSQLIdentificatorNaming(db)
                     logger.info(infoMsg)
                     continue
@@ -400,26 +401,40 @@ class Databases(object):
                     plusOne = Backend.getIdentifiedDbms() in PLUS_ONE_DBMSES
                     indexRange = getLimitRange(count, plusOne=plusOne)
 
-                    for index in indexRange:
-                        if Backend.isDbms(DBMS.SYBASE):
-                            query = _query % (db, (kb.data.cachedTables[-1] if kb.data.cachedTables else " "))
-                        elif Backend.getIdentifiedDbms() in (DBMS.MAXDB, DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB):
-                            query = _query % (kb.data.cachedTables[-1] if kb.data.cachedTables else " ")
-                        elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD):
-                            query = _query % index
-                        elif Backend.getIdentifiedDbms() in (DBMS.HSQLDB, DBMS.INFORMIX, DBMS.FRONTBASE, DBMS.VIRTUOSO):
-                            query = _query % (index, unsafeSQLIdentificatorNaming(db))
-                        elif Backend.getIdentifiedDbms() in (DBMS.SPANNER,):
-                            query = _query % (unsafeSQLIdentificatorNaming(db), unsafeSQLIdentificatorNaming(db), index)
-                        else:
-                            query = _query % (unsafeSQLIdentificatorNaming(db), index)
+                    # Value-parallel, prediction-assisted name enumeration for the DBMSes using the
+                    # generic "<db>, <index>" blind template. Retrieves whole names concurrently (one per
+                    # worker, each decoded sequentially so wordlist prediction applies). Used with '--threads'
+                    # and under '--eta' (one whole-job bar/ETA) per valueParallelEligible(); plain single-thread
+                    # stays on the classic getValue loop, which still gets predictive inference via getPartRun.
+                    # The special templates stay serial.
+                    genericTemplate = Backend.getIdentifiedDbms() not in (DBMS.SYBASE, DBMS.MAXDB, DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB, DBMS.SQLITE, DBMS.FIREBIRD, DBMS.HSQLDB, DBMS.INFORMIX, DBMS.FRONTBASE, DBMS.VIRTUOSO, DBMS.SPANNER)
 
-                        table = unArrayizeValue(inject.getValue(query, union=False, error=False))
+                    if genericTemplate and inject.valueParallelEligible():
+                        for table in (inject._threadedInferenceValues(lambda index: _query % (unsafeSQLIdentificatorNaming(db), index), indexRange, context="Tables") or []):
+                            if not isNoneValue(table):
+                                kb.hintValue = table
+                                tables.append(safeSQLIdentificatorNaming(table, True))
+                    else:
+                        for index in indexRange:
+                            if Backend.isDbms(DBMS.SYBASE):
+                                query = _query % (db, (kb.data.cachedTables[-1] if kb.data.cachedTables else " "))
+                            elif Backend.getIdentifiedDbms() in (DBMS.MAXDB, DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB):
+                                query = _query % (kb.data.cachedTables[-1] if kb.data.cachedTables else " ")
+                            elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD):
+                                query = _query % index
+                            elif Backend.getIdentifiedDbms() in (DBMS.HSQLDB, DBMS.INFORMIX, DBMS.FRONTBASE, DBMS.VIRTUOSO):
+                                query = _query % (index, unsafeSQLIdentificatorNaming(db))
+                            elif Backend.getIdentifiedDbms() in (DBMS.SPANNER,):
+                                query = _query % (unsafeSQLIdentificatorNaming(db), unsafeSQLIdentificatorNaming(db), index)
+                            else:
+                                query = _query % (unsafeSQLIdentificatorNaming(db), index)
 
-                        if not isNoneValue(table):
-                            kb.hintValue = table
-                            table = safeSQLIdentificatorNaming(table, True)
-                            tables.append(table)
+                            table = unArrayizeValue(inject.getValue(query, union=False, error=False))
+
+                            if not isNoneValue(table):
+                                kb.hintValue = table
+                                table = safeSQLIdentificatorNaming(table, True)
+                                tables.append(table)
 
                     if tables:
                         kb.data.cachedTables[db] = tables
@@ -840,7 +855,7 @@ class Databases(object):
                             logger.error(errMsg)
                             continue
 
-                for index in getLimitRange(count):
+                def columnNameQuery(index):
                     if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.VERTICA, DBMS.PRESTO, DBMS.CRATEDB, DBMS.CUBRID, DBMS.CACHE, DBMS.FRONTBASE, DBMS.VIRTUOSO):
                         query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
                         query += condQuery
@@ -879,8 +894,24 @@ class Databases(object):
                         query += condQuery
                         field = condition
 
-                    query = agent.limitQuery(index, query, field, field)
-                    column = unArrayizeValue(inject.getValue(query, union=False, error=False))
+                    return agent.limitQuery(index, query, field, field)
+
+                indexList = list(getLimitRange(count))
+
+                # Value-parallel column-NAME enumeration: the same axis/mechanism as getTables (one name per
+                # worker, decoded sequentially - no length probe, predictive inference applies, names stream
+                # live, and under '--eta' a single whole-job bar/ETA is drawn). Eligibility is shared via
+                # valueParallelEligible(); serial fallback only when also fetching per-column comments (those
+                # need an extra per-column query).
+                columnNames = None
+                if not conf.getComments and inject.valueParallelEligible():
+                    columnNames = inject._threadedInferenceValues(columnNameQuery, indexList, context="Columns")
+
+                for position, index in enumerate(indexList):
+                    if columnNames is not None:
+                        column = unArrayizeValue(columnNames[position])
+                    else:
+                        column = unArrayizeValue(inject.getValue(columnNameQuery(index), union=False, error=False))
 
                     if not isNoneValue(column):
                         if conf.getComments:
@@ -1051,6 +1082,11 @@ class Databases(object):
 
         rootQuery = queries[Backend.getIdentifiedDbms()].statements
 
+        if "inband" not in rootQuery and "blind" not in rootQuery:
+            warnMsg = "on %s it is not possible to enumerate the SQL statements" % Backend.getIdentifiedDbms()
+            logger.warning(warnMsg)
+            return kb.data.cachedStatements
+
         if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
             if Backend.isDbms(DBMS.MYSQL) and Backend.isFork(FORK.DRIZZLE):
                 query = rootQuery.inband.query2
@@ -1122,3 +1158,62 @@ class Databases(object):
             kb.data.cachedStatements = [_.replace(REFLECTED_VALUE_MARKER, "<payload>") for _ in kb.data.cachedStatements]
 
         return kb.data.cachedStatements
+
+    def getProcedures(self):
+        infoMsg = "fetching stored procedures"
+        logger.info(infoMsg)
+
+        rootQuery = queries[Backend.getIdentifiedDbms()].procedures
+
+        # Generic-first by design: a DBMS is supported iff it declares a <procedures> query block in
+        # queries.xml (INFORMATION_SCHEMA.ROUTINES / pg_proc / sys.sql_modules / ALL_SOURCE / RDB$PROCEDURES).
+        # Engines without stored procedures (or without a declared block) fall through with a clean
+        # warning - same model as getStatements() (uneven coverage is the established convention).
+        if "inband" not in rootQuery and "blind" not in rootQuery:
+            warnMsg = "on %s it is not possible to enumerate the stored procedures" % Backend.getIdentifiedDbms()
+            logger.warning(warnMsg)
+            return kb.data.cachedProcedures
+
+        if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
+            query = rootQuery.inband.query
+
+            values = inject.getValue(query, blind=False, time=False)
+
+            if not isNoneValue(values):
+                kb.data.cachedProcedures = []
+                for value in arrayizeValue(values):
+                    value = (unArrayizeValue(value) or "").strip()
+                    if not isNoneValue(value):
+                        kb.data.cachedProcedures.append(value.strip())
+
+        if not kb.data.cachedProcedures and isInferenceAvailable() and not conf.direct:
+            infoMsg = "fetching number of stored procedures"
+            logger.info(infoMsg)
+
+            count = inject.getValue(rootQuery.blind.count, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+
+            if count == 0:
+                return kb.data.cachedProcedures
+            elif not isNumPosStrValue(count):
+                errMsg = "unable to retrieve the number of stored procedures"
+                raise SqlmapNoneDataException(errMsg)
+
+            # every <procedures> blind query uses 0-based paging (MySQL "LIMIT %d,1", PostgreSQL/MSSQL/Oracle
+            # "OFFSET %d"), so the index range stays 0-based here regardless of PLUS_ONE_DBMSES (unlike
+            # getStatements(), whose MSSQL/Oracle idioms are 1-based)
+            indexRange = getLimitRange(count)
+
+            for index in indexRange:
+                query = rootQuery.blind.query % index
+                value = unArrayizeValue(inject.getValue(query, union=False, error=False))
+
+                if not isNoneValue(value):
+                    kb.data.cachedProcedures.append((value or "").strip())
+
+        if not kb.data.cachedProcedures:
+            errMsg = "unable to retrieve the stored procedures"
+            logger.error(errMsg)
+        else:
+            kb.data.cachedProcedures = [_.replace(REFLECTED_VALUE_MARKER, "<payload>") for _ in kb.data.cachedProcedures]
+
+        return kb.data.cachedProcedures

@@ -82,13 +82,19 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
         redurl = self._get_header_redirect(headers) if not conf.ignoreRedirects else None
 
         try:
-            content = fp.fp.read(MAX_CONNECTION_TOTAL_SIZE)
-            fp.fp = io.BytesIO(content)
+            # Note: drain via the length-aware response (honors Content-Length/chunked), NOT the raw
+            # socket 'fp.fp' - the latter has no HTTP framing, so on a Keep-Alive connection (no EOF)
+            # it blocks for the whole '--timeout' on every redirect (Issue #6080)
+            content = fp.read(MAX_CONNECTION_TOTAL_SIZE)
         except _http_client.IncompleteRead as ex:
             content = ex.partial
-            fp.fp = io.BytesIO(content)
         except:
             content = b""
+
+        # back 'fp' with the captured body so it stays re-readable downstream (Issue #5985); the
+        # length-aware read above has consumed the response, so restore both the buffer and read()
+        fp.fp = io.BytesIO(content)
+        fp.read = fp.fp.read
 
         content = decodePage(content, headers.get(HTTP_HEADER.CONTENT_ENCODING), headers.get(HTTP_HEADER.CONTENT_TYPE))
 

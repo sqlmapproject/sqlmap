@@ -68,7 +68,7 @@ class Fingerprint(GenericFingerprint):
         infoMsg = "testing %s" % DBMS.MONETDB
         logger.info(infoMsg)
 
-        result = inject.checkBooleanExpression("isaurl(NULL)=false")
+        result = inject.checkBooleanExpression("isaurl(NULL) IS NULL")
 
         if result:
             infoMsg = "confirming %s" % DBMS.MONETDB

@@ -93,7 +93,7 @@ class Enumeration(GenericEnumeration):
 
         if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
             for db in dbs:
-                if conf.excludeSysDbs and db in self.excludeDbsList:
+                if conf.excludeSysDbs and unsafeSQLIdentificatorNaming(db) in self.excludeDbsList:
                     infoMsg = "skipping system database '%s'" % db
                     singleTimeLogMessage(infoMsg)
                     continue
@@ -116,7 +116,7 @@ class Enumeration(GenericEnumeration):
 
         if not kb.data.cachedTables and isInferenceAvailable() and not conf.direct:
             for db in dbs:
-                if conf.excludeSysDbs and db in self.excludeDbsList:
+                if conf.excludeSysDbs and unsafeSQLIdentificatorNaming(db) in self.excludeDbsList:
                     infoMsg = "skipping system database '%s'" % db
                     singleTimeLogMessage(infoMsg)
                     continue
@@ -206,7 +206,7 @@ class Enumeration(GenericEnumeration):
             for db in foundTbls.keys():
                 db = safeSQLIdentificatorNaming(db)
 
-                if conf.excludeSysDbs and db in self.excludeDbsList:
+                if conf.excludeSysDbs and unsafeSQLIdentificatorNaming(db) in self.excludeDbsList:
                     infoMsg = "skipping system database '%s'" % db
                     singleTimeLogMessage(infoMsg)
                     continue
@@ -343,7 +343,7 @@ class Enumeration(GenericEnumeration):
             for db in (_ for _ in dbs if _):
                 db = safeSQLIdentificatorNaming(db)
 
-                if conf.excludeSysDbs and db in self.excludeDbsList:
+                if conf.excludeSysDbs and unsafeSQLIdentificatorNaming(db) in self.excludeDbsList:
                     continue
 
                 if conf.exclude and re.search(conf.exclude, db, re.I) is not None:

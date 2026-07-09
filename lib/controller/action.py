@@ -8,11 +8,14 @@ See the file 'LICENSE' for copying permission
 from lib.controller.handler import setHandler
 from lib.core.common import Backend
 from lib.core.common import Format
+from lib.core.common import hashDBWrite
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
 from lib.core.enums import CONTENT_TYPE
+from lib.core.enums import DBMS
+from lib.core.enums import HASHDB_KEYS
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapUnsupportedDBMSException
 from lib.core.settings import SUPPORTED_DBMS
@@ -28,9 +31,51 @@ def action():
     if possible
     """
 
+    # HTTP/2 timeless timing ('--timeless'): detection is done and the back-end DBMS is known, so engage
+    # the oracle for this target's extraction (swaps the time-based vector for a tuned heavy one, so all
+    # subsequent extraction reads bits by response order instead of delay). Guarded + calibrated - a no-op
+    # unless '--timeless' is set and the target is usable; disengage() first clears any prior target's.
+    from lib.request import timeless
+    timeless.disengage()
+    if not timeless.autoEngage():          # engages if '--timeless' was given and the target is usable
+        timeless.hintTimeless()            # otherwise nudge the user toward '--timeless' if the target fits
+
     # First of all we have to identify the back-end database management
     # system to be able to go ahead with the injection
+    # automatic WAF-bypass: if a WAF/IPS is present and the back-end DBMS is already indicated by the error
+    # page or the heuristic checks, skip active fingerprinting (the WAF would just block its payloads
+    # and flood the run with 403s) and assume that DBMS, so the user gets a usable result
+    if kb.wafBypass and not conf.forceDbms:
+        fallback = Backend.getErrorParsedDBMSes() or ([kb.heuristicDbms] if kb.heuristicDbms else [])
+        fallback = next((_ for _ in fallback if _ and _.lower() in SUPPORTED_DBMS), None)
+        if fallback:
+            logger.warning("skipping active back-end DBMS fingerprinting behind the WAF/IPS and assuming '%s' from error/heuristic detection" % fallback)
+            conf.forceDbms = fallback
+
     setHandler()
+
+    if kb.wafBypass and Backend.getDbms():      # persist the assumed DBMS so a resumed run restores it instead of re-fingerprinting (and dead-ending) behind the WAF
+        hashDBWrite(HASHDB_KEYS.DBMS, Backend.getDbms())
+
+    # automatic WAF-bypass: with MySQL behind the WAF, make data retrieval AND table enumeration survive a
+    # libinjection-class WAF (e.g. OWASP CRS), verified end-to-end through ModSecurity/CRS:
+    #   * fingerprinting was skipped, so flag has_information_schema (modern MySQL >=5.0 always has it) -
+    #     otherwise enumeration wrongly assumes 'MySQL < 5.0' and bails with "no tables";
+    #   * 'blindbinary' reshapes the single-character read ORD(MID())->RIGHT(LEFT())>BINARY 0x.. (sheds the
+    #     ORD/MID function names scored by 942151/942190);
+    #   * 'infoschema2innodb' moves table enumeration off 'information_schema' (scored by 942140) onto
+    #     'mysql.innodb_table_stats', which is not on those blocklists.
+    # (blindbinary also reshapes PostgreSQL, but full extraction through the CRS proxy garbles there - an
+    #  open issue - so PG is not auto-applied; it stays available as manual '--tamper=blindbinary'.)
+    if kb.wafBypass and Backend.getIdentifiedDbms() == DBMS.MYSQL:
+        kb.data.has_information_schema = True
+        if not conf.tamper:
+            from lib.utils.wafbypass import loadTamper
+            for _name in ("blindbinary", "infoschema2innodb"):
+                function = loadTamper(_name)
+                if function is not None and function not in (kb.tamperFunctions or []):
+                    kb.tamperFunctions = (kb.tamperFunctions or []) + [function]
+            logger.info("using tamper scripts 'blindbinary' and 'infoschema2innodb' so data retrieval and table enumeration can pass the WAF/IPS")
 
     if not Backend.getDbms() or not conf.dbmsHandler:
         htmlParsed = Format.getErrorParsedDBMSes()
@@ -77,6 +122,9 @@ def action():
 
     if conf.getStatements:
         conf.dumper.statements(conf.dbmsHandler.getStatements())
+
+    if conf.getProcs:
+        conf.dumper.procedures(conf.dbmsHandler.getProcedures())
 
     if conf.getPasswordHashes:
         try:

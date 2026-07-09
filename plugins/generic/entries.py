@@ -42,12 +42,15 @@ from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.core.settings import CHECK_ZERO_COLUMNS_THRESHOLD
 from lib.core.settings import CURRENT_DB
+from lib.core.settings import KEYSET_MIN_ROWS
 from lib.core.settings import METADB_SUFFIX
 from lib.core.settings import NULL
 from lib.core.settings import PLUS_ONE_DBMSES
 from lib.core.settings import UPPER_CASE_DBMSES
 from lib.request import inject
 from lib.utils.hash import attackDumpedTable
+from lib.utils.keysetdump import keysetDumpTable
+from lib.utils.keysetdump import resolveKeysetCursor
 from lib.utils.pivotdumptable import pivotDumpTable
 from thirdparty import six
 from thirdparty.six.moves import zip as _zip
@@ -309,6 +312,9 @@ class Entries(object):
 
                     count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
+                    # keyset (seek) pagination: forced with --keyset, automatic for large tables, off with --no-keyset
+                    keysetCursor = resolveKeysetCursor(tbl, colList) if (not conf.noKeyset and isNumPosStrValue(count) and (conf.keyset or int(count) >= KEYSET_MIN_ROWS)) else None
+
                     lengths = {}
                     entries = {}
 
@@ -331,6 +337,19 @@ class Entries(object):
                         logger.warning(warnMsg)
 
                         continue
+
+                    elif keysetCursor:
+                        infoMsg = "using keyset (seek) pagination on column(s) '%s' " % ', '.join(keysetCursor)
+                        infoMsg += "for table '%s'" % unsafeSQLIdentificatorNaming(tbl)
+                        logger.info(infoMsg)
+
+                        try:
+                            entries, lengths = keysetDumpTable(tbl, colList, count, keysetCursor)
+                        except KeyboardInterrupt:
+                            kb.dumpKeyboardInterrupt = True
+                            clearConsoleLine()
+                            warnMsg = "Ctrl+C detected in dumping phase"
+                            logger.warning(warnMsg)
 
                     elif Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.SYBASE, DBMS.MAXDB, DBMS.MSSQL, DBMS.INFORMIX, DBMS.MCKOI, DBMS.RAIMA):
                         if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.RAIMA):
@@ -399,41 +418,74 @@ class Entries(object):
                                     debugMsg += "dumped as it appears to be empty"
                                     logger.debug(debugMsg)
 
+                        def cellQuery(column, index):
+                            if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2, DBMS.VERTICA, DBMS.PRESTO, DBMS.CRATEDB, DBMS.CACHE, DBMS.CLICKHOUSE, DBMS.SNOWFLAKE, DBMS.SPANNER):
+                                query = rootQuery.blind.query % (agent.preprocessField(tbl, column), conf.db, conf.tbl, prioritySortColumns(colList)[0], index)
+                            elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE,):
+                                query = rootQuery.blind.query % (agent.preprocessField(tbl, column), tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())), index)
+                            elif Backend.getIdentifiedDbms() in (DBMS.MIMERSQL,):
+                                query = rootQuery.blind.query % (agent.preprocessField(tbl, column), tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())), prioritySortColumns(colList)[0], index)
+                            elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.EXTREMEDB):
+                                query = rootQuery.blind.query % (agent.preprocessField(tbl, column), tbl, index)
+                            elif Backend.isDbms(DBMS.FIREBIRD):
+                                query = rootQuery.blind.query % (index, agent.preprocessField(tbl, column), tbl)
+                            elif Backend.getIdentifiedDbms() in (DBMS.INFORMIX, DBMS.VIRTUOSO):
+                                query = rootQuery.blind.query % (index, agent.preprocessField(tbl, column), conf.db, tbl, prioritySortColumns(colList)[0])
+                            elif Backend.isDbms(DBMS.FRONTBASE):
+                                query = rootQuery.blind.query % (index, agent.preprocessField(tbl, column), conf.db, tbl)
+                            else:
+                                query = rootQuery.blind.query % (agent.preprocessField(tbl, column), conf.db, tbl, index)
+
+                            return agent.whereQuery(query)
+
                         try:
-                            for index in indexRange:
+                            # Value-parallel dumping: one whole cell per worker, decoded sequentially, so there
+                            # is NO per-cell LENGTH() probe (the position-parallel path needs one to split a
+                            # value's characters across threads) and the per-column Huffman model + low-cardinality
+                            # guessing engage under concurrency. Used for the boolean channel with '--threads', and
+                            # for the HTTP/2 timeless oracle (its per-thread connections make concurrency safe and
+                            # deterministic). Also used under '--eta' - including single-threaded time-based, the
+                            # slowest channel - to drive one whole-job progress bar/ETA (how long the dump takes)
+                            # instead of a per-cell counter. Eligibility (channel x threads/eta) is valueParallelEligible();
+                            # '--dns-domain' keeps the classic loop (its OOB fast path bypasses bisection).
+                            if not conf.dnsDomain and inject.valueParallelEligible():
+                                # One value-parallel pass over every (non-empty) cell, so there is a single
+                                # thread pool and values stream live as they complete - out of order, exactly
+                                # like the error/union dumps - instead of a silent progress counter.
+                                nonEmpty = [_ for _ in colList if _ not in emptyColumns]
+                                tasks = [(column, index) for column in nonEmpty for index in indexRange]
+                                retrieved = inject._threadedInferenceValues(lambda pair: cellQuery(pair[0], pair[1]), tasks, charsetType=None, dump=True) if tasks else []
+                                retrieved = retrieved if retrieved is not None else [None] * len(tasks)
+
+                                offset = 0
                                 for column in colList:
-                                    value = ""
+                                    entries[column] = BigArray()
+                                    lengths.setdefault(column, 0)
 
-                                    if column not in lengths:
-                                        lengths[column] = 0
-
-                                    if column not in entries:
-                                        entries[column] = BigArray()
-
-                                    if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2, DBMS.VERTICA, DBMS.PRESTO, DBMS.CRATEDB, DBMS.CACHE, DBMS.CLICKHOUSE, DBMS.SNOWFLAKE, DBMS.SPANNER):
-                                        query = rootQuery.blind.query % (agent.preprocessField(tbl, column), conf.db, conf.tbl, sorted(colList, key=len)[0], index)
-                                    elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE,):
-                                        query = rootQuery.blind.query % (agent.preprocessField(tbl, column), tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())), index)
-                                    elif Backend.getIdentifiedDbms() in (DBMS.MIMERSQL,):
-                                        query = rootQuery.blind.query % (agent.preprocessField(tbl, column), tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())), sorted(colList, key=len)[0], index)
-                                    elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.EXTREMEDB):
-                                        query = rootQuery.blind.query % (agent.preprocessField(tbl, column), tbl, index)
-                                    elif Backend.isDbms(DBMS.FIREBIRD):
-                                        query = rootQuery.blind.query % (index, agent.preprocessField(tbl, column), tbl)
-                                    elif Backend.getIdentifiedDbms() in (DBMS.INFORMIX, DBMS.VIRTUOSO):
-                                        query = rootQuery.blind.query % (index, agent.preprocessField(tbl, column), conf.db, tbl, sorted(colList, key=len)[0])
-                                    elif Backend.isDbms(DBMS.FRONTBASE):
-                                        query = rootQuery.blind.query % (index, agent.preprocessField(tbl, column), conf.db, tbl)
+                                    if column in emptyColumns:
+                                        values = [NULL] * len(indexRange)
                                     else:
-                                        query = rootQuery.blind.query % (agent.preprocessField(tbl, column), conf.db, tbl, index)
+                                        values = retrieved[offset:offset + len(indexRange)]
+                                        offset += len(indexRange)
 
-                                    query = agent.whereQuery(query)
+                                    for value in values:
+                                        value = '' if value is None else value
+                                        lengths[column] = max(lengths[column], getConsoleLength(DUMP_REPLACEMENTS.get(getUnicode(value), getUnicode(value))))
+                                        entries[column].append(value)
+                            else:
+                                for index in indexRange:
+                                    for column in colList:
+                                        if column not in lengths:
+                                            lengths[column] = 0
 
-                                    value = NULL if column in emptyColumns else inject.getValue(query, union=False, error=False, dump=True)
-                                    value = '' if value is None else value
+                                        if column not in entries:
+                                            entries[column] = BigArray()
 
-                                    lengths[column] = max(lengths[column], getConsoleLength(DUMP_REPLACEMENTS.get(getUnicode(value), getUnicode(value))))
-                                    entries[column].append(value)
+                                        value = NULL if column in emptyColumns else inject.getValue(cellQuery(column, index), union=False, error=False, dump=True)
+                                        value = '' if value is None else value
+
+                                        lengths[column] = max(lengths[column], getConsoleLength(DUMP_REPLACEMENTS.get(getUnicode(value), getUnicode(value))))
+                                        entries[column].append(value)
 
                         except KeyboardInterrupt:
                             kb.dumpKeyboardInterrupt = True

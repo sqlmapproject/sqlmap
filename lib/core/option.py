@@ -144,7 +144,10 @@ from lib.request.basicauthhandler import SmartHTTPBasicAuthHandler
 from lib.request.chunkedhandler import ChunkedHandler
 from lib.request.connect import Connect as Request
 from lib.request.dns import DNSServer
+from lib.request.dns import InteractshDNSServer
 from lib.request.httpshandler import HTTPSHandler
+from lib.request.keepalive import HTTPKeepAliveHandler
+from lib.request.keepalive import HTTPSKeepAliveHandler
 from lib.request.pkihandler import HTTPSPKIAuthHandler
 from lib.request.rangehandler import HTTPRangeHandler
 from lib.request.redirecthandler import SmartRedirectHandler
@@ -154,8 +157,7 @@ from lib.utils.har import HTTPCollectorFactory
 from lib.utils.purge import purge
 from lib.utils.search import search
 from thirdparty import six
-from thirdparty.keepalive import keepalive
-from thirdparty.multipart import multipartpost
+from lib.request.multiparthandler import MultipartPostHandler
 from thirdparty.six.moves import collections_abc as _collections
 from thirdparty.six.moves import http_client as _http_client
 from thirdparty.six.moves import http_cookiejar as _http_cookiejar
@@ -166,11 +168,12 @@ from xml.etree.ElementTree import ElementTree
 authHandler = _urllib.request.BaseHandler()
 chunkedHandler = ChunkedHandler()
 httpsHandler = HTTPSHandler()
-keepAliveHandler = keepalive.HTTPHandler()
+keepAliveHandler = HTTPKeepAliveHandler()
+keepAliveHandlerHTTPS = HTTPSKeepAliveHandler()
 proxyHandler = _urllib.request.ProxyHandler()
 redirectHandler = SmartRedirectHandler()
 rangeHandler = HTTPRangeHandler()
-multipartPostHandler = multipartpost.MultipartPostHandler()
+multipartPostHandler = MultipartPostHandler()
 
 # Reference: https://mail.python.org/pipermail/python-list/2009-November/558615.html
 try:
@@ -436,19 +439,27 @@ def _setStdinPipeTargets():
                 return self.next()
 
             def next(self):
-                try:
-                    line = next(conf.stdinPipe)
-                except (IOError, OSError, TypeError, UnicodeDecodeError):
-                    line = None
+                while True:
+                    try:
+                        line = next(conf.stdinPipe)
+                    except (IOError, OSError, TypeError, UnicodeDecodeError):
+                        line = None
+                    except StopIteration:
+                        line = None
 
-                if line:
-                    match = re.search(r"\b(https?://[^\s'\"]+|[\w.]+\.\w{2,3}[/\w+]*\?[^\s'\"]+)", line, re.I)
-                    if match:
-                        return (match.group(0), conf.method, conf.data, conf.cookie, None)
-                elif self.__rest:
-                    return self.__rest.pop()
+                    if line:
+                        match = re.search(r"\b(https?://[^\s'\"]+|[\w.]+\.\w{2,3}[/\w+]*\?[^\s'\"]+)", line, re.I)
+                        if match:
+                            return (match.group(0), conf.method, conf.data, conf.cookie, None)
+                        # Note: a non-empty line that is not a target (blank line, comment,
+                        # non-parameterized URL) must be skipped, not treated as end-of-input
+                        continue
 
-                raise StopIteration()
+                    # end-of-input (or read error): drain any queued targets, then stop
+                    if self.__rest:
+                        return self.__rest.pop()
+
+                    raise StopIteration()
 
             def add(self, elem):
                 self.__rest.add(elem)
@@ -480,6 +491,75 @@ def _setBulkMultipleTargets():
 
     if not found and not conf.forms and not conf.crawlDepth:
         warnMsg = "no usable links found (with GET parameters)"
+        logger.warning(warnMsg)
+
+def _setOpenApiTargets():
+    if not conf.openApiFile:
+        return
+
+    from lib.parse.openapi import openApiTargets
+
+    if conf.method:
+        warnMsg = "option '--method' will override the HTTP method(s) derived from the OpenAPI/Swagger specification"
+        logger.warning(warnMsg)
+
+    # origin resolves a spec's relative 'servers' to absolute target URLs: an explicit '--openapi-base'
+    # (needed for a host-less local spec) or, when fetched by URL, the fetch URL itself.
+    origin = conf.openApiBase.rstrip('/') if conf.openApiBase else None
+    if re.match(r"(?i)\Ahttps?://", conf.openApiFile):
+        infoMsg = "fetching OpenAPI/Swagger specification from '%s'" % conf.openApiFile
+        logger.info(infoMsg)
+        from lib.request.connect import Connect as Request
+        content = Request.getPage(url=conf.openApiFile, raise404=True)[0]
+        if not origin:
+            match = re.match(r"(?i)(https?://[^/]+)", conf.openApiFile)
+            origin = match.group(1) if match else None
+    else:
+        conf.openApiFile = safeExpandUser(conf.openApiFile)
+        checkFile(conf.openApiFile)
+        infoMsg = "parsing OpenAPI/Swagger specification from '%s'" % conf.openApiFile
+        logger.info(infoMsg)
+        content = openFile(conf.openApiFile).read()
+
+    tags = [_.strip() for _ in re.split(PARAMETER_SPLITTING_REGEX, conf.openApiTags) if _.strip()] if conf.openApiTags else None
+    if tags:
+        infoMsg = "restricting extraction to OpenAPI/Swagger operations tagged: %s" % ", ".join(tags)
+        logger.info(infoMsg)
+
+    try:
+        targets = openApiTargets(content, origin, tags)
+    except ValueError as ex:
+        errMsg = "unable to parse the OpenAPI/Swagger specification ('%s')" % getSafeExString(ex)
+        raise SqlmapSyntaxException(errMsg)
+
+    if re.search(r"(?i)securitySchemes|securityDefinitions", content) and not any((conf.authType, conf.authCred, conf.authFile)) and not any((_[0] or "").lower() == HTTP_HEADER.AUTHORIZATION.lower() for _ in (conf.httpHeaders or [])):
+        warnMsg = "the OpenAPI/Swagger specification declares authentication (security schemes) but no credentials were provided. "
+        warnMsg += "If the API requires authentication, requests are likely to be rejected. Provide credentials with "
+        warnMsg += "'--auth-type'/'--auth-cred' or a header (e.g. --headers=\"Authorization: Bearer ...\")"
+        logger.warning(warnMsg)
+
+    before = len(kb.targets)                               # openapi carries per-target bodies -> no conf.data fallback
+    mutating = 0
+    for url, method, data, headers in targets:
+        if conf.scope and not re.search(conf.scope, url, re.I):
+            continue
+        if method not in ("GET", "HEAD", "OPTIONS"):
+            mutating += 1
+        kb.targets.add((url, method, data, conf.cookie, tuple(headers) if headers else None))
+
+    added = len(kb.targets) - before
+    if added:
+        conf.multipleTargets = True
+        infoMsg = "derived %d target(s) from the OpenAPI/Swagger specification" % added
+        logger.info(infoMsg)
+        if mutating:
+            warnMsg = "%d of the derived target(s) use state-changing HTTP methods (e.g. POST/PUT/PATCH/DELETE). " % mutating
+            warnMsg += "Scanning them may create, modify or delete server-side data"
+            logger.warning(warnMsg)
+    else:
+        warnMsg = "no usable targets derived from the OpenAPI/Swagger specification"
+        if not conf.openApiBase:
+            warnMsg += " (if it uses relative 'servers', provide a base with '--openapi-base' or fetch it by URL)"
         logger.warning(warnMsg)
 
 def _findPageForms():
@@ -608,7 +688,7 @@ def _setMetasploit():
         else:
             warnMsg = "the provided Metasploit Framework path "
             warnMsg += "'%s' is not valid. The cause could " % conf.msfPath
-            warnMsg += "be that the path does not exists or that one "
+            warnMsg += "be that the path does not exist or that one "
             warnMsg += "or more of the needed Metasploit executables "
             warnMsg += "within msfcli, msfconsole, msfencode and "
             warnMsg += "msfpayload do not exist"
@@ -858,6 +938,15 @@ def _setTamperingFunctions():
         if kb.tamperFunctions and len(kb.tamperFunctions) > 3:
             warnMsg = "using too many tamper scripts is usually not "
             warnMsg += "a good idea"
+            logger.warning(warnMsg)
+
+        # tamper scripts rewrite SQL injection payloads; the self-contained non-SQL engines
+        # (--graphql/--nosql/--ldap/--xpath/--ssti/--xxe) do not run payloads through the tampering hook, so
+        # warn instead of silently ignoring the user's '--tamper'
+        if kb.tamperFunctions and any((conf.graphql, conf.nosql, conf.ldap, conf.xpath, conf.ssti, conf.xxe)):
+            engine = next(_ for _ in ("graphql", "nosql", "ldap", "xpath", "ssti", "xxe") if conf.get(_))
+            warnMsg = "tamper scripts are applied to SQL injection payloads only and "
+            warnMsg += "will be ignored by the '--%s' engine" % engine
             logger.warning(warnMsg)
 
         if resolve_priorities and priorities:
@@ -1239,18 +1328,24 @@ def _setHTTPHandlers():
             handlers.append(_urllib.request.HTTPCookieProcessor(conf.cj))
 
         # Reference: http://www.w3.org/Protocols/rfc2616/rfc2616-sec8.html
-        if conf.keepAlive:
-            warnMsg = "persistent HTTP(s) connections, Keep-Alive, has "
-            warnMsg += "been disabled because of its incompatibility "
+        # Note: persistent (Keep-Alive) connections are used by default (including through an HTTP(s)
+        # proxy - the keep-alive handler pools the proxy socket for plain HTTP and the CONNECT-tunnelled
+        # socket per origin for HTTPS); '--no-keep-alive' opts out, and they are automatically disabled
+        # when incompatible (authentication methods, or chunked transfer-encoding of the request body -
+        # handled by a dedicated, non-pooling handler)
+        conf.keepAlive = not conf.noKeepAlive and not conf.authType and not conf.chunked
 
-            if conf.proxy:
-                warnMsg += "with HTTP(s) proxy"
-                logger.warning(warnMsg)
-            elif conf.authType:
-                warnMsg += "with authentication methods"
-                logger.warning(warnMsg)
-            else:
-                handlers.append(keepAliveHandler)
+        if conf.keepAlive:
+            # persistent connections for both HTTP and HTTPS; the keep-alive HTTPS
+            # handler supersedes the regular one (reusing its SSL connection)
+            if httpsHandler in handlers:
+                handlers.remove(httpsHandler)
+            handlers.append(keepAliveHandler)
+            handlers.append(keepAliveHandlerHTTPS)
+        elif not conf.noKeepAlive and (conf.authType or conf.chunked):
+            reason = "authentication methods" if conf.authType else "chunked transfer-encoding"
+            debugMsg = "persistent (Keep-Alive) connections were disabled (incompatible with %s)" % reason
+            logger.debug(debugMsg)
 
         opener = _urllib.request.build_opener(*handlers)
         opener.addheaders = []  # Note: clearing default "User-Agent: Python-urllib/X.Y"
@@ -1396,7 +1491,9 @@ def _setHTTPAuthentication():
             conf.httpHeaders.append((HTTP_HEADER.AUTHORIZATION, "Bearer %s" % conf.authCred.strip()))
             return
         elif authType == AUTH_TYPE.NTLM:
-            regExp = "^(.*\\\\.*):(.*?)$"
+            # Note: the DOMAIN\username part is colon-free, so the password group takes the full
+            # remainder (a greedy first group would otherwise swallow colons inside the password)
+            regExp = "^([^:]*\\\\[^:]*):(.*)$"
             errMsg = "HTTP NTLM authentication credentials value must "
             errMsg += "be in format 'DOMAIN\\username:password'"
         elif authType == AUTH_TYPE.PKI:
@@ -1423,15 +1520,8 @@ def _setHTTPAuthentication():
             authHandler = _urllib.request.HTTPDigestAuthHandler(kb.passwordMgr)
 
         elif authType == AUTH_TYPE.NTLM:
-            try:
-                from ntlm import HTTPNtlmAuthHandler
-            except ImportError:
-                errMsg = "sqlmap requires Python NTLM third-party library "
-                errMsg += "in order to authenticate via NTLM. Download from "
-                errMsg += "'https://github.com/mullender/python-ntlm'"
-                raise SqlmapMissingDependence(errMsg)
-
-            authHandler = HTTPNtlmAuthHandler.HTTPNtlmAuthHandler(kb.passwordMgr)
+            from lib.request.ntlm import HTTPNtlmAuthHandler
+            authHandler = HTTPNtlmAuthHandler(kb.passwordMgr)
     else:
         debugMsg = "setting the HTTP(s) authentication PEM private key"
         logger.debug(debugMsg)
@@ -1454,14 +1544,14 @@ def _setHTTPExtraHeaders():
             if not headerValue.strip():
                 continue
 
-            if headerValue.count(':') >= 1:
+            if headerValue.startswith('@'):
+                checkFile(headerValue[1:])
+                kb.headersFile = headerValue[1:]
+            elif headerValue.count(':') >= 1:
                 header, value = (_.lstrip() for _ in headerValue.split(":", 1))
 
                 if header and value:
                     conf.httpHeaders.append((header, value))
-            elif headerValue.startswith('@'):
-                checkFile(headerValue[1:])
-                kb.headersFile = headerValue[1:]
             else:
                 errMsg = "invalid header value: %s. Valid header format is 'name:value'" % repr(headerValue).lstrip('u')
                 raise SqlmapSyntaxException(errMsg)
@@ -1675,9 +1765,9 @@ def _createTemporaryDirectory():
         except Exception as ex:
             warnMsg = "there has been a problem while accessing "
             warnMsg += "system's temporary directory location(s) ('%s'). Please " % getSafeExString(ex)
-            warnMsg += "make sure that there is enough disk space left. If problem persists, "
+            warnMsg += "make sure that there is enough disk space left. If the problem persists, "
             warnMsg += "try to set environment variable 'TEMP' to a location "
-            warnMsg += "writeable by the current user"
+            warnMsg += "writable by the current user"
             logger.warning(warnMsg)
 
     if "sqlmap" not in (tempfile.tempdir or "") or conf.tmpDir and tempfile.tempdir == conf.tmpDir:
@@ -1825,7 +1915,7 @@ def _cleanupOptions():
     if conf.tmpPath:
         conf.tmpPath = ntToPosixSlashes(normalizePath(conf.tmpPath))
 
-    if any((conf.googleDork, conf.logFile, conf.bulkFile, conf.forms, conf.crawlDepth, conf.stdinPipe)):
+    if any((conf.googleDork, conf.logFile, conf.bulkFile, conf.forms, conf.crawlDepth, conf.stdinPipe, conf.openApiFile)):
         conf.multipleTargets = True
 
     if conf.optimize:
@@ -2074,6 +2164,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.cache.comparison = LRUDict(capacity=256)
     kb.cache.encoding = LRUDict(capacity=256)
     kb.cache.alphaBoundaries = None
+    kb.cache.charsetAsciiTbl = None
     kb.cache.hashRegex = None
     kb.cache.intBoundaries = None
     kb.cache.parsedDbms = {}
@@ -2144,6 +2235,17 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.heuristicTest = None
     kb.hintValue = ""
     kb.htmlFp = []
+    kb.huffmanModel = {}
+    kb.respTruncated = False
+    kb.huffmanValidated = False
+    kb.disableHuffman = False
+    kb.huffmanProbes = 0
+    kb.huffmanEscapes = 0
+    kb.lowCardCache = {}
+    kb.dumpCharset = {}
+    kb.dumpCharsetStable = {}
+    kb.litmusCounter = 0
+    kb.reliabilityAlarm = False
     kb.httpErrorCodes = {}
     kb.inferenceMode = False
     kb.ignoreCasted = None
@@ -2157,7 +2259,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.lastParserStatus = None
 
     kb.locks = AttribDict()
-    for _ in ("cache", "connError", "count", "handlers", "hint", "identYwaf", "index", "io", "limit", "liveCookies", "log", "socket", "redirect", "request", "value"):
+    for _ in ("cache", "connError", "count", "handlers", "hint", "identYwaf", "index", "io", "limit", "liveCookies", "log", "prediction", "socket", "redirect", "request", "value"):
         kb.locks[_] = threading.Lock()
 
     kb.matchRatio = None
@@ -2187,6 +2289,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.pageTemplates = dict()
     kb.pageEncoding = DEFAULT_PAGE_ENCODING
     kb.pageStable = None
+    kb.pageStructurallyStable = None
     kb.partRun = None
     kb.permissionFlag = False
     kb.place = None
@@ -2225,6 +2328,8 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.suppressResumeInfo = False
     kb.tableFrom = None
     kb.technique = None
+    kb.timeless = None          # active HTTP/2 timeless-timing oracle (lib/request/timeless.py) or None
+    kb.timelessHinted = False   # whether the "target speaks HTTP/2 -> try --timeless" nudge was shown (once/run)
     kb.tempDir = None
     kb.testMode = False
     kb.testOnlyCustom = False
@@ -2236,6 +2341,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.udfFail = False
     kb.unionDuplicates = False
     kb.unionTemplate = None
+    kb.wafBypass = None
     kb.webSocketRecvCount = None
     kb.wizardMode = False
     kb.xpCmdshellAvailable = False
@@ -2481,6 +2587,26 @@ def _setDNSServer():
     if not conf.dnsDomain:
         return
 
+    from lib.core.settings import OOB_INTERACTSH_SERVERS
+
+    _requested = conf.dnsDomain.strip().lower()
+    if _requested in ("interactsh", "oast", "oob") or _requested in OOB_INTERACTSH_SERVERS:
+        infoMsg = "setting up interactsh-backed DNS exfiltration collector"
+        logger.info(infoMsg)
+
+        try:
+            conf.dnsServer = InteractshDNSServer(server=_requested if _requested in OOB_INTERACTSH_SERVERS else None)
+            conf.dnsServer.run()
+            conf.dnsDomain = conf.dnsServer.domain
+        except socket.error as ex:
+            errMsg = "there was an error while setting up "
+            errMsg += "the interactsh DNS collector ('%s')" % getSafeExString(ex)
+            raise SqlmapGenericException(errMsg)
+
+        infoMsg = "using interactsh DNS collector (exfiltration domain '%s')" % conf.dnsDomain
+        logger.info(infoMsg)
+        return
+
     infoMsg = "setting up DNS server instance"
     logger.info(infoMsg)
 
@@ -2506,9 +2632,11 @@ def _setProxyList():
         return
 
     conf.proxyList = []
-    for match in re.finditer(r"(?i)((http[^:]*|socks[^:]*)://)?([\w\-.]+):(\d+)", readCachedFileContent(conf.proxyFile)):
-        _, type_, address, port = match.groups()
-        conf.proxyList.append("%s://%s:%s" % (type_ or "http", address, port))
+    # Note: preserve an explicit scheme and any 'user:pass@' credentials (entries use the same format
+    # as --proxy); otherwise a SOCKS proxy is silently downgraded to HTTP and proxy auth is dropped
+    for match in re.finditer(r"(?i)((http[^:\s]*|socks[^:\s]*)://)?(?:([^:@\s/]+:[^@\s/]*)@)?([\w\-.]+):(\d+)", readCachedFileContent(conf.proxyFile)):
+        _, type_, cred, address, port = match.groups()
+        conf.proxyList.append("%s://%s%s:%s" % (type_ or "http", ("%s@" % cred) if cred else "", address, port))
 
 def _setTorProxySettings():
     if not conf.tor:
@@ -2574,14 +2702,6 @@ def _setHttpOptions():
     if conf.http10:
         _http_client.HTTPConnection._http_vsn = 10
         _http_client.HTTPConnection._http_vsn_str = 'HTTP/1.0'
-
-    if conf.url and (conf.url.startswith("ws:/") or conf.url.startswith("wss:/")):
-        try:
-            from websocket import ABNF
-        except ImportError:
-            errMsg = "sqlmap requires third-party module 'websocket-client' "
-            errMsg += "in order to use WebSocket functionality"
-            raise SqlmapMissingDependence(errMsg)
 
 def _checkTor():
     if not conf.checkTor:
@@ -2689,8 +2809,8 @@ def _basicOptionValidation():
         errMsg += "'SQLMAP_UNSAFE_EVAL=1' to be explicitly set"
         raise SqlmapSystemException(errMsg)
 
-    if conf.chunked and not any((conf.data, conf.requestFile, conf.forms)):
-        errMsg = "switch '--chunked' requires usage of (POST) options/switches '--data', '-r' or '--forms'"
+    if conf.chunked and not any((conf.data, conf.requestFile, conf.forms, conf.openApiFile)):
+        errMsg = "switch '--chunked' requires usage of (POST) options/switches '--data', '-r', '--forms' or '--openapi'"
         raise SqlmapSyntaxException(errMsg)
 
     if conf.api and not conf.configFile:
@@ -2790,10 +2910,6 @@ def _basicOptionValidation():
         errMsg = "switch '--dump' is incompatible with switch '--dump-all'"
         raise SqlmapSyntaxException(errMsg)
 
-    if conf.predictOutput and (conf.threads > 1 or conf.optimize):
-        errMsg = "switch '--predict-output' is incompatible with option '--threads' and switch '-o'"
-        raise SqlmapSyntaxException(errMsg)
-
     if conf.threads > MAX_NUMBER_OF_THREADS and not conf.get("skipThreadCheck"):
         errMsg = "maximum number of used threads is %d avoiding potential connection issues" % MAX_NUMBER_OF_THREADS
         raise SqlmapSyntaxException(errMsg)
@@ -2831,7 +2947,7 @@ def _basicOptionValidation():
         raise SqlmapSyntaxException(errMsg)
 
     if conf.csrfToken and conf.threads > 1:
-        errMsg = "option '--csrf-url' is incompatible with option '--threads'"
+        errMsg = "option '--csrf-token' is incompatible with option '--threads'"
         raise SqlmapSyntaxException(errMsg)
 
     if conf.requestFile and conf.url and conf.url != DUMMY_URL:
@@ -2983,7 +3099,7 @@ def init():
 
     parseTargetDirect()
 
-    if any((conf.url, conf.logFile, conf.bulkFile, conf.requestFile, conf.googleDork, conf.stdinPipe)):
+    if any((conf.url, conf.logFile, conf.bulkFile, conf.requestFile, conf.googleDork, conf.stdinPipe, conf.openApiFile)):
         _setHostname()
         _setHTTPTimeout()
         _setHTTPExtraHeaders()
@@ -2999,6 +3115,7 @@ def init():
         _doSearch()
         _setStdinPipeTargets()
         _setBulkMultipleTargets()
+        _setOpenApiTargets()
         _checkTor()
         _setCrawler()
         _findPageForms()

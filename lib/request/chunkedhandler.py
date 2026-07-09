@@ -14,6 +14,10 @@ class ChunkedHandler(_urllib.request.HTTPHandler):
     Ensures that HTTPHandler is working properly in case of Chunked Transfer-Encoding
     """
 
+    # Note: run after urllib's own request munging so that a Content-Length it may have added (the
+    # HTTPS path on Python 2 adds one unconditionally) is present to be stripped when '--chunked'
+    handler_order = _urllib.request.HTTPHandler.handler_order + 1
+
     def _http_request(self, request):
         host = request.get_host() if hasattr(request, "get_host") else request.host
         if not host:
@@ -23,7 +27,11 @@ class ChunkedHandler(_urllib.request.HTTPHandler):
             data = request.data
             if not request.has_header(HTTP_HEADER.CONTENT_TYPE):
                 request.add_unredirected_header(HTTP_HEADER.CONTENT_TYPE, "application/x-www-form-urlencoded")
-            if not request.has_header(HTTP_HEADER.CONTENT_LENGTH) and not conf.chunked:
+            if conf.chunked:  # Content-Length must not accompany 'Transfer-Encoding: chunked'
+                for store in (request.headers, request.unredirected_hdrs):
+                    for name in [_ for _ in store if _.lower() == HTTP_HEADER.CONTENT_LENGTH.lower()]:
+                        del store[name]
+            elif not request.has_header(HTTP_HEADER.CONTENT_LENGTH):
                 request.add_unredirected_header(HTTP_HEADER.CONTENT_LENGTH, "%d" % len(data))
 
         sel_host = host
@@ -38,4 +46,4 @@ class ChunkedHandler(_urllib.request.HTTPHandler):
                 request.add_unredirected_header(name, value)
         return request
 
-    http_request = _http_request
+    http_request = https_request = _http_request

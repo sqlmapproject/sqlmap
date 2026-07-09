@@ -116,6 +116,7 @@ class FORK(object):
     DM8 = "DM8"
     DORIS = "Doris"
     STARROCKS = "StarRocks"
+    TRINO = "Trino"
 
 class CUSTOM_LOGGING(object):
     PAYLOAD = 9
@@ -181,6 +182,8 @@ class HASH(object):
     MYSQL = r'(?i)\A\*[0-9a-f]{40}\Z'
     MYSQL_OLD = r'(?i)\A(?![0-9]+\Z)[0-9a-f]{16}\Z'
     POSTGRES = r'(?i)\Amd5[0-9a-f]{32}\Z'
+    POSTGRES_SCRAM = r'\ASCRAM-SHA-256\$\d+:[A-Za-z0-9+/]+={0,2}\$[A-Za-z0-9+/]+={0,2}:[A-Za-z0-9+/]+={0,2}\Z'
+    MYSQL_SHA2 = r'\A\$mysql\$A\$[0-9A-Fa-f]{3}\*[0-9A-Fa-f]{40}\*[0-9A-Fa-f]{86}\Z'
     MSSQL = r'(?i)\A0x0100[0-9a-f]{8}[0-9a-f]{40}\Z'
     MSSQL_OLD = r'(?i)\A0x0100[0-9a-f]{8}[0-9a-f]{80}\Z'
     MSSQL_NEW = r'(?i)\A0x0200[0-9a-f]{8}[0-9a-f]{128}\Z'
@@ -193,6 +196,8 @@ class HASH(object):
     SHA384_GENERIC = r'(?i)\A[0-9a-f]{96}\Z'
     SHA512_GENERIC = r'(?i)\A(0x)?[0-9a-f]{128}\Z'
     CRYPT_GENERIC = r'\A(?!\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\Z)(?![0-9]+\Z)[./0-9A-Za-z]{13}\Z'
+    SHA256_UNIX_CRYPT = r'\A\$5\$(?:rounds=\d+\$)?[./0-9A-Za-z]{1,16}\$[./0-9A-Za-z]{43}\Z'
+    SHA512_UNIX_CRYPT = r'\A\$6\$(?:rounds=\d+\$)?[./0-9A-Za-z]{1,16}\$[./0-9A-Za-z]{86}\Z'
     JOOMLA = r'\A[0-9a-f]{32}:\w{32}\Z'
     PHPASS = r'\A\$[PHQS]\$[./0-9a-zA-Z]{31}\Z'
     APACHE_MD5_CRYPT = r'\A\$apr1\$.{1,8}\$[./a-zA-Z0-9]+\Z'
@@ -206,6 +211,13 @@ class HASH(object):
     SSHA512 = r'\A\{SSHA512\}[a-zA-Z0-9+/]+={0,2}\Z'
     DJANGO_MD5 = r'\Amd5\$[^$]*\$[0-9a-f]{32}\Z'
     DJANGO_SHA1 = r'\Asha1\$[^$]*\$[0-9a-f]{40}\Z'
+    DJANGO_PBKDF2_SHA256 = r'\Apbkdf2_sha256\$\d+\$[^$]+\$[A-Za-z0-9+/]+={0,2}\Z'
+    WERKZEUG_PBKDF2 = r'\Apbkdf2:(?:sha1|sha256|sha512):\d+\$[^$]+\$[0-9a-f]+\Z'
+    WERKZEUG_SCRYPT = r'\Ascrypt:\d+:\d+:\d+\$[^$]+\$[0-9a-f]+\Z'
+    BCRYPT = r'\A\$2[abxy]\$\d{2}\$[./A-Za-z0-9]{53}\Z'
+    WORDPRESS_BCRYPT = r'\A\$wp\$2[abxy]\$\d{2}\$[./A-Za-z0-9]{53}\Z'
+    ARGON2 = r'\A\$argon2(?:id|i|d)\$v=\d+\$m=\d+,t=\d+,p=\d+\$[A-Za-z0-9+/]+={0,2}\$[A-Za-z0-9+/]+={0,2}\Z'
+    ASPNET_IDENTITY = r'\AAQAAAA[A-Za-z0-9+/]{76}==\Z'
     MD5_BASE64 = r'\A[a-zA-Z0-9+/]{22}==\Z'
     SHA1_BASE64 = r'\A[a-zA-Z0-9+/]{27}=\Z'
     SHA256_BASE64 = r'\A[a-zA-Z0-9+/]{43}=\Z'
@@ -240,6 +252,7 @@ class DUMP_FORMAT(object):
     CSV = "CSV"
     HTML = "HTML"
     SQLITE = "SQLITE"
+    JSONL = "JSONL"
 
 class HTTP_HEADER(object):
     ACCEPT = "Accept"
@@ -289,6 +302,7 @@ class HASHDB_KEYS(object):
     DBMS = "DBMS"
     DBMS_FORK = "DBMS_FORK"
     CHECK_WAF_RESULT = "CHECK_WAF_RESULT"
+    CHECK_WAF_BYPASS = "CHECK_WAF_BYPASS"
     CHECK_NULL_CONNECTION_RESULT = "CHECK_NULL_CONNECTION_RESULT"
     CONF_TMP_PATH = "CONF_TMP_PATH"
     KB_ABS_FILE_PATHS = "KB_ABS_FILE_PATHS"
@@ -408,6 +422,7 @@ class CONTENT_TYPE(object):
     OS_CMD = 24
     REG_READ = 25
     STATEMENTS = 26
+    PROCEDURES = 27
 
 class CONTENT_STATUS(object):
     IN_PROGRESS = 0

@@ -22,7 +22,6 @@ from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import HTTP_HEADER
 from lib.core.enums import REDIRECTION
 from lib.core.exception import SqlmapBaseException
-from lib.core.exception import SqlmapConnectionException
 from lib.core.settings import BING_REGEX
 from lib.core.settings import DUCKDUCKGO_REGEX
 from lib.core.settings import DUMMY_SEARCH_USER_AGENT

@@ -23,8 +23,11 @@ class Replication(object):
     """
 
     def __init__(self, dbpath):
+        self.dbpath = dbpath
+        self.connection = None
+        self.cursor = None
+
         try:
-            self.dbpath = dbpath
             self.connection = sqlite3.connect(dbpath)
             self.connection.isolation_level = None
             self.cursor = self.connection.cursor()
@@ -120,8 +123,17 @@ class Replication(object):
         return Replication.Table(parent=self, name=tblname, columns=columns, typeless=typeless)
 
     def __del__(self):
-        self.cursor.close()
-        self.connection.close()
+        try:
+            if self.cursor is not None:
+                self.cursor.close()
+        except Exception:
+            pass
+
+        try:
+            if self.connection is not None:
+                self.connection.close()
+        except Exception:
+            pass
 
     # sqlite data types
     NULL = DataType('NULL')

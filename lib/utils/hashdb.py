@@ -16,6 +16,7 @@ from lib.core.common import getSafeExString
 from lib.core.common import serializeObject
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import unserializeObject
+from lib.core.compat import RecursionError
 from lib.core.compat import xrange
 from lib.core.convert import getBytes
 from lib.core.convert import getUnicode
@@ -164,8 +165,9 @@ class HashDB(object):
             self._write_cache = {}
             self._last_flush_time = time.time()
 
+        began = False
         try:
-            self.beginTransaction()
+            began = self.beginTransaction()
             for hash_, value in flush_cache.items():
                 retries = 0
                 while True:
@@ -196,23 +198,30 @@ class HashDB(object):
                     else:
                         break
         finally:
-            self.endTransaction()
+            # Only close a transaction we actually opened; when flush() runs nested inside an
+            # outer batch (e.g. lib/utils/hash.py wrapping cracked-password writes) beginTransaction()
+            # returns False and the outer owner keeps ownership - ending it here would commit it early
+            if began:
+                self.endTransaction()
 
     def beginTransaction(self):
         threadData = getCurrentThreadData()
-        if not threadData.inTransaction:
+        if threadData.inTransaction:
+            return False  # already inside an (outer) transaction; do not nest
+
+        try:
+            self.cursor.execute("BEGIN TRANSACTION")
+        except Exception:  # Note: deliberately not bare - a KeyboardInterrupt here must propagate
             try:
-                self.cursor.execute("BEGIN TRANSACTION")
-            except:
-                try:
-                    # Reference: http://stackoverflow.com/a/25245731
-                    self.cursor.close()
-                except sqlite3.ProgrammingError:
-                    pass
-                threadData.hashDBCursor = None
-                self.cursor.execute("BEGIN TRANSACTION")
-            finally:
-                threadData.inTransaction = True
+                # Reference: http://stackoverflow.com/a/25245731
+                self.cursor.close()
+            except sqlite3.ProgrammingError:
+                pass
+            threadData.hashDBCursor = None
+            self.cursor.execute("BEGIN TRANSACTION")
+
+        threadData.inTransaction = True  # set only on a genuine BEGIN (not if the retry above raised)
+        return True
 
     def endTransaction(self):
         threadData = getCurrentThreadData()

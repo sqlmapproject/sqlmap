@@ -6,7 +6,6 @@ See the file 'LICENSE' for copying permission
 """
 
 import codecs
-import collections
 import difflib
 import inspect
 import logging
@@ -71,7 +70,8 @@ def dirtyPatches():
 
     # add support for inet_pton() on Windows OS
     if IS_WIN:
-        from thirdparty.wininetpton import win_inet_pton
+        from thirdparty.wininetpton.win_inet_pton import inject_into_socket
+        inject_into_socket()
 
     # Reference: https://github.com/nodejs/node/issues/12786#issuecomment-298652440
     codecs.register(lambda name: codecs.lookup("utf-8") if name == "cp65001" else None)
@@ -177,45 +177,6 @@ def dirtyPatches():
 
         et.parse = _safe_parse
         et._patched = True
-
-    import io
-    import pickle
-    if not getattr(pickle, "_patched", False):
-        class RestrictedUnpickler(pickle.Unpickler):
-            def find_class(self, module, name):
-                # blacklist for OS-level execution modules
-                if module in ("os", "subprocess", "sys", "posix", "nt", "pty", "commands", "shutil"):
-                    raise ValueError("unpickling of module '%s' is forbidden" % module)
-
-                # partial whitelist for builtins to allow safe data types but block eval/exec/__import__
-                if module in ("builtins", "__builtin__") and name not in ("set", "frozenset", "dict", "list", "tuple", "int", "float", "bool", "str", "bytes", "bytearray", "object", "NoneType"):
-                    raise ValueError("unpickling of '%s.%s' is forbidden" % (module, name))
-
-                # Python 2/3 method resolution
-                if hasattr(pickle.Unpickler, "find_class"):
-                    return pickle.Unpickler.find_class(self, module, name)
-
-                __import__(module)
-                return getattr(sys.modules[module], name)
-
-        def _safe_loads(data):
-            try:
-                stream = io.BytesIO(data)
-            except TypeError:
-                stream = io.StringIO(data)
-
-            return RestrictedUnpickler(stream).load()
-
-        pickle.loads = _safe_loads
-        pickle._patched = True
-
-    try:
-        import cPickle
-        if not getattr(cPickle, "_patched", False):
-            cPickle.loads = pickle.loads
-            cPickle._patched = True
-    except ImportError:
-        pass
 
     try:
         import builtins

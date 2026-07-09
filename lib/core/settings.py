@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.6.95"
+VERSION = "1.10.7.59"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -53,6 +53,38 @@ IPS_WAF_CHECK_RATIO = 0.5
 
 # Timeout used in heuristic check for WAF/IPS protected targets
 IPS_WAF_CHECK_TIMEOUT = 10
+
+# HTTP status codes a WAF/IPS typically returns when it blocks a request. Used to reject a boolean
+# "injection" whose only TRUE/FALSE difference is the always-true payload being blocked (a status-code
+# false positive) rather than the back-end actually answering.
+WAF_BLOCK_HTTP_CODES = (403, 406, 429, 451, 501, 503)
+
+# Candidate tamper scripts for automatic WAF-bypass, ordered by empirical WAF-bypass value
+# (structural token-substitution first, camouflage last; per identYwaf data). The back-end DBMS
+# is not pre-filtered here: semantics-preservation is verified at runtime by re-running detection
+# through each candidate, so a DBMS-incompatible script simply fails the trial and is discarded.
+WAF_BYPASS_TAMPERS = (
+    "equaltolike",
+    "between",
+    "greatest",
+    "charencode",
+    "randomcase",
+    "space2comment",
+    "versionedkeywords",
+    "space2hash",
+)
+
+# Maximum number of candidate tamper (chains) trialled during automatic WAF-bypass
+WAF_BYPASS_MAX_TRIALS = 8
+
+# Browser-like request headers applied alongside the random (non-scanner) User-Agent during
+# automatic WAF bypass: sqlmap's defaults ('Accept: */*', no 'Accept-Language') are themselves a
+# non-browser tell that header/behavioral WAFs key on, so the whole request fingerprint - not just
+# the UA - is made to look like a real browser. Kept standard so it cannot skew content negotiation.
+WAF_BYPASS_HTTP_HEADERS = (
+    ("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"),
+    ("Accept-Language", "en-US,en;q=0.5"),
+)
 
 # Timeout used in checking for existence of live-cookies file
 LIVE_COOKIES_TIMEOUT = 120
@@ -109,6 +141,9 @@ FUZZ_UNION_ERROR_REGEX = r"(?i)data\s?type|mismatch|comparable|compatible|conver
 # Upper threshold for starting the fuzz(y) UNION test
 FUZZ_UNION_MAX_COLUMNS = 10
 
+# Maximum number of probe requests the fuzz(y) UNION test may issue (bounds its otherwise exponential type-combination search when run automatically)
+FUZZ_UNION_MAX_REQUESTS = 80
+
 # Regular expression used for recognition of generic maximum connection messages
 MAX_CONNECTIONS_REGEX = r"\bmax.{1,100}\bconnection"
 
@@ -147,6 +182,29 @@ DUMMY_SEARCH_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:141.0) Gecko/20100
 
 # Regular expression used for extracting content from "textual" tags
 TEXT_TAG_REGEX = r"(?si)<(abbr|acronym|b|blockquote|br|center|cite|code|dt|em|font|h[1-6]|i|li|p|pre|q|strong|sub|sup|td|th|title|tt|u)(?!\w).*?>(?P<result>[^<]+)"
+
+# Regular expressions used for extracting a value-free structural skeleton of a (HTML) page (tag
+# names and class/id attribute hooks), for structure-aware comparison of pages whose textual
+# content is dynamic but whose layout is stable
+STRUCTURAL_TAG_REGEX = r"(?si)<\s*([a-z][a-z0-9]*)((?:\s+[^<>]*)?)/?>"
+STRUCTURAL_CLASS_REGEX = r"""(?si)\bclass\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'<>]+))"""
+STRUCTURAL_ID_REGEX = r"""(?si)\bid\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'<>]+))"""
+
+# Minimum response size (in bytes) for the 'skip-read' NULL connection method to be used. Unlike
+# HEAD/Range, 'skip-read' leaves the body unread and must therefore close the connection (an unread
+# body cannot be reused), paying a fresh TCP/TLS handshake per request. That only pays off when
+# avoiding the body transfer outweighs the reconnect - i.e. for large responses; for small ones it
+# is a net slowdown, so it is gated by this size
+NULL_CONNECTION_SKIP_READ_MIN_LENGTH = 256 * 1024
+
+# Coarse plausibility band for a NULL connection method's reported length, relative to the known
+# original page length (len(kb.originalPage)). A method is accepted only if its length falls within
+# it; this rejects a method whose length does not track the real GET response (e.g. HEAD returning
+# 'Content-Length: 0', HEAD served from a different code path, or sneaked-in compression). The band
+# is deliberately generous (byte-vs-character size and moderate page dynamism are expected, and a
+# false reject merely forgoes the optimization, which is safe) - it only catches gross mismatches
+NULL_CONNECTION_LENGTH_TOLERANCE_LOW = 0.5
+NULL_CONNECTION_LENGTH_TOLERANCE_HIGH = 4.0
 
 # Regular expression used for recognition of IP addresses
 IP_ADDRESS_REGEX = r"\b(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\b"
@@ -191,8 +249,14 @@ THREAD_FINALIZATION_TIMEOUT = 1
 # Maximum number of techniques used in inject.py/getValue() per one value
 MAX_TECHNIQUES_PER_VALUE = 2
 
+# Fraction of the currently displayed progress-bar ETA kept when a fresh estimate arrives (eases the on-screen countdown toward the new value instead of snapping); 0 disables smoothing, higher is smoother but laggier
+ETA_DISPLAY_SMOOTHING = 0.5
+
 # In case of missing piece of partial union dump, buffered array must be flushed after certain size
 MAX_BUFFERED_PARTIAL_UNION_LENGTH = 1024
+
+# Initial number of rows aggregated per request when a full (single-shot) JSON-agg UNION dump is too large and falls back to chunked windowed aggregation (halved adaptively if a chunk response still gets truncated)
+JSON_AGG_CHUNK_ROWS = 1000
 
 # Maximum size of cache used in @cachedmethod decorator
 MAX_CACHE_ITEMS = 1024
@@ -279,7 +343,7 @@ FIREBIRD_SYSTEM_DBS = ("RDB$BACKUP_HISTORY", "RDB$CHARACTER_SETS", "RDB$CHECK_CO
 MAXDB_SYSTEM_DBS = ("SYSINFO", "DOMAIN")
 SYBASE_SYSTEM_DBS = ("master", "model", "sybsystemdb", "sybsystemprocs", "tempdb")
 DB2_SYSTEM_DBS = ("NULLID", "SQLJ", "SYSCAT", "SYSFUN", "SYSIBM", "SYSIBMADM", "SYSIBMINTERNAL", "SYSIBMTS", "SYSPROC", "SYSPUBLIC", "SYSSTAT", "SYSTOOLS", "SYSDEBUG", "SYSINST")
-HSQLDB_SYSTEM_DBS = ("INFORMATION_SCHEMA", "SYSTEM_LOB")
+HSQLDB_SYSTEM_DBS = ("INFORMATION_SCHEMA", "SYSTEM_LOBS")
 H2_SYSTEM_DBS = ("INFORMATION_SCHEMA",) + ("IGNITE", "ignite-sys-cache")
 INFORMIX_SYSTEM_DBS = ("sysmaster", "sysutils", "sysuser", "sysadmin")
 MONETDB_SYSTEM_DBS = ("tmp", "json", "profiler")
@@ -336,7 +400,7 @@ HANA_ALIASES = ("hana", "sap hana", "saphana", "hdb")
 
 DBMS_DIRECTORY_DICT = dict((getattr(DBMS, _), getattr(DBMS_DIRECTORY_NAME, _)) for _ in dir(DBMS) if not _.startswith("_"))
 
-SUPPORTED_DBMS = set(MSSQL_ALIASES + MYSQL_ALIASES + PGSQL_ALIASES + ORACLE_ALIASES + SQLITE_ALIASES + ACCESS_ALIASES + FIREBIRD_ALIASES + MAXDB_ALIASES + SYBASE_ALIASES + DB2_ALIASES + HSQLDB_ALIASES + H2_ALIASES + INFORMIX_ALIASES + MONETDB_ALIASES + DERBY_ALIASES + VERTICA_ALIASES + MCKOI_ALIASES + PRESTO_ALIASES + ALTIBASE_ALIASES + MIMERSQL_ALIASES + CLICKHOUSE_ALIASES + CRATEDB_ALIASES + CUBRID_ALIASES + CACHE_ALIASES + EXTREMEDB_ALIASES + RAIMA_ALIASES + VIRTUOSO_ALIASES + SNOWFLAKE_ALIASES + SPANNER_ALIASES + HANA_ALIASES)
+SUPPORTED_DBMS = set(MSSQL_ALIASES + MYSQL_ALIASES + PGSQL_ALIASES + ORACLE_ALIASES + SQLITE_ALIASES + ACCESS_ALIASES + FIREBIRD_ALIASES + MAXDB_ALIASES + SYBASE_ALIASES + DB2_ALIASES + HSQLDB_ALIASES + H2_ALIASES + INFORMIX_ALIASES + MONETDB_ALIASES + DERBY_ALIASES + VERTICA_ALIASES + MCKOI_ALIASES + PRESTO_ALIASES + ALTIBASE_ALIASES + MIMERSQL_ALIASES + CLICKHOUSE_ALIASES + CRATEDB_ALIASES + CUBRID_ALIASES + CACHE_ALIASES + EXTREMEDB_ALIASES + FRONTBASE_ALIASES + RAIMA_ALIASES + VIRTUOSO_ALIASES + SNOWFLAKE_ALIASES + SPANNER_ALIASES + HANA_ALIASES)
 SUPPORTED_OS = ("linux", "windows")
 
 DBMS_ALIASES = ((DBMS.MSSQL, MSSQL_ALIASES), (DBMS.MYSQL, MYSQL_ALIASES), (DBMS.PGSQL, PGSQL_ALIASES), (DBMS.ORACLE, ORACLE_ALIASES), (DBMS.SQLITE, SQLITE_ALIASES), (DBMS.ACCESS, ACCESS_ALIASES), (DBMS.FIREBIRD, FIREBIRD_ALIASES), (DBMS.MAXDB, MAXDB_ALIASES), (DBMS.SYBASE, SYBASE_ALIASES), (DBMS.DB2, DB2_ALIASES), (DBMS.HSQLDB, HSQLDB_ALIASES), (DBMS.H2, H2_ALIASES), (DBMS.INFORMIX, INFORMIX_ALIASES), (DBMS.MONETDB, MONETDB_ALIASES), (DBMS.DERBY, DERBY_ALIASES), (DBMS.VERTICA, VERTICA_ALIASES), (DBMS.MCKOI, MCKOI_ALIASES), (DBMS.PRESTO, PRESTO_ALIASES), (DBMS.ALTIBASE, ALTIBASE_ALIASES), (DBMS.MIMERSQL, MIMERSQL_ALIASES), (DBMS.CLICKHOUSE, CLICKHOUSE_ALIASES), (DBMS.CRATEDB, CRATEDB_ALIASES), (DBMS.CUBRID, CUBRID_ALIASES), (DBMS.CACHE, CACHE_ALIASES), (DBMS.EXTREMEDB, EXTREMEDB_ALIASES), (DBMS.FRONTBASE, FRONTBASE_ALIASES), (DBMS.RAIMA, RAIMA_ALIASES), (DBMS.VIRTUOSO, VIRTUOSO_ALIASES), (DBMS.SNOWFLAKE, SNOWFLAKE_ALIASES), (DBMS.SPANNER, SPANNER_ALIASES), (DBMS.HANA, HANA_ALIASES))
@@ -433,7 +497,8 @@ ERROR_PARSING_REGEXES = (
     r"error '[0-9a-f]{8}'((<[^>]+>)|\s)+(?P<result>[^<>]+)",
     r"\[[^\n\]]{1,100}(ODBC|JDBC)[^\n\]]+\](\[[^\]]+\])?(?P<result>[^\n]+(in query expression|\(SQL| at /[^ ]+pdo)[^\n<]+)",
     r"(?P<result>query error: SELECT[^<>]+)",
-    r"(?P<result>(?:(?:ORA|PLS)-[0-9]{5}:|SQLCODE[ =:]+-?[0-9]+|SQLSTATE[ =:]+[0-9A-Z]{5}|Dynamic SQL Error|DB2 SQL error:|SAP DBTech JDBC:|SQLiteException:|You have an error in your SQL syntax;|Incorrect syntax near |Unclosed quotation mark after the character string|near \"[^\"]+\": syntax error)[^\n<]*)"
+    r"(?P<result>(?:(?:ORA|PLS)-[0-9]{5}:|SQLCODE[ =:]+-?[0-9]+|SQLSTATE[ =:]+[0-9A-Z]{5}|Dynamic SQL Error|DB2 SQL error:|SAP DBTech JDBC:|SQLiteException:|You have an error in your SQL syntax;|Incorrect syntax near |Unclosed quotation mark after the character string|near \"[^\"]+\": syntax error)[^\n<]*)",
+    r'"(?:errmsg|errorMessage|reason|msg)"\s*:\s*"(?P<result>[^"]+)"'      # generic JSON error-message field (NoSQL document/REST back-ends)
 )
 
 # Regular expression used for parsing charset info from meta html headers
@@ -480,6 +545,74 @@ SENSITIVE_OPTIONS = ("hostname", "answers", "data", "dnsDomain", "googleDork", "
 
 # Maximum number of threads (avoiding connection issues and/or DoS)
 MAX_NUMBER_OF_THREADS = 10
+
+# Wrapper applied to MySQL UNION-based retrieval values to neutralize "Illegal mix of collations" errors (e.g. utf8mb4_0900_ai_ci tables vs a utf8mb4_general_ci connection on MySQL 8+). CONVERT normalizes the (possibly binary) charset to utf8mb4 and the explicit COLLATE then wins the UNION column merge (highest coercibility)
+MYSQL_UNION_VALUE_CAST = "CONVERT(%s USING utf8mb4) COLLATE utf8mb4_bin"
+
+# Row count at/above which keyset (seek) pagination is used automatically for table dumps when a usable integer-key cursor exists (smaller tables keep the plain LIMIT/OFFSET path; '--keyset' forces it regardless of size)
+KEYSET_MIN_ROWS = 1000
+
+# Number of consecutive Huffman (set-membership) character attempts allowed to decline/escape without a single validated success before the technique latches itself off (safety against trimmed/blocked long IN() payloads)
+HUFFMAN_PROBE_LIMIT = 8
+
+# Cold-start (prior) weights for the order-0 Huffman model used in adaptive blind retrieval. Gently
+# biases the initial tree toward bytes that dominate real DBMS output (lowercase text, digits, common
+# identifier punctuation) so SHORT extractions don't pay the full balanced-tree depth before the online
+# frequency model warms up. Magnitude is small so genuine learned counts overtake it within a few dozen
+# characters (kept low-risk for uniform/hex columns: hex digits 0-9a-f are themselves favored here).
+HUFFMAN_PRIOR_WEIGHTS = {}
+for _weight, _chars in ((6, " etaoinsrhldcumfgypwbvkxjqz"), (4, "0123456789"), (3, "_.-/@:,'")):
+    for _char in _chars:
+        HUFFMAN_PRIOR_WEIGHTS[ord(_char)] = _weight
+
+# Enumeration contexts (kb.partRun) for which predictive inference is active by default: the identifier
+# names retrieved here are drawn from a known, skewed distribution captured by the common-tables/
+# common-columns wordlists, so whole-value prediction / charset reordering pays off. Deliberately NOT
+# applied to arbitrary dumped data (unknown distribution) or one-shot values (banner, current-user).
+NAME_PREDICTION_CONTEXTS = ("Tables", "Columns")
+
+# Order of the character-level Markov model used to seed the Huffman set-membership tree during blind
+# name enumeration: warmed from the shipped identifier corpus so it predicts a name from the first
+# character (identifiers are short, structured and low-entropy). CATALOG_IDENTIFIERS_PRIOR_PEAK is the
+# weight the corpus prior is scaled to (higher -> the predicted next character sits nearer the tree
+# root -> closer to one request per character). Data dumps keep the classic order-0 adaptive model.
+NAME_MARKOV_ORDER = 3
+CATALOG_IDENTIFIERS_PRIOR_PEAK = 20
+
+# Maximum number of distinct values a dumped column may show before it is treated as high-cardinality
+# and whole-value guessing is abandoned for it. At or below this, each new cell is first confirmed by
+# equality against the values already seen for that column (one request on a hit) before per-character
+# extraction. Self-verifying, so it never returns a wrong value; the bound keeps misses cheap.
+LOW_CARDINALITY_THRESHOLD = 32
+
+# Oracle-reliability litmus: during bulk blind extraction (dumps / name enumeration) a known-answer
+# differential is fired every this-many extracted values - one probe that MUST be TRUE (the value we just
+# read equals itself) and one that MUST be FALSE (it equals a deliberately corrupted copy). A healthy
+# oracle always answers T/F; an always-true channel (WAF/200-for-everything, reads-everything-true) or a
+# flaky/degraded one (timing jitter, lease near end-of-life) trips it - converting SILENT data corruption
+# into a one-time "results may be unreliable" warning. The first value is always checked (catch it before
+# a whole garbage dump), then every Nth. Cheap and amortized; set to 0 to disable.
+ORACLE_LITMUS_CHECK_EVERY = 25
+
+# Whole-value guessing only starts once some value has repeated (proof the column is low-cardinality), so
+# an all-unique column - primary key, hash, free text - never wastes a probe. Once armed, at most this
+# many candidates (most-frequent first) are tried per cell, so even a column that trips the threshold with
+# many near-unique values can only ever waste a small, bounded number of probes before falling back.
+LOW_CARDINALITY_MAX_GUESSES = 8
+
+# Number of consecutive dumped rows a column's observed character set must stay unchanged before it is
+# trusted as closed and used to restrict the time-based bisection alphabet. A column whose alphabet keeps
+# growing (e.g. a monotonic primary key or high-entropy text) never reaches this, so it is never charged
+# the speculative restricted-search-then-escalate cost.
+DUMP_CHARSET_STABLE_ROWS = 3
+
+# Bounds for feeding extracted values back into the predictive-inference pool for their enumeration
+# context, so later same-context items that share structure (e.g. wp_posts / wp_users / wp_options ...)
+# are predicted faster. MAX_LENGTH keeps large data cells from bloating/polluting the pool (identifiers
+# are short); MAX_ITEMS bounds per-context growth so a huge enumeration cannot make the per-character
+# prediction scan costly. Only fed single-threaded (never mutated under value-parallel enumeration).
+PREDICTION_FEEDBACK_MAX_LENGTH = 128
+PREDICTION_FEEDBACK_MAX_ITEMS = 10000
 
 # Minimum range between minimum and maximum of statistical set
 MIN_STATISTICAL_RANGE = 0.01
@@ -626,10 +759,13 @@ DUMMY_SQL_INJECTION_CHARS = ";()'"
 DUMMY_USER_INJECTION = r"(?i)[^\w](AND|OR)\s+[^\s]+[=><]|\bUNION\b.+\bSELECT\b|\bSELECT\b.+\bFROM\b|\b(CONCAT|information_schema|SLEEP|DELAY|FLOOR\(RAND)\b"
 
 # Extensions skipped by crawler
-CRAWL_EXCLUDE_EXTENSIONS = frozenset(("3ds", "3g2", "3gp", "7z", "DS_Store", "a", "aac", "accdb", "access", "adp", "ai", "aif", "aiff", "apk", "ar", "asf", "au", "avi", "bak", "bin", "bk", "bkp", "bmp", "btif", "bz2", "c", "cab", "caf", "cfg", "cgm", "cmx", "com", "conf", "config", "cpio", "cpp", "cr2", "cue", "dat", "db", "dbf", "deb", "debug", "djvu", "dll", "dmg", "dmp", "dng", "doc", "docx", "dot", "dotx", "dra", "dsk", "dts", "dtshd", "dvb", "dwg", "dxf", "dylib", "ear", "ecelp4800", "ecelp7470", "ecelp9600", "egg", "elf", "env", "eol", "eot", "epub", "error", "exe", "f4v", "fbs", "fh", "fla", "flac", "fli", "flv", "fpx", "fst", "fvt", "g3", "gif", "go", "gz", "h", "h261", "h263", "h264", "ico", "ief", "img", "ini", "ipa", "iso", "jar", "java", "jpeg", "jpg", "jpgv", "jpm", "js", "jxr", "ktx", "lock", "log", "lvp", "lz", "lzma", "lzo", "m3u", "m4a", "m4v", "mar", "mdb", "mdi", "mid", "mj2", "mka", "mkv", "mmr", "mng", "mov", "movie", "mp3", "mp4", "mp4a", "mpeg", "mpg", "mpga", "msi", "mxu", "nef", "npx", "nrg", "o", "oga", "ogg", "ogv", "old", "otf", "ova", "ovf", "pbm", "pcx", "pdf", "pea", "pgm", "php", "pic", "pid", "pkg", "png", "pnm", "ppm", "pps", "ppt", "pptx", "ps", "psd", "py", "pya", "pyc", "pyo", "pyv", "qt", "rar", "ras", "raw", "rb", "rgb", "rip", "rlc", "rs", "run", "rz", "s3m", "s7z", "scm", "scpt", "service", "sgi", "shar", "sil", "smv", "so", "sock", "socket", "sqlite", "sqlitedb", "sub", "svc", "swf", "swo", "swp", "sys", "tar", "tbz2", "temp", "tga", "tgz", "tif", "tiff", "tlz", "tmp", "toast", "torrent", "ts", "ttf", "uvh", "uvi", "uvm", "uvp", "uvs", "uvu", "vbox", "vdi", "vhd", "vhdx", "viv", "vmdk", "vmx", "vob", "vxd", "war", "wav", "wax", "wbmp", "wdp", "weba", "webm", "webp", "whl", "wm", "wma", "wmv", "wmx", "woff", "woff2", "wvx", "xbm", "xif", "xls", "xlsx", "xlt", "xm", "xpi", "xpm", "xwd", "xz", "yaml", "yml", "z", "zip", "zipx"))
+CRAWL_EXCLUDE_EXTENSIONS = frozenset(("3ds", "3g2", "3gp", "7z", "DS_Store", "a", "aac", "accdb", "access", "adp", "ai", "aif", "aiff", "apk", "ar", "asf", "au", "avi", "bak", "bin", "bk", "bkp", "bmp", "btif", "bz2", "c", "cab", "caf", "cfg", "cgm", "cmx", "com", "conf", "config", "cpio", "cpp", "cr2", "cue", "dat", "db", "dbf", "deb", "debug", "djvu", "dll", "dmg", "dmp", "dng", "doc", "docx", "dot", "dotx", "dra", "dsk", "dts", "dtshd", "dvb", "dwg", "dxf", "dylib", "ear", "ecelp4800", "ecelp7470", "ecelp9600", "egg", "elf", "env", "eol", "eot", "epub", "error", "exe", "f4v", "fbs", "fh", "fla", "flac", "fli", "flv", "fpx", "fst", "fvt", "g3", "gif", "go", "gz", "h", "h261", "h263", "h264", "ico", "ief", "img", "ini", "ipa", "iso", "jar", "java", "jpeg", "jpg", "jpgv", "jpm", "js", "jxr", "ktx", "lock", "log", "lvp", "lz", "lzma", "lzo", "m3u", "m4a", "m4v", "mar", "mdb", "mdi", "mid", "mj2", "mka", "mkv", "mmr", "mng", "mov", "movie", "mp3", "mp4", "mp4a", "mpeg", "mpg", "mpga", "msi", "mxu", "nef", "npx", "nrg", "o", "oga", "ogg", "ogv", "old", "otf", "ova", "ovf", "pbm", "pcx", "pdf", "pea", "pgm", "pic", "pid", "pkg", "png", "pnm", "ppm", "pps", "ppt", "pptx", "ps", "psd", "py", "pya", "pyc", "pyo", "pyv", "qt", "rar", "ras", "raw", "rb", "rgb", "rip", "rlc", "rs", "run", "rz", "s3m", "s7z", "scm", "scpt", "service", "sgi", "shar", "sil", "smv", "so", "sock", "socket", "sqlite", "sqlitedb", "sub", "svc", "swf", "swo", "swp", "sys", "tar", "tbz2", "temp", "tga", "tgz", "tif", "tiff", "tlz", "tmp", "toast", "torrent", "ts", "ttf", "uvh", "uvi", "uvm", "uvp", "uvs", "uvu", "vbox", "vdi", "vhd", "vhdx", "viv", "vmdk", "vmx", "vob", "vxd", "war", "wav", "wax", "wbmp", "wdp", "weba", "webm", "webp", "whl", "wm", "wma", "wmv", "wmx", "woff", "woff2", "wvx", "xbm", "xif", "xls", "xlsx", "xlt", "xm", "xpi", "xpm", "xwd", "xz", "yaml", "yml", "z", "zip", "zipx"))
 
 # Patterns often seen in HTTP headers containing custom injection marking character '*'
-PROBLEMATIC_CUSTOM_INJECTION_PATTERNS = r"(;q=[^;']+)|(\*/\*)"
+# Note: the ';q=' quality-value class excludes '*' so a user-placed injection mark right after a
+# quality value (e.g. 'Accept: ...;q=0.9*') is not swallowed (ref: #5357 - header injection was then
+# missed on a GET lacking a Content-Length header, which is otherwise what forces params detection)
+PROBLEMATIC_CUSTOM_INJECTION_PATTERNS = r"(;q=[^;'*]+)|(\*/\*)"
 
 # Template used for common table existence check
 BRUTE_TABLE_EXISTS_TEMPLATE = "EXISTS(SELECT %d FROM %s)"
@@ -683,6 +819,9 @@ TRIM_STDOUT_DUMP_SIZE = 256
 # Reference: https://web.archive.org/web/20150407141500/https://support.microsoft.com/en-us/kb/899149
 DUMP_FILE_BUFFER_SIZE = 1024
 
+# Block size used for the in-place secure-overwrite passes of '--purge' (bounds peak memory regardless of file size)
+PURGE_BLOCK_SIZE = 1024 * 1024
+
 # Parse response headers only first couple of times
 PARSE_HEADERS_LIMIT = 3
 
@@ -716,6 +855,9 @@ FORCE_COOKIE_EXPIRATION_TIME = "9999999999"
 # Restricted PAT token for automated crash reporting (last rotation: 2026-04-24)
 GITHUB_REPORT_PAT_TOKEN = "0EZh0n8npcacTH4oBcdKKWvfZLcdGWx0N5XFHD2xYaQDOkmI9LWaeDvZRZUMDz8l96RDH3+LVsbwGE5zUtaau0kld9VXG20fVbYES3ooFpNv+U9J5OTnaT2OlZcYzk4w5veT+GiHV5cuCngOJ6QgL1+qRpZDX1gzFecXbm2sNfQ2SGjT5McQe1mtxMTN7WsS1fQfPH+RhMUgbnwXJ5YG6EsBNZWOyk0C16QnekrVtuQpK0/ZVvU560uQhoMsP1/FBguBwJe"
 
+# Age (in days) past which a resumed session file is considered stale (triggers a one-time nudge)
+HASHDB_STALE_DAYS = 7
+
 # Flush HashDB threshold number of cached items
 HASHDB_FLUSH_THRESHOLD_ITEMS = 200
 
@@ -731,11 +873,8 @@ HASHDB_RETRIEVE_RETRIES = 3
 # Number of retries for unsuccessful HashDB end transaction attempts
 HASHDB_END_TRANSACTION_RETRIES = 3
 
-# Unique milestone value used for forced deprecation of old HashDB values (e.g. when changing hash/pickle mechanism)
-HASHDB_MILESTONE_VALUE = "GpqxbkWTfz"  # python -c 'import random, string; print "".join(random.sample(string.ascii_letters, 10))'
-
-# Pickle protocl used for storage of serialized data inside HashDB (https://docs.python.org/3/library/pickle.html#data-stream-format)
-PICKLE_PROTOCOL = 2
+# Unique milestone value used for forced deprecation of old HashDB values (e.g. when changing the hash/serialization mechanism)
+HASHDB_MILESTONE_VALUE = "MvKpZrBqTn"  # python -c 'import random, string; print "".join(random.sample(string.ascii_letters, 10))'
 
 # Warn user of possible delay due to large page dump in full UNION query injections
 LARGE_OUTPUT_THRESHOLD = 1024 ** 2
@@ -761,6 +900,11 @@ MAX_STABILITY_DELAY = 0.5
 # Reference: http://www.tcpipguide.com/free/t_DNSLabelsNamesandSyntaxRules.htm
 MAX_DNS_LABEL = 63
 
+# Maximum number of (most recent) DNS resolution requests retained by the DNS server (bounded so
+# that unrelated/stray traffic to the listening :53 socket cannot grow memory without limit; the
+# value is popped right after it is triggered, so only recent entries ever matter)
+MAX_DNS_REQUESTS = 1000
+
 # Alphabet used for prefix and suffix strings of name resolution requests in DNS technique (excluding hexadecimal chars for not mixing with inner content)
 DNS_BOUNDARIES_ALPHABET = re.sub(r"[a-fA-F]", "", string.ascii_letters)
 
@@ -771,10 +915,313 @@ HEURISTIC_CHECK_ALPHABET = ('"', '\'', ')', '(', ',', '.')
 BANNER = re.sub(r"\[.\]", lambda _: "[\033[01;41m%s\033[01;49m]" % random.sample(HEURISTIC_CHECK_ALPHABET, 1)[0], BANNER)
 
 # String used for dummy non-SQLi (e.g. XSS) heuristic checks of a tested parameter value
-DUMMY_NON_SQLI_CHECK_APPENDIX = "<'\">"
+DUMMY_NON_SQLI_CHECK_APPENDIX = "<'\">)"
 
 # Regular expression used for recognition of file inclusion errors
 FI_ERROR_REGEX = r"(?i)[^\n]{0,100}(no such file|failed (to )?open)[^\n]{0,100}"
+
+# Regular expressions (per back-end, anchored to actual error-message structure - not product names) used for heuristic recognition of NoSQL injection
+NOSQL_ERRORS = (
+    ("MongoDB", r"Mongo(?:Server|Parse|Network|Runtime|Bulk|WriteConcern)?Error\b|\bBSON(?:Type)?Error\b|\bMongooseError\b|CastError: Cast to|unknown (?:top.level )?operator: ?\$|\$(?:regex|where|expr|in|nin|ne|gt|lt|elemMatch) (?:has to be|is not allowed|must be|not supported|requires)|Regular expression is invalid"),
+    ("CouchDB", r'"error"\s*:\s*"(?:bad_request|query_parse_error|missing_named_query)"|invalid operator: ?\$'),
+    ("Elasticsearch", r'"type"\s*:\s*"[a-z_]*?(?:query_shard|x_content_parse|parsing|search_phase_execution|illegal_argument|too_many_clauses|number_format|script)_exception"|Failed to parse query \['),
+    ("Solr", r"org\.apache\.solr\.[\w.]*(?:SyntaxError|SolrException)"),
+    ("Neo4j", r"Neo\.(?:ClientError|DatabaseError|TransientError|ClientNotification)\.|\bNeo4jError\b|even number of non-escaped quotes|Failed to parse string literal|expected an expression|'(?:UNWIND|OPTIONAL|DETACH|FOREACH|MERGE|LOAD CSV)'"),
+    ("ArangoDB", r"\bArangoError\b|AQL: (?:syntax|parse) error"),
+    ("Cassandra", r"line \d+:\d+ (?:no viable alternative at input|(?:mismatched|extraneous) input '.*?' expecting)|org\.apache\.cassandra|com\.datastax|\bInvalid(?:Request|Query)Exception\b"),
+    ("Redis", r"\bWRONGTYPE\b|ERR Error (?:compiling|running) script|@user_script|\bReplyError\b"),
+    ("Memcached", r"CLIENT_ERROR bad|SERVER_ERROR object too large"),
+    ("InfluxDB", r"error parsing query|unable to parse '[^']*': found"),
+    ("HBase/Phoenix", r"org\.apache\.phoenix|PhoenixParserException|org\.apache\.hadoop\.hbase"),
+)
+NOSQL_ERROR_REGEX = "(?:%s)" % '|'.join(regex for _, regex in NOSQL_ERRORS)
+
+# Printable-ASCII codepoint bounds bisected (via regexp character-class ranges) during NoSQL blind extraction
+NOSQL_CHAR_MIN = 0x20
+NOSQL_CHAR_MAX = 0x7e
+
+# Maximum number of document fields enumerated during a NoSQL ($where server-side JavaScript) document dump
+NOSQL_MAX_FIELDS = 64
+
+# Maximum number of records walked during a NoSQL blind multi-record (ordered key paging) collection dump
+NOSQL_MAX_RECORDS = 100
+
+# Upper bound for the length search during NoSQL blind extraction
+NOSQL_MAX_LENGTH = 1024
+
+# GraphQL endpoint paths to probe when the user supplies a base URL with --graphql (no explicit /graphql)
+GRAPHQL_ENDPOINT_PATHS = ("/graphql", "/api/graphql", "/v1/graphql", "/api/v1/graphql", "/graphql/api", "/graphql/console", "/graphql.php", "/graphiql", "/graph", "/gql", "/query")
+
+# Seed field/argument names used to recover a GraphQL schema from "Did you mean" suggestion error
+# messages when introspection is disabled (the field-suggestion / "Clairvoyance" technique)
+GRAPHQL_FIELD_WORDLIST = ("user", "users", "me", "search", "login", "node", "post", "posts",
+    "account", "accounts", "profile", "product", "products", "order", "orders", "item", "items",
+    "customer", "find", "get", "list", "comment", "comments", "message", "messages", "updateUser")
+GRAPHQL_ARG_WORDLIST = ("id", "username", "user", "name", "term", "query", "q", "search",
+    "email", "input", "password", "key", "filter", "slug", "title", "uid")
+
+# Canonical GraphQL introspection query (the one everyone copy-pastes). Returned schema carries the
+# full type system: query/mutation/subscription roots, OBJECT/INPUT_OBJECT/ENUM/SCALAR types, their
+# fields/arguments/inputFields with type chains, directives, and deprecation metadata.
+GRAPHQL_INTROSPECTION_QUERY = """query IntrospectionForSqlmap {
+  __schema {
+    queryType { name }
+    mutationType { name }
+    subscriptionType { name }
+    directives { name args { name type { kind name ofType { kind name ofType { kind name } } } } }
+    types {
+      kind
+      name
+      fields(includeDeprecated: true) {
+        name
+        args {
+          name
+          defaultValue
+          type { kind name ofType { kind name ofType { kind name ofType { kind name } } } }
+        }
+        type { kind name ofType { kind name ofType { kind name } } }
+      }
+      inputFields {
+        name
+        defaultValue
+        type { kind name ofType { kind name ofType { kind name ofType { kind name } } } }
+      }
+      enumValues(includeDeprecated: true) { name }
+      specifiedByURL
+    }
+  }
+}"""
+
+# GraphQL error patterns that identify the response as originating from a GraphQL layer (parse,
+# validation, execution, or APQ errors). Used by the heuristic in checks.py and for error-based
+# detection inside the GraphQL engine.
+GRAPHQL_PARSE_ERRORS = (
+    r'"code"\s*:\s*"GRAPHQL_PARSE_FAILED"',
+    r"\bSyntax Error:\s*[^\"]",
+    r"\bExpected Name,\s*found\b",
+    r"\bUnexpected\s+<EOF>\b",
+)
+GRAPHQL_VALIDATION_ERRORS = (
+    r'"code"\s*:\s*"GRAPHQL_VALIDATION_FAILED"',
+    r"\bCannot query field\s+\"[^\"]+\"\s+on type\s+\"[^\"]+\"",
+    r"\bUnknown argument\s+\"[^\"]+\"\s+on field\s+\"[^\"]+\"",
+    r"\bField\s+\"[^\"]+\"\s+argument\s+\"[^\"]+\"\s+of type\s+\"[^\"]+\"\s+is required\b",
+    r"\bVariable\s+\"\$[^\"]+\"\s+got invalid value\b",
+    r"\bExpected type\s+[^,]+,\s*found\b",
+    r"\bDid you mean\s+\"[^\"]+\"\b",
+)
+GRAPHQL_APQ_ERRORS = (
+    r"\bPersistedQueryNotFound\b",
+    r"\bPersistedQueryNotSupported\b",
+)
+GRAPHQL_RUNTIME_ERRORS = (
+    r"\bGraphQL\s+(?:resolver\s+)?error\b",
+)
+GRAPHQL_ERROR_REGEX = "(?:%s)" % '|'.join(GRAPHQL_PARSE_ERRORS + GRAPHQL_VALIDATION_ERRORS + GRAPHQL_APQ_ERRORS + GRAPHQL_RUNTIME_ERRORS)
+
+# LDAP error signatures per back-end for error-based detection and fingerprinting (matched against
+# HTTP response bodies). Each tuple is (backend_name, regex_fragment).
+LDAP_ERROR_SIGNATURES = (
+    ("Microsoft Active Directory", r"AcceptSecurityContext error, data [0-9a-fA-F]+"),
+    ("Microsoft Active Directory", r"LdapErr: DSID-[0-9a-fA-F]+"),
+    ("Microsoft Active Directory", r"80090308:\s*LdapErr"),
+    ("OpenLDAP", r"(?:Bad search filter|ldap_search_ext:\s*Bad search filter)(?:\s*\(-7\))?"),
+    ("OpenLDAP", r"Invalid DN syntax(?:\s*\(34\))?"),
+    ("ApacheDS", r"javax\.naming\.(?:directory\.)?(?:Naming|Authentication|InvalidName|InvalidSearchFilter|OperationNotSupported)Exception"),
+    ("ApacheDS", r"org\.apache\.directory\.api\.ldap\.model\.exception\.Ldap(?:InvalidSearchFilter|InvalidDn|SchemaViolation)?Exception"),
+    ("ApacheDS", r"LDAPException=\d+\s+msg=ERR_\d+"),
+    ("Oracle Directory Server", r"(?:attribute syntax error:|ACL parsing error:|Oracle (?:Unified )?Directory)"),
+    ("389 Directory Server", r"(?:Filter Syntax Verification|389[- ]Directory(?:[ /]Server)?)"),
+    ("Java JNDI", r"javax\.naming\.(?:InvalidNameException|InvalidSearchFilterException)"),
+    ("python-ldap", r"ldap\.(?:INVALID_DN_SYNTAX|FILTER_ERROR|NO_SUCH_OBJECT)"),
+)
+
+# Combined LDAP error regex used for heuristic detection (checks.py) and for recognising
+# that an error response originates from an LDAP back-end rather than a generic HTTP 500
+LDAP_ERROR_REGEX = r"(?i)(?:%s)" % '|'.join(regex for _, regex in LDAP_ERROR_SIGNATURES)
+
+# Printable-ASCII codepoint bounds bisected during LDAP blind extraction via >= lexicographic comparison
+LDAP_CHAR_MIN = 0x20
+LDAP_CHAR_MAX = 0x7e
+
+# Upper bound for the value-length search during LDAP blind extraction
+LDAP_MAX_LENGTH = 256
+
+# Maximum number of directory entries enumerated during LDAP blind dumping
+LDAP_MAX_RECORDS = 20
+
+# Attributes that definitively identify the backend vendor when probed on the RootDSE or
+# a well-known directory entry. Each tuple is (attribute, expected_value_substring, backend).
+LDAP_FINGERPRINT_ATTRIBUTES = (
+    ("objectGUID", None, "Microsoft Active Directory"),
+    ("vendorName", "OpenLDAP", "OpenLDAP"),
+    ("vendorName", "Apache Software Foundation", "ApacheDS"),
+    ("vendorName", "Oracle Corporation", "Oracle Directory Server"),
+    ("vendorName", "Red Hat", "389 Directory Server"),
+)
+
+# XPath error signatures per parser implementation for error-based detection and
+# fingerprinting (matched against HTTP response bodies). Each tuple is
+# (backend_name, regex_fragment).
+XPATH_ERROR_SIGNATURES = (
+    ("Java JAXP / Xalan", r"(?:javax\.xml\.(?:xpath\.XPathExpressionException|transform\.Transformer(?:Configuration)?Exception)|com\.sun\.org\.apache\.xpath\.(?:XPathException|XPathProcessorException)|org\.apache\.xpath|org\.xml\.sax\.SAX(?:Parse)?Exception)"),
+    ("Java JAXP / Xalan", r"XPath (?:expression|syntax) error"),
+    ("Java JAXP / Saxon", r"net\.sf\.saxon\.(?:trans\.XPathException|s9api\.SaxonApiException)"),
+    ("Java JAXP / Saxon", r"(?:XPST|XPTY|XPDY|XQST|XTDE)\d{4}:"),
+    (".NET XPathNavigator", r"System\.Xml\.(?:XPath\.XPathException|XmlException)"),
+    (".NET XPathNavigator", r"Expression must evaluate to a node-set"),
+    (".NET XPathNavigator", r"has an invalid (?:token|qualified name)"),
+    ("lxml / libxml2", r"(?:lxml\.etree\.(?:XPath(?:Eval|Document|Syntax)?Error)|libxml2|xmlXPath(?:CompOp|Eval|Err))"),
+    ("lxml / libxml2", r"(?:XPath error|Invalid (?:expression|predicate))"),
+    ("PHP SimpleXML / DOMXPath", r"(?:SimpleXMLElement::xpath\(\)|DOMXPath::(?:query|evaluate)\(\))"),
+    ("PHP SimpleXML / DOMXPath", r"Invalid expression|xmlXPathEval"),
+    ("Saxon (standalone)", r"(?:net\.sf\.saxon\.(?:s9api\.SaxonApiException|trans\.XPathException)|Saxon error)"),
+    ("Saxon (standalone)", r"Static error\(s\) in query"),
+    ("BaseX", r"org\.basex\.(?:query\.QueryException|core\.BaseXException)"),
+    ("BaseX", r"\[(?:XPST|XPTY|XPDY)\d{4}\]"),
+    ("eXist", r"org\.exist\.xquery\.(?:XPathException|XQueryException)"),
+    ("eXist", r"exerr:ERROR"),
+    ("Python ElementTree", r"xml\.etree\.ElementTree\.(?:ParseError|Element)"),
+    ("Generic XPath", r"(?:XPath|XSLT).*?(?:error|exception|syntax)"),
+    ("Generic XPath", r"Invalid XPath|XPath evaluation failed"),
+)
+
+XPATH_ERROR_REGEX = r"(?i)(?:%s)" % '|'.join(regex for _, regex in XPATH_ERROR_SIGNATURES)
+
+# Printable-ASCII codepoint bounds bisected during XPath blind character extraction
+XPATH_CHAR_MIN = 0x20
+XPATH_CHAR_MAX = 0x7e
+
+# Maximum tree depth for recursive XML walking during XPath blind extraction
+XPATH_MAX_DEPTH = 32
+
+# Upper bound for the value-length search during XPath blind extraction
+XPATH_MAX_LENGTH = 256
+
+# SSTI error signatures per template engine for detection and fingerprinting.
+# Each tuple is (engine_name, regex_fragment).
+SSTI_ERROR_SIGNATURES = (
+    ("Jinja2", r"jinja2\.exceptions\.\w+|TemplateSyntaxError|UndefinedError|TemplateNotFound|TemplateAssertionError"),
+    ("Twig", r"Twig[\\_]Error|Twig[\\_]Environment|Unknown (?:filter|function|test|tag)"),
+    ("Freemarker", r"freemarker\.(?:core|template|extract|cache)\.\w+|ParseException|InvalidReferenceException|TemplateException"),
+    ("Velocity", r"org\.apache\.velocity\.(?:runtime|exception)\.\w+|ParseErrorException|MethodInvocationException|ResourceNotFoundException"),
+    ("Spring EL / Thymeleaf", r"org\.springframework\.expression\.\w+|org\.thymeleaf\.\w+|SpelEvaluationException|TemplateProcessingException|ExpressionParsingException"),
+    ("ERB", r"\(erb\):\d+|NameError.*undefined local variable"),
+    ("Pug/Jade", r"pug|jade|ParseError"),
+    ("Handlebars", r"handlebars|Handlebars|Parse error on line"),
+    ("Generic SSTI", r"template.*?(?:error|syntax|exception)"),
+)
+
+SSTI_ERROR_REGEX = r"(?i)(?:%s)" % '|'.join(regex for _, regex in SSTI_ERROR_SIGNATURES)
+
+# XXE parser error signatures for detection and fingerprinting. Each tuple is
+# (parser_family, regex_fragment). A match means the XML surface reached a real
+# parser and the DOCTYPE/entity was processed (or rejected with a diagnostic) -
+# useful both as an error-based oracle and to fingerprint the back-end parser.
+XXE_ERROR_SIGNATURES = (
+    ("libxml2 (PHP/lxml)", r"(?:failed to load (?:external entity|\")|xmlParseEntityRef|Entity '[^']*' not defined|EntityRef: expecting|Detected an entity reference loop|String not started expecting|StartTag: invalid element name|Start tag expected|Extra content at the end of the document|Premature end of data|error parsing DTD|internal error: Huge input lookup)"),
+    ("PHP simplexml/DOM", r"(?:simplexml_load_string\(\)|DOMDocument::load(?:XML)?\(\)|SimpleXMLElement::__construct\(\))"),
+    ("Java (Xerces/JAXP)", r"(?:org\.xml\.sax\.SAXParseException|com\.sun\.org\.apache\.xerces|javax\.xml\.stream\.XMLStreamException|The (?:entity|element type) \"[^\"]*\" was referenced|DOCTYPE is disallowed when the feature|External (?:DTD|parsed entities|Entity): failed|must be declared|had to be read but the maximum)"),
+    (".NET System.Xml", r"(?:System\.Xml\.XmlException|For security reasons DTD is prohibited|Reference to undeclared entity|An error occurred while parsing EntityName|XmlTextReaderImpl)"),
+    ("Python expat", r"(?:xml\.parsers\.expat\.ExpatError|undefined entity|not well-formed \(invalid token\)|ExpatError)"),
+    ("Ruby Nokogiri/REXML", r"(?:Nokogiri::XML::SyntaxError|REXML::ParseException|Entity .* not defined)"),
+    ("Go encoding/xml", r"XML syntax error on line \d+"),
+    ("Generic XML", r"(?:XML (?:parsing|parse|syntax) error|malformed XML|unexpected (?:end of|<) )"),
+)
+
+XXE_ERROR_REGEX = r"(?i)(?:%s)" % '|'.join(regex for _, regex in XXE_ERROR_SIGNATURES)
+
+# Signatures indicating a hardened / XXE-safe parser posture (DTDs or external
+# entities explicitly refused). Reported as "reachable but protected" - never a hit.
+XXE_HARDENED_REGEX = r"(?i)(?:DOCTYPE is disallowed|DTD is prohibited|(?:external )?(?:DTD|entit(?:y|ies)) (?:are|is) (?:not (?:supported|allowed)|disabled|prohibited|forbidden)|loading of external|network access is not allowed|FEATURE_SECURE_PROCESSING|access to external)"
+
+# Benign, low-entropy files used only to demonstrate file-read impact once XXE is
+# confirmed. Deliberately NOT /etc/passwd (WAF honeypots key on "root:x:0:0") - a
+# short host-identity file is enough to prove the read without tripping decoys.
+# Out-of-band (interactsh) collector for blind XXE confirmation. Public default
+# pool (best-effort, may rotate/be blocklisted by WAFs); override with --oob-server
+# to point at a self-hosted interactsh-server. Correlation-id + nonce lengths match
+# the interactsh defaults (subdomain = <20-char id><13-char nonce>.<server>).
+OOB_INTERACTSH_SERVERS = ("oast.fun", "oast.pro", "oast.live", "oast.site", "oast.online", "oast.me")
+# Public content-hosting + request-logging endpoint for blind-XXE OOB exfiltration
+# (hosts the malicious external DTD and captures the file-bearing callback). Unlike
+# interactsh it can serve arbitrary content; HTTP-only. Used only on explicit consent.
+OOB_EXFIL_ENDPOINT = "https://webhook.site"
+OOB_CORRELATION_ID_LENGTH = 20
+OOB_NONCE_LENGTH = 13
+OOB_POLL_ATTEMPTS = 15     # generous: two-hop exfil (target fetches DTD, then calls back) over the
+OOB_POLL_DELAY = 2         # target's own link + webhook.site's eventually-consistent API (best-effort)
+
+# Time-based blind tier: an external entity aimed at this non-routable RFC5737
+# TEST-NET-1 host makes a fetching parser stall on the connection, so a large,
+# reproducible response delay betrays otherwise-blind XXE with NO collector needed.
+# The delay must exceed a DTD-processing control baseline by this many seconds.
+XXE_BLACKHOLE_HOST = "192.0.2.1"
+XXE_TIME_THRESHOLD = 5
+
+XXE_IMPACT_FILES = (
+    ("file:///etc/os-release", r"(?i)^(?:NAME|ID|VERSION)="),                     # anchored, high-signal
+    ("file:///c:/windows/win.ini", r"(?i)\[(?:fonts|extensions|mci extensions|files)\]"),
+)
+
+# Once an in-band XXE file-read primitive is CONFIRMED, sqlmap proactively harvests
+# this curated set of high-value, fixed-path files (host identity, process env/
+# secrets, key material, common application drop paths) - the XXE analogue of the
+# automatic dumping the other non-SQL engines perform. Kept small and high-signal (each
+# entry costs 1-2 requests); best-effort, so unreadable/absent files are silently
+# skipped. Unlike XXE_IMPACT_FILES (a benign PRE-confirmation impact probe that avoids
+# WAF-honeypot paths) this runs only AFTER confirmation, so sensitive paths are
+# appropriate. Skipped when the user gave an explicit '--file-read' (that targeted
+# request is honoured verbatim instead).
+XXE_FILE_HARVEST = (
+    "/etc/passwd",
+    "/etc/hostname",
+    "/etc/hosts",
+    "/etc/os-release",
+    "/etc/shadow",
+    "/etc/group",
+    "/proc/self/environ",
+    "/proc/self/cmdline",
+    "/proc/self/status",
+    "/proc/version",
+    "/root/.bash_history",
+    "/root/.ssh/id_rsa",
+    "/flag",
+    "/flag.txt",
+    "c:/windows/win.ini",
+    "c:/windows/system32/drivers/etc/hosts",
+    "c:/inetpub/wwwroot/web.config",
+)
+
+# Application web roots + source filenames used, once php://filter is available, to
+# disclose server-side SOURCE code (which is executed and never rendered, yet leaks its
+# literals - credentials, tokens, embedded secrets - verbatim through the base64 filter
+# wrapper). Combined with the running script derived from harvested /proc/self/{cmdline,
+# environ}. Best-effort and bounded.
+XXE_WEBROOTS = ("/var/www/html", "/var/www", "/app", "/usr/src/app", "/srv/app")
+XXE_SOURCE_NAMES = (
+    "index.php", "config.php", "config.inc.php", "secret.php",
+    "db.php", "database.php", "settings.php", "init.php", "functions.php",
+    "app.py", "server.py", "main.py", "wp-config.php", ".env",
+)
+
+# GoSecure dtd-finder local-DTD repurposing table for no-egress error-based XXE:
+# an on-disk DTD is loaded, one of its parameter entities is redefined to smuggle
+# an error/exfil primitive, so no outbound network is needed. (path, entity_name).
+# Windows paths are community-sourced and remain UNVERIFIED vendor-side.
+XXE_LOCAL_DTDS = (
+    ("file:///usr/share/yelp/dtd/docbookx.dtd", "ISOamso"),                       # GNOME yelp - reliably repurposable
+    ("file:///usr/share/xml/docbook/schema/dtd/4.5/docbookx.dtd", "ISOamso"),     # docbook package
+    ("file:///opt/IBM/WebSphere/AppServer/properties/sip-app_1_0.dtd", "connection"),
+    ("file:///usr/share/xml/fontconfig/fonts.dtd", "constant"),                   # widespread but gadget is version-fragile
+    ("file:///C:/Windows/System32/wbem/cim20.dtd", "SuperClass"),                 # Windows paths community-sourced, UNVERIFIED
+    ("file:///C:/Windows/System32/wbem/wmi20.dtd", "extension"),
+    ("file:///C:/Windows/System32/xwizards/xwizard.dtd", "ELEMENT"),
+    ("jar:file:///usr/share/java/lotus-domino.jar!/schema/domino.dtd", "abbr"),
+)
+
+# Upper bound for SSTI value extraction (reserved for future use)
+SSTI_MAX_LENGTH = 256
 
 # Length of prefix and suffix used in non-SQLI heuristic checks
 NON_SQLI_CHECK_PREFIX_SUFFIX_LENGTH = 6
@@ -784,6 +1231,12 @@ MAX_CONNECTION_READ_SIZE = 10 * 1024 * 1024
 
 # Maximum response total page size (trimmed if larger)
 MAX_CONNECTION_TOTAL_SIZE = 100 * 1024 * 1024
+
+# Maximum number of requests served over a single persistent (Keep-Alive) connection before it is recycled
+KEEPALIVE_MAX_REQUESTS = 1000
+
+# Maximum idle time (in seconds) a pooled persistent (Keep-Alive) connection is considered reusable before being recycled
+KEEPALIVE_IDLE_TIMEOUT = 30
 
 # For preventing MemoryError exceptions (caused when using large sequences in difflib.SequenceMatcher)
 MAX_DIFFLIB_SEQUENCE_LENGTH = 10 * 1024 * 1024
@@ -842,6 +1295,15 @@ LIMITED_ROWS_TEST_NUMBER = 15
 # Default adapter to use for bottle server
 RESTAPI_DEFAULT_ADAPTER = "wsgiref"
 
+# REST API / scan-data contract version (semantic versioning), INDEPENDENT of the sqlmap version.
+# Bump MAJOR for breaking changes (removed/renamed field, changed type, restructured response),
+# MINOR for additive backward-compatible changes (new field/endpoint), PATCH for non-contract fixes.
+# Exposed at GET /version (as "api_version"), in the --report-json "meta", and as the OpenAPI
+# info.version (keep sqlmapapi.yaml in sync). Maintained by hand when the contract changes.
+# 2.0.0: first explicitly-versioned contract; a MAJOR break from the old implicit shape
+# (TECHNIQUES is now a named list, DUMP_TABLE restructured, internal fields dropped, type_name added).
+RESTAPI_VERSION = "2.0.0"
+
 # Default REST API server listen address
 RESTAPI_DEFAULT_ADDRESS = "127.0.0.1"
 
@@ -849,7 +1311,7 @@ RESTAPI_DEFAULT_ADDRESS = "127.0.0.1"
 RESTAPI_DEFAULT_PORT = 8775
 
 # Unsupported options by REST API server
-RESTAPI_UNSUPPORTED_OPTIONS = ("sqlShell", "wizard", "evalCode", "alert")
+RESTAPI_UNSUPPORTED_OPTIONS = ("sqlShell", "wizard", "evalCode", "alert", "reportJson")
 
 # Use "Supplementary Private Use Area-A"
 INVALID_UNICODE_PRIVATE_AREA = False
@@ -978,6 +1440,11 @@ for key, value in os.environ.items():
             elif isinstance(original, int):
                 try:
                     globals()[_] = int(value)
+                except ValueError:
+                    pass
+            elif isinstance(original, float):
+                try:
+                    globals()[_] = float(value)
                 except ValueError:
                     pass
             elif isinstance(original, (list, tuple)):

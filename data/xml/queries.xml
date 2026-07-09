@@ -35,8 +35,8 @@
         <!-- https://github.com/dev-sec/mysql-baseline/issues/35 -->
         <!-- https://stackoverflow.com/a/31122246 -->
         <passwords>
-            <inband query="SELECT user,authentication_string FROM mysql.user" condition="user"/>
-            <blind query="SELECT DISTINCT(authentication_string) FROM mysql.user WHERE user='%s' LIMIT %d,1" count="SELECT COUNT(DISTINCT(authentication_string)) FROM mysql.user WHERE user='%s'"/>
+            <inband query="SELECT user,IF(LEFT(authentication_string,3)=0x244124,CONCAT(0x246d7973716c,LEFT(authentication_string,6),0x2a,INSERT(HEX(SUBSTR(authentication_string,8)),41,0,0x2a)),authentication_string) FROM mysql.user" condition="user"/>
+            <blind query="SELECT DISTINCT(IF(LEFT(authentication_string,3)=0x244124,CONCAT(0x246d7973716c,LEFT(authentication_string,6),0x2a,INSERT(HEX(SUBSTR(authentication_string,8)),41,0,0x2a)),authentication_string)) FROM mysql.user WHERE user='%s' LIMIT %d,1" count="SELECT COUNT(DISTINCT(authentication_string)) FROM mysql.user WHERE user='%s'"/>
         </passwords>
         <privileges>
             <inband query="SELECT grantee,privilege_type FROM INFORMATION_SCHEMA.USER_PRIVILEGES" condition="grantee" query2="SELECT user,select_priv,insert_priv,update_priv,delete_priv,create_priv,drop_priv,reload_priv,shutdown_priv,process_priv,file_priv,grant_priv,references_priv,index_priv,alter_priv,show_db_priv,super_priv,create_tmp_table_priv,lock_tables_priv,execute_priv,repl_slave_priv,repl_client_priv,create_view_priv,show_view_priv,create_routine_priv,alter_routine_priv,create_user_priv FROM mysql.user" condition2="user"/>
@@ -47,6 +47,10 @@
             <inband query="SELECT INFO FROM INFORMATION_SCHEMA.PROCESSLIST" query2="SELECT INFO FROM DATA_DICTIONARY.PROCESSLIST"/>
             <blind query="SELECT INFO FROM INFORMATION_SCHEMA.PROCESSLIST ORDER BY ID LIMIT %d,1" query2="SELECT INFO FROM INFORMATION_SCHEMA.PROCESSLIST WHERE ID=%d" query3="SELECT ID FROM INFORMATION_SCHEMA.PROCESSLIST LIMIT %d,1" count="SELECT COUNT(DISTINCT(INFO)) FROM INFORMATION_SCHEMA.PROCESSLIST"/>
         </statements>
+        <procedures>
+            <inband query="SELECT CONCAT(ROUTINE_NAME,' [',ROUTINE_TYPE,'] ',IFNULL(ROUTINE_DEFINITION,'')) FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_SCHEMA NOT IN ('mysql','sys','information_schema','performance_schema')"/>
+            <blind query="SELECT CONCAT(ROUTINE_NAME,' [',ROUTINE_TYPE,'] ',IFNULL(ROUTINE_DEFINITION,'')) FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_SCHEMA NOT IN ('mysql','sys','information_schema','performance_schema') ORDER BY ROUTINE_SCHEMA,ROUTINE_NAME LIMIT %d,1" count="SELECT COUNT(*) FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_SCHEMA NOT IN ('mysql','sys','information_schema','performance_schema')"/>
+        </procedures>
         <dbs>
             <inband query="SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA" query2="SELECT db FROM mysql.db"/>
             <blind query="SELECT DISTINCT(schema_name) FROM INFORMATION_SCHEMA.SCHEMATA LIMIT %d,1" query2="SELECT DISTINCT(db) FROM mysql.db LIMIT %d,1" count="SELECT COUNT(DISTINCT(schema_name)) FROM INFORMATION_SCHEMA.SCHEMATA" count2="SELECT COUNT(DISTINCT(db)) FROM mysql.db"/>
@@ -61,7 +65,8 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s.%s ORDER BY %s"/>
-            <blind query="SELECT %s FROM %s.%s ORDER BY %s LIMIT %d,1" count="SELECT COUNT(*) FROM %s.%s"/>
+            <blind query="SELECT %s FROM %s.%s ORDER BY %s LIMIT %d,1" count="SELECT COUNT(*) FROM %s.%s" keyset_first="SELECT MIN(%s) FROM %s" keyset_next="SELECT MIN(%s) FROM %s WHERE %s>'%s'" keyset_by="SELECT MAX(%s) FROM %s WHERE %s='%s'" keyset_seed="SELECT %s FROM %s ORDER BY %s LIMIT 1 OFFSET %d" keyset_ordered="SELECT %s FROM %s WHERE %s ORDER BY %s LIMIT 1" keyset_where="SELECT MAX(%s) FROM %s WHERE %s"/>
+            <primary_key count="SELECT COUNT(*) FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE TABLE_SCHEMA='%s' AND TABLE_NAME='%s' AND CONSTRAINT_NAME='PRIMARY'" query="SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE TABLE_SCHEMA='%s' AND TABLE_NAME='%s' AND CONSTRAINT_NAME='PRIMARY' ORDER BY ORDINAL_POSITION LIMIT %d,1"/>
         </dump_table>
         <search_db>
             <inband query="SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA WHERE %s" query2="SELECT db FROM mysql.db WHERE %s" condition="schema_name" condition2="db"/>
@@ -122,6 +127,10 @@
             <inband query="SELECT query FROM pg_stat_activity WHERE query != '&lt;IDLE&gt;'"/>
             <blind query="SELECT DISTINCT(query) FROM pg_stat_activity WHERE query != '&lt;IDLE&gt;' OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(query)) FROM pg_stat_activity WHERE query != '&lt;IDLE&gt;'"/>
         </statements>
+        <procedures>
+            <inband query="SELECT n.nspname||'.'||p.proname||': '||p.prosrc FROM pg_proc p JOIN pg_namespace n ON p.pronamespace=n.oid WHERE n.nspname NOT IN ('pg_catalog','information_schema')"/>
+            <blind query="SELECT n.nspname||'.'||p.proname||': '||p.prosrc FROM pg_proc p JOIN pg_namespace n ON p.pronamespace=n.oid WHERE n.nspname NOT IN ('pg_catalog','information_schema') ORDER BY n.nspname,p.proname OFFSET %d LIMIT 1" count="SELECT COUNT(*) FROM pg_proc p JOIN pg_namespace n ON p.pronamespace=n.oid WHERE n.nspname NOT IN ('pg_catalog','information_schema')"/>
+        </procedures>
         <dbs>
             <inband query="SELECT DISTINCT(schemaname) FROM pg_tables"/>
             <blind query="SELECT DISTINCT(schemaname) FROM pg_tables ORDER BY schemaname OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(schemaname)) FROM pg_tables"/>
@@ -136,7 +145,8 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s.%s ORDER BY %s"/>
-            <blind query="SELECT %s FROM %s.%s ORDER BY %s OFFSET %d LIMIT 1" count="SELECT COUNT(*) FROM %s.%s"/>
+            <blind query="SELECT %s FROM %s.%s ORDER BY %s OFFSET %d LIMIT 1" count="SELECT COUNT(*) FROM %s.%s" keyset_first="SELECT MIN(%s) FROM %s" keyset_next="SELECT MIN(%s) FROM %s WHERE %s>'%s'" keyset_by="SELECT MAX(%s) FROM %s WHERE %s='%s'" keyset_seed="SELECT %s FROM %s ORDER BY %s LIMIT 1 OFFSET %d" keyset_ordered="SELECT %s FROM %s WHERE %s ORDER BY %s LIMIT 1" keyset_where="SELECT MAX(%s) FROM %s WHERE %s"/>
+            <primary_key count="SELECT COUNT(*) FROM information_schema.table_constraints tc JOIN information_schema.key_column_usage kcu ON tc.constraint_name=kcu.constraint_name AND tc.table_schema=kcu.table_schema WHERE tc.constraint_type='PRIMARY KEY' AND tc.table_schema='%s' AND tc.table_name='%s'" query="SELECT kcu.column_name FROM information_schema.table_constraints tc JOIN information_schema.key_column_usage kcu ON tc.constraint_name=kcu.constraint_name AND tc.table_schema=kcu.table_schema WHERE tc.constraint_type='PRIMARY KEY' AND tc.table_schema='%s' AND tc.table_name='%s' ORDER BY kcu.ordinal_position OFFSET %d LIMIT 1"/>
         </dump_table>
         <search_db>
             <inband query="SELECT schemaname FROM pg_tables WHERE %s" condition="schemaname"/>
@@ -193,6 +203,11 @@
             <inband query="SELECT st.text FROM sys.dm_exec_cached_plans cp CROSS APPLY sys.dm_exec_sql_text(cp.plan_handle) st"/>
             <blind query="SELECT TOP 1 a.text FROM sys.dm_exec_cached_plans cp CROSS APPLY sys.dm_exec_sql_text(cp.plan_handle) a WHERE a.text NOT IN (SELECT TOP %d b.text FROM sys.dm_exec_cached_plans cp CROSS APPLY sys.dm_exec_sql_text(cp.plan_handle) b ORDER BY b.text) ORDER BY a.text" count="SELECT LTRIM(STR(COUNT(st.text))) FROM sys.dm_exec_cached_plans cp CROSS APPLY sys.dm_exec_sql_text(cp.plan_handle) st"/>
         </statements>
+        <!-- NOTE: o.type_desc carries SQL Server's fixed catalog-metadata collation (Latin1_General_CI_AS_KS_WS), which clashes with m.definition's database collation under '+' ("cannot resolve collation conflict"). Coercing the catalog string columns to DATABASE_DEFAULT makes the whole concat single-collation. o.name is usually already the database collation so its COLLATE is a no-op, but it is coerced too defensively, since catalog name-column collation can vary by version/config. -->
+        <procedures>
+            <inband query="SELECT o.name COLLATE DATABASE_DEFAULT+' ['+o.type_desc COLLATE DATABASE_DEFAULT+'] '+m.definition FROM sys.sql_modules m INNER JOIN sys.objects o ON m.object_id=o.object_id WHERE o.is_ms_shipped=0 AND o.type IN ('P','FN','IF','TF')"/>
+            <blind query="SELECT o.name COLLATE DATABASE_DEFAULT+' ['+o.type_desc COLLATE DATABASE_DEFAULT+'] '+m.definition FROM sys.sql_modules m INNER JOIN sys.objects o ON m.object_id=o.object_id WHERE o.is_ms_shipped=0 AND o.type IN ('P','FN','IF','TF') ORDER BY o.name OFFSET %d ROWS FETCH NEXT 1 ROWS ONLY" count="SELECT LTRIM(STR(COUNT(*))) FROM sys.sql_modules m INNER JOIN sys.objects o ON m.object_id=o.object_id WHERE o.is_ms_shipped=0 AND o.type IN ('P','FN','IF','TF')"/>
+        </procedures>
         <dbs>
             <inband query="SELECT name FROM master..sysdatabases" query2="SELECT DB_NAME(%d)"/>
             <blind query="SELECT TOP 1 name FROM master..sysdatabases WHERE name NOT IN (SELECT TOP %d name FROM master..sysdatabases ORDER BY name) ORDER BY name" count="SELECT LTRIM(STR(COUNT(name))) FROM master..sysdatabases"/>
@@ -207,7 +222,8 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s.%s"/>
-            <blind query="SELECT MIN(%s) FROM %s WHERE CONVERT(NVARCHAR(4000),%s)>'%s'" query2="SELECT MAX(%s) FROM %s WHERE CONVERT(NVARCHAR(4000),%s) LIKE '%s'" query3="SELECT %s FROM (SELECT %s, ROW_NUMBER() OVER (ORDER BY (SELECT 1)) AS CAP FROM %s)x WHERE CAP=%d" count="SELECT LTRIM(STR(COUNT(*))) FROM %s" count2="SELECT LTRIM(STR(COUNT(DISTINCT(%s)))) FROM %s"/>
+            <blind query="SELECT MIN(%s) FROM %s WHERE CONVERT(NVARCHAR(4000),%s)>'%s'" query2="SELECT MAX(%s) FROM %s WHERE CONVERT(NVARCHAR(4000),%s) LIKE '%s'" query3="SELECT %s FROM (SELECT %s, ROW_NUMBER() OVER (ORDER BY (SELECT 1)) AS CAP FROM %s)x WHERE CAP=%d" count="SELECT LTRIM(STR(COUNT(*))) FROM %s" count2="SELECT LTRIM(STR(COUNT(DISTINCT(%s)))) FROM %s" keyset_first="SELECT MIN(%s) FROM %s" keyset_next="SELECT MIN(%s) FROM %s WHERE %s>'%s'" keyset_by="SELECT MAX(%s) FROM %s WHERE %s='%s'" keyset_seed="SELECT %s FROM %s ORDER BY %s OFFSET %d ROWS FETCH NEXT 1 ROWS ONLY" keyset_ordered="SELECT TOP 1 %s FROM %s WHERE %s ORDER BY %s" keyset_where="SELECT MAX(%s) FROM %s WHERE %s"/>
+            <primary_key count="SELECT COUNT(*) FROM sys.indexes i JOIN sys.index_columns ic ON i.object_id=ic.object_id AND i.index_id=ic.index_id WHERE i.is_primary_key=1 AND i.object_id=OBJECT_ID('%s.dbo.%s')" query="SELECT name FROM (SELECT c.name AS name, ROW_NUMBER() OVER (ORDER BY ic.key_ordinal) AS rn FROM sys.indexes i JOIN sys.index_columns ic ON i.object_id=ic.object_id AND i.index_id=ic.index_id JOIN sys.columns c ON ic.object_id=c.object_id AND c.column_id=ic.column_id WHERE i.is_primary_key=1 AND i.object_id=OBJECT_ID('%s.dbo.%s')) x WHERE rn=%d+1"/>
         </dump_table>
         <search_db>
             <inband query="SELECT name FROM master..sysdatabases WHERE %s" condition="name"/>
@@ -287,6 +303,11 @@
             <inband query="SELECT SQL_TEXT FROM V$SQL"/>
             <blind query="SELECT SQL_TEXT FROM (SELECT SQL_TEXT,ROWNUM AS CAP FROM V$SQL WHERE SQL_TEXT NOT LIKE '%%SQL_TEXT%%') WHERE CAP=%d" count="SELECT COUNT(SQL_TEXT) FROM V$SQL WHERE SQL_TEXT NOT LIKE '%%SQL_TEXT%%'"/>
         </statements>
+        <!-- NOTE: ALL_SOURCE stores one row per source line, so LISTAGG reassembles them (subject to its 4000-char limit). ORACLE_MAINTAINED='N' (12.2+) cleanly excludes every Oracle built-in schema (SYS, WMSYS, LBACSYS, DVSYS, ...) instead of a hand-maintained blocklist. -->
+        <procedures>
+            <inband query="SELECT NAME||' ['||TYPE||'] '||(SELECT LISTAGG(TEXT) WITHIN GROUP (ORDER BY LINE) FROM ALL_SOURCE WHERE NAME=s.NAME AND OWNER=s.OWNER AND TYPE=s.TYPE) FROM (SELECT DISTINCT OWNER,NAME,TYPE FROM ALL_SOURCE WHERE TYPE IN ('PROCEDURE','FUNCTION') AND OWNER IN (SELECT USERNAME FROM ALL_USERS WHERE ORACLE_MAINTAINED='N')) s"/>
+            <blind query="SELECT NAME||' ['||TYPE||'] '||(SELECT LISTAGG(TEXT) WITHIN GROUP (ORDER BY LINE) FROM ALL_SOURCE WHERE NAME=s.NAME AND OWNER=s.OWNER AND TYPE=s.TYPE) FROM (SELECT DISTINCT OWNER,NAME,TYPE FROM ALL_SOURCE WHERE TYPE IN ('PROCEDURE','FUNCTION') AND OWNER IN (SELECT USERNAME FROM ALL_USERS WHERE ORACLE_MAINTAINED='N')) s ORDER BY NAME OFFSET %d ROWS FETCH NEXT 1 ROWS ONLY" count="SELECT COUNT(*) FROM (SELECT DISTINCT OWNER,NAME,TYPE FROM ALL_SOURCE WHERE TYPE IN ('PROCEDURE','FUNCTION') AND OWNER IN (SELECT USERNAME FROM ALL_USERS WHERE ORACLE_MAINTAINED='N'))"/>
+        </procedures>
         <!-- NOTE: in Oracle schema names are the counterpart to database names on other DBMSes -->
         <dbs>
             <inband query="SELECT OWNER FROM (SELECT DISTINCT(OWNER) FROM SYS.ALL_TABLES)"/>
@@ -302,7 +323,8 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s ORDER BY ROWNUM"/>
-            <blind query="SELECT %s FROM (SELECT qq.*,ROWNUM AS CAP FROM %s qq ORDER BY ROWNUM) WHERE CAP=%d" count="SELECT COUNT(*) FROM %s"/>
+            <blind query="SELECT %s FROM (SELECT qq.*,ROWNUM AS CAP FROM %s qq ORDER BY ROWNUM) WHERE CAP=%d" count="SELECT COUNT(*) FROM %s" keyset_first="SELECT MIN(%s) FROM %s" keyset_next="SELECT MIN(%s) FROM %s WHERE %s>'%s'" keyset_by="SELECT MAX(%s) FROM %s WHERE %s='%s'" keyset_seed="SELECT %s FROM %s ORDER BY %s OFFSET %d ROWS FETCH NEXT 1 ROWS ONLY" keyset_ordered="SELECT c FROM (SELECT %s AS c FROM %s WHERE %s ORDER BY %s) WHERE ROWNUM=1" keyset_where="SELECT MAX(%s) FROM %s WHERE %s"/>
+            <primary_key count="SELECT COUNT(*) FROM all_cons_columns cols, all_constraints cons WHERE cons.constraint_type='P' AND cons.constraint_name=cols.constraint_name AND cons.owner=cols.owner AND UPPER(cols.owner)=UPPER('%s') AND UPPER(cols.table_name)=UPPER('%s')" query="SELECT column_name FROM (SELECT cols.column_name, ROW_NUMBER() OVER (ORDER BY cols.position) AS rn FROM all_cons_columns cols, all_constraints cons WHERE cons.constraint_type='P' AND cons.constraint_name=cols.constraint_name AND cons.owner=cols.owner AND UPPER(cols.owner)=UPPER('%s') AND UPPER(cols.table_name)=UPPER('%s')) WHERE rn=%d+1"/>
         </dump_table>
         <!-- NOTE: in Oracle schema names are the counterpart to database names on other DBMSes -->
         <search_db>
@@ -362,7 +384,7 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s"/>
-            <blind query="SELECT %s FROM %s LIMIT %d,1" count="SELECT COUNT(*) FROM %s"/>
+            <blind query="SELECT %s FROM %s LIMIT %d,1" count="SELECT COUNT(*) FROM %s" rowid="rowid" keyset_first="SELECT MIN(%s) FROM %s" keyset_next="SELECT MIN(%s) FROM %s WHERE %s>'%s'" keyset_by="SELECT MAX(%s) FROM %s WHERE %s='%s'" keyset_seed="SELECT %s FROM %s ORDER BY %s LIMIT 1 OFFSET %d" keyset_ordered="SELECT %s FROM %s WHERE %s ORDER BY %s LIMIT 1" keyset_where="SELECT MAX(%s) FROM %s WHERE %s"/>
         </dump_table>
         <search_db/>
         <search_table>
@@ -442,16 +464,16 @@
         <column_comment/>
         <is_dba query="CURRENT_USER='SYSDBA'"/>
         <users>
-            <inband query="SELECT RDB$USER FROM RDB$USER_PRIVILEGES"/>
-            <blind query="SELECT FIRST 1 SKIP %d DISTINCT(RDB$USER) FROM RDB$USER_PRIVILEGES" count="SELECT COUNT(DISTINCT(RDB$USER)) FROM RDB$USER_PRIVILEGES"/>
+            <inband query="SELECT RDB$USER FROM RDB$USER_PRIVILEGES WHERE RDB$USER_TYPE=8"/>
+            <blind query="SELECT FIRST 1 SKIP %d DISTINCT(RDB$USER) FROM RDB$USER_PRIVILEGES WHERE RDB$USER_TYPE=8" count="SELECT COUNT(DISTINCT(RDB$USER)) FROM RDB$USER_PRIVILEGES WHERE RDB$USER_TYPE=8"/>
         </users>
         <tables>
             <inband query="SELECT RDB$RELATION_NAME FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG=0)"/>
             <blind query="SELECT FIRST 1 SKIP %d RDB$RELATION_NAME FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG=0)" count="SELECT COUNT(RDB$RELATION_NAME) FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG=0)"/>
         </tables>
         <privileges>
-            <inband query="SELECT RDB$USER,RDB$PRIVILEGE FROM RDB$USER_PRIVILEGES" condition="RDB$USER"/>
-            <blind query="SELECT FIRST 1 SKIP %d DISTINCT(RDB$PRIVILEGE) FROM RDB$USER_PRIVILEGES WHERE RDB$USER='%s'" count="SELECT COUNT(DISTINCT(RDB$PRIVILEGE)) FROM RDB$USER_PRIVILEGES WHERE RDB$USER='%s'"/>
+            <inband query="SELECT RDB$USER,RDB$PRIVILEGE FROM RDB$USER_PRIVILEGES WHERE RDB$USER_TYPE=8" condition="RDB$USER"/>
+            <blind query="SELECT FIRST 1 SKIP %d DISTINCT(RDB$PRIVILEGE) FROM RDB$USER_PRIVILEGES WHERE RDB$USER='%s' AND RDB$USER_TYPE=8" count="SELECT COUNT(DISTINCT(RDB$PRIVILEGE)) FROM RDB$USER_PRIVILEGES WHERE RDB$USER='%s' AND RDB$USER_TYPE=8"/>
         </privileges>
         <roles/>
         <statements/>
@@ -726,7 +748,8 @@
             <inband query="SELECT column_name,type_name FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS WHERE table_name='%s' AND table_schem='%s' ORDER BY column_name" condition="column_name"/>
         </columns>
         <dump_table>
-            <blind query="SELECT %s FROM %s.%s ORDER BY %s LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM %s.%s"/>
+            <blind query="SELECT %s FROM %s.%s ORDER BY %s LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM %s.%s" keyset_first="SELECT MIN(%s) FROM %s" keyset_next="SELECT MIN(%s) FROM %s WHERE %s>'%s'" keyset_by="SELECT MAX(%s) FROM %s WHERE %s='%s'" keyset_seed="SELECT %s FROM %s ORDER BY %s LIMIT 1 OFFSET %d" keyset_ordered="SELECT %s FROM %s WHERE %s ORDER BY %s LIMIT 1" keyset_where="SELECT MAX(%s) FROM %s WHERE %s"/>
+            <primary_key count="SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu ON tc.CONSTRAINT_NAME=kcu.CONSTRAINT_NAME AND tc.TABLE_SCHEMA=kcu.TABLE_SCHEMA WHERE tc.CONSTRAINT_TYPE='PRIMARY KEY' AND UPPER(tc.TABLE_SCHEMA)=UPPER('%s') AND UPPER(tc.TABLE_NAME)=UPPER('%s')" query="SELECT kcu.COLUMN_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu ON tc.CONSTRAINT_NAME=kcu.CONSTRAINT_NAME AND tc.TABLE_SCHEMA=kcu.TABLE_SCHEMA WHERE tc.CONSTRAINT_TYPE='PRIMARY KEY' AND UPPER(tc.TABLE_SCHEMA)=UPPER('%s') AND UPPER(tc.TABLE_NAME)=UPPER('%s') ORDER BY kcu.ORDINAL_POSITION LIMIT 1 OFFSET %d"/>
             <inband query="SELECT %s FROM %s.%s ORDER BY %s"/>
         </dump_table>
         <search_db>
@@ -790,7 +813,8 @@
             <inband query="SELECT COLUMN_NAME,DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='%s' AND TABLE_SCHEMA='%s' ORDER BY COLUMN_NAME" condition="COLUMN_NAME" query2="SELECT COLUMN_NAME,TYPE_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='%s' AND TABLE_SCHEMA='%s' ORDER BY COLUMN_NAME" condition2="COLUMN_NAME"/>
         </columns>
         <dump_table>
-            <blind query="SELECT %s FROM %s.%s ORDER BY %s LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM %s.%s"/>
+            <blind query="SELECT %s FROM %s.%s ORDER BY %s LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM %s.%s" keyset_first="SELECT MIN(%s) FROM %s" keyset_next="SELECT MIN(%s) FROM %s WHERE %s>'%s'" keyset_by="SELECT MAX(%s) FROM %s WHERE %s='%s'" keyset_seed="SELECT %s FROM %s ORDER BY %s LIMIT 1 OFFSET %d" keyset_ordered="SELECT %s FROM %s WHERE %s ORDER BY %s LIMIT 1" keyset_where="SELECT MAX(%s) FROM %s WHERE %s"/>
+            <primary_key count="SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu ON tc.CONSTRAINT_NAME=kcu.CONSTRAINT_NAME AND tc.TABLE_SCHEMA=kcu.TABLE_SCHEMA WHERE tc.CONSTRAINT_TYPE='PRIMARY KEY' AND UPPER(tc.TABLE_SCHEMA)=UPPER('%s') AND UPPER(tc.TABLE_NAME)=UPPER('%s')" query="SELECT kcu.COLUMN_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu ON tc.CONSTRAINT_NAME=kcu.CONSTRAINT_NAME AND tc.TABLE_SCHEMA=kcu.TABLE_SCHEMA WHERE tc.CONSTRAINT_TYPE='PRIMARY KEY' AND UPPER(tc.TABLE_SCHEMA)=UPPER('%s') AND UPPER(tc.TABLE_NAME)=UPPER('%s') ORDER BY kcu.ORDINAL_POSITION LIMIT 1 OFFSET %d"/>
             <inband query="SELECT %s FROM %s.%s ORDER BY %s"/>
         </dump_table>
         <search_db>
@@ -1136,9 +1160,9 @@
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
         <hex query="TO_HEX(%s)"/>
         <inference query="CODEPOINT(SUBSTR((%s),%d,1))>%d" dbms_version="&gt;=0.178" query2="SUBSTR((%s),%d,1)>'%c'"/>/>
-        <banner/>
+        <banner query="version()"/>
         <current_user query="CURRENT_USER"/>
-        <current_db/>
+        <current_db query="current_schema"/>
         <hostname/>
         <table_comment query="SELECT table_comment FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='%s' AND table_name='%s'"/>
         <column_comment query="SELECT column_comment FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema='%s' AND table_name='%s' AND column_name='%s'"/>
@@ -1321,7 +1345,7 @@
     </dbms>
 
     <dbms value="ClickHouse">
-        <cast query="CAST(%s AS String)"/>
+        <cast query="CAST(%s AS Nullable(String))"/>
         <length query="length(%s)"/>
         <isnull query="ifNull(%s, '')"/>
         <delimiter query="||"/>
@@ -1424,7 +1448,7 @@
         <passwords/>
         <privileges>
             <inband query="SELECT grantee,type FROM sys.privileges" condition="grantee"/>
-            <blind query="SELECT DISTINCT(type) FROM sys.privileges WHERE grantee %s '%s' LIMIT 1 OFFSET %d" count="SELECT COUNT(DISTINCT(type)) FROM sys.privileges WHERE grantee %s '%s'"/>
+            <blind query="SELECT DISTINCT(type) FROM sys.privileges WHERE grantee='%s' ORDER BY 1 LIMIT 1 OFFSET %d" count="SELECT COUNT(DISTINCT(type)) FROM sys.privileges WHERE grantee='%s'"/>
         </privileges>
         <roles/>
         <statements>
@@ -1445,7 +1469,8 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s.%s ORDER BY %s"/>
-            <blind query="SELECT %s FROM %s.%s ORDER BY %s LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM %s.%s"/>
+            <blind query="SELECT %s FROM %s.%s ORDER BY %s LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM %s.%s" keyset_first="SELECT MIN(%s) FROM %s" keyset_next="SELECT MIN(%s) FROM %s WHERE %s>'%s'" keyset_by="SELECT MAX(%s) FROM %s WHERE %s='%s'" keyset_seed="SELECT %s FROM %s ORDER BY %s LIMIT 1 OFFSET %d" keyset_ordered="SELECT %s FROM %s WHERE %s ORDER BY %s LIMIT 1" keyset_where="SELECT MAX(%s) FROM %s WHERE %s"/>
+            <primary_key count="SELECT COUNT(*) FROM information_schema.table_constraints tc JOIN information_schema.key_column_usage kcu ON tc.constraint_name=kcu.constraint_name AND tc.table_schema=kcu.table_schema WHERE tc.constraint_type='PRIMARY KEY' AND tc.table_schema='%s' AND tc.table_name='%s'" query="SELECT kcu.column_name FROM information_schema.table_constraints tc JOIN information_schema.key_column_usage kcu ON tc.constraint_name=kcu.constraint_name AND tc.table_schema=kcu.table_schema WHERE tc.constraint_type='PRIMARY KEY' AND tc.table_schema='%s' AND tc.table_name='%s' ORDER BY kcu.ordinal_position LIMIT 1 OFFSET %d"/>
         </dump_table>
         <search_db>
             <inband query="SELECT schema_name FROM information_schema.schemata WHERE %s" condition="schema_name"/>
@@ -1713,6 +1738,7 @@
         <concatenate query="%s||%s"/>
         <case query="SELECT (IF(%s,1,0))"/>
         <inference query="UNICODE(SUBSTRING((%s),%d,1))>%d"/>
+        <substring query="SUBSTRING((%s),%d,%d)"/>
         <banner/>
         <current_user/>
         <current_db/>
@@ -1752,6 +1778,7 @@
         <concatenate query="%s||%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
         <inference query="ASCII(SUBSTRING((%s),%d,1))>%d"/>
+        <substring query="SUBSTRING((%s),%d,%d)"/>
         <banner query="sys_stat('st_dbms_name')||' - '||sys_stat('st_dbms_ver')"/>
         <current_user query="USERNAME()"/>
         <current_db query="UPPER(USERNAME())"/>
@@ -1803,6 +1830,7 @@
         <concatenate query="%s||%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
         <inference query="ASCII(SUBSTR((%s),%d,1))>%d"/>
+        <substring query="SUBSTR((%s),%d,%d)"/>
         <banner query="CURRENT_VERSION()"/>
         <current_user query="CURRENT_USER()"/>
         <current_db query="CURRENT_SCHEMA()"/>

@@ -16,6 +16,8 @@ class Syntax(GenericSyntax):
         True
         >>> Syntax.escape(u"SELECT 'abcd\xebfgh' FROM foobar") == "SELECT CHR(97)||CHR(98)||CHR(99)||CHR(100)||NCHR(235)||CHR(102)||CHR(103)||CHR(104) FROM foobar"
         True
+        >>> Syntax.escape("SELECT 'a''b' FROM DUAL") == "SELECT CHR(97)||CHR(39)||CHR(98) FROM DUAL"
+        True
         """
 
         def escaper(value):

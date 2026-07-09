@@ -16,6 +16,7 @@ from extra.beep.beep import beep
 from lib.core.agent import agent
 from lib.core.common import Backend
 from lib.core.common import extractRegexResult
+from lib.core.common import extractStructuralTokens
 from lib.core.common import extractTextTagContent
 from lib.core.common import filterNone
 from lib.core.common import findDynamicContent
@@ -56,6 +57,7 @@ from lib.core.dicts import HEURISTIC_NULL_EVAL
 from lib.core.enums import DBMS
 from lib.core.enums import HASHDB_KEYS
 from lib.core.enums import HEURISTIC_TEST
+from lib.core.enums import POST_HINT
 from lib.core.enums import HTTP_HEADER
 from lib.core.enums import HTTPMETHOD
 from lib.core.enums import NOTE
@@ -79,14 +81,23 @@ from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DUMMY_NON_SQLI_CHECK_APPENDIX
 from lib.core.settings import FI_ERROR_REGEX
 from lib.core.settings import FORMAT_EXCEPTION_STRINGS
+from lib.core.settings import GRAPHQL_ERROR_REGEX
 from lib.core.settings import HEURISTIC_CHECK_ALPHABET
 from lib.core.settings import INFERENCE_EQUALS_CHAR
+from lib.core.settings import LDAP_ERROR_REGEX
+from lib.core.settings import SSTI_ERROR_REGEX
+from lib.core.settings import XPATH_ERROR_REGEX
+from lib.core.settings import XXE_ERROR_REGEX
 from lib.core.settings import IPS_WAF_CHECK_PAYLOAD
 from lib.core.settings import IPS_WAF_CHECK_RATIO
 from lib.core.settings import IPS_WAF_CHECK_TIMEOUT
 from lib.core.settings import MAX_DIFFLIB_SEQUENCE_LENGTH
 from lib.core.settings import MAX_STABILITY_DELAY
 from lib.core.settings import NON_SQLI_CHECK_PREFIX_SUFFIX_LENGTH
+from lib.core.settings import NOSQL_ERROR_REGEX
+from lib.core.settings import NULL_CONNECTION_LENGTH_TOLERANCE_HIGH
+from lib.core.settings import NULL_CONNECTION_LENGTH_TOLERANCE_LOW
+from lib.core.settings import NULL_CONNECTION_SKIP_READ_MIN_LENGTH
 from lib.core.settings import PRECONNECT_INCOMPATIBLE_SERVERS
 from lib.core.settings import SINGLE_QUOTE_MARKER
 from lib.core.settings import SLEEP_TIME_MARKER
@@ -94,12 +105,14 @@ from lib.core.settings import SUHOSIN_MAX_VALUE_LENGTH
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.settings import URI_HTTP_HEADER
+from lib.core.settings import WAF_BLOCK_HTTP_CODES
 from lib.core.threads import getCurrentThreadData
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.request.comparison import comparison
 from lib.request.inject import checkBooleanExpression
 from lib.request.templates import getPageTemplate
+from lib.utils.dialect import dialectCheckDbms
 from lib.techniques.union.test import unionTest
 from lib.techniques.union.use import configUnion
 from thirdparty import six
@@ -148,6 +161,13 @@ def checkSqlInjection(place, parameter, value):
                 if not injection.dbms and PAYLOAD.TECHNIQUE.BOOLEAN in injection.data:
                     if not Backend.getIdentifiedDbms() and kb.heuristicDbms is None and not kb.droppingRequests:
                         kb.heuristicDbms = heuristicCheckDbms(injection)
+
+                    # keyword-free fallback: heuristicCheckDbms() above uses SELECT/quote payloads
+                    # and is skipped when the WAF/IPS is dropping requests; the operator-dialect
+                    # probes carry no SELECT/quote/schema name, so they can still narrow the DBMS in
+                    # that case (or when it was inconclusive), using the now-calibrated boolean oracle
+                    if not Backend.getIdentifiedDbms() and kb.heuristicDbms is None:
+                        kb.heuristicDbms = dialectCheckDbms(injection)
 
                 # If the DBMS has already been fingerprinted (via DBMS-specific
                 # error message, simple heuristic check or via DBMS-specific
@@ -580,6 +600,18 @@ def checkSqlInjection(place, parameter, value):
                                                     break
 
                             if injectable:
+                                # WAF/IPS block-artifact guard: a TRUE condition (the always-true payload that
+                                # mimics a legitimate request) coming back with a blocked HTTP status (e.g. 403)
+                                # while the FALSE condition passes (2xx) is the WAF answering, not the database.
+                                # A real boolean injection's TRUE condition reproduces the normal page, so this
+                                # status-code asymmetry is the classic false positive - refuse it here.
+                                if not kb.negativeLogic and trueCode in WAF_BLOCK_HTTP_CODES and (falseCode or 0) < 400 and (kb.heuristicCode or 200) < 400:
+                                    warnMsg = "%sparameter '%s' TRUE/FALSE responses differ only by a blocked HTTP %d vs %d status, " % ("%s " % paramType if paramType != parameter else "", parameter, trueCode, falseCode)
+                                    warnMsg += "which is characteristic of a WAF/IPS block rather than a SQL injection; skipping as a likely false positive"
+                                    logger.warning(warnMsg)
+                                    injectable = False
+                                    continue
+
                                 if kb.pageStable and not any((conf.string, conf.notString, conf.regexp, conf.code, conf.titles, kb.nullConnection)):
                                     if all((falseCode, trueCode)) and falseCode != trueCode and trueCode != kb.heuristicCode:
                                         suggestion = conf.code = trueCode
@@ -1149,6 +1181,48 @@ def heuristicCheckSqlInjection(place, parameter):
     except (SystemError, RuntimeError) as ex:
         logger.debug("Skipping FI heuristic due to regex failure: %s", getSafeExString(ex))
 
+    if not conf.nosql and re.search(NOSQL_ERROR_REGEX, page or ""):
+        infoMsg = "heuristic (NoSQL) test shows that %sparameter '%s' might be vulnerable to NoSQL injection attacks (rerun with switch '--nosql')" % ("%s " % paramType if paramType != parameter else "", parameter)
+        logger.info(infoMsg)
+
+        if conf.beep:
+            beep()
+
+    if not conf.graphql and re.search(GRAPHQL_ERROR_REGEX, page or ""):
+        infoMsg = "heuristic (GraphQL) test shows that %sparameter '%s' appears to be a GraphQL endpoint (rerun with switch '--graphql')" % ("%s " % paramType if paramType != parameter else "", parameter)
+        logger.info(infoMsg)
+
+        if conf.beep:
+            beep()
+
+    if not conf.ldap and re.search(LDAP_ERROR_REGEX, page or ""):
+        infoMsg = "heuristic (LDAP) test shows that %sparameter '%s' might be vulnerable to LDAP injection (rerun with switch '--ldap')" % ("%s " % paramType if paramType != parameter else "", parameter)
+        logger.info(infoMsg)
+
+        if conf.beep:
+            beep()
+
+    if not conf.xpath and re.search(XPATH_ERROR_REGEX, page or ""):
+        infoMsg = "heuristic (XPath) test shows that %sparameter '%s' might be vulnerable to XPath injection (rerun with switch '--xpath')" % ("%s " % paramType if paramType != parameter else "", parameter)
+        logger.info(infoMsg)
+
+        if conf.beep:
+            beep()
+
+    if not conf.ssti and re.search(SSTI_ERROR_REGEX, page or ""):
+        infoMsg = "heuristic (SSTI) test shows that %sparameter '%s' might be vulnerable to server-side template injection (rerun with switch '--ssti')" % ("%s " % paramType if paramType != parameter else "", parameter)
+        logger.info(infoMsg)
+
+        if conf.beep:
+            beep()
+
+    if not conf.xxe and kb.postHint in (POST_HINT.XML, POST_HINT.SOAP) and re.search(XXE_ERROR_REGEX, page or ""):
+        infoMsg = "heuristic (XXE) test shows that the XML request body might be vulnerable to XML External Entity injection (rerun with switch '--xxe')"
+        logger.info(infoMsg)
+
+        if conf.beep:
+            beep()
+
     kb.disableHtmlDecoding = False
     kb.heuristicMode = False
 
@@ -1209,7 +1283,9 @@ def checkDynamicContent(firstPage, secondPage):
             seqMatcher.set_seq1(firstPage)
             seqMatcher.set_seq2(secondPage)
             ratio = seqMatcher.quick_ratio()
-        except MemoryError:
+        except (MemoryError, TypeError, SystemError, ValueError, AttributeError):
+            # difflib can fail on pathological input or, rarely, with interpreter-level
+            # errors under heavy threading; degrade to "undetermined" instead of crashing
             ratio = None
 
     if ratio is None:
@@ -1224,6 +1300,27 @@ def checkDynamicContent(firstPage, secondPage):
             count += 1
 
             if count > conf.retries:
+                # Last resort before the (lossy) '--text-only' fallback: if the page is byte-unstable
+                # but STRUCTURALLY stable - an identical, non-empty tag/class/id skeleton across
+                # requests - base the comparison on that value-free structure instead. Dynamic text
+                # (e.g. per-render result rows) then no longer masks an injection whose signal is
+                # structural (the HTML counterpart of the structure-aware JSON comparison). Content
+                # with no usable structure (empty skeleton, e.g. random/binary bodies) falls through
+                # to '--text-only' as before.
+                skeleton = extractStructuralTokens(firstPage)
+                if skeleton and skeleton == extractStructuralTokens(secondPage):
+                    kb.pageStructurallyStable = True
+
+                    if kb.nullConnection:
+                        debugMsg = "turning off NULL connection support because of structural page comparison"
+                        logger.debug(debugMsg)
+                        kb.nullConnection = None
+
+                    infoMsg = "target URL content is not byte-stable but structurally stable; sqlmap "
+                    infoMsg += "will base the page comparison on the page structure"
+                    logger.info(infoMsg)
+                    return
+
                 warnMsg = "target URL content appears to be too dynamic. "
                 warnMsg += "Switching to '--text-only' "
                 logger.warning(warnMsg)
@@ -1351,6 +1448,10 @@ def checkWaf():
             warnMsg = "previous heuristics detected that the target "
             warnMsg += "is protected by some kind of WAF/IPS"
             logger.critical(warnMsg)
+            if hashDBRetrieve(HASHDB_KEYS.CHECK_WAF_BYPASS, True):    # re-apply a previously accepted automatic bypass
+                from lib.utils.wafbypass import neutralizeFingerprint
+                kb.wafBypass = True
+                neutralizeFingerprint()
         return _
 
     if not kb.originalPage:
@@ -1393,6 +1494,7 @@ def checkWaf():
 
     hashDBWrite(HASHDB_KEYS.CHECK_WAF_RESULT, retVal, True)
 
+
     if retVal:
         if not kb.identifiedWafs:
             warnMsg = "heuristics detected that the target "
@@ -1406,9 +1508,19 @@ def checkWaf():
         if not choice:
             raise SqlmapUserQuitException
         else:
-            if not conf.tamper:
-                warnMsg = "please consider usage of tamper scripts (option '--tamper')"
-                singleTimeWarnMessage(warnMsg)
+            if not conf.tamper and not kb.tamperFunctions:
+                message = "do you want sqlmap to try to automatically bypass the WAF/IPS during "
+                message += "the run (e.g. by using a non-scanner User-Agent and tamper script(s))? [Y/n] "
+                kb.wafBypass = readInput(message, default='Y', boolean=True)
+                hashDBWrite(HASHDB_KEYS.CHECK_WAF_BYPASS, kb.wafBypass, True)
+                if kb.wafBypass:
+                    # apply it up-front so the whole run (detection included) avoids the scanner
+                    # fingerprint, instead of getting blocked first and only then retrying
+                    from lib.utils.wafbypass import neutralizeFingerprint
+                    neutralizeFingerprint()
+                    logger.info("using a random (non-scanner) User-Agent and browser-like headers to bypass the WAF/IPS")
+                else:
+                    singleTimeWarnMessage("please consider manual usage of tamper scripts (option '--tamper')")
 
     return retVal
 
@@ -1436,30 +1548,79 @@ def checkNullConnection():
         pushValue(kb.pageCompress)
         kb.pageCompress = False
 
+        # A method is accepted only if the length it reports tracks the real GET response. The
+        # original page length (len(kb.originalPage)) is the reference; a method whose length is
+        # grossly off (e.g. HEAD returning 'Content-Length: 0', HEAD served from a different code
+        # path, or sneaked-in compression) would otherwise make every page look identical and
+        # silently break detection. The band is coarse on purpose (byte-vs-character size and
+        # moderate page dynamism are expected); a false reject just forgoes the optimization
+        def _plausibleLength(length):
+            reference = len(kb.originalPage or "")
+            if not reference:
+                return True
+            return NULL_CONNECTION_LENGTH_TOLERANCE_LOW * reference <= length <= NULL_CONNECTION_LENGTH_TOLERANCE_HIGH * reference
+
         try:
             page, headers, _ = Request.getPage(method=HTTPMETHOD.HEAD, raise404=False)
 
             if not page and HTTP_HEADER.CONTENT_LENGTH in (headers or {}):
-                kb.nullConnection = NULLCONNECTION.HEAD
+                try:
+                    length = int(headers[HTTP_HEADER.CONTENT_LENGTH].split(',')[0])
+                except ValueError:
+                    length = None
 
-                infoMsg = "NULL connection is supported with HEAD method ('Content-Length')"
-                logger.info(infoMsg)
-            else:
+                if length is not None and _plausibleLength(length):
+                    kb.nullConnection = NULLCONNECTION.HEAD
+
+                    infoMsg = "NULL connection is supported with HEAD method ('Content-Length')"
+                    logger.info(infoMsg)
+                elif length is not None:
+                    debugMsg = "HEAD method reports an implausible 'Content-Length' (%d B vs ~%d B for the original page); skipping it" % (length, len(kb.originalPage or ""))
+                    logger.debug(debugMsg)
+
+            if kb.nullConnection is None:
                 page, headers, _ = Request.getPage(auxHeaders={HTTP_HEADER.RANGE: "bytes=-1"})
 
                 if page and len(page) == 1 and HTTP_HEADER.CONTENT_RANGE in (headers or {}):
-                    kb.nullConnection = NULLCONNECTION.RANGE
+                    try:
+                        length = int(headers[HTTP_HEADER.CONTENT_RANGE][headers[HTTP_HEADER.CONTENT_RANGE].find('/') + 1:])
+                    except ValueError:
+                        length = None
 
-                    infoMsg = "NULL connection is supported with GET method ('Range')"
-                    logger.info(infoMsg)
-                else:
-                    _, headers, _ = Request.getPage(skipRead=True)
+                    if length is not None and _plausibleLength(length):
+                        kb.nullConnection = NULLCONNECTION.RANGE
 
-                    if HTTP_HEADER.CONTENT_LENGTH in (headers or {}):
+                        infoMsg = "NULL connection is supported with GET method ('Range')"
+                        logger.info(infoMsg)
+                    elif length is not None:
+                        debugMsg = "'Range' method reports an implausible total length (%d B vs ~%d B for the original page); skipping it" % (length, len(kb.originalPage or ""))
+                        logger.debug(debugMsg)
+
+            if kb.nullConnection is None:
+                _, headers, _ = Request.getPage(skipRead=True)
+
+                if HTTP_HEADER.CONTENT_LENGTH in (headers or {}):
+                    try:
+                        length = int(headers[HTTP_HEADER.CONTENT_LENGTH].split(',')[0])
+                    except ValueError:
+                        length = len(kb.originalPage or "")
+
+                    if not _plausibleLength(length):
+                        debugMsg = "'skip-read' method reports an implausible 'Content-Length' (%d B vs ~%d B for the original page); skipping it" % (length, len(kb.originalPage or ""))
+                        logger.debug(debugMsg)
+                    # Unlike HEAD/Range, 'skip-read' leaves the body unread and must close the
+                    # connection (an unread body cannot be reused), paying a fresh TCP/TLS handshake
+                    # per request. That only outweighs the avoided body transfer for large responses;
+                    # for small ones it is a net slowdown, so it is gated by the response size here
+                    elif length >= NULL_CONNECTION_SKIP_READ_MIN_LENGTH:
                         kb.nullConnection = NULLCONNECTION.SKIP_READ
 
                         infoMsg = "NULL connection is supported with 'skip-read' method"
                         logger.info(infoMsg)
+                    else:
+                        debugMsg = "'skip-read' NULL connection method is available but skipped because the "
+                        debugMsg += "response (%d B) is too small for it to outweigh the per-request reconnect cost" % length
+                        logger.debug(debugMsg)
 
         except SqlmapConnectionException:
             pass

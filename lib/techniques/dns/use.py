@@ -84,7 +84,10 @@ def dnsUse(payload, expression):
                 _ = conf.dnsServer.pop(prefix, suffix)
 
                 if _:
-                    _ = extractRegexResult(r"%s\.(?P<result>.+)\.%s" % (prefix, suffix), _, re.I)
+                    # Note: non-greedy so a '--dns-domain' label that happens to match the random
+                    # suffix can't make the match run past the real boundary (the boundary alphabet
+                    # excludes hex characters, so it can never under-match into the hex payload)
+                    _ = extractRegexResult(r"%s\.(?P<result>.+?)\.%s" % (prefix, suffix), _, re.I)
                     _ = decodeDbmsHexValue(_)
                     output = (output or "") + _
                     offset += len(_)

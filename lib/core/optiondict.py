@@ -19,6 +19,9 @@ optDict = {
         "sessionFile": "string",
         "googleDork": "string",
         "configFile": "string",
+        "openApiFile": "string",
+        "openApiBase": "string",
+        "openApiTags": "string",
     },
 
     "Request": {
@@ -77,8 +80,8 @@ optDict = {
 
     "Optimization": {
         "optimize": "boolean",
-        "predictOutput": "boolean",
         "keepAlive": "boolean",
+        "noKeepAlive": "boolean",
         "nullConnection": "boolean",
         "threads": "integer",
     },
@@ -100,6 +103,7 @@ optDict = {
         "prefix": "string",
         "suffix": "string",
         "tamper": "string",
+        "proof": "boolean",
     },
 
     "Detection": {
@@ -116,7 +120,16 @@ optDict = {
 
     "Techniques": {
         "technique": "string",
+        "nosql": "boolean",
+        "graphql": "boolean",
+        "ldap": "boolean",
+        "xpath": "boolean",
+        "ssti": "boolean",
+        "xxe": "boolean",
+        "oobServer": "string",
+        "oobToken": "string",
         "timeSec": "integer",
+        "timeless": "boolean",
         "uCols": "string",
         "uChar": "string",
         "uFrom": "string",
@@ -151,6 +164,7 @@ optDict = {
         "search": "boolean",
         "getComments": "boolean",
         "getStatements": "boolean",
+        "getProcs": "boolean",
         "db": "string",
         "tbl": "string",
         "col": "string",
@@ -235,6 +249,7 @@ optDict = {
         "postprocess": "string",
         "preprocess": "string",
         "repair": "boolean",
+        "reportJson": "string",
         "saveConfig": "string",
         "scope": "string",
         "skipHeuristics": "boolean",
@@ -268,10 +283,14 @@ optDict = {
     "Hidden": {
         "dummy": "boolean",
         "disablePrecon": "boolean",
+        "noHuffman": "boolean",
         "profile": "boolean",
         "forceDns": "boolean",
         "murphyRate": "integer",
         "smokeTest": "boolean",
+        "fpTest": "boolean",
+        "payloadLint": "boolean",
+        "apiTest": "boolean",
     },
 
     "API": {

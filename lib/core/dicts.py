@@ -289,9 +289,9 @@ HEURISTIC_NULL_EVAL = {
     DBMS.PRESTO: "FROM_HEX(NULL)",
     DBMS.ALTIBASE: "TDESENCRYPT(NULL,NULL)",
     DBMS.MIMERSQL: "ASCII_CHAR(256)",
-    DBMS.CRATEDB: "MD5(NULL~NULL)",  # NOTE: NULL~NULL also being evaluated on H2 and Ignite
+    DBMS.CRATEDB: "GEN_RANDOM_TEXT_UUID()~NULL",  # NOTE: old MD5(NULL~NULL) was too loose (also NULL on MonetDB/H2/Ignite -> they mis-identified as CrateDB); gen_random_text_uuid() is CrateDB-only, and ~NULL keeps it a NULL-eval
     DBMS.CUBRID: "(NULL SETEQ NULL)",
-    DBMS.CACHE: "%SQLUPPER NULL",
+    DBMS.CACHE: "%EXACT(NULL)",  # NOTE: '%SQLUPPER NULL' does not parse inside the heuristic's (SELECT ...) form, so Cache/IRIS fell through to a later, non-unique marker (e.g. Mckoi TONUMBER); the %-prefixed collation function %EXACT() is InterSystems-unique and works here
     DBMS.EXTREMEDB: "NULLIFZERO(hashcode(NULL))",
     DBMS.RAIMA: "IF(ROWNUMBER()>0,CONVERT(NULL,TINYINT),NULL)",
     DBMS.VIRTUOSO: "__MAX_NOTNULL(NULL)",
@@ -431,6 +431,8 @@ PART_RUN_CONTENT_TYPES = {
     "dumpTable": CONTENT_TYPE.DUMP_TABLE,
     "search": CONTENT_TYPE.SEARCH,
     "sqlQuery": CONTENT_TYPE.SQL_QUERY,
+    "getStatements": CONTENT_TYPE.STATEMENTS,
+    "getProcs": CONTENT_TYPE.PROCEDURES,
     "tableExists": CONTENT_TYPE.COMMON_TABLES,
     "columnExists": CONTENT_TYPE.COMMON_COLUMNS,
     "readFile": CONTENT_TYPE.FILE_READ,

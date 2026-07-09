@@ -3,6 +3,11 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -11,6 +16,10 @@ jobs:
   build:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
+
+    env:
+      # deterministic dict/set iteration order run-to-run (guards against hash-order flakiness in CI)
+      PYTHONHASHSEED: "0"
 
     strategy:
       matrix:
@@ -37,11 +46,89 @@ jobs:
       - name: Python sanity
         run: python -VV
 
+      - name: Pyflakes lint
+        shell: bash
+        run: |
+          python - <<'PY'
+          from __future__ import print_function
+
+          import subprocess
+          import sys
+
+          subprocess.check_call([
+              sys.executable, "-m", "pip", "install", "pyflakes"
+          ])
+
+          files = subprocess.check_output(
+              ["git", "ls-files", "*.py"]
+          ).decode("utf-8").splitlines()
+
+          files = [
+              f for f in files
+              if not f.startswith("thirdparty/")
+          ]
+
+          proc = subprocess.Popen(
+              [sys.executable, "-m", "pyflakes"] + files,
+              stdout=subprocess.PIPE,
+              stderr=subprocess.STDOUT,
+          )
+          out, _ = proc.communicate()
+
+          text = out.decode("utf-8", "replace")
+          lines = [
+              line for line in text.splitlines()
+              if " redefines " not in line
+          ]
+
+          if lines:
+              print("\n".join(lines))
+              sys.exit(1)
+
+          if proc.returncode not in (0, 1):
+              if text:
+                  print(text)
+              print("pyflakes failed unexpectedly with status %s" % proc.returncode)
+              sys.exit(proc.returncode or 1)
+
+          print("pyflakes: clean")
+          PY
+
       - name: Basic import test
         run: python -c "import sqlmap; import sqlmapapi"
 
+      - name: Install optional test deps (lxml, jinja2)
+        # lxml has no PyPy-2.7 wheel and 5.x is Py3-only, so it cannot be pip-installed there. The
+        # tests that use it (test_xpath's real-XPath checks, and the --xpath/--ssti vuln-test
+        # endpoints) skip themselves when the engine is unavailable, so these deps are only needed
+        # on the Py3 jobs.
+        if: matrix.python-version != 'pypy-2.7'
+        run: python -m pip install -q lxml jinja2
+
+      - name: Unit tests
+        # -B: do not write .pyc files. On Python 2 / PyPy a cached .pyc makes a module's __file__
+        # point at the .pyc, which would make the later --smoke getFileType(__file__) doctest see
+        # 'binary' instead of 'text'. Keeping this step byte-compile-free leaves --smoke clean.
+        run: python -B -m unittest discover -s tests -p "test_*.py"
+
+      - name: Coverage
+        if: matrix.python-version != 'pypy-2.7'
+        run: |
+          python -m pip install coverage
+          python -m coverage run --source=lib,plugins,tamper -m unittest discover -s tests -p "test_*.py"
+          python -m coverage run -a --source=lib,plugins,tamper sqlmap.py --doc-test
+          python -m coverage report --fail-under=50
+
       - name: Smoke test
-        run: python sqlmap.py --smoke
+        run: python sqlmap.py --smoke-test
+
+      - name: Payload lint
+        # offline: emulates blind + UNION enumeration across all DBMSes and checks
+        # every payload agent.py builds with lib/utils/sqllint (structural sanity)
+        run: python sqlmap.py --payload-lint
 
       - name: Vuln test
-        run: python sqlmap.py --vuln
+        run: python sqlmap.py --vuln-test
+
+      - name: API test
+        run: python sqlmap.py --api-test

@@ -47,4 +47,5 @@ Linkovi
 * Najčešće postavljena pitanja (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
 * X: [@sqlmap](https://x.com/sqlmap)
 * Demo: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
+* Poligon: https://sekumart.sekuripy.hr
 * Slike: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

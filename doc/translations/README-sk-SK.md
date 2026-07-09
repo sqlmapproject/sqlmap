@@ -47,4 +47,5 @@ Linky
 * Často kladené otázky (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
 * X: [@sqlmap](https://x.com/sqlmap)
 * Demá: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
+* Cvičisko: https://sekumart.sekuripy.hr
 * Snímky obrazovky: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

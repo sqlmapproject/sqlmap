@@ -6,6 +6,7 @@ See the file 'LICENSE' for copying permission
 """
 
 import hashlib
+import json
 import os
 import re
 import shutil
@@ -14,6 +15,7 @@ import threading
 
 from lib.core.common import Backend
 from lib.core.common import checkFile
+from lib.core.common import clearColors
 from lib.core.common import dataToDumpFile
 from lib.core.common import dataToStdout
 from lib.core.common import filterNone
@@ -30,6 +32,7 @@ from lib.core.common import unsafeSQLIdentificatorNaming
 from lib.core.compat import xrange
 from lib.core.convert import getBytes
 from lib.core.convert import getConsoleLength
+from lib.core.convert import stdoutEncode
 from lib.core.convert import getText
 from lib.core.convert import getUnicode
 from lib.core.convert import htmlEscape
@@ -59,6 +62,7 @@ from lib.core.settings import WINDOWS_RESERVED_NAMES
 from lib.utils.safe2bin import safechardecode
 from thirdparty import six
 from thirdparty.magic import magic
+from collections import OrderedDict
 
 class Dump(object):
     """
@@ -90,11 +94,24 @@ class Dump(object):
             except IOError as ex:
                 errMsg = "error occurred while writing to log file ('%s')" % getSafeExString(ex)
                 raise SqlmapGenericException(errMsg)
-
-            if multiThreadMode:
-                self._lock.release()
+            finally:
+                if multiThreadMode:
+                    self._lock.release()
 
         kb.dataOutputFlag = True
+
+    def _reportData(self, data, content_type):
+        """
+        --report-json: capture a structured result exactly as the REST API would store it (the raw
+        value + COMPLETE status), independent of console/file rendering. No-op unless a report
+        collector is active - which is only ever the case for a CLI --report-json run, never under
+        --api - so this never double-captures alongside StdDbOut. A None content_type is resolved
+        via the kb.partRun fallback (e.g. the fingerprint line), mirroring the API exactly.
+        """
+
+        if conf.get("reportCollector") is not None:
+            from lib.utils.api import _storeData, REPORT_TASKID
+            _storeData(conf.reportCollector, REPORT_TASKID, stdoutEncode(clearColors(data)), CONTENT_STATUS.COMPLETE, content_type)
 
     def flush(self):
         if self._outputFP:
@@ -116,9 +133,12 @@ class Dump(object):
             raise SqlmapGenericException(errMsg)
 
     def singleString(self, data, content_type=None):
+        self._reportData(data, content_type)
         self._write(data, content_type=content_type)
 
     def string(self, header, data, content_type=None, sort=True):
+        self._reportData(data, content_type)
+
         if conf.api:
             self._write(data, content_type=content_type)
 
@@ -152,6 +172,8 @@ class Dump(object):
                 elements.sort(key=lambda _: _.lower() if hasattr(_, "lower") else _)
             except:
                 pass
+
+        self._reportData(elements, content_type)
 
         if conf.api:
             self._write(elements, content_type=content_type)
@@ -194,6 +216,9 @@ class Dump(object):
     def statements(self, statements):
         self.lister("SQL statements", statements, content_type=CONTENT_TYPE.STATEMENTS)
 
+    def procedures(self, procedures):
+        self.lister("stored procedures", procedures, content_type=CONTENT_TYPE.PROCEDURES)
+
     def userSettings(self, header, userSettings, subHeader, content_type=None):
         self._areAdmins = set()
 
@@ -203,6 +228,8 @@ class Dump(object):
 
         users = [_ for _ in userSettings.keys() if _ is not None]
         users.sort(key=lambda _: _.lower() if hasattr(_, "lower") else _)
+
+        self._reportData(userSettings, content_type)
 
         if conf.api:
             self._write(userSettings, content_type=content_type)
@@ -237,6 +264,8 @@ class Dump(object):
 
     def dbTables(self, dbTables):
         if isinstance(dbTables, dict) and len(dbTables) > 0:
+            self._reportData(dbTables, CONTENT_TYPE.TABLES)
+
             if conf.api:
                 self._write(dbTables, content_type=CONTENT_TYPE.TABLES)
 
@@ -279,6 +308,8 @@ class Dump(object):
 
     def dbTableColumns(self, tableColumns, content_type=None):
         if isinstance(tableColumns, dict) and len(tableColumns) > 0:
+            self._reportData(tableColumns, content_type)
+
             if conf.api:
                 self._write(tableColumns, content_type=content_type)
 
@@ -290,10 +321,13 @@ class Dump(object):
                     maxlength1 = 0
                     maxlength2 = 0
 
-                    colType = None
-
                     colList = list(columns.keys())
                     colList.sort(key=lambda _: _.lower() if hasattr(_, "lower") else _)
+
+                    # Note: decide the layout by whether ANY column carries a type, not by the last
+                    # column iterated; otherwise a mixed table (some columns typed, some not) whose
+                    # alphabetically-last column is type-less renders a header/body column mismatch
+                    hasType = any(columns[_] is not None for _ in colList)
 
                     for column in colList:
                         colType = columns[column]
@@ -305,7 +339,7 @@ class Dump(object):
                     maxlength1 = max(maxlength1, len("COLUMN"))
                     lines1 = "-" * (maxlength1 + 2)
 
-                    if colType is not None:
+                    if hasType:
                         maxlength2 = max(maxlength2, len("TYPE"))
                         lines2 = "-" * (maxlength2 + 2)
 
@@ -316,17 +350,15 @@ class Dump(object):
                     else:
                         self._write("[%d columns]" % len(columns))
 
-                    if colType is not None:
+                    if hasType:
                         self._write("+%s+%s+" % (lines1, lines2))
                     else:
                         self._write("+%s+" % lines1)
 
                     blank1 = " " * (maxlength1 - len("COLUMN"))
 
-                    if colType is not None:
+                    if hasType:
                         blank2 = " " * (maxlength2 - len("TYPE"))
-
-                    if colType is not None:
                         self._write("| Column%s | Type%s |" % (blank1, blank2))
                         self._write("+%s+%s+" % (lines1, lines2))
                     else:
@@ -339,19 +371,22 @@ class Dump(object):
                         column = unsafeSQLIdentificatorNaming(column)
                         blank1 = " " * (maxlength1 - getConsoleLength(column))
 
-                        if colType is not None:
+                        if hasType:
+                            colType = colType or ""
                             blank2 = " " * (maxlength2 - getConsoleLength(colType))
                             self._write("| %s%s | %s%s |" % (column, blank1, colType, blank2))
                         else:
                             self._write("| %s%s |" % (column, blank1))
 
-                    if colType is not None:
+                    if hasType:
                         self._write("+%s+%s+\n" % (lines1, lines2))
                     else:
                         self._write("+%s+\n" % lines1)
 
     def dbTablesCount(self, dbTables):
         if isinstance(dbTables, dict) and len(dbTables) > 0:
+            self._reportData(dbTables, CONTENT_TYPE.COUNT)
+
             if conf.api:
                 self._write(dbTables, content_type=CONTENT_TYPE.COUNT)
 
@@ -413,6 +448,8 @@ class Dump(object):
         safeDb = re.sub(r"[^\w]", UNSAFE_DUMP_FILEPATH_REPLACEMENT, unsafeSQLIdentificatorNaming(db))
         safeTable = re.sub(r"[^\w]", UNSAFE_DUMP_FILEPATH_REPLACEMENT, unsafeSQLIdentificatorNaming(table))
 
+        self._reportData(tableValues, CONTENT_TYPE.DUMP_TABLE)
+
         if conf.api:
             self._write(tableValues, content_type=CONTENT_TYPE.DUMP_TABLE)
 
@@ -431,7 +468,7 @@ class Dump(object):
 
         if conf.dumpFormat == DUMP_FORMAT.SQLITE:
             replication = Replication(os.path.join(conf.dumpPath, "%s.sqlite3" % safeDb))
-        elif conf.dumpFormat in (DUMP_FORMAT.CSV, DUMP_FORMAT.HTML):
+        elif conf.dumpFormat in (DUMP_FORMAT.CSV, DUMP_FORMAT.HTML, DUMP_FORMAT.JSONL):
             if not os.path.isdir(dumpDbPath):
                 try:
                     os.makedirs(dumpDbPath)
@@ -590,10 +627,25 @@ class Dump(object):
         elif conf.dumpFormat == DUMP_FORMAT.SQLITE:
             rtable.beginTransaction()
 
+        # Precompute the per-column layout once. These values are invariant across
+        # every row, so resolving them per cell (dict lookup, int() conversion and
+        # identifier normalization) wasted count x ncols work on large dumps.
+        dumpColumns = []
+        for column in columns:
+            if column != "__infos__":
+                info = tableValues[column]
+                dumpColumns.append((unsafeSQLIdentificatorNaming(column), info["values"], int(info["length"])))
+
         for i in xrange(count):
             console = (i >= count - TRIM_STDOUT_DUMP_SIZE)
             field = 1
-            values = []
+
+            # Only the SQLITE and JSONL paths accumulate a per-row container; the
+            # others left these unused, wasting an allocation on every single row
+            if conf.dumpFormat == DUMP_FORMAT.SQLITE:
+                values = []
+            elif conf.dumpFormat == DUMP_FORMAT.JSONL:
+                record = OrderedDict()
 
             if i == 0 and count > TRIM_STDOUT_DUMP_SIZE:
                 self._write(" ...")
@@ -601,51 +653,58 @@ class Dump(object):
             if conf.dumpFormat == DUMP_FORMAT.HTML:
                 dataToDumpFile(dumpFP, "<tr>")
 
-            for column in columns:
-                if column != "__infos__":
-                    info = tableValues[column]
+            for safeColumn, colValues, maxlength in dumpColumns:
+                if len(colValues) <= i or colValues[i] is None:
+                    value = u''
+                else:
+                    value = getUnicode(colValues[i])
+                    value = DUMP_REPLACEMENTS.get(value, value)
 
-                    if len(info["values"]) <= i or info["values"][i] is None:
-                        value = u''
+                if conf.dumpFormat == DUMP_FORMAT.SQLITE:
+                    # Note: store a real NULL for the NULL sentinel (and the raw value otherwise),
+                    # mirroring the JSONL path below; appending the display-replaced 'NULL'/'<blank>'
+                    # text would corrupt the INTEGER/REAL-typed columns inferred above
+                    if len(colValues) <= i or colValues[i] is None or colValues[i] == " ":  # NULL
+                        values.append(None)
                     else:
-                        value = getUnicode(info["values"][i])
-                        value = DUMP_REPLACEMENTS.get(value, value)
+                        values.append(getUnicode(colValues[i]))
 
-                    if conf.dumpFormat == DUMP_FORMAT.SQLITE:
-                        values.append(value)
+                blank = " " * (maxlength - getConsoleLength(value))
+                self._write("| %s%s" % (value, blank), newline=False, console=console)
 
-                    maxlength = int(info["length"])
-                    blank = " " * (maxlength - getConsoleLength(value))
-                    self._write("| %s%s" % (value, blank), newline=False, console=console)
+                if len(value) > MIN_BINARY_DISK_DUMP_SIZE and r'\x' in value:
+                    try:
+                        mimetype = getText(magic.from_buffer(getBytes(value), mime=True))
+                        if any(mimetype.startswith(_) for _ in ("application", "image")):
+                            if not os.path.isdir(dumpDbPath):
+                                os.makedirs(dumpDbPath)
 
-                    if len(value) > MIN_BINARY_DISK_DUMP_SIZE and r'\x' in value:
-                        try:
-                            mimetype = getText(magic.from_buffer(getBytes(value), mime=True))
-                            if any(mimetype.startswith(_) for _ in ("application", "image")):
-                                if not os.path.isdir(dumpDbPath):
-                                    os.makedirs(dumpDbPath)
+                            _ = re.sub(r"[^\w]", UNSAFE_DUMP_FILEPATH_REPLACEMENT, normalizeUnicode(safeColumn))
+                            filepath = os.path.join(dumpDbPath, "%s-%d.bin" % (_, randomInt(8)))
+                            warnMsg = "writing binary ('%s') content to file '%s' " % (mimetype, filepath)
+                            logger.warning(warnMsg)
 
-                                _ = re.sub(r"[^\w]", UNSAFE_DUMP_FILEPATH_REPLACEMENT, normalizeUnicode(unsafeSQLIdentificatorNaming(column)))
-                                filepath = os.path.join(dumpDbPath, "%s-%d.bin" % (_, randomInt(8)))
-                                warnMsg = "writing binary ('%s') content to file '%s' " % (mimetype, filepath)
-                                logger.warning(warnMsg)
+                            with openFile(filepath, "w+b", None) as f:
+                                _ = safechardecode(value, True)
+                                f.write(_)
 
-                                with openFile(filepath, "w+b", None) as f:
-                                    _ = safechardecode(value, True)
-                                    f.write(_)
+                    except Exception as ex:
+                        logger.debug(getSafeExString(ex))
 
-                        except Exception as ex:
-                            logger.debug(getSafeExString(ex))
+                if conf.dumpFormat == DUMP_FORMAT.CSV:
+                    if field == fields:
+                        dataToDumpFile(dumpFP, "%s" % safeCSValue(value))
+                    else:
+                        dataToDumpFile(dumpFP, "%s%s" % (safeCSValue(value), conf.csvDel))
+                elif conf.dumpFormat == DUMP_FORMAT.HTML:
+                    dataToDumpFile(dumpFP, "<td>%s</td>" % getUnicode(htmlEscape(value).encode("ascii", "xmlcharrefreplace")))
+                elif conf.dumpFormat == DUMP_FORMAT.JSONL:
+                    if len(colValues) <= i or colValues[i] is None or colValues[i] == " ":  # NULL
+                        record[safeColumn] = None
+                    else:
+                        record[safeColumn] = getUnicode(colValues[i])
 
-                    if conf.dumpFormat == DUMP_FORMAT.CSV:
-                        if field == fields:
-                            dataToDumpFile(dumpFP, "%s" % safeCSValue(value))
-                        else:
-                            dataToDumpFile(dumpFP, "%s%s" % (safeCSValue(value), conf.csvDel))
-                    elif conf.dumpFormat == DUMP_FORMAT.HTML:
-                        dataToDumpFile(dumpFP, "<td>%s</td>" % getUnicode(htmlEscape(value).encode("ascii", "xmlcharrefreplace")))
-
-                    field += 1
+                field += 1
 
             if conf.dumpFormat == DUMP_FORMAT.SQLITE:
                 try:
@@ -656,6 +715,8 @@ class Dump(object):
                 dataToDumpFile(dumpFP, "\n")
             elif conf.dumpFormat == DUMP_FORMAT.HTML:
                 dataToDumpFile(dumpFP, "</tr>\n")
+            elif conf.dumpFormat == DUMP_FORMAT.JSONL:
+                dataToDumpFile(dumpFP, "%s\n" % getUnicode(json.dumps(record, ensure_ascii=False)))
 
             self._write("|", console=console)
 
@@ -665,11 +726,11 @@ class Dump(object):
             rtable.endTransaction()
             logger.info("table '%s.%s' dumped to SQLITE database '%s'" % (db, table, replication.dbpath))
 
-        elif conf.dumpFormat in (DUMP_FORMAT.CSV, DUMP_FORMAT.HTML):
+        elif conf.dumpFormat in (DUMP_FORMAT.CSV, DUMP_FORMAT.HTML, DUMP_FORMAT.JSONL):
             if conf.dumpFormat == DUMP_FORMAT.HTML:
                 dataToDumpFile(dumpFP, "</tbody>\n</table>\n<script>let lc=-1,ld=1;function sortTable(n,h){var t=document.querySelector(\"table\"),r=Array.from(t.tBodies[0].rows);ld=(lc==n?-ld:1);lc=n;r.sort((a,b)=>{var x=a.cells[n].innerText.trim(),y=b.cells[n].innerText.trim(),nx=parseFloat(x),ny=parseFloat(y);return(!isNaN(nx)&&!isNaN(ny)?(nx-ny)*ld:x.localeCompare(y)*ld)});r.forEach(e=>t.tBodies[0].appendChild(e));Array.from(t.tHead.rows[0].cells).forEach(c=>{c.innerText=c.innerText.replace(/[\u2191\u2193]/g,\"\")});h.innerText=h.innerText+ (ld==1?\"\u2191\":\"\u2193\");}</script>\n</body>\n</html>")
-            else:
-                dataToDumpFile(dumpFP, "\n")
+            # Note: each CSV row already ends with '\n' (above); no extra close-newline, otherwise
+            # the file ends with a blank line and a later --start/--stop append injects an empty record
             dumpFP.close()
 
             msg = "table '%s.%s' dumped to %s file '%s'" % (db, table, conf.dumpFormat, dumpFileName)
@@ -679,6 +740,8 @@ class Dump(object):
                 logger.warning(msg)
 
     def dbColumns(self, dbColumnsDict, colConsider, dbs):
+        self._reportData(dbColumnsDict, CONTENT_TYPE.COLUMNS)
+
         if conf.api:
             self._write(dbColumnsDict, content_type=CONTENT_TYPE.COLUMNS)
 

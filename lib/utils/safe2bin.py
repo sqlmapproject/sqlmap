@@ -12,14 +12,16 @@ import sys
 
 PY3 = sys.version_info >= (3, 0)
 
-if PY3:
+try:
+    # Py2
+    text_type = unicode
+    string_types = (basestring,)
+except NameError:
+    # Py3
     xrange = range
     text_type = str
     string_types = (str,)
     unichr = chr
-else:
-    text_type = unicode
-    string_types = (basestring,)
 
 # Regex used for recognition of hex encoded characters
 HEX_ENCODED_CHAR_REGEX = r"(?P<result>\\x[0-9A-Fa-f]{2})"

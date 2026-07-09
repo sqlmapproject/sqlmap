@@ -41,6 +41,7 @@ from lib.core.common import readInput
 from lib.core.common import removePostHintPrefix
 from lib.core.common import safeCSValue
 from lib.core.common import showHttpErrorCodes
+from lib.core.common import singleTimeWarnMessage
 from lib.core.common import urldecode
 from lib.core.common import urlencode
 from lib.core.compat import xrange
@@ -70,11 +71,13 @@ from lib.core.settings import CSRF_TOKEN_PARAMETER_INFIXES
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import EMPTY_FORM_FIELDS_REGEX
 from lib.core.settings import GOOGLE_ANALYTICS_COOKIE_REGEX
+from lib.core.settings import HASHDB_STALE_DAYS
 from lib.core.settings import HOST_ALIASES
 from lib.core.settings import IGNORE_PARAMETERS
 from lib.core.settings import LOW_TEXT_PERCENT
 from lib.core.settings import REFERER_ALIASES
 from lib.core.settings import USER_AGENT_ALIASES
+from lib.core.settings import WAF_BYPASS_MAX_TRIALS
 from lib.core.target import initTargetEnv
 from lib.core.target import setupTargetEnv
 from lib.utils.hash import crackHashFile
@@ -167,6 +170,57 @@ def _formatInjection(inj):
 
     return data
 
+def _autoWafBypass(place, parameter, value):
+    """
+    Automatic WAF/IPS bypass (offered interactively once a WAF/IPS is detected, cached in
+    kb.wafBypass). The request fingerprint has already been neutralized up-front (non-scanner
+    User-Agent, see checkWaf), so here the empirically-ranked candidate tamper scripts are trialled
+    and the first that RESTORES a confirmed injection is adopted. Re-running checkSqlInjection()
+    through a candidate is itself the validation - it succeeds only if the resulting payload both
+    passes the WAF and stays valid SQL, so junk/incompatible candidates are rejected automatically.
+    """
+
+    from lib.utils.wafbypass import candidateTampers, loadTamper
+
+    retVal = None
+
+    savedTamper = kb.tamperFunctions
+    savedTechnique = conf.technique
+    conf.technique = [PAYLOAD.TECHNIQUE.BOOLEAN]    # bound each trial to a quick boolean re-check
+
+    candidates = candidateTampers(identifiedWafs=kb.identifiedWafs)
+
+    try:
+        for count, name in enumerate(candidates):
+            if count >= WAF_BYPASS_MAX_TRIALS:
+                break
+
+            function = loadTamper(name)
+            if function is None:
+                continue
+
+            kb.tamperFunctions = [function]
+            logger.info("trying to bypass the WAF/IPS with tamper script '%s'" % name)
+
+            injection = checkSqlInjection(place, parameter, value)
+            if getattr(injection, "place", None) is not None and NOTE.FALSE_POSITIVE_OR_UNEXPLOITABLE not in injection.notes:
+                logger.info("bypassed the WAF/IPS by using tamper script '%s' (with a non-scanner User-Agent)" % name)
+                logger.info("the same result can be reproduced manually with switch '--random-agent' and tamper script '%s'" % name)
+                retVal = injection
+                return retVal
+
+            if kb.droppingRequests and count >= 2:
+                logger.warning("target keeps dropping requests; giving up on the WAF/IPS bypass")
+                break
+    finally:
+        conf.technique = savedTechnique
+        if retVal is None:      # nothing worked - leave tampering untouched
+            kb.tamperFunctions = savedTamper
+            # honest bail: say it could not be bypassed and what to try manually
+            logger.warning("unable to automatically bypass the WAF/IPS; it might be using behavioral or rate-based detection (consider a manual '--tamper' selection, '--delay', or '--proxy' rotation)")
+
+    return retVal
+
 def _showInjections():
     if conf.wizard and kb.wizardMode:
         kb.wizardMode = False
@@ -181,8 +235,28 @@ def _showInjections():
         conf.dumper.string("", {"url": conf.url, "query": conf.parameters.get(PLACE.GET), "data": conf.parameters.get(PLACE.POST)}, content_type=CONTENT_TYPE.TARGET)
         conf.dumper.string("", kb.injections, content_type=CONTENT_TYPE.TECHNIQUES)
     else:
+        # --report-json: capture the same TARGET/TECHNIQUES structures the API emits, without
+        # printing them (the human-readable injection points are rendered just below)
+        if conf.reportJson:
+            conf.dumper._reportData({"url": conf.url, "query": conf.parameters.get(PLACE.GET), "data": conf.parameters.get(PLACE.POST)}, CONTENT_TYPE.TARGET)
+            conf.dumper._reportData(kb.injections, CONTENT_TYPE.TECHNIQUES)
+
         data = "".join(set(_formatInjection(_) for _ in kb.injections)).rstrip("\n")
         conf.dumper.string(header, data)
+
+    # when results were resumed (no test requests this run), nudge if the session file is stale -
+    # this is the common "why is it showing old/unexpected results?" confusion
+    if kb.testQueryCount == 0 and not conf.freshQueries:
+        try:
+            days = int((time.time() - os.path.getmtime(conf.hashDBFile)) / (24 * 3600))
+        except (OSError, IOError, TypeError):
+            days = 0
+
+        if days >= HASHDB_STALE_DAYS:
+            warnMsg = "results above were resumed from a session file last updated %d days ago, " % days
+            warnMsg += "so they may be stale. Rerun with '--flush-session' to retest "
+            warnMsg += "or '--fresh-queries' to ignore cached query results"
+            logger.warning(warnMsg)
 
     if conf.tamper:
         warnMsg = "changes made by tampering scripts are not "
@@ -431,9 +505,17 @@ def start():
                     infoMsg = "testing URL '%s'" % targetUrl
                     logger.info(infoMsg)
 
+            if conf.graphql and PLACE.GET not in conf.parameters:
+                # graphqlScan() is self-contained and operates on the GraphQL
+                # document, not on HTTP parameters. A dummy GET parameter keeps
+                # _setRequestParams() from appending the URI injection marker ('*')
+                # to a bare endpoint URL (which would break detection under
+                # '--batch'); it is discarded by graphqlScan() on entry.
+                conf.parameters[PLACE.GET] = "x"
+
             setupTargetEnv()
 
-            if not checkConnection(suppressOutput=conf.forms):
+            if not any((conf.graphql,)) and not checkConnection(suppressOutput=conf.forms):
                 continue
 
             if conf.rParam and kb.originalPage:
@@ -447,13 +529,47 @@ def start():
 
             checkWaf()
 
+            if any((conf.graphql, conf.nosql, conf.ldap, conf.xpath, conf.ssti, conf.xxe)) and (conf.reportJson or conf.resultsFile):
+                singleTimeWarnMessage("'--report-json'/'--results-file' do not (yet) capture non-SQL technique (--graphql/--nosql/--ldap/--xpath/--ssti/--xxe) findings; these are reported on the console only")
+
+            if conf.graphql:
+                from lib.techniques.graphql.inject import graphqlScan
+                graphqlScan()
+                continue
+
+            if conf.nosql:
+                from lib.techniques.nosql.inject import nosqlScan
+                nosqlScan()
+                continue
+
+            if conf.ldap:
+                from lib.techniques.ldap.inject import ldapScan
+                ldapScan()
+                continue
+
+            if conf.xpath:
+                from lib.techniques.xpath.inject import xpathScan
+                xpathScan()
+                continue
+
+            if conf.ssti:
+                from lib.techniques.ssti.inject import sstiScan
+                sstiScan()
+                continue
+
+            if conf.xxe:
+                from lib.techniques.xxe.inject import xxeScan
+                xxeScan()
+                continue
+
             if conf.nullConnection:
                 checkNullConnection()
 
             if (len(kb.injections) == 0 or (len(kb.injections) == 1 and kb.injections[0].place is None)) and (kb.injection.place is None or kb.injection.parameter is None):
-                if not any((conf.string, conf.notString, conf.regexp)) and PAYLOAD.TECHNIQUE.BOOLEAN in conf.technique:
-                    # NOTE: this is not needed anymore, leaving only to display
-                    # a warning message to the user in case the page is not stable
+                if not any((conf.string, conf.notString, conf.regexp)) and any(_ in conf.technique for _ in (PAYLOAD.TECHNIQUE.BOOLEAN, PAYLOAD.TECHNIQUE.UNION)):
+                    # NOTE: besides the not-stable warning, this marks dynamic content for removal, which
+                    # UNION column-count detection relies on too (it compares pages) - so it must run when
+                    # UNION is tested even if BOOLEAN is excluded (e.g. '--technique=U' on a dynamic page)
                     checkStability()
 
                 # Do a little prioritization reorder of a testable parameter list
@@ -605,6 +721,14 @@ def start():
                                 logger.info(infoMsg)
 
                                 injection = checkSqlInjection(place, parameter, value)
+
+                                # WAF/IPS bypass accepted: the parameter looks injectable (heuristics) but
+                                # the standard payloads were blocked -> try to auto-bypass it (request
+                                # fingerprint neutralization and/or a tamper script)
+                                if getattr(injection, "place", None) is None and kb.wafBypass and check == HEURISTIC_TEST.POSITIVE \
+                                   and not conf.tamper and not kb.tamperFunctions:
+                                    injection = _autoWafBypass(place, parameter, value) or injection
+
                                 proceed = not kb.endDetection
                                 injectable = False
 
@@ -704,9 +828,13 @@ def start():
                         errMsg += "does not match exclusively True responses."
 
                     if not conf.tamper:
-                        errMsg += " If you suspect that there is some kind of protection mechanism "
-                        errMsg += "involved (e.g. WAF) maybe you could try to use "
-                        errMsg += "option '--tamper' (e.g. '--tamper=space2comment')"
+                        if kb.identifiedWafs:
+                            errMsg += " As a WAF/IPS ('%s') was identified during the run, " % ", ".join(kb.identifiedWafs)
+                            errMsg += "you are strongly advised to retry with option '--tamper' (e.g. '--tamper=space2comment')"
+                        else:
+                            errMsg += " If you suspect that there is some kind of protection mechanism "
+                            errMsg += "involved (e.g. WAF) maybe you could try to use "
+                            errMsg += "option '--tamper' (e.g. '--tamper=space2comment')"
 
                         if not conf.randomAgent:
                             errMsg += " and/or switch '--random-agent'"
@@ -729,7 +857,12 @@ def start():
                     condition = True
 
                 if condition:
-                    action()
+                    try:
+                        action()
+                    finally:
+                        if conf.proof:
+                            from lib.utils.prove import proveExploitation
+                            proveExploitation()
 
         except KeyboardInterrupt:
             if kb.lastCtrlCTime and (time.time() - kb.lastCtrlCTime < 1):

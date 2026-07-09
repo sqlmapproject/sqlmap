@@ -46,10 +46,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 * The `Chardet` library located under `thirdparty/chardet/`.
   Copyright (C) 2008, Mark Pilgrim.
-* The `KeepAlive` library located under `thirdparty/keepalive/`.
-  Copyright (C) 2002-2003, Michael D. Stenner.
-* The `MultipartPost` library located under `thirdparty/multipart/`.
-  Copyright (C) 2006, Will Holcomb.
 * The `icmpsh` tool located under `extra/icmpsh/`.
   Copyright (C) 2010, Nico Leidecker, Bernardo Damele.
 
@@ -272,8 +268,6 @@ be bound by the terms and conditions of this License Agreement.
   Copyright (C) 2024, Marcel Hellkamp.
 * The `identYwaf` library located under `thirdparty/identywaf/`.
   Copyright (C) 2019-2021, Miroslav Stampar.
-* The `ordereddict` library located under `thirdparty/odict/`.
-  Copyright (C) 2009, Raymond Hettinger.
 * The `six` Python 2 and 3 compatibility library located under `thirdparty/six/`.
   Copyright (C) 2010-2024, Benjamin Peterson.
 * The `Termcolor` library located under `thirdparty/termcolor/`.

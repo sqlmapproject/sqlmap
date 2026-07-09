@@ -314,8 +314,8 @@ def errorUse(expression, dump=False):
 
     _, _, _, _, _, expressionFieldsList, expressionFields, _ = agent.getFields(expression)
 
-    # Set kb.partRun in case the engine is called from the API
-    kb.partRun = getPartRun(alias=False) if conf.api else None
+    # Set kb.partRun in case the engine is called from the API or a JSON report is being collected
+    kb.partRun = getPartRun(alias=False) if (conf.api or conf.reportJson) else None
 
     # We have to check if the SQL query might return multiple entries
     # and in such case forge the SQL limiting the query output one
@@ -326,8 +326,10 @@ def errorUse(expression, dump=False):
         expression, limitCond, topLimit, startLimit, stopLimit = agent.limitCondition(expression, dump)
 
         if limitCond:
-            # Count the number of SQL query entries output
-            countedExpression = expression.replace(expressionFields, queries[Backend.getIdentifiedDbms()].count.query % ('*' if len(expressionFieldsList) > 1 else expressionFields), 1)
+            # Count the number of SQL query entries output. NOTE: always COUNT(*) (row count); a single
+            # field must NOT use COUNT(field) as that excludes NULLs and would drop NULL-valued rows from
+            # the dump (e.g. a column whose value is NULL on some rows).
+            countedExpression = expression.replace(expressionFields, queries[Backend.getIdentifiedDbms()].count.query % '*', 1)
 
             if " ORDER BY " in countedExpression.upper():
                 _ = countedExpression.upper().rindex(" ORDER BY ")

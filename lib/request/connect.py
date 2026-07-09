@@ -19,12 +19,8 @@ import sys
 import time
 import traceback
 
-try:
-    import websocket
-    from websocket import WebSocketException
-except ImportError:
-    class WebSocketException(Exception):
-        pass
+from lib.request import websocket
+from lib.request.websocket import WebSocketException
 
 from lib.core.agent import agent
 from lib.core.common import asciifyUrl
@@ -63,7 +59,6 @@ from lib.core.common import unsafeVariableNaming
 from lib.core.common import urldecode
 from lib.core.common import urlencode
 from lib.core.common import wasLastResponseDelayed
-from lib.core.compat import LooseVersion
 from lib.core.compat import patchHeaders
 from lib.core.compat import xrange
 from lib.core.convert import encodeBase64
@@ -111,7 +106,6 @@ from lib.core.settings import IS_WIN
 from lib.core.settings import JAVASCRIPT_HREF_REGEX
 from lib.core.settings import LARGE_READ_TRIM_MARKER
 from lib.core.settings import LIVE_COOKIES_TIMEOUT
-from lib.core.settings import MIN_HTTPX_VERSION
 from lib.core.settings import MAX_CONNECTION_READ_SIZE
 from lib.core.settings import MAX_CONNECTIONS_REGEX
 from lib.core.settings import MAX_CONNECTION_TOTAL_SIZE
@@ -141,8 +135,9 @@ from lib.request.comparison import comparison
 from lib.request.direct import direct
 from lib.request.methodrequest import MethodRequest
 from lib.utils.safe2bin import safecharencode
+from lib.utils.sqllint import checkSanity
 from thirdparty import six
-from thirdparty.odict import OrderedDict
+from collections import OrderedDict
 from thirdparty.six import unichr as _unichr
 from thirdparty.six.moves import http_client as _http_client
 from thirdparty.six.moves import urllib as _urllib
@@ -229,6 +224,7 @@ class Connect(object):
     @staticmethod
     def _connReadProxy(conn):
         parts = []
+        kb.respTruncated = False
 
         if not kb.dnsMode and conn:
             headers = conn.info()
@@ -255,6 +251,7 @@ class Connect(object):
                         singleTimeWarnMessage(warnMsg)
                         part = re.sub(getBytes(r"(?si)%s.+?%s" % (kb.chars.stop, kb.chars.start)), getBytes("%s%s%s" % (kb.chars.stop, LARGE_READ_TRIM_MARKER, kb.chars.start)), part)
                         parts.append(part)
+                        kb.respTruncated = True  # response exceeded the read cap and was trimmed (signal for chunked UNION dumping)
                     else:
                         parts.append(part)
                         break
@@ -262,6 +259,7 @@ class Connect(object):
                     if sum(len(_) for _ in parts) > MAX_CONNECTION_TOTAL_SIZE:
                         warnMsg = "too large response detected. Automatically trimming it"
                         singleTimeWarnMessage(warnMsg)
+                        kb.respTruncated = True
                         break
 
         if conf.yuge:
@@ -507,7 +505,10 @@ class Connect(object):
 
             for key, value in list(headers.items()):
                 if key.upper() == HTTP_HEADER.ACCEPT_ENCODING.upper():
-                    value = ','.join(_ for _ in re.split(r"\s*,\s*", value) if _.split(';', 1)[0].lower() != "br") or "identity"
+                    # keep only content-codings sqlmap can actually decode (see decodePage): a browser-pasted
+                    # 'Accept-Encoding' (e.g. "gzip, deflate, br, zstd") must not make the server return a body
+                    # we cannot read. Anything else (br, zstd, *, ...) is dropped, falling back to "identity".
+                    value = ','.join(_ for _ in re.split(r"\s*,\s*", value) if _.split(';', 1)[0].strip().lower() in ("gzip", "x-gzip", "deflate", "identity")) or "identity"
 
                 del headers[key]
                 if isinstance(value, six.string_types):
@@ -520,31 +521,33 @@ class Connect(object):
 
             if webSocket:
                 ws = websocket.WebSocket()
-                ws.settimeout(WEBSOCKET_INITIAL_TIMEOUT if kb.webSocketRecvCount is None else timeout)
-                wsHeaders = tuple("%s: %s" % (getUnicode(key), getUnicode(value)) for key, value in headers.items() if getUnicode(key).upper() != HTTP_HEADER.HOST.upper())
-                ws.connect(url, header=wsHeaders, cookie=cookie)  # WebSocket will add Host field of headers automatically
-                ws.send(urldecode(post or ""))
+                try:
+                    ws.settimeout(WEBSOCKET_INITIAL_TIMEOUT if kb.webSocketRecvCount is None else timeout)
+                    wsHeaders = tuple("%s: %s" % (getUnicode(key), getUnicode(value)) for key, value in headers.items() if getUnicode(key).upper() != HTTP_HEADER.HOST.upper())
+                    ws.connect(url, header=wsHeaders, cookie=cookie)  # WebSocket will add Host field of headers automatically
+                    ws.send(urldecode(post or ""))
 
-                _page = []
+                    _page = []
 
-                if kb.webSocketRecvCount is None:
-                    while True:
-                        try:
-                            _page.append(ws.recv())
-                            if sum(len(_) for _ in _page) > MAX_CONNECTION_TOTAL_SIZE:
-                                warnMsg = "too large websocket response detected. Automatically trimming it"
-                                singleTimeWarnMessage(warnMsg)
+                    if kb.webSocketRecvCount is None:
+                        while True:
+                            try:
+                                _page.append(ws.recv())
+                                if sum(len(_) for _ in _page) > MAX_CONNECTION_TOTAL_SIZE:
+                                    warnMsg = "too large websocket response detected. Automatically trimming it"
+                                    singleTimeWarnMessage(warnMsg)
+                                    break
+                            except websocket.WebSocketTimeoutException:
+                                kb.webSocketRecvCount = len(_page)
                                 break
-                        except websocket.WebSocketTimeoutException:
-                            kb.webSocketRecvCount = len(_page)
-                            break
-                else:
-                    for i in xrange(max(1, kb.webSocketRecvCount)):
-                        _page.append(ws.recv())
+                    else:
+                        for i in xrange(max(1, kb.webSocketRecvCount)):
+                            _page.append(ws.recv())
 
-                page = "\n".join(_page)
+                    page = "\n".join(_page)
+                finally:
+                    ws.close()
 
-                ws.close()
                 code = ws.status
                 status = _http_client.responses.get(code, "")
 
@@ -628,31 +631,29 @@ class Connect(object):
                             for char in (r"\r", r"\n"):
                                 cookie.value = re.sub(r"(%s)([^ \t])" % char, r"\g<1>\t\g<2>", cookie.value)
 
+                # Build-only capture: return the fully-assembled request instead of sending it, so the
+                # HTTP/2 timeless-timing oracle (lib/request/timeless.py) can coalesce two of these into a
+                # single multiplexed pair rather than issue them as independent single-stream requests.
+                if kwargs.get("buildOnly"):
+                    return (url, method or (HTTPMETHOD.POST if post is not None else HTTPMETHOD.GET), headers, post)
+
                 if conf.http2:
-                    try:
-                        import httpx
-                    except ImportError:
-                        raise SqlmapMissingDependence("httpx[http2] not available (e.g. 'pip%s install httpx[http2]')" % ('3' if six.PY3 else ""))
+                    from lib.request.http2 import open_url as http2OpenUrl
 
-                    if LooseVersion(httpx.__version__) < LooseVersion(MIN_HTTPX_VERSION):
-                        raise SqlmapMissingDependence("outdated version of httpx detected (%s<%s)" % (httpx.__version__, MIN_HTTPX_VERSION))
+                    h2proxy = None
+                    if conf.proxy:
+                        _proxyParts = _urllib.parse.urlsplit(conf.proxy if "://" in conf.proxy else "http://%s" % conf.proxy)
+                        if (_proxyParts.scheme or "").lower().startswith("socks"):
+                            raise SqlmapMissingDependence("native HTTP/2 client does not support SOCKS proxies (omit '--http2' or use an HTTP proxy)")
+                        h2proxy = (_proxyParts.hostname, _proxyParts.port or 8080, conf.proxyCred or None)
 
                     try:
-                        proxy_mounts = dict(("%s://" % key, httpx.HTTPTransport(proxy="%s%s" % ("http://" if "://" not in kb.proxies[key] else "", kb.proxies[key]))) for key in kb.proxies) if kb.proxies else None
-                        with httpx.Client(verify=False, http2=True, timeout=timeout, follow_redirects=True, cookies=conf.cj, mounts=proxy_mounts) as client:
-                            conn = client.request(method or (HTTPMETHOD.POST if post is not None else HTTPMETHOD.GET), url, headers=headers, data=post)
-                    except (httpx.HTTPError, httpx.InvalidURL, httpx.CookieConflict, httpx.StreamError) as ex:
+                        conn = http2OpenUrl(url, method or (HTTPMETHOD.POST if post is not None else HTTPMETHOD.GET), headers, post, timeout, follow_redirects=kb.choices.redirect != REDIRECTION.NO, proxy=h2proxy)
+                    except IOError as ex:
                         raise _http_client.HTTPException(getSafeExString(ex))
                     else:
-                        if conn.status_code >= 400:
-                            raise _urllib.error.HTTPError(url, conn.status_code, conn.reason_phrase, conn.headers, io.BytesIO(conn.read()))
-
-                        conn.code = conn.status_code
-                        conn.msg = conn.reason_phrase
-                        conn.info = lambda c=conn: c.headers
-
-                        conn._read_buffer = conn.read()
-                        conn._read_offset = 0
+                        if conn.code >= 400:
+                            raise _urllib.error.HTTPError(url, conn.code, conn.msg, conn.info(), io.BytesIO(conn.read()))
 
                         requestMsg = re.sub(r" HTTP/[0-9.]+\r\n", " %s\r\n" % conn.http_version, requestMsg, count=1)
 
@@ -660,18 +661,6 @@ class Connect(object):
                             threadData.lastRequestMsg = requestMsg
 
                             logger.log(CUSTOM_LOGGING.TRAFFIC_OUT, requestMsg)
-
-                        def _read(count=None):
-                            offset = conn._read_offset
-                            if count is None:
-                                result = conn._read_buffer[offset:]
-                                conn._read_offset = len(conn._read_buffer)
-                            else:
-                                result = conn._read_buffer[offset: offset + count]
-                                conn._read_offset += len(result)
-                            return result
-
-                        conn.read = _read
                 else:
                     if not multipart:
                         threadData.lastRequestMsg = requestMsg
@@ -767,6 +756,17 @@ class Connect(object):
                 except Exception as ex:
                     warnMsg = "problem occurred during connection closing ('%s')" % getSafeExString(ex)
                     logger.warning(warnMsg)
+
+            # Keep-alive: dispose the response explicitly. Its wrapped close() hands the socket
+            # back to the pool when the body was fully drained, otherwise drops it (a size-capped
+            # partial read must not be reused). This avoids leaning on GC to reclaim it (delayed on
+            # non-refcounting runtimes like PyPy). Guarded by the handler's marker so the HTTP/2
+            # reuse pool is left untouched.
+            elif conn is not None and getattr(conn, "_keepaliveManaged", False):
+                try:
+                    conn.close()
+                except Exception:
+                    pass
 
         except SqlmapConnectionException as ex:
             if conf.proxyList and not kb.threadException:
@@ -1015,7 +1015,7 @@ class Connect(object):
             if conn and getattr(conn, "redurl", None):
                 _ = _urllib.parse.urlsplit(conn.redurl)
                 _ = ("%s%s" % (_.path or "/", ("?%s" % _.query) if _.query else ""))
-                requestMsg = re.sub(r"(\n[A-Z]+ ).+?( HTTP/\d)", r"\g<1>%s\g<2>" % getUnicode(_).replace("\\", "\\\\"), requestMsg, 1)
+                requestMsg = re.sub(r"(\n[A-Z]+ ).+?( HTTP/\d)", r"\g<1>%s\g<2>" % getUnicode(_).replace("\\", "\\\\"), requestMsg, count=1)
 
                 if kb.resendPostOnRedirect is False:
                     requestMsg = re.sub(r"(\[#\d+\]:\n)POST ", r"\g<1>GET ", requestMsg)
@@ -1043,7 +1043,7 @@ class Connect(object):
 
     @staticmethod
     @stackedmethod
-    def queryPage(value=None, place=None, content=False, getRatioValue=False, silent=False, method=None, timeBasedCompare=False, noteResponseTime=True, auxHeaders=None, response=False, raise404=None, removeReflection=True, disableTampering=False, ignoreSecondOrder=False):
+    def queryPage(value=None, place=None, content=False, getRatioValue=False, silent=False, method=None, timeBasedCompare=False, noteResponseTime=True, auxHeaders=None, response=False, raise404=None, removeReflection=True, disableTampering=False, ignoreSecondOrder=False, buildOnly=False):
         """
         This method calls a function to get the target URL page content
         and returns its page ratio (0 <= ratio <= 1) or a boolean value
@@ -1052,6 +1052,10 @@ class Connect(object):
 
         if conf.direct:
             return direct(value, content)
+
+        # Snapshot the pristine payload for the timeless oracle before placement/tampering rewrites it,
+        # so its sentinel-bracketed comparison can be negated to build the symmetric-oracle pair.
+        timelessOrigValue = value if (timeBasedCompare and kb.get("timeless") is not None) else None
 
         get = None
         post = None
@@ -1080,6 +1084,15 @@ class Connect(object):
         value = agent.adjustLateValues(value)
         payload = agent.extractPayload(value)
         threadData = getCurrentThreadData()
+
+        # Opt-in sanity lint of the outbound (pre-tamper) payload. Skipped during
+        # detection (kb.testMode) where deliberately-invalid probes are expected;
+        # for operational payloads a structural defect is a genuine bug worth a
+        # heads-up. Enabled via SQLMAP_LINT_PAYLOADS (e.g. CI/--vuln-test runs).
+        if payload and not kb.testMode and os.environ.get("SQLMAP_LINT_PAYLOADS"):
+            for issue in checkSanity(agent.removePayloadDelimiters(value)):
+                singleTimeWarnMessage("potentially malformed SQL payload emitted (%s): %s" % (issue, payload))
+                break
 
         if conf.httpHeaders:
             headers = OrderedDict(conf.httpHeaders)
@@ -1529,6 +1542,22 @@ class Connect(object):
             elif postUrlEncode:
                 post = urlencode(post, spaceplus=kb.postSpaceToPlus)
 
+        # When the timeless oracle is engaged (by action() at the start of extraction, so the heavy vector
+        # is in place before any payload is built), a boolean comparison is answered by relative HTTP/2
+        # response order instead of wall-clock timing - orders of magnitude faster and jitter-immune, and
+        # it skips the time-based statistical warm-up entirely. The comparison request is assembled exactly
+        # as it would be sent (buildOnly) and the bit is read from a coalesced pair. Not engaged -> timing.
+        if timeBasedCompare and kb.get("timeless") is not None:
+            from lib.request.timeless import negatePayload
+            # Build the condition and negation requests through the SAME path (queryPage buildOnly on the
+            # raw pre-placement value) so the pair differs ONLY by the negated comparison - building cond
+            # from the already-placed uri/get/post while neg goes through fresh placement would make them
+            # non-corresponding and flip the order.
+            negValue = negatePayload(timelessOrigValue)
+            condSpec = Connect.queryPage(timelessOrigValue, place=place, buildOnly=True)
+            negSpec = Connect.queryPage(negValue, place=place, buildOnly=True) if negValue is not None else None
+            return kb.timeless.readBitFromSpecs(condSpec, negSpec)
+
         if timeBasedCompare and not conf.disableStats:
             if len(kb.responseTimes.get(kb.responseTimeMode, [])) < MIN_TIME_RESPONSES:
                 clearConsoleLine()
@@ -1606,6 +1635,12 @@ class Connect(object):
             finally:
                 kb.pageCompress = popValue()
 
+        # Timeless-timing oracle: after all placement/tampering, hand back the fully-assembled request
+        # (url, method, headers, post) instead of sending it, so two payloads can be coalesced into one
+        # multiplexed HTTP/2 pair (lib/request/timeless.py).
+        if buildOnly:
+            return Connect.getPage(url=uri, get=get, post=post, method=method, cookie=cookie, ua=ua, referer=referer, host=host, silent=True, auxHeaders=auxHeaders, buildOnly=True)
+
         if pageLength is None:
             try:
                 page, headers, code = Connect.getPage(url=uri, get=get, post=post, method=method, cookie=cookie, ua=ua, referer=referer, host=host, silent=silent, auxHeaders=auxHeaders, response=response, raise404=raise404, ignoreTimeout=timeBasedCompare)
@@ -1626,10 +1661,7 @@ class Connect(object):
                         if payload is None:
                             value = value.replace(kb.customInjectionMark, "")
                         else:
-                            try:
-                                value = re.sub(r"\w*%s" % re.escape(kb.customInjectionMark), payload, value)
-                            except re.error:
-                                value = re.sub(r"\w*%s" % re.escape(kb.customInjectionMark), re.escape(payload), value)
+                            value = re.sub(r"\w*%s" % re.escape(kb.customInjectionMark), lambda _: payload, value)  # Note: function replacement inserts payload literally - avoids re.sub interpreting backslashes / group refs (e.g. \1, \g<...>) in the payload
                     return value
                 page, headers, code = Connect.getPage(url=_(kb.secondReq[0]), post=_(kb.secondReq[2]), method=kb.secondReq[1], cookie=kb.secondReq[3], silent=silent, auxHeaders=dict(auxHeaders, **dict(kb.secondReq[4])), response=response, raise404=False, ignoreTimeout=timeBasedCompare, refreshing=True)
 

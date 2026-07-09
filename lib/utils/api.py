@@ -44,7 +44,9 @@ from lib.core.defaults import _defaults
 from lib.core.dicts import PART_RUN_CONTENT_TYPES
 from lib.core.enums import AUTOCOMPLETE_TYPE
 from lib.core.enums import CONTENT_STATUS
+from lib.core.enums import CONTENT_TYPE
 from lib.core.enums import MKSTEMP_PREFIX
+from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapConnectionException
 from lib.core.log import LOGGER_HANDLER
 from lib.core.optiondict import optDict
@@ -53,6 +55,7 @@ from lib.core.settings import RESTAPI_DEFAULT_ADAPTER
 from lib.core.settings import RESTAPI_DEFAULT_ADDRESS
 from lib.core.settings import RESTAPI_DEFAULT_PORT
 from lib.core.settings import RESTAPI_UNSUPPORTED_OPTIONS
+from lib.core.settings import RESTAPI_VERSION
 from lib.core.settings import VERSION_STRING
 from lib.core.shell import autoCompletion
 from lib.core.subprocessng import Popen
@@ -79,6 +82,201 @@ class DataStore(object):
     password = None
 
 RESTAPI_READONLY_OPTIONS = ("api", "taskid", "database")
+
+# Reverse map CONTENT_TYPE int -> name (e.g. 2 -> "DBMS_FINGERPRINT"), for machine-readable reports
+CONTENT_TYPE_NAMES = dict((v, k) for k, v in vars(CONTENT_TYPE).items() if not k.startswith("_") and isinstance(v, int))
+
+# Task id used for the single-target CLI collector backing --report-json
+REPORT_TASKID = 0
+
+def _storeData(cursor, taskid, value, status=CONTENT_STATUS.IN_PROGRESS, content_type=None):
+    """
+    Records a single (status, content_type, value) result row into an IPC-style 'data' table.
+
+    Shared by the REST API (via StdDbOut) and the CLI --report-json collector so both capture
+    results through identical logic (partial outputs are appended; a COMPLETE output replaces
+    its partials). Mirrors the API's per-content_type merge semantics.
+    """
+
+    if content_type is None:
+        if kb.partRun is not None:
+            content_type = PART_RUN_CONTENT_TYPES.get(kb.partRun)
+        else:
+            # Ignore all non-relevant (untyped) messages
+            return
+
+    output = cursor.execute("SELECT id, status, value FROM data WHERE taskid = ? AND content_type = ?", (taskid, content_type))
+
+    # Delete partial output from the database if we have got a complete output
+    if status == CONTENT_STATUS.COMPLETE:
+        if len(output) > 0:
+            for index in xrange(len(output)):
+                cursor.execute("DELETE FROM data WHERE id = ?", (output[index][0],))
+
+        cursor.execute("INSERT INTO data VALUES(NULL, ?, ?, ?, ?)", (taskid, status, content_type, jsonize(value)))
+        if kb.partRun:
+            kb.partRun = None
+
+    elif status == CONTENT_STATUS.IN_PROGRESS:
+        if len(output) == 0:
+            cursor.execute("INSERT INTO data VALUES(NULL, ?, ?, ?, ?)", (taskid, status, content_type, jsonize(value)))
+        else:
+            new_value = "%s%s" % (dejsonize(output[0][2]), value)
+            cursor.execute("UPDATE data SET value = ? WHERE id = ?", (jsonize(new_value), output[0][0]))
+
+# Internal detection/plumbing fields that are meaningless to API/report consumers and are stripped
+# from the assembled output (the underlying kb/session structures keep them; only the output is cleaned)
+INJECTION_INTERNAL_FIELDS = ("conf", "prefix", "suffix", "ptype", "clause")            # detection/construction internals, irrelevant to a result consumer
+TECHNIQUE_INTERNAL_FIELDS = ("matchRatio", "trueCode", "falseCode", "templatePayload", "where")  # per-technique internals
+
+def _cleanIdentifier(name):
+    """
+    Strips SQL identifier quoting (`backticks`, "double quotes", [brackets]) in a DBMS-INDEPENDENT
+    way. Used instead of unsafeSQLIdentificatorNaming (which needs Backend.getIdentifiedDbms) so the
+    result is identical in the CLI and in the API server process - which has no Backend context
+    because the scan ran in a subprocess. Context-free => API and report stay in parity.
+    """
+
+    if isinstance(name, six.string_types):
+        for ch in ("`", "\"", "[", "]"):
+            name = name.replace(ch, "")
+    return name
+
+def _cleanIdentifiersDeep(value):
+    """
+    Recursively unquotes every identifier in a metadata structure (dict keys and string leaves -
+    db/table/column names). Used for the schema-listing content types (TABLES/COLUMNS/SCHEMA/COUNT)
+    whose payload is entirely identifiers + types/counts (never user row data), so cleaning every
+    string is safe. NOT used for DUMP_TABLE, whose leaf values are real row data.
+    """
+
+    if isinstance(value, dict):
+        return dict((_cleanIdentifier(k), _cleanIdentifiersDeep(v)) for k, v in value.items())
+    elif isinstance(value, (list, tuple)):
+        return [_cleanIdentifiersDeep(_) for _ in value]
+    elif isinstance(value, six.string_types):
+        return _cleanIdentifier(value)
+    return value
+
+# Schema-listing content types: pure identifiers + types/counts, so identifier quoting is cleaned
+# recursively for consistency with DUMP_TABLE (which is handled separately because it carries row data)
+IDENTIFIER_KEYED_TYPES = (CONTENT_TYPE.TABLES, CONTENT_TYPE.COLUMNS, CONTENT_TYPE.SCHEMA, CONTENT_TYPE.COUNT)
+
+def _sanitizeScanData(content_type, value):
+    """
+    Reshapes an assembled result value into the clean, consumer-facing form used by BOTH the API
+    response and the --report-json file: internal detection/plumbing fields are dropped, the
+    per-technique map becomes a named list, and dumped-table identifiers are unquoted. Operates on
+    the dejsonized copy, so the live kb/session structures are never modified. Falls back to the raw
+    value on any surprise.
+    """
+
+    try:
+        if content_type == CONTENT_TYPE.TECHNIQUES and isinstance(value, (list, tuple)):
+            cleaned = []
+            for injection in value:
+                if not isinstance(injection, dict):
+                    cleaned.append(injection)
+                    continue
+                injection = dict(injection)
+                for field in INJECTION_INTERNAL_FIELDS:
+                    injection.pop(field, None)
+                techniques = injection.get("data")
+                if isinstance(techniques, dict):
+                    # turn the {"1": {...}, "2": {...}} map (keyed by opaque technique ids) into an
+                    # ordered list, each entry naming its technique (e.g. "boolean-based blind")
+                    reduced = []
+                    for stype in sorted(techniques, key=lambda _: int(_) if str(_).isdigit() else _):
+                        details = techniques[stype]
+                        if isinstance(details, dict):
+                            details = dict(details)
+                            for field in TECHNIQUE_INTERNAL_FIELDS:
+                                details.pop(field, None)
+                            key = int(stype) if str(stype).isdigit() else stype
+                            entry = {"technique": PAYLOAD.SQLINJECTION.get(key, key)}
+                            entry.update(details)
+                            details = entry
+                        reduced.append(details)
+                    injection["data"] = reduced
+                cleaned.append(injection)
+            return cleaned
+
+        elif content_type == CONTENT_TYPE.DUMP_TABLE and isinstance(value, dict):
+            infos = value.get("__infos__") or {}
+            result = {"db": _cleanIdentifier(infos.get("db")), "table": _cleanIdentifier(infos.get("table")), "count": infos.get("count"), "columns": {}}
+            for column, cell in value.items():
+                if column == "__infos__":
+                    continue
+                # clean the identifier, drop the per-column display 'length', keep just the values list
+                values = cell.get("values") if isinstance(cell, dict) else cell
+                if isinstance(values, (list, tuple)):
+                    # sqlmap represents a DB NULL as a single space (DUMP_REPLACEMENTS); surface it as
+                    # JSON null. An empty string "" is a genuine empty value and is left as-is.
+                    values = [None if _ == " " else _ for _ in values]
+                result["columns"][_cleanIdentifier(column)] = values
+            return result
+
+        elif content_type in IDENTIFIER_KEYED_TYPES and isinstance(value, (dict, list, tuple)):
+            return _cleanIdentifiersDeep(value)
+
+    except Exception as ex:
+        logger.debug("failed to sanitize scan data (content type %s): %s" % (content_type, getSafeExString(ex)))
+
+    return value
+
+def _assembleData(cursor, taskid):
+    """
+    Assembles all stored results for a task into the canonical scan-data structure
+    {"success": True, "data": [{status, type, type_name, value}, ...], "error": [...]}.
+
+    Shared by the REST API endpoint /scan/<id>/data and the CLI --report-json writer so the two
+    produce identical output (the CLI report is this dict plus a 'meta' wrapper).
+    """
+
+    json_data_message = list()
+    json_errors_message = list()
+
+    for status, content_type, value in cursor.execute("SELECT status, content_type, value FROM data WHERE taskid = ? ORDER BY id ASC", (taskid,)):
+        json_data_message.append({"status": status, "type": content_type, "type_name": CONTENT_TYPE_NAMES.get(content_type), "value": _sanitizeScanData(content_type, dejsonize(value))})
+
+    for error, in cursor.execute("SELECT error FROM errors WHERE taskid = ? ORDER BY id ASC", (taskid,)):
+        json_errors_message.append(error)
+
+    return {"success": True, "data": json_data_message, "error": json_errors_message}
+
+def setupReportCollector():
+    """
+    Creates an in-memory IPC-style database used to collect results for a CLI --report-json run.
+    Reuses the same Database/schema the REST API uses so capture+assembly logic is shared.
+    """
+
+    collector = Database(":memory:")
+    collector.connect("report")
+    collector.init()
+
+    # record error/critical log messages into the collector so that a CLI --report-json report carries
+    # the same 'error' content the REST API exposes via /scan/<id>/data - letting consumers tell a
+    # failed/unreachable run apart from a clean "nothing found" one (both otherwise have empty 'data')
+    logger.addHandler(ReportErrorRecorder(collector))
+
+    return collector
+
+def writeReportJson(collector, filepath):
+    """
+    Writes the collected results to filepath as JSON, in the same shape as the REST API's
+    /scan/<id>/data response, wrapped with a small 'meta' block for standalone consumers.
+    """
+
+    result = _assembleData(collector, REPORT_TASKID)
+    result["meta"] = {
+        "api_version": int(RESTAPI_VERSION.split(".")[0]),   # MAJOR only - the part that matters for client compatibility
+        "sqlmap_version": VERSION_STRING,
+        "url": conf.get("url"),
+        "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+    with openFile(filepath, "w+") as f:
+        f.write(getText(jsonize(result)))
 
 # API objects
 class Database(object):
@@ -236,31 +434,7 @@ class StdDbOut(object):
 
     def write(self, value, status=CONTENT_STATUS.IN_PROGRESS, content_type=None):
         if self.messagetype == "stdout":
-            if content_type is None:
-                if kb.partRun is not None:
-                    content_type = PART_RUN_CONTENT_TYPES.get(kb.partRun)
-                else:
-                    # Ignore all non-relevant messages
-                    return
-
-            output = conf.databaseCursor.execute("SELECT id, status, value FROM data WHERE taskid = ? AND content_type = ?", (self.taskid, content_type))
-
-            # Delete partial output from IPC database if we have got a complete output
-            if status == CONTENT_STATUS.COMPLETE:
-                if len(output) > 0:
-                    for index in xrange(len(output)):
-                        conf.databaseCursor.execute("DELETE FROM data WHERE id = ?", (output[index][0],))
-
-                conf.databaseCursor.execute("INSERT INTO data VALUES(NULL, ?, ?, ?, ?)", (self.taskid, status, content_type, jsonize(value)))
-                if kb.partRun:
-                    kb.partRun = None
-
-            elif status == CONTENT_STATUS.IN_PROGRESS:
-                if len(output) == 0:
-                    conf.databaseCursor.execute("INSERT INTO data VALUES(NULL, ?, ?, ?, ?)", (self.taskid, status, content_type, jsonize(value)))
-                else:
-                    new_value = "%s%s" % (dejsonize(output[0][2]), value)
-                    conf.databaseCursor.execute("UPDATE data SET value = ? WHERE id = ?", (jsonize(new_value), output[0][0]))
+            _storeData(conf.databaseCursor, self.taskid, value, status, content_type)
         else:
             conf.databaseCursor.execute("INSERT INTO errors VALUES(NULL, ?, ?)", (self.taskid, str(value) if value else ""))
 
@@ -280,6 +454,22 @@ class LogRecorder(logging.StreamHandler):
         communication with the parent process
         """
         conf.databaseCursor.execute("INSERT INTO logs VALUES(NULL, ?, ?, ?, ?)", (conf.taskid, time.strftime("%X"), record.levelname, str(record.msg % record.args if record.args else record.msg)))
+
+class ReportErrorRecorder(logging.Handler):
+    def __init__(self, collector):
+        """
+        Records error/critical log messages into a report collector's 'errors' table (the counterpart
+        of StdDbOut's stderr branch for CLI --report-json runs)
+        """
+        logging.Handler.__init__(self)
+        self.setLevel(logging.ERROR)
+        self.collector = collector
+
+    def emit(self, record):
+        try:
+            self.collector.execute("INSERT INTO errors VALUES(NULL, ?, ?)", (REPORT_TASKID, str(record.msg % record.args if record.args else record.msg)))
+        except Exception:
+            pass
 
 def setRestAPILog():
     if conf.api:
@@ -327,11 +517,11 @@ def check_authentication():
     except:
         request.environ["PATH_INFO"] = "/error/401"
     else:
-        if creds.count(':') != 1:
+        if ':' not in creds:
             request.environ["PATH_INFO"] = "/error/401"
         else:
-            username, password = creds.split(':')
-            if username.strip() != (DataStore.username or "") or password.strip() != (DataStore.password or ""):
+            username, password = creds.split(':', 1)
+            if not (safeCompareStrings(username.strip(), DataStore.username or "") and safeCompareStrings(password.strip(), DataStore.password or "")):  # Note: constant-time comparison (mirrors is_admin) to avoid a timing side-channel on the credentials
                 request.environ["PATH_INFO"] = "/error/401"
 
 @hook("after_request")
@@ -429,9 +619,13 @@ def task_list(token=None):
     """
     tasks = {}
 
-    for key in DataStore.tasks:
+    for key in list(DataStore.tasks):
         if is_admin(token) or DataStore.tasks[key].remote_addr == request.remote_addr:
-            tasks[key] = dejsonize(scan_status(key))["status"]
+            # NOTE: tolerate a task being deleted concurrently (scan_status would then return an
+            # error envelope without a "status" key); skip it rather than raising KeyError
+            status = dejsonize(scan_status(key)).get("status")
+            if status is not None:
+                tasks[key] = status
 
     logger.debug("(%s) Listed task pool (%s)" % (token, "admin" if is_admin(token) else request.remote_addr))
     return jsonize({"success": True, "tasks": tasks, "tasks_num": len(tasks)})
@@ -606,23 +800,15 @@ def scan_data(taskid):
     Retrieve the data of a scan
     """
 
-    json_data_message = list()
-    json_errors_message = list()
-
     if taskid not in DataStore.tasks:
         logger.warning("[%s] Invalid task ID provided to scan_data()" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
-    # Read all data from the IPC database for the taskid
-    for status, content_type, value in DataStore.current_db.execute("SELECT status, content_type, value FROM data WHERE taskid = ? ORDER BY id ASC", (taskid,)):
-        json_data_message.append({"status": status, "type": content_type, "value": dejsonize(value)})
-
-    # Read all error messages from the IPC database
-    for error, in DataStore.current_db.execute("SELECT error FROM errors WHERE taskid = ? ORDER BY id ASC", (taskid,)):
-        json_errors_message.append(error)
+    # Read all data and error messages from the IPC database (shared assembler - same output as --report-json)
+    result = _assembleData(DataStore.current_db, taskid)
 
     logger.debug("(%s) Retrieved scan data and error messages" % taskid)
-    return jsonize({"success": True, "data": json_data_message, "error": json_errors_message})
+    return jsonize(result)
 
 # Functions to handle scans' logs
 @get("/scan/<taskid>/log/<start>/<end>")
@@ -702,7 +888,7 @@ def version(token=None):
     """
 
     logger.debug("Fetched version (%s)" % ("admin" if is_admin(token) else request.remote_addr))
-    return jsonize({"success": True, "version": VERSION_STRING.split('/')[-1]})
+    return jsonize({"success": True, "version": VERSION_STRING.split('/')[-1], "api_version": int(RESTAPI_VERSION.split(".")[0])})
 
 def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=RESTAPI_DEFAULT_ADAPTER, username=None, password=None, database=None):
     """
@@ -793,11 +979,12 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
     DataStore.username = username
     DataStore.password = password
 
+    auth = ' --user "%s:%s"' % (username, password) if (username or password) else ""  # REST API requires HTTP Basic auth
     dbgMsg = "Example client access from command line:"
-    dbgMsg += "\n\t$ taskid=$(curl http://%s:%d/task/new 2>1 | grep -o -I '[a-f0-9]\\{16\\}') && echo $taskid" % (host, port)
-    dbgMsg += "\n\t$ curl -H \"Content-Type: application/json\" -X POST -d '{\"url\": \"http://testasp.vulnweb.com/showforum.asp?id=1\"}' http://%s:%d/scan/$taskid/start" % (host, port)
-    dbgMsg += "\n\t$ curl http://%s:%d/scan/$taskid/data" % (host, port)
-    dbgMsg += "\n\t$ curl http://%s:%d/scan/$taskid/log" % (host, port)
+    dbgMsg += "\n\t$ taskid=$(curl -s%s http://%s:%d/task/new | grep -o -I '[a-f0-9]\\{16\\}') && echo $taskid" % (auth, host, port)
+    dbgMsg += "\n\t$ curl%s -H \"Content-Type: application/json\" -X POST -d '{\"url\": \"https://sekumart.sekuripy.hr/product.php?id=1\"}' http://%s:%d/scan/$taskid/start" % (auth, host, port)
+    dbgMsg += "\n\t$ curl%s http://%s:%d/scan/$taskid/data" % (auth, host, port)
+    dbgMsg += "\n\t$ curl%s http://%s:%d/scan/$taskid/log" % (auth, host, port)
     logger.debug(dbgMsg)
 
     addr = "http://%s:%d" % (host, port)
@@ -925,7 +1112,7 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
 
         elif command in ("help", "?"):
             msg = "help           Show this help message\n"
-            msg += "new ARGS       Start a new scan task with provided arguments (e.g. 'new -u \"http://testasp.vulnweb.com/showforum.asp?id=1\"')\n"
+            msg += "new ARGS       Start a new scan task with provided arguments (e.g. 'new -u \"https://sekumart.sekuripy.hr/product.php?id=1\"')\n"
             msg += "use TASKID     Switch current context to different task (e.g. 'use c04d8c5c7582efb4')\n"
             msg += "data           Retrieve and show data for current task\n"
             msg += "log            Retrieve and show log for current task\n"

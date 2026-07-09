@@ -5,11 +5,6 @@ Copyright (c) 2006-2026 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
-try:
-    import cPickle as pickle
-except:
-    import pickle
-
 import itertools
 import os
 import shutil
@@ -86,7 +81,7 @@ class BigArray(list):
     >>> _[0] = [None]
     >>> _.index(0)
     20
-    >>> import pickle; __ = pickle.loads(pickle.dumps(_))
+    >>> import copy; __ = copy.deepcopy(_)
     >>> __.append(1)
     >>> len(_)
     100001
@@ -158,9 +153,10 @@ class BigArray(list):
                     self.chunks[-1] = self.cache.data
                     self.cache.dirty = False
                 else:
+                    from lib.core.convert import deserializeValue
                     try:
                         with open(filename, "rb") as f:
-                            self.chunks[-1] = pickle.loads(zlib.decompress(f.read()))
+                            self.chunks[-1] = deserializeValue(zlib.decompress(f.read()))
                     except IOError as ex:
                         errMsg = "exception occurred while retrieving data "
                         errMsg += "from a temporary file ('%s')" % ex
@@ -171,6 +167,12 @@ class BigArray(list):
                     self.filenames.discard(filename)
                 except OSError:
                     pass
+
+                # Note: the formerly on-disk chunk is now an in-memory list (and its file has been
+                # removed), so any cache entry still pointing at it is stale; dropping it prevents
+                # serving outdated data if that chunk index is later re-dumped (e.g. append after pop)
+                if isinstance(self.cache, Cache) and self.cache.index == idx:
+                    self.cache = None
 
         return self.chunks[-1].pop()
 
@@ -201,18 +203,20 @@ class BigArray(list):
         self.close()
 
     def _dump(self, chunk):
+        from lib.core.convert import getBytes, serializeValue
         try:
             handle, filename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.BIG_ARRAY)
             self.filenames.add(filename)
             with os.fdopen(handle, "w+b") as f:
-                f.write(zlib.compress(pickle.dumps(chunk, pickle.HIGHEST_PROTOCOL), BIGARRAY_COMPRESS_LEVEL))
+                # serializeValue() returns text; encode to bytes for the compressed on-disk chunk
+                f.write(zlib.compress(getBytes(serializeValue(chunk)), BIGARRAY_COMPRESS_LEVEL))
             return filename
         except (OSError, IOError) as ex:
             errMsg = "exception occurred while storing data "
             errMsg += "to a temporary file ('%s'). Please " % ex
-            errMsg += "make sure that there is enough disk space left. If problem persists, "
+            errMsg += "make sure that there is enough disk space left. If the problem persists, "
             errMsg += "try to set environment variable 'TEMP' to a location "
-            errMsg += "writeable by the current user"
+            errMsg += "writable by the current user"
             raise SqlmapSystemException(errMsg)
 
     def _checkcache(self, index):
@@ -220,13 +224,24 @@ class BigArray(list):
             self.cache = None
 
         if (self.cache and self.cache.index != index and self.cache.dirty):
+            old_filename = self.chunks[self.cache.index]
             filename = self._dump(self.cache.data)
             self.chunks[self.cache.index] = filename
 
+            # Note: remove the now-superseded chunk file (mirrors __getstate__); otherwise every
+            # cross-chunk dirty flush orphans one temp file on disk and in self.filenames
+            if isinstance(old_filename, STRING_TYPES):
+                try:
+                    self._os_remove(old_filename)
+                    self.filenames.discard(old_filename)
+                except OSError:
+                    pass
+
         if not (self.cache and self.cache.index == index):
+            from lib.core.convert import deserializeValue
             try:
                 with open(self.chunks[index], "rb") as f:
-                    self.cache = Cache(index, pickle.loads(zlib.decompress(f.read())), False)
+                    self.cache = Cache(index, deserializeValue(zlib.decompress(f.read())), False)
             except Exception as ex:
                 errMsg = "exception occurred while retrieving data "
                 errMsg += "from a temporary file ('%s')" % ex
@@ -345,8 +360,9 @@ class BigArray(list):
                     if cache_index == idx and cache_data is not None:
                         data = cache_data
                     else:
+                        from lib.core.convert import deserializeValue
                         with open(chunk, "rb") as f:
-                            data = pickle.loads(zlib.decompress(f.read()))
+                            data = deserializeValue(zlib.decompress(f.read()))
                 except Exception as ex:
                     errMsg = "exception occurred while retrieving data "
                     errMsg += "from a temporary file ('%s')" % ex

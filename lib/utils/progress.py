@@ -13,6 +13,8 @@ from lib.core.common import dataToStdout
 from lib.core.convert import getUnicode
 from lib.core.data import conf
 from lib.core.data import kb
+from lib.core.settings import ETA_DISPLAY_SMOOTHING
+from lib.core.settings import IS_TTY
 
 class ProgressBar(object):
     """
@@ -26,7 +28,9 @@ class ProgressBar(object):
         self._span = max(self._max - self._min, 0.001)
         self._width = totalWidth if totalWidth else conf.progressWidth
         self._amount = 0
-        self._start = None
+        self._start = time.time()   # begin timing at construction, so the first completed item already yields an estimate
+        self._eta = None            # last estimated seconds-remaining and when it was computed, so tick()
+        self._etaAt = None          # can keep the countdown live between (possibly slow) item updates
         self.update()
 
     def _convertSeconds(self, value):
@@ -73,23 +77,48 @@ class ProgressBar(object):
 
     def progress(self, newAmount):
         """
-        This method saves item delta time and shows updated progress bar with calculated eta
+        Redraw the bar with an ETA from the average time per completed item so far, applied to the items
+        still remaining: (elapsed / done) * (max - newAmount). The remaining-item count is (max - newAmount)
+        - i.e. at 1/3 it estimates the 2 items left, at 2/3 the 1 left - not just the current item.
         """
 
-        if self._start is None or newAmount > self._max:
-            self._start = time.time()
-            eta = None
-        else:
-            delta = time.time() - self._start
-            eta = (self._max - self._min) * (1.0 * delta / newAmount) - delta
+        now = time.time()
+        if newAmount > self._max:               # counter rollover/reset -> restart timing
+            self._start = now
+            self._eta = None
 
+        done = newAmount - self._min
+        elapsed = now - self._start
+        target = (elapsed / done) * (self._max - newAmount) if (done > 0 and elapsed > 0) else None
+
+        if target is None:
+            self._eta = None
+        elif self._eta is None:
+            self._eta = target                  # first estimate: nothing to ease from
+        else:
+            current = max(0, self._eta - (now - self._etaAt))   # what is on screen now (already decremented by tick())
+            self._eta = ETA_DISPLAY_SMOOTHING * current + (1 - ETA_DISPLAY_SMOOTHING) * target   # ease into the fresh estimate
+
+        self._etaAt = now
         self.update(newAmount)
+        self.draw(self._eta)
+
+    def tick(self):
+        """
+        Redraw the current bar with its ETA decremented by real elapsed time, so the countdown stays
+        live between updates (e.g. during a long time-based wait) instead of freezing at the last estimate
+        """
+
+        eta = None if self._eta is None else max(0, self._eta - (time.time() - self._etaAt))
         self.draw(eta)
 
     def draw(self, eta=None):
         """
         This method draws the progress bar if it has changed
         """
+
+        if not IS_TTY:      # a progress bar is a terminal animation; suppress it when piped/redirected (as done for other '\r' output)
+            return
 
         dataToStdout("\r%s %d/%d%s" % (self._progBar, self._amount, self._max, ("  (ETA %s)" % (self._convertSeconds(int(eta)) if eta is not None else "??:??"))))
         if self._amount >= self._max:

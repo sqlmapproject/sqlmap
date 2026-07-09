@@ -46,4 +46,5 @@ Links
 * Häufig gestellte Fragen (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
 * X: [@sqlmap](https://x.com/sqlmap)
 * Demonstrationen: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
+* Spielwiese: https://sekumart.sekuripy.hr
 * Screenshots: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

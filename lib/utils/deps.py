@@ -84,38 +84,6 @@ def checkDependencies():
         missing_libraries.add('python-impacket')
 
     try:
-        __import__("ntlm")
-        debugMsg = "'python-ntlm' third-party library is found"
-        logger.debug(debugMsg)
-    except ImportError:
-        warnMsg = "sqlmap requires 'python-ntlm' third-party library "
-        warnMsg += "if you plan to attack a web application behind NTLM "
-        warnMsg += "authentication. Download from 'https://github.com/mullender/python-ntlm'"
-        logger.warning(warnMsg)
-        missing_libraries.add('python-ntlm')
-
-    try:
-        __import__("httpx")
-        debugMsg = "'httpx[http2]' third-party library is found"
-        logger.debug(debugMsg)
-    except ImportError:
-        warnMsg = "sqlmap requires 'httpx[http2]' third-party library "
-        warnMsg += "if you plan to use HTTP version 2"
-        logger.warning(warnMsg)
-        missing_libraries.add('httpx[http2]')
-
-    try:
-        __import__("websocket._abnf")
-        debugMsg = "'websocket-client' library is found"
-        logger.debug(debugMsg)
-    except ImportError:
-        warnMsg = "sqlmap requires 'websocket-client' third-party library "
-        warnMsg += "if you plan to attack a web application using WebSocket. "
-        warnMsg += "Download from 'https://pypi.python.org/pypi/websocket-client/'"
-        logger.warning(warnMsg)
-        missing_libraries.add('websocket-client')
-
-    try:
         __import__("tkinter")
         debugMsg = "'tkinter' library is found"
         logger.debug(debugMsg)

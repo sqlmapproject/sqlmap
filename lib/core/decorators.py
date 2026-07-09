@@ -59,15 +59,19 @@ def cachedmethod(f):
                     return cache[key]
 
         except TypeError:
-            # Note: fallback (slowpath(
-            if kwargs:
-                key = (_freeze(args), _freeze(kwargs))
-            else:
-                key = _freeze(args)
+            # Note: fallback (slow-path) for unhashable arguments
+            try:
+                if kwargs:
+                    key = (_freeze(args), _freeze(kwargs))
+                else:
+                    key = _freeze(args)
 
-            with lock:
-                if key in cache:
-                    return cache[key]
+                with lock:
+                    if key in cache:
+                        return cache[key]
+            except TypeError:
+                # Note: genuinely uncacheable arguments; skip caching altogether
+                return f(*args, **kwargs)
 
         result = f(*args, **kwargs)
 

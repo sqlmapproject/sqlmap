@@ -10,7 +10,9 @@ from __future__ import division
 import re
 
 from lib.core.common import extractRegexResult
+from lib.core.common import extractStructuralTokens
 from lib.core.common import getFilteredPageContent
+from lib.core.common import jsonMinimize
 from lib.core.common import listToStrValue
 from lib.core.common import removeDynamicContent
 from lib.core.common import getLastRequestHTTPError
@@ -20,6 +22,7 @@ from lib.core.convert import getBytes
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
+from lib.core.enums import HTTP_HEADER
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.settings import DEFAULT_PAGE_ENCODING
 from lib.core.settings import DIFF_TOLERANCE
@@ -33,6 +36,23 @@ from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.settings import URI_HTTP_HEADER
 from lib.core.threads import getCurrentThreadData
 from thirdparty import six
+
+def _isJsonResponse(headers):
+    """
+    Returns True if the response Content-Type plausibly indicates a JSON document - i.e. the canonical
+    'application/json', the common misservings ('text/json', 'application/javascript', ...), or a
+    structured suffix like 'application/vnd.api+json'. Being liberal here is safe: jsonMinimize() returns
+    None for anything that is not actually parseable JSON, so a mislabelled body simply falls back to the
+    normal text comparison.
+    """
+
+    retVal = False
+
+    if headers:
+        contentType = (headers.get(HTTP_HEADER.CONTENT_TYPE) or "").split(';')[0].strip().lower()
+        retVal = contentType in ("application/json", "text/json", "application/javascript", "text/javascript", "application/x-javascript") or contentType.endswith("+json")
+
+    return retVal
 
 def comparison(page, headers, code=None, getRatioValue=False, pageLength=None):
     if not isinstance(page, (six.text_type, six.binary_type, type(None))):
@@ -97,6 +117,10 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
     seqMatcher = threadData.seqMatcher
     seqMatcher.set_seq1(kb.pageTemplate)
 
+    # raw (pre-dynamic-removal) body, kept for the structured (JSON) comparison path below;
+    # parsing the raw form avoids removeDynamicContent splicing JSON mid-token
+    rawPage = page
+
     if page:
         # In case of an DBMS error page return None
         if kb.errorIsNone and (wasLastResponseDBMSError() or wasLastResponseHTTPError()) and not kb.negativeLogic:
@@ -108,6 +132,11 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
             page = removeDynamicContent(page)
             if threadData.lastPageTemplate != kb.pageTemplate:
                 threadData.lastPageTemplateCleaned = removeDynamicContent(kb.pageTemplate)
+                # Same template-identity memoization for the structure-aware projections (see below): the
+                # template is constant across an extraction, so it must not be re-parsed/re-tokenized on
+                # every inference request - only seq2 (from the live page) is recomputed per response
+                threadData.lastPageTemplateJsonMinimized = jsonMinimize(kb.pageTemplate)
+                threadData.lastPageTemplateStructural = "\n".join(sorted(extractStructuralTokens(kb.pageTemplate)))
                 threadData.lastPageTemplate = kb.pageTemplate
 
             seqMatcher.set_seq1(threadData.lastPageTemplateCleaned)
@@ -148,12 +177,31 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
         else:
             seq1, seq2 = None, None
 
-            if conf.titles:
-                seq1 = extractRegexResult(HTML_TITLE_REGEX, seqMatcher.a)
-                seq2 = extractRegexResult(HTML_TITLE_REGEX, page)
-            else:
-                seq1 = getFilteredPageContent(seqMatcher.a, True) if conf.textOnly else seqMatcher.a
-                seq2 = getFilteredPageContent(page, True) if conf.textOnly else page
+            # Structure-aware comparison for JSON responses: compare an order-independent
+            # projection of the parsed bodies instead of raw text, so key reordering/whitespace
+            # noise does not perturb the ratio while a changed value/array-length does. Engages
+            # only on a JSON Content-Type with both bodies parseable; any doubt (or an explicit
+            # --text-only/--titles) falls back to the exact text path below.
+            if _isJsonResponse(headers) and not (conf.titles or conf.textOnly or kb.nullConnection):
+                seq1 = threadData.lastPageTemplateJsonMinimized  # memoized per template (see above)
+                seq2 = jsonMinimize(rawPage)
+
+            # Structure-aware comparison for a structurally-stable (but byte-unstable) HTML page:
+            # compare the value-free tag/class/id skeleton so dynamic text does not perturb the ratio
+            # while a structural change (e.g. a results table appearing/disappearing) still does
+            if seq1 is None and kb.pageStructurallyStable and not (conf.titles or conf.textOnly or kb.nullConnection):
+                _ = threadData.lastPageTemplateStructural  # memoized per template (see above)
+                if _:   # only engage when the page actually exposes structure (HTML tags); tagless content falls back to text
+                    seq1 = _
+                    seq2 = "\n".join(sorted(extractStructuralTokens(rawPage)))
+
+            if seq1 is None or seq2 is None:
+                if conf.titles:
+                    seq1 = extractRegexResult(HTML_TITLE_REGEX, seqMatcher.a)
+                    seq2 = extractRegexResult(HTML_TITLE_REGEX, page)
+                else:
+                    seq1 = getFilteredPageContent(seqMatcher.a, True) if conf.textOnly else seqMatcher.a
+                    seq2 = getFilteredPageContent(page, True) if conf.textOnly else page
 
             if seq1 is None or seq2 is None:
                 return None
@@ -183,9 +231,9 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
                 seqMatcher.set_seq1(repr(seq1))
                 seqMatcher.set_seq2(repr(seq2))
 
-            if key in kb.cache.comparison:
-                ratio = kb.cache.comparison[key]
-            else:
+            ratio = kb.cache.comparison.get(key) if key else None
+
+            if ratio is None:
                 try:
                     try:
                         ratio = seqMatcher.quick_ratio() if not kb.heavilyDynamic else seqMatcher.ratio()

@@ -32,14 +32,18 @@ try:
     import traceback
     import warnings
 
+    try:
+        ResourceWarning
+    except NameError:
+        ResourceWarning = Warning
+
     if "--deprecations" not in sys.argv:
         warnings.filterwarnings(action="ignore", category=DeprecationWarning)
     else:
         warnings.resetwarnings()
         warnings.filterwarnings(action="ignore", message="'crypt'", category=DeprecationWarning)
         warnings.simplefilter("ignore", category=ImportWarning)
-        if sys.version_info >= (3, 0):
-            warnings.simplefilter("ignore", category=ResourceWarning)
+        warnings.simplefilter("ignore", category=ResourceWarning)
 
     warnings.filterwarnings(action="ignore", message="Python 2 is no longer supported")
     warnings.filterwarnings(action="ignore", message=".*was already imported", category=UserWarning)
@@ -51,7 +55,7 @@ try:
 
     from lib.core.common import banner
     from lib.core.common import checkPipedInput
-    from lib.core.common import checkSums
+    from lib.core.common import codeIsModified
     from lib.core.common import createGithubIssue
     from lib.core.common import dataToStdout
     from lib.core.common import extractRegexResult
@@ -176,6 +180,10 @@ def main():
 
         init()
 
+        if conf.get("reportJson"):
+            from lib.utils.api import setupReportCollector
+            conf.reportCollector = setupReportCollector()
+
         if not conf.updateAll:
             # Postponed imports (faster start)
             if conf.smokeTest:
@@ -184,6 +192,15 @@ def main():
             elif conf.vulnTest:
                 from lib.core.testing import vulnTest
                 os._exitcode = 1 - (vulnTest() or 0)
+            elif conf.fpTest:
+                from lib.core.testing import fpTest
+                os._exitcode = 1 - (fpTest() or 0)
+            elif conf.payloadLint:
+                from lib.core.testing import payloadLintTest
+                os._exitcode = 1 - (payloadLintTest() or 0)
+            elif conf.apiTest:
+                from lib.core.testing import apiTest
+                os._exitcode = 1 - (apiTest() or 0)
             else:
                 from lib.controller.controller import start
                 if conf.profile:
@@ -268,7 +285,7 @@ def main():
         print()
         errMsg = unhandledExceptionMessage()
         excMsg = traceback.format_exc()
-        valid = checkSums()
+        valid = not codeIsModified()
 
         os._exitcode = 255
 
@@ -415,11 +432,6 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
-        elif all(_ in excMsg for _ in ("ntlm", "socket.error, err", "SyntaxError")):
-            errMsg = "wrong initialization of 'python-ntlm' detected (using Python2 syntax)"
-            logger.critical(errMsg)
-            raise SystemExit
-
         elif all(_ in excMsg for _ in ("drda", "to_bytes")):
             errMsg = "wrong initialization of 'drda' detected (using Python3 syntax)"
             logger.critical(errMsg)
@@ -501,12 +513,6 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
-        elif all(_ in excMsg for _ in ("HTTPNtlmAuthHandler", "'str' object has no attribute 'decode'")):
-            errMsg = "package 'python-ntlm' has a known compatibility issue with the "
-            errMsg += "Python 3 (Reference: 'https://github.com/mullender/python-ntlm/pull/61')"
-            logger.critical(errMsg)
-            raise SystemExit
-
         elif "'DictObject' object has no attribute '" in excMsg and all(_ in errMsg for _ in ("(fingerprinted)", "(identified)")):
             errMsg = "there has been a problem in enumeration. "
             errMsg += "Because of a considerable chance of false-positive case "
@@ -568,6 +574,21 @@ def main():
             warnMsg = "your sqlmap version is outdated"
             logger.warning(warnMsg)
 
+        # emit the JSON report BEFORE the closing banner, so it does not appear awkwardly after
+        # "[*] ending @ ..."
+        if conf.get("reportCollector") is not None:
+            try:
+                from lib.utils.api import writeReportJson
+                writeReportJson(conf.reportCollector, conf.reportJson)
+                logger.info("JSON report written to '%s'" % conf.reportJson)
+            except Exception as ex:
+                logger.error("unable to write JSON report to '%s' ('%s')" % (conf.reportJson, getSafeExString(ex)))
+            finally:
+                try:
+                    conf.reportCollector.disconnect()
+                except Exception as ex:
+                    logger.debug("problem occurred while closing the report collector ('%s')" % getSafeExString(ex))
+
         if conf.get("showTime"):
             dataToStdout("\n[*] ending @ %s\n\n" % time.strftime("%X /%Y-%m-%d/"), forceOutput=True)
 
@@ -581,7 +602,7 @@ def main():
                     except OSError:
                         pass
 
-            if any((conf.vulnTest, conf.smokeTest)) or not filterNone(filepath for filepath in glob.glob(os.path.join(tempDir, '*')) if not any(filepath.endswith(_) for _ in (".lock", ".exe", ".so", '_'))):  # ignore junk files
+            if any((conf.vulnTest, conf.fpTest, conf.smokeTest, conf.payloadLint, conf.apiTest)) or not filterNone(filepath for filepath in glob.glob(os.path.join(tempDir, '*')) if not any(filepath.endswith(_) for _ in (".lock", ".exe", ".so", '_'))):  # ignore junk files
                 try:
                     shutil.rmtree(tempDir, ignore_errors=True)
                 except OSError:
@@ -635,3 +656,9 @@ if __name__ == "__main__":
 else:
     # cancelling postponed imports (because of CI/CD checks)
     __import__("lib.controller.controller")
+
+    # exposing the programmatic library facade as 'sqlmap.scan()' / 'sqlmap.scanFromRequest()'
+    from lib.utils.library import scan, scanFromRequest, SqlmapError
+
+# public library API (also marks the re-exported names above as intentional for pyflakes)
+__all__ = ["scan", "scanFromRequest", "SqlmapError"]

@@ -27,11 +27,11 @@ class HTMLHandler(ContentHandler):
 
         self._dbms = None
         self._page = (page or "")
+        self._urldecodedPage = urldecode(self._page)
         try:
-            self._lower_page = self._page.lower()
+            self._lowerPage = self._urldecodedPage.lower()  # Note: keyword pre-filter must match the page that re.search() runs on (the URL-decoded one)
         except SystemError:  # https://bugs.python.org/issue18183
-            self._lower_page = None
-        self._urldecoded_page = urldecode(self._page)
+            self._lowerPage = None
 
         self.dbms = None
 
@@ -53,7 +53,7 @@ class HTMLHandler(ContentHandler):
                 keywords = sorted(keywords, key=len)
                 kb.cache.regex[regexp] = keywords[-1].lower()
 
-            if ('|' in regexp or kb.cache.regex[regexp] in (self._lower_page or kb.cache.regex[regexp])) and re.search(regexp, self._urldecoded_page, re.I):
+            if ('|' in regexp or kb.cache.regex[regexp] in (self._lowerPage or kb.cache.regex[regexp])) and re.search(regexp, self._urldecodedPage, re.I):
                 self.dbms = self._dbms
                 self._markAsErrorPage()
                 kb.forkNote = kb.forkNote or attrs.get("fork")

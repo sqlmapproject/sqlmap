@@ -43,8 +43,6 @@ def decloak(inputFile=None, data=None):
         print(ex)
         print('ERROR: the provided input file \'%s\' does not contain valid cloaked content' % inputFile)
         sys.exit(1)
-    finally:
-        f.close()
 
     return data
 

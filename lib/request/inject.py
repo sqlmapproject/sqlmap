@@ -8,11 +8,17 @@ See the file 'LICENSE' for copying permission
 from __future__ import print_function
 
 import re
+import threading
 import time
 
 from lib.core.agent import agent
 from lib.core.bigarray import BigArray
 from lib.core.common import applyFunctionRecursively
+from lib.core.common import dataToStdout
+from lib.core.common import unArrayizeValue
+from lib.core.datatype import AttribDict
+from lib.utils.progress import ProgressBar
+from lib.utils.safe2bin import safecharencode
 from lib.core.common import Backend
 from lib.core.common import calculateDeltaSeconds
 from lib.core.common import cleanQuery
@@ -22,6 +28,7 @@ from lib.core.common import filterNone
 from lib.core.common import getPublicTypeMembers
 from lib.core.common import getTechnique
 from lib.core.common import getTechniqueData
+from lib.core.common import incrementCounter
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
 from lib.core.common import initTechnique
@@ -53,15 +60,20 @@ from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapNotVulnerableException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import GET_VALUE_UPPERCASE_KEYWORDS
+from lib.core.settings import IS_TTY
 from lib.core.settings import INFERENCE_MARKER
 from lib.core.settings import MAX_TECHNIQUES_PER_VALUE
 from lib.core.settings import SQL_SCALAR_REGEX
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.threads import getCurrentThreadData
+from lib.core.threads import runThreads
+from lib.core.threads import setDaemon
+from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
 from lib.request.direct import direct
 from lib.techniques.blind.inference import bisection
 from lib.techniques.blind.inference import queryOutputLength
+from lib.techniques.blind.inference import valueMatchCondition
 from lib.techniques.dns.test import dnsTest
 from lib.techniques.dns.use import dnsUse
 from lib.techniques.error.use import errorUse
@@ -162,8 +174,8 @@ def _goInferenceFields(expression, expressionFields, expressionFieldsList, paylo
 
 def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, charsetType=None, firstChar=None, lastChar=None, dump=False):
     """
-    Retrieve the output of a SQL query characted by character taking
-    advantage of an blind SQL injection vulnerability on the affected
+    Retrieve the output of a SQL query character by character taking
+    advantage of a blind SQL injection vulnerability on the affected
     parameter through a bisection algorithm.
     """
 
@@ -209,9 +221,11 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
                     test = False
 
             if test:
-                # Count the number of SQL query entries output
-                countFirstField = queries[Backend.getIdentifiedDbms()].count.query % expressionFieldsList[0]
-                countedExpression = expression.replace(expressionFields, countFirstField, 1)
+                # Count the number of SQL query entries output. NOTE: COUNT(*) (row count), not
+                # COUNT(<first field>) - the latter excludes NULLs and would drop NULL-valued rows from
+                # the dump (e.g. dumping a single column whose value is NULL on some rows).
+                countField = queries[Backend.getIdentifiedDbms()].count.query % '*'
+                countedExpression = expression.replace(expressionFields, countField, 1)
 
                 if " ORDER BY " in countedExpression.upper():
                     _ = countedExpression.upper().rindex(" ORDER BY ")
@@ -355,6 +369,211 @@ def _goUnion(expression, unpack=True, dump=False):
         output = parseUnionPage(output)
 
     return output
+
+def _verifyInferredValue(expression, value):
+    """
+    Confirm a value-parallel-inferred name with ONE equality boolean (lock-free forged
+    query, mirroring the predictive commonValue check). A wrong bisection bit under heavy
+    concurrent load on a flaky/WAF'd target flips a character; a full-value equality catches
+    it sharply (a corrupted name != the real one). Returns True when (expression) == value
+    holds, or on a transient verify error (never discard a value on a hiccup).
+    """
+
+    if value is None or isNoneValue(value):
+        return True
+
+    value = unArrayizeValue(value)
+    if not isinstance(value, six.string_types):
+        return True
+
+    if Backend.getDbms():
+        _, _, _, _, _, _, fieldToCastStr, _ = agent.getFields(expression)
+        nulledCastedField = agent.nullAndCastField(fieldToCastStr)
+        expressionUnescaped = unescaper.escape(expression.replace(fieldToCastStr, nulledCastedField, 1))
+    else:
+        expressionUnescaped = unescaper.escape(expression)
+
+    matchCondition = valueMatchCondition(expressionUnescaped, value)
+    if matchCondition is None:   # non-ASCII value: no reliable whole-value equality (see valueMatchCondition)
+        return None              # caller confirms these by an independent re-extraction instead
+
+    query = getTechniqueData().vector.replace(INFERENCE_MARKER, matchCondition)
+    query = agent.suffixQuery(agent.prefixQuery(query))
+
+    timeBasedCompare = getTechnique() in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED)
+
+    try:
+        result = bool(Request.queryPage(agent.payload(newValue=query), timeBasedCompare=timeBasedCompare, raise404=False))
+        incrementCounter(getTechnique())
+        return result
+    except Exception:
+        return True
+
+def valueParallelEligible():
+    """
+    Whether blind enumeration/dumping should take the value-parallel path (one whole value per worker)
+    rather than the classic char loop. It is chosen for concurrency ('--threads') and, independently, to
+    render a single whole-job progress bar/ETA ('--eta'). A concurrency-safe channel - boolean or the
+    HTTP/2 timeless oracle - qualifies with either. Classic time-based qualifies only single-threaded under
+    '--eta': concurrent SLEEP measurements interfere, so it must stay sequential (where it is safe, and
+    still gets the whole-job ETA that matters most for the slowest channel). Callers add their own extra
+    guards (e.g. '--dns-domain', per-column comments).
+    """
+
+    concurrencySafe = isTechniqueAvailable(PAYLOAD.TECHNIQUE.BOOLEAN) or kb.get("timeless") is not None
+
+    if conf.threads > 1:
+        return concurrencySafe
+    if conf.eta:
+        return concurrencySafe or isTechniqueAvailable(PAYLOAD.TECHNIQUE.TIME)
+    return False
+
+def _threadedInferenceValues(exprBuilder, indices, context=None, charsetType=None, dump=False):
+    """
+    Value-parallel blind retrieval.
+
+    Retrieve many independent values concurrently, ONE whole value per worker thread, each decoded
+    sequentially via bisection with length=None - so there is NO per-value length probe (unlike the
+    position-parallel path, which must probe LENGTH() to split a value's characters across threads) and
+    the sequential prefix lets predictive inference / low-cardinality guessing / the per-column Huffman
+    model work. This parallelizes across VALUES instead of character positions - the right axis for the
+    MANY short values of table/column NAME enumeration (context="Tables"/"Columns" tags kb.partRun so
+    predictValue() consults the wordlist) and, with dump=True, of per-column data dumping (Huffman and
+    low-cardinality guessing engage). It bypasses getValue()'s @lockedmethod the same way union/error
+    row-threading calls _oneShotUnionUse directly. `exprBuilder(index)` yields the per-value expression.
+    Returns a list aligned with `indices` (None where a value could not be retrieved); single-thread is
+    just sequential retrieval (no worse than the classic loop, and still without the length probe).
+    """
+
+    indices = list(indices)
+
+    # Snapshot the raw per-thread technique (may be None) so the finally can restore it verbatim -
+    # getTechnique() would fall back to kb.technique, and a None result there used to skip the restore
+    # entirely, leaking the BOOLEAN/TIME we set below onto the calling thread for every later caller.
+    savedTechnique = getCurrentThreadData().technique
+
+    if isTechniqueAvailable(PAYLOAD.TECHNIQUE.BOOLEAN):
+        setTechnique(PAYLOAD.TECHNIQUE.BOOLEAN)
+    elif isTechniqueAvailable(PAYLOAD.TECHNIQUE.TIME):
+        setTechnique(PAYLOAD.TECHNIQUE.TIME)
+    else:
+        return None
+
+    try:
+        initTechnique(getTechnique())
+        payload = agent.payload(newValue=agent.suffixQuery(agent.prefixQuery(getTechniqueData().vector)))
+    except:
+        setTechnique(savedTechnique)   # these run before the runThreads try/finally below, so restore here too
+        raise
+
+    results = [None] * len(indices)
+    cursor = iter(xrange(len(indices)))
+
+    # With '--eta' show a single value-level bar (values completed / total) instead of the per-value
+    # stream: it is monotonic and carries a meaningful ETA across the whole set, and - unlike the
+    # per-char bar drawn inside bisection() - it survives the worker's disableStdOut (drawn forced,
+    # below), so '--eta' is honoured under '--threads' too. Skipped for trivial single-value sets.
+    etaProgress = ProgressBar(maxValue=len(indices)) if (conf.eta and len(indices) > 1) else None
+    completed = [0]
+
+    def inferenceThread():
+        threadData = getCurrentThreadData()
+        # Each per-value bisection streams its characters to stdout and mirrors them into
+        # threadData.shared.value - which is a PROCESS-GLOBAL object. Left as-is, concurrent
+        # workers interleave their character output (garbled console) and stomp each other's
+        # partial value. So suppress the per-char streaming here and give each worker a private
+        # shared-state object; a single clean line/counter is printed per completed value below.
+        threadData.disableStdOut = True
+        threadData.shared = AttribDict()
+
+        while kb.threadContinue:
+            with kb.locks.limit:
+                try:
+                    slot = next(cursor)
+                except StopIteration:
+                    break
+
+            expression = exprBuilder(indices[slot])
+            try:
+                _, value = bisection(payload, expression, length=None, charsetType=charsetType, dump=dump)
+                # Self-verify each value: sustained concurrent boolean load on a flaky/WAF'd target can flip
+                # a bisection bit (raw retrieval has no per-char validation), so confirm the whole value and
+                # re-extract on mismatch. ASCII values use ONE fast equality probe; a value carrying non-ASCII
+                # (which a quoted literal may not round-trip, AND which is itself a common corruption symptom)
+                # is instead confirmed by an INDEPENDENT re-extraction having to agree - a random flip will not
+                # reproduce the same bytes twice. Bounded to a few tries; correctness over a marginal request.
+                tries = 0
+                while not isNoneValue(value) and not threadData.lowCardHit and tries < 3:
+                    verdict = _verifyInferredValue(expression, value)
+                    if verdict is True:
+                        break
+                    tries += 1
+                    _, other = bisection(payload, expression, length=None, charsetType=charsetType, dump=dump)
+                    if verdict is None and other == value:   # two independent extractions agree -> trust it
+                        break
+                    value = other                            # equality said wrong, or the two disagree -> adopt fresh, recheck
+            except Exception as ex:
+                logger.debug("parallel retrieval worker failed at slot %d ('%s')" % (slot, ex))
+                value = None
+
+            with kb.locks.value:
+                results[slot] = value
+
+            if etaProgress is not None:
+                with kb.locks.io:
+                    completed[0] += 1
+                    threadData.disableStdOut = False        # let the value-level bar through (per-char streaming stays muted)
+                    try:
+                        etaProgress.progress(completed[0])
+                    finally:
+                        threadData.disableStdOut = True
+
+            # Stream each retrieved value as it completes (they arrive out of order under threads, exactly
+            # like the error/union dumps), so a dump shows its data live rather than a silent counter.
+            elif conf.verbose >= 1 and not kb.bruteMode and not isNoneValue(value):
+                with kb.locks.io:
+                    rendered = safecharencode(unArrayizeValue(value))
+                    dataToStdout("[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), "'%s'" % rendered if dump else rendered), forceOutput=True)
+
+    # Keep the '--eta' countdown live between value updates: a value (esp. time-based) can take many
+    # seconds, so a daemon redraws the bar every second with the ETA decremented by elapsed time (it runs
+    # on its own thread, so it is not muted by the workers' disableStdOut, and shares kb.locks.io with them).
+    etaTickerStop = threading.Event()
+    etaTicker = None
+    if etaProgress is not None and IS_TTY:
+        def _etaTicker():
+            while not etaTickerStop.wait(1.0):
+                with kb.locks.io:
+                    etaProgress.tick()
+        etaTicker = threading.Thread(target=_etaTicker, name="eta-ticker")
+        setDaemon(etaTicker)
+        etaTicker.start()
+
+    # Save/restore the calling thread's state: with a single thread runThreads runs the worker
+    # INLINE on this thread, so the worker's disableStdOut/shared mutations must not leak out.
+    savedPartRun = kb.partRun
+    mainThreadData = getCurrentThreadData()
+    savedStdOut, savedShared = mainThreadData.disableStdOut, mainThreadData.shared
+    kb.partRun = context
+    try:
+        runThreads(min(conf.threads or 1, len(indices)) or 1, inferenceThread)
+    finally:
+        etaTickerStop.set()
+        if etaTicker is not None:
+            etaTicker.join(timeout=2)
+        kb.partRun = savedPartRun
+        mainThreadData.disableStdOut = savedStdOut
+        mainThreadData.shared = savedShared
+        setTechnique(savedTechnique)
+
+    # Robustness: any slot a worker could not retrieve (None, i.e. a transient per-cell failure) is
+    # re-extracted serially via the classic getValue() path - full error handling, and a persistent error
+    # surfaces there - rather than being silently returned as an empty value.
+    for slot in xrange(len(results)):
+        if results[slot] is None and kb.threadContinue:
+            results[slot] = getValue(exprBuilder(indices[slot]), union=False, error=False, dump=dump, charsetType=charsetType)
+
+    return results
 
 @lockedmethod
 @stackedmethod
