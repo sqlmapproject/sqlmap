@@ -246,8 +246,13 @@ def _detectError(place, parameter):
         return None
 
     for engine, tokens in ERROR_SIGNATURES:
-        if any(_ in broken.lower() for _ in tokens):
-            return engine
+        # the diagnostic must be injection-specific (token absent from the normal page) and
+        # must reproduce, so a dynamic page that merely happens to diverge and mention an
+        # engine name once is not mistaken for an error-based oracle
+        if any(_ in broken.lower() for _ in tokens) and not any(_ in normal.lower() for _ in tokens):
+            reBroken = _fetchValue(place, parameter, original + "'")
+            if any(_ in (reBroken or "").lower() for _ in tokens):
+                return engine
 
     return None
 
@@ -303,10 +308,12 @@ def _whereDelay(condition):
     return "%s' || (function(d){if(%s){var t=new Date().getTime();while(new Date().getTime()-t<%d){}}return false})(this) || '1'=='2" % (NOSQL_SENTINEL, condition, int(conf.timeSec * 1000))
 
 def _detectWhere(place, parameter):
-    # an unconditional-delay payload must run ~conf.timeSec slower than the baseline while a
-    # non-delaying one stays fast (the latter guards against a uniformly slow endpoint)
+    # an unconditional-delay payload must run ~conf.timeSec slower than the baseline - and do so
+    # TWICE, to reject a one-off jitter spike - while a non-delaying one stays fast (the latter
+    # guards against a uniformly slow endpoint)
+    delayed = lambda: _timed(lambda: _fetchValue(place, parameter, _whereDelay("true")))
     threshold = _timed(lambda: _fetchValue(place, parameter, _originalValue(place, parameter) or "1")) + conf.timeSec * 0.5
-    if threshold < conf.timeSec and _timed(lambda: _fetchValue(place, parameter, _whereDelay("true"))) > threshold:
+    if threshold < conf.timeSec and delayed() > threshold and delayed() > threshold:
         if _timed(lambda: _fetchValue(place, parameter, "%s' || '1'=='2" % NOSQL_SENTINEL)) <= threshold:
             return threshold
     return None

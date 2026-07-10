@@ -526,7 +526,7 @@ def _mockOracle(target):
 
     dialect = gi.Dialect(
         fingerprint="FP", delay=None, banner=None, currentUser=None, currentDb=None,
-        tables=None, columns=None,
+        tableFrom=None, tableCol=None, columnFrom=None, columnCol=None, paginate=None,
         length=lambda expr: "LEN(%s)" % expr,
         ordinal=lambda expr, pos: "ORD(%s,%d)" % (expr, pos),
         row=None)
@@ -572,12 +572,12 @@ class TestGraphqlInference(unittest.TestCase):
 
     def test_batched_extraction_matches_sequential(self):
         for target in ("3.45.1", "users,creds", "luther~~~blisset^^^fluffy~~~bunny"):
-            dialect, _, truthBatch = _mockOracle(target)
-            self.assertEqual(gi._inferExprBatched(truthBatch, dialect, "EXPR"), target)
+            dialect, truth, truthBatch = _mockOracle(target)
+            self.assertEqual(gi._inferExprBatched(truthBatch, truth, dialect, "EXPR"), target)
 
     def test_batched_empty(self):
-        dialect, _, truthBatch = _mockOracle("")
-        self.assertEqual(gi._inferExprBatched(truthBatch, dialect, "EXPR"), "")
+        dialect, truth, truthBatch = _mockOracle("")
+        self.assertEqual(gi._inferExprBatched(truthBatch, truth, dialect, "EXPR"), "")
 
 
 class TestGraphqlDumpTable(unittest.TestCase):
@@ -585,8 +585,12 @@ class TestGraphqlDumpTable(unittest.TestCase):
 
     def test_dump_table(self):
         d = gi.DIALECTS["SQLite"]
+        colFrom = d.columnFrom("users")
         responses = {
-            d.columns("users"): "id,name",
+            # columns are enumerated by ordinal position (COUNT + per-index), like rows
+            "(SELECT COUNT(*) %s)" % colFrom: "2",
+            "(SELECT %s %s %s)" % (d.columnCol, colFrom, d.paginate(d.columnCol, 0)): "id",
+            "(SELECT %s %s %s)" % (d.columnCol, colFrom, d.paginate(d.columnCol, 1)): "name",
             "(SELECT COUNT(*) FROM users)": "2",
             d.row(["id", "name"], "users", 0): "1~~~null",
             d.row(["id", "name"], "users", 1): "2~~~luther",
