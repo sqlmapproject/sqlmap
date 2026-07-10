@@ -188,6 +188,7 @@ class HASH(object):
     MSSQL_OLD = r'(?i)\A0x0100[0-9a-f]{8}[0-9a-f]{80}\Z'
     MSSQL_NEW = r'(?i)\A0x0200[0-9a-f]{8}[0-9a-f]{128}\Z'
     ORACLE = r'(?i)\As:[0-9a-f]{60}\Z'
+    ORACLE_12C = r'(?i)\At:[0-9a-f]{160}\Z'
     ORACLE_OLD = r'(?i)\A[0-9a-f]{16}\Z'
     MD5_GENERIC = r'(?i)\A(0x)?[0-9a-f]{32}\Z'
     SHA1_GENERIC = r'(?i)\A(0x)?[0-9a-f]{40}\Z'

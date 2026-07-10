@@ -240,6 +240,22 @@ def oracle_passwd(password, salt, uppercase=True):
 
     return retVal.upper() if uppercase else retVal.lower()
 
+def oracle_12c_passwd(password, salt, uppercase=False, **kwargs):  # 'T:' verifier since version '12c' (PBKDF2-HMAC-SHA512 then SHA-512)
+    """
+    Reference(s):
+        https://www.trustwave.com/en-us/resources/blogs/spiderlabs-blog/changes-in-oracle-database-12c-password-hashes/
+        https://hashcat.net/wiki/doku.php?id=example_hashes (mode 12300)
+
+    >>> oracle_12c_passwd(password='hashcat', salt='34141655046766111066420254008225', uppercase=True)
+    'T:78281A9C0CF626BD05EFC4F41B515B61D6C4D95A250CD4A605CA0EF97168D670EBCB5673B6F5A2FB9CC4E0C0101E659C0C4E3B9B3BEDA846CD15508E88685A2334141655046766111066420254008225'
+    """
+
+    binsalt = decodeHex(salt)
+    key = pbkdf2_hmac("sha512", getBytes(password), binsalt + b"AUTH_PBKDF2_SPEEDY_KEY", 4096, 64)
+    retVal = "t:%s%s" % (sha512(key + binsalt).hexdigest(), salt)
+
+    return retVal.upper() if uppercase else retVal.lower()
+
 def oracle_old_passwd(password, username, uppercase=True):  # prior to version '11g'
     """
     Reference(s):
@@ -753,6 +769,7 @@ __functions__ = {
     HASH.MSSQL_OLD: mssql_old_passwd,
     HASH.MSSQL_NEW: mssql_new_passwd,
     HASH.ORACLE: oracle_passwd,
+    HASH.ORACLE_12C: oracle_12c_passwd,
     HASH.ORACLE_OLD: oracle_old_passwd,
     HASH.MD5_GENERIC: md5_generic_passwd,
     HASH.SHA1_GENERIC: sha1_generic_passwd,
@@ -1273,6 +1290,8 @@ def dictionaryAttack(attack_dict):
                             item = [(user, hash_), {'username': user}]
                         elif hash_regex in (HASH.ORACLE,):
                             item = [(user, hash_), {"salt": hash_[-20:]}]
+                        elif hash_regex in (HASH.ORACLE_12C,):
+                            item = [(user, hash_), {"salt": hash_[-32:]}]
                         elif hash_regex in (HASH.MSSQL, HASH.MSSQL_OLD, HASH.MSSQL_NEW):
                             item = [(user, hash_), {"salt": hash_[6:14]}]
                         elif hash_regex in (HASH.CRYPT_GENERIC,):
@@ -1335,7 +1354,7 @@ def dictionaryAttack(attack_dict):
             while not kb.wordlists:
 
                 # the slowest of all methods hence smaller default dict
-                if hash_regex in (HASH.ORACLE_OLD, HASH.PHPASS, HASH.SHA256_UNIX_CRYPT, HASH.SHA512_UNIX_CRYPT, HASH.WERKZEUG_SCRYPT, HASH.BCRYPT, HASH.WORDPRESS_BCRYPT, HASH.MYSQL_SHA2):
+                if hash_regex in (HASH.ORACLE_OLD, HASH.ORACLE_12C, HASH.PHPASS, HASH.SHA256_UNIX_CRYPT, HASH.SHA512_UNIX_CRYPT, HASH.WERKZEUG_SCRYPT, HASH.BCRYPT, HASH.WORDPRESS_BCRYPT, HASH.MYSQL_SHA2):
                     dictPaths = [paths.SMALL_DICT]
                 else:
                     dictPaths = [paths.WORDLIST]

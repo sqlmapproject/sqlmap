@@ -280,8 +280,8 @@
             <blind query="SELECT USERNAME FROM (SELECT USERNAME,ROWNUM AS CAP FROM SYS.ALL_USERS) WHERE CAP=%d" count="SELECT COUNT(USERNAME) FROM SYS.ALL_USERS"/>
         </users>
         <passwords>
-            <inband query="SELECT NAME,PASSWORD FROM SYS.USER$" condition="NAME"/>
-            <blind query="SELECT PASSWORD FROM (SELECT PASSWORD,ROWNUM AS CAP FROM SYS.USER$ WHERE NAME='%s') WHERE CAP=%d" count="SELECT COUNT(PASSWORD) FROM SYS.USER$ WHERE NAME='%s'"/>
+            <inband query="SELECT NAME,COALESCE(REGEXP_SUBSTR(SPARE4,'S:[0-9A-F]{60}'),REGEXP_SUBSTR(SPARE4,'T:[0-9A-F]{160}'),PASSWORD) FROM SYS.USER$" condition="NAME"/>
+            <blind query="SELECT COALESCE(REGEXP_SUBSTR(SPARE4,'S:[0-9A-F]{60}'),REGEXP_SUBSTR(SPARE4,'T:[0-9A-F]{160}'),PASSWORD) FROM (SELECT SPARE4,PASSWORD,ROWNUM AS CAP FROM SYS.USER$ WHERE NAME='%s') WHERE CAP=%d" count="SELECT COUNT(*) FROM SYS.USER$ WHERE NAME='%s'"/>
         </passwords>
         <!--
              NOTE: in Oracle to enumerate the privileges for the session user you can use:
