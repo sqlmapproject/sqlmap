@@ -1227,13 +1227,18 @@ class TestGraphqlDumpTable(unittest.TestCase):
     DIALECT = gql.DIALECTS["MySQL"]
 
     def test_dump_table_grid(self):
-        # infer() returns the column list for dialect.columns(table), then the concatenated
-        # rows scalar for dialect.rows(...). We map by which sub-expression is requested.
-        columns_expr = self.DIALECT.columns("users")
-        rows_value = gql.COL_SEP.join(("1", "alice")) + gql.ROW_SEP + gql.COL_SEP.join(("2", "bob"))
+        # infer() returns the column list for dialect.columns(table), the COUNT(*), then
+        # one COL_SEP-joined row scalar per ordinal offset (rows are dumped individually
+        # to avoid the back-end's GROUP_CONCAT truncation).
+        responses = {
+            self.DIALECT.columns("users"): "id,name",
+            "(SELECT COUNT(*) FROM users)": "2",
+            self.DIALECT.row(["id", "name"], "users", 0): gql.COL_SEP.join(("1", "alice")),
+            self.DIALECT.row(["id", "name"], "users", 1): gql.COL_SEP.join(("2", "bob")),
+        }
 
         def infer(expr, maxLen=gql.MAX_LENGTH):
-            return "id,name" if expr == columns_expr else rows_value
+            return responses.get(expr)
 
         columns, rows = gql._dumpTable(infer, self.DIALECT, "users")
         self.assertEqual(columns, ["id", "name"])

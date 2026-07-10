@@ -439,10 +439,10 @@ class TestGraphqlDialects(unittest.TestCase):
         self.assertEqual(d.length("x"), "LENGTH((x))")
         self.assertEqual(d.ordinal("x", 3), "UNICODE(SUBSTR((x),3,1))")
 
-    def test_sqlite_rows_handles_nulls(self):
+    def test_sqlite_row_handles_nulls(self):
         d = gi.DIALECTS["SQLite"]
-        sql = d.rows(["name", "surname"], "users")
-        self.assertIn("GROUP_CONCAT", sql)
+        sql = d.row(["name", "surname"], "users", 3)
+        self.assertIn("LIMIT 1 OFFSET 3", sql)                       # per-row, not a whole-table GROUP_CONCAT
         self.assertIn("COALESCE(CAST(name AS TEXT),'NULL')", sql)
         self.assertIn("FROM users", sql)
 
@@ -529,7 +529,7 @@ def _mockOracle(target):
         tables=None, columns=None,
         length=lambda expr: "LEN(%s)" % expr,
         ordinal=lambda expr, pos: "ORD(%s,%d)" % (expr, pos),
-        rows=None)
+        row=None)
 
     def _value(cond):
         pos = None
@@ -581,20 +581,21 @@ class TestGraphqlInference(unittest.TestCase):
 
 
 class TestGraphqlDumpTable(unittest.TestCase):
-    """Whole-table dump: column list + row scalar split back into a grid"""
+    """Whole-table dump: column list + COUNT(*) + one row-scalar per ordinal offset"""
 
     def test_dump_table(self):
+        d = gi.DIALECTS["SQLite"]
         responses = {
-            "(SELECT GROUP_CONCAT(name) FROM pragma_table_info('users'))": "id,name",
+            d.columns("users"): "id,name",
+            "(SELECT COUNT(*) FROM users)": "2",
+            d.row(["id", "name"], "users", 0): "1~~~null",
+            d.row(["id", "name"], "users", 1): "2~~~luther",
         }
-        rowScalar = "1%snull^^^2%sluther" % ("~~~", "~~~")     # two rows, two columns
 
         def infer(expr, maxLen=gi.MAX_LENGTH):
-            if expr in responses:
-                return responses[expr]
-            return rowScalar                                   # the GROUP_CONCAT row dump
+            return responses.get(expr)
 
-        columns, rows = gi._dumpTable(infer, gi.DIALECTS["SQLite"], "users")
+        columns, rows = gi._dumpTable(infer, d, "users")
         self.assertEqual(columns, ["id", "name"])
         self.assertEqual(rows, [["1", "null"], ["2", "luther"]])
 

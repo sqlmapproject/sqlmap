@@ -482,6 +482,12 @@ def _familyUniquelyIdentifies(engine):
     return sum(e.family == engine.family for e in siblings) == 1
 
 
+# Delimiters shared by more than one engine in _ENGINE_TABLE; a match on any of these
+# needs the full cross-engine comparison to disambiguate (Jinja2/Twig/Handlebars for
+# "{{", Freemarker/SpringEL/Mako for "${"). Any other delimiter is unique to one engine.
+_SHARED_DELIMITERS = frozenset(("{{", "${"))
+
+
 def _fingerprint(place, parameter):
     """Identify the template engine and confirm injection. Returns (engine, evidence)
     where evidence is a dict of detection results, or (None, None).
@@ -531,6 +537,12 @@ def _fingerprint(place, parameter):
             bestScore = score
             bestEngine = engine
             bestEvidence = evidence
+
+        # A decisive arithmetic proof on an engine whose delimiter no other engine shares
+        # is unambiguous: stop scanning the remaining engines (all phases of THIS engine
+        # already ran, so its evidence is complete) instead of exhaustively testing all nine.
+        if bestEngine is engine and evidence.get("arithmetic") and engine.delimiter not in _SHARED_DELIMITERS:
+            break
 
     if bestEngine and bestScore >= 3:
         # For engines with ambiguous delimiters (shared by multiple engines),

