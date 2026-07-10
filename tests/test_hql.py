@@ -58,7 +58,7 @@ class TestBoundary(unittest.TestCase):
         self.assertEqual(hql._base(hql.Boundary(" OR ", "", False), "5"), "-1")
 
     def test_scalar_casts_attribute(self):
-        expr = hql._scalar("Member", "id", "LENGTH(%s)", "id")
+        expr = hql._scalar("Member", "LENGTH(CAST(_h.id AS string))", "id")
         self.assertIn("CAST(_h.id AS string)", expr)
         self.assertIn("FROM Member _h", expr)
         self.assertIn("MIN(_h2.id)", expr)
@@ -111,14 +111,15 @@ def _recordOracle(record, entity="Member"):
             n = re.search(r">=(\d+)", predicate)
             if m and n:
                 return len(str(record.get(m.group(1), ""))) >= int(n.group(1))
-        # char: SUBSTRING(CAST(_h.<attr> AS string),<pos>,1) ... ='<c>'
-        if "SUBSTRING" in predicate:
-            m = re.search(r"SUBSTRING\(CAST\(_h\.(\w+) AS string\),(\d+),1\)", predicate)
-            c = re.search(r"='(.)'\s*$", predicate)
-            if m and c:
-                attr, pos, ch = m.group(1), int(m.group(2)), c.group(1)
+        # char: LOCATE(SUBSTRING(CAST(_h.<attr> AS string),<pos>,1),'<lit>') ... >=<N>
+        if "LOCATE" in predicate:
+            m = re.search(r"SUBSTRING\(CAST\(_h\.(\w+) AS string\),(\d+),1\),'([^']*)'", predicate)
+            n = re.search(r">=(\d+)\s*$", predicate)
+            if m and n:
+                attr, pos, literal = m.group(1), int(m.group(2)), m.group(3)
                 value = str(record.get(attr, ""))
-                return pos <= len(value) and value[pos - 1] == ch
+                index = (literal.find(value[pos - 1]) + 1) if pos <= len(value) else 0
+                return index >= int(n.group(1))
         return False
 
     return truth
@@ -174,13 +175,14 @@ def _multiOracle(records):
             n = re.search(r">=(\d+)", predicate)
             if m and n:
                 return len(str(rec.get(m.group(1), ""))) >= int(n.group(1))
-        if "SUBSTRING" in predicate:
-            m = re.search(r"SUBSTRING\(CAST\(_h\.(\w+) AS string\),(\d+),1\)", predicate)
-            c = re.search(r"='(.)'\s*$", predicate)
-            if m and c:
+        if "LOCATE" in predicate:
+            m = re.search(r"SUBSTRING\(CAST\(_h\.(\w+) AS string\),(\d+),1\),'([^']*)'", predicate)
+            n = re.search(r">=(\d+)\s*$", predicate)
+            if m and n:
                 value = str(rec.get(m.group(1), ""))
-                pos = int(m.group(2))
-                return pos <= len(value) and value[pos - 1] == c.group(1)
+                pos, literal = int(m.group(2)), m.group(3)
+                index = (literal.find(value[pos - 1]) + 1) if pos <= len(value) else 0
+                return index >= int(n.group(1))
         return False
 
     return truth

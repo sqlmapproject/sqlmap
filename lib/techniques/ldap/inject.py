@@ -553,6 +553,8 @@ def _enumerateEntryKeys(oracle, builder):
             logger.info("identified directory entry: %s='%s'" % (keyAttr, value))
 
         if values:
+            if len(values) >= LDAP_MAX_RECORDS:
+                logger.warning("directory enumeration hit the LDAP_MAX_RECORDS (%d) cap; some entries may be omitted" % LDAP_MAX_RECORDS)
             return keyAttr, values
 
     return None, []
@@ -602,10 +604,22 @@ def _dumpMultiValues(oracle, builder, place, parameter):
         if not _exists(oracle, builder, attr):
             continue
 
-        value = _inferAttribute(oracle, builder, attr)
-        if value:
-            logger.info("fetched 1 value from attribute '%s'" % attr)
-            _dumpTable("LDAP: %s parameter '%s' '%s' values" % (place, parameter, attr), [attr], [(value,)])
+        # Multi-valued attributes (member, memberOf, ...) carry several values;
+        # walk them by excluding each recovered value from the next probe, exactly
+        # like _enumerateEntryKeys does for entry keys.
+        values = []
+        while len(values) < LDAP_MAX_RECORDS:
+            exclusions = [(attr, _) for _ in values]
+            value = _inferAttribute(oracle, builder, attr, exclusions=exclusions)
+            if not value or value in values:
+                break
+            values.append(value)
+
+        if values:
+            if len(values) >= LDAP_MAX_RECORDS:
+                logger.warning("attribute '%s' hit the LDAP_MAX_RECORDS (%d) cap; some values may be omitted" % (attr, LDAP_MAX_RECORDS))
+            logger.info("fetched %d value%s from attribute '%s'" % (len(values), "" if len(values) == 1 else "s", attr))
+            _dumpTable("LDAP: %s parameter '%s' '%s' values" % (place, parameter, attr), [attr], [(_,) for _ in values])
             dumped = True
 
     return dumped
@@ -720,7 +734,7 @@ def ldapScan():
     if not slot.backend or slot.backend == "Generic LDAP":
         backend = _fingerprintByAttribute(oracle, builder)
         if backend:
-            logger.info("identified back-end DBMS: '%s'" % backend)
+            logger.info("identified back-end: '%s'" % backend)
             slot = slot._replace(backend=backend)
 
     # Determine extraction method: in-band if the template page already

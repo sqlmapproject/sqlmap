@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.7.66"
+VERSION = "1.10.7.67"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -1040,7 +1040,7 @@ LDAP_ERROR_SIGNATURES = (
 # that an error response originates from an LDAP back-end rather than a generic HTTP 500
 LDAP_ERROR_REGEX = r"(?i)(?:%s)" % '|'.join(regex for _, regex in LDAP_ERROR_SIGNATURES)
 
-# Printable-ASCII codepoint bounds bisected during LDAP blind extraction via >= lexicographic comparison
+# Printable-ASCII codepoint bounds for the (linear, prefix-wildcard) LDAP blind character scan
 LDAP_CHAR_MIN = 0x20
 LDAP_CHAR_MAX = 0x7e
 
@@ -1267,9 +1267,6 @@ XXE_LOCAL_DTDS = (
     ("file:///C:/Windows/System32/xwizards/xwizard.dtd", "ELEMENT"),
     ("jar:file:///usr/share/java/lotus-domino.jar!/schema/domino.dtd", "abbr"),
 )
-
-# Upper bound for SSTI value extraction (reserved for future use)
-SSTI_MAX_LENGTH = 256
 
 # Length of prefix and suffix used in non-SQLI heuristic checks
 NON_SQLI_CHECK_PREFIX_SUFFIX_LENGTH = 6

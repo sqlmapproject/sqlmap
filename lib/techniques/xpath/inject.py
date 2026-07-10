@@ -488,10 +488,14 @@ def _walkTree(oracle, builder, path="/*", depth=0):
     childCount = _inferCount(oracle, builder, path,
                              lambda b, p, c: b.childCount(p, c),
                              maxCount=32)
+    if childCount >= 32:
+        logger.warning("element '%s' hit the 32-child cap; some child nodes may be omitted" % name)
 
     attrCount = _inferCount(oracle, builder, path,
                             lambda b, p, c: b.attributeCount(p, c),
                             maxCount=16)
+    if attrCount >= 16:
+        logger.warning("element '%s' hit the 16-attribute cap; some attributes may be omitted" % name)
 
     attributes = []
     for i in xrange(1, attrCount + 1):

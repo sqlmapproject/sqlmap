@@ -18,9 +18,6 @@ bootstrap()
 import lib.techniques.ssti.inject as ssti
 
 
-SENTINEL = ssti.SENTINEL
-
-
 class TestHelpers(unittest.TestCase):
     def test_ratio(self):
         self.assertGreater(ssti._ratio("abc", "abc"), 0.9)

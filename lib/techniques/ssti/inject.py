@@ -24,8 +24,6 @@ from lib.core.settings import UPPER_RATIO_BOUND
 from lib.request.connect import Connect as Request
 
 
-SENTINEL = randomStr(length=10, lowercase=True)
-
 SSTI_PLACES = (PLACE.GET, PLACE.POST, PLACE.COOKIE, PLACE.CUSTOM_POST)
 
 # Each Engine entry defines detection payloads and expected behaviour for one
@@ -572,9 +570,6 @@ def _fingerprint(place, parameter):
 
 
 def sstiScan():
-    global SENTINEL
-    SENTINEL = randomStr(length=10, lowercase=True)
-
     debugMsg = "'--ssti' is self-contained: it detects SSTI and fingerprints "
     debugMsg += "common template engines when possible. SQL enumeration "
     debugMsg += "switches (--banner, --dbs, --tables, --users, --sql-query) are ignored"

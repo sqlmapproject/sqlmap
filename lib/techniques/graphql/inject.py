@@ -835,6 +835,9 @@ def _inferExpr(truth, dialect, expr, maxLen=MAX_LENGTH):
             high = mid
     length = low
 
+    if length >= maxLen:
+        logger.warning("value length hit the %d-char cap; the recovered value may be truncated" % maxLen)
+
     value = ""
     for pos in xrange(1, length + 1):
         ordExpr = dialect.ordinal(expr, pos)
@@ -1064,6 +1067,7 @@ def _testSlot(slot, endpoint):
         logger.info("no oracle confirmed for this slot")
         return None, None, None
 
+    logger.info("%s.%s(%s:) is vulnerable to GraphQL injection (%s-based)" % (slot.parentType, slot.fieldName, slot.targetArg, kind))
     title = "GraphQL %s" % oracleType
     payload = _buildQuery(slot, _SQL_BOOLEAN_TRUE) or _SQL_BOOLEAN_TRUE
     report = "---\nParameter: %s.%s(%s:) (%s)\n    Type: GraphQL injection\n    Title: %s\n    Payload: %s\n---" % (

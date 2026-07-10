@@ -278,15 +278,16 @@ def _hql_atom(atom):
             return False
         return len(HQL_RECORD[attr]) >= n
 
-    match = re.match(r"^\(SELECT SUBSTRING\(CAST\(_h\.(\w+) AS string\),(\d+),1\).*?\)\s*=\s*'(.)'$", atom, re.I)  # scalar char
+    match = re.match(r"^\(SELECT LOCATE\(SUBSTRING\(CAST\(_h\.(\w+) AS string\),(\d+),1\),'([^']*)'\).*?\)\s*>=\s*(\d+)$", atom, re.I)  # scalar char (LOCATE index)
     if match:
-        attr, pos, ch = match.group(1), int(match.group(2)), match.group(3)
+        attr, pos, literal, n = match.group(1), int(match.group(2)), match.group(3), int(match.group(4))
         if attr not in HQL_RECORD:
             raise _HqlError("org.hibernate.query.sqm.PathElementException: Could not resolve attribute '%s' of '%s'" % (attr, HQL_ENTITY))
         if _hql_no_row(atom):
             return False
         value = HQL_RECORD[attr]
-        return pos <= len(value) and value[pos - 1] == ch
+        index = (literal.find(value[pos - 1]) + 1) if pos <= len(value) else 0    # 1-based, 0 if absent
+        return index >= n
 
     match = re.match(r"^(?:\w+\.)?(\w+)\s+IS NOT NULL$", atom, re.I)             # path probe (entity leak)
     if match:

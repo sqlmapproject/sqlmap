@@ -424,6 +424,8 @@ def _cypherDump(place, parameter):
             records.append(dict(zip(cols, values[0])))     # align by field name (keys(u) order is per-node)
             columns.extend(_ for _ in cols if _ not in columns)
         lastId = nodeId
+    else:
+        logger.warning("hit the NOSQL_MAX_RECORDS (%d) cap; some records may be omitted" % NOSQL_MAX_RECORDS)
 
     return (columns, [[row.get(_, "") for _ in columns] for row in records]) if records else None
 
