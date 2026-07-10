@@ -11,11 +11,13 @@ from __future__ import print_function
 
 import base64
 import json
+import os
 import random
 import re
 import sqlite3
 import string
 import sys
+import tempfile
 import threading
 import time
 import traceback
@@ -23,6 +25,18 @@ import traceback
 PY3 = sys.version_info >= (3, 0)
 UNICODE_ENCODING = "utf-8"
 DEBUG = False
+
+# A benign file with random content/name that the XXE endpoint can disclose via a file://
+# external entity, so '--xxe --file-read' has a target in the vuln-test. Randomized (never a
+# static literal) to match sqlmap's below-the-radar convention, so nothing here becomes a
+# blacklistable signature. In-process server, so callers read these same values.
+XXE_READ_MARKER = "".join(random.choice(string.ascii_lowercase + string.digits) for _ in range(20))
+XXE_READ_FILE = os.path.join(tempfile.gettempdir(), "%s.txt" % "".join(random.choice(string.ascii_lowercase) for _ in range(12)))
+try:
+    with open(XXE_READ_FILE, "w") as _f:
+        _f.write(XXE_READ_MARKER + "\n")
+except (IOError, OSError):
+    pass
 
 if PY3:
     from http.client import FORBIDDEN
@@ -944,6 +958,26 @@ class ReqHandler(BaseHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(b"<html><body>Request blocked: security policy violation (WAF)</body></html>")
                 return
+
+        if self.url == "/xxe":
+            self.send_response(OK)
+            self.send_header("Content-type", "application/xml; charset=%s" % UNICODE_ENCODING)
+            self.send_header("Connection", "close")
+            self.end_headers()
+
+            body = getattr(self, "data", "") or ""
+            try:
+                from lxml import etree
+                # VULNERABLE: a parser configured to load DTDs and resolve entities (incl.
+                # external file:// general entities) - the textbook XXE misconfiguration.
+                parser = etree.XMLParser(resolve_entities=True, load_dtd=True, no_network=True)
+                root = etree.fromstring(body.encode(UNICODE_ENCODING), parser)
+                output = "<result>%s</result>" % "".join(root.itertext())     # reflects expanded entities
+            except Exception as ex:
+                output = "<error>%s: %s</error>" % (type(ex).__name__, ex)    # parser diagnostic (error-based tier)
+
+            self.wfile.write(output.encode(UNICODE_ENCODING, "ignore"))
+            return
 
         if self.url == "/csrf":
             if self.params.get("csrf_token") == _csrf_token:

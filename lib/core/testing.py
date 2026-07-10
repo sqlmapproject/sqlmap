@@ -97,6 +97,7 @@ def vulnTest(tests=None, label="vuln"):
         ("-u \"<base>xpath/search?q=x\" --xpath --flush-session --disable-hashing", ("is vulnerable to XPath injection", "Title: XPath boolean-based blind", "XPath: GET parameter 'q' XML tree", "extracted", "XPath scan complete")),   # XPath: error-based detection + boolean oracle + blind XML tree-walking via starts-with character extraction
         ("-u \"<base>ssti/search?q=x\" --ssti --flush-session --disable-hashing", ("is vulnerable to SSTI", "Title: SSTI Jinja2 injection", "back-end template engine: 'Jinja2'", "in-band arithmetic proof confirmed", "SSTI scan complete")),   # SSTI: Jinja2 detection via arithmetic control-pair + boolean oracle + distinguishing probe
         ("-u \"<base>hql/search?name=admin\" -p name --hql --flush-session --disable-hashing", ("is vulnerable to HQL injection", "back-end: 'Hibernate'", "entity 'Users'", "s3cr3t", "HQL scan complete")),   # HQL: error-based Hibernate fingerprint + boolean oracle + error-leaked entity + blind attribute enumeration and substring value extraction
+        ("-u \"<base>xxe\" --data=\"<root><q>x</q></root>\" --xxe --file-read=\"%s\" --flush-session" % vulnserver.XXE_READ_FILE, ("the XML body processes DTD/internal entities", "in-band XXE file-read impact confirmed", "Type: XXE injection", "XXE scan complete")),   # XXE: in-band internal-entity reflection (real libxml2/lxml parser) + external file:// entity file read
         ("-u \"<url>&query=*\" --flush-session --technique=Q --banner", ("Title: SQLite inline queries", "banner: '3.")),
         ("-d \"<direct>\" --flush-session --dump -T creds --dump-format=SQLITE --binary-fields=password_hash --where \"user_id=5\"", ("3137396164343563366365326362393763663130323965323132303436653831", "dumped to SQLITE database")),
         ("-d \"<direct>\" --flush-session --banner --schema --sql-query=\"UPDATE users SET name='foobar' WHERE id=4; SELECT * FROM users; SELECT 987654321\"", ("banner: '3.", "INTEGER", "TEXT", "id", "name", "surname", "4,foobar,nameisnull", "'987654321'",)),
@@ -104,14 +105,14 @@ def vulnTest(tests=None, label="vuln"):
         ("--purge -v 3", ("~ERROR", "~CRITICAL", "deleting the whole directory tree")),
     )
 
-    # The vulnserver's XPath endpoint renders with lxml and its SSTI endpoint with jinja2; where those
-    # optional third-party engines are not importable (e.g. PyPy 2.7, which has no lxml wheel), skip
+    # The vulnserver's XPath and XXE endpoints render with lxml and its SSTI endpoint with jinja2; where
+    # those optional third-party engines are not importable (e.g. PyPy 2.7, which has no lxml wheel), skip
     # just those entries instead of failing the whole run - the rest of the suite is unaffected.
     try:
         __import__("lxml")
     except ImportError:
-        TESTS = tuple(_ for _ in TESTS if "--xpath" not in _[0])
-        logger.warning("skipping the XPath vuln-test entry ('lxml' not available)")
+        TESTS = tuple(_ for _ in TESTS if "--xpath" not in _[0] and "--xxe" not in _[0])
+        logger.warning("skipping the XPath and XXE vuln-test entries ('lxml' not available)")
     try:
         __import__("jinja2")
     except ImportError:
