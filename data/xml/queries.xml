@@ -164,7 +164,7 @@
 
     <dbms value="Microsoft SQL Server">
         <cast query="CAST(%s AS NVARCHAR(4000))"/>
-        <length query="LTRIM(STR(LEN(%s)))"/>
+        <length query="LTRIM(STR(LEN(%s+'.')-1))"/>
         <isnull query="ISNULL(%s,' ')"/>
         <delimiter query="+"/>
         <limit query="SELECT TOP %d "/>
@@ -556,7 +556,7 @@
 
     <dbms value="Sybase">
         <cast query="CONVERT(VARCHAR(4000),%s)"/>
-        <length query="LTRIM(STR(LEN(%s)))"/>
+        <length query="LTRIM(STR(LEN(%s+'.')-1))"/>
         <isnull query="ISNULL(%s,' ')"/>
         <delimiter query="+"/>
         <limit query="SELECT TOP %d "/>
