@@ -218,6 +218,92 @@ def nosql_match(params):
     else:           # $eq, $in (single-valued here) and any literal equality
         return record == value
 
+# --- HQL endpoint (vulnerable Hibernate ORM search over a single mapped entity) -------------------
+# The query "FROM Users u WHERE u.name = '<input>'" is built by string concatenation; the evaluator
+# below reproduces just enough HQL semantics (boolean logic, EXISTS, scalar sub-queries, path
+# resolution) to make sqlmap's --hql engine detect, fingerprint, leak the entity, enumerate mapped
+# attributes and blindly extract their values. Unlike the local Hibernate lab, this endpoint reflects
+# the parser diagnostic, so it also exercises the error-based entity-leak path.
+
+HQL_ENTITY = "org.vulnserver.model.Users"
+HQL_RECORD = {"id": "1", "name": "admin", "password": "s3cr3t", "role": "administrator", "email": "admin@vulnserver.local"}
+
+
+class _HqlError(Exception):
+    pass
+
+
+def _hql_short(name):
+    return re.split(r"[.$]", name)[-1]
+
+
+def _hql_no_row(atom):
+    """True when a row-walk bound "_h2.<pin> > <n>" excludes the only record, so the
+    scalar sub-query resolves to NULL and its comparison is false."""
+
+    match = re.search(r"_h2\.\w+>(\d+)", atom)
+    return bool(match) and int(HQL_RECORD["id"]) <= int(match.group(1))
+
+
+def _hql_atom(atom):
+    atom = atom.strip()
+
+    match = re.match(r"^'([^']*)'\s*=\s*'([^']*)'$", atom)                       # literal '1'='1'
+    if match:
+        return match.group(1) == match.group(2)
+
+    match = re.match(r"^\w+\s*=\s*'([^']*)'$", atom)                             # outer: name = 'X'
+    if match:
+        return HQL_RECORD["name"] == match.group(1)
+
+    match = re.match(r"^EXISTS\(SELECT 1 FROM (\w+) _h\)$", atom, re.I)          # entity brute
+    if match:
+        if _hql_short(match.group(1)) != _hql_short(HQL_ENTITY):
+            raise _HqlError("org.hibernate.query.sqm.UnknownEntityException: Could not resolve root entity '%s'" % match.group(1))
+        return True
+
+    match = re.match(r"^EXISTS\(SELECT _h\.(\w+) FROM (\w+) _h\)$", atom, re.I)  # attribute existence
+    if match:
+        attr = match.group(1)
+        if _hql_short(match.group(2)) != _hql_short(HQL_ENTITY) or attr not in HQL_RECORD:
+            raise _HqlError("org.hibernate.query.sqm.PathElementException: Could not resolve attribute '%s' of '%s'" % (attr, HQL_ENTITY))
+        return True
+
+    match = re.match(r"^\(SELECT LENGTH\(CAST\(_h\.(\w+) AS string\)\).*?\)\s*>=\s*(\d+)$", atom, re.I)  # scalar length
+    if match:
+        attr, n = match.group(1), int(match.group(2))
+        if attr not in HQL_RECORD:
+            raise _HqlError("org.hibernate.query.sqm.PathElementException: Could not resolve attribute '%s' of '%s'" % (attr, HQL_ENTITY))
+        if _hql_no_row(atom):                       # row-walk cursor advanced past the only record
+            return False
+        return len(HQL_RECORD[attr]) >= n
+
+    match = re.match(r"^\(SELECT SUBSTRING\(CAST\(_h\.(\w+) AS string\),(\d+),1\).*?\)\s*=\s*'(.)'$", atom, re.I)  # scalar char
+    if match:
+        attr, pos, ch = match.group(1), int(match.group(2)), match.group(3)
+        if attr not in HQL_RECORD:
+            raise _HqlError("org.hibernate.query.sqm.PathElementException: Could not resolve attribute '%s' of '%s'" % (attr, HQL_ENTITY))
+        if _hql_no_row(atom):
+            return False
+        value = HQL_RECORD[attr]
+        return pos <= len(value) and value[pos - 1] == ch
+
+    match = re.match(r"^(?:\w+\.)?(\w+)\s+IS NOT NULL$", atom, re.I)             # path probe (entity leak)
+    if match:
+        attr = match.group(1)
+        if attr not in HQL_RECORD:
+            raise _HqlError("org.hibernate.query.sqm.PathElementException: Could not resolve attribute '%s' of '%s'" % (attr, HQL_ENTITY))
+        return HQL_RECORD[attr] is not None
+
+    raise _HqlError("org.hibernate.query.SyntaxException: unexpected token near '%s'" % atom[:24])
+
+
+def hql_evaluate(value):
+    """Evaluate "name = '<value>'" as an HQL boolean; returns True/False or raises _HqlError."""
+
+    clause = "name = '%s'" % value
+    return any(all(_hql_atom(a) for a in term.split(" AND ")) for term in clause.split(" OR "))
+
 # --- XPath endpoint (vulnerable search and login, backed by an in-memory XML document) ------------
 
 XPATH_XML = """<?xml version="1.0" encoding="UTF-8"?>
@@ -964,6 +1050,22 @@ class ReqHandler(BaseHTTPRequestHandler):
                     output = json.dumps({"resultCode": 49, "authenticated": False, "errorMessage": "Invalid credentials"})
             else:
                 output = json.dumps({"resultCode": 49, "authenticated": False, "errorMessage": "Missing credentials"})
+
+            self.wfile.write(output.encode(UNICODE_ENCODING))
+            return
+
+        if self.url == "/hql/search":
+            self.send_response(OK)
+            self.send_header("Content-type", "application/json; charset=%s" % UNICODE_ENCODING)
+            self.send_header("Connection", "close")
+            self.end_headers()
+
+            name = self.params.get("name", "")
+            try:
+                matched = hql_evaluate(name)                     # VULNERABLE: input concatenated into HQL
+                output = json.dumps({"results": [HQL_RECORD] if matched else [], "count": 1 if matched else 0})
+            except _HqlError as ex:
+                output = json.dumps({"results": [], "count": 0, "error": str(ex)})
 
             self.wfile.write(output.encode(UNICODE_ENCODING))
             return

@@ -83,6 +83,7 @@ from lib.core.settings import FI_ERROR_REGEX
 from lib.core.settings import FORMAT_EXCEPTION_STRINGS
 from lib.core.settings import GRAPHQL_ERROR_REGEX
 from lib.core.settings import HEURISTIC_CHECK_ALPHABET
+from lib.core.settings import HQL_ERROR_REGEX
 from lib.core.settings import INFERENCE_EQUALS_CHAR
 from lib.core.settings import LDAP_ERROR_REGEX
 from lib.core.settings import SSTI_ERROR_REGEX
@@ -1211,6 +1212,13 @@ def heuristicCheckSqlInjection(place, parameter):
 
     if not conf.ssti and re.search(SSTI_ERROR_REGEX, page or ""):
         infoMsg = "heuristic (SSTI) test shows that %sparameter '%s' might be vulnerable to server-side template injection (rerun with switch '--ssti')" % ("%s " % paramType if paramType != parameter else "", parameter)
+        logger.info(infoMsg)
+
+        if conf.beep:
+            beep()
+
+    if not conf.hql and re.search(HQL_ERROR_REGEX, page or ""):
+        infoMsg = "heuristic (HQL) test shows that %sparameter '%s' might be vulnerable to HQL/JPQL (Hibernate ORM) injection (rerun with switch '--hql')" % ("%s " % paramType if paramType != parameter else "", parameter)
         logger.info(infoMsg)
 
         if conf.beep:

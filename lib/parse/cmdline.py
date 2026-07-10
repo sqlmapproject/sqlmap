@@ -796,6 +796,9 @@ def cmdLineParser(argv=None):
         nonsql.add_argument("--xxe", dest="xxe", action="store_true",
             help="Test for XML External Entity (XXE) injection")
 
+        nonsql.add_argument("--hql", dest="hql", action="store_true",
+            help="Test for HQL/JPQL (Hibernate ORM) injection")
+
         nonsql.add_argument("--oob-server", dest="oobServer",
             help="Out-of-band server for blind '--xxe'")
 

@@ -126,6 +126,7 @@ optDict = {
         "xpath": "boolean",
         "ssti": "boolean",
         "xxe": "boolean",
+        "hql": "boolean",
         "oobServer": "string",
         "oobToken": "string",
         "timeSec": "integer",

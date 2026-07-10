@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.7.65"
+VERSION = "1.10.7.66"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -1158,6 +1158,54 @@ OOB_POLL_DELAY = 2         # target's own link + webhook.site's eventually-consi
 # The delay must exceed a DTD-processing control baseline by this many seconds.
 XXE_BLACKHOLE_HOST = "192.0.2.1"
 XXE_TIME_THRESHOLD = 5
+
+# HQL/JPQL (Hibernate, EclipseLink) injection error signatures for error-based
+# detection and ORM fingerprinting. Each tuple is (backend_name, regex_fragment).
+# A match means the injection reached the ORM query parser (not the SQL layer),
+# which is what distinguishes HQL injection from ordinary SQL injection.
+HQL_ERROR_SIGNATURES = (
+    ("Hibernate", r"org\.hibernate\.(?:query|hql|QueryException|exception\.SQLGrammarException)"),
+    ("Hibernate", r"(?:QuerySyntaxException|QueryException|SemanticException|PathElementException|UnknownEntityException|InterpretationException)"),
+    ("Hibernate", r"(?:token recognition error at|unexpected (?:token|end of subtree|AST node)|Could not (?:resolve|interpret) (?:attribute|root entity|path|property)|line \d+:\d+ (?:no viable alternative|mismatched input|token recognition error))"),
+    ("EclipseLink / JPQL", r"(?:org\.eclipse\.persistence\.exceptions\.JPQLException|Exception \[EclipseLink|Problem compiling \[|An exception occurred while creating a query)"),
+    ("JPA / JPQL", r"(?:javax|jakarta)\.persistence\.(?:PersistenceException|Query(?:Syntax|Timeout)?Exception)"),
+    ("Generic HQL/JPQL", r"(?:HQL|JPQL|EJBQL)\b.*?(?:error|exception|syntax|not (?:mapped|resolve))"),
+)
+
+HQL_ERROR_REGEX = r"(?i)(?:%s)" % '|'.join(regex for _, regex in HQL_ERROR_SIGNATURES)
+
+# Regexes that pull the mapped entity/root name out of a Hibernate diagnostic (the
+# ORM equivalent of a leaked table name; HQL has no information_schema so error-based
+# leakage is the native way to learn the entity model). First capture group = name.
+HQL_ENTITY_REGEX = (
+    r"(?:attribute|property|path) '[^']+' of '([\w.$]+)'",
+    r"resolve root entity '([^']+)'",
+    r"(?:entity|class) ['\"]?([\w.$]+[\w$])['\"]? is not mapped",
+)
+
+# Printable-ASCII codepoint bounds bisected during HQL blind character extraction
+HQL_CHAR_MIN = 0x20
+HQL_CHAR_MAX = 0x7e
+
+# Upper bound for the value-length search during HQL blind extraction
+HQL_MAX_LENGTH = 256
+
+# Maximum number of attributes to enumerate per entity during HQL blind extraction
+HQL_MAX_FIELDS = 64
+
+# Maximum number of records walked (ordered by a numeric pin) during HQL blind dump
+HQL_MAX_RECORDS = 100
+
+# Common mapped entity names brute-forced through the boolean oracle when the app
+# does not reflect Hibernate diagnostics (a mapped name keeps the query valid; an
+# unmapped one raises UnknownEntityException and reads as false).
+HQL_COMMON_ENTITIES = (
+    "User", "Users", "Account", "Accounts", "Member", "Members", "Customer",
+    "Customers", "Person", "People", "Employee", "Admin", "Login", "Credential",
+    "Profile", "Role", "Client", "Contact", "Company", "Product", "Order",
+    "Item", "Article", "Post", "Comment", "Category", "Document", "File",
+    "Message", "Group", "Session", "Token", "Application", "Setting",
+)
 
 XXE_IMPACT_FILES = (
     ("file:///etc/os-release", r"(?i)^(?:NAME|ID|VERSION)="),                     # anchored, high-signal
