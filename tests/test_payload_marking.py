@@ -175,10 +175,17 @@ class TestXmlMarking(unittest.TestCase):
 
     CASES = [
         ("<a>x</a>",                                 "<a>x*</a>"),
-        ('<a id="1">x</a>',                          '<a id="1">x*</a>'),
+        # attribute values are now marked too, not just element text (issue #5993)
+        ('<a id="1">x</a>',                          '<a id="1*">x*</a>'),
         ("<user><name>bob</name><id>5</id></user>",  "<user><name>bob*</name><id>5*</id></user>"),
         ("<ns:tag>v</ns:tag>",                       "<ns:tag>v*</ns:tag>"),
         ("<soap:Body><q>1</q></soap:Body>",          "<soap:Body><q>1*</q></soap:Body>"),
+        # multiple attributes and single-quoted attribute values
+        ('<a id="1" role="x">y</a>',                 '<a id="1*" role="x*">y*</a>'),
+        ("<a id='1'>y</a>",                          "<a id='1*'>y*</a>"),
+        # XML declaration and namespace declarations are left intact (not injection points)
+        ('<?xml version="1.0"?><a>y</a>',            '<?xml version="1.0"?><a>y*</a>'),
+        ('<a xmlns="urn:x" id="1">y</a>',            '<a xmlns="urn:x" id="1*">y*</a>'),
     ]
 
     def test_cases(self):

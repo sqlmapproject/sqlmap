@@ -214,6 +214,22 @@ def _setRequestParams():
                     conf.data = conf.data.replace(kb.customInjectionMark, ASTERISK_MARKER)
                     conf.data = re.sub(r"(<(?P<name>[^>]+)( [^<]*)?>)([^<]+)(</\2)", functools.partial(process, repl=r"\g<1>\g<4>%s\g<5>" % kb.customInjectionMark), conf.data)
 
+                    # Also expose XML attribute values (e.g. <item id="1">) as injection points, not just
+                    # element text (Reference: https://github.com/sqlmapproject/sqlmap/issues/5993). Done per
+                    # opening tag (skipping <?...?> declarations, <!...> and closing tags) so every attribute
+                    # is covered while the XML declaration/namespaces are left intact.
+                    def processAttributes(match):
+                        def _attr(m):
+                            name = m.group("name")
+                            if name == "xmlns" or name.startswith("xmlns:"):  # namespace declarations are not injection points
+                                return m.group(0)
+                            if conf.testParameter and name not in (removePostHintPrefix(_) for _ in conf.testParameter):
+                                return m.group(0)
+                            hintNames.append(("%s%s%s" % (m.group(1), m.group(3), m.group(4)), name))
+                            return "%s%s%s%s%s" % (m.group(1), m.group(3), m.group(4), kb.customInjectionMark, m.group(5))
+                        return re.sub(r'(\s(?P<name>[\w:.-]+)\s*=\s*)(["\'])([^"\'<>]*)(["\'])', _attr, match.group(0))
+                    conf.data = re.sub(r"(?s)<[^>?!/][^>]*>", processAttributes, conf.data)
+
         elif re.search(MULTIPART_RECOGNITION_REGEX, conf.data):
             message = "Multipart-like data found in %s body. " % conf.method
             message += "Do you want to process it? [Y/n/q] "
