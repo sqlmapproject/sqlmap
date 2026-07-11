@@ -189,12 +189,12 @@ def _dumpSingle(tbl, colList, count, cursor, tableRef, entries, lengths):
     produced = 0
 
     while produced < target:
-        if pivotValue is None:
-            query = blind.keyset_first % (field, tableRef)
-        else:
-            query = _embed(blind.keyset_next, pivotValue, field, tableRef, field)
-
-        query = agent.whereQuery(query)
+        # Advance with ORDER BY ... LIMIT 1 (like the composite path), NOT MIN(): the value-extraction
+        # casts the aggregated column to VARCHAR *inside* MIN(), yielding a LEXICAL minimum ('10' after
+        # '1') that disagrees with the numeric '>' comparison and silently skips rows (2..9, 11..). The
+        # ORDER BY is on the raw (numeric) column, so the next cursor value is the true successor.
+        condition = "1=1" if pivotValue is None else "%s>%s" % (field, _lit(pivotValue))
+        query = agent.whereQuery(blind.keyset_ordered % (field, tableRef, condition, field))
         value = unArrayizeValue(inject.getValue(query))
 
         if isNoneValue(value) or value == NULL:

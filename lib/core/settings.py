@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.7.74"
+VERSION = "1.10.7.75"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -878,9 +878,6 @@ HASHDB_MILESTONE_VALUE = "MvKpZrBqTn"  # python -c 'import random, string; print
 
 # Warn user of possible delay due to large page dump in full UNION query injections
 LARGE_OUTPUT_THRESHOLD = 1024 ** 2
-
-# On huge tables there is a considerable slowdown if every row retrieval requires ORDER BY (most noticable in table dumping using ERROR injections)
-SLOW_ORDER_COUNT_THRESHOLD = 10000
 
 # Give up on hash recognition if nothing was found in first given number of rows
 HASH_RECOGNITION_QUIT_THRESHOLD = 1000

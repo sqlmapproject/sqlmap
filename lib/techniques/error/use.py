@@ -29,7 +29,6 @@ from lib.core.common import initTechnique
 from lib.core.common import isListLike
 from lib.core.common import isNumPosStrValue
 from lib.core.common import listToStrValue
-from lib.core.common import readInput
 from lib.core.common import unArrayizeValue
 from lib.core.common import wasLastResponseHTTPError
 from lib.core.compat import xrange
@@ -51,7 +50,6 @@ from lib.core.settings import MIN_ERROR_CHUNK_LENGTH
 from lib.core.settings import NULL
 from lib.core.settings import PARTIAL_VALUE_MARKER
 from lib.core.settings import ROTATING_CHARS
-from lib.core.settings import SLOW_ORDER_COUNT_THRESHOLD
 from lib.core.settings import SQL_SCALAR_REGEX
 from lib.core.settings import TURN_OFF_RESUME_INFO_LIMIT
 from lib.core.threads import getCurrentThreadData
@@ -322,7 +320,7 @@ def errorUse(expression, dump=False):
     # entry at a time
     # NOTE: we assume that only queries that get data from a table can
     # return multiple entries
-    if (dump and (conf.limitStart or conf.limitStop)) or (" FROM " in expression.upper() and ((Backend.getIdentifiedDbms() not in FROM_DUMMY_TABLE) or (Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE and not expression.upper().endswith(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]))) and ("(CASE" not in expression.upper() or ("(CASE" in expression.upper() and "WHEN use" in expression))) and not re.search(SQL_SCALAR_REGEX, expression, re.I):
+    if not re.search(SQL_SCALAR_REGEX, expression, re.I) and ((dump and (conf.limitStart or conf.limitStop)) or (" FROM " in expression.upper() and ((Backend.getIdentifiedDbms() not in FROM_DUMMY_TABLE) or (Backend.getIdentifiedDbms() in FROM_DUMMY_TABLE and not expression.upper().endswith(FROM_DUMMY_TABLE[Backend.getIdentifiedDbms()]))) and ("(CASE" not in expression.upper() or ("(CASE" in expression.upper() and "WHEN use" in expression)))):
         expression, limitCond, topLimit, startLimit, stopLimit = agent.limitCondition(expression, dump)
 
         if limitCond:
@@ -367,13 +365,10 @@ def errorUse(expression, dump=False):
                 return value
 
             if isNumPosStrValue(count) and int(count) > 1:
-                if " ORDER BY " in expression and (stopLimit - startLimit) > SLOW_ORDER_COUNT_THRESHOLD:
-                    message = "due to huge table size do you want to remove "
-                    message += "ORDER BY clause gaining speed over consistency? [y/N] "
-
-                    if readInput(message, default='N', boolean=True):
-                        expression = expression[:expression.index(" ORDER BY ")]
-
+                # NOTE: the ORDER BY clause is deliberately NOT stripped here. This path fetches each column
+                # of a row in a separate LIMIT/OFFSET query, so dropping ORDER BY would let the per-column
+                # offsets resolve to different physical rows and silently misalign cells across the row. Huge
+                # tables are handled cheaply and safely by keyset (seek) pagination (see plugins/generic/entries.py).
                 numThreads = min(conf.threads, (stopLimit - startLimit))
 
                 threadData = getCurrentThreadData()

@@ -184,7 +184,49 @@ class Entries(object):
 
                 entriesCount = 0
 
-                if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
+                def _dumpCountQuery():
+                    if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE, DBMS.MIMERSQL, DBMS.SNOWFLAKE):
+                        _ = rootQuery.blind.count % (tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())))
+                    elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.MAXDB, DBMS.ACCESS, DBMS.FIREBIRD, DBMS.MCKOI, DBMS.EXTREMEDB, DBMS.RAIMA):
+                        _ = rootQuery.blind.count % tbl
+                    elif Backend.getIdentifiedDbms() in (DBMS.SYBASE, DBMS.MSSQL):
+                        _ = rootQuery.blind.count % ("%s.%s" % (conf.db, tbl)) if conf.db else tbl
+                    elif Backend.isDbms(DBMS.INFORMIX):
+                        _ = rootQuery.blind.count % (conf.db, tbl)
+                    else:
+                        _ = rootQuery.blind.count % (conf.db, tbl)
+                    return agent.whereQuery(_)
+
+                # Keyset (seek) pagination for the error/query (inband) path too, not just the blind path below.
+                # It fetches every cell value-anchored (MAX(col) WHERE key=K_r on a unique integer key), so the
+                # per-cell retrievals of one row are pinned to the SAME physical row regardless of scan order,
+                # threads or MVCC - unlike ORDER BY ... LIMIT/OFFSET, which silently misaligns cells once a
+                # stable order is unavailable. UNION is intrinsically aligned (whole-row), so it is never preempted.
+                keysetDone = False
+                if not conf.direct and not conf.noKeyset and not isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) \
+                        and any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)):
+                    count = inject.getValue(_dumpCountQuery(), expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+                    if isNumPosStrValue(count) and (conf.keyset or int(count) >= KEYSET_MIN_ROWS):
+                        keysetCursor = resolveKeysetCursor(tbl, colList)
+                        if keysetCursor:
+                            infoMsg = "using keyset (seek) pagination on column(s) '%s' " % ', '.join(keysetCursor)
+                            infoMsg += "for table '%s'" % unsafeSQLIdentificatorNaming(tbl)
+                            logger.info(infoMsg)
+
+                            try:
+                                entries, lengths = keysetDumpTable(tbl, colList, int(count), keysetCursor)
+                                for column, columnEntries in entries.items():
+                                    length = max(lengths[column], getConsoleLength(column))
+                                    kb.data.dumpedTable[column] = {"length": length, "values": columnEntries}
+                                    entriesCount = len(columnEntries)
+                                keysetDone = bool(kb.data.dumpedTable)
+                            except KeyboardInterrupt:
+                                kb.dumpKeyboardInterrupt = True
+                                clearConsoleLine()
+                                warnMsg = "Ctrl+C detected in dumping phase"
+                                logger.warning(warnMsg)
+
+                if not keysetDone and (any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct):
                     entries = []
                     query = None
 
@@ -213,7 +255,7 @@ class Entries(object):
                                         for index in indexRange:
                                             row = []
                                             for column in colList:
-                                                query = rootQuery.blind.query3 % (column, column, table, index)
+                                                query = rootQuery.blind.query3 % (column, column, prioritySortColumns(colList)[0], table, index)
                                                 query = agent.whereQuery(query)
                                                 value = inject.getValue(query, blind=False, time=False, dump=True) or ""
                                                 row.append(value)
@@ -369,7 +411,7 @@ class Entries(object):
 
                                 for index in indexRange:
                                     for column in colList:
-                                        query = rootQuery.blind.query3 % (column, column, table, index)
+                                        query = rootQuery.blind.query3 % (column, column, prioritySortColumns(colList)[0], table, index)
                                         query = agent.whereQuery(query)
 
                                         value = inject.getValue(query, union=False, error=False, dump=True) or ""
