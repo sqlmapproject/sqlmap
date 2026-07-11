@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.7.75"
+VERSION = "1.10.7.76"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -884,6 +884,11 @@ HASH_RECOGNITION_QUIT_THRESHOLD = 1000
 
 # Regular expression used for automatic hex conversion and hash cracking of (RAW) binary column values
 HASH_BINARY_COLUMNS_REGEX = r"(?i)pass|psw|hash"
+
+# Regular expression matching (declared) binary column types, used to auto-hex their values during dumping
+# so raw bytes (e.g. password hashes stored in binary form) are not silently truncated at NUL / mangled by
+# the text extraction channel (mirrors a manual '--binary-fields', using the already-fetched column type)
+BINARY_FIELDS_TYPE_REGEX = r"(?i)binary|blob|bytea|image|\braw\b"
 
 # Maximum number of redirections to any single URL - this is needed because of the state that cookies introduce
 MAX_SINGLE_URL_REDIRECTIONS = 4

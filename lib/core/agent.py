@@ -508,10 +508,26 @@ class Agent(object):
         if field and Backend.getIdentifiedDbms():
             rootQuery = queries[Backend.getIdentifiedDbms()]
 
+            kb.binaryField = conf.binaryFields and field in conf.binaryFields
+            hexConvert = conf.hexConvert or kb.binaryField
+
+            # For BINARY fields, wrap the RAW column with the hex function rather than the text-casted one:
+            # text-casting binary first (e.g. CAST(<binary> AS NCHAR) on MySQL) NULLs non-text bytes, so HEX()
+            # would encode the NULL placeholder and silently lose the value (e.g. binary-stored password
+            # hashes). This is limited to binary fields: the blanket '--hex' keeps the cast-first path because
+            # raw-hexing a numeric/temporal column uses the DBMS's numeric HEX semantics (MySQL HEX(255)='FF'),
+            # which is NOT the hex of its string representation. Every DBMS hex function takes binary directly
+            # EXCEPT PostgreSQL's CONVERT_TO() (needs text), so PostgreSQL stays on the cast-first path too.
+            hexRaw = kb.binaryField and not Backend.isDbms(DBMS.PGSQL)
+
             if field.startswith("(CASE") or field.startswith("(IIF") or conf.noCast and not (field.startswith("COUNT(") and Backend.getIdentifiedDbms() == DBMS.MSSQL):
                 nulledCastedField = field
+                if hexConvert:
+                    nulledCastedField = self.hexConvertField(nulledCastedField)
             else:
-                if not (Backend.isDbms(DBMS.SQLITE) and not isDBMSVersionAtLeast('3')):
+                if hexRaw:
+                    nulledCastedField = self.hexConvertField(field)
+                elif not (Backend.isDbms(DBMS.SQLITE) and not isDBMSVersionAtLeast('3')):
                     nulledCastedField = rootQuery.cast.query % field
 
                 if re.search(r"COUNT\(", field) and Backend.getIdentifiedDbms() in (DBMS.RAIMA,):
@@ -521,9 +537,8 @@ class Agent(object):
                 else:
                     nulledCastedField = rootQuery.isnull.query % nulledCastedField
 
-            kb.binaryField = conf.binaryFields and field in conf.binaryFields
-            if conf.hexConvert or kb.binaryField:
-                nulledCastedField = self.hexConvertField(nulledCastedField)
+                if hexConvert and not hexRaw:
+                    nulledCastedField = self.hexConvertField(nulledCastedField)
 
         if suffix:
             nulledCastedField += suffix

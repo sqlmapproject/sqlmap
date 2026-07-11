@@ -83,7 +83,7 @@
     </dbms>
 
     <dbms value="PostgreSQL">
-        <cast query="CAST(%s AS VARCHAR(10000))"/>
+        <cast query="CAST(%s AS TEXT)"/>
         <length query="LENGTH(%s)"/>
         <!-- NOTE: PostgreSQL does not like COALESCE with different data-types (e.g. COALESCE(id,' ')) -->
         <isnull query="COALESCE(%s::text,' ')"/>
@@ -119,8 +119,8 @@
             <blind query="SELECT DISTINCT(passwd) FROM pg_shadow WHERE usename='%s' OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(passwd)) FROM pg_shadow WHERE usename='%s'"/>
         </passwords>
         <privileges>
-            <inband query="SELECT usename,(CASE WHEN usecreatedb THEN 1 ELSE 0 END),(CASE WHEN usesuper THEN 1 ELSE 0 END),(CASE WHEN usecatupd THEN 1 ELSE 0 END) FROM pg_user" condition="usename"/>
-            <blind query="SELECT (CASE WHEN usecreatedb THEN 1 ELSE 0 END),(CASE WHEN usesuper THEN 1 ELSE 0 END),(CASE WHEN usecatupd THEN 1 ELSE 0 END) FROM pg_user WHERE usename='%s' OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(usename)) FROM pg_user WHERE usename='%s'"/>
+            <inband query="SELECT usename,(CASE WHEN usecreatedb THEN 1 ELSE 0 END),(CASE WHEN usesuper THEN 1 ELSE 0 END),(CASE WHEN userepl THEN 1 ELSE 0 END) FROM pg_user" condition="usename"/>
+            <blind query="SELECT (CASE WHEN usecreatedb THEN 1 ELSE 0 END),(CASE WHEN usesuper THEN 1 ELSE 0 END),(CASE WHEN userepl THEN 1 ELSE 0 END) FROM pg_user WHERE usename='%s' OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(usename)) FROM pg_user WHERE usename='%s'"/>
         </privileges>
         <roles/>
         <statements>
@@ -163,7 +163,7 @@
     </dbms>
 
     <dbms value="Microsoft SQL Server">
-        <cast query="CAST(%s AS NVARCHAR(4000))"/>
+        <cast query="CAST(%s AS NVARCHAR(MAX))"/>
         <length query="LTRIM(STR(LEN(%s+'.')-1))"/>
         <isnull query="ISNULL(%s,' ')"/>
         <delimiter query="+"/>
@@ -384,7 +384,7 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s"/>
-            <blind query="SELECT %s FROM %s LIMIT %d,1" count="SELECT COUNT(*) FROM %s" rowid="rowid" keyset_first="SELECT MIN(%s) FROM %s" keyset_next="SELECT MIN(%s) FROM %s WHERE %s>'%s'" keyset_by="SELECT MAX(%s) FROM %s WHERE %s='%s'" keyset_seed="SELECT %s FROM %s ORDER BY %s LIMIT 1 OFFSET %d" keyset_ordered="SELECT %s FROM %s WHERE %s ORDER BY %s LIMIT 1" keyset_where="SELECT MAX(%s) FROM %s WHERE %s"/>
+            <blind query="SELECT %s FROM %s ORDER BY rowid LIMIT %d,1" count="SELECT COUNT(*) FROM %s" rowid="rowid" keyset_first="SELECT MIN(%s) FROM %s" keyset_next="SELECT MIN(%s) FROM %s WHERE %s>'%s'" keyset_by="SELECT MAX(%s) FROM %s WHERE %s='%s'" keyset_seed="SELECT %s FROM %s ORDER BY %s LIMIT 1 OFFSET %d" keyset_ordered="SELECT %s FROM %s WHERE %s ORDER BY %s LIMIT 1" keyset_where="SELECT MAX(%s) FROM %s WHERE %s"/>
         </dump_table>
         <search_db/>
         <search_table>
@@ -959,8 +959,8 @@
 
     <dbms value="Apache Derby">
         <!-- NOTE: CHAR(%s) causes 'A truncation error was encountered trying to shrink CHAR' -->
-        <cast query="RTRIM(CAST(%s AS CHAR(254)))"/>
-        <length query="LENGTH(RTRIM(CAST(%s AS CHAR(254))))"/>
+        <cast query="CAST(%s AS VARCHAR(32672))"/>
+        <length query="LENGTH(CAST(%s AS VARCHAR(32672)))"/>
         <isnull query="COALESCE(%s,' ')"/>
         <delimiter query="||"/>
         <limit query="OFFSET %d ROWS FETCH FIRST %d ROWS ONLY"/>
@@ -1158,7 +1158,7 @@
         <substring query="SUBSTR(%s,%d,%d)"/>
         <concatenate query="%s||%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
-        <hex query="TO_HEX(%s)"/>
+        <hex query="TO_HEX(CAST(%s AS VARBINARY))"/>
         <inference query="CODEPOINT(SUBSTR((%s),%d,1))>%d" dbms_version="&gt;=0.178" query2="SUBSTR((%s),%d,1)>'%c'"/>/>
         <banner query="version()"/>
         <current_user query="CURRENT_USER"/>

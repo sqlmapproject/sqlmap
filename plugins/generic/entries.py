@@ -40,6 +40,7 @@ from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapMissingMandatoryOptionException
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapUnsupportedFeatureException
+from lib.core.settings import BINARY_FIELDS_TYPE_REGEX
 from lib.core.settings import CHECK_ZERO_COLUMNS_THRESHOLD
 from lib.core.settings import CURRENT_DB
 from lib.core.settings import KEYSET_MIN_ROWS
@@ -114,6 +115,8 @@ class Entries(object):
         for tbl in tblList:
             tblList[tblList.index(tbl)] = safeSQLIdentificatorNaming(tbl, True)
 
+        binaryFields = conf.binaryFields  # user-provided '--binary-fields' (auto-detected ones are added per-table)
+
         for tbl in tblList:
             if kb.dumpKeyboardInterrupt:
                 break
@@ -168,6 +171,18 @@ class Entries(object):
                 kb.dumpColumns = [unsafeSQLIdentificatorNaming(_) for _ in colList]
                 colNames = colString = ','.join(column for column in colList)
                 rootQuery = queries[Backend.getIdentifiedDbms()].dump_table
+
+                # Auto-treat binary-typed columns (blob/varbinary/bytea/image/raw) as '--binary-fields', so their
+                # raw bytes (e.g. password hashes stored in binary form) are hex-extracted instead of being
+                # silently truncated at a NUL / mangled by the text channel (issues #8, #582, #2827). The column
+                # type is already known from the enumeration above, so this costs no extra request.
+                # (PostgreSQL excluded: its bytea already renders as readable '\xHEX' through the default text
+                # cast, and its hex path needs text input, so auto-hexing would double-encode.)
+                autoBinary = [] if Backend.isDbms(DBMS.PGSQL) else [column for column in colList if columns.get(column) and re.search(BINARY_FIELDS_TYPE_REGEX, getUnicode(columns[column]))]
+                conf.binaryFields = (list(binaryFields) if binaryFields else []) + [_ for _ in autoBinary if not (binaryFields and _ in binaryFields)]
+                if autoBinary:
+                    debugMsg = "auto-treating binary column(s) '%s' as binary fields" % ', '.join(unsafeSQLIdentificatorNaming(_) for _ in autoBinary)
+                    logger.debug(debugMsg)
 
                 infoMsg = "fetching entries"
                 if conf.col:
@@ -572,6 +587,7 @@ class Entries(object):
             finally:
                 kb.dumpColumns = None
                 kb.dumpTable = None
+                conf.binaryFields = binaryFields  # restore user-provided value (drop this table's auto-detected ones)
 
     def dumpAll(self):
         if conf.db is not None and conf.tbl is None:

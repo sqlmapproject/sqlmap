@@ -68,9 +68,10 @@ class TestNullAndCastField(unittest.TestCase):
 
     CASES = {
         DBMS.MYSQL:  "IFNULL(CAST(col AS NCHAR),' ')",
-        DBMS.MSSQL:  "ISNULL(CAST(col AS NVARCHAR(4000)),' ')",
+        # MSSQL/PGSQL casts are unbounded (NVARCHAR(MAX)/TEXT) so long values are not silently truncated
+        DBMS.MSSQL:  "ISNULL(CAST(col AS NVARCHAR(MAX)),' ')",
         DBMS.SYBASE: "ISNULL(CONVERT(VARCHAR(4000),col),' ')",
-        DBMS.PGSQL:  "COALESCE(CAST(col AS VARCHAR(10000))::text,' ')",
+        DBMS.PGSQL:  "COALESCE(CAST(col AS TEXT)::text,' ')",
         DBMS.ORACLE: "NVL(CAST(col AS VARCHAR(4000)),' ')",
     }
 
