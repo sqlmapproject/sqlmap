@@ -131,6 +131,15 @@ class SQLAlchemy(GenericConnector):
             retVal = True
         except (_sqlalchemy.exc.OperationalError, _sqlalchemy.exc.ProgrammingError) as ex:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % getSafeExString(ex))
+            # Roll back the failed statement's transaction so it does not poison every following query with
+            # 'InFailedSqlTransaction' (SQLAlchemy 2.0+ keeps the transaction open after an error). Without this
+            # a single legitimately-failing probe - e.g. AURORA_VERSION() on vanilla PostgreSQL during
+            # fingerprinting - made all later queries silently return wrong values (e.g. '--is-dba' read False)
+            if hasattr(self.connector, "rollback"):
+                try:
+                    self.connector.rollback()
+                except Exception:
+                    pass
         except _sqlalchemy.exc.InternalError as ex:
             raise SqlmapConnectionException(getSafeExString(ex))
 

@@ -15,11 +15,12 @@ def tamper(payload, **kwargs):
     Replaces space character (' ') with a pound character ('#') followed by a new line ('\n')
 
     Requirement:
-        * MSSQL
         * MySQL
 
     Notes:
         * Useful to bypass several web application firewalls
+        * The '#' single-line comment used here is MySQL-only (despite this script's legacy name);
+          T-SQL has no '#' comment, so it does not apply to Microsoft SQL Server
 
     >>> tamper('1 AND 9227=9227')
     '1%23%0AAND%23%0A9227=9227'

@@ -347,6 +347,10 @@ def proveExploitation():
     # back, exploitation is NOT proven; say so plainly instead of echoing the detection verdict.
     proven = bool(rungs)
 
+    # whether ANY confirmed technique here can return data inline; a stacked-query-only point cannot, so a
+    # failed read-back below is expected there and must NOT be spun into a "false positive" verdict
+    canReadBack = any(_ in injection.data for _ in (PAYLOAD.TECHNIQUE.BOOLEAN, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.TIME))
+
     if proven:
         if proof:
             fields.append(_field("Proof", proof))
@@ -361,7 +365,12 @@ def proveExploitation():
         verdict = ["no value could be read back through the injection (tried a random arithmetic product and the DBMS banner)"]
         if suspectWaf:
             verdict.append("the TRUE/FALSE difference is only an HTTP %s (blocked) response - characteristic of a WAF/IPS, not a database answer" % signal.get("trueCode"))
-        if wafInterfering:
+        if not canReadBack:
+            # e.g. stacked-query-only: no confirmed technique returns data inline, so a value cannot be read
+            # back here - that is expected by design and is NOT evidence of a false positive
+            verdict.append("this injection point exposes no data-returning channel (e.g. stacked queries), so a value cannot be read back inline - expected here, not a false positive")
+            verdict.append("=> confirm exploitation through a side effect instead (e.g. '--os-shell', or '--sql-query' run with '--technique=S')")
+        elif wafInterfering:
             # behind a WAF, an unconfirmed read-back is ambiguous: a genuine injection whose data-retrieval
             # payloads are being blocked looks the same as a pure WAF artifact - so don't assert "false
             # positive", point the user at the way to disambiguate instead
