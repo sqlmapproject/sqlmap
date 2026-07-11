@@ -32,7 +32,7 @@ class Connector(GenericConnector):
         try:
             database = "DRIVER={IBM DB2 ODBC DRIVER};DATABASE=%s;HOSTNAME=%s;PORT=%s;PROTOCOL=TCPIP;" % (self.db, self.hostname, self.port)
             self.connector = ibm_db_dbi.connect(database, self.user, self.password)
-        except ibm_db_dbi.OperationalError as ex:
+        except ibm_db_dbi.Error as ex:  # base class: ibm_db_dbi maps wrong-credential (SQLSTATE 28) to ProgrammingError, not OperationalError
             raise SqlmapConnectionException(getSafeExString(ex))
 
         self.initCursor()

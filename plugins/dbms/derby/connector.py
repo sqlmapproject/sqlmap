@@ -30,7 +30,7 @@ class Connector(GenericConnector):
         self.initConnection()
 
         try:
-            self.connector = drda.connect(host=self.hostname, database=self.db, port=self.port)
+            self.connector = drda.connect(host=self.hostname, database=self.db, port=self.port, user=self.user or None, password=self.password or None)
         except drda.OperationalError as ex:
             raise SqlmapConnectionException(getSafeExString(ex))
 

@@ -232,7 +232,7 @@ DBMS_DICT = {
     DBMS.SQLITE: (SQLITE_ALIASES, "python-sqlite", "https://docs.python.org/3/library/sqlite3.html", "sqlite"),
     DBMS.ACCESS: (ACCESS_ALIASES, "python-pyodbc", "https://github.com/mkleehammer/pyodbc", "access"),
     DBMS.FIREBIRD: (FIREBIRD_ALIASES, "python3-firebirdsql", "https://github.com/nakagami/pyfirebirdsql/", "firebird"),
-    DBMS.MAXDB: (MAXDB_ALIASES, None, None, "maxdb"),
+    DBMS.MAXDB: (MAXDB_ALIASES, None, None, None),  # 'maxdb'/'sapdb' SQLAlchemy dialect was removed long ago; a dead dialect only produces a misleading warning
     DBMS.SYBASE: (SYBASE_ALIASES, "python-pymssql", "https://github.com/pymssql/pymssql", "sybase"),
     DBMS.DB2: (DB2_ALIASES, "python ibm-db", "https://github.com/ibmdb/python-ibmdb", "ibm_db_sa"),
     DBMS.HSQLDB: (HSQLDB_ALIASES, "python jaydebeapi & python-jpype", "https://pypi.python.org/pypi/JayDeBeApi/ & https://github.com/jpype-project/jpype", None),

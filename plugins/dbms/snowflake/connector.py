@@ -32,6 +32,14 @@ class Connector(GenericConnector):
     def connect(self):
         self.initConnection()
 
+        # Snowflake's mandatory 'account' identifier is carried in the DSN host field
+        # (e.g. -d "snowflake://user:pass@ACCOUNT/db"); warehouse/schema are optional. These were previously
+        # read from self.account/self.warehouse/self.schema which were never set anywhere -> AttributeError on
+        # every attempt.
+        self.account = self.hostname
+        self.warehouse = getattr(self, "warehouse", None)
+        self.schema = getattr(self, "schema", None)
+
         try:
             self.connector = snowflake.connector.connect(
                 user=self.user,

@@ -38,7 +38,9 @@ class Connector(GenericConnector):
         self.checkFileDb()
 
         try:
-            self.connector = pyodbc.connect('Driver={Microsoft Access Driver (*.mdb)};Dbq=%s;Uid=Admin;Pwd=;' % self.db)
+            # ACE driver ('*.mdb, *.accdb') handles both legacy Jet .mdb and modern .accdb (the old '*.mdb'-only
+            # Jet driver is 32-bit-only and absent on modern installs); honor supplied credentials, not Admin/empty
+            self.connector = pyodbc.connect('Driver={Microsoft Access Driver (*.mdb, *.accdb)};Dbq=%s;Uid=%s;Pwd=%s;' % (self.db, self.user or "Admin", self.password or ""))
         except (pyodbc.Error, pyodbc.OperationalError) as ex:
             raise SqlmapConnectionException(getSafeExString(ex))
 

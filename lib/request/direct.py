@@ -60,7 +60,10 @@ def direct(query, content=True):
                 break
 
     if select:
-        if re.search(r"(?i)\ASELECT ", query) is None:
+        # only auto-wrap a bare scalar expression (e.g. 'CURRENT_USER', '48*60') in SELECT; a user-supplied
+        # complete row-returning statement (--sql-query 'PRAGMA ...' / 'WITH ...' / 'EXPLAIN ...') must be left
+        # intact, otherwise 'SELECT PRAGMA ...' is a syntax error and silently returns nothing
+        if re.search(r"(?i)\A\s*(?:SELECT|WITH|PRAGMA|EXPLAIN|DESCRIBE|DESC|SHOW|TABLE|VALUES)\b", query) is None:
             query = "SELECT %s" % query
 
         if conf.binaryFields:
@@ -82,7 +85,11 @@ def direct(query, content=True):
             output = [tuple(_hexifyBinary(_) for _ in row) if isListLike(row) else _hexifyBinary(row) for row in output]
         if state == TIMEOUT_STATE.NORMAL:
             hashDBWrite(query, output, True)
-        elif state == TIMEOUT_STATE.TIMEOUT:
+        elif state in (TIMEOUT_STATE.TIMEOUT, TIMEOUT_STATE.EXCEPTION):
+            # a timed-out OR fatally-errored query (e.g. the connector raised SqlmapConnectionException, or the
+            # connection dropped mid-scan) left the connection unusable; reconnect so the rest of the scan
+            # recovers instead of every following query being silently swallowed to None (wrong/empty data).
+            # A genuinely dead DB makes connect() raise here and the scan aborts cleanly, as with TIMEOUT.
             conf.dbmsConnector.close()
             conf.dbmsConnector.connect()
     elif output:
