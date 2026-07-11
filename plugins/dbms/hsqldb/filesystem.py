@@ -52,7 +52,7 @@ class Filesystem(GenericFilesystem):
 
         logger.debug("cleaning up the database management system")
 
-        delQuery = "DELETE PROCEDURE %s" % func_name
+        delQuery = "DROP PROCEDURE %s" % func_name
         inject.goStacked(delQuery)
 
         message = "the local file '%s' has been written on the back-end DBMS" % localFile
