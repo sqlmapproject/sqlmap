@@ -45,8 +45,8 @@ class Connector(GenericConnector):
 
         try:
             driver = 'org.hsqldb.jdbc.JDBCDriver'
-            connection_string = 'jdbc:hsqldb:mem:.'  # 'jdbc:hsqldb:hsql://%s/%s' % (self.hostname, self.db)
-            self.connector = jaydebeapi.connect(driver, connection_string, str(self.user), str(self.password))
+            connection_string = 'jdbc:hsqldb:hsql://%s:%s/%s' % (self.hostname, self.port, self.db)  # was hardcoded to 'jdbc:hsqldb:mem:.' (a fresh empty in-memory DB), ignoring the -d target
+            self.connector = jaydebeapi.connect(driver, connection_string, [str(self.user), str(self.password)])
         except Exception as ex:
             raise SqlmapConnectionException(getSafeExString(ex))
 

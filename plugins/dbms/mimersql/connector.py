@@ -30,8 +30,10 @@ class Connector(GenericConnector):
         self.initConnection()
 
         try:
-            self.connector = mimerpy.connect(hostname=self.hostname, username=self.user, password=self.password, database=self.db, port=self.port, connect_timeout=conf.timeout)
-        except mimerpy.OperationalError as ex:
+            # mimerpy.connect uses dsn/user/password (host/port come from Mimer's sqlhosts/MIMER_DATABASE
+            # configuration, not connect() kwargs); the previous hostname/username/... kwargs raised a TypeError
+            self.connector = mimerpy.connect(dsn=self.db, user=str(self.user), password=str(self.password))
+        except Exception as ex:
             raise SqlmapConnectionException(getSafeExString(ex))
 
         self.initCursor()

@@ -46,7 +46,7 @@ class Connector(GenericConnector):
         try:
             driver = 'com.intersys.jdbc.CacheDriver'
             connection_string = 'jdbc:Cache://%s:%d/%s' % (self.hostname, self.port, self.db)
-            self.connector = jaydebeapi.connect(driver, connection_string, str(self.user), str(self.password))
+            self.connector = jaydebeapi.connect(driver, connection_string, [str(self.user), str(self.password)])
         except Exception as ex:
             raise SqlmapConnectionException(getSafeExString(ex))
 

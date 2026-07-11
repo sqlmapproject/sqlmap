@@ -32,6 +32,14 @@ class Connector(GenericConnector):
     def connect(self):
         self.initConnection()
 
+        # Fetch CLOB/BLOB values directly as str/bytes instead of oracledb.LOB objects; otherwise a LOB cell
+        # reached the renderer as the repr '<oracledb.LOB object at 0x...>' (BLOB bytes are then hex-encoded
+        # by direct()'s binary handling).
+        try:
+            oracledb.defaults.fetch_lobs = False
+        except AttributeError:
+            pass
+
         self.user = getText(self.user)
         self.password = getText(self.password)
 

@@ -44,7 +44,7 @@ class Connector(GenericConnector):
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % getSafeExString(ex))
             return None
 
-    def execute(self, query):
+    def execute(self, query, commit=True):
         try:
             self.cursor.execute(query)
         except (vertica_python.OperationalError, vertica_python.ProgrammingError) as ex:
@@ -52,8 +52,13 @@ class Connector(GenericConnector):
         except vertica_python.InternalError as ex:
             raise SqlmapConnectionException(getSafeExString(ex))
 
-        self.connector.commit()
+        # commit non-SELECT (DML) here; select() commits only AFTER fetchall() because vertica_python shares one
+        # cursor per connection and commit() runs COMMIT through it, discarding the unfetched result set
+        if commit:
+            self.connector.commit()
 
     def select(self, query):
-        self.execute(query)
-        return self.fetchall()
+        self.execute(query, commit=False)
+        retVal = self.fetchall()
+        self.connector.commit()
+        return retVal
