@@ -53,11 +53,11 @@ class TestCheckDependencies(unittest.TestCase):
         deps.logger = self._real_logger
 
     def test_missing_driver_warns_with_library_name(self):
-        # 'kinterbasdb' (Firebird driver) is essentially never installed, so the
-        # probe must hit the except branch and emit a warning naming the library.
+        # 'CUBRIDdb' (CUBRID driver) is not on PyPI and essentially never installed,
+        # so the probe must hit the except branch and emit a warning naming the library.
         try:
-            __import__("kinterbasdb")
-            self.skipTest("kinterbasdb is unexpectedly installed")
+            __import__("CUBRIDdb")
+            self.skipTest("CUBRIDdb is unexpectedly installed")
         except ImportError:
             pass
 
@@ -65,10 +65,10 @@ class TestCheckDependencies(unittest.TestCase):
 
         warnings = self.rec.messages("warning")
         self.assertTrue(warnings, msg="no warnings captured for a missing driver")
-        # the Firebird entry must name its third-party library in a warning
+        # the CUBRID entry must name its third-party library in a warning
         self.assertTrue(
-            any("kinterbasdb" in w for w in warnings),
-            msg="missing Firebird driver did not produce a library-naming warning: %r" % warnings,
+            any("CUBRID-Python" in w for w in warnings),
+            msg="missing CUBRID driver did not produce a library-naming warning: %r" % warnings,
         )
 
     def test_all_present_emits_all_installed_info(self):

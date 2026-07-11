@@ -1714,7 +1714,7 @@ def parseTargetDirect():
             try:
                 conf.dbms = dbmsName
 
-                if dbmsName in (DBMS.ACCESS, DBMS.SQLITE, DBMS.FIREBIRD):
+                if dbmsName in (DBMS.ACCESS, DBMS.SQLITE):
                     if remote:
                         warnMsg = "direct connection over the network for "
                         warnMsg += "%s DBMS is not supported" % dbmsName
@@ -1749,7 +1749,7 @@ def parseTargetDirect():
                 elif dbmsName == DBMS.ACCESS:
                     __import__("pyodbc")
                 elif dbmsName == DBMS.FIREBIRD:
-                    __import__("kinterbasdb")
+                    __import__("firebirdsql")
             except (SqlmapSyntaxException, SqlmapMissingDependence):
                 raise
             except:

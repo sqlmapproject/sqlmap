@@ -38,7 +38,7 @@ def checkDependencies():
             elif dbmsName == DBMS.ACCESS:
                 __import__("pyodbc")
             elif dbmsName == DBMS.FIREBIRD:
-                __import__("kinterbasdb")
+                __import__("firebirdsql")
             elif dbmsName == DBMS.DB2:
                 __import__("ibm_db_dbi")
             elif dbmsName in (DBMS.HSQLDB, DBMS.CACHE):
