@@ -55,7 +55,10 @@ class Connector(GenericConnector):
         try:
             self.cursor.execute(query)
             retVal = True
-        except (psycopg2.OperationalError, psycopg2.ProgrammingError) as ex:
+        # Note: also catch DataError/IntegrityError (e.g. division-by-zero, bad cast, unique violation from a
+        # user '--sql-query') so the commit() below still runs and clears the aborted transaction; otherwise
+        # PostgreSQL poisons every later query with 'InFailedSqlTransaction' and silently returns None
+        except (psycopg2.OperationalError, psycopg2.ProgrammingError, psycopg2.DataError, psycopg2.IntegrityError) as ex:
             logger.warning(("(remote) '%s'" % getSafeExString(ex)).strip())
         except psycopg2.InternalError as ex:
             raise SqlmapConnectionException(getSafeExString(ex))

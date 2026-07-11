@@ -117,7 +117,7 @@ class SQLAlchemy(GenericConnector):
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % getSafeExString(ex))
             return None
 
-    def execute(self, query):
+    def execute(self, query, commit=True):
         retVal = False
 
         # Reference: https://stackoverflow.com/a/69491015
@@ -126,10 +126,14 @@ class SQLAlchemy(GenericConnector):
 
         try:
             self.cursor = self.connector.execute(query)
-            if hasattr(self.connector, "commit"):  # Note: SQLAlchemy 2.0+ dropped implicit autocommit (otherwise DML changes - e.g. via --sql-query - would be silently lost)
+            # Note: SQLAlchemy 2.0+ dropped implicit autocommit (otherwise DML changes - e.g. via --sql-query -
+            # would be silently lost). SELECT goes through select() with commit=False so the result set is
+            # fetched BEFORE committing: on some drivers (e.g. pymssql) commit() discards the open cursor, which
+            # otherwise made every MSSQL '-d' query silently return empty (banner/is-dba/dump all blank).
+            if commit and hasattr(self.connector, "commit"):
                 self.connector.commit()
             retVal = True
-        except (_sqlalchemy.exc.OperationalError, _sqlalchemy.exc.ProgrammingError) as ex:
+        except (_sqlalchemy.exc.OperationalError, _sqlalchemy.exc.ProgrammingError, _sqlalchemy.exc.DataError, _sqlalchemy.exc.IntegrityError) as ex:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) %s" % getSafeExString(ex))
             # Roll back the failed statement's transaction so it does not poison every following query with
             # 'InFailedSqlTransaction' (SQLAlchemy 2.0+ keeps the transaction open after an error). Without this
@@ -148,7 +152,14 @@ class SQLAlchemy(GenericConnector):
     def select(self, query):
         retVal = None
 
-        if self.execute(query):
+        # Fetch BEFORE committing (commit=False): committing can discard the open result cursor on some drivers
+        # (e.g. pymssql), which silently emptied every MSSQL '-d' result. No DML is persisted by a SELECT anyway.
+        if self.execute(query, commit=False):
             retVal = self.fetchall()
+            if hasattr(self.connector, "commit"):
+                try:
+                    self.connector.commit()
+                except Exception:
+                    pass
 
         return retVal

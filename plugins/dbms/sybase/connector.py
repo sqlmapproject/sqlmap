@@ -54,11 +54,20 @@ class Connector(GenericConnector):
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) '%s'" % getSafeExString(ex).replace("\n", " "))
             return None
 
-    def execute(self, query):
+    def execute(self, query, commit=True):
         retVal = False
 
         try:
             self.cursor.execute(getText(query))
+            # Commit non-SELECT (DML/DDL) here: direct() routes those to execute() alone, so without this a
+            # '--sql-query'/'--sql-shell' write was silently rolled back on connection close. select() passes
+            # commit=False and commits only AFTER fetchall(), because on pymssql commit() discards the open
+            # result cursor (which otherwise emptied every SELECT result).
+            if commit:
+                try:
+                    self.connector.commit()
+                except pymssql.OperationalError:
+                    pass
             retVal = True
         except (pymssql.OperationalError, pymssql.ProgrammingError) as ex:
             logger.log(logging.WARN if conf.dbmsHandler else logging.DEBUG, "(remote) '%s'" % getSafeExString(ex).replace("\n", " "))
@@ -70,7 +79,7 @@ class Connector(GenericConnector):
     def select(self, query):
         retVal = None
 
-        if self.execute(query):
+        if self.execute(query, commit=False):
             retVal = self.fetchall()
 
             try:

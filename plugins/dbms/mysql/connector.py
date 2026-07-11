@@ -12,7 +12,6 @@ except:
 
 import logging
 import struct
-import sys
 
 from lib.core.common import getSafeExString
 from lib.core.data import conf
@@ -34,7 +33,7 @@ class Connector(GenericConnector):
         self.initConnection()
 
         try:
-            self.connector = pymysql.connect(host=self.hostname, user=self.user, passwd=self.password.encode(sys.stdin.encoding), db=self.db, port=self.port, connect_timeout=conf.timeout, use_unicode=True)
+            self.connector = pymysql.connect(host=self.hostname, user=self.user, passwd=self.password, db=self.db, port=self.port, connect_timeout=conf.timeout, use_unicode=True)
         except (pymysql.OperationalError, pymysql.InternalError, pymysql.ProgrammingError, struct.error) as ex:
             raise SqlmapConnectionException(getSafeExString(ex))
 
