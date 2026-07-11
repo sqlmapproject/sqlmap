@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.7.77"
+VERSION = "1.10.7.78"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -889,6 +889,10 @@ HASH_BINARY_COLUMNS_REGEX = r"(?i)pass|psw|hash"
 # so raw bytes (e.g. password hashes stored in binary form) are not silently truncated at NUL / mangled by
 # the text extraction channel (mirrors a manual '--binary-fields', using the already-fetched column type)
 BINARY_FIELDS_TYPE_REGEX = r"(?i)binary|blob|bytea|image|\braw\b"
+
+# Uppercased keywords of the above, for building an in-SQL "is this column binary-typed?" check when only
+# column names (not types) were fetched - i.e. blind dumping (keep in sync with BINARY_FIELDS_TYPE_REGEX)
+BINARY_FIELDS_TYPE_KEYWORDS = ("BINARY", "BLOB", "BYTEA", "IMAGE", "RAW")
 
 # Maximum number of redirections to any single URL - this is needed because of the state that cookies introduce
 MAX_SINGLE_URL_REDIRECTIONS = 4

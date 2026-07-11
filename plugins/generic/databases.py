@@ -46,6 +46,7 @@ from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapMissingMandatoryOptionException
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapUserQuitException
+from lib.core.settings import BINARY_FIELDS_TYPE_KEYWORDS
 from lib.core.settings import CURRENT_DB
 from lib.core.settings import METADB_SUFFIX
 from lib.core.settings import PLUS_ONE_DBMSES
@@ -931,7 +932,16 @@ class Databases(object):
                                 warnMsg += "possible to get column comments"
                                 singleTimeWarnMessage(warnMsg)
 
-                        if not onlyColNames:
+                        # In dump mode we don't need the exact type, only whether the column is binary (so its raw
+                        # bytes get hex-extracted instead of mangled/truncated - issues #8/#582/#2827). Rather than
+                        # extract the whole type string char-by-char, wrap the type query into a single-bit check and
+                        # extract just that (~10x fewer requests). Skipped where query2 doesn't yield a type name:
+                        # MSSQL (returns the column name), Firebird/Informix (numeric type codes), and PostgreSQL
+                        # (its bytea already renders fine, so it's excluded from auto-hexing anyway).
+                        binaryProbe = onlyColNames and dumpMode and not Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.PGSQL, DBMS.FIREBIRD, DBMS.INFORMIX)
+
+                        if not onlyColNames or binaryProbe:
+                            query = None
                             if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2, DBMS.VERTICA, DBMS.PRESTO, DBMS.CRATEDB, DBMS.CACHE, DBMS.FRONTBASE, DBMS.VIRTUOSO, DBMS.CLICKHOUSE):
                                 query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(tbl), column, unsafeSQLIdentificatorNaming(conf.db))
                             elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE, DBMS.MIMERSQL):
@@ -947,22 +957,35 @@ class Databases(object):
                             elif Backend.isDbms(DBMS.SPANNER):
                                 query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(tbl), column, unsafeSQLIdentificatorNaming(conf.db), unsafeSQLIdentificatorNaming(conf.db))
 
-                            colType = unArrayizeValue(inject.getValue(query, union=False, error=False))
-                            key = int(colType) if hasattr(colType, "isdigit") and colType.isdigit() else colType
+                            if binaryProbe and query:
+                                typeMatch = re.match(r"(?is)\s*SELECT\s+(.+?)\s+FROM\s+(.+)", query)
+                                if typeMatch:
+                                    binaryCondition = " OR ".join("UPPER(%s) LIKE '%%%s%%'" % (typeMatch.group(1), _) for _ in BINARY_FIELDS_TYPE_KEYWORDS)
+                                    query = "SELECT (CASE WHEN %s THEN 1 ELSE 0 END) FROM %s" % (binaryCondition, typeMatch.group(2))
+                                else:
+                                    query = None  # unexpected shape - fall back to leaving the type unknown
 
-                            if Backend.isDbms(DBMS.FIREBIRD):
-                                colType = FIREBIRD_TYPES.get(key, colType)
-                            elif Backend.isDbms(DBMS.INFORMIX):
-                                notNull = False
-                                if isinstance(key, int) and key > 255:
-                                    key -= 256
-                                    notNull = True
-                                colType = INFORMIX_TYPES.get(key, colType)
-                                if notNull:
-                                    colType = "%s NOT NULL" % colType
+                            colType = unArrayizeValue(inject.getValue(query, union=False, error=False)) if query else None
 
-                            column = safeSQLIdentificatorNaming(column)
-                            columns[column] = colType
+                            if binaryProbe:
+                                column = safeSQLIdentificatorNaming(column)
+                                columns[column] = "binary" if colType in ('1', 1) else None  # sentinel matched by BINARY_FIELDS_TYPE_REGEX
+                            else:
+                                key = int(colType) if hasattr(colType, "isdigit") and colType.isdigit() else colType
+
+                                if Backend.isDbms(DBMS.FIREBIRD):
+                                    colType = FIREBIRD_TYPES.get(key, colType)
+                                elif Backend.isDbms(DBMS.INFORMIX):
+                                    notNull = False
+                                    if isinstance(key, int) and key > 255:
+                                        key -= 256
+                                        notNull = True
+                                    colType = INFORMIX_TYPES.get(key, colType)
+                                    if notNull:
+                                        colType = "%s NOT NULL" % colType
+
+                                column = safeSQLIdentificatorNaming(column)
+                                columns[column] = colType
                         else:
                             column = safeSQLIdentificatorNaming(column)
                             columns[column] = None
