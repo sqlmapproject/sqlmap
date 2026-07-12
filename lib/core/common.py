@@ -71,6 +71,7 @@ from lib.core.datatype import OrderedSet
 from lib.core.decorators import cachedmethod
 from lib.core.defaults import defaults
 from lib.core.dicts import DBMS_DICT
+from lib.core.dicts import DBWIRE_MODULES
 from lib.core.dicts import DEFAULT_DOC_ROOTS
 from lib.core.dicts import DEPRECATED_OPTIONS
 from lib.core.dicts import OBSOLETE_OPTIONS
@@ -1754,6 +1755,8 @@ def parseTargetDirect():
                 raise
             except:
                 if _sqlalchemy and data[3] and any(_ in _sqlalchemy.dialects.__all__ for _ in (data[3], data[3].split('+')[0])):
+                    pass
+                elif dbmsName in DBWIRE_MODULES:  # our dependency-free pure-python 'dbwire' client covers this DBMS
                     pass
                 else:
                     errMsg = "sqlmap requires '%s' third-party library " % data[1]

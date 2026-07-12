@@ -258,6 +258,20 @@ DBMS_DICT = {
     DBMS.HANA: (HANA_ALIASES, "hdbcli", "https://pypi.org/project/hdbcli/", "hana"),
 }
 
+# DBMS -> pure-python 'extra/dbwire' wire-protocol module, used as a dependency-free '-d' fallback when
+# neither a native driver nor SQLAlchemy is installed (a single module serves the whole compatible family,
+# e.g. 'postgres' also covers CockroachDB/CrateDB/Redshift/Greenplum)
+DBWIRE_MODULES = {
+    DBMS.PGSQL: "postgres",
+    DBMS.CRATEDB: "postgres",  # CrateDB speaks the PostgreSQL wire protocol
+    DBMS.MYSQL: "mysql",
+    DBMS.MSSQL: "tds",
+    DBMS.SYBASE: "tds",
+    DBMS.CLICKHOUSE: "clickhouse",
+    DBMS.MONETDB: "monetdb",
+    DBMS.PRESTO: "presto",
+}
+
 # Reference: https://blog.jooq.org/tag/sysibm-sysdummy1/
 FROM_DUMMY_TABLE = {
     DBMS.ORACLE: " FROM DUAL",

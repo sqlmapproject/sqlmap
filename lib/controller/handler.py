@@ -12,7 +12,9 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.dicts import DBMS_DICT
 from lib.core.enums import DBMS
+from lib.core.dicts import DBWIRE_MODULES
 from lib.core.exception import SqlmapConnectionException
+from lib.utils.dbwire import Connector as DbwireConnector
 from lib.core.settings import ACCESS_ALIASES
 from lib.core.settings import ALTIBASE_ALIASES
 from lib.core.settings import CACHE_ALIASES
@@ -158,7 +160,12 @@ def setHandler():
                 try:
                     conf.dbmsConnector.connect()
                 except NameError:
-                    if exception:
+                    # neither a native driver nor SQLAlchemy is available: fall back to our dependency-free
+                    # pure-python 'dbwire' client if it covers this DBMS (so '-d' works out of the box)
+                    if dbms in DBWIRE_MODULES:
+                        conf.dbmsConnector = DbwireConnector(DBWIRE_MODULES[dbms])
+                        conf.dbmsConnector.connect()
+                    elif exception:
                         raise exception
                     else:
                         msg = "support for direct connection to '%s' is not available. " % dbms
