@@ -270,6 +270,7 @@ DBWIRE_MODULES = {
     DBMS.CLICKHOUSE: "clickhouse",
     DBMS.MONETDB: "monetdb",
     DBMS.PRESTO: "presto",
+    DBMS.FIREBIRD: "firebird",
 }
 
 # Reference: https://blog.jooq.org/tag/sysibm-sysdummy1/
