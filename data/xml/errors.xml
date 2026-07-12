@@ -228,6 +228,11 @@
         <error regexp="io\.crate\."/>
     </dbms>
 
+    <dbms value="Cubrid">
+        <error regexp="\[CAS INFO"/>
+        <error regexp="cubrid\.jdbc\.driver"/>
+    </dbms>
+
     <dbms value="Cache">
         <error regexp="encountered after end of query"/>
         <error regexp="A comparison operator is required here"/>
