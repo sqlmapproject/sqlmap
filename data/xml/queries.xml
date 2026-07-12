@@ -670,8 +670,8 @@
             <blind query="SELECT schemaname FROM (SELECT ROW_NUMBER() OVER () AS CAP,schemaname FROM syscat.schemata) AS qq WHERE CAP=%d" count="SELECT COUNT(schemaname) FROM syscat.schemata"/>
         </dbs>
         <tables>
-            <inband query="SELECT tabschema,tabname FROM sysstat.tables" condition="tabschema"/>
-            <blind query="SELECT tabname FROM (SELECT ROW_NUMBER() OVER () AS CAP,tabname FROM sysstat.tables WHERE tabschema='%s') AS qq WHERE CAP=INT('%d')" count="SELECT COUNT(*) FROM sysstat.tables WHERE tabschema='%s'"/>
+            <inband query="SELECT tabschema,tabname FROM syscat.tables WHERE type IN ('T','V')" condition="tabschema"/>
+            <blind query="SELECT tabname FROM (SELECT ROW_NUMBER() OVER () AS CAP,tabname FROM syscat.tables WHERE tabschema='%s' AND type IN ('T','V')) AS qq WHERE CAP=INT('%d')" count="SELECT COUNT(*) FROM syscat.tables WHERE tabschema='%s' AND type IN ('T','V')"/>
         </tables>
         <columns>
             <inband query="SELECT name,RTRIM(coltype)||'('||RTRIM(CAST(length AS CHAR(254)))||')' FROM sysibm.syscolumns WHERE tbname='%s' AND tbcreator='%s'" condition="name"/>
@@ -686,12 +686,12 @@
             <blind query="SELECT schemaname FROM (SELECT DISTINCT(schemaname) FROM syscat.schemata WHERE %s) AS qq" count="SELECT COUNT(DISTINCT(schemaname)) FROM syscat.schemata WHERE %s" condition="schemaname"/>
         </search_db>
         <search_table>
-            <inband query="SELECT tabschema,tabname FROM sysstat.tables WHERE %s" condition="tabname" condition2="tabschema"/>
-            <blind query="SELECT tabschema FROM (SELECT DISTINCT(tabschema) FROM sysstat.tables WHERE %s) AS qq" query2="SELECT DISTINCT(tabname) FROM sysstat.tables WHERE tabschema='%s'" count="SELECT COUNT(DISTINCT(tabschema)) FROM sysstat.tables WHERE %s" count2="SELECT COUNT(tabname) FROM sysstat.tables WHERE tabschema='%s'" condition="tabname" condition2="tabschema"/>
+            <inband query="SELECT tabschema,tabname FROM syscat.tables WHERE (%s) AND type IN ('T','V')" condition="tabname" condition2="tabschema"/>
+            <blind query="SELECT tabschema FROM (SELECT DISTINCT(tabschema) FROM syscat.tables WHERE (%s) AND type IN ('T','V')) AS qq" query2="SELECT DISTINCT(tabname) FROM syscat.tables WHERE tabschema='%s' AND type IN ('T','V')" count="SELECT COUNT(DISTINCT(tabschema)) FROM syscat.tables WHERE (%s) AND type IN ('T','V')" count2="SELECT COUNT(tabname) FROM syscat.tables WHERE tabschema='%s' AND type IN ('T','V')" condition="tabname" condition2="tabschema"/>
         </search_table>
         <search_column>
-            <inband query="SELECT tabschema,tabname FROM sysstat.columns WHERE %s" condition="colname" condition2="tabschema" condition3="tabname"/>
-            <blind query="SELECT tabschema FROM (SELECT DISTINCT(tabschema) FROM sysstat.columns WHERE %s) AS qq" query2="SELECT DISTINCT(tabname) FROM sysstat.columns WHERE tabschema='%s'" count="SELECT COUNT(DISTINCT(tabschema)) FROM sysstat.columns WHERE %s" count2="SELECT COUNT(DISTINCT(tabname)) FROM sysstat.columns WHERE tabschema='%s'" condition="colname" condition2="tabschema" condition3="tabname"/>
+            <inband query="SELECT tabschema,tabname FROM syscat.columns WHERE %s" condition="colname" condition2="tabschema" condition3="tabname"/>
+            <blind query="SELECT tabschema FROM (SELECT DISTINCT(tabschema) FROM syscat.columns WHERE %s) AS qq" query2="SELECT DISTINCT(tabname) FROM syscat.columns WHERE tabschema='%s'" count="SELECT COUNT(DISTINCT(tabschema)) FROM syscat.columns WHERE %s" count2="SELECT COUNT(DISTINCT(tabname)) FROM syscat.columns WHERE tabschema='%s'" condition="colname" condition2="tabschema" condition3="tabname"/>
         </search_column>
     </dbms>
 
