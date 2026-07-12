@@ -608,7 +608,7 @@
     <test>
         <title>Oracle AND error-based - WHERE or HAVING clause (UTL_INADDR.GET_HOST_ADDRESS)</title>
         <stype>2</stype>
-        <level>2</level>
+        <level>4</level>
         <risk>1</risk>
         <clause>1,9</clause>
         <where>1</where>
@@ -628,7 +628,7 @@
     <test>
         <title>Oracle OR error-based - WHERE or HAVING clause (UTL_INADDR.GET_HOST_ADDRESS)</title>
         <stype>2</stype>
-        <level>2</level>
+        <level>4</level>
         <risk>3</risk>
         <clause>1,9</clause>
         <where>2</where>
@@ -686,7 +686,7 @@
     <test>
         <title>Oracle AND error-based - WHERE or HAVING clause (DBMS_UTILITY.SQLID_TO_SQLHASH)</title>
         <stype>2</stype>
-        <level>4</level>
+        <level>2</level>
         <risk>1</risk>
         <clause>1,9</clause>
         <where>1</where>
@@ -705,7 +705,7 @@
     <test>
         <title>Oracle OR error-based - WHERE or HAVING clause (DBMS_UTILITY.SQLID_TO_SQLHASH)</title>
         <stype>2</stype>
-        <level>4</level>
+        <level>2</level>
         <risk>3</risk>
         <clause>1,9</clause>
         <where>2</where>
