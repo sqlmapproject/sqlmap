@@ -75,6 +75,16 @@ _BINARY_SYMBOLS = frozenset(("=", "<>", "!=", "<", ">", "<=", ">=", "/", "%", "|
 # "a,limit,b" would false-positive.
 _CLAUSE_KEYWORDS = frozenset(("FROM", "WHERE", "HAVING", "INTO"))
 
+# single-occurrence clause keywords (at most one per SELECT scope) with no
+# identifier-collision risk - unlike GROUP/ORDER, which double as column names.
+# a repeat at the same paren-depth is the 'WHERE x WHERE y' structural bug (e.g.
+# a schema filter appended onto a base query that already carries a WHERE).
+_SINGLE_CLAUSE_KEYWORDS = frozenset(("WHERE", "HAVING"))
+
+# set operators that begin a fresh SELECT, resetting single-occurrence clauses at
+# the current scope ('a WHERE x UNION b WHERE y' is legal; two WHEREs are not).
+_SET_OPERATORS = frozenset(("UNION", "EXCEPT", "INTERSECT", "MINUS"))
+
 # sqlmap's own templating markers. If any survives into a *final* outbound payload
 # a substitution failed upstream (agent.py / cleanupPayload / queries.xml) - always
 # a bug. Matched on the raw payload because a marker can leak anywhere (bare, inside
@@ -309,6 +319,10 @@ def checkSanity(sql, keywords=None):
     True
     >>> bool(checkSanity("1UNION SELECT NULL"))
     True
+    >>> bool(checkSanity("SELECT a FROM t WHERE x=1 WHERE y=2"))
+    True
+    >>> checkSanity("SELECT a FROM t WHERE x=1 UNION SELECT b FROM u WHERE y=2")
+    []
     """
     if not sql:
         return []
@@ -418,5 +432,29 @@ def checkSanity(sql, keywords=None):
         # -- stray un-lexable character ------------------------------------
         if cur.type == T_OTHER:
             issues.append("stray character '%s' at offset %d" % (cur.value, cur.start))
+
+    # -- duplicated single-occurrence clause at one scope ('WHERE x WHERE y') --
+    # WHERE/HAVING may appear at most once per SELECT scope; a second one at the
+    # same paren-depth (no set operator or ';' resetting the SELECT in between)
+    # is a structural impossibility no surrounding query can undo - subquery
+    # clauses live at a deeper depth and reset on '(' / ')'.
+    scopeSeen = [set()]
+    for token in sig:
+        if token.type == T_LPAREN:
+            scopeSeen.append(set())
+        elif token.type == T_RPAREN:
+            if len(scopeSeen) > 1:
+                scopeSeen.pop()
+        elif token.type == T_SEMI:
+            scopeSeen = [set()]
+        elif token.type == T_KEYWORD:
+            word = token.value.upper()
+            if word in _SINGLE_CLAUSE_KEYWORDS:
+                if word in scopeSeen[-1]:
+                    issues.append("duplicate '%s' clause at offset %d" % (word, token.start))
+                else:
+                    scopeSeen[-1].add(word)
+            elif word in _SET_OPERATORS:
+                scopeSeen[-1].clear()
 
     return issues

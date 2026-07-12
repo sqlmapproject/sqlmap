@@ -66,6 +66,9 @@ DIALECT_GOOD = (
     "SELECT LIMIT 0 1 DISTINCT(user) FROM INFORMATION_SCHEMA.SYSTEM_USERS",  # HSQLDB space-LIMIT
     "SELECT TOP 1 name FROM master..sysdatabases",              # MSSQL TOP + db..table
     "CONCAT('\\',0x71,(SELECT 1))",                             # backslash-literal string (ANSI)
+    "SELECT a FROM t WHERE x=1 UNION SELECT b FROM u WHERE y=2",  # two WHEREs across UNION (legal)
+    "SELECT a FROM (SELECT b FROM t WHERE c=1) z WHERE d=2",     # subquery WHERE + outer WHERE (different scopes)
+    "SELECT a FROM t WHERE x IN (SELECT c FROM d WHERE e=1) AND f=2",  # WHERE with a WHERE'd subquery
 )
 
 # malformed fragments/statements that MUST flag
@@ -92,6 +95,9 @@ BAD = (
     "1 UNION ALLSELECT NULL",                                    # glued keyword after UNION
     "1 AND ORD(MID((SELECT COUNT(x FROM t),1,1))>64",            # unbalanced parentheses (dropped ')')
     "1 UNION ALL SELECT ,CONCAT(0x71,a,0x71) FROM t",            # comma right after SELECT
+    "SELECT OWNER,OBJECT_NAME FROM SYS.ALL_OBJECTS WHERE OBJECT_TYPE IN ('TABLE','VIEW') WHERE OWNER IN ('APPU')",  # double WHERE (mis-appended schema filter)
+    "SELECT tabschema,tabname FROM syscat.tables WHERE type IN ('T','V') WHERE tabschema IN ('DB2INST1')",  # double WHERE (DB2)
+    "SELECT a FROM t WHERE x=1 HAVING c>1 HAVING d<2",           # duplicate HAVING
 )
 
 # cross-dialect valid constructs the near-keyword / comma / digit-glue rules must
