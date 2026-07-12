@@ -36,10 +36,11 @@ _CLIENT_PLUGIN_AUTH = 0x00080000
 _MAX_PACKET = 0x1000000
 _MAX_MESSAGE_LENGTH = 0x40000000  # cap on a (re-assembled) payload, to bound a hostile/corrupt stream
 _BINARY_CHARSET = 63              # collation id 63 == 'binary'
-# field types for which charset==63 genuinely denotes raw bytes (BLOB/BINARY/VARBINARY/BIT/GEOMETRY family).
+# field types for which charset==63 genuinely denotes raw bytes (BLOB/BINARY/VARBINARY/GEOMETRY family).
 # Numeric & temporal columns ALSO report charset 63 in the text protocol, but carry their ASCII text form -
 # they must be decoded, not returned as bytes (else -d hexifies e.g. the int 12345 to '3132333435').
-_BINARY_TYPES = frozenset((15, 16, 249, 250, 251, 252, 253, 254, 255))  # VARCHAR,BIT,*BLOB,VAR_STRING,STRING,GEOMETRY
+_BINARY_TYPES = frozenset((15, 249, 250, 251, 252, 253, 254, 255))  # VARCHAR,*BLOB,VAR_STRING,STRING,GEOMETRY
+_TYPE_BIT = 16  # BIT reports charset 63 but is decoded to a big-endian integer (matches SQLAlchemy/mysql-connector)
 
 def _xor(a, b):
     if str is bytes:  # Python 2
@@ -116,6 +117,12 @@ def _err_message(payload):
     if payload[3:4] == b"#":
         off = 9
     return payload[off:].decode("utf-8", "replace")
+
+def _bit_int(value):
+    n = 0  # BIT arrives as a big-endian byte string
+    for b in bytearray(value):
+        n = (n << 8) | b
+    return n
 
 def _scramble_native(password, salt):
     if not password:
@@ -232,6 +239,8 @@ class Connection(object):
                 value, off = _lenc_str(payload, off)
                 if value is None:
                     row.append(None)
+                elif description[i][1] == _TYPE_BIT:
+                    row.append(str(_bit_int(value)))  # big-endian integer, e.g. b'\x2a' -> '42'
                 elif binary[i]:
                     row.append(value)  # keep binary/BLOB columns as raw bytes (sqlmap hex-encodes them)
                 else:
@@ -327,10 +336,15 @@ def connect(host=None, port=3306, user=None, password=None, database=None, conne
         raise OperationalError("handshake failed (%s)" % ex)
 
     connection = Connection(sock)
-    try:
-        connection._query("SET autocommit=1")  # so DML persists even if the server default is autocommit=0
-    except Exception:
-        pass
+    # SET NAMES: reset collation_connection to the server's default (the fixed handshake collation 45 =
+    # utf8mb4_general_ci otherwise clashes with MySQL 8's utf8mb4_0900_ai_ci columns -> 'illegal mix of
+    # collations' 1271 in a UNION/CONCAT); results stay utf8mb4 so the utf-8 decode is unchanged. autocommit=1
+    # so DML persists even if the server default is autocommit=0. Both best-effort (one-time, at connect).
+    for setup in ("SET NAMES utf8mb4", "SET autocommit=1"):
+        try:
+            connection._query(setup)
+        except Exception:
+            pass
     return connection
 
 def _safe_close(sock):

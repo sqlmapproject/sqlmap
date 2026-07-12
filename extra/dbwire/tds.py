@@ -131,7 +131,10 @@ def _login7(sock, user, password, database, hostname="dbwire", appname="dbwire")
     header += struct.pack("<I", 0)               # client prog version
     header += struct.pack("<I", 0)               # client PID
     header += struct.pack("<I", 0)               # connection id
-    header += struct.pack("<BBBB", 0, 0, 0, 0)   # option flags 1/2, type flags, option flags 3
+    # OptionFlags2 fODBC (0x02): make the server prepare the session like ODBC/FreeTDS - SET ANSI_DEFAULTS ON
+    # (ANSI_NULLS/WARNINGS/PADDING, CONCAT_NULL_YIELDS_NULL, QUOTED_IDENTIFIER) + TEXTSIZE 2147483647 (else the
+    # default 4096 silently truncates varchar(max)/text/image dumps) + IMPLICIT_TRANSACTIONS OFF + ROWCOUNT OFF
+    header += struct.pack("<BBBB", 0, 0x02, 0, 0)  # option flags 1, option flags 2 (fODBC), type flags, option flags 3
     header += struct.pack("<i", 0)               # client time zone
     header += struct.pack("<I", 0)               # client LCID
 
@@ -157,7 +160,13 @@ def _decode_money(raw):
     else:  # 8 bytes: signed high dword, unsigned low dword
         hi, lo = struct.unpack("<iI", raw)
         v = (hi << 32) | lo
-    return "%.4f" % (v / 10000.0)
+    s = "%05d" % abs(v)  # scale 4; format from the integer (int64 money exceeds float's ~15-digit precision)
+    return ("-" if v < 0 else "") + s[:-4] + "." + s[-4:]
+
+def _decode_smalldatetime(raw):
+    import datetime
+    days, mins = struct.unpack("<HH", raw)  # 2-byte days since 1900-01-01 + 2-byte minutes
+    return "%s" % (datetime.datetime(1900, 1, 1) + datetime.timedelta(days=days, minutes=mins))
 
 def _decode_numeric(raw, scale):
     sign = bytearray(raw)[0]  # 1 == positive, 0 == negative; magnitude is little-endian
@@ -276,6 +285,8 @@ def _decode_variant(body):
         return _decode_money(val)
     if base == 0x3d:
         return _decode_datetime(val)
+    if base == 0x3a:
+        return _decode_smalldatetime(val)
     if base == 0x24:
         return _decode_guid(val)
     if base in (0x6a, 0x6c):  # decimal/numeric: metadata = precision, scale
@@ -381,10 +392,8 @@ def _decode_value(col, data, off):
         return _decode_money(data[off:off + 8]), off + 8
     if t == 0x3d:  # DATETIME (8 bytes)
         return _decode_datetime(data[off:off + 8]), off + 8
-    if t == 0x3a:  # DATETIM4 / smalldatetime (2-byte days since 1900 + 2-byte minutes)
-        import datetime
-        days, mins = struct.unpack("<HH", data[off:off + 4])
-        return "%s" % (datetime.datetime(1900, 1, 1) + datetime.timedelta(days=days, minutes=mins)), off + 4
+    if t == 0x3a:  # DATETIM4 / smalldatetime (4 bytes)
+        return _decode_smalldatetime(data[off:off + 4]), off + 4
 
     # variable-length with a length prefix
     if t in (0xa7, 0xaf, 0xe7, 0xef, 0xa5, 0xad):
@@ -448,11 +457,7 @@ def _decode_value(col, data, off):
     if t == 0x24:  # GUID
         return _decode_guid(raw), off
     if t == 0x6f:  # DATETIMN (n=8 datetime, n=4 smalldatetime)
-        if n == 8:
-            return _decode_datetime(raw), off
-        import datetime
-        days, mins = struct.unpack("<HH", raw)
-        return "%s" % (datetime.datetime(1900, 1, 1) + datetime.timedelta(days=days, minutes=mins)), off
+        return (_decode_datetime(raw) if n == 8 else _decode_smalldatetime(raw)), off
     if t in (0x28, 0x29, 0x2a, 0x2b):  # DATE / TIME / DATETIME2 / DATETIMEOFFSET
         return _decode_temporal(t, col.scale, raw), off
     # unknown layout: return the raw hex as a last resort (never desyncs)

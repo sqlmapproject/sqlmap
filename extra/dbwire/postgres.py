@@ -32,6 +32,28 @@ from extra.dbwire import ProgrammingError
 
 _PROTOCOL_VERSION = 196608  # 3.0
 _MAX_MESSAGE_LENGTH = 0x40000000  # 1 GB - guard against a hostile/corrupt length triggering an unbounded read
+_OID_BYTEA = 17  # bytea arrives as the server's text form; decode to bytes so it hexes like the native driver
+
+def _decode_bytea(raw):
+    # PG text output: modern 'hex' = b'\\x<hexdigits>'; legacy 'escape' = octal \ooo + literal bytes
+    if raw[:2] == b"\\x":
+        try:
+            return binascii.unhexlify(raw[2:])
+        except (binascii.Error, ValueError):
+            return raw.decode("utf-8", "replace")
+    src, out, i, n = bytearray(raw), bytearray(), 0, len(raw)
+    while i < n:
+        if src[i] == 0x5c and i + 1 < n:  # backslash
+            nxt = src[i + 1]
+            if nxt == 0x5c:
+                out.append(0x5c); i += 2
+            elif 0x30 <= nxt <= 0x37 and i + 3 < n:  # \ooo octal
+                out.append(((nxt - 48) << 6) | ((src[i + 2] - 48) << 3) | (src[i + 3] - 48)); i += 4
+            else:
+                out.append(nxt); i += 2
+        else:
+            out.append(src[i]); i += 1
+    return bytes(out)
 
 # SQLSTATE class (first 2 chars) -> DB-API exception, so callers can distinguish (mirrors psycopg2)
 _SQLSTATE_CLASS = {
@@ -114,6 +136,7 @@ class Cursor(object):
 class Connection(object):
     def __init__(self, sock):
         self._sock = sock
+        self._txn_status = b"I"  # last ReadyForQuery transaction status: I(dle) / T(ransaction) / E(rror)
 
     def cursor(self):
         return Cursor(self)
@@ -134,7 +157,19 @@ class Connection(object):
         except Exception:
             pass
 
+    def _clear_aborted(self):
+        # a prior statement left an aborted transaction block ('E'): every further statement errors with
+        # 25P02 until it is rolled back. Clear it so the reused connection recovers (psycopg2 rollback semantics).
+        _send(self._sock, b"Q", b"ROLLBACK\x00")
+        while True:
+            mtype, payload = _read_message(self._sock)
+            if mtype == b"Z":
+                self._txn_status = payload[:1] or b"I"
+                break
+
     def _simple_query(self, query):
+        if self._txn_status == b"E":
+            self._clear_aborted()
         _send(self._sock, b"Q", query.encode("utf-8") + b"\x00")
 
         description, rows, rowcount, error = None, [], -1, None
@@ -154,7 +189,7 @@ class Connection(object):
                 elif mtype == b"D":  # DataRow
                     (count,) = struct.unpack("!H", payload[:2])
                     off, row = 2, []
-                    for _ in range(count):
+                    for col in range(count):
                         (vlen,) = struct.unpack("!i", payload[off:off + 4])
                         off += 4
                         if vlen == -1:
@@ -162,8 +197,15 @@ class Connection(object):
                         else:
                             if off + vlen > len(payload):
                                 raise InterfaceError("truncated DataRow")
-                            row.append(payload[off:off + vlen].decode("utf-8", "replace"))
+                            raw = payload[off:off + vlen]
                             off += vlen
+                            if description and col < len(description) and description[col][1] == _OID_BYTEA:
+                                row.append(_decode_bytea(raw))  # bytes so sqlmap hex-encodes it (like the native driver)
+                            else:
+                                try:
+                                    row.append(raw.decode("utf-8"))
+                                except UnicodeDecodeError:
+                                    row.append(raw)  # non-UTF-8 (e.g. a SQL_ASCII db): keep bytes (hex-encoded), not lossy U+FFFD
                     rows.append(tuple(row))
                 elif mtype == b"C":  # CommandComplete ("SELECT 3", "INSERT 0 1", ...)
                     tag = payload[:-1].decode("utf-8", "replace").split()
@@ -173,7 +215,8 @@ class Connection(object):
                     _send(self._sock, b"f", b"COPY FROM STDIN is not supported\x00")  # CopyFail
                 elif mtype == b"E":  # ErrorResponse
                     error = _error_message(payload)
-                elif mtype == b"Z":  # ReadyForQuery (end of response)
+                elif mtype == b"Z":  # ReadyForQuery (end of response); payload byte = transaction status
+                    self._txn_status = payload[:1] or b"I"
                     break
                 # ParameterStatus(S)/NoticeResponse(N)/EmptyQueryResponse(I)/CopyData(d)/CopyDone(c)/... ignored
             except (struct.error, IndexError, ValueError) as ex:
