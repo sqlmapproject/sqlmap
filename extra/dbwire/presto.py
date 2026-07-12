@@ -14,7 +14,7 @@ headers are sent so the same client works against Presto and Trino.
 
 import base64
 import json
-import time
+import socket
 
 try:
     from urllib.request import Request, urlopen        # Python 3
@@ -26,6 +26,20 @@ from extra.dbwire import InterfaceError
 from extra.dbwire import NotSupportedError
 from extra.dbwire import OperationalError
 from extra.dbwire import ProgrammingError
+
+def _convert(value, coltype):
+    # normalize Presto/Trino JSON cells for sqlmap: VARBINARY arrives base64-encoded (decode to bytes so
+    # direct()'s binary handling hex-encodes it), ARRAY/MAP/ROW arrive as JSON structures (serialize to text)
+    if value is None:
+        return value
+    if coltype.startswith("varbinary"):
+        try:
+            return base64.b64decode(value)
+        except Exception:
+            return value
+    if isinstance(value, (list, dict)):
+        return json.dumps(value)
+    return value
 
 class Cursor(object):
     def __init__(self, connection):
@@ -65,9 +79,13 @@ class Connection(object):
         self._headers = {"Content-Type": "text/plain"}
         for prefix in ("X-Presto-", "X-Trino-"):
             self._headers[prefix + "User"] = user or "sqlmap"
-            self._headers[prefix + "Catalog"] = catalog or ""
-            self._headers[prefix + "Schema"] = schema or "default"
             self._headers[prefix + "Source"] = "dbwire"
+            # only send Catalog/Schema when supplied: a Schema without a Catalog makes Trino reject every
+            # request ("Schema is set but catalog is not"), so never force a "default" schema
+            if catalog:
+                self._headers[prefix + "Catalog"] = catalog
+            if schema:
+                self._headers[prefix + "Schema"] = schema
         if password:
             token = base64.b64encode(("%s:%s" % (user or "", password)).encode("utf-8")).decode("ascii")
             self._headers["Authorization"] = "Basic %s" % token
@@ -92,6 +110,8 @@ class Connection(object):
             raise ProgrammingError("(remote) HTTP %s: %s" % (ex.code, ex.read().decode("utf-8", "replace")[:200]))
         except URLError as ex:
             raise OperationalError("(remote) %s" % ex)
+        except (socket.timeout, socket.error) as ex:
+            raise OperationalError("(remote) %s" % ex)
         try:
             return json.loads(body)
         except ValueError as ex:
@@ -99,15 +119,16 @@ class Connection(object):
 
     def _query(self, query):
         page = self._request(self._statement_url, data=query)
-        columns, rows = None, []
+        columns, rows, types = None, [], []
         while True:
             if page.get("error"):
                 message = page["error"].get("message", "unknown error")
                 raise ProgrammingError("(remote) %s" % message)
             if page.get("columns") and columns is None:
                 columns = [(c.get("name"), c.get("type"), None, None, None, None, None) for c in page["columns"]]
+                types = [(c.get("type") or "") for c in page["columns"]]
             for row in page.get("data") or []:
-                rows.append(tuple(row))
+                rows.append(tuple(_convert(v, types[i] if i < len(types) else "") for i, v in enumerate(row)))
             next_uri = page.get("nextUri")
             if not next_uri:
                 break

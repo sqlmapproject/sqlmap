@@ -14,6 +14,7 @@ backslash escaping and \\N for NULL). Covers ClickHouse and its HTTP-compatible 
 """
 
 import base64
+import socket
 
 try:
     from urllib.request import Request, urlopen        # Python 3
@@ -29,14 +30,14 @@ def _unescape(value):
         return None
     if "\\" not in value:
         return value
-    out, it = [], iter(range(len(value)))
+    out = []
     i = 0
     n = len(value)
     while i < n:
         ch = value[i]
         if ch == "\\" and i + 1 < n:
             nxt = value[i + 1]
-            out.append({"t": "\t", "n": "\n", "r": "\r", "0": "\0", "\\": "\\", "'": "'"}.get(nxt, nxt))
+            out.append({"t": "\t", "n": "\n", "r": "\r", "0": "\0", "b": "\b", "f": "\f", "a": "\a", "v": "\v", "\\": "\\", "'": "'"}.get(nxt, nxt))
             i += 2
         else:
             out.append(ch)
@@ -102,6 +103,8 @@ class Connection(object):
         except HTTPError as ex:
             raise ProgrammingError("(remote) %s" % ex.read().decode("utf-8", "replace").strip())
         except URLError as ex:
+            raise OperationalError("(remote) %s" % ex)
+        except (socket.timeout, socket.error) as ex:
             raise OperationalError("(remote) %s" % ex)
 
         if not body:

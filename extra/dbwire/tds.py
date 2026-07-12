@@ -355,7 +355,6 @@ def _parse_tokens(sock, login=False):
             rows.append(tuple(row))
         elif token == 0xaa:  # ERROR
             (tlen,) = struct.unpack("<H", data[off:off + 2]); off += 2
-            number = struct.unpack("<i", data[off:off + 4])[0]
             msg_off = off + 4 + 1 + 1  # number(4) state(1) class(1)
             (mlen,) = struct.unpack("<H", data[msg_off:msg_off + 2])
             error = data[msg_off + 2:msg_off + 2 + mlen * 2].decode("utf-16-le", "replace")

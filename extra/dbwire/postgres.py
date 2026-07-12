@@ -23,7 +23,6 @@ import os
 import socket
 import struct
 
-from extra.dbwire import DatabaseError
 from extra.dbwire import DataError
 from extra.dbwire import IntegrityError
 from extra.dbwire import InterfaceError
