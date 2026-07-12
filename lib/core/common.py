@@ -3746,7 +3746,8 @@ def initTechnique(technique=None):
         if data:
             kb.pageTemplate, kb.errorIsNone = getPageTemplate(data.templatePayload, kb.injection.place)
             kb.matchRatio = data.matchRatio
-            kb.trueLength = data.trueLength
+            kb.trueLength = data.get("trueLength")  # NOTE: absent in sessions stored before the '--lengths' switch was introduced
+
             kb.negativeLogic = (technique == PAYLOAD.TECHNIQUE.BOOLEAN) and (data.where == PAYLOAD.WHERE.NEGATIVE)
 
             # Restoring stored conf options
