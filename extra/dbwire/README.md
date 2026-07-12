@@ -24,6 +24,7 @@ A wire protocol is shared across a whole family of products, so one client serve
 | `mysql.py`      | MySQL client/server | MySQL, MariaDB, TiDB, Aurora (MySQL), Percona |
 | `tds.py`        | TDS                 | Microsoft SQL Server, Sybase |
 | `firebird.py`   | Firebird wire       | Firebird 3 / 4 / 5 |
+| `cubrid.py`     | CUBRID CAS          | CUBRID |
 | `clickhouse.py` | HTTP (TabSeparated) | ClickHouse and HTTP-compatible forks |
 | `monetdb.py`    | MAPI                | MonetDB |
 | `presto.py`     | HTTP/REST (JSON)    | Presto, Trino |
@@ -59,6 +60,8 @@ parameter binding, prepared statements, bulk load/`COPY`, or TLS. Notable per-pr
   require TLS and are not supported here; the native driver or SQLAlchemy tier covers those.
 - **Firebird** - SRP-256 (and SRP) authentication with ChaCha20 or RC4 wire encryption, as required by
   default on Firebird 3 and later. Legacy (pre-SRP) authentication is not implemented.
+- **CUBRID** - cleartext login over the CAS broker protocol. Large objects (BLOB/CLOB) are returned as
+  their raw locator handles rather than fetched inline.
 
 When a case is not supported, the client raises a clear `NotSupportedError` rather than returning
 wrong data, so `-d` cleanly falls through to another connector tier where possible.

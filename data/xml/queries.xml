@@ -1509,7 +1509,7 @@
         <current_db query="CURRENT_USER"/>
         <hostname/>
         <table_comment query="SELECT comment FROM db_class WHERE owner_name='%s' AND class_name='%s'"/>
-        <column_comment query="SELECT db_attribute.comment FROM db_attribute JOIN db_class ON db_attribute.class_name=db_class.class_name WHERE owner_name='%s' AND db_class.class_name='%s' AND attr_name='%s'"/>
+        <column_comment query="SELECT db_attribute.comment FROM db_attribute JOIN db_class ON db_attribute.class_name=db_class.class_name WHERE db_class.owner_name='%s' AND db_class.class_name='%s' AND attr_name='%s'"/>
         <is_dba query="CURRENT_USER='DBA'"/>
         <check_udf query="(SELECT meth_name FROM db_method WHERE meth_name='%s' LIMIT 0,1)='%s'"/>
         <users>
@@ -1532,8 +1532,8 @@
             <blind query="SELECT class_name FROM db_class WHERE owner_name='%s' LIMIT %d,1" count="SELECT COUNT(class_name) FROM db_class WHERE owner_name='%s'"/>
         </tables>
         <columns>
-            <inband query="SELECT attr_name,data_type FROM db_attribute JOIN db_class ON db_attribute.class_name=db_class.class_name WHERE db_class.class_name='%s' AND owner_name='%s'" condition="attr_name"/>
-            <blind query="SELECT attr_name FROM db_attribute JOIN db_class ON db_attribute.class_name=db_class.class_name WHERE db_class.class_name='%s' AND owner_name='%s'" query2="SELECT data_type FROM db_attribute JOIN db_class ON db_attribute.class_name=db_class.class_name WHERE db_class.class_name='%s' AND owner_name='%s'" count="SELECT COUNT(attr_name) FROM db_attribute JOIN db_class ON db_attribute.class_name=db_class.class_name WHERE db_class.class_name='%s' AND owner_name='%s'" condition="attr_name"/>
+            <inband query="SELECT attr_name,data_type FROM db_attribute JOIN db_class ON db_attribute.class_name=db_class.class_name WHERE db_class.class_name='%s' AND db_class.owner_name='%s'" condition="attr_name"/>
+            <blind query="SELECT attr_name FROM db_attribute JOIN db_class ON db_attribute.class_name=db_class.class_name WHERE db_class.class_name='%s' AND db_class.owner_name='%s'" query2="SELECT data_type FROM db_attribute JOIN db_class ON db_attribute.class_name=db_class.class_name WHERE db_class.class_name='%s' AND db_class.owner_name='%s'" count="SELECT COUNT(attr_name) FROM db_attribute JOIN db_class ON db_attribute.class_name=db_class.class_name WHERE db_class.class_name='%s' AND db_class.owner_name='%s'" condition="attr_name"/>
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s.%s"/>

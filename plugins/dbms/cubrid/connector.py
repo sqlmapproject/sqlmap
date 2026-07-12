@@ -33,7 +33,7 @@ class Connector(GenericConnector):
             # CUBRIDdb.connect takes a positional URL 'CUBRID:host:port:db:::' then user/password positionally
             # (it does not accept hostname/username/database keyword args, which raised a TypeError before)
             self.connector = CUBRIDdb.connect("CUBRID:%s:%s:%s:::" % (self.hostname, self.port, self.db), str(self.user), str(self.password))
-        except Exception as ex:
+        except CUBRIDdb.Error as ex:
             raise SqlmapConnectionException(getSafeExString(ex))
 
         self.initCursor()
