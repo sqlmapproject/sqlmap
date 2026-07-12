@@ -229,7 +229,7 @@ class Filesystem(object):
                     logger.debug(debugMsg)
 
                 fileContent = self.stackedReadFile(remoteFile)
-            elif Backend.isDbms(DBMS.MYSQL) or Backend.isDbms(DBMS.PGSQL):
+            elif Backend.isDbms(DBMS.MYSQL) or Backend.isDbms(DBMS.PGSQL) or Backend.isDbms(DBMS.H2):
                 debugMsg = "going to try to read the file with non-stacked query "
                 debugMsg += "SQL injection technique"
                 logger.debug(debugMsg)

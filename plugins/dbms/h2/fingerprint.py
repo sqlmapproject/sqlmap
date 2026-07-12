@@ -119,3 +119,10 @@ class Fingerprint(GenericFingerprint):
     def getHostname(self):
         warnMsg = "on H2 it is not possible to enumerate the hostname"
         logger.warning(warnMsg)
+
+    def checkDbmsOs(self, detailed=False):
+        if Backend.getOs():
+            infoMsg = "the back-end DBMS operating system is %s" % Backend.getOs()
+            logger.info(infoMsg)
+        else:
+            self.userChooseDbmsOs()

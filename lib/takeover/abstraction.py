@@ -58,6 +58,9 @@ class Abstraction(Web, UDF, XP_cmdshell):
         elif Backend.isDbms(DBMS.MSSQL):
             self.xpCmdshellExecCmd(cmd, silent=silent)
 
+        elif Backend.isDbms(DBMS.H2):
+            self.h2ExecCmd(cmd, silent=silent)
+
         else:
             errMsg = "Feature not yet implemented for the back-end DBMS"
             raise SqlmapUnsupportedFeatureException(errMsg)
@@ -76,6 +79,9 @@ class Abstraction(Web, UDF, XP_cmdshell):
 
         elif Backend.isDbms(DBMS.MSSQL):
             retVal = self.xpCmdshellEvalCmd(cmd, first, last)
+
+        elif Backend.isDbms(DBMS.H2):
+            retVal = self.h2EvalCmd(cmd, first, last)
 
         else:
             errMsg = "Feature not yet implemented for the back-end DBMS"
