@@ -117,6 +117,7 @@ class FORK(object):
     DORIS = "Doris"
     STARROCKS = "StarRocks"
     TRINO = "Trino"
+    DUCKDB = "DuckDB"
 
 class CUSTOM_LOGGING(object):
     PAYLOAD = 9

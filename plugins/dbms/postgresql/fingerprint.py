@@ -45,6 +45,8 @@ class Fingerprint(GenericFingerprint):
                 fork = FORK.OPENGAUSS
             elif inject.checkBooleanExpression("AURORA_VERSION() LIKE '%'"):        # Reference: https://aws.amazon.com/premiumsupport/knowledge-center/aurora-version-number/
                 fork = FORK.AURORA
+            elif inject.checkBooleanExpression("[1,2,3][2]=2"):                      # NOTE: bare list literal with 1-based indexing is DuckDB-only (invalid syntax on PostgreSQL)
+                fork = FORK.DUCKDB
             else:
                 fork = ""
 
@@ -109,7 +111,8 @@ class Fingerprint(GenericFingerprint):
         logger.info(infoMsg)
 
         # NOTE: Vertica works too without the CONVERT_TO()
-        result = inject.checkBooleanExpression("CONVERT_TO('[RANDSTR]', QUOTE_IDENT(NULL)) IS NULL")
+        # NOTE: DuckDB (PostgreSQL dialect fork) lacks CONVERT_TO()/QUOTE_IDENT(), so it is accepted via its list-literal instead
+        result = inject.checkBooleanExpression("CONVERT_TO('[RANDSTR]', QUOTE_IDENT(NULL)) IS NULL") or inject.checkBooleanExpression("[1,2,3][2]=2")
 
         if result:
             infoMsg = "confirming %s" % DBMS.PGSQL
