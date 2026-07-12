@@ -8,7 +8,7 @@ See the file 'LICENSE' for copying permission
 """
 Minimal pure-python PostgreSQL frontend/backend protocol v3 client (stdlib only).
 
-Covers the whole PostgreSQL-wire family (PostgreSQL, CockroachDB, CrateDB, Redshift, Greenplum, ...).
+Covers the whole PostgreSQL-wire family (PostgreSQL, CockroachDB, CrateDB, Redshift, Greenplum, Vertica).
 Auth: trust / cleartext / MD5 / SCRAM-SHA-256 (modern default). Uses the *simple query* protocol, whose
 per-message implicit transaction auto-commits - so it is immune to the aborted-transaction poisoning and
 commit-before-fetch pitfalls that bite the stateful native drivers. Binary (bytea) values arrive as the

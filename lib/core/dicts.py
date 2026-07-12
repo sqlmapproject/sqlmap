@@ -271,6 +271,7 @@ DBWIRE_MODULES = {
     DBMS.MONETDB: "monetdb",
     DBMS.PRESTO: "presto",
     DBMS.FIREBIRD: "firebird",
+    DBMS.VERTICA: "postgres",  # Vertica speaks a PostgreSQL-v3-derived wire protocol (trust/cleartext/md5 auth)
 }
 
 # Reference: https://blog.jooq.org/tag/sysibm-sysdummy1/

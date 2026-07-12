@@ -20,7 +20,7 @@ A wire protocol is shared across a whole family of products, so one client serve
 
 | Module          | Protocol            | Engines |
 |-----------------|---------------------|---------|
-| `postgres.py`   | PostgreSQL v3       | PostgreSQL, CockroachDB, CrateDB, Redshift, Greenplum |
+| `postgres.py`   | PostgreSQL v3       | PostgreSQL, CockroachDB, CrateDB, Redshift, Greenplum, Vertica |
 | `mysql.py`      | MySQL client/server | MySQL, MariaDB, TiDB, Aurora (MySQL), Percona |
 | `tds.py`        | TDS                 | Microsoft SQL Server, Sybase |
 | `firebird.py`   | Firebird wire       | Firebird 3 / 4 / 5 |
