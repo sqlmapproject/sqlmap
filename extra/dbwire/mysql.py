@@ -35,7 +35,11 @@ _CLIENT_PLUGIN_AUTH = 0x00080000
 
 _MAX_PACKET = 0x1000000
 _MAX_MESSAGE_LENGTH = 0x40000000  # cap on a (re-assembled) payload, to bound a hostile/corrupt stream
-_BINARY_CHARSET = 63              # collation id 63 == 'binary' (BLOB/BINARY/VARBINARY columns)
+_BINARY_CHARSET = 63              # collation id 63 == 'binary'
+# field types for which charset==63 genuinely denotes raw bytes (BLOB/BINARY/VARBINARY/BIT/GEOMETRY family).
+# Numeric & temporal columns ALSO report charset 63 in the text protocol, but carry their ASCII text form -
+# they must be decoded, not returned as bytes (else -d hexifies e.g. the int 12345 to '3132333435').
+_BINARY_TYPES = frozenset((15, 16, 249, 250, 251, 252, 253, 254, 255))  # VARCHAR,BIT,*BLOB,VAR_STRING,STRING,GEOMETRY
 
 def _xor(a, b):
     if str is bytes:  # Python 2
@@ -210,8 +214,9 @@ class Connection(object):
             _, off = _lenc_str(cpay, off)             # org_name
             _, off = _lenc_int(cpay, off)             # length of the fixed-length block (0x0c)
             charset = struct.unpack("<H", cpay[off:off + 2])[0]
-            description.append((name.decode("utf-8", "replace"), None, None, None, None, None, None))
-            binary.append(charset == _BINARY_CHARSET)
+            col_type = _u8(cpay, off + 6)             # fixed block: charset(2) column_length(4) type(1) flags(2) ...
+            description.append((name.decode("utf-8", "replace"), col_type, None, None, None, None, None))
+            binary.append(charset == _BINARY_CHARSET and col_type in _BINARY_TYPES)
 
         _read_packet(self._sock)  # EOF after the column definitions
 

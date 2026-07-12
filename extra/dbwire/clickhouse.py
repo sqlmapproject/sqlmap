@@ -25,24 +25,34 @@ except ImportError:
 from extra.dbwire import OperationalError
 from extra.dbwire import ProgrammingError
 
+# TabSeparated backslash escapes -> the literal byte they denote
+_ESCAPE = {ord("t"): 9, ord("n"): 10, ord("r"): 13, ord("0"): 0, ord("b"): 8,
+           ord("f"): 12, ord("a"): 7, ord("v"): 11, ord("\\"): 92, ord("'"): 39}
+
 def _unescape(value):
-    if value == "\\N":
+    # value: the raw bytes of one TSV field -> None (\N) or the unescaped bytes. Operates on bytes because a
+    # String/FixedString column can hold arbitrary non-UTF-8 data, which a whole-body utf-8 decode would destroy.
+    if value == b"\\N":
         return None
-    if "\\" not in value:
+    if b"\\" not in value:
         return value
-    out = []
-    i = 0
-    n = len(value)
+    src, out, i, n = bytearray(value), bytearray(), 0, len(value)
     while i < n:
-        ch = value[i]
-        if ch == "\\" and i + 1 < n:
-            nxt = value[i + 1]
-            out.append({"t": "\t", "n": "\n", "r": "\r", "0": "\0", "b": "\b", "f": "\f", "a": "\a", "v": "\v", "\\": "\\", "'": "'"}.get(nxt, nxt))
-            i += 2
+        c = src[i]
+        if c == 0x5c and i + 1 < n:  # backslash
+            out.append(_ESCAPE.get(src[i + 1], src[i + 1])); i += 2
         else:
-            out.append(ch)
-            i += 1
-    return "".join(out)
+            out.append(c); i += 1
+    return bytes(out)
+
+def _decode_cell(value):
+    # keep text as str; hand back raw bytes only when a value is not valid UTF-8 (sqlmap then hex-encodes it)
+    if value is None:
+        return None
+    try:
+        return value.decode("utf-8")
+    except UnicodeDecodeError:
+        return value
 
 class Cursor(object):
     def __init__(self, connection):
@@ -99,7 +109,7 @@ class Connection(object):
     def _query(self, query):
         req = Request(self._url, data=query.encode("utf-8"), headers=self._headers)
         try:
-            body = urlopen(req, timeout=self._timeout).read().decode("utf-8", "replace")
+            body = urlopen(req, timeout=self._timeout).read()  # bytes: column data may be non-UTF-8
         except HTTPError as ex:
             raise ProgrammingError("(remote) %s" % ex.read().decode("utf-8", "replace").strip())
         except URLError as ex:
@@ -109,13 +119,13 @@ class Connection(object):
 
         if not body:
             return None, []
-        lines = body.split("\n")
-        if lines and lines[-1] == "":
+        lines = body.split(b"\n")
+        if lines and lines[-1] == b"":
             lines.pop()
         if not lines:
             return None, []
-        description = [(name, None, None, None, None, None, None) for name in (_unescape(_) for _ in lines[0].split("\t"))]
-        rows = [tuple(_unescape(_) for _ in line.split("\t")) for line in lines[1:]]
+        description = [(name, None, None, None, None, None, None) for name in (_decode_cell(_unescape(_)) for _ in lines[0].split(b"\t"))]
+        rows = [tuple(_decode_cell(_unescape(_)) for _ in line.split(b"\t")) for line in lines[1:]]
         return description, rows
 
 def connect(host=None, port=8123, user=None, password=None, database=None, connect_timeout=None, **kwargs):
