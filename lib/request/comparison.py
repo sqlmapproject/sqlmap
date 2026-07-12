@@ -114,6 +114,10 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
     if conf.code:
         return conf.code == code
 
+    # Response content length to match when the query is True
+    if conf.lengths:
+        return len(page or "") == kb.trueLength
+
     seqMatcher = threadData.seqMatcher
     seqMatcher.set_seq1(kb.pageTemplate)
 

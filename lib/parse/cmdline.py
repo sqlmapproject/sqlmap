@@ -406,6 +406,9 @@ def cmdLineParser(argv=None):
         detection.add_argument("--code", dest="code", type=int,
             help="HTTP code to match when query is evaluated to True")
 
+        detection.add_argument("--lengths", dest="lengths", action="store_true",
+            help="Compare pages based only on their content length")
+
         detection.add_argument("--smart", dest="smart", action="store_true",
             help="Perform thorough tests only if positive heuristic(s)")
 

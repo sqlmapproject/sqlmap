@@ -523,6 +523,7 @@ def checkSqlInjection(place, parameter, value):
 
                             # Useful to set kb.matchRatio at first based on False response content
                             kb.matchRatio = None
+                            kb.trueLength = None
                             kb.negativeLogic = (where == PAYLOAD.WHERE.NEGATIVE)
                             suggestion = None
                             Request.queryPage(genCmpPayload(), place, raise404=False)
@@ -530,7 +531,7 @@ def checkSqlInjection(place, parameter, value):
                             falseRawResponse = "%s%s" % (falseHeaders, falsePage)
 
                             # Checking if there is difference between current FALSE, original and heuristics page (i.e. not used parameter)
-                            if not any((kb.negativeLogic, conf.string, conf.notString, conf.code)):
+                            if not any((kb.negativeLogic, conf.string, conf.notString, conf.code, conf.lengths)):
                                 try:
                                     ratio = 1.0
                                     seqMatcher = getCurrentThreadData().seqMatcher
@@ -550,6 +551,10 @@ def checkSqlInjection(place, parameter, value):
                             truePage, trueHeaders, trueCode = threadData.lastComparisonPage or "", threadData.lastComparisonHeaders, threadData.lastComparisonCode
                             trueRawResponse = "%s%s" % (trueHeaders, truePage)
 
+                            if conf.lengths:
+                                kb.trueLength = len(truePage)
+                                trueResult = True
+
                             if trueResult and not (truePage == falsePage and not any((kb.nullConnection, conf.code))):
                                 # Perform the test's False request
                                 falseResult = Request.queryPage(genCmpPayload(), place, raise404=False)
@@ -563,7 +568,7 @@ def checkSqlInjection(place, parameter, value):
                                         errorResult = Request.queryPage(errorPayload, place, raise404=False)
                                         if errorResult:
                                             continue
-                                    elif kb.heuristicPage and not any((conf.string, conf.notString, conf.regexp, conf.code, kb.nullConnection)):
+                                    elif kb.heuristicPage and not any((conf.string, conf.notString, conf.regexp, conf.code, conf.lengths, kb.nullConnection)):
                                         _ = comparison(kb.heuristicPage, None, getRatioValue=True)
                                         if (_ or 0) > (kb.matchRatio or 0):
                                             kb.matchRatio = _
@@ -575,7 +580,7 @@ def checkSqlInjection(place, parameter, value):
 
                                     injectable = True
 
-                                elif (threadData.lastComparisonRatio or 0) > UPPER_RATIO_BOUND and not any((conf.string, conf.notString, conf.regexp, conf.code, conf.titles, kb.nullConnection)):
+                                elif (threadData.lastComparisonRatio or 0) > UPPER_RATIO_BOUND and not any((conf.string, conf.notString, conf.regexp, conf.code, conf.lengths, conf.titles, kb.nullConnection)):
                                     originalSet = set(getFilteredPageContent(kb.pageTemplate, True, "\n").split("\n"))
                                     trueSet = set(getFilteredPageContent(truePage, True, "\n").split("\n"))
                                     falseSet = set(getFilteredPageContent(falsePage, True, "\n").split("\n"))
@@ -613,7 +618,7 @@ def checkSqlInjection(place, parameter, value):
                                     injectable = False
                                     continue
 
-                                if kb.pageStable and not any((conf.string, conf.notString, conf.regexp, conf.code, conf.titles, kb.nullConnection)):
+                                if kb.pageStable and not any((conf.string, conf.notString, conf.regexp, conf.code, conf.lengths, conf.titles, kb.nullConnection)):
                                     if all((falseCode, trueCode)) and falseCode != trueCode and trueCode != kb.heuristicCode:
                                         suggestion = conf.code = trueCode
 
@@ -805,12 +810,14 @@ def checkSqlInjection(place, parameter, value):
                         injection.data[stype].comment = comment
                         injection.data[stype].templatePayload = templatePayload
                         injection.data[stype].matchRatio = kb.matchRatio
+                        injection.data[stype].trueLength = kb.trueLength
                         injection.data[stype].trueCode = trueCode
                         injection.data[stype].falseCode = falseCode
 
                         injection.conf.textOnly = conf.textOnly
                         injection.conf.titles = conf.titles
                         injection.conf.code = conf.code
+                        injection.conf.lengths = conf.lengths
                         injection.conf.string = conf.string
                         injection.conf.notString = conf.notString
                         injection.conf.regexp = conf.regexp
