@@ -301,7 +301,7 @@ class Databases(object):
 
                 if condition:
                     if not Backend.isDbms(DBMS.SQLITE):
-                        query += " WHERE %s" % condition
+                        query += " %s %s" % ("AND" if re.search(r"(?i)\bWHERE\b", query) else "WHERE", condition)
 
                         if conf.excludeSysDbs:
                             infoMsg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(db) for db in self.excludeDbsList))
