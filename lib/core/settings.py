@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.7.104"
+VERSION = "1.10.7.105"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -519,6 +519,10 @@ COMMON_PASSWORD_SUFFIXES = ("1", "123", "2", "12", "3", "13", "7", "11", "5", "2
 # Reference: http://www.the-interweb.com/serendipity/index.php?/archives/94-A-brief-analysis-of-40,000-leaked-MySpace-passwords.html
 COMMON_PASSWORD_SUFFIXES += ("!", ".", "*", "!!", "?", ";", "..", "!!!", ",", "@")
 
+# Most common passwords (frequency-ordered) tried for very slow, per-hash-salted algorithms (bcrypt) where a
+# full dictionary is impractical; kept small on purpose so a candidate-major attack stays within a time budget
+COMMON_PASSWORDS = ("123456", "123456789", "12345678", "password", "qwerty", "12345", "123123", "111111", "1234567890", "1234567", "qwerty123", "000000", "1q2w3e", "abc123", "password1", "1234", "qwertyuiop", "123321", "password123", "1q2w3e4r5t", "iloveyou", "654321", "666666", "987654321", "1q2w3e4r", "7777777", "dragon", "1qaz2wsx", "123qwe", "monkey", "123456a", "112233", "qwe123", "159753", "letmein", "11111111", "222222", "123abc", "qazwsx", "555555", "princess", "admin", "121212", "1234qwer", "sunshine", "football", "aaaaaa", "123123123", "computer", "michael", "superman", "welcome", "zxcvbnm", "asdfghjkl", "1111", "shadow", "master", "999999", "88888888", "secret", "qwerty1", "12341234", "101010", "1111111", "asdfgh", "147258369", "qwertyui", "123654", "google", "123456789a", "ashley", "jesus", "ninja", "mustang", "baseball", "jennifer", "hunter", "soccer", "batman", "andrew", "tigger", "charlie", "robert", "thomas", "hockey", "ranger", "daniel", "hannah", "maggie", "696969", "harley", "1234abcd", "trustno1", "buster", "starwars", "freedom", "whatever", "qazwsxedc", "passw0rd")
+
 # Splitter used between requests in WebScarab log files
 WEBSCARAB_SPLITTER = "### Conversation"
 
@@ -881,6 +885,11 @@ LARGE_OUTPUT_THRESHOLD = 1024 ** 2
 
 # Give up on hash recognition if nothing was found in first given number of rows
 HASH_RECOGNITION_QUIT_THRESHOLD = 1000
+
+# Wall-clock budget (in seconds) for the pure-Python cracking of very slow, per-hash-salted algorithms
+# (bcrypt); candidate-major so the most common passwords are tried against every hash first, then it stops
+# and the remainder is left for a dedicated tool (e.g. 'hashcat'). Overridable via 'SQLMAP_HASH_ATTACK_TIME_LIMIT'
+HASH_ATTACK_TIME_LIMIT = 300
 
 # Regular expression used for automatic hex conversion and hash cracking of (RAW) binary column values
 HASH_BINARY_COLUMNS_REGEX = r"(?i)pass|psw|hash"

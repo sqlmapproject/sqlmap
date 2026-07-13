@@ -80,9 +80,11 @@ from lib.core.enums import MKSTEMP_PREFIX
 from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import COMMON_PASSWORD_SUFFIXES
+from lib.core.settings import COMMON_PASSWORDS
 from lib.core.settings import COMMON_USER_COLUMNS
 from lib.core.settings import DEV_EMAIL_ADDRESS
 from lib.core.settings import DUMMY_USER_PREFIX
+from lib.core.settings import HASH_ATTACK_TIME_LIMIT
 from lib.core.settings import HASH_BINARY_COLUMNS_REGEX
 from lib.core.settings import HASH_EMPTY_PASSWORD_MARKER
 from lib.core.settings import HASH_MOD_ITEM_DISPLAY
@@ -807,9 +809,40 @@ __functions__ = {
 if _scrypt is not None:
     __functions__[HASH.WERKZEUG_SCRYPT] = werkzeug_scrypt_passwd
 
-# Recognized-only formats with no pure-Python/stdlib crack path; identified and pointed to dedicated tools
-HASH_TOOL_HINTS = {
-    HASH.ARGON2: "an Argon2 hash (e.g. 'hashcat -m 34000' or 'john --format=argon2')",
+# hashcat '-m' mode per recognized hash format (Reference: https://hashcat.net/wiki/doku.php?id=example_hashes);
+# used to point the user at the right command when hashes are stored or cannot be cracked in pure Python
+# (e.g. Argon2). Only well-established modes are listed - a format left out just gets the generic hint
+HASHCAT_MODES = {
+    HASH.ARGON2: 34000,
+    HASH.MYSQL_OLD: 200,
+    HASH.MYSQL: 300,
+    HASH.POSTGRES: 12,
+    HASH.MSSQL_OLD: 131,
+    HASH.MSSQL: 132,
+    HASH.MSSQL_NEW: 1731,
+    HASH.ORACLE_OLD: 3100,
+    HASH.ORACLE: 112,
+    HASH.ORACLE_12C: 12300,
+    HASH.MD5_GENERIC: 0,
+    HASH.SHA1_GENERIC: 100,
+    HASH.SHA224_GENERIC: 1300,
+    HASH.SHA256_GENERIC: 1400,
+    HASH.SHA384_GENERIC: 10800,
+    HASH.SHA512_GENERIC: 1700,
+    HASH.CRYPT_GENERIC: 1500,
+    HASH.APACHE_SHA1: 101,
+    HASH.SSHA: 111,
+    HASH.SSHA256: 1411,
+    HASH.SSHA512: 1711,
+    HASH.UNIX_MD5_CRYPT: 500,
+    HASH.APACHE_MD5_CRYPT: 1600,
+    HASH.SHA256_UNIX_CRYPT: 7400,
+    HASH.SHA512_UNIX_CRYPT: 1800,
+    HASH.BCRYPT: 3200,
+    HASH.PHPASS: 400,
+    HASH.VBULLETIN: 2611,
+    HASH.DJANGO_SHA1: 124,
+    HASH.DJANGO_PBKDF2_SHA256: 10000,
 }
 
 def _finalize(retVal, results, processes, attack_info=None):
@@ -852,12 +885,18 @@ def storeHashesToFile(attack_dict):
         return
 
     items = OrderedSet()
+    regexes = set()
 
     for user, hashes in attack_dict.items():
         for hash_ in hashes:
             hash_ = hash_.split()[0] if hash_ and hash_.strip() else hash_
-            if hash_ and hash_ != NULL and hashRecognition(hash_):
-                item = None
+            if hash_ and hash_ != NULL:
+                regex = hashRecognition(hash_)
+                if not regex:
+                    continue
+
+                regexes.add(regex)
+
                 if user and not user.startswith(DUMMY_USER_PREFIX):
                     item = "%s:%s\n" % (user, hash_)
                 else:
@@ -885,6 +924,12 @@ def storeHashesToFile(attack_dict):
                     f.write(item)
                 except (UnicodeError, TypeError):
                     pass
+
+        modes = sorted(set(HASHCAT_MODES[_] for _ in regexes if _ in HASHCAT_MODES))
+        if modes:
+            infoMsg = "the stored hashes can be cracked with a dedicated tool "
+            infoMsg += "(e.g. %s)" % ", ".join("'hashcat -m %d'" % _ for _ in modes)
+            logger.info(infoMsg)
 
 def attackCachedUsersPasswords():
     if kb.data.cachedUsersPasswords:
@@ -1204,6 +1249,90 @@ def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found
             with proc_count.get_lock():
                 proc_count.value -= 1
 
+def _bruteProcessVariantSalted(attack_info, hash_regex, suffix, retVal, proc_id, proc_count, wordlists, custom_wordlist, api, deadline):
+    # Candidate-major crack for the very slow, per-hash-salted algorithms (bcrypt): the OUTER loop is the
+    # candidate word (partitioned across processes) and the INNER loop is every still-unsolved hash, each
+    # verified with its own salt. Trying the most common passwords against ALL hashes first means a weak
+    # account anywhere in a dumped table is found in the first rounds - a hash-major loop would instead grind
+    # the whole wordlist on row 1 before ever testing row 2. Bounded by `deadline` so hundreds of separately
+    # salted hashes can't become an hours-long run; whatever is left is meant for a dedicated tool.
+    if IS_WIN:
+        coloramainit()
+
+    count = 0
+    rotator = 0
+    remaining = attack_info[:]   # per-process (post-fork) copy; shrinks as this process solves hashes
+
+    wordlist = Wordlist(wordlists, proc_id, getattr(proc_count, "value", 0), custom_wordlist)
+
+    try:
+        for word in wordlist:
+            if not remaining or time.time() > deadline:
+                break
+
+            count += 1
+
+            if isinstance(word, six.binary_type):
+                word = getUnicode(word)
+            elif not isinstance(word, six.string_types):
+                continue
+
+            if suffix:
+                word = word + suffix
+
+            for item in remaining[:]:
+                ((user, hash_), kwargs) = item
+
+                try:
+                    current = __functions__[hash_regex](password=word, uppercase=False, **kwargs)
+
+                    if hash_ == current:
+                        retVal.put((user, hash_, word))
+
+                        clearConsoleLine()
+
+                        infoMsg = "\r[%s] [INFO] cracked password '%s'" % (time.strftime("%X"), word)
+
+                        if user and not user.startswith(DUMMY_USER_PREFIX):
+                            infoMsg += " for user '%s'\n" % user
+                        else:
+                            infoMsg += " for hash '%s'\n" % hash_
+
+                        dataToStdout(infoMsg, True)
+
+                        remaining.remove(item)
+
+                except KeyboardInterrupt:
+                    raise
+
+                except (UnicodeEncodeError, UnicodeDecodeError):
+                    pass  # ignore possible encoding problems caused by some words in custom dictionaries
+
+                except Exception as ex:
+                    warnMsg = "there was a problem while hashing entry: %s ('%s'). " % (repr(word), getSafeExString(ex))
+                    warnMsg += "Please report by e-mail to '%s'" % DEV_EMAIL_ADDRESS
+                    logger.critical(warnMsg)
+
+            if (proc_id == 0 or getattr(proc_count, "value", 0) == 1) and count % HASH_MOD_ITEM_DISPLAY == 0:
+                rotator += 1
+
+                if rotator >= len(ROTATING_CHARS):
+                    rotator = 0
+
+                status = "current status: %s... %s" % (word.ljust(5)[:5], ROTATING_CHARS[rotator])
+
+                if not api:
+                    dataToStdout("\r[%s] [INFO] %s" % (time.strftime("%X"), status))
+
+    except KeyboardInterrupt:
+        pass
+
+    finally:
+        wordlist.closeFP()   # release the wordlist file handle (else it leaks; Windows can't rmtree an open file)
+        if hasattr(proc_count, "value"):
+            with proc_count.get_lock():
+                proc_count.value -= 1
+
 def dictionaryAttack(attack_dict):
     global _multiprocessing
 
@@ -1251,8 +1380,9 @@ def dictionaryAttack(attack_dict):
                     infoMsg = "using hash method '%s'" % __functions__[regex].__name__
                     logger.info(infoMsg)
                 else:
-                    warnMsg = "sqlmap identified %s that cannot be cracked with the " % HASH_TOOL_HINTS.get(regex, "a hash")
-                    warnMsg += "built-in dictionary attack"
+                    warnMsg = "sqlmap identified a hash that cannot be cracked with the built-in dictionary attack"
+                    if regex in HASHCAT_MODES:
+                        warnMsg += " (use e.g. 'hashcat -m %d')" % HASHCAT_MODES[regex]
                     singleTimeWarnMessage(warnMsg)
 
     for hash_regex in hash_regexes:
@@ -1350,11 +1480,21 @@ def dictionaryAttack(attack_dict):
         if not attack_info:
             continue
 
-        if not kb.wordlists:
+        # the pure-Python bcrypt is so slow (seconds per candidate) that even the small dictionary would take
+        # many hours; it uses the built-in COMMON_PASSWORDS list (no file), tried candidate-major under a time
+        # budget below, and points at a dedicated tool for anything beyond it
+        if hash_regex in (HASH.BCRYPT, HASH.WORDPRESS_BCRYPT):
+            warnMsg = "bcrypt hashing is very slow in pure Python; trying only the most common passwords. "
+            warnMsg += "For an exhaustive attack use a dedicated tool"
+            if hash_regex in HASHCAT_MODES:
+                warnMsg += " (e.g. 'hashcat -m %d')" % HASHCAT_MODES[hash_regex]
+            singleTimeWarnMessage(warnMsg)
+
+        elif not kb.wordlists:
             while not kb.wordlists:
 
-                # the slowest of all methods hence smaller default dict
-                if hash_regex in (HASH.ORACLE_OLD, HASH.ORACLE_12C, HASH.PHPASS, HASH.SHA256_UNIX_CRYPT, HASH.SHA512_UNIX_CRYPT, HASH.WERKZEUG_SCRYPT, HASH.BCRYPT, HASH.WORDPRESS_BCRYPT, HASH.MYSQL_SHA2):
+                # the slowest of the remaining methods hence smaller default dict
+                if hash_regex in (HASH.ORACLE_OLD, HASH.ORACLE_12C, HASH.PHPASS, HASH.SHA256_UNIX_CRYPT, HASH.SHA512_UNIX_CRYPT, HASH.WERKZEUG_SCRYPT, HASH.MYSQL_SHA2):
                     dictPaths = [paths.SMALL_DICT]
                 else:
                     dictPaths = [paths.WORDLIST]
@@ -1468,6 +1608,73 @@ def dictionaryAttack(attack_dict):
                     _finalize(retVal, results, processes, attack_info)
 
             clearConsoleLine()
+
+        # bcrypt is minutes-per-candidate in pure Python and every hash is separately salted (no shared
+        # work), so a whole table's worth would run for hours; crack candidate-major (most common passwords
+        # against all hashes first) under a wall-clock budget, then leave the rest for a dedicated tool
+        elif hash_regex in (HASH.BCRYPT, HASH.WORDPRESS_BCRYPT):
+            deadline = time.time() + HASH_ATTACK_TIME_LIMIT
+            bcryptWordlist = list(COMMON_PASSWORDS) + custom_wordlist   # built-in list (+usernames), no file
+
+            for suffix in suffix_list:
+                if not attack_info or processException or time.time() > deadline:
+                    break
+
+                if suffix:
+                    clearConsoleLine()
+                    infoMsg = "using suffix '%s'" % suffix
+                    logger.info(infoMsg)
+
+                retVal = None
+                processes = []
+
+                try:
+                    if _multiprocessing:
+                        if _multiprocessing.cpu_count() > 1:
+                            infoMsg = "starting %d processes " % _multiprocessing.cpu_count()
+                            singleTimeLogMessage(infoMsg)
+
+                        gc.disable()
+
+                        retVal = _multiprocessing.Queue()
+                        count = _multiprocessing.Value('i', _multiprocessing.cpu_count())
+
+                        for i in xrange(_multiprocessing.cpu_count()):
+                            process = _multiprocessing.Process(target=_bruteProcessVariantSalted, args=(attack_info, hash_regex, suffix, retVal, i, count, [], bcryptWordlist, conf.api, deadline))
+                            processes.append(process)
+
+                        for process in processes:
+                            process.daemon = True
+                            process.start()
+
+                        while count.value > 0:
+                            time.sleep(0.5)
+
+                    else:
+                        warnMsg = "multiprocessing hash cracking is currently "
+                        warnMsg += "%s on this platform" % ("not supported" if not conf.disableMulti else "disabled")
+                        singleTimeWarnMessage(warnMsg)
+
+                        retVal = _queue.Queue()
+                        _bruteProcessVariantSalted(attack_info, hash_regex, suffix, retVal, 0, 1, [], bcryptWordlist, conf.api, deadline)
+
+                except KeyboardInterrupt:
+                    print()
+                    processException = True
+                    warnMsg = "user aborted during dictionary-based attack phase (Ctrl+C was pressed)"
+                    logger.warning(warnMsg)
+
+                finally:
+                    _finalize(retVal, results, processes, attack_info)
+
+            clearConsoleLine()
+
+            if attack_info and not processException:  # _finalize() drops solved hashes, so any left are uncracked
+                warnMsg = "%d bcrypt hash(es) not cracked with common passwords; " % len(attack_info)
+                warnMsg += "use a dedicated tool for an exhaustive attack"
+                if hash_regex in HASHCAT_MODES:
+                    warnMsg += " (e.g. 'hashcat -m %d')" % HASHCAT_MODES[hash_regex]
+                logger.warning(warnMsg)
 
         else:
             for ((user, hash_), kwargs) in attack_info:
