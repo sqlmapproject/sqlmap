@@ -204,8 +204,8 @@ class Users(object):
             condition = rootQuery.inband.condition
 
             if conf.user:
-                query += " WHERE "
-                query += " OR ".join("%s = '%s'" % (condition, user) for user in sorted(users))
+                userCondition = " OR ".join("%s = '%s'" % (condition, user) for user in sorted(users))
+                query += " %s (%s)" % ("AND" if re.search(r"(?i)\bWHERE\b", query) else "WHERE", userCondition)
 
             if Backend.isDbms(DBMS.SYBASE):
                 getCurrentThreadData().disableStdOut = True
@@ -417,12 +417,12 @@ class Users(object):
                 condition = rootQuery.inband.condition
 
             if conf.user:
-                query += " WHERE "
-
                 if Backend.isDbms(DBMS.MYSQL) and kb.data.has_information_schema:
-                    query += " OR ".join("%s LIKE '%%%s%%'" % (condition, user) for user in sorted(users))
+                    userCondition = " OR ".join("%s LIKE '%%%s%%'" % (condition, user) for user in sorted(users))
                 else:
-                    query += " OR ".join("%s = '%s'" % (condition, user) for user in sorted(users))
+                    userCondition = " OR ".join("%s = '%s'" % (condition, user) for user in sorted(users))
+
+                query += " %s (%s)" % ("AND" if re.search(r"(?i)\bWHERE\b", query) else "WHERE", userCondition)
 
             values = inject.getValue(query, blind=False, time=False)
 
