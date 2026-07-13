@@ -144,7 +144,7 @@ STATIC_LEN = len(STATIC_TABLE)
 # HTTP/2 frame codec (RFC 7540 section 4.1) - the zero-table-risk brick. Pure stdlib, py2/py3, ASCII.
 
 # frame types (RFC 7540 s6)
-DATA, HEADERS, RST_STREAM, SETTINGS, PING, GOAWAY, WINDOW_UPDATE, CONTINUATION = 0x0, 0x1, 0x3, 0x4, 0x6, 0x7, 0x8, 0x9
+DATA, HEADERS, RST_STREAM, SETTINGS, PUSH_PROMISE, PING, GOAWAY, WINDOW_UPDATE, CONTINUATION = 0x0, 0x1, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9
 # flags
 FLAG_END_STREAM = 0x1
 FLAG_ACK = 0x1
@@ -374,6 +374,7 @@ class Encoder(object):
             out += encode_string(value)
         return bytes(out)
 
+SETTINGS_ENABLE_PUSH = 0x2
 SETTINGS_INITIAL_WINDOW_SIZE = 0x4
 BIG_WINDOW = (1 << 31) - 1
 
@@ -469,9 +470,12 @@ class _H2Connection(object):
             if self.sock.selected_alpn_protocol() != "h2":
                 raise IOError("server did not negotiate h2 (ALPN=%r)" % self.sock.selected_alpn_protocol())
             self.sock.settimeout(timeout)
-            # connection preface + client SETTINGS (advertise a large per-stream window) + bump conn window
+            # connection preface + client SETTINGS (disable server push + advertise a large per-stream window)
+            # + bump conn window. ENABLE_PUSH=0 keeps servers from opening pushed streams whose HPACK header
+            # block we would otherwise have to decode to keep the dynamic table in sync (skipping it desyncs
+            # the decoder and corrupts every later header) - this client has no use for pushed responses.
             self.sock.sendall(CONNECTION_PREFACE)
-            self.sock.sendall(encode_frame(SETTINGS, 0, 0, struct.pack("!HI", SETTINGS_INITIAL_WINDOW_SIZE, BIG_WINDOW)))
+            self.sock.sendall(encode_frame(SETTINGS, 0, 0, struct.pack("!HIHI", SETTINGS_ENABLE_PUSH, 0, SETTINGS_INITIAL_WINDOW_SIZE, BIG_WINDOW)))
             self.sock.sendall(encode_frame(WINDOW_UPDATE, 0, 0, struct.pack("!I", BIG_WINDOW - 65535)))
         except Exception:
             self.close()
@@ -514,6 +518,9 @@ class _H2Connection(object):
             elif ftype == PING:
                 if not (flags & FLAG_ACK):
                     self.sock.sendall(encode_frame(PING, FLAG_ACK, 0, payload))
+            elif ftype == PUSH_PROMISE:
+                self.usable = False                           # we advertised ENABLE_PUSH=0; a push would desync HPACK
+                raise _UnprocessedStream("unexpected PUSH_PROMISE despite SETTINGS_ENABLE_PUSH=0")
             elif ftype == GOAWAY:
                 self.usable = False                           # server won't accept new streams -> retire connection
                 last_sid = (struct.unpack("!I", payload[4:8])[0] & 0x7fffffff) if len(payload) >= 8 else 0
@@ -601,12 +608,18 @@ class _H2Connection(object):
             elif ftype == PING:
                 if not (flags & FLAG_ACK):
                     self.sock.sendall(encode_frame(PING, FLAG_ACK, 0, payload))
+            elif ftype == PUSH_PROMISE:
+                self.usable = False                           # we advertised ENABLE_PUSH=0; a push would desync HPACK
+                raise _UnprocessedStream("unexpected PUSH_PROMISE despite SETTINGS_ENABLE_PUSH=0")
             elif ftype == GOAWAY:
+                # Routine on a long-lived connection (server retires it after its per-connection request cap).
+                # The pair did not complete cleanly, so it must be re-sent on a fresh connection; flag it
+                # retry-safe (idempotent boolean read) rather than crashing the extraction.
                 self.usable = False
-                raise IOError("GOAWAY during timeless pair")
+                raise _UnprocessedStream("GOAWAY during timeless pair")
             elif ftype == RST_STREAM and fsid in state:
                 self.usable = False
-                raise IOError("stream reset during timeless pair")
+                raise _UnprocessedStream("stream reset during timeless pair")
             elif ftype in (HEADERS, CONTINUATION) and fsid in state:
                 p = payload
                 if ftype == HEADERS:

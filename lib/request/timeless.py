@@ -17,6 +17,8 @@ See the file 'LICENSE' for copying permission
 # front-proxy makes order track arrival, not work. calibrate() detects that (and estimates the readable
 # delta) so the caller never applies the oracle blind - it falls back to classic time-based instead.
 
+import socket
+import ssl
 import threading
 
 from lib.core.enums import DBMS
@@ -49,18 +51,32 @@ def buildConditionPair(condition, heavy, cheap="0"):
     return condExpr, negExpr
 
 
-def _pairOrder(conn, reqA, reqB, timeout):
+def _pairOrder(connSource, reqA, reqB, timeout, retries=2):
     """Send reqA and reqB as one coalesced pair; return the stream id that finished FIRST plus the two
-    stream ids in send order (reqA got the lower id)."""
-    order, _results = conn.exchange_pair([reqA, reqB], timeout)
-    loSid = conn.next_sid - 4
-    hiSid = conn.next_sid - 2
-    return order[0], loSid, hiSid
+    stream ids in send order (reqA got the lower id).
+
+    `connSource` is either a live _H2Connection or a zero-arg callable returning one. The callable form
+    lets a dropped connection be replaced transparently and the pair re-sent: a long extraction routinely
+    outlives a single HTTP/2 connection (the server retires it with GOAWAY after its per-connection request
+    cap), and a coalesced boolean-read pair is idempotent, so re-sending it on a fresh connection is safe.
+    A raw connection (used by calibration and the self-test) is not retried - it simply raises."""
+    attempt = 0
+    while True:
+        conn = connSource() if callable(connSource) else connSource
+        try:
+            order, _results = conn.exchange_pair([reqA, reqB], timeout)
+            return order[0], conn.next_sid - 4, conn.next_sid - 2
+        except (socket.error, ssl.SSLError, IOError):
+            conn.close()                                # retire; a callable source reopens on the next pass
+            attempt += 1
+            if not callable(connSource) or attempt > retries:
+                raise
 
 
-def readBit(conn, reqCond, reqNeg, votes=5, timeout=30):
+def readBit(connSource, reqCond, reqNeg, votes=5, timeout=30):
     """Read one boolean by the cond-last FRACTION over symmetric pairs, ESCALATING when the fraction is
-    ambiguous (load-degraded).
+    ambiguous (load-degraded). `connSource` is a live connection or a factory (see _pairOrder) so a
+    connection dropped mid-vote (e.g. server GOAWAY) is replaced and that pair re-sent transparently.
 
     reqCond does the heavy work iff the guessed condition is TRUE; reqNeg does the SAME heavy work iff the
     condition is FALSE (it carries the negated condition). Exactly one runs heavy, so whichever finishes
@@ -83,10 +99,10 @@ def readBit(conn, reqCond, reqNeg, votes=5, timeout=30):
     cap = votes * 5                     # escalation ceiling for ambiguous (load-degraded) bits
     while True:
         if i % 2 == 0:
-            first, loSid, _hiSid = _pairOrder(conn, reqCond, reqNeg, timeout)
+            first, loSid, _hiSid = _pairOrder(connSource, reqCond, reqNeg, timeout)
             condSid = loSid
         else:
-            first, _loSid, hiSid = _pairOrder(conn, reqNeg, reqCond, timeout)
+            first, _loSid, hiSid = _pairOrder(connSource, reqNeg, reqCond, timeout)
             condSid = hiSid
         if first != condSid:            # reqCond finished last -> it ran heavy -> vote says TRUE
             condLast += 1
@@ -159,6 +175,16 @@ class TimelessOracle(object):
     def _conn(self):
         conn = getattr(self._local, "conn", None)
         if conn is None or not conn.usable:
+            if conn is not None:                        # retire the dead one so reconnects don't leak sockets
+                try:
+                    conn.close()
+                except Exception:
+                    pass
+                with self._lock:
+                    try:
+                        self._conns.remove(conn)
+                    except ValueError:
+                        pass
             conn = self._local.conn = connect(self.host, self.port, self.proxy, self.timeout)
             with self._lock:
                 self._conns.append(conn)
@@ -172,9 +198,11 @@ class TimelessOracle(object):
         be used for a heavy-base condition (the trivial-base reference is not comparable). Specs are the
         (url, method, headers, post) tuples from getPage(buildOnly=True)."""
         reqCond = _specToReq(condSpec, self.host)
+        # Pass the bound _conn factory (not a resolved connection) so a pair whose connection is retired
+        # mid-read (server GOAWAY on a long dump) is transparently re-sent on a fresh one.
         if negSpec is not None:
-            return readBit(self._conn(), reqCond, _specToReq(negSpec, self.host), votes=self.votes, timeout=self.timeout)
-        return readBitAsymmetric(self._conn(), reqCond, self.refReq, self.asymVotes, self.timeout)
+            return readBit(self._conn, reqCond, _specToReq(negSpec, self.host), votes=self.votes, timeout=self.timeout)
+        return readBitAsymmetric(self._conn, reqCond, self.refReq, self.asymVotes, self.timeout)
 
     def close(self):
         with self._lock:
@@ -655,7 +683,7 @@ def readBitLive(conn, condition, vector=None, votes=1, timeout=30):
     return readBit(conn, reqCond, reqNeg, votes=votes, timeout=timeout)
 
 
-def readBitAsymmetric(conn, reqCond, reqRef, votes=12, timeout=30):
+def readBitAsymmetric(connSource, reqCond, reqRef, votes=12, timeout=30):
     """Read one boolean WITHOUT the negated comparison - only the condition request and a FIXED always-heavy
     reference. When the condition is TRUE, reqCond runs the SAME heavy work as reqRef, so they race ~50/50
     and reqCond finishes last about HALF the votes; when FALSE - or when the comparison is NULL / the DBMS
@@ -668,10 +696,10 @@ def readBitAsymmetric(conn, reqCond, reqRef, votes=12, timeout=30):
     condLast = 0
     for i in range(votes):
         if i % 2 == 0:
-            order, _ = conn.exchange_pair([reqCond, reqRef], timeout); condSid = conn.next_sid - 4
+            first, condSid, _hiSid = _pairOrder(connSource, reqCond, reqRef, timeout)
         else:
-            order, _ = conn.exchange_pair([reqRef, reqCond], timeout); condSid = conn.next_sid - 2
-        if order[0] != condSid:            # cond finished last -> it ran the heavy branch this vote
+            first, _loSid, condSid = _pairOrder(connSource, reqRef, reqCond, timeout)
+        if first != condSid:               # cond finished last -> it ran the heavy branch this vote
             condLast += 1
     return condLast * 4 >= votes           # >= 25% cond-last -> TRUE (mid-way between ~50% and ~0%)
 
