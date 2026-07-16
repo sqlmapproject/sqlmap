@@ -449,20 +449,28 @@ class TestEsperanto(unittest.TestCase):
         self.assertTrue(any("stopped early" in n for n in esp.dialect.notes))
 
     def test_left_right_rung(self):
-        # SUBSTR/SUBSTRING/MID blocked but LEFT+RIGHT present -> RIGHT(LEFT(x,p),1)
+        # SUBSTR/SUBSTRING/MID blocked but LEFT+RIGHT present -> RIGHT(LEFT(x,p),1).
+        # LEFT/RIGHT are reserved JOIN keywords in SQLite; some builds reject LEFT(/RIGHT(
+        # as function calls (syntax error, keyword) rather than invoking a same-named UDF,
+        # so register the shims under non-keyword names and translate the engine's LEFT(/
+        # RIGHT( onto them (the same rewrite the disguised-dialect oracles use). Keeps the
+        # test portable across SQLite builds while still exercising the real left_right rung.
         con = sqlite3.connect(":memory:")
         con.execute("CREATE TABLE t7 (v TEXT)")
         con.execute("INSERT INTO t7 VALUES ('Zagreb-42')")
         con.commit()
-        con.create_function("LEFT", 2, lambda s, n: (s or "")[:max(n, 0)])
-        con.create_function("RIGHT", 2, lambda s, n: (s or "")[len(s or "") - n:] if n > 0 else "")
+        con.create_function("esp_left", 2, lambda s, n: (s or "")[:max(n, 0)])
+        con.create_function("esp_right", 2, lambda s, n: (s or "")[len(s or "") - n:] if n > 0 else "")
         blk = re.compile(r"(?i)\b(SUBSTR|SUBSTRING|SUBSTRC|MID)\s*\(")
+        rwLeft = re.compile(r"(?i)\bLEFT\s*\(")
+        rwRight = re.compile(r"(?i)\bRIGHT\s*\(")
 
         def ask(cond):
             if blk.search(cond):
                 return False
+            sql = rwRight.sub("esp_right(", rwLeft.sub("esp_left(", cond))
             try:
-                return con.execute("SELECT CASE WHEN (%s) THEN 1 ELSE 0 END" % cond).fetchone()[0] == 1
+                return con.execute("SELECT CASE WHEN (%s) THEN 1 ELSE 0 END" % sql).fetchone()[0] == 1
             except sqlite3.DatabaseError:
                 return False
         esp = Esperanto(ask)
