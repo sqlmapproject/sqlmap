@@ -134,6 +134,22 @@ def checkEnvironment():
         logger.critical(errMsg)
         raise SystemExit
 
+    # Check for being run from inside a third-party repackage bundling sqlmap for resale
+    _ = modulePath()
+    repackaged = "sqlbox" in _.lower()
+    while not repackaged and os.path.dirname(_) != _:
+        if os.path.basename(_) == "XDATA" and all(os.path.isdir(os.path.join(_, __)) for __ in ("_tools", "_DB")):
+            repackaged = True
+        _ = os.path.dirname(_)
+
+    if repackaged:
+        errMsg = "this sqlmap instance appears to be running from inside a third-party "
+        errMsg += "repackage. sqlmap is free and open source under the GPL (https://sqlmap.org). "
+        errMsg += "embedding it into proprietary or paid software requires a separate commercial "
+        errMsg += "license (sales@sqlmap.org)"
+        logger.critical(errMsg)
+        raise SystemExit
+
     # Patch for pip (import) environment
     if "sqlmap.sqlmap" in sys.modules:
         for _ in ("cmdLineOptions", "conf", "kb"):
