@@ -633,9 +633,10 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
                     fallback = not expected and kb.injection.data[PAYLOAD.TECHNIQUE.UNION].where == PAYLOAD.WHERE.ORIGINAL and not kb.forcePartialUnion
 
                     if expected == EXPECTED.BOOL:
-                        # Note: some DBMSes (e.g. Altibase) don't support implicit conversion of boolean check result during concatenation with prefix and suffix (e.g. 'qjjvq'||(1=1)||'qbbbq')
+                        # Note: some DBMSes (e.g. Altibase, SQL Server) don't support implicit conversion of boolean check result during concatenation with prefix and suffix (e.g. 'qjjvq'||(1=1)||'qbbbq')
 
-                        if not any(_ in forgeCaseExpression for _ in ("SELECT", "CASE")):
+                        # skip only when already CASE-wrapped or a bare scalar SELECT value (cf. the startswith check above); a boolean predicate that merely EMBEDS a subquery (e.g. '(SELECT ...) IS NULL', common when the DBMS is unidentified and forgeCaseStatement() is a no-op) still needs wrapping for concatenation safety
+                        if "CASE" not in forgeCaseExpression and not forgeCaseExpression.startswith("SELECT "):
                             forgeCaseExpression = "(CASE WHEN (%s) THEN '1' ELSE '0' END)" % forgeCaseExpression
 
                     try:

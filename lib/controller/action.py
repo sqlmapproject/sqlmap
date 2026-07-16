@@ -77,7 +77,7 @@ def action():
                     kb.tamperFunctions = (kb.tamperFunctions or []) + [function]
             logger.info("using tamper scripts 'blindbinary' and 'infoschema2innodb' so data retrieval and table enumeration can pass the WAF/IPS")
 
-    if not Backend.getDbms() or not conf.dbmsHandler:
+    if (not Backend.getDbms() and not conf.esperanto) or not conf.dbmsHandler:
         htmlParsed = Format.getErrorParsedDBMSes()
 
         errMsg = "sqlmap was not able to fingerprint the "

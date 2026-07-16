@@ -76,10 +76,16 @@ def _serializeEncode(value):
     # string that would round-trip as 'unicode') keeps the exact byte type across versions
     if isinstance(value, (six.binary_type, bytearray)):
         raw = bytes(value) if isinstance(value, bytearray) else value
-        return {_SERIALIZE_TAG: "b", "v": encodeBase64(raw, binary=False), "a": 1 if isinstance(value, bytearray) else 0}
+        retVal = {_SERIALIZE_TAG: "b", "v": encodeBase64(raw, binary=False), "a": 1 if isinstance(value, bytearray) else 0}
+        if six.PY3:             # mark genuine Python 3 bytes so restore keeps them bytes; a
+            retVal["pv"] = 3    # Python 2 'str' (text) is unmarked and recovered as text (see decode)
+        return retVal
 
     if isinstance(value, memoryview):
-        return {_SERIALIZE_TAG: "b", "v": encodeBase64(value.tobytes(), binary=False), "a": 0}
+        retVal = {_SERIALIZE_TAG: "b", "v": encodeBase64(value.tobytes(), binary=False), "a": 0}
+        if six.PY3:
+            retVal["pv"] = 3
+        return retVal
 
     try:
         if isinstance(value, buffer):  # noqa: F821  # Python 2 only
@@ -171,7 +177,19 @@ def _serializeDecode(struct):
 
         if tag == "b":
             raw = decodeBase64(struct["v"], binary=True)
-            return bytearray(raw) if struct.get("a") else raw
+            if struct.get("a"):
+                return bytearray(raw)
+            # Genuine Python 3 bytes (pv==3) are kept as-is. A value WITHOUT the marker was
+            # written by Python 2, whose text-'str' goes through this bytes branch; on Python 3
+            # that would surface as 'bytes' and break str consumers - most visibly kb.chars,
+            # whose str-key lookups then return None and crash cleanupPayload(). Recover such
+            # cross-version TEXT by decoding valid UTF-8 to 'str'; real binary stays bytes.
+            if struct.get("pv") == 3:
+                return raw
+            try:
+                return raw.decode("utf-8")
+            except UnicodeDecodeError:
+                return raw
         elif tag == "t":
             return tuple(_serializeDecode(_) for _ in struct["v"])
         elif tag == "f":

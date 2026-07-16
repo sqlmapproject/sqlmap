@@ -355,6 +355,9 @@ def cmdLineParser(argv=None):
         injection.add_argument("--dbms-cred", dest="dbmsCred",
             help="DBMS authentication credentials (user:password)")
 
+        injection.add_argument("--esperanto", dest="esperanto", action="store_true",
+            help="Use the DBMS-agnostic enumeration engine")
+
         injection.add_argument("--os", dest="os",
             help="Force back-end DBMS operating system to provided value")
 

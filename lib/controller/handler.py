@@ -10,6 +10,7 @@ from lib.core.common import getSafeExString
 from lib.core.common import singleTimeWarnMessage
 from lib.core.data import conf
 from lib.core.data import kb
+from lib.core.data import logger
 from lib.core.dicts import DBMS_DICT
 from lib.core.enums import DBMS
 from lib.core.dicts import DBWIRE_MODULES
@@ -85,6 +86,15 @@ def setHandler():
     Detect which is the target web application back-end database
     management system.
     """
+
+    if conf.esperanto:
+        # force the DBMS-agnostic engine: skip per-DBMS fingerprinting entirely and
+        # let the boolean-oracle 'esperanto' handler drive enumeration.
+        from extra.esperanto import buildHandler
+        conf.dbmsHandler = buildHandler()
+        conf.dbmsHandler._dbms = "Esperanto"
+        logger.info("using the DBMS-agnostic 'Esperanto' engine (fingerprinting skipped)")
+        return
 
     items = [
         (DBMS.MYSQL, MYSQL_ALIASES, MySQLMap, "plugins.dbms.mysql.connector"),
