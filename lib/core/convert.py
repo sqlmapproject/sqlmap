@@ -184,7 +184,7 @@ def _serializeDecode(struct):
             # that would surface as 'bytes' and break str consumers - most visibly kb.chars,
             # whose str-key lookups then return None and crash cleanupPayload(). Recover such
             # cross-version TEXT by decoding valid UTF-8 to 'str'; real binary stays bytes.
-            if struct.get("pv") == 3:
+            if struct.get("pv") == 3 or not six.PY3:
                 return raw
             try:
                 return raw.decode("utf-8")

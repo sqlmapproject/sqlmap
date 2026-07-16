@@ -24,6 +24,7 @@ bootstrap()
 
 from lib.core.common import (getFilteredPageContent, getPageWordSet,
                              extractTextTagContent, parseSqliteTableSchema)
+from lib.core.data import conf
 from lib.core.data import kb
 
 
@@ -60,8 +61,14 @@ class TestExtractTextTagContent(unittest.TestCase):
 
 class TestParseSqliteTableSchema(unittest.TestCase):
     def setUp(self):
+        # parseSqliteTableSchema keys cachedColumns by conf.db/conf.tbl - reset them (not just
+        # cachedColumns) so a leaked db/tbl from a prior test can't shift the storage key and
+        # break this test's [None][None] lookup (order-dependent flake under PyPy discovery)
         self.addCleanup(setattr, kb.data, "cachedColumns", kb.data.get("cachedColumns"))
+        self.addCleanup(setattr, conf, "db", conf.get("db"))
+        self.addCleanup(setattr, conf, "tbl", conf.get("tbl"))
         kb.data.cachedColumns = {}
+        conf.db = conf.tbl = None
 
     def _cols(self):
         # parseSqliteTableSchema stores under cachedColumns[db][table] (both None here)
