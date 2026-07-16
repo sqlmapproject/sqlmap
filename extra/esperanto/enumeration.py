@@ -5,8 +5,18 @@ Copyright (c) 2006-2026 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
-from .atlas import *
-from .records import *
+from .atlas import _BULK_AGG
+from .atlas import _COLUMN_SPECS
+from .atlas import _HEX_PAYLOAD_CODES
+from .atlas import _IDENT_QUOTE
+from .atlas import _KEY_SPECS
+from .atlas import _REPL
+from .atlas import _ROWID
+from .atlas import _ROWID_LITBOUND
+from .records import BulkResult
+from .records import Cap
+from .records import InferenceStrategy
+from .records import OracleUndecided
 from .wordlist import commonColumns
 from .wordlist import commonTables
 

@@ -7,8 +7,8 @@ See the file 'LICENSE' for copying permission
 
 from contextlib import contextmanager
 
-from .atlas import *
-from .records import *
+from .records import OracleUndecided
+from .records import QueryBudgetExceeded
 
 
 class _OracleCore(object):

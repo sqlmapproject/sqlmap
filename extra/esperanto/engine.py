@@ -5,8 +5,11 @@ Copyright (c) 2006-2026 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
-from .atlas import *
-from .records import *
+from .atlas import _FREQ_ORDER
+from .atlas import _PRINTABLE_SORTED
+from .atlas import _REPL
+from .atlas import _unichr
+from .records import Dialect
 from .oracle import _OracleCore
 from .discovery import _Discovery
 from .extraction import _Extraction

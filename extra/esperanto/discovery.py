@@ -5,8 +5,25 @@ Copyright (c) 2006-2026 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
-from .atlas import *
-from .records import *
+from .atlas import _BANNER_KEYWORDS
+from .atlas import _BANNERS
+from .atlas import _BINWRAP
+from .atlas import _BYTELEN
+from .atlas import _CATALOGS
+from .atlas import _CHARCODE
+from .atlas import _CHARFROM
+from .atlas import _COALESCE
+from .atlas import _CONCAT
+from .atlas import _DUAL
+from .atlas import _DUAL_IMPLIES
+from .atlas import _HEXFN
+from .atlas import _IDENTITY
+from .atlas import _LENGTH
+from .atlas import _PREFIX
+from .atlas import _SUBSTRING
+from .atlas import _TEXTCAST
+from .records import Cap
+from .records import OracleUndecided
 
 
 class _Discovery(object):

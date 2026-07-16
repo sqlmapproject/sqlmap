@@ -5,9 +5,6 @@ Copyright (c) 2006-2026 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
-from .atlas import *
-
-
 class OracleUndecided(RuntimeError):
     """The oracle gave no reliable True/False after retries/voting - a transport or
     observation failure, NOT a definitive answer. Raised so blind extraction fails

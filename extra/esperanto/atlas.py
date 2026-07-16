@@ -418,12 +418,18 @@ try:
 except NameError:
     _unichr = chr                       # py3
 
+# py2/py3 shim: the py2 unicode text type (str on py3)
+try:
+    _unicode = unicode                  # py2
+except NameError:
+    _unicode = str                      # py3
+
 
 def _native(s):
     # embed a literal as the native str type: on py2 a unicode value is encoded to
     # utf-8 bytes so the byte-string SQL templates ('{expr}'.format(...)) don't force
     # an ascii encode of non-ASCII data; on py3 str is already unicode-clean.
-    if str is bytes and isinstance(s, unicode):     # py2 only (unicode unresolved on py3)
+    if str is bytes and isinstance(s, _unicode):    # py2 only
         return s.encode("utf-8")
     return s
 

@@ -5,8 +5,23 @@ Copyright (c) 2006-2026 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
-from .atlas import *
-from .records import *
+import binascii
+
+from .atlas import _FREQ_ORDER
+from .atlas import _HEX_Q_ENCODINGS
+from .atlas import _HEXDIGITS
+from .atlas import _HEXFN
+from .atlas import _isSingleUnicodeScalar
+from .atlas import _MAX_HEX_CHAR_NIBBLES
+from .atlas import _native
+from .atlas import _PRINTABLE_SORTED
+from .atlas import _REPL
+from .atlas import _SIMILAR_META
+from .atlas import _UNICODE_MAX
+from .atlas import _unhexlify
+from .atlas import _unichr
+from .records import Cap
+from .records import ExtractResult
 
 
 class _Extraction(object):

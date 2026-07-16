@@ -111,6 +111,12 @@ jobs:
         # 'binary' instead of 'text'. Keeping this step byte-compile-free leaves --smoke clean.
         run: python -B -m unittest discover -s tests -p "test_*.py"
 
+      - name: Esperanto self-test
+        # offline, deterministic engine check against an in-memory SQLite boolean oracle: all
+        # compare modes + identify + bytes/text + noisy-oracle quorum + integrity + strategy
+        # handoff (a failed assertion exits non-zero)
+        run: python extra/esperanto/run.py --self-test
+
       - name: Coverage
         if: matrix.python-version != 'pypy-2.7'
         run: |
