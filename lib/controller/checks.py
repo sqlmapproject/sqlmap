@@ -166,9 +166,11 @@ def checkSqlInjection(place, parameter, value):
                     # keyword-free fallback: heuristicCheckDbms() above uses SELECT/quote payloads
                     # and is skipped when the WAF/IPS is dropping requests; the operator-dialect
                     # probes carry no SELECT/quote/schema name, so they can still narrow the DBMS in
-                    # that case (or when it was inconclusive), using the now-calibrated boolean oracle
-                    if not Backend.getIdentifiedDbms() and kb.heuristicDbms is None:
-                        kb.heuristicDbms = dialectCheckDbms(injection)
+                    # that case (or when it was inconclusive), using the now-calibrated boolean oracle.
+                    # It feeds the lower-confidence heuristicExtendedDbms (UNION FROM / handler hint),
+                    # deliberately NOT heuristicDbms, so it never drives reduceTests (skipping payloads)
+                    if not Backend.getIdentifiedDbms() and kb.heuristicDbms is None and kb.heuristicExtendedDbms is None:
+                        kb.heuristicExtendedDbms = dialectCheckDbms(injection)
 
                 # If the DBMS has already been fingerprinted (via DBMS-specific
                 # error message, simple heuristic check or via DBMS-specific
@@ -730,7 +732,8 @@ def checkSqlInjection(place, parameter, value):
                             if len(kb.dbmsFilter or []) == 1:
                                 Backend.forceDbms(kb.dbmsFilter[0])
                             elif not Backend.getIdentifiedDbms():
-                                if kb.heuristicDbms is None:
+                                heuristicDbms = kb.heuristicDbms or kb.heuristicExtendedDbms
+                                if heuristicDbms is None:
                                     if kb.heuristicTest == HEURISTIC_TEST.POSITIVE or injection.data:
                                         warnMsg = "using unescaped version of the test "
                                         warnMsg += "because of zero knowledge of the "
@@ -738,7 +741,7 @@ def checkSqlInjection(place, parameter, value):
                                         warnMsg += "explicitly set it with option '--dbms'"
                                         singleTimeWarnMessage(warnMsg)
                                 else:
-                                    Backend.forceDbms(kb.heuristicDbms)
+                                    Backend.forceDbms(heuristicDbms)
 
                             if unionExtended:
                                 infoMsg = "automatically extending ranges for UNION "

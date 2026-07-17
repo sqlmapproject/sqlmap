@@ -294,13 +294,15 @@ HEURISTIC_NULL_EVAL = {
     DBMS.ACCESS: "CVAR(NULL)",
     DBMS.MAXDB: "ALPHA(NULL)",
     DBMS.MSSQL: "PARSENAME(NULL,NULL)",
+    DBMS.SYBASE: "STR_REPLACE(NULL,'x','x')",  # ASE extension (MSSQL has REPLACE); doc-derived, not live-tested. Also SAP IQ / SQL Anywhere (not in DBMS)
     DBMS.MYSQL: "IFNULL(QUARTER(NULL),NULL XOR NULL)",  # NOTE: previous form (i.e., QUARTER(NULL XOR NULL)) was bad as some optimization engines wrongly evaluate QUARTER(NULL XOR NULL) to 0
     DBMS.ORACLE: "INSTR2(NULL,NULL)",
     DBMS.PGSQL: "QUOTE_IDENT(NULL)",
     DBMS.SQLITE: "JULIANDAY(NULL)",
     DBMS.H2: "STRINGTOUTF8(NULL)",
     DBMS.MONETDB: "CODE(NULL)",
-    DBMS.DERBY: "NULLIF(USER,SESSION_USER)",
+    DBMS.DERBY: "NULLIF(USER,SESSION_USER)",  # not Derby-specific; safe only because DB2 (shares this dummy) is tested first
+    DBMS.DB2: "MULTIPLY_ALT(NULL,NULL)",  # DB2-unique (Derby shares the dummy, not this function)
     DBMS.VERTICA: "BITSTRING_TO_BINARY(NULL)",
     DBMS.MCKOI: "TONUMBER(NULL)",
     DBMS.PRESTO: "FROM_HEX(NULL)",
@@ -314,7 +316,7 @@ HEURISTIC_NULL_EVAL = {
     DBMS.VIRTUOSO: "__MAX_NOTNULL(NULL)",
     DBMS.CLICKHOUSE: "halfMD5(NULL)",
     DBMS.SNOWFLAKE: "BOOLNOT(NULL)",
-    DBMS.SPANNER: "FARM_FINGERPRINT(NULL)",
+    DBMS.SPANNER: "FARM_FINGERPRINT(NULL)",  # also BigQuery GoogleSQL (not in DBMS)
     DBMS.HANA: "MAP(NULL,NULL,NULL,NULL,NULL)",
 }
 
