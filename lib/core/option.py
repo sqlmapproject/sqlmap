@@ -2295,6 +2295,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.permissionFlag = False
     kb.place = None
     kb.postHint = None
+    kb.grpcWeb = None
     kb.postSpaceToPlus = False
     kb.postUrlEncode = True
     kb.prependFlag = False

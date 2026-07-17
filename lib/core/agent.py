@@ -133,7 +133,7 @@ class Agent(object):
             origValue = origValue.split(kb.customInjectionMark)[0]
             if kb.postHint in (POST_HINT.SOAP, POST_HINT.XML):
                 origValue = re.split(r"['\">]", origValue)[-1]
-            elif kb.postHint in (POST_HINT.JSON, POST_HINT.JSON_LIKE):
+            elif kb.postHint in (POST_HINT.JSON, POST_HINT.JSON_LIKE, POST_HINT.GRPC_WEB):
                 match = re.search(r"['\"]", origValue)
                 quote = match.group(0) if match else '"'
                 origValue = extractRegexResult(r"%s\s*:\s*(?P<result>\d+)\Z" % quote, origValue) or extractRegexResult(r"(?P<result>[^%s]*)\Z" % quote, origValue)
@@ -206,7 +206,7 @@ class Agent(object):
         if place in (PLACE.URI, PLACE.CUSTOM_POST, PLACE.CUSTOM_HEADER):
             _ = "%s%s" % (_origValue if base64Encoding else origValue, kb.customInjectionMark)
 
-            if kb.postHint == POST_HINT.JSON and isNumber(origValue) and not isNumber(newValue) and '"%s"' % _ not in paramString:
+            if kb.postHint in (POST_HINT.JSON, POST_HINT.GRPC_WEB) and isNumber(origValue) and not isNumber(newValue) and '"%s"' % _ not in paramString:
                 newValue = '"%s"' % self.addPayloadDelimiters(newValue)
             elif kb.postHint == POST_HINT.JSON_LIKE and isNumber(origValue) and not isNumber(newValue) and re.search(r"['\"]%s['\"]" % re.escape(_), paramString) is None:
                 newValue = "'%s'" % self.addPayloadDelimiters(newValue)

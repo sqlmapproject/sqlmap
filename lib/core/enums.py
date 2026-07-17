@@ -146,6 +146,7 @@ class POST_HINT(object):
     MULTIPART = "MULTIPART"
     XML = "XML (generic)"
     ARRAY_LIKE = "Array-like"
+    GRPC_WEB = "gRPC-Web"
 
 class HTTPMETHOD(object):
     GET = "GET"

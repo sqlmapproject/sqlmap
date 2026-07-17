@@ -134,6 +134,8 @@ from lib.request.basic import processResponse
 from lib.request.comparison import comparison
 from lib.request.direct import direct
 from lib.request.methodrequest import MethodRequest
+from lib.utils.grpcweb import decodeResponse as grpcDecodeResponse
+from lib.utils.grpcweb import encodeBody as grpcEncodeBody
 from lib.utils.safe2bin import safecharencode
 from lib.utils.sqllint import checkSanity
 from thirdparty import six
@@ -569,6 +571,10 @@ class Connect(object):
 
                 logger.log(CUSTOM_LOGGING.TRAFFIC_OUT, requestMsg)
             else:
+                # re-encode a gRPC-Web body from its injected JSON view, fixing length prefixes
+                if kb.postHint == POST_HINT.GRPC_WEB and post is not None:
+                    post = grpcEncodeBody(post)
+
                 post = getBytes(post)
 
                 # Reference: https://github.com/sqlmapproject/sqlmap/issues/6049
@@ -996,6 +1002,12 @@ class Connect(object):
                     singleTimeLogMessage(errMsg, logging.CRITICAL)
                     raise SystemExit
 
+            # decode a gRPC-Web response to readable text so the oracle/error/inband paths see the
+            # message fields + trailer (grpc-message) instead of an opaque base64 blob. Headers are
+            # passed so a trailers-only error (empty body, grpc-status/message in headers) is still surfaced
+            if kb.postHint == POST_HINT.GRPC_WEB:
+                page = grpcDecodeResponse(page, responseHeaders)
+
             threadData.lastPage = page
             threadData.lastCode = code
 
@@ -1149,7 +1161,7 @@ class Connect(object):
                     payload = payload.replace("&#", SAFE_HEX_MARKER)
                     payload = payload.replace('&', "&amp;").replace('>', "&gt;").replace('<', "&lt;").replace('"', "&quot;").replace("'", "&apos;")  # Reference: https://stackoverflow.com/a/1091953
                     payload = payload.replace(SAFE_HEX_MARKER, "&#")
-                elif kb.postHint == POST_HINT.JSON:
+                elif kb.postHint in (POST_HINT.JSON, POST_HINT.GRPC_WEB):
                     payload = escapeJsonValue(payload)
                 elif kb.postHint == POST_HINT.JSON_LIKE:
                     payload = payload.replace("'", REPLACEMENT_MARKER).replace('"', "'").replace(REPLACEMENT_MARKER, '"')
@@ -1391,7 +1403,7 @@ class Connect(object):
                         value = urldecode(value, convall=True, spaceplus=(item == post and kb.postSpaceToPlus))
                         variables[name] = value
 
-            if post and kb.postHint in (POST_HINT.JSON, POST_HINT.JSON_LIKE):
+            if post and kb.postHint in (POST_HINT.JSON, POST_HINT.JSON_LIKE, POST_HINT.GRPC_WEB):
                 json_ = parseJson(post)
                 for name, value in (json_ if isinstance(json_, dict) else {}).items():
                     if safeVariableNaming(name) != name:
@@ -1485,7 +1497,7 @@ class Connect(object):
                                     found = True
                                     post = re.sub(r"(?s)(\b%s>)(.*?)(</[^<]*\b%s>)" % (re.escape(name), re.escape(name)), r"\g<1>%s\g<3>" % entry.replace('\\', r'\\'), post)
 
-                            elif kb.postHint in (POST_HINT.JSON, POST_HINT.JSON_LIKE):
+                            elif kb.postHint in (POST_HINT.JSON, POST_HINT.JSON_LIKE, POST_HINT.GRPC_WEB):
                                 match = re.search(r"['\"]%s['\"]:" % re.escape(name), post)
                                 if match:
                                     quote = match.group(0)[0]
@@ -1521,7 +1533,7 @@ class Connect(object):
 
                         if not found:
                             if post is not None:
-                                if kb.postHint in (POST_HINT.JSON, POST_HINT.JSON_LIKE):
+                                if kb.postHint in (POST_HINT.JSON, POST_HINT.JSON_LIKE, POST_HINT.GRPC_WEB):
                                     match = re.search(r"['\"]", post)
                                     if match:
                                         quote = match.group(0)

@@ -77,6 +77,8 @@ from lib.core.settings import URI_INJECTABLE_REGEX
 from lib.core.settings import USER_AGENT_ALIASES
 from lib.core.settings import XML_RECOGNITION_REGEX
 from lib.core.threads import getCurrentThreadData
+from lib.utils.grpcweb import CONTENT_TYPE as grpcWebContentType
+from lib.utils.grpcweb import decodeBody as grpcDecodeBody
 from lib.utils.hashdb import HashDB
 from thirdparty import six
 from collections import OrderedDict
@@ -112,6 +114,16 @@ def _setRequestParams():
     if conf.data is not None:
         conf.method = conf.method or HTTPMETHOD.POST
 
+        # probe (side-effect-free) whether this is a gRPC-Web body; if so, expose its string fields as a
+        # JSON view so the standard JSON injection path can process it. The skeleton is committed to
+        # kb.grpcWeb (and the JSON view kept) ONLY on user acceptance below; if declined, the original
+        # body is restored so it is sent verbatim (never the JSON surrogate)
+        kb.grpcWeb = None
+        _grpcOriginalData = conf.data
+        _grpcView, _grpcSkeleton = grpcDecodeBody(conf.data)
+        if _grpcView is not None:
+            conf.data = _grpcView
+
         def process(match, repl):
             retVal = match.group(0)
 
@@ -145,14 +157,26 @@ def _setRequestParams():
                     kb.testOnlyCustom = True
 
         if re.search(JSON_RECOGNITION_REGEX, conf.data):
-            message = "JSON data found in %s body. " % conf.method
-            message += "Do you want to process it? [Y/n/q] "
+            if _grpcSkeleton:
+                message = "gRPC-Web text data found in %s body. Do you want to process its detected string fields? [Y/n/q] " % conf.method
+            else:
+                message = "JSON data found in %s body. Do you want to process it? [Y/n/q] " % conf.method
             choice = readInput(message, default='Y').upper()
 
             if choice == 'Q':
                 raise SqlmapUserQuitException
             elif choice == 'Y':
-                kb.postHint = POST_HINT.JSON
+                kb.postHint = POST_HINT.GRPC_WEB if _grpcSkeleton else POST_HINT.JSON
+                if _grpcSkeleton:
+                    kb.grpcWeb = _grpcSkeleton  # commit only on acceptance
+                    # force a grpc-web-text response (the only kind this cut decodes) by REPLACING any
+                    # existing Accept - a captured 'Accept: */*', or an explicit 'q=0' we cannot honor
+                    for _index, (_header, _value) in enumerate(conf.httpHeaders or []):
+                        if _header.lower() == HTTP_HEADER.ACCEPT.lower():
+                            conf.httpHeaders[_index] = (_header, grpcWebContentType)
+                            break
+                    else:
+                        conf.httpHeaders.append((HTTP_HEADER.ACCEPT, grpcWebContentType))
                 if not (kb.processUserMarks and kb.customInjectionMark in conf.data):
                     conf.data = getattr(conf.data, UNENCODED_ORIGINAL_VALUE, conf.data)
                     conf.data = conf.data.replace(kb.customInjectionMark, ASTERISK_MARKER)
@@ -244,6 +268,11 @@ def _setRequestParams():
                     conf.data = conf.data.replace(kb.customInjectionMark, ASTERISK_MARKER)
                     conf.data = re.sub(r"(?si)(Content-Disposition:[^\n]+\s+name=\"(?P<name>[^\"]+)\"(?:[^f|^b]|f(?!ilename=)|b(?!oundary=))*?)((%s)--)" % ("\r\n" if "\r\n" in conf.data else '\n'),
                                        functools.partial(process, repl=r"\g<1>%s\g<3>" % kb.customInjectionMark), conf.data)
+
+        # a gRPC-Web body that was NOT accepted as GRPC_WEB (declined prompt) must be sent verbatim,
+        # not as the JSON surrogate that was temporarily swapped into conf.data for detection
+        if _grpcSkeleton is not None and kb.postHint != POST_HINT.GRPC_WEB:
+            conf.data = _grpcOriginalData
 
         if not kb.postHint:
             if kb.customInjectionMark in conf.data:  # later processed
