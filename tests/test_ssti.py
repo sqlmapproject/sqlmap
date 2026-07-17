@@ -87,6 +87,20 @@ class TestArithmeticDetection(unittest.TestCase):
         ssti._send = mock
         self.assertTrue(ssti._probeArithmetic("GET", "q", engine))
 
+    def test_struts2_ognl_arithmetic_control_pair(self):
+        # Struts2 evaluates '%{expr}' (OGNL) and reflects it in the redisplayed field value
+        engine = [e for e in ssti._ENGINE_TABLE if e.name == "Struts2 (OGNL)"][0]
+
+        def mock(place, parameter, value):
+            import re
+            m = re.search(r"%\{(\d+)\*(\d+)\}", value)
+            if m:
+                return 'name="username" value="%d"' % (int(m.group(1)) * int(m.group(2)))
+            return 'name="username" value="%s"' % value
+
+        ssti._send = mock
+        self.assertTrue(ssti._probeArithmetic("GET", "q", engine))
+
     def test_arithmetic_requires_both_results_correct(self):
         engine = ssti._ENGINE_TABLE[0]
 
@@ -613,3 +627,42 @@ class TestFileBasedRce(unittest.TestCase):
         ssti._executeCommand("GET", "q", engine, "id")
         self.assertTrue(any("uid=0(root)" in _ for _ in self.captured),
                         msg="two-step file-based RCE did not surface command output: %r" % self.captured)
+
+
+class TestStruts2Header(unittest.TestCase):
+    """CVE-2017-5638 (S2-045): OGNL via the Content-Type header. The vector is not reflected, so
+    detection prints a marker to the response and RCE brackets stdout with markers to slice it out."""
+
+    def setUp(self):
+        self._s2045Send = ssti._s2045Send
+
+    def tearDown(self):
+        ssti._s2045Send = self._s2045Send
+
+    def test_struts2_wired_for_file_rce(self):
+        self.assertIn("Struts2 (OGNL)", ssti._FILE_RCE)   # modern-JDK file-based fallback wired
+
+    def test_s2045_detection_marker_echo(self):
+        import re
+        # a vulnerable Struts2 evaluates the OGNL and writes the printed marker into the response
+        def mock(url, action):
+            m = re.search(r"#w\.print\('([a-z0-9]+)'\)", action)
+            return "<html> %s </html>" % m.group(1) if m else "<html/>"
+        ssti._s2045Send = mock
+        self.assertIsNotNone(ssti._probeStruts2Header("http://target"))
+
+    def test_s2045_not_vulnerable(self):
+        ssti._s2045Send = lambda url, action: "<html>ordinary Struts page, no eval</html>"
+        self.assertIsNone(ssti._probeStruts2Header("http://target"))
+
+    def test_s2045_command_output_sliced_from_markers(self):
+        # the shell echoes start/end markers around stdout; the response also carries the action HTML
+        def mock(url, action):
+            m = re.search(r"echo ([a-z0-9]+); .* 2>&1; echo ([a-z0-9]+)", action)
+            if not m:
+                return "<html/>"
+            start, end = m.group(1), m.group(2)
+            return "<html>%s\nuid=0(root) gid=0(root)\n%s</html>" % (start, end)
+        import re
+        ssti._s2045Send = mock
+        self.assertEqual(ssti._executeStruts2Header("http://target", "id"), "uid=0(root) gid=0(root)")

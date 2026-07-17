@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.7.110"
+VERSION = "1.10.7.111"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -1121,6 +1121,7 @@ SSTI_ERROR_SIGNATURES = (
     ("Freemarker", r"freemarker\.(?:core|template|extract|cache)\.\w+|ParseException|InvalidReferenceException|TemplateException"),
     ("Velocity", r"org\.apache\.velocity\.(?:runtime|exception)\.\w+|ParseErrorException|MethodInvocationException|ResourceNotFoundException"),
     ("Spring EL / Thymeleaf", r"org\.springframework\.expression\.\w+|org\.thymeleaf\.\w+|SpelEvaluationException|TemplateProcessingException|ExpressionParsingException"),
+    ("Struts2 (OGNL)", r"ognl\.(?:OgnlException|NoSuchPropertyException|MethodFailedException|InappropriateExpressionException|ExpressionSyntaxException)|com\.opensymphony\.xwork2|org\.apache\.struts2|There is no Action mapped for|Struts (?:Problem Report|has detected an unhandled exception)"),
     ("ERB", r"\(erb\):\d+|NameError.*undefined local variable"),
     ("Pug/Jade", r"pug|jade|ParseError"),
     ("Handlebars", r"handlebars|Handlebars|Parse error on line"),

