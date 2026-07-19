@@ -2768,6 +2768,42 @@ shouji
 u_pass
 hashedPw
 
+# API keys, tokens and secrets
+
+api_key
+apikey
+api_token
+access_token
+refresh_token
+auth_token
+session_token
+remember_token
+secret_key
+client_secret
+encryption_key
+reset_token
+password_reset_token
+verification_token
+confirmation_token
+otp
+otp_secret
+totp_secret
+mfa_secret
+two_factor_secret
+
+# Framework and identity columns
+
+deleted_at
+uuid
+role
+is_admin
+is_active
+is_verified
+date_of_birth
+dob
+credit_card
+postal_code
+
 # password (international)
 
 adgangskode
