@@ -54,6 +54,8 @@ from lib.core.settings import HTML_DUMP_CSS_STYLE
 from lib.core.settings import IS_WIN
 from lib.core.settings import METADB_SUFFIX
 from lib.core.settings import MIN_BINARY_DISK_DUMP_SIZE
+from lib.core.settings import SQLITE_INT_MAX
+from lib.core.settings import SQLITE_INT_MIN
 from lib.core.settings import TRIM_STDOUT_DUMP_SIZE
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import UNSAFE_DUMP_FILEPATH_REPLACEMENT
@@ -558,7 +560,10 @@ class Dump(object):
                             if not value or value == " ":  # NULL
                                 continue
 
-                            int(value)
+                            # Note: keep INTEGER only for values SQLite's affinity leaves untouched; leading zeros ('007'), signs ('+1') or 64-bit overflow would be silently rewritten on insert
+                            parsed = int(value)
+                            if str(parsed) != value or not (SQLITE_INT_MIN <= parsed <= SQLITE_INT_MAX):
+                                raise ValueError
                         except ValueError:
                             colType = None
                             break
@@ -572,7 +577,9 @@ class Dump(object):
                                 if not value or value == " ":  # NULL
                                     continue
 
-                                float(value)
+                                # Note: likewise REAL must round-trip textually ('2.00' or '1e5' would lose their exact form)
+                                if repr(float(value)) != value:
+                                    raise ValueError
                             except ValueError:
                                 colType = None
                                 break

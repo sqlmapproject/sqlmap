@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.7.119"
+VERSION = "1.10.7.120"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -682,6 +682,10 @@ HASH_EMPTY_PASSWORD_MARKER = "<empty>"
 
 # Maximum integer value
 MAX_INT = sys.maxsize
+
+# Signed 64-bit range of SQLite's INTEGER storage class (used for safe --dump-format=SQLITE typing)
+SQLITE_INT_MIN = -0x8000000000000000
+SQLITE_INT_MAX = 0x7fffffffffffffff
 
 # Replacement for unsafe characters in dump table filenames
 UNSAFE_DUMP_FILEPATH_REPLACEMENT = '_'

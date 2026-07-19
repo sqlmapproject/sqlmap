@@ -358,6 +358,37 @@ class TestSqliteDump(_FileDumpCase):
         finally:
             conn.close()
 
+    def test_non_roundtrip_numbers_stay_text(self):
+        # Values that look numeric but would be silently rewritten by SQLite's INTEGER/REAL
+        # affinity (leading zeros, sign prefix, 64-bit overflow, trailing-zero/exponent floats)
+        # must be stored verbatim as TEXT, otherwise the export corrupts the dumped data
+        tv = _PlainOrderedDict([
+            ("__infos__", {"count": 1, "db": "testdb", "table": "t"}),
+            ("zip", {"length": 5, "values": ["007"]}),
+            ("phone", {"length": 10, "values": ["0917123456"]}),
+            ("signed", {"length": 2, "values": ["+1"]}),
+            ("huge", {"length": 30, "values": ["123456789012345678901234567890"]}),
+            ("money", {"length": 4, "values": ["2.00"]}),
+            ("real_int", {"length": 1, "values": ["5"]}),   # genuine ints still typed INTEGER
+        ])
+        conf.dumpFormat = DUMP_FORMAT.SQLITE
+        self.d.dbTableValues(tv)
+
+        import sqlite3
+        conn = sqlite3.connect(os.path.join(self.tmp, "testdb.sqlite3"))
+        try:
+            cur = conn.cursor()
+            cur.execute("SELECT zip, phone, signed, huge, money, real_int FROM t")
+            self.assertEqual(cur.fetchone(), ("007", "0917123456", "+1", "123456789012345678901234567890", "2.00", 5))
+            cur.execute("PRAGMA table_info(t)")
+            types = {name: ctype for (_cid, name, ctype, _nn, _dv, _pk) in cur.fetchall()}
+            self.assertEqual(types["zip"], "TEXT")
+            self.assertEqual(types["huge"], "TEXT")
+            self.assertEqual(types["money"], "TEXT")
+            self.assertEqual(types["real_int"], "INTEGER")
+        finally:
+            conn.close()
+
 
 # --- replication backend tests (pure sqlite3, no network/DBMS) -----------------------------------
 
