@@ -544,7 +544,13 @@ class Connect(object):
                                 break
                     else:
                         for i in xrange(max(1, kb.webSocketRecvCount)):
-                            _page.append(ws.recv())
+                            # Note: a later response may carry fewer frames than the calibration one
+                            # (e.g. a FALSE boolean-blind reply); stop on timeout instead of letting it
+                            # bubble up as a failed request, mirroring the initial recv loop above
+                            try:
+                                _page.append(ws.recv())
+                            except websocket.WebSocketTimeoutException:
+                                break
 
                     page = "\n".join(_page)
                 finally:
