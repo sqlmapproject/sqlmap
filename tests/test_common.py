@@ -86,6 +86,7 @@ from lib.core.common import (
     getTechnique,
     getText,
     intersect,
+    isDBMSVersionAtLeast,
     isListLike,
     isNoneValue,
     isNullValue,
@@ -981,6 +982,48 @@ class TestAliasToDbmsEnum(unittest.TestCase):
 
     def test_empty_returns_none(self):
         self.assertIsNone(aliasToDbmsEnum(""))
+
+
+class TestIsDBMSVersionAtLeast(unittest.TestCase):
+    """Version gating drives per-DBMS query selection; comparison must be component-wise."""
+
+    def setUp(self):
+        self._saved = kb.get("dbmsVersion")
+
+    def tearDown(self):
+        kb.dbmsVersion = self._saved
+
+    def _at_least(self, version, minimum):
+        kb.dbmsVersion = version
+        return isDBMSVersionAtLeast(minimum)
+
+    def test_single_major_thresholds(self):
+        self.assertTrue(self._at_least("5.4.3", "5"))
+        self.assertTrue(self._at_least("8.0.32", "8"))
+        self.assertFalse(self._at_least("5.7.44", "8"))
+
+    def test_multi_digit_minor_ordering(self):
+        # floats mis-sorted these (10.11->10.11 vs 10.5->10.5): component-wise fixes it
+        self.assertTrue(self._at_least("10.11", "10.5"))    # MariaDB
+        self.assertFalse(self._at_least("10.6", "10.11"))
+        self.assertTrue(self._at_least("5.10.0", "5.5"))
+        self.assertTrue(self._at_least("9.10", "9.6"))      # PostgreSQL
+
+    def test_presto_sequential_minor(self):
+        # Presto 0.NNN: release 99 is OLDER than release 178 (float made 0.99 > 0.178)
+        self.assertFalse(self._at_least("0.99", "0.178"))
+        self.assertTrue(self._at_least("0.180", "0.178"))
+
+    def test_range_and_prefix_semantics(self):
+        self.assertTrue(self._at_least("2", ">=2.0"))
+        self.assertFalse(self._at_least("2", ">2"))
+        self.assertFalse(self._at_least("<2", "2"))
+        self.assertTrue(self._at_least("<2", "1.5"))
+
+    def test_unknown_version_is_none(self):
+        from lib.core.settings import UNKNOWN_DBMS_VERSION
+        kb.dbmsVersion = UNKNOWN_DBMS_VERSION
+        self.assertIsNone(isDBMSVersionAtLeast("5"))
 
 
 class TestGetPageWordSet(unittest.TestCase):

@@ -190,7 +190,6 @@ from lib.core.settings import URI_QUESTION_MARKER
 from lib.core.settings import URLENCODE_CHAR_LIMIT
 from lib.core.settings import URLENCODE_FAILSAFE_CHARS
 from lib.core.settings import USER_AGENT_ALIASES
-from lib.core.settings import VERSION_COMPARISON_CORRECTION
 from lib.core.settings import VERSION_STRING
 from lib.core.settings import ZIP_HEADER
 from lib.core.settings import WEBSCARAB_SPLITTER
@@ -3500,42 +3499,40 @@ def isDBMSVersionAtLeast(minimum):
     if not any(isNoneValue(_) for _ in (Backend.getVersion(), minimum)) and Backend.getVersion() != UNKNOWN_DBMS_VERSION:
         version = Backend.getVersion().replace(" ", "").rstrip('.')
 
-        correction = 0.0
+        # Note: a fuzzy/ranged detected version (e.g. '>2', '<2') is captured as a sign so an
+        # otherwise-equal comparison still resolves in the right direction
+        vSign = 0
         if ">=" in version:
             pass
         elif '>' in version:
-            correction = VERSION_COMPARISON_CORRECTION
+            vSign = 1
         elif '<' in version:
-            correction = -VERSION_COMPARISON_CORRECTION
+            vSign = -1
 
         version = extractRegexResult(r"(?P<result>[0-9][0-9.]*)", version)
 
         if version:
-            if '.' in version:
-                parts = version.split('.', 1)
-                parts[1] = filterStringValue(parts[1], '[0-9]')
-                version = '.'.join(parts)
+            minimum = minimum if isinstance(minimum, six.string_types) else getUnicode(minimum)
 
-            try:
-                version = float(filterStringValue(version, '[0-9.]')) + correction
-            except ValueError:
-                return None
+            mSign = 0
+            if minimum.startswith(">="):
+                pass
+            elif minimum.startswith(">"):
+                mSign = 1
 
-            if isinstance(minimum, six.string_types):
-                if '.' in minimum:
-                    parts = minimum.split('.', 1)
-                    parts[1] = filterStringValue(parts[1], '[0-9]')
-                    minimum = '.'.join(parts)
+            minimum = extractRegexResult(r"(?P<result>[0-9][0-9.]*)", minimum)
 
-                correction = 0.0
-                if minimum.startswith(">="):
-                    pass
-                elif minimum.startswith(">"):
-                    correction = VERSION_COMPARISON_CORRECTION
+            if minimum:
+                # Note: compare dotted versions component-wise as int tuples, not as floats; a float
+                # collapses e.g. 5.4.3->5.43 and 5.10.0->5.100(==5.1), silently mis-ordering multi-part
+                # or multi-digit-minor versions (MariaDB 10.11, PostgreSQL 9.10, Presto 0.99 vs 0.178)
+                vParts = tuple(int(_) for _ in re.findall(r"\d+", version))
+                mParts = tuple(int(_) for _ in re.findall(r"\d+", minimum))
+                length = max(len(vParts), len(mParts))
+                vParts += (0,) * (length - len(vParts))
+                mParts += (0,) * (length - len(mParts))
 
-                minimum = float(filterStringValue(minimum, '[0-9.]')) + correction
-
-            retVal = version >= minimum
+                retVal = (vParts, vSign) >= (mParts, mSign)
 
     return retVal
 
