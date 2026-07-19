@@ -72,7 +72,10 @@ class SQLAlchemy(GenericConnector):
                         raise SqlmapFilePathException("the provided database file '%s' does not exist" % self.db)
 
                     _ = self.address.split("//", 1)
-                    self.address = "%s////%s" % (_[0], os.path.abspath(self.db))
+                    # Note: SQLAlchemy's absolute-SQLite form is 'sqlite:///' + abspath (the abspath's own
+                    # leading '/' completes the triple slash on POSIX). A 4th slash yields db '//path' (only
+                    # tolerated on Linux by accident) and, on Windows, '/C:\...' which fails to open.
+                    self.address = "%s///%s" % (_[0], os.path.abspath(self.db))
 
                 if self.dialect == "sqlite":
                     engine = _sqlalchemy.create_engine(self.address, connect_args={"check_same_thread": False})
