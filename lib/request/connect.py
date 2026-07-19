@@ -1366,11 +1366,14 @@ class Connect(object):
         if conf.rParam:
             def _randomizeParameter(paramString, randomParameter):
                 retVal = paramString
-                match = re.search(r"(\A|\b)%s=(?P<value>[^&;]*)" % re.escape(randomParameter), paramString)
+                # Note: anchor to a real parameter boundary (start, or the '&'/';' delimiter with any
+                # following space), like _adjustParameter, so randomizing 'id' does not match inside a
+                # longer name such as 'user-id'/'session-id'; the captured prefix is kept on replace
+                match = re.search(r"(?:\A|[&;]\s*)%s=(?P<value>[^&;]*)" % re.escape(randomParameter), paramString)
                 if match:
                     origValue = match.group("value")
                     newValue = randomizeParameterValue(origValue) if randomParameter not in kb.randomPool else random.sample(kb.randomPool[randomParameter], 1)[0]
-                    retVal = re.sub(r"(\A|\b)%s=[^&;]*" % re.escape(randomParameter), "%s=%s" % (randomParameter, newValue), paramString)
+                    retVal = re.sub(r"(\A|[&;]\s*)%s=[^&;]*" % re.escape(randomParameter), lambda m: "%s%s=%s" % (m.group(1), randomParameter, newValue), paramString)
                 else:
                     match = re.search(r"(\A|\b)(%s\b[^\w]+)(?P<value>\w+)" % re.escape(randomParameter), paramString)
                     if match:
