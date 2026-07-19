@@ -181,16 +181,22 @@ class Response(object):
     def toDict(self):
         content = {
             "mimeType": self.headers.get("Content-Type"),
-            "text": self.content,
             "size": len(self.content or "")
         }
 
-        binary = set([b'\0', b'\1', u'\0', u'\1', 0, 1])
-        if any(c in binary for c in self.content):
-            content["encoding"] = "base64"
-            content["text"] = getText(base64.b64encode(self.content))
+        # HAR text must be UTF-8: a body that does not decode (binary content such as an image, or
+        # text in another charset) is base64-encoded losslessly rather than mangled through a lossy
+        # text decode. The previous check only treated NUL/0x01 as binary, so e.g. a JPEG lacking
+        # those bytes was corrupted into the "text" field.
+        raw = self.content or b""
+        if not isinstance(raw, bytes):
+            content["text"] = getText(raw)
         else:
-            content["text"] = getText(content["text"])
+            try:
+                content["text"] = getText(raw.decode("utf-8"))
+            except UnicodeDecodeError:
+                content["encoding"] = "base64"
+                content["text"] = getText(base64.b64encode(raw))
 
         return {
             "httpVersion": self.httpVersion,

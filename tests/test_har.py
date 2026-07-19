@@ -160,6 +160,23 @@ class TestResponse(unittest.TestCase):
         d = resp.toDict()
         self.assertEqual(d["content"]["encoding"], "base64")
 
+    def test_toDict_binary_without_null_still_base64(self):
+        # regression: binary content lacking NUL/0x01 (e.g. a JPEG header) must still be
+        # base64-encoded, not mangled into the "text" field as a lossy decode
+        import base64 as _b64
+        jpeg = b"\xff\xd8\xff\xe0\x10JFIF\x02\x03"
+        d = H.Response("HTTP/1.1", 200, "OK", {"Content-Type": "image/jpeg"}, jpeg).toDict()
+        self.assertEqual(d["content"]["encoding"], "base64")
+        self.assertEqual(_b64.b64decode(d["content"]["text"]), jpeg)  # lossless
+
+    def test_toDict_utf8_multibyte_stays_text(self):
+        # valid UTF-8 (incl. multibyte) is human-readable text, not base64
+        original = b"caf\xc3\xa9 \xe4\xbd\xa0\xe5\xa5\xbd".decode("utf-8")  # cafe+e-acute+two CJK, pure-ASCII source
+        d = H.Response("HTTP/1.1", 200, "OK", {"Content-Type": "text/plain; charset=utf-8"},
+                       original.encode("utf-8")).toDict()
+        self.assertNotIn("encoding", d["content"])
+        self.assertEqual(d["content"]["text"], original)
+
     def test_toDict_non_text_content(self):
         resp = H.Response("HTTP/1.1", 200, "OK",
                           {"Content-Type": "text/plain"}, b"plain text")
