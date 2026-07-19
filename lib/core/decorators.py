@@ -15,6 +15,11 @@ from lib.core.threads import getCurrentThreadData
 _cache = {}
 _method_locks = {}
 
+# Private marker prefixing the slow-path (frozen) cache key so it can never collide with a raw
+# fast-path key: without it e.g. args ([1,2],) freezes to ((1,2),), the exact fast key of ((1,2),),
+# and the two calls would share a cache slot and return each other's result
+_FROZEN_KEY_MARKER = object()
+
 def cachedmethod(f):
     """
     Method with a cached content
@@ -62,9 +67,9 @@ def cachedmethod(f):
             # Note: fallback (slow-path) for unhashable arguments
             try:
                 if kwargs:
-                    key = (_freeze(args), _freeze(kwargs))
+                    key = (_FROZEN_KEY_MARKER, _freeze(args), _freeze(kwargs))
                 else:
-                    key = _freeze(args)
+                    key = (_FROZEN_KEY_MARKER, _freeze(args))
 
                 with lock:
                     if key in cache:
