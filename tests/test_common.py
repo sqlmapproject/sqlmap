@@ -185,6 +185,23 @@ class TestParamToDict(unittest.TestCase):
         result = paramToDict(PLACE.GET, "lonely&id=1")
         self.assertEqual(list(result.items()), [("id", "1")])
 
+    def test_html_entity_in_value_not_split(self):
+        # a genuine HTML entity in a value must not be split on its '&'/';' (any entity length)
+        result = paramToDict(PLACE.GET, "q=foo&amp;bar&id=5")
+        self.assertEqual(list(result.items()), [("q", "foo&amp;bar"), ("id", "5")])
+        result = paramToDict(PLACE.GET, "q=foo&mdash;bar&id=5")
+        self.assertEqual(list(result.items()), [("q", "foo&mdash;bar"), ("id", "5")])
+
+    def test_html_entity_in_cookie_value_not_corrupted(self):
+        # regression: the entity's own ';' must not act as the cookie delimiter
+        result = paramToDict(PLACE.COOKIE, "token=a&mdash;b; id=5")
+        self.assertEqual(list(result.items()), [("token", "a&mdash;b"), ("id", "5")])
+
+    def test_non_entity_ampersand_still_splits(self):
+        # "&nope;" is not a real entity, so '&' remains a genuine delimiter
+        result = paramToDict(PLACE.GET, "a=1&nope=2")
+        self.assertEqual(list(result.items()), [("a", "1"), ("nope", "2")])
+
 
 class TestGetCharset(unittest.TestCase):
     """Inference charsets are fixed integer tables."""

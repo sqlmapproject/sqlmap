@@ -74,6 +74,7 @@ from lib.core.dicts import DBMS_DICT
 from lib.core.dicts import DBWIRE_MODULES
 from lib.core.dicts import DEFAULT_DOC_ROOTS
 from lib.core.dicts import DEPRECATED_OPTIONS
+from lib.core.dicts import HTML_ENTITIES
 from lib.core.dicts import OBSOLETE_OPTIONS
 from lib.core.dicts import SQL_STATEMENTS
 from lib.core.enums import ADJUST_TIME_DELAY
@@ -629,7 +630,9 @@ def paramToDict(place, parameters=None):
     if place in conf.parameters and not parameters:
         parameters = conf.parameters[place]
 
-    parameters = re.sub(r"&(\w{1,4});", r"%s\g<1>%s" % (PARAMETER_AMP_MARKER, PARAMETER_SEMICOLON_MARKER), parameters)
+    # Note: shield real HTML entities (e.g. &amp; &mdash; &rsquo;) from being split on the '&'/';' delimiter;
+    # match a named entity of any length but only when it is a genuine one, so a plain "&word;" still splits
+    parameters = re.sub(r"&(\w+);", lambda match: "%s%s%s" % (PARAMETER_AMP_MARKER, match.group(1), PARAMETER_SEMICOLON_MARKER) if match.group(1) in HTML_ENTITIES else match.group(0), parameters)
     if place == PLACE.COOKIE:
         splitParams = parameters.split(conf.cookieDel or DEFAULT_COOKIE_DELIMITER)
     else:
