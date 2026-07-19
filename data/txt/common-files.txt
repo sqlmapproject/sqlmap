@@ -1807,3 +1807,48 @@
 /opt/kibana/config/kibana.yml
 /etc/kibana/kibana.yml
 /etc/elasticsearch/elasticsearch.yml
+
+# Containers and orchestration secrets
+
+/.dockerenv
+/proc/self/cgroup
+/proc/1/cgroup
+/run/secrets/kubernetes.io/serviceaccount/token
+/var/run/secrets/kubernetes.io/serviceaccount/token
+/run/secrets/kubernetes.io/serviceaccount/namespace
+/var/run/secrets/kubernetes.io/serviceaccount/namespace
+/run/secrets/kubernetes.io/serviceaccount/ca.crt
+
+# Cloud provider credentials
+
+/root/.aws/credentials
+/root/.aws/config
+/root/.config/gcloud/application_default_credentials.json
+/root/.config/gcloud/credentials.db
+/root/.azure/accessTokens.json
+/root/.kube/config
+
+# SSH keys and DB/tool history
+
+/root/.ssh/authorized_keys
+/root/.ssh/id_ed25519
+/root/.ssh/id_ecdsa
+/root/.ssh/id_dsa
+/root/.mysql_history
+/root/.psql_history
+/root/.rediscli_history
+/root/.python_history
+/root/.sqlite_history
+
+# dotenv, VCS and app config under common web roots
+
+/var/www/.env
+/var/www/html/.env
+/app/.env
+/usr/share/nginx/html/.env
+/var/www/html/.git/config
+/var/www/html/.git/HEAD
+/var/www/html/wp-config.php
+/app/application.properties
+/app/application.yml
+/app/docker-compose.yml
