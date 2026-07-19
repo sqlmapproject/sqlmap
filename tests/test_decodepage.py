@@ -25,7 +25,10 @@ from _testutils import bootstrap
 bootstrap()
 
 from lib.request.basic import decodePage
+from lib.core.common import extractRegexResult
+from lib.core.data import conf, kb
 from lib.core.exception import SqlmapCompressionException
+from lib.core.settings import META_CHARSET_REGEX
 
 BODY = b"Hello plain body content 12345 - no markup here"
 
@@ -67,6 +70,43 @@ class TestCharset(unittest.TestCase):
         original = u"café — 你好 \U0001f512"
         out = decodePage(original.encode("utf-8"), None, "text/html; charset=utf-8")
         self.assertEqual(out, original)
+
+    def test_meta_charset_used_when_no_http_charset(self):
+        # charset declared only via <meta> (no HTTP charset) with an attribute on <head>
+        # must still be honored; byte 0xC0 is 'А' (U+0410) in windows-1251
+        page = b'<html><head lang="ru"><meta charset="windows-1251"></head><body>\xc0\xc1\xc2</body></html>'
+        conf.encoding = None
+        kb.pageEncoding = None
+        out = decodePage(page, None, "text/html")
+        self.assertIn(u"АБВ", out)
+
+
+class TestMetaCharsetRegex(unittest.TestCase):
+    """META_CHARSET_REGEX must tolerate real-world <head>/meta forms while staying scoped
+    to the head so body content can't hijack the detected charset."""
+
+    def _charset(self, html):
+        return extractRegexResult(META_CHARSET_REGEX, html)
+
+    def test_head_with_attributes(self):
+        self.assertEqual(self._charset('<html><head lang="en"><meta charset="iso-8859-2"></head></html>'), "iso-8859-2")
+
+    def test_whitespace_around_equals(self):
+        self.assertEqual(self._charset('<html><head><meta  charset = "utf-8"></head></html>'), "utf-8")
+
+    def test_single_quotes_stripped(self):
+        self.assertEqual(self._charset("<html><head><meta charset='utf-8'></head></html>"), "utf-8")
+
+    def test_http_equiv_content_type(self):
+        self.assertEqual(self._charset('<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1251"></head></html>'), "windows-1251")
+
+    def test_header_tag_not_matched(self):
+        # <header> is not <head>
+        self.assertIsNone(self._charset('<html><header><meta charset="utf-8"></header></html>'))
+
+    def test_body_meta_not_hijacked(self):
+        # a meta whose content merely mentions charset= in the body must not be picked up
+        self.assertIsNone(self._charset('<html><head><title>t</title></head><body><meta name="d" content="learn charset=evil"></body></html>'))
 
 
 class TestMalformed(unittest.TestCase):
