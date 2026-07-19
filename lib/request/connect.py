@@ -1272,13 +1272,16 @@ class Connect(object):
                 if urlencode(parameter) in paramString:
                     parameter = urlencode(parameter)
 
-                match = re.search(r"%s=[^&]*" % re.escape(parameter), paramString, re.I)
+                # Note: anchor to a real parameter boundary (start or right after '&'/a quote) so that
+                # adjusting e.g. 'token' does not match inside a longer name like 'csrf_token'/'user_token'
+                # and rewrite the wrong parameter (which broke anti-CSRF token injection)
+                match = re.search(r"(?i)(?:\A|(?<=&))%s=[^&]*" % re.escape(parameter), paramString)
                 if match:
-                    retVal = re.sub(r"(?i)%s" % re.escape(match.group(0)), ("%s=%s" % (parameter, newValue)).replace('\\', r'\\'), paramString)
+                    retVal = "%s%s=%s%s" % (paramString[:match.start()], parameter, newValue, paramString[match.end():])
                 else:
-                    match = re.search(r"(%s[\"']\s*:\s*[\"'])([^\"']*)" % re.escape(parameter), paramString, re.I)
+                    match = re.search(r"(?i)[\"']%s[\"']\s*:\s*[\"'](?P<value>[^\"']*)" % re.escape(parameter), paramString)
                     if match:
-                        retVal = re.sub(r"(?i)%s" % re.escape(match.group(0)), "%s%s" % (match.group(1), newValue), paramString)
+                        retVal = "%s%s%s" % (paramString[:match.start("value")], newValue, paramString[match.end("value"):])
 
                 return retVal
 
