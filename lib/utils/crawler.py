@@ -223,21 +223,34 @@ def crawl(target, post=None, cookie=None):
                 kb.normalizeCrawlingChoice = readInput(message, default='Y', boolean=True)
 
             if kb.normalizeCrawlingChoice:
-                seen = set()
-                results = OrderedSet()
-
-                for target in kb.targets:
-                    value = "%s%s%s" % (target[0], '&' if '?' in target[0] else '?', target[2] or "")
-                    match = re.search(r"/[^/?]*\?.+\Z", value)
-                    if match:
-                        key = re.sub(r"=[^=&]*", "=", match.group(0)).strip("&?")
-                        if '=' in key and key not in seen:
-                            results.add(target)
-                            seen.add(key)
-
-                kb.targets = results
+                kb.targets = normalizeCrawlingResults(kb.targets)
 
             storeResultsToFile(kb.targets)
+
+def normalizeCrawlingResults(targets):
+    """
+    Collapses crawled targets that differ only in their parameter values (e.g. ?id=1 vs ?id=2),
+    keeping one representative per distinct endpoint+parameter-name shape
+
+    >>> sorted(_[0] for _ in normalizeCrawlingResults([("http://h/users/edit?id=1", None, None, None, None), ("http://h/users/edit?id=2", None, None, None, None), ("http://h/products/edit?id=1", None, None, None, None)]))
+    ['http://h/products/edit?id=1', 'http://h/users/edit?id=1']
+    """
+
+    seen = set()
+    results = OrderedSet()
+
+    for target in targets:
+        value = "%s%s%s" % (target[0], '&' if '?' in target[0] else '?', target[2] or "")
+        # Note: key on the full path (not just the last segment) so distinct endpoints sharing an
+        # action name and parameters (e.g. /users/edit?id= vs /products/edit?id=) are not collapsed
+        match = re.search(r"\A[^?]+\?.+\Z", value)
+        if match:
+            key = re.sub(r"=[^=&]*", "=", match.group(0)).strip("&?")
+            if '=' in key and key not in seen:
+                results.add(target)
+                seen.add(key)
+
+    return results
 
 def storeResultsToFile(results):
     if not results:
