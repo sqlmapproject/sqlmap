@@ -11,8 +11,10 @@ conf.scheme / conf.path - the values every subsequent request is built from. A
 wrong default port or dropped scheme here misdirects the entire scan, so the
 scheme/default-port/explicit-port/path cases are pinned.
 
-(Inline URL credentials user:pw@host are intentionally not covered - sqlmap
-uses --auth-cred for that and does not parse them out of conf.url.)
+Inline URL credentials (user:pw@host) are stripped so the host/port parse
+correctly - previously the userinfo was mistaken for the host (user:pass@host ->
+hostname 'user'). The credentials are still NOT used for authentication (sqlmap
+warns and expects --auth-cred); only the host-misparse is fixed.
 """
 
 import os
@@ -78,6 +80,25 @@ class TestExplicitPort(unittest.TestCase):
 class TestPath(unittest.TestCase):
     def test_path_extracted(self):
         self.assertEqual(_parse("http://host/some/path?q=1")[3], "/some/path")
+
+
+class TestInlineCredentials(unittest.TestCase):
+    """Userinfo (user:pw@) must be stripped from the host, not mistaken for it."""
+
+    def test_user_pass_with_port(self):
+        host, port, _, _ = _parse("http://user:pass@host:8080/?id=1")
+        self.assertEqual((host, port), ("host", 8080))
+
+    def test_user_pass_default_port(self):
+        host, port, _, _ = _parse("http://user:pass@host/?id=1")
+        self.assertEqual((host, port), ("host", 80))
+
+    def test_user_only(self):
+        self.assertEqual(_parse("http://user@host/?id=1")[0], "host")
+
+    def test_credentials_with_ipv6(self):
+        host, port, _, _ = _parse("http://user:pass@[::1]:8443/?id=1")
+        self.assertEqual((host, port), ("::1", 8443))
 
 
 if __name__ == "__main__":

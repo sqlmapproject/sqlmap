@@ -1809,7 +1809,17 @@ def parseTargetUrl():
         errMsg += "in the hostname part"
         raise SqlmapGenericException(errMsg)
 
-    hostnamePort = urlSplit.netloc.split(":") if not re.search(r"\[.+\]", urlSplit.netloc) else filterNone((re.search(r"\[.+\]", urlSplit.netloc).group(0), re.search(r"\](:(?P<port>\d+))?", urlSplit.netloc).group("port")))
+    netloc = urlSplit.netloc
+
+    # Note: strip any URL userinfo ('user:pass@') so it is not mistaken for host:port (as the proxy
+    # parser already does). Credentials embedded in the URL are NOT applied - '--auth-cred' is the
+    # supported way to pass HTTP authentication - so warn rather than silently dropping them.
+    if '@' in netloc:
+        if not any((conf.get("authType"), conf.get("authCred"), conf.get("authFile"))):
+            singleTimeWarnMessage("credentials in the target URL are ignored. Use '--auth-cred' for HTTP authentication")
+        netloc = netloc.rsplit('@', 1)[-1]
+
+    hostnamePort = netloc.split(":") if not re.search(r"\[.+\]", netloc) else filterNone((re.search(r"\[.+\]", netloc).group(0), re.search(r"\](:(?P<port>\d+))?", netloc).group("port")))
 
     conf.scheme = (urlSplit.scheme.strip().lower() or "http")
     conf.path = urlSplit.path.strip()
