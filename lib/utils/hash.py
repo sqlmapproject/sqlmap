@@ -1074,9 +1074,6 @@ def hashRecognition(value):
                 # Hashes for Oracle and old MySQL look the same hence these checks
                 if isOracle and regex == HASH.MYSQL_OLD or isMySQL and regex == HASH.ORACLE_OLD:
                     continue
-                elif regex == HASH.CRYPT_GENERIC:
-                    if any((value.lower() == value, value.upper() == value)):
-                        continue
                 else:
                     parts.append("(?P<%s>%s)" % (name, regex))
 
@@ -1087,6 +1084,10 @@ def hashRecognition(value):
             if match:
                 algorithm, _ = [_ for _ in match.groupdict().items() if _[1] is not None][0]
                 retVal = getattr(HASH, algorithm)
+
+                # Note: greedy CRYPT_GENERIC requires a mixed-case value to reduce false positives
+                if retVal == HASH.CRYPT_GENERIC and any((value.lower() == value, value.upper() == value)):
+                    retVal = None
 
     return retVal
 

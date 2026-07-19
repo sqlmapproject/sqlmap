@@ -97,6 +97,15 @@ class TestHashRecognition(unittest.TestCase):
     def test_mysql(self):
         self.assertEqual(H.hashRecognition("*00E247AC5F9AF26AE0194B41E1E769DEE1429A29"), HASH.MYSQL)
 
+    def test_crypt_generic(self):
+        # Traditional DES crypt(3) (hashcat -m 1500); mixed-case is required by the heuristic
+        self.assertEqual(H.hashRecognition("rl.3StKT.4T8M"), HASH.CRYPT_GENERIC)
+
+    def test_crypt_generic_single_case_is_none(self):
+        # All-lower/all-upper 13-char values are too greedy to be trusted as crypt
+        self.assertIsNone(H.hashRecognition("abcdefghijklm"))
+        self.assertIsNone(H.hashRecognition("ABCDEFGHIJKLM"))
+
     def test_junk_is_none(self):
         self.assertIsNone(H.hashRecognition("foobar"))
 
