@@ -108,7 +108,10 @@ def forgeHeaders(items=None, base=None):
     if conf.cj:
         if HTTP_HEADER.COOKIE in headers:
             for cookie in conf.cj:
-                if cookie is None or cookie.domain_specified and not (conf.hostname or "").endswith(cookie.domain):
+                # Note: a domain-scoped cookie (Domain=example.com) is stored by the cookie jar as
+                # '.example.com', so a plain endswith() wrongly excludes the apex host itself
+                # ('example.com' does not end with '.example.com'); accept the exact domain too
+                if cookie is None or cookie.domain_specified and not ((conf.hostname or "").endswith(cookie.domain) or (conf.hostname or "") == cookie.domain.lstrip('.')):
                     continue
 
                 if ("%s=" % getUnicode(cookie.name)) in getUnicode(headers[HTTP_HEADER.COOKIE]):

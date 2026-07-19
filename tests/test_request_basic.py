@@ -84,5 +84,59 @@ class TestBasicDecodePage(unittest.TestCase):
         self.assertEqual(getText(decodePage(b"", None, "text/html")), "")
 
 
+class TestForgeHeadersCookieMerge(unittest.TestCase):
+    """A domain-scoped jar cookie (Domain=example.com -> '.example.com') must merge into the
+    request for the apex host, not be dropped by a naive endswith() domain check."""
+
+    _CONF = ("cj", "hostname", "httpHeaders", "loadCookies", "cookieDel", "parameters", "csrfToken", "safeUrl")
+    _KB = ("mergeCookies", "testMode", "injection")
+
+    def setUp(self):
+        self._c = dict((k, conf.get(k)) for k in self._CONF)
+        self._k = dict((k, kb.get(k)) for k in self._KB)
+
+    def tearDown(self):
+        for k, v in self._c.items():
+            conf[k] = v
+        for k, v in self._k.items():
+            kb[k] = v
+
+    def _jar_with_domain_cookie(self):
+        try:
+            from http.cookiejar import CookieJar, Cookie
+        except ImportError:
+            from cookielib import CookieJar, Cookie
+        # a domain-scoped cookie the jar stores as '.example.com' (domain_specified=True),
+        # exactly as it would after Set-Cookie: sid=NEW; Domain=example.com
+        cookie = Cookie(version=0, name="sid", value="NEW", port=None, port_specified=False,
+                        domain=".example.com", domain_specified=True, domain_initial_dot=True,
+                        path="/", path_specified=True, secure=False, expires=None, discard=True,
+                        comment=None, comment_url=None, rest={})
+        cj = CookieJar()
+        cj.set_cookie(cookie)
+        return cj
+
+    def test_domain_cookie_merged_on_apex_host(self):
+        from lib.request.basic import forgeHeaders
+        from lib.core.enums import PLACE, HTTP_HEADER
+        from lib.core.datatype import AttribDict
+
+        conf.cj = self._jar_with_domain_cookie()
+        conf.hostname = "example.com"                       # apex host == cookie domain
+        conf.httpHeaders = [(HTTP_HEADER.COOKIE, "sid=OLD")]
+        conf.loadCookies = False
+        conf.cookieDel = None
+        conf.parameters = {}
+        conf.csrfToken = conf.safeUrl = None
+        kb.mergeCookies = True
+        kb.testMode = False
+        kb.injection = AttribDict()
+        kb.injection.place = PLACE.GET
+
+        headers = forgeHeaders()
+        # before the fix the domain cookie was skipped for the apex host, leaving 'sid=OLD'
+        self.assertEqual(headers.get(HTTP_HEADER.COOKIE), "sid=NEW")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
