@@ -104,7 +104,7 @@ class TestSerialized(_HashDBCase):
         # a stdlib dict subclass (e.g. OrderedDict) must round-trip its data rather than
         # silently degrade to its text repr (session codec: round-trip or fail loudly)
         from collections import OrderedDict
-        import six
+        from thirdparty import six
         val = OrderedDict([("b", 2), ("a", [1, {"n": "v"}])])
         self.db.write("od", val, True)
         self.db.flush()
