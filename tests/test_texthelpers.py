@@ -61,6 +61,20 @@ class TestParseFilePaths(unittest.TestCase):
         self.assertIn("C:\\inetpub\\wwwroot\\app\\index.asp", kb.absFilePaths,
                       msg="windows path not harvested in full: %s" % kb.absFilePaths)
 
+    def test_quoted_paths_harvested(self):
+        # paths delimited by a leading quote (Python/Java/.NET stack traces) must be harvested too
+        parseFilePaths('File "/usr/lib/python3.11/site-packages/app.py", line 10')
+        parseFilePaths("Cannot read '/opt/tomcat/webapps/app/WEB-INF/web.xml' now")
+        parseFilePaths('Could not find file "C:\\data\\config.ini".')
+        self.assertIn("/usr/lib/python3.11/site-packages/app.py", kb.absFilePaths)
+        self.assertIn("/opt/tomcat/webapps/app/WEB-INF/web.xml", kb.absFilePaths)
+        self.assertIn("C:\\data\\config.ini", kb.absFilePaths)
+
+    def test_quoted_non_path_ignored(self):
+        # a leading quote must not turn ordinary quoted words or URLs into "paths"
+        parseFilePaths("error: 'foobar' invalid; see 'https://example.com/help' for info")
+        self.assertEqual(kb.absFilePaths, set())
+
 
 class TestGetSafeExString(unittest.TestCase):
     def test_format(self):
