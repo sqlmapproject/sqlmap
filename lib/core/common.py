@@ -2955,7 +2955,12 @@ def extractErrorMessage(page):
 
             if match:
                 candidate = htmlUnescape(match.group("result")).replace("<br>", "\n").strip()
-                if candidate and (1.0 * len(re.findall(r"[^A-Za-z,. ]", candidate)) / len(candidate) > MIN_ERROR_PARSING_NON_WRITING_RATIO):
+                # Note: only the generic '(fatal|error|warning|exception): ...' regexes can capture
+                # arbitrary prose, so guard those with the non-writing-char ratio; the specific
+                # DBMS-signature regexes (e.g. MSSQL 'Unclosed quotation mark ...') are definitive and
+                # must not be discarded just because the message happens to read like plain text
+                generic = "(fatal|error|warning|exception)" in regex
+                if candidate and (not generic or 1.0 * len(re.findall(r"[^A-Za-z,. ]", candidate)) / len(candidate) > MIN_ERROR_PARSING_NON_WRITING_RATIO):
                     retVal = candidate
                     break
 

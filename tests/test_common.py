@@ -1623,6 +1623,16 @@ class TestCommonRegexAndPage(unittest.TestCase):
     def test_extract_error_message_none_for_plain(self):
         self.assertIsNone(extractErrorMessage("Warning: This is only a dummy foobar test"))
 
+    def test_extract_error_message_prose_like_dbms_signature(self):
+        # a specific DBMS signature must be extracted even when it reads like plain text (few
+        # non-writing chars) - the non-writing-char ratio guards only the generic keyword regexes
+        page = "Microsoft OLE DB Provider for SQL Server error '80040e14' Unclosed quotation mark after the character string ''."
+        self.assertEqual(extractErrorMessage(page), "Unclosed quotation mark after the character string ''.")
+
+    def test_extract_error_message_generic_prose_still_rejected(self):
+        # the generic '(fatal|error|warning): ...' path must still drop natural-language prose
+        self.assertIsNone(extractErrorMessage("Error: everything is working fine and nothing is wrong here"))
+
     def test_extract_error_message_non_string(self):
         self.assertIsNone(extractErrorMessage(None))
 
