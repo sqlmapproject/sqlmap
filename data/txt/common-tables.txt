@@ -3372,17 +3372,23 @@ django_session
 django_migrations
 django_content_type
 django_admin_log
+auth_user_groups
+auth_user_user_permissions
 
 # laravel
 
 migrations
 password_resets
+password_reset_tokens
 failed_jobs
 personal_access_tokens
 job_batches
 model_has_roles
 model_has_permissions
 role_has_permissions
+cache
+cache_locks
+notifications
 
 # rails
 
@@ -3420,3 +3426,6 @@ subscriptions
 users_bak
 users_old
 orders_backup
+user_roles
+role_permissions
+tokens
