@@ -114,7 +114,10 @@ def _serializeEncode(value):
         name = "%s.%s" % (value.__class__.__module__, value.__class__.__name__)
         if name in _SERIALIZE_CLASSES:
             return {_SERIALIZE_TAG: "o", "c": name, "d": [[_serializeEncode(k), _serializeEncode(v)] for (k, v) in value.items()], "s": _serializeEncode(dict(value.__dict__))}
-        elif value.__class__ is dict:
+        elif value.__class__ is dict or (name or "").split(".")[0] not in ("lib", "plugins", "thirdparty"):
+            # a plain dict, or a foreign mapping subclass (e.g. collections.OrderedDict/defaultdict): store the
+            # items as a plain mapping so the data round-trips, instead of silently degrading to its text repr.
+            # A non-allowlisted lib/plugins/thirdparty subclass still falls through to _serializeUnknown (fail loudly)
             return {_SERIALIZE_TAG: "m", "v": [[_serializeEncode(k), _serializeEncode(v)] for (k, v) in value.items()]}
         else:
             return _serializeUnknown(value, name)

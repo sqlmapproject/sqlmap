@@ -100,6 +100,19 @@ class TestSerialized(_HashDBCase):
         self.assertEqual(got.x, 1)
         self.assertEqual(got.y, [1, 2])
 
+    def test_foreign_mapping_roundtrips_as_dict(self):
+        # a stdlib dict subclass (e.g. OrderedDict) must round-trip its data rather than
+        # silently degrade to its text repr (session codec: round-trip or fail loudly)
+        from collections import OrderedDict
+        import six
+        val = OrderedDict([("b", 2), ("a", [1, {"n": "v"}])])
+        self.db.write("od", val, True)
+        self.db.flush()
+        got = self.db.retrieve("od", True)
+        self.assertEqual(got, {"b": 2, "a": [1, {"n": "v"}]})   # data preserved (was lost to text repr before)
+        if six.PY3:
+            self.assertEqual(list(got), ["b", "a"])             # order preserved where dicts are ordered
+
     def test_bigarray_roundtrip(self):
         self.db.write("ba", BigArray([1, 2, 3]), True)
         self.db.flush()
