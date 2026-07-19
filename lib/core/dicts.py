@@ -233,7 +233,7 @@ DBMS_DICT = {
     DBMS.ACCESS: (ACCESS_ALIASES, "python-pyodbc", "https://github.com/mkleehammer/pyodbc", "access"),
     DBMS.FIREBIRD: (FIREBIRD_ALIASES, "python3-firebirdsql", "https://github.com/nakagami/pyfirebirdsql/", "firebird"),
     DBMS.MAXDB: (MAXDB_ALIASES, None, None, None),  # 'maxdb'/'sapdb' SQLAlchemy dialect was removed long ago; a dead dialect only produces a misleading warning
-    DBMS.SYBASE: (SYBASE_ALIASES, "python-pymssql", "https://github.com/pymssql/pymssql", "sybase"),
+    DBMS.SYBASE: (SYBASE_ALIASES, "python-pymssql", "https://github.com/pymssql/pymssql", None),  # 'sybase' SQLAlchemy dialect was removed in 1.4 (external replacement abandoned); pymssql/dbwire cover '-d', so a dead dialect only wastes an attempt and shows a misleading warning
     DBMS.DB2: (DB2_ALIASES, "python ibm-db", "https://github.com/ibmdb/python-ibmdb", "ibm_db_sa"),
     DBMS.HSQLDB: (HSQLDB_ALIASES, "python jaydebeapi & python-jpype", "https://pypi.python.org/pypi/JayDeBeApi/ & https://github.com/jpype-project/jpype", None),
     DBMS.H2: (H2_ALIASES, None, None, None),
