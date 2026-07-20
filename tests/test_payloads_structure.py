@@ -105,6 +105,26 @@ class TestBoundaryEntries(unittest.TestCase):
         for b in conf.boundaries:
             self.assertTrue(isinstance(b.clause, (list, tuple)), msg="boundary clause not list-like")
 
+    def test_ptype_in_range(self):
+        # ptype feeds the recorded injection identity (report label, (place,parameter,ptype) dedup
+        # key, session hash) - an out-of-range value silently corrupts all three
+        for b in conf.boundaries:
+            self.assertIn(b.ptype, (1, 2, 3, 4, 5, 6), msg="boundary %r bad ptype %r" % (b.prefix, b.ptype))
+
+    def test_ptype_matches_prefix_quote(self):
+        # The lexical quote a prefix opens with must agree with ptype (else the injection is recorded
+        # under the wrong type - e.g. a backtick identifier breakout mislabelled numeric). Only the
+        # unambiguous cases are asserted: backtick is ALWAYS an identifier delimiter (ptype 6), and a
+        # leading single quote is ALWAYS a single-quoted string (ptype 2/3). Double quote is left out
+        # on purpose - it is a string literal (4/5) under some DBMS and an ANSI identifier (6) under
+        # others, so it is genuinely ambiguous from the prefix alone.
+        for b in conf.boundaries:
+            prefix = (b.prefix or "").lstrip()
+            if prefix.startswith('`'):
+                self.assertEqual(b.ptype, 6, msg="backtick prefix %r must be identifier ptype 6, got %r" % (b.prefix, b.ptype))
+            elif prefix.startswith("'"):
+                self.assertIn(b.ptype, (2, 3), msg="single-quote prefix %r must be ptype 2/3, got %r" % (b.prefix, b.ptype))
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
