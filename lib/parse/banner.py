@@ -12,6 +12,7 @@ from xml.sax.handler import ContentHandler
 from lib.core.common import Backend
 from lib.core.common import parseXmlFile
 from lib.core.common import sanitizeStr
+from lib.core.common import singleTimeWarnMessage
 from lib.core.data import kb
 from lib.core.data import paths
 from lib.core.enums import DBMS
@@ -103,13 +104,17 @@ def bannerParser(banner):
     if not xmlfile:
         return
 
-    if Backend.isDbms(DBMS.MSSQL):
-        handler = MSSQLBannerHandler(banner, kb.bannerFp)
-        parseXmlFile(xmlfile, handler)
+    try:
+        if Backend.isDbms(DBMS.MSSQL):
+            handler = MSSQLBannerHandler(banner, kb.bannerFp)
+            parseXmlFile(xmlfile, handler)
 
-        handler = FingerprintHandler(banner, kb.bannerFp)
-        parseXmlFile(paths.GENERIC_XML, handler)
-    else:
-        handler = FingerprintHandler(banner, kb.bannerFp)
-        parseXmlFile(xmlfile, handler)
-        parseXmlFile(paths.GENERIC_XML, handler)
+            handler = FingerprintHandler(banner, kb.bannerFp)
+            parseXmlFile(paths.GENERIC_XML, handler)
+        else:
+            handler = FingerprintHandler(banner, kb.bannerFp)
+            parseXmlFile(xmlfile, handler)
+            parseXmlFile(paths.GENERIC_XML, handler)
+    except Exception:
+        # best-effort banner fingerprinting - a broken/patched xml.sax must not abort the scan (see #6086)
+        singleTimeWarnMessage("unable to parse the DBMS banner for version fingerprinting")

@@ -8,6 +8,7 @@ See the file 'LICENSE' for copying permission
 import os
 
 from lib.core.common import parseXmlFile
+from lib.core.common import singleTimeWarnMessage
 from lib.core.data import kb
 from lib.core.data import paths
 from lib.parse.handler import FingerprintHandler
@@ -32,5 +33,9 @@ def headersParser(headers):
     for header, xmlfile in kb.headerPaths.items():
         if header in headers:
             handler = FingerprintHandler(headers[header], kb.headersFp)
-            parseXmlFile(xmlfile, handler)
-            parseXmlFile(paths.GENERIC_XML, handler)
+            try:
+                parseXmlFile(xmlfile, handler)
+                parseXmlFile(paths.GENERIC_XML, handler)
+            except Exception:
+                # best-effort header fingerprinting - a broken/patched xml.sax must not abort the scan (see #6086)
+                singleTimeWarnMessage("unable to parse the response headers for technology fingerprinting")
