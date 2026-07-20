@@ -346,7 +346,7 @@ Formats:
         <level>5</level>
         <clause>9</clause>
         <where>1,2</where>
-        <ptype>2</ptype>
+        <ptype>4</ptype>
         <prefix>") WHERE [RANDNUM]=[RANDNUM]</prefix>
         <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
@@ -457,7 +457,7 @@ Formats:
         <level>5</level>
         <clause>1</clause>
         <where>1,2</where>
-        <ptype>2</ptype>
+        <ptype>4</ptype>
         <prefix>")) AS [RANDSTR] WHERE [RANDNUM]=[RANDNUM]</prefix>
         <suffix>[GENERIC_SQL_COMMENT]</suffix>
     </boundary>
@@ -550,7 +550,7 @@ Formats:
         <level>5</level>
         <clause>7</clause>
         <where>1</where>
-        <ptype>3</ptype>
+        <ptype>6</ptype>
         <prefix> [RANDSTR1],</prefix>
         <suffix> [RANDSTR2]</suffix>
     </boundary>
