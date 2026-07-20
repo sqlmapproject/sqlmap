@@ -666,8 +666,9 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             if kb.disableShiftTable:
                 shiftTable = None
             elif continuousOrder and shiftTable is None:
-                # Used for gradual expanding into unicode charspace
-                shiftTable = [2, 2, 3, 3, 3]
+                # Used for gradual expanding into unicode charspace (Note: leading value covers MySQL's
+                # 3-byte ORD() range up to 0xEFBFBF, restoring CJK/non-Latin extraction - see issue #5171)
+                shiftTable = [4, 2, 2, 3, 3, 3]
 
             if "'%s'" % CHAR_INFERENCE_MARK in payload:
                 for char in ('\n', '\r'):
