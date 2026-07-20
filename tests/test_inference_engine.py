@@ -51,11 +51,15 @@ class _EngineCase(unittest.TestCase):
         self._saved_kb = {k: kb.get(k) for k in _KB}
         self._saved_qp = Connect.queryPage
         self._saved_processChar = kb.data.get("processChar")
+        self._saved_counters = kb.get("counters")
         for k, v in _CONF.items():
             conf[k] = v
         for k, v in _KB.items():
             kb[k] = v
         kb.data.processChar = None
+        # getCounter()/kb.counters is a cumulative per-technique query tally; reset it so each test
+        # measures only its own extraction (bisection returns the absolute counter, not a per-call delta)
+        kb.counters = {}
         set_dbms("MySQL")
 
     def tearDown(self):
@@ -64,6 +68,7 @@ class _EngineCase(unittest.TestCase):
         for k, v in self._saved_kb.items():
             kb[k] = v
         kb.data.processChar = self._saved_processChar
+        kb.counters = self._saved_counters
         Connect.queryPage = self._saved_qp
         inf.Request.queryPage = self._saved_qp
 
@@ -133,6 +138,57 @@ class TestUnicodeExpansion(_EngineCase):
     def test_extracts_latin1_via_first_expansion(self):
         for s in (u"caf\xe9", u"\xfcber", u"ni\xf1o", u"\xe9\xe8\xea\xeb"):
             self.assertEqual(self._extract(s)[0], s, msg="expansion extraction failed for %r" % s)
+
+
+class TestMysqlMultibyteExpansion(_EngineCase):
+    """Regression guard for the shiftTable expansion ceiling (getChar, inference.py ~671).
+
+    MySQL's ORD() returns the byte-composite integer of a multibyte UTF-8 character (e.g. CJK
+    U+4E2D -> UTF-8 E4 B8 AD -> 0xE4B8AD = 14989485), and decodeIntToUnicode reconstructs the
+    character back from that integer. The gradual unicode expansion must therefore be able to
+    reach MySQL's full 3-byte ORD range (up to 0xEFBFBF = 15728575). A table whose ceiling
+    stops below that (as [2, 2, 3, 3, 3] did, ceiling 0xFFFFF = 1048575) silently truncates or
+    garbles every CJK and non-Latin >= U+0800 value on the most common DBMS - see issue #5171.
+
+    Unlike TestUnicodeExpansion (which models a single-byte oracle via ord()), this oracle
+    models MySQL ORD() as the char's UTF-8 bytes read big-endian, exercising the real high
+    code-point path end to end."""
+
+    def _extract_ord(self, secret):
+        def mysql_ord(ch):
+            value = 0
+            for octet in bytearray(ch.encode("utf-8")):
+                value = (value << 8) | octet
+            return value
+
+        def oracle(payload=None, *args, **kwargs):
+            m = _PARSE.search(payload)
+            idx, op, threshold = int(m.group(1)), m.group(2), int(m.group(3))
+            ch = mysql_ord(secret[idx - 1]) if 0 <= idx - 1 < len(secret) else 0
+            return (ch > threshold) if op == ">" else (ch == threshold)
+
+        Connect.queryPage = staticmethod(oracle)
+        inf.Request.queryPage = staticmethod(oracle)
+        td = getCurrentThreadData()
+        td.shared.value = ""
+        td.shared.index = [0]
+        td.shared.start = 0
+        td.shared.count = 0
+        count, value = inf.bisection(TEMPLATE, "SELECT secret", length=len(secret), charsetType=None)
+        return value, count
+
+    def test_extracts_3byte_cjk(self):
+        # U+4E2D/U+6587 are CJK; each returned None (truncation) / '?' under the regressed ceiling
+        for s in (u"\u4e2d", u"\u4e2d\u6587", u"A\u4e2dZ", u"\u4e2d123"):
+            self.assertEqual(self._extract_ord(s)[0], s, msg="3-byte extraction failed for %r" % s)
+
+    def test_extracts_near_max_3byte(self):
+        # U+FFFD -> UTF-8 EF BF BD -> ORD 0xEFBFBD, just under the 0xEFBFBF 3-byte ceiling
+        self.assertEqual(self._extract_ord(u"\ufffd")[0], u"\ufffd")
+
+    def test_2byte_still_extracts(self):
+        # guard: raising the ceiling must not disturb the (unchanged) 2-byte path
+        self.assertEqual(self._extract_ord(u"caf\xe9")[0], u"caf\xe9")
 
 
 class TestSearchIsLogarithmic(_EngineCase):
