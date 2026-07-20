@@ -1585,7 +1585,7 @@ def setPaths(rootPath):
     paths.SQLMAP_XML_PAYLOADS_PATH = os.path.join(paths.SQLMAP_XML_PATH, "payloads")
 
     # sqlmap files
-    paths.CATALOG_IDENTIFIERS = os.path.join(paths.SQLMAP_TXT_PATH, "catalog-identifiers.txt")
+    paths.CATALOG_IDENTIFIERS = os.path.join(paths.SQLMAP_TXT_PATH, "catalog-identifiers.tx_")
     paths.COMMON_COLUMNS = os.path.join(paths.SQLMAP_TXT_PATH, "common-columns.txt")
     paths.COMMON_FILES = os.path.join(paths.SQLMAP_TXT_PATH, "common-files.txt")
     paths.COMMON_TABLES = os.path.join(paths.SQLMAP_TXT_PATH, "common-tables.txt")

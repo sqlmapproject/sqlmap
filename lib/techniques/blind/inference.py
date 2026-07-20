@@ -24,7 +24,7 @@ from lib.core.common import getFileItems
 from lib.core.common import getPartRun
 from lib.core.common import getTechnique
 from lib.core.common import getTechniqueData
-from lib.core.common import openFile
+from lib.core.common import getText
 from lib.core.common import predictValue
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
@@ -44,6 +44,7 @@ from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapThreadException
 from lib.core.exception import SqlmapUnsupportedFeatureException
+from lib.core.wordlist import Wordlist
 from lib.core.settings import CHAR_INFERENCE_MARK
 from lib.core.settings import HUFFMAN_PROBE_LIMIT
 from lib.core.settings import HUFFMAN_PRIOR_WEIGHTS
@@ -109,7 +110,7 @@ def getHuffmanPrior(order, scale, dbms=None):
     set-membership tree during blind NAME enumeration (so it predicts from the first character rather
     than cold). Trained on the app-identifier wordlists (common-tables/common-columns) plus, when the
     back-end is fingerprinted, the system/catalog identifiers harvested for that DBMS (from the matching
-    [<DBMS>] section of catalog-identifiers.txt - a single global model dilutes across dialects).
+    [<DBMS>] section of catalog-identifiers.tx_ - a single global model dilutes across dialects).
     Per-context counts are scaled to a peak of `scale`. Retrieval is correct regardless of this model.
     """
 
@@ -126,19 +127,23 @@ def getHuffmanPrior(order, scale, dbms=None):
             pass
 
     if dbms:
+        wordlist = None
         try:
-            with openFile(paths.CATALOG_IDENTIFIERS, "r", errors="ignore") as f:
-                section = None
-                for line in f:
-                    line = line.strip()
-                    if not line or line.startswith('#'):
-                        continue
-                    if line.startswith('[') and line.endswith(']'):
-                        section = line[1:-1]
-                    elif section == dbms:
-                        names.append(line)
+            wordlist = Wordlist(paths.CATALOG_IDENTIFIERS)  # transparently decompresses the shipped .tx_
+            section = None
+            for line in wordlist:
+                line = getText(line).strip()
+                if not line or line.startswith('#'):
+                    continue
+                if line.startswith('[') and line.endswith(']'):
+                    section = line[1:-1]
+                elif section == dbms:
+                    names.append(line)
         except Exception:
             pass
+        finally:
+            if wordlist is not None:
+                wordlist.closeFP()
 
     for name in names:
         terminated = name + "\x00"
