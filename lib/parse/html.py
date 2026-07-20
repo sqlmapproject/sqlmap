@@ -9,6 +9,7 @@ import re
 
 from xml.sax.handler import ContentHandler
 
+from lib.core.common import singleTimeWarnMessage
 from lib.core.common import urldecode
 from lib.core.common import parseXmlFile
 from lib.core.data import kb
@@ -86,7 +87,12 @@ def htmlParser(page):
             handler._markAsErrorPage()
         return retVal
 
-    parseXmlFile(xmlfile, handler)
+    try:
+        parseXmlFile(xmlfile, handler)
+    except Exception:
+        # DBMS fingerprinting from the error page is best-effort - a broken or third-party-patched
+        # xml.sax (e.g. a modified stdlib on some distros) must not abort the whole scan (see #6086)
+        singleTimeWarnMessage("unable to parse the response page for DBMS-specific error messages")
 
     if handler.dbms and handler.dbms not in kb.htmlFp:
         kb.lastParserStatus = handler.dbms
