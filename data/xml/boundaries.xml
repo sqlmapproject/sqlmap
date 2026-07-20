@@ -55,6 +55,8 @@ Tag: <boundary>
             4: Double quoted string
             5: LIKE double quoted string
             6: Identifier (e.g. column name)
+            7: Block comment
+            8: Alternative quoted string (e.g. PostgreSQL $$...$$, Oracle q'[...]')
 
     Sub-tag: <prefix>
         A string to prepend to the payload.
@@ -517,6 +519,18 @@ Formats:
     </boundary>
     <!-- End of pre-WHERE derived table boundaries -->
 
+    <!-- Block-comment escape: injection point sits INSIDE /* ... */ (e.g. a query tag / trace / tenant
+         annotation). '*/' terminates the app comment, the test runs, '/*' re-opens a comment that the
+         app's original '*/' closes. Inert (stays inside the literal) when the value is not in a comment. -->
+    <boundary>
+        <level>4</level>
+        <clause>1,2,3</clause>
+        <where>1,2</where>
+        <ptype>7</ptype>
+        <prefix>*/</prefix>
+        <suffix>/*</suffix>
+    </boundary>
+
     <!-- Escaped column name (e.g. SELECT `...` FROM table) boundaries -->
     <boundary>
         <level>4</level>
@@ -565,4 +579,48 @@ Formats:
         <suffix>#</suffix>
     </boundary>
     <!-- End of AGAINST boolean full-text search boundaries -->
+
+    <!-- Alternative quoted string delimiters where ' and " have no terminating effect:
+         PostgreSQL $$...$$ dollar quoting, Oracle q'[...]' / q'{...}' / q'(...)' / q'<...>'. -->
+    <boundary>
+        <level>5</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>8</ptype>
+        <prefix>$$</prefix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
+    </boundary>
+    <boundary>
+        <level>5</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>8</ptype>
+        <prefix>]'</prefix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
+    </boundary>
+    <boundary>
+        <level>5</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>8</ptype>
+        <prefix>}'</prefix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
+    </boundary>
+    <boundary>
+        <level>5</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>8</ptype>
+        <prefix>)'</prefix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
+    </boundary>
+    <boundary>
+        <level>5</level>
+        <clause>1</clause>
+        <where>1,2</where>
+        <ptype>8</ptype>
+        <prefix>&gt;'</prefix>
+        <suffix>[GENERIC_SQL_COMMENT]</suffix>
+    </boundary>
+    <!-- End of alternative quoted string boundaries -->
 </root>

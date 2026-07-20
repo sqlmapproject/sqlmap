@@ -339,6 +339,8 @@ class PAYLOAD(object):
         4: "Double quoted string",
         5: "LIKE double quoted string",
         6: "Identifier (e.g. column name)",
+        7: "Block comment",
+        8: "Alternative quoted string",
     }
 
     RISK = {

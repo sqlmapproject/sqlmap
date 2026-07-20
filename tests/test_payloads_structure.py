@@ -109,7 +109,7 @@ class TestBoundaryEntries(unittest.TestCase):
         # ptype feeds the recorded injection identity (report label, (place,parameter,ptype) dedup
         # key, session hash) - an out-of-range value silently corrupts all three
         for b in conf.boundaries:
-            self.assertIn(b.ptype, (1, 2, 3, 4, 5, 6), msg="boundary %r bad ptype %r" % (b.prefix, b.ptype))
+            self.assertIn(b.ptype, (1, 2, 3, 4, 5, 6, 7, 8), msg="boundary %r bad ptype %r" % (b.prefix, b.ptype))
 
     def test_ptype_matches_prefix_quote(self):
         # The lexical quote a prefix opens with must agree with ptype (else the injection is recorded
