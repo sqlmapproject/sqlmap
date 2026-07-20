@@ -207,7 +207,7 @@
         <title>PostgreSQL &lt; 8.2 stacked queries (Glibc - comment)</title>
         <stype>4</stype>
         <level>3</level>
-        <risk>1</risk>
+        <risk>3</risk>
         <clause>1-8</clause>
         <where>1</where>
         <vector>;SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT [RANDNUM] FROM SLEEP([SLEEPTIME])) ELSE [RANDNUM] END)</vector>
@@ -229,7 +229,7 @@
         <title>PostgreSQL &lt; 8.2 stacked queries (Glibc)</title>
         <stype>4</stype>
         <level>5</level>
-        <risk>1</risk>
+        <risk>3</risk>
         <clause>1-8</clause>
         <where>1</where>
         <vector>;SELECT (CASE WHEN ([INFERENCE]) THEN (SELECT [RANDNUM] FROM SLEEP([SLEEPTIME])) ELSE [RANDNUM] END)</vector>

