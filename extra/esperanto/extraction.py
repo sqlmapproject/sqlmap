@@ -288,7 +288,7 @@ class _Extraction(object):
 
         if mode == "code":
             code = self.dialect.charcode[1].format(expr=one)
-            ordered = self._comparator in ("gt", "between")
+            ordered = self._comparator != "membership"     # gt/between OR an operator-free rung (all bisect via _gtNum)
             if codes is not None:
                 # restricted-alphabet (e.g. the hex-framed dump payload): a small ASCII
                 # set. no per-char verify - ASCII codes are unambiguous across charcode

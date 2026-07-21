@@ -539,19 +539,22 @@ class TestEsperanto(unittest.TestCase):
         self.assertEqual(esp.extract(_SECRET_EXPR), "admin")
         self.assertEqual(len((esp.dump("users") or {}).get("rows") or []), 3)   # BETWEEN keyset pages all
 
-    def test_disguise_gt_and_between_blocked_use_in(self):
-        # '<'/'>' AND BETWEEN gone: order-free IN() subset bisection for the chars and
-        # NOT IN() paging for the rows - needs only '=' membership
+    def test_disguise_gt_and_between_blocked_use_operator_free(self):
+        # '<'/'>' AND BETWEEN gone: rather than drop to slow order-free membership, the ladder
+        # finds an ORDERED operator-free rung (SIGN((e)-(n))=1 etc.) that needs no comparison
+        # operator - keeping efficient log2 bisection alive.
         esp = Esperanto(_disguisedOracle(blocked=r">|<|BETWEEN"))
         esp.discover()
-        self.assertEqual(esp._comparator, "membership")
+        self.assertEqual(esp._comparator, "sign")
         self.assertEqual(esp.extract(_SECRET_EXPR), "admin")
-        self.assertEqual(len((esp.dump("users") or {}).get("rows") or []), 3)   # NOT IN() pages all
+        self.assertEqual(len((esp.dump("users") or {}).get("rows") or []), 3)   # ordered rung still pages all
 
     def test_disguise_no_ordering_no_in_still_extracts(self):
-        # the hard floor: no '<'/'>', no BETWEEN, no IN - only '=' equality. Values
+        # the hard floor: no '<'/'>', no BETWEEN, no IN, and no operator-free ordered rung
+        # (SIGN/ABS/LEAST/GREATEST/NULLIF/WIDTH_BUCKET/INTERVAL) - only '=' equality. Values
         # still extract (linear scan); multi-row dump honestly degrades (can't page)
-        esp = Esperanto(_disguisedOracle(blocked=r">|<|BETWEEN|\bIN\s*\("))
+        esp = Esperanto(_disguisedOracle(
+            blocked=r">|<|BETWEEN|\bIN\s*\(|SIGN\(|ABS\(|LEAST\(|GREATEST\(|NULLIF\(|WIDTH_BUCKET\(|INTERVAL\("))
         esp.discover()
         self.assertEqual(esp.extract(_SECRET_EXPR), "admin")
         rows = (esp.dump("users") or {}).get("rows")
