@@ -660,8 +660,7 @@ class Databases(object):
                     query += condQuery
 
                 elif Backend.isDbms(DBMS.MSSQL):
-                    query = rootQuery.inband.query % (conf.db, conf.db, conf.db, conf.db,
-                                                      conf.db, conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl).split(".")[-1])
+                    query = rootQuery.inband.query % (conf.db, conf.db, conf.db, conf.db, conf.db, safeSQLIdentificatorNaming(tbl, True))
                     query += condQuery.replace("[DB]", conf.db)
 
                 elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD):
@@ -690,7 +689,7 @@ class Databases(object):
                     index, values = 1, []
 
                     while True:
-                        query = rootQuery.inband.query2 % (conf.db, unsafeSQLIdentificatorNaming(tbl), index)
+                        query = rootQuery.inband.query2 % (conf.db, safeSQLIdentificatorNaming(tbl, True), index)
                         value = unArrayizeValue(inject.getValue(query, blind=False, time=False))
 
                         if isNoneValue(value) or value == " ":
@@ -793,7 +792,7 @@ class Databases(object):
                     query += condQuery
 
                 elif Backend.isDbms(DBMS.MSSQL):
-                    query = rootQuery.blind.count % (conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl).split(".")[-1])
+                    query = rootQuery.blind.count % (conf.db, conf.db, safeSQLIdentificatorNaming(tbl, True))
                     query += condQuery.replace("[DB]", conf.db)
 
                 elif Backend.isDbms(DBMS.FIREBIRD):
@@ -839,7 +838,7 @@ class Databases(object):
                         if Backend.isDbms(DBMS.MSSQL):
                             count, index, values = 0, 1, []
                             while True:
-                                query = rootQuery.blind.query3 % (conf.db, unsafeSQLIdentificatorNaming(tbl), index)
+                                query = rootQuery.blind.query3 % (conf.db, safeSQLIdentificatorNaming(tbl, True), index)
                                 value = unArrayizeValue(inject.getValue(query, union=False, error=False))
 
                                 if isNoneValue(value) or value == " ":
@@ -883,7 +882,7 @@ class Databases(object):
                         query += condQuery
                         field = None
                     elif Backend.isDbms(DBMS.MSSQL):
-                        query = rootQuery.blind.query.replace("'%s'", "'%s'" % unsafeSQLIdentificatorNaming(tbl).split(".")[-1]).replace("%s", conf.db).replace("%d", str(index))
+                        query = rootQuery.blind.query % (conf.db, conf.db, conf.db, conf.db, safeSQLIdentificatorNaming(tbl, True), conf.db, index, conf.db, conf.db, conf.db, conf.db, safeSQLIdentificatorNaming(tbl, True), conf.db, conf.db)
                         query += condQuery.replace("[DB]", conf.db)
                         field = condition.replace("[DB]", conf.db)
                     elif Backend.isDbms(DBMS.FIREBIRD):
@@ -947,7 +946,7 @@ class Databases(object):
                             elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE, DBMS.MIMERSQL):
                                 query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(tbl.upper()), column, unsafeSQLIdentificatorNaming(conf.db.upper()))
                             elif Backend.isDbms(DBMS.MSSQL):
-                                query = rootQuery.blind.query2 % (conf.db, conf.db, conf.db, conf.db, column, conf.db, conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl).split(".")[-1])
+                                query = rootQuery.blind.query2 % (conf.db, conf.db, conf.db, column, conf.db, conf.db, safeSQLIdentificatorNaming(tbl, True))
                             elif Backend.isDbms(DBMS.FIREBIRD):
                                 query = rootQuery.blind.query2 % (unsafeSQLIdentificatorNaming(tbl), column)
                             elif Backend.isDbms(DBMS.INFORMIX):
