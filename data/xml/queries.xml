@@ -959,8 +959,8 @@
 
     <dbms value="Apache Derby">
         <!-- NOTE: CHAR(%s) causes 'A truncation error was encountered trying to shrink CHAR' -->
-        <cast query="CAST(%s AS VARCHAR(32672))"/>
-        <length query="LENGTH(CAST(%s AS VARCHAR(32672)))"/>
+        <cast query="RTRIM(CAST(%s AS VARCHAR(32672)))"/>
+        <length query="LENGTH(RTRIM(CAST(%s AS VARCHAR(32672))))"/>
         <isnull query="COALESCE(%s,' ')"/>
         <delimiter query="||"/>
         <limit query="OFFSET %d ROWS FETCH FIRST %d ROWS ONLY"/>
