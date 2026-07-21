@@ -238,7 +238,7 @@ def checkCharEncoding(encoding, warn=True):
     # Reference: http://docs.python.org/library/codecs.html
     try:
         codecs.lookup(encoding)
-    except LookupError:
+    except (LookupError, ValueError):   # ValueError: an attacker-controlled charset with a NUL (e.g. "utf-8\x00") -> "embedded null character"
         encoding = None
 
     if encoding:
