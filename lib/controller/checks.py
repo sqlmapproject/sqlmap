@@ -1061,10 +1061,33 @@ def checkFilteredChars(injection):
     # inference techniques depend on character '>'
     if not any(_ in injection.data for _ in (PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.QUERY)):
         if not checkBooleanExpression("%d>%d" % (randInt + 1, randInt)):
-            warnMsg = "it appears that the character '>' is "
-            warnMsg += "filtered by the back-end server. You are strongly "
-            warnMsg += "advised to rerun with the '--tamper=between'"
-            logger.warning(warnMsg)
+            # '>' is filtered - blind inference bisection (e.g. ASCII(...)>N) would silently
+            # retrieve nothing. Auto-apply the 'between' tamper (>  ->  NOT BETWEEN 0 AND, SQL
+            # standard, all DBMS) and re-verify, so the run adapts in place instead of forcing a
+            # manual rerun. Skipped when the user chose their own '--tamper' (respect that choice).
+            adapted = False
+
+            if not conf.tamper:
+                from lib.utils.wafbypass import loadTamper
+                function = loadTamper("between")
+
+                if function is not None and function not in (kb.tamperFunctions or []):
+                    kb.tamperFunctions = (kb.tamperFunctions or []) + [function]
+                    _ = randomInt()
+
+                    if checkBooleanExpression("%d>%d" % (_ + 1, _)):
+                        adapted = True
+                        infoMsg = "the character '>' appears to be filtered by the back-end "
+                        infoMsg += "server; sqlmap automatically applied the 'between' tamper script to adapt"
+                        logger.info(infoMsg)
+                    else:
+                        kb.tamperFunctions.remove(function)
+
+            if not adapted:
+                warnMsg = "it appears that the character '>' is "
+                warnMsg += "filtered by the back-end server. You are strongly "
+                warnMsg += "advised to rerun with the '--tamper=between'"
+                logger.warning(warnMsg)
 
     kb.injection = popValue()
 
