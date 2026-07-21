@@ -1572,6 +1572,7 @@ class Connect(object):
         # it skips the time-based statistical warm-up entirely. The comparison request is assembled exactly
         # as it would be sent (buildOnly) and the bit is read from a coalesced pair. Not engaged -> timing.
         if timeBasedCompare and kb.get("timeless") is not None:
+            from lib.request.timeless import CONNECTIVITY_ERRORS
             from lib.request.timeless import negatePayload
             # Build the condition and negation requests through the SAME path (queryPage buildOnly on the
             # raw pre-placement value) so the pair differs ONLY by the negated comparison - building cond
@@ -1580,7 +1581,17 @@ class Connect(object):
             negValue = negatePayload(timelessOrigValue)
             condSpec = Connect.queryPage(timelessOrigValue, place=place, buildOnly=True)
             negSpec = Connect.queryPage(negValue, place=place, buildOnly=True) if negValue is not None else None
-            return kb.timeless.readBitFromSpecs(condSpec, negSpec)
+            try:
+                return kb.timeless.readBitFromSpecs(condSpec, negSpec)
+            except CONNECTIVITY_ERRORS as ex:
+                # The oracle's own per-pair retries (see _pairOrder) are exhausted - the target has stopped
+                # negotiating HTTP/2 altogether (e.g. a load-balanced backend that only some nodes speak it
+                # on), not just dropped one connection. Disengage (restores the classic time-based vector)
+                # and fall through below to the normal wall-clock comparison instead of crashing the scan.
+                from lib.request.timeless import disengage
+                warnMsg = "HTTP/2 timeless timing lost connectivity ('%s'). Falling back to classic time-based" % getSafeExString(ex)
+                singleTimeWarnMessage(warnMsg)
+                disengage()
 
         if timeBasedCompare and not conf.disableStats:
             if len(kb.responseTimes.get(kb.responseTimeMode, [])) < MIN_TIME_RESPONSES:

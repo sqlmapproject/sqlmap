@@ -27,6 +27,12 @@ from lib.request.http2 import _H2Connection
 # Serializes the one-shot autoEngage() so concurrent worker threads never double-calibrate/double-engage.
 _engageLock = threading.Lock()
 
+# Transport-level failures that mean "this connection/attempt is unusable" - covers a mid-exchange drop
+# (GOAWAY, reset) as well as a failed (re)connect, including the h2 client's own IOError when the server
+# does not negotiate ALPN 'h2' on a fresh socket (seen on backends that speak h2 inconsistently, e.g. only
+# some nodes behind a load balancer). Shared by _pairOrder (per-pair retry) and connect.py (the give-up path).
+CONNECTIVITY_ERRORS = (socket.error, ssl.SSLError, IOError)
+
 
 def buildConditionPair(condition, heavy, cheap="0"):
     """Turn a boolean `condition` (the same comparison bisection injects at INFERENCE_MARKER, e.g.
@@ -59,15 +65,19 @@ def _pairOrder(connSource, reqA, reqB, timeout, retries=2):
     lets a dropped connection be replaced transparently and the pair re-sent: a long extraction routinely
     outlives a single HTTP/2 connection (the server retires it with GOAWAY after its per-connection request
     cap), and a coalesced boolean-read pair is idempotent, so re-sending it on a fresh connection is safe.
-    A raw connection (used by calibration and the self-test) is not retried - it simply raises."""
+    Opening that fresh connection is retried the same way - it can fail just like an in-progress exchange
+    (including ALPN renegotiation failing on the new socket). A raw connection (used by calibration and the
+    self-test) is not retried - it simply raises."""
     attempt = 0
     while True:
-        conn = connSource() if callable(connSource) else connSource
+        conn = None
         try:
+            conn = connSource() if callable(connSource) else connSource
             order, _results = conn.exchange_pair([reqA, reqB], timeout)
             return order[0], conn.next_sid - 4, conn.next_sid - 2
-        except (socket.error, ssl.SSLError, IOError):
-            conn.close()                                # retire; a callable source reopens on the next pass
+        except CONNECTIVITY_ERRORS:
+            if conn is not None:
+                conn.close()                            # retire; a callable source reopens on the next pass
             attempt += 1
             if not callable(connSource) or attempt > retries:
                 raise
