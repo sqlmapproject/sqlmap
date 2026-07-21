@@ -1223,7 +1223,7 @@ class Databases(object):
 
             # every <procedures> blind query uses 0-based paging (MySQL "LIMIT %d,1", PostgreSQL/MSSQL/Oracle
             # "OFFSET %d"), so the index range stays 0-based here regardless of PLUS_ONE_DBMSES (unlike
-            # getStatements(), whose MSSQL/Oracle idioms are 1-based)
+            # getStatements(), whose Oracle idiom is 1-based; MSSQL is now 0-based, out of PLUS_ONE_DBMSES)
             indexRange = getLimitRange(count)
 
             for index in indexRange:
