@@ -485,7 +485,7 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s"/>
-            <blind query="SELECT FIRST 1 SKIP %d %s FROM %s" count="SELECT COUNT(*) FROM %s"/>
+            <blind query="SELECT FIRST 1 SKIP %d %s FROM %s ORDER BY %s" count="SELECT COUNT(*) FROM %s"/>
         </dump_table>
         <search_db/>
         <search_table>
@@ -679,7 +679,7 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s"/>
-            <blind query="SELECT ENTRY_VALUE FROM (SELECT ROW_NUMBER() OVER () AS CAP,%s AS ENTRY_VALUE FROM %s) AS qq WHERE CAP=%d" count="SELECT COUNT(*) FROM %s"/>
+            <blind query="SELECT ENTRY_VALUE FROM (SELECT ROW_NUMBER() OVER (ORDER BY %s) AS CAP,%s AS ENTRY_VALUE FROM %s) AS qq WHERE CAP=%d" count="SELECT COUNT(*) FROM %s"/>
         </dump_table>
         <search_db>
             <inband query="SELECT schemaname FROM syscat.schemata WHERE %s" condition="schemaname"/>
@@ -941,7 +941,7 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s.%s"/>
-            <blind query="SELECT z FROM (SELECT %s AS z,row_number() over() AS y FROM %s.%s)x WHERE x.y-1=%d" count="SELECT COUNT(*) FROM %s.%s"/>
+            <blind query="SELECT z FROM (SELECT %s AS z,row_number() over(ORDER BY %s) AS y FROM %s.%s)x WHERE x.y-1=%d" count="SELECT COUNT(*) FROM %s.%s"/>
         </dump_table>
         <search_db>
             <inband query="SELECT schemas.name FROM schemas WHERE %s" condition="schemas.name"/>
@@ -1000,7 +1000,7 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s"/>
-            <blind query="SELECT %s FROM %s OFFSET %d ROWS FETCH FIRST 1 ROW ONLY" count="SELECT COUNT(*) FROM %s"/>
+            <blind query="SELECT %s FROM %s ORDER BY %s OFFSET %d ROWS FETCH FIRST 1 ROW ONLY" count="SELECT COUNT(*) FROM %s"/>
         </dump_table>
         <users>
             <inband query="SELECT USERNAME FROM SYS.SYSUSERS"/>
@@ -1259,7 +1259,7 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s"/>
-            <blind query="SELECT %s FROM %s LIMIT %d,1" count="SELECT COUNT(*) FROM %s"/>
+            <blind query="SELECT %s FROM %s ORDER BY %s LIMIT %d,1" count="SELECT COUNT(*) FROM %s"/>
         </dump_table>
         <search_db>
             <inband query="SELECT USER_NAME FROM SYSTEM_.SYS_USERS_ WHERE %s" condition="USER_NAME"/>
@@ -1537,7 +1537,7 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s.%s"/>
-            <blind query="SELECT %s FROM %s.%s LIMIT %d,1" count="SELECT COUNT(*) FROM %s.%s"/>
+            <blind query="SELECT %s FROM %s.%s ORDER BY %s LIMIT %d,1" count="SELECT COUNT(*) FROM %s.%s"/>
         </dump_table>
         <search_db>
             <inband query="SELECT name FROM db_user WHERE %s" condition="name"/>
@@ -1648,7 +1648,7 @@
         <columns/>
         <dump_table>
             <inband query="SELECT %s FROM %s"/>
-            <blind query="SELECT %s FROM %s LIMIT %d,1" count="SELECT COUNT(*) FROM %s"/>
+            <blind query="SELECT %s FROM %s ORDER BY %s LIMIT %d,1" count="SELECT COUNT(*) FROM %s"/>
         </dump_table>
         <search_db/>
         <search_table/>
@@ -1705,7 +1705,7 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s.%s"/>
-            <blind query="SELECT TOP (%d,1) %s FROM %s.%s" count="SELECT COUNT(*) FROM %s.%s"/>
+            <blind query="SELECT TOP (%d,1) %s FROM %s.%s ORDER BY %s" count="SELECT COUNT(*) FROM %s.%s"/>
         </dump_table>
         <search_db>
             <inband query="SELECT &quot;schema_name&quot; FROM INFORMATION_SCHEMA.SCHEMATA WHERE %s" condition="&quot;schema_name&quot;"/>
@@ -1992,7 +1992,7 @@
         </columns>
         <dump_table>
             <inband query="SELECT %s FROM %s.%s"/>
-            <blind query="SELECT %s FROM %s.%s LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM %s.%s"/>
+            <blind query="SELECT %s FROM %s.%s ORDER BY %s LIMIT 1 OFFSET %d" count="SELECT COUNT(*) FROM %s.%s"/>
         </dump_table>
         <search_db>
             <inband query="SELECT SCHEMA_NAME FROM SYS.SCHEMAS WHERE %s" condition="schema_name"/>

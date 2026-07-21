@@ -478,18 +478,24 @@ class Entries(object):
                         def cellQuery(column, index):
                             if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2, DBMS.VERTICA, DBMS.PRESTO, DBMS.CRATEDB, DBMS.CACHE, DBMS.CLICKHOUSE, DBMS.SNOWFLAKE, DBMS.SPANNER):
                                 query = rootQuery.blind.query % (agent.preprocessField(tbl, column), conf.db, conf.tbl, prioritySortColumns(colList)[0], index)
-                            elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE,):
+                            elif Backend.getIdentifiedDbms() in (DBMS.HANA, DBMS.CUBRID):
+                                query = rootQuery.blind.query % (agent.preprocessField(tbl, column), conf.db, tbl, prioritySortColumns(colList)[0], index)
+                            elif Backend.isDbms(DBMS.MONETDB):
+                                query = rootQuery.blind.query % (agent.preprocessField(tbl, column), prioritySortColumns(colList)[0], conf.db, tbl, index)
+                            elif Backend.isDbms(DBMS.DB2):
+                                query = rootQuery.blind.query % (prioritySortColumns(colList)[0], agent.preprocessField(tbl, column), tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())), index)
+                            elif Backend.isDbms(DBMS.ORACLE):
                                 query = rootQuery.blind.query % (agent.preprocessField(tbl, column), tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())), index)
-                            elif Backend.getIdentifiedDbms() in (DBMS.MIMERSQL,):
+                            elif Backend.getIdentifiedDbms() in (DBMS.MIMERSQL, DBMS.DERBY, DBMS.ALTIBASE):
                                 query = rootQuery.blind.query % (agent.preprocessField(tbl, column), tbl.upper() if not conf.db else ("%s.%s" % (conf.db.upper(), tbl.upper())), prioritySortColumns(colList)[0], index)
-                            elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.EXTREMEDB):
+                            elif Backend.isDbms(DBMS.SQLITE):
                                 query = rootQuery.blind.query % (agent.preprocessField(tbl, column), tbl, index)
+                            elif Backend.isDbms(DBMS.EXTREMEDB):
+                                query = rootQuery.blind.query % (agent.preprocessField(tbl, column), tbl, prioritySortColumns(colList)[0], index)
                             elif Backend.isDbms(DBMS.FIREBIRD):
-                                query = rootQuery.blind.query % (index, agent.preprocessField(tbl, column), tbl)
-                            elif Backend.getIdentifiedDbms() in (DBMS.INFORMIX, DBMS.VIRTUOSO):
+                                query = rootQuery.blind.query % (index, agent.preprocessField(tbl, column), tbl, prioritySortColumns(colList)[0])
+                            elif Backend.getIdentifiedDbms() in (DBMS.INFORMIX, DBMS.VIRTUOSO, DBMS.FRONTBASE):
                                 query = rootQuery.blind.query % (index, agent.preprocessField(tbl, column), conf.db, tbl, prioritySortColumns(colList)[0])
-                            elif Backend.isDbms(DBMS.FRONTBASE):
-                                query = rootQuery.blind.query % (index, agent.preprocessField(tbl, column), conf.db, tbl)
                             else:
                                 query = rootQuery.blind.query % (agent.preprocessField(tbl, column), conf.db, tbl, index)
 
