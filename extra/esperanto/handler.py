@@ -9,6 +9,14 @@ from .engine import Esperanto
 from .records import OracleUndecided
 
 
+def _sanitize(s):
+    """Escape C0/DEL/C1 control bytes in recovered DB content before it is logged - a stored
+    value can carry ANSI/OSC sequences that would otherwise drive or forge the sqlmap console."""
+    if not isinstance(s, type(u"")):
+        return s
+    return "".join(c if (u" " <= c < u"\x7f") or c > u"\x9f" else "\\x%02x" % ord(c) for c in s)
+
+
 def buildHandler():
     """Build the sqlmap dbmsHandler that drives enumeration through this engine when
     the back-end cannot be (or should not be) fingerprinted. sqlmap-core imports are
@@ -39,6 +47,7 @@ def buildHandler():
             Enumeration.__init__(self)
             Miscellaneous.__init__(self)
             self._esp = None
+            self._notesLogged = 0       # how many dialect.notes already surfaced (see _flushNotes)
             self._identCache = {}       # current user/db: fetch (and announce) once
             self._colCache = {}         # (db, table) -> ordered column names, so a dump
                                         # reuses what --columns already enumerated
@@ -71,11 +80,20 @@ def buildHandler():
                         # primitive) - stop cleanly instead of surfacing an internal traceback
                         raise SqlmapDataException("Esperanto could not establish a reliable extraction oracle on this target (%s)" % ex)
                 logger.info("Esperanto dialect verdict: %s" % (esp.identify().get("product") or "unknown"))
-                esp._progress = lambda value: logger.info("retrieved: %s" % value)  # live feedback
-                for note in esp.dialect.notes:          # surface degradations LOUDLY (never silent)
-                    logger.warning("Esperanto: %s" % note)
+                esp._progress = lambda value: logger.info("retrieved: %s" % _sanitize(value))  # live feedback (sanitized)
                 self._esp = esp
+                self._notesLogged = 0
+                self._flushNotes()                      # discovery-time notes
             return self._esp
+
+        def _flushNotes(self):
+            # surface degradation notes LOUDLY as they accrue. Enumeration/dump append notes
+            # AFTER discovery, so logging once would hide every runtime degradation (incomplete
+            # listing, truncation, blocked paging) - flush the NEW ones after each operation.
+            notes = self._esp.dialect.notes if self._esp else []
+            for note in notes[self._notesLogged:]:
+                logger.warning("Esperanto: %s" % note)
+            self._notesLogged = len(notes)
 
         def _scopeDb(self):
             # the database to scope table/column lookups to: -D if given, else the
@@ -133,19 +151,30 @@ def buildHandler():
             return kb.data.currentDb
 
         def _safeExtract(self, expr):
+            # current user/db are used as SQL QUALIFIERS + cache keys + scoping decisions, so
+            # they must be EXACT - a truncated/case-ambiguous value here becomes wrong SQL.
             try:
-                return self._esp.extract(expr)
+                res = self._esp.extractResult(expr)
             except OracleUndecided:
                 logger.warning("Esperanto could not retrieve %s (oracle undecided)" % expr)
                 return None
+            if res.value is not None and not res.exact:
+                logger.warning("Esperanto: %s not recovered exactly (%s) - not used for scoping" % (expr, res.integrity))
+                return None
+            return res.value
 
         def isDba(self, user=None):
-            kb.data.isDba = False           # no privilege claim the oracle cannot prove
+            # UNKNOWN, not a negative claim: Esperanto has no generic DBA probe, so returning
+            # False would assert "not a DBA" on no evidence. Report it can't tell and return
+            # None (unknown) so a transient can't be read as a proven privilege verdict.
+            logger.warning("Esperanto cannot determine DBA status (no generic privilege probe)")
+            kb.data.isDba = None
             return kb.data.isDba
 
         def getDbs(self):
             logger.info("fetching database names")
             kb.data.cachedDbs = self._engine().enumerate("database", limit=(conf.limitStop or 50)) or []
+            self._flushNotes()
             return kb.data.cachedDbs
 
         def getTables(self, bruteForce=None):
@@ -165,6 +194,7 @@ def buildHandler():
                 infoMsg += " for database '%s'" % db
             logger.info(infoMsg)
             kb.data.cachedTables = {db or "<current>": names}
+            self._flushNotes()
             return kb.data.cachedTables
 
         def getColumns(self, onlyColNames=False, colTuple=None, bruteForce=None, dumpMode=False):
@@ -179,15 +209,22 @@ def buildHandler():
             names = self._engine().columns(conf.tbl, schema=db) or []
             self._colCache[(db, conf.tbl)] = names       # let a following dump reuse these
             kb.data.cachedColumns = {db or "<current>": {conf.tbl: dict((n, None) for n in names)}}
+            self._flushNotes()
             return kb.data.cachedColumns
 
         def getSchema(self):
             esp = self._engine()
-            db = self._scopeDb()
+            # use the EFFECTIVE db that getTables() actually resolved (it may have broadened to
+            # 'public' when the current schema was empty) - recomputing _db() here would miss
+            # that and look columns up in the wrong (empty) schema.
+            tabmap = self.getTables()
+            effdb, tables = next(iter(tabmap.items()), ("<current>", []))
+            colscope = self._scopeDb() if effdb == "<current>" else effdb
             schema = {}
-            for table in (self.getTables().get(self._db()) or []):
-                schema[table] = dict((n, None) for n in (esp.columns(table, schema=db) or []))
-            kb.data.cachedColumns = {self._db(): schema}
+            for table in (tables or []):
+                schema[table] = dict((n, None) for n in (esp.columns(table, schema=colscope) or []))
+            kb.data.cachedColumns = {effdb: schema}
+            self._flushNotes()
             return kb.data.cachedColumns
 
         def dumpTable(self, foundData=None):
@@ -205,7 +242,26 @@ def buildHandler():
             if db:
                 infoMsg += " in database '%s'" % db
             logger.info(infoMsg)
-            result = self._engine().dump(conf.tbl, columns=cols, schema=db, limit=(conf.limitStop or 10))
+            # sqlmap row-SELECTORS change WHICH rows come back, so REFUSE (don't silently return
+            # different data): --where filters, --start offsets. --stop is honored as a row cap.
+            if getattr(conf, "dumpWhere", None):
+                logger.error("Esperanto cannot honor --where; refusing rather than returning unfiltered rows")
+                return
+            if getattr(conf, "limitStart", None):
+                logger.error("Esperanto cannot honor --start; refusing rather than returning the wrong row range")
+                return
+            # the SAME qualified reference for count and dump, so a non-default schema can't make
+            # the count hit a different (unqualified) table than the dump (#8).
+            qtable = self._engine().qualify(conf.tbl, db)
+            if conf.limitStop:
+                limit = conf.limitStop
+            else:
+                try:
+                    limit = self._engine().extractInteger("(SELECT COUNT(*) FROM %s)" % qtable) or 10
+                except (OracleUndecided, OverflowError):
+                    limit = 1 << 30             # unknown count -> effectively "all" (keyset stops at end)
+                logger.info("no --stop given; dumping all %s rows" % (limit if limit < (1 << 30) else "(count unknown)"))
+            result = self._engine().dump(conf.tbl, columns=cols, schema=db, limit=limit)
             if not result or not result["columns"]:
                 logger.error("Esperanto could not dump table '%s'" % conf.tbl)
                 return
@@ -217,7 +273,11 @@ def buildHandler():
             table_data["__infos__"] = {"count": len(result["rows"]), "table": conf.tbl, "db": self._db()}
             if not result["complete"]:
                 logger.warning("Esperanto dump of '%s' may be incomplete" % conf.tbl)
+            if not result.get("exact", True):       # coverage may be complete yet content inexact
+                logger.warning("Esperanto dump of '%s': values recovered via a collation-dependent "
+                               "comparison - case/accents may not be byte-exact" % conf.tbl)
             kb.data.dumpedTable = table_data
+            self._flushNotes()
             conf.dumper.dbTableValues(kb.data.dumpedTable)
 
     return _EsperantoHandler()

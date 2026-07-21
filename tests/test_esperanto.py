@@ -25,6 +25,7 @@ Regression suite for the DBMS-agnostic engine (extra/esperanto/), in two parts:
 stdlib unittest only; Python 2.7 and 3.x.
 """
 
+import binascii
 import os
 import re
 import sqlite3
@@ -36,6 +37,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from extra.esperanto import Cap
 from extra.esperanto import Esperanto
 from extra.esperanto import hostExtract
+from extra.esperanto import Integrity
 
 EXPR = "(SELECT v FROM t)"
 
@@ -190,6 +192,430 @@ class TestEsperanto(unittest.TestCase):
             esp = Esperanto(_oracle())
             esp.discover()
             self.assertEqual(esp.extractInteger("(%d)" % n), n, "extractInteger(%d)" % n)
+
+    def test_between_no_saturation(self):
+        # #1: BETWEEN caps range probes at the ceiling, so an out-of-range value must be
+        # flagged (truncated length / OverflowError), NEVER converge to a wrong SMALL value
+        # (the old bug read a len-16 value as length 1 and an int 100/max-10 as 0).
+        esp = Esperanto(_oracle(u"0123456789ABCDEF"), maxlen=8)     # true length 16 > ceiling 8
+        esp.discover()
+        esp._comparator = "between"
+        n, trunc = esp._measureLength(EXPR, ceiling=8)
+        self.assertTrue(trunc and n == 8, "between over-length saturated wrong: (%r,%r)" % (n, trunc))
+        esp2 = Esperanto(_oracle())
+        esp2.discover()
+        esp2._comparator = "between"
+        self.assertEqual(esp2.extractInteger("(100)", maximum=1000), 100)
+        self.assertRaises(OverflowError, esp2.extractInteger, "(100)", 10)
+
+    def test_framing_requires_terminal_marker(self):
+        # a length-framed token MUST carry its terminal ';' - a truncated final token (no ';')
+        # must be rejected, not accepted as valid
+        esp = Esperanto(lambda c: False)
+        esp._rowLenFramed = True
+        self.assertEqual(esp._splitRow("V3:414243", 1), (None, False))    # no terminator -> invalid
+        self.assertEqual(esp._splitRow("V3:414243;", 1), (["ABC"], True))  # terminated -> valid
+        self.assertEqual(esp._splitRow("V4:414243;", 1), (None, False))    # declared 4 != decoded 3
+
+    def test_host_native_integrity_parity(self):
+        # hostExtract must mirror the native EXACT/AMBIGUOUS verdict: in a mode with no byte-exact
+        # witness (ordinal), both must be WHOLE_BUT_AMBIGUOUS, not native-ambiguous/host-exact.
+        con = sqlite3.connect(":memory:")
+        con.execute("CREATE TABLE t (v TEXT)")
+        con.execute("INSERT INTO t VALUES ('Admin-42')")
+        con.commit()
+        blk = re.compile(r"(?i)\bHEX\(|RAWTOHEX|ENCODE\(|(ASCII|UNICODE|ORD)\(|COLLATE|BLOB|BINARY")
+
+        def ask(cond):
+            if blk.search(cond):
+                return False
+            try:
+                return con.execute("SELECT CASE WHEN (%s) THEN 1 ELSE 0 END" % cond).fetchone()[0] == 1
+            except sqlite3.DatabaseError:
+                return False
+        esp = Esperanto(ask, maxlen=64)
+        esp.discover()
+        if esp._byteFaithful():
+            self.skipTest("dialect still byte-faithful")
+        native = esp.extractResult("(SELECT v FROM t)")
+        host = hostExtract(ask, esp.strategy(), "(SELECT v FROM t)")
+        self.assertEqual(host.value, native.value)
+        self.assertFalse(host.exact, "host claimed exact without a witness: %r" % host)
+        self.assertEqual(host.integrity, native.integrity)
+
+    def test_framing_length_witness_catches_capped_hex(self):
+        # a HEX fn that silently caps its output (correct up to a point, then truncates) would
+        # shorten a framed cell. The independent <charlen> witness in the row token (V<len>:<hex>;)
+        # must reject the shortened token -> fall back to cell-by-cell (which reads the true
+        # length via substring), so a 400-char value is recovered whole, not silently as 300.
+        con = sqlite3.connect(":memory:")
+        con.execute("CREATE TABLE t (id INTEGER PRIMARY KEY, v TEXT)")
+        big = "A" * 400
+        con.execute("INSERT INTO t VALUES (1, ?)", (big,))
+        con.commit()
+        con.create_function("CHEX", 1, lambda s: binascii.hexlify((s or "").encode("utf-8")[:300]).decode().upper())
+
+        def ask(cond):
+            c = re.sub(r"UPPER\(HEX\(([^()]*)\)\)", r"CHEX(\1)", cond)   # HEX -> a 300-byte-capped hex
+            try:
+                return con.execute("SELECT CASE WHEN (%s) THEN 1 ELSE 0 END" % c).fetchone()[0] == 1
+            except sqlite3.DatabaseError:
+                return False
+        esp = Esperanto(ask, maxlen=8192)
+        esp.discover()
+        d = esp.dump("t")
+        val = d["rows"][0][1] if d and d["rows"] else None
+        self.assertTrue((val == big and d["complete"]) or (d and not d["complete"]),
+                        "capped hex slipped through: %r len=%s" % ((val or "")[:8], len(val) if val else None))
+
+    def test_integer_final_equality(self):
+        # comparator proven on literals, but the backend rewrites '>' to '>=' for scalar/fn
+        # operands -> bisection converges off-by-one. The final `expr = recovered` check must
+        # reject it (fail closed) rather than return a silently-wrong integer.
+        con = sqlite3.connect(":memory:")
+
+        def ask(cond):
+            c = cond
+            if re.search(r"(SELECT|LENGTH|UNICODE|SUBSTR|\+)", c, re.I):
+                c = c.replace(">", ">=")
+            try:
+                return con.execute("SELECT CASE WHEN (%s) THEN 1 ELSE 0 END" % c).fetchone()[0] == 1
+            except sqlite3.DatabaseError:
+                return False
+        esp = Esperanto(ask)
+        esp.discover()
+        self.assertRaises(Exception, esp.extractInteger, "(SELECT 5)", 10)   # OracleUndecided (fail closed)
+
+    def test_charset_codec_quirks(self):
+        from extra.esperanto.atlas import _charsetCodec
+        self.assertEqual(_charsetCodec("latin1"), "cp1252")          # MySQL 'latin1' is Windows-1252
+        self.assertEqual(_charsetCodec("utf8mb4"), "utf-8")
+        self.assertEqual(_charsetCodec("utf8mb4_general_ci"), "utf-8")   # collation suffix peeled
+        self.assertEqual(_charsetCodec("WE8MSWIN1252"), "cp1252")     # Oracle
+        self.assertEqual(_charsetCodec("1252"), "cp1252")            # SQL Server code page
+        self.assertEqual(_charsetCodec("AL32UTF8"), "utf-8")
+        self.assertIsNone(_charsetCodec("some_unknown_set"))
+
+    def test_host_length_code_final_equality(self):
+        # Round 8 #1: hostExtract must apply the native reader's final-equality to the recovered
+        # LENGTH and each per-char CODE - a backend that rewrites '>' to '>=' for computed operands
+        # (LENGTH(..)>n, UNICODE(..)>n) converges off-by-one; the '=' confirmation must fail closed
+        # rather than hand back silently-wrong code-point text as exact.
+        con = sqlite3.connect(":memory:")
+        con.execute("CREATE TABLE t (v TEXT)")
+        con.execute("INSERT INTO t VALUES ('Admin-42')")
+        con.commit()
+
+        def ask(cond):
+            c = cond
+            if re.search(r"(LENGTH|UNICODE|SUBSTR)\(", c, re.I):     # '>' rewritten for computed operands
+                c = c.replace(">", ">=")
+            try:
+                return con.execute("SELECT CASE WHEN (%s) THEN 1 ELSE 0 END" % c).fetchone()[0] == 1
+            except sqlite3.DatabaseError:
+                return False
+        esp = Esperanto(ask, maxlen=64)
+        esp.discover()
+        if esp.dialect.compare != "code":
+            self.skipTest("dialect not in code mode")
+        host = hostExtract(ask, esp.strategy(), "(SELECT v FROM t)")
+        # the invariant: anything claimed EXACT must be CORRECT. An off-by-one read is caught by
+        # the final equality and must surface as non-exact/failed, never as a wrong exact value.
+        self.assertTrue(host.value == "Admin-42" or not host.exact,
+                        "host handed back a wrong value as exact: %r" % host)
+
+    def test_hex_unknown_codec_non_ascii_not_exact(self):
+        # Round 8 #2: scalar hex recovery under an UNKNOWN codec must not certify non-ASCII text
+        # (e.g. utf-8 bytes with an embedded NUL heuristically read as UTF-16). Bytes are faithful;
+        # only a PROVEN codec makes the decoded text exact.
+        con = sqlite3.connect(":memory:")
+        con.execute("CREATE TABLE t (v TEXT)")
+        con.execute("INSERT INTO t VALUES (?)", (u"é",))            # utf-8 C3 A9 -> non-ASCII bytes
+        con.execute("CREATE TABLE a (v TEXT)")
+        con.execute("INSERT INTO a VALUES ('plain')")
+        con.commit()
+
+        def ask(cond):
+            try:
+                return con.execute("SELECT CASE WHEN (%s) THEN 1 ELSE 0 END" % cond).fetchone()[0] == 1
+            except sqlite3.DatabaseError:
+                return False
+        esp = Esperanto(ask, maxlen=64)
+        esp.discover()
+        if not esp._ensureHexfn():
+            self.skipTest("no hex fn")
+        esp.dialect.charset = None                                  # force UNKNOWN codec
+        hx = esp.dialect.hexfn
+        esp.dialect.hexfn = Cap(hx.name, hx[1], encoding=None)
+        self.assertIsNone(esp._extractViaHex("(SELECT v FROM t)"),  # non-ASCII + unknown codec -> refuse
+                          "unknown-codec non-ASCII hex certified as exact")
+        ascii_r = esp._extractViaHex("(SELECT v FROM a)")           # ASCII is codec-invariant -> still OK
+        self.assertTrue(ascii_r is None or ascii_r.value == "plain")
+
+    def test_bytelen_witness_fails_closed(self):
+        # Round 8 #5: once a byte-length witness is selected, an UNDECIDED reading must reject the
+        # bytes (fail closed), never treat "couldn't verify" as "matched".
+        con = sqlite3.connect(":memory:")
+        con.execute("CREATE TABLE t (v TEXT)")
+        con.execute("INSERT INTO t VALUES ('abc')")
+        con.commit()
+
+        def ask(cond):
+            try:
+                return con.execute("SELECT CASE WHEN (%s) THEN 1 ELSE 0 END" % cond).fetchone()[0] == 1
+            except sqlite3.DatabaseError:
+                return False
+        esp = Esperanto(ask, maxlen=64)
+        esp.discover()
+        if not esp._ensureHexfn():
+            self.skipTest("no hex fn")
+        esp.dialect.bytelen = Cap("blen", "OCTET_NOSUCH({expr})")   # a byte-length fn that never resolves
+        self.assertIsNone(esp.extractBytes("(SELECT v FROM t)"),
+                          "undecided byte-length witness slipped through")
+
+    def test_unknown_codec_nul_not_shortened(self):
+        # Round 8 (final) blocker #1: unknown codec + embedded NUL is genuinely ambiguous - bytes
+        # 41 00 are valid UTF-8 ("A"+NUL) AND valid UTF-16LE ("A"). _decodeHexToken must refuse
+        # rather than collapse to a shortened ASCII "A" that then reads as exact. The framed dump
+        # calls _decodeHexToken directly, so the guard has to live there (not just _extractViaHex).
+        esp = Esperanto(lambda c: False)
+        self.assertIsNone(esp._decodeHexToken("4100", None))                # ambiguous -> refuse
+        self.assertEqual(esp._decodeHexToken("4100", "utf-8"), u"A\x00")    # proven codec keeps NUL
+        self.assertEqual(esp._decodeHexToken("41", None), u"A")             # pure ASCII still fine
+
+    def test_lossy_cast_marked_inexact(self):
+        # Round 8 (final) blocker #2: a text cast that FOLDS non-ASCII to "?" (café -> caf?) yields
+        # an ASCII-only result, so gating the cast-safety canary on _hasNonAscii(rows) meant it
+        # never ran on the very failure it defends against. The canary must run whenever a textcast
+        # was applied, and an unproven cast must not certify source identity.
+        con = sqlite3.connect(":memory:")
+        con.execute("CREATE TABLE t (id INTEGER PRIMARY KEY, v TEXT)")
+        con.execute(u"INSERT INTO t VALUES (1, 'café')")
+        con.commit()
+        con.create_function("LOSSY", 1, lambda s: "".join(c if ord(c) < 128 else "?" for c in (s or "")))
+
+        def ask(cond):
+            try:
+                return con.execute("SELECT CASE WHEN (%s) THEN 1 ELSE 0 END" % cond).fetchone()[0] == 1
+            except sqlite3.DatabaseError:
+                return False
+        esp = Esperanto(ask, maxlen=64)
+        esp.discover()
+        esp.dialect.charset = None                              # unknown -> exercise the canary path
+        esp.dialect.textcast = Cap("lossy", "LOSSY({expr})")   # a narrowing/folding cast
+        esp._castPreserves = None
+        self.assertFalse(esp._castPreservesAccents(), "folding cast wrongly certified as preserving")
+        d = esp.dump("t")
+        self.assertTrue(d and d["rows"], "dump returned nothing")
+        self.assertFalse(d["exact"], "folded (café->caf?) dump reported source-exact: %r" % d["rows"])
+
+    def test_repl_chars_escalate_to_hex(self):
+        # a code fn lossy for a column type (Oracle NVARCHAR2 read in code mode marks non-ASCII
+        # chars outside its alphabet -> _REPL). Rather than return the marked-incomplete value,
+        # the engine must escalate to the cast+hex path (which the framed dump proves works) and
+        # recover the value exactly. Without hex, it stays honestly incomplete (no false-complete).
+        con = sqlite3.connect(":memory:")
+        con.execute("CREATE TABLE t (v TEXT)")
+        con.execute(u"INSERT INTO t VALUES ('café-€')")
+        con.commit()
+        con.create_function("UNICODE", 1, lambda s: (ord(s[0]) if s and ord(s[0]) < 128 else None))
+
+        def make(block_hex):
+            pat = r"\bASCII\(|\bORD\(" + (r"|RAWTOHEX|\bHEX\(|ENCODE\(" if block_hex else "")
+            blk = re.compile(pat, re.I)
+
+            def ask(cond):
+                if blk.search(cond):
+                    return False
+                try:
+                    return con.execute("SELECT CASE WHEN (%s) THEN 1 ELSE 0 END" % cond).fetchone()[0] == 1
+                except Exception:
+                    return False
+            return ask
+        with_hex = Esperanto(make(False)); with_hex.discover()
+        r = with_hex.extractResult("(SELECT v FROM t)")
+        self.assertEqual(r.value, u"café-€", "hex escalation failed to recover _REPL value: %r" % r.value)
+        no_hex = Esperanto(make(True)); no_hex.discover()
+        r2 = no_hex.extractResult("(SELECT v FROM t)")
+        self.assertFalse(r2.complete, "no-hex _REPL value must stay incomplete, got complete: %r" % r2.value)
+
+    def test_keyset_cycle_detection(self):
+        # Round 8 (keyset): paging and read-back can resolve under different collations, so the
+        # walk can revisit an earlier name (f,e,f,e...). Full cycle detection (not just the
+        # immediate predecessor) must stop with a partial, de-duplicated list, never loop.
+        esp = Esperanto(lambda c: True)                            # _keysetWalk only, no discovery
+        seq = iter(["f", "e", "f", "e", "f"])
+
+        class _R(object):
+            def __init__(self, v):
+                self.value, self.complete, self.exact, self.is_null = v, True, True, False
+        esp.extractResult = lambda *a, **k: _R(next(seq))
+        esp._ask = lambda c: True
+        esp._beyondSql = lambda *a, **k: "1=1"
+        names = esp._keysetWalk("name", "cat", "", 10)
+        self.assertEqual(names, ["f", "e"], "cycle not detected/deduped: %r" % names)
+
+    def test_terminal_sanitized(self):
+        from extra.esperanto.__main__ import _safeterm
+        self.assertEqual(_safeterm(u"ok"), u"ok")
+        self.assertEqual(_safeterm(u"a\x1b[2Jb"), u"a\\x1b[2Jb")     # ANSI clear-screen neutralized
+        self.assertEqual(_safeterm(u"x\ny"), u"x\\x0ay")            # embedded newline neutralized
+
+    def test_comparator_rejects_gte_rewrite(self):
+        # a '>' -> '>=' rewrite passes 2>1 / !2>3 but FAILS the equality boundary (2>2 must be
+        # False). the full truth table must reject 'gt' (and fall to BETWEEN) so counts/lengths
+        # aren't read off-by-one. reproduced: extractInteger('5',max=10) used to return 6.
+        con = sqlite3.connect(":memory:")
+
+        def ask(cond):
+            try:
+                return con.execute("SELECT CASE WHEN (%s) THEN 1 ELSE 0 END" % cond.replace(">", ">=")).fetchone()[0] == 1
+            except sqlite3.DatabaseError:
+                return False
+        esp = Esperanto(ask)
+        esp.discover()
+        self.assertNotEqual(esp._comparator, "gt", "'>'->'>=' rewrite wrongly accepted as gt")
+        self.assertEqual(esp.extractInteger("(5)", maximum=10), 5)
+
+    def test_exact_requires_byte_witness(self):
+        # without a proven hex/binary witness (or code-codepoint), a value is WHOLE_BUT_AMBIGUOUS,
+        # never EXACT - plain '=' is collation-dependent and can't certify byte-exactness.
+        con = sqlite3.connect(":memory:")
+        con.execute("CREATE TABLE t (v TEXT)")
+        con.execute("INSERT INTO t VALUES ('Zz')")
+        con.commit()
+        blk = re.compile(r"(?i)\bHEX\(|RAWTOHEX|ENCODE\(|(ASCII|UNICODE|ORD)\(|GLOB|COLLATE|BLOB|BINARY")
+
+        def ask(cond):
+            if blk.search(cond):
+                return False
+            try:
+                return con.execute("SELECT CASE WHEN (%s) THEN 1 ELSE 0 END" % cond).fetchone()[0] == 1
+            except sqlite3.DatabaseError:
+                return False
+        esp = Esperanto(ask, maxlen=64)
+        esp.discover()
+        r = esp.extractResult("(SELECT v FROM t)")
+        if esp._byteFaithful():
+            self.skipTest("dialect still has a byte-faithful primitive")
+        self.assertEqual(r.value, "Zz")
+        self.assertFalse(r.exact, "value marked exact without a byte-faithful witness: %r" % r)
+
+    def test_extractresult_no_contradiction(self):
+        # a hard defect (incomplete/truncated) is classified before null-exactness
+        from extra.esperanto import ExtractResult, Integrity
+        self.assertEqual(ExtractResult(None, is_null=True, complete=False).integrity, Integrity.FAILED)
+        self.assertEqual(ExtractResult(None, is_null=True, complete=True).integrity, Integrity.EXACT)
+        self.assertFalse(ExtractResult(None, is_null=True, complete=False).exact)
+
+    def test_host_maxlen_zero(self):
+        con = sqlite3.connect(":memory:")
+        con.execute("CREATE TABLE t (v TEXT)")
+        con.execute("INSERT INTO t VALUES ('abcdef')")
+        con.commit()
+
+        def ask(cond):
+            try:
+                return con.execute("SELECT CASE WHEN (%s) THEN 1 ELSE 0 END" % cond).fetchone()[0] == 1
+            except sqlite3.DatabaseError:
+                return False
+        esp = Esperanto(ask)
+        esp.discover()
+        r = hostExtract(ask, esp.strategy(), "(SELECT v FROM t)", maxlen=0)
+        self.assertEqual(r.value, "")
+        self.assertTrue(r.truncated and not r.complete)
+
+    def test_between_overflow_magnitude(self):
+        # a positive value beyond BETWEEN's global ceiling fails closed WITHOUT claiming "below
+        # minimum" (the direction is genuinely unknown to a bounded range predicate)
+        esp = Esperanto(_oracle())
+        esp.discover()
+        esp._comparator = "between"
+        try:
+            esp.extractInteger("(%d)" % ((1 << 62) + 5))
+            self.fail("expected OverflowError")
+        except OverflowError as ex:
+            self.assertNotIn("below minimum", str(ex))
+
+    def test_integrity_semantics(self):
+        # `complete` (walk finished) must be distinct from `exact` (bytes proven identical).
+        # a case-insensitive collation recovers a WHOLE value that is NOT exact.
+        con = sqlite3.connect(":memory:")
+        con.execute("CREATE TABLE t (v TEXT)")
+        con.execute("INSERT INTO t VALUES ('A')")
+        con.commit()
+        blk = re.compile(r"(?i)\bHEX\(|RAWTOHEX|ENCODE\(|(ASCII|UNICODE|ORD)\(|GLOB|COLLATE|BLOB")
+
+        def ask(cond):
+            if blk.search(cond):
+                return False
+            try:
+                return con.execute("SELECT CASE WHEN (%s COLLATE NOCASE) THEN 1 ELSE 0 END" % cond).fetchone()[0] == 1
+            except sqlite3.DatabaseError:
+                try:
+                    return con.execute("SELECT CASE WHEN (%s) THEN 1 ELSE 0 END" % cond).fetchone()[0] == 1
+                except sqlite3.DatabaseError:
+                    return False
+        esp = Esperanto(ask, maxlen=64)
+        esp.discover()
+        self.assertEqual(esp.dialect.compare, "equality-ci")
+        r = esp.extractResult(EXPR.replace("v FROM t", "v FROM t"))
+        self.assertTrue(r.complete, "case-ci value should be WHOLE: %r" % r)
+        self.assertFalse(r.exact, "case-ci value must NOT be exact: %r" % r)
+        self.assertEqual(r.integrity, Integrity.WHOLE_BUT_AMBIGUOUS)
+
+    def test_hostextract_structured_and_tristate(self):
+        # hostExtract returns an ExtractResult: a bounded read is TRUNCATED (not a bare string),
+        # and an undecided (None) host observation degrades to a FAILED result, never a fake bit.
+        con = sqlite3.connect(":memory:")
+        con.execute("CREATE TABLE t (v TEXT)")
+        con.execute("INSERT INTO t VALUES ('abcdef')")
+        con.commit()
+
+        def ask(cond):
+            try:
+                return con.execute("SELECT CASE WHEN (%s) THEN 1 ELSE 0 END" % cond).fetchone()[0] == 1
+            except sqlite3.DatabaseError:
+                return False
+        esp = Esperanto(ask, maxlen=64)
+        esp.discover()
+        strat = esp.strategy()
+        r = hostExtract(ask, strat, "(SELECT v FROM t)", maxlen=3)
+        self.assertEqual(r.value, "abc")
+        self.assertTrue(r.truncated and not r.exact and r.integrity == Integrity.TRUNCATED)
+        undecided = hostExtract(lambda c: None, strat, "(SELECT v FROM t)")
+        self.assertTrue(undecided.value is None and not undecided.complete)
+
+    def test_between_overflow_direction(self):
+        # a positive value above the cap in BETWEEN mode must report ABOVE maximum (not below)
+        esp = Esperanto(_oracle())
+        esp.discover()
+        esp._comparator = "between"
+        try:
+            esp.extractInteger("(100)", maximum=10)
+            self.fail("expected OverflowError")
+        except OverflowError as ex:
+            self.assertIn("exceeds maximum", str(ex))
+
+    def test_key_uniqueness_gate(self):
+        # #2: a keyset ordering column MUST be single-column unique + non-NULL. a composite
+        # key's first column repeats -> `> prev` paging silently drops rows sharing it, so it
+        # must be REJECTED (COUNT(*) != COUNT(DISTINCT col)); only a unique column is accepted.
+        con = sqlite3.connect(":memory:")
+        con.execute("CREATE TABLE k (a INT, b INT, u INT, nul INT)")
+        con.executemany("INSERT INTO k VALUES (?,?,?,?)", [(1, 1, 10, 1), (1, 2, 20, None), (2, 1, 30, 3)])
+        con.commit()
+
+        def ask(cond):
+            try:
+                return con.execute("SELECT CASE WHEN (%s) THEN 1 ELSE 0 END" % cond).fetchone()[0] == 1
+            except Exception:
+                return False
+        esp = Esperanto(ask)
+        esp.discover()
+        self.assertFalse(esp._keyIsUnique("a", "k"), "non-unique composite-first column accepted")
+        self.assertFalse(esp._keyIsUnique("nul", "k"), "nullable column accepted as key")
+        self.assertTrue(esp._keyIsUnique("u", "k"), "unique non-null column rejected")
 
     def test_fixup_length(self):
         # a trailing-space-trimming length fn is rebuilt as LEN(x||'.')-1
@@ -354,7 +780,9 @@ class TestEsperanto(unittest.TestCase):
         esp.discover()
         strat = esp.strategy()
         self.assertRaises(AttributeError, setattr, strat, "compare_mode", "x")
-        self.assertEqual(hostExtract(ask, strat, "(SELECT v FROM k)"), "Str4t3gy!")
+        hr = hostExtract(ask, strat, "(SELECT v FROM k)")
+        self.assertEqual(hr.value, "Str4t3gy!")
+        self.assertTrue(hr.exact)
         self.assertTrue(strat.asQueriesRow()["substring"])
 
     def test_pattern_match_fallback(self):

@@ -22,7 +22,7 @@ for a built-in self-test against an in-memory SQLite oracle.
 from .engine import Esperanto
 from .engine import hostExtract
 from .handler import buildHandler
-from .records import Cap, ExtractResult, BulkResult, Dialect, InferenceStrategy
+from .records import Cap, ExtractResult, BulkResult, Dialect, InferenceStrategy, Integrity
 from .records import OracleUndecided, QueryBudgetExceeded
 
-__all__ = ["Esperanto", "hostExtract", "buildHandler", "Cap", "ExtractResult", "BulkResult", "Dialect", "InferenceStrategy", "OracleUndecided", "QueryBudgetExceeded"]
+__all__ = ["Esperanto", "hostExtract", "buildHandler", "Cap", "ExtractResult", "BulkResult", "Dialect", "InferenceStrategy", "Integrity", "OracleUndecided", "QueryBudgetExceeded"]

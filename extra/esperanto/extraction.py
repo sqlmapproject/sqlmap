@@ -8,6 +8,7 @@ See the file 'LICENSE' for copying permission
 import binascii
 
 from .atlas import _FREQ_ORDER
+from .atlas import _hardWarnings
 from .atlas import _HEX_Q_ENCODINGS
 from .atlas import _HEXDIGITS
 from .atlas import _HEXFN
@@ -22,6 +23,8 @@ from .atlas import _unhexlify
 from .atlas import _unichr
 from .records import Cap
 from .records import ExtractResult
+from .records import NumericOutOfRange
+from .records import OracleUndecided
 
 
 class _Extraction(object):
@@ -88,8 +91,12 @@ class _Extraction(object):
             return 0, False
         if ceiling < 1:                     # non-empty value but capped to nothing (maxlen=0)
             return 0, True
-        n = self._readNum(lexpr, 1, ceiling)
-        return n, n >= ceiling              # at the cap -> treat as (possibly) truncated
+        try:
+            n = self._readNum(lexpr, 1, ceiling)
+        except NumericOutOfRange:           # length exceeds the cap -> truncated, not a small value
+            return ceiling, True
+        return n, False                     # _readNum PROVED n<=ceiling (raises above), so exact-at-cap
+                                            # is COMPLETE, not truncated - overflow is the exception above
 
     def valueLength(self, expr):
         length, truncated = self._measureLength(expr)
@@ -142,40 +149,50 @@ class _Extraction(object):
         return self._ask("(%s) IS NOT NULL" % expr)
 
     def _readNum(self, expr, lo, hi):
-        # bounded numeric read in [lo, hi]. ordered comparators bisect (exponential
-        # first so a small value in a big range stays cheap); the order-free path
-        # scans fixed windows then IN-bisects inside the hit window (IN lists bounded).
-        if self._comparator != "membership":
-            low, high = lo, min(max(lo, 8), hi)
-            while high < hi and self._gtNum(expr, high, hi):
-                low, high = high + 1, min(high * 2, hi)
-            while low < high:
-                mid = (low + high) // 2
-                if self._gtNum(expr, mid, hi):
-                    low = mid + 1
-                else:
-                    high = mid
-            return low
-        if self._inOk:
-            window = 128
-            base = lo
-            while base <= hi:
-                win = list(range(base, min(base + window, hi + 1)))
-                if self._ask("%s IN (%s)" % (expr, ",".join(str(v) for v in win))):
-                    while len(win) > 1:
-                        half = win[:len(win) // 2]
-                        if self._ask("%s IN (%s)" % (expr, ",".join(str(v) for v in half))):
-                            win = half
-                        else:
-                            win = win[len(win) // 2:]
-                    return win[0]
-                base += window
-            return hi
-        # no ordered op and no IN: plain '=' scan (bounded by hi; small values first)
-        for v in range(lo, hi + 1):
-            if self._ask("%s=%d" % (expr, v)):
-                return v
-        return hi
+        """Bounded numeric read in [lo, hi]. PROVES the value lies in range before
+        bisecting - a bounded search must never invent an in-range boundary ('>'
+        saturates to `hi`, BETWEEN converges to a wrong SMALL value) - so an
+        out-of-range value raises NumericOutOfRange for the caller to classify
+        (length -> truncated, integer -> overflow) instead of returning wrong data."""
+        if self._comparator == "membership":
+            if self._inOk:
+                window = 128
+                base = lo
+                while base <= hi:
+                    win = list(range(base, min(base + window, hi + 1)))
+                    if self._ask("%s IN (%s)" % (expr, ",".join(str(v) for v in win))):
+                        while len(win) > 1:
+                            half = win[:len(win) // 2]
+                            if self._ask("%s IN (%s)" % (expr, ",".join(str(v) for v in half))):
+                                win = half
+                            else:
+                                win = win[len(win) // 2:]
+                        return win[0]
+                    base += window
+                raise NumericOutOfRange("%s not in [%d,%d]" % (expr, lo, hi))
+            for v in range(lo, hi + 1):             # no ordered op and no IN: '=' scan
+                if self._ask("%s=%d" % (expr, v)):
+                    return v
+            raise NumericOutOfRange("%s not in [%d,%d]" % (expr, lo, hi))
+        # ordered comparators (gt / between / operator-free rung): prove range first
+        if self._comparator == "between":
+            if not self._ask("%s BETWEEN %d AND %d" % (expr, lo, hi)):
+                raise NumericOutOfRange("%s not in [%d,%d]" % (expr, lo, hi))
+        else:                                       # gt or operator-free rung ('>' semantics)
+            if self._gtNum(expr, hi, hi):
+                raise NumericOutOfRange("%s > %d" % (expr, hi))
+            if not self._gtNum(expr, lo - 1, hi):   # expr <= lo-1 -> below range (any sign of lo)
+                raise NumericOutOfRange("%s < %d" % (expr, lo))
+        low, high = lo, min(max(lo, 8), hi)         # exponential climb keeps small values cheap
+        while high < hi and self._gtNum(expr, high, hi):
+            low, high = high + 1, min(high * 2, hi)
+        while low < high:
+            mid = (low + high) // 2
+            if self._gtNum(expr, mid, hi):
+                low = mid + 1
+            else:
+                high = mid
+        return low
 
     def _bisectCodes(self, code, codes):
         # ordered bisection over a sorted code list (restricted alphabet)
@@ -255,8 +272,8 @@ class _Extraction(object):
             with self._probePhase():        # wrong rungs (e.g. HEX() on PostgreSQL) error -> "unusable", not undecided
                 for name, tmpl in _HEXFN:
                     enc = self._hexEncoding(tmpl)
-                    if enc:
-                        self.dialect.hexfn = Cap(name, tmpl, encoding=enc)
+                    if enc is not None:                     # '' = usable, codec unknown (auto-detect)
+                        self.dialect.hexfn = Cap(name, tmpl, encoding=(enc or None))
                         break
         return self.dialect.hexfn
 
@@ -266,9 +283,33 @@ class _Extraction(object):
         # AND track the char (a DIFFERENT value for 'p'), so a constant can't match.
         hq = tmpl.format(expr=self._sub("'sqlmap'", 2, 1))     # 'q'
         hp = tmpl.format(expr=self._sub("'sqlmap'", 6, 1))     # 'p'
+        cf = self._codeCharTmpl()
         for form, enc in _HEX_Q_ENCODINGS:
-            if self._ask("%s='%s'" % (hq, form)) and not self._ask("%s='%s'" % (hp, form)):
-                return enc
+            if not (self._ask("%s='%s'" % (hq, form)) and not self._ask("%s='%s'" % (hp, form))):
+                continue
+            # BYTE length-preservation, via the INDEPENDENT length fn (not the hex fn certifying
+            # itself). A LONG probe is required: a short sample passes any large-enough fixed cap,
+            # so an 8/64/255-byte-capped hex fn would slip through. No usable length measure ->
+            # do NOT certify whole-value hex output.
+            bpc = 2 if "16" in enc else 1
+            probe = "A" * 256
+            if not self._lenEquals(tmpl.format(expr="'%s'" % probe), len(probe) * bpc * 2):
+                continue
+            # PROVE the codec on a NON-ASCII char (EUR 0x20AC): 'q'->'71' is ASCII-compatible in
+            # MANY encodings (CP1252/Latin-1/Shift-JIS/GBK/...), NOT just UTF-8, so the 'q' match
+            # alone can't certify UTF-8. Confirm with EUR; if it can't be proven the codec is
+            # UNKNOWN ('' -> decode auto-detects) - the bytes are still FAITHFUL (length probe
+            # passed), so the hex fn stays USABLE; it is NOT rejected (that would drop to a
+            # byte-based mode that mangles multibyte). None means only 'no working hex fn'.
+            if cf:
+                eur = tmpl.format(expr=cf.format(code=0x20AC))
+                want = {"utf-8": "e282ac", "utf-16-be": "20ac", "utf-16-le": "ac20"}.get(enc)
+                if want and self._ask("LOWER(%s)='%s'" % (eur, want)):
+                    return enc
+                return ""                  # ASCII-compatible, codec unproven: usable, auto-detect decode
+            return ""                      # no char-from-code fn to PROVE the codec: '71'->q is ASCII-
+                                           # compatible in many charsets (CP1252/Latin-1/SJIS/...), so it
+                                           # is UNKNOWN, not UTF-8 - usable for bytes, not authoritative text
         return None
 
     def _escalate(self, one, pos):
@@ -425,14 +466,21 @@ class _Extraction(object):
         return length_ok and self._ask("%s IS NOT NULL" % self._sub(expr, 1, 1))
 
     def _resolveText(self, expr):
-        # if the expression isn't directly substringable (e.g. a numeric/date column
-        # on a strict engine), wrap it in the discovered text cast
-        if self._textable(expr):
-            return expr
-        if self.dialect.textcast is not None and self._ask("%s IS NOT NULL" % expr):
-            casted = self.dialect.textcast[1].format(expr=expr)
-            if self._textable(casted):
-                return casted
+        # if the expression isn't directly substringable (e.g. a numeric/date column on a
+        # strict engine, or PG's `tid`/ctid which has no LENGTH), wrap it in the discovered
+        # text cast. probe-safe: an ERRORING length/substring probe here (LENGTH(tid) does
+        # not exist) means "not directly textable" -> fall through to the cast, never fatal.
+        with self._probePhase():
+            if self._textable(expr):
+                return expr
+            if self.dialect.textcast is not None:
+                casted = self.dialect.textcast[1].format(expr=expr)
+                # use the cast when it makes a NON-NULL value textable; if the value is
+                # currently NULL the cast is STILL correct (LENGTH may not even exist for the
+                # raw type, e.g. PG tid) - returning raw there errors on LENGTH(tid) instead
+                # of yielding a clean is_null, so prefer the cast in the NULL case too
+                if self._textable(casted) or self._ask("(%s) IS NULL" % expr):
+                    return casted
         return expr
 
     def coalesce(self, expr, fallback="''"):
@@ -481,37 +529,82 @@ class _Extraction(object):
         if limit is not None and limit < length:
             truncated = True                    # a bounded prefix of a longer value
             length = limit
-        value = "" if length == 0 else "".join(self._readChar(expr, i, codes) for i in range(1, length + 1))
+        if length == 0:
+            value = ""
+        else:
+            chars = []
+            for i in range(1, length + 1):
+                chars.append(self._readChar(expr, i, codes))
+                self._emitChar("".join(chars), length)      # live progress: user sees it working
+            value = "".join(chars)
         warns = ["contains unresolved char"] if _REPL in value else []
         if self.dialect.compare == "equality-ci":
             warns.append("lossy equality collation: case/accents ambiguous")
-        complete = not truncated and not warns
+        complete = not truncated and not _hardWarnings(warns)   # soft (case/accent) keeps complete
         # a length fn can stop at an embedded NUL, yielding a convincing short prefix.
         # ALWAYS verify the WHOLE reconstructed value once - _exactEquals uses the
         # strongest available comparator (hex > binary wrapper > plain equality); even
         # plain equality catches a NUL-truncated prefix. recover via hex on mismatch.
         # (_verify=False on the internal hex-string pull to avoid re-entry.)
-        if _verify and complete and not self._exactEquals(expr, self._lit(value)):
+        # escalate to hex when the code/ordinal read is UNTRUSTWORTHY: a complete value that fails
+        # whole-value verify (NUL-truncated / wrong), OR one carrying unresolved chars (_REPL) - a
+        # code fn lossy for this column's type (e.g. Oracle NVARCHAR2 read in code mode) marks
+        # chars outside its alphabet, yet the cast+hex path recovers them cleanly.
+        if _verify and (_REPL in value or (complete and not self._exactEquals(expr, self._lit(value)))):
             recovered = self._extractViaHex(expr, q0)
             if recovered is not None:
                 return recovered
-            complete = False
-            warns.append("whole-value verification failed")
+            if complete:                        # verify failed and no hex recovery -> demote
+                complete = False
+                warns.append("whole-value verification failed")
+        # a value can be EXACT only if a BYTE-FAITHFUL witness backs it: plain SQL '=' and
+        # collation/ordinal ordering are collation-dependent (accent/case/width folding), so
+        # without a proven hex/binary witness (or code-mode codepoint reads) the recovered
+        # bytes are NOT provably the source's - downgrade to WHOLE_BUT_AMBIGUOUS, never EXACT.
+        if _verify and value and complete and not self._byteFaithful():
+            warns.append("byte-exactness unproven: collation-dependent comparison, no hex/binary witness")
         return ExtractResult(value, complete=complete, truncated=truncated,
                              queries=self._queries - q0, warnings=warns)
+
+    def _byteFaithful(self):
+        # is a BYTE-EXACT primitive available to certify a recovered value? a proven hex fn or a
+        # binary-compare wrapper is; plain '='/collation is not. Code mode with PROVEN codepoint
+        # semantics reads true code points, so it is faithful on its own.
+        if self.dialect.hexfn is not None:
+            return True
+        if self.dialect.binwrap is not None and self.dialect.binwrap.get("byte_exact"):
+            return True                     # only a PROVEN byte-exact wrapper (accents tested) counts
+        return (self.dialect.compare == "code" and self.dialect.charcode is not None
+                and self.dialect.charcode.get("semantics") == "codepoint")
 
     def _extractViaHex(self, expr, q0=None):
         # recover a full text value through strict hex extraction, or None
         if not self._ensureHexfn():
             return None
         q0 = self._queries if q0 is None else q0
-        res = self.extractResult(self.dialect.hexfn[1].format(expr=expr),
+        # route through the text cast, exactly as the framed dump does: a column whose STORAGE
+        # charset differs from the DB charset - e.g. Oracle NVARCHAR2 (UTF-16 national charset) -
+        # hexes to bytes the DB-charset decode garbles; casting to the DB char type first
+        # normalizes it (VARCHAR2 == DB charset), so the decode matches the discovered codec.
+        hexpr = self.dialect.textcast[1].format(expr=expr) if self.dialect.textcast else expr
+        res = self.extractResult(self.dialect.hexfn[1].format(expr=hexpr),
                                   _ceiling=self.maxbytes * 2, _verify=False)
         if res.is_null:
             return ExtractResult(None, is_null=True, complete=True, queries=self._queries - q0)
         if res.value is None or not res.complete or res.truncated or res.warnings:
             return None
-        dec = self._decodeHexToken(res.value)
+        enc = (self.dialect.hexfn.get("encoding") if self.dialect.hexfn else None) or self.dialect.charset
+        # UNKNOWN codec + non-ASCII bytes: the TEXT reading is a GUESS (e.g. UTF-8 bytes with an
+        # embedded NUL get heuristically read as UTF-16), so it must NOT be certified exact. Bytes
+        # are faithful (they'd round-trip), but only a PROVEN codec makes the decoded text exact.
+        if enc is None:
+            try:
+                rawb = bytearray(_unhexlify(res.value))
+            except (TypeError, ValueError, binascii.Error, UnicodeError):
+                return None
+            if any(b >= 0x80 for b in rawb):
+                return None                      # non-ASCII under an unproven codec -> not exact
+        dec = self._decodeHexToken(res.value, enc)
         if dec is None:
             return None
         return ExtractResult(dec, complete=True, queries=self._queries - q0,
@@ -529,49 +622,60 @@ class _Extraction(object):
 
     def extractInteger(self, expr, maximum=None):
         """Extract a (possibly signed) integer by range-bounded bisection - avoids
-        stringifying and reading digit-by-digit."""
+        stringifying and reading digit-by-digit. EVERY numeric decision renders through
+        `_gtNum` (the discovered comparator: gt / BETWEEN / operator-free rung), so it
+        never emits a raw '>='/'<'/'>' discovery did not validate, and an operator-free
+        rung keeps FULL signed range (not the membership magnitude ceiling)."""
         cap = maximum if maximum is not None else 1 << 62
-        if self._comparator != "gt":
-            # BETWEEN / order-free IN(): read the non-negative magnitude (counts,
-            # lengths - the only integers enumeration needs). ceil bounds the
-            # order-free window scan; hitting it overflows rather than saturating.
-            if not self._numDefined(expr):
-                return None
-            ceil = cap if self._comparator == "between" else min(cap, 1 << 16)
-            n = self._readNum(expr, 0, ceil)
-            if n >= ceil and ceil < cap:
+        if not self._numDefined(expr):
+            return None
+        if self._comparator == "membership":
+            # no ordered comparator at all: read the non-negative magnitude (counts /
+            # lengths) via the bounded IN/scan window; out-of-range -> overflow.
+            ceil = min(cap, 1 << 16)
+            try:
+                return self._readNum(expr, 0, ceil)
+            except NumericOutOfRange:
                 raise OverflowError("integer exceeds maximum %d" % ceil)
-            return n
-        if not self._ask("%s>=0" % expr):
-            if not self._ask("%s<0" % expr):
-                return None                     # NULL or non-numeric
-            if self._ask("%s<%d" % (expr, -cap)):   # symmetric: negative side capped too
+        # ordered comparator: bracket the value with `expr > n` probes then bisect the
+        # transition. The `high` arg to _gtNum MUST exceed any possible value (BETWEEN renders
+        # `expr BETWEEN n+1 AND high`; using `cap` there made every over-cap positive read as
+        # an empty range -> misclassified NEGATIVE, reporting "below minimum" for an above-max
+        # value). Use HUGE as the range ceiling everywhere; `cap` is only the overflow threshold.
+        HUGE = 1 << 62
+        if self._gtNum(expr, -1, HUGE):                 # expr > -1  <=>  expr >= 0 (any magnitude)
+            if self._gtNum(expr, cap, HUGE):            # expr > cap  -> ABOVE maximum
+                raise OverflowError("integer exceeds maximum %d" % cap)
+            lo, hi = -1, 1
+            while hi < cap and self._gtNum(expr, hi, HUGE):
+                lo, hi = hi, min(hi * 2 + 1, cap)
+        else:                                           # not in [0, HUGE]
+            # BETWEEN's sign test caps at HUGE, so a positive value ABOVE HUGE also lands here.
+            # distinguish it from a genuine negative before reporting a direction (a gt/operator-
+            # free sign test is unbounded, so its else-branch is truly negative and skips this).
+            if self._comparator == "between" and not self._ask("(%s) BETWEEN %d AND %d" % (expr, -HUGE, -1)):
+                raise OverflowError("integer magnitude exceeds representable range (+/-%d), direction unknown" % HUGE)
+            if not self._gtNum(expr, -cap - 1, HUGE):   # expr <= -cap-1 -> BELOW minimum
                 raise OverflowError("integer below minimum -%d" % cap)
-            hi = -1
-            lo = -2
-            while self._ask("%s<%d" % (expr, lo)):
-                hi = lo
-                lo *= 2
-            while lo < hi:
-                mid = -((-lo + -hi) // 2)       # ceil toward zero
-                if self._ask("%s<%d" % (expr, mid)):
-                    hi = mid - 1
-                else:
-                    lo = mid
-            return lo
-        lo, hi = 0, 1
-        while hi < cap and self._ask("%s>%d" % (expr, hi)):
-            lo = hi + 1
-            hi = min(hi * 2 + 1, cap)
-        if hi == cap and self._ask("%s>%d" % (expr, cap)):
-            raise OverflowError("integer exceeds maximum %d" % cap)   # never saturate silently
-        while lo < hi:
+            hi, lo = -1, -2
+            while lo > -cap and not self._gtNum(expr, lo, HUGE):
+                hi, lo = lo, lo * 2
+            lo = max(lo, -cap - 1)
+        # invariant: expr > lo is True, expr > hi is False -> value is the transition in (lo, hi]
+        while hi - lo > 1:
             mid = (lo + hi) // 2
-            if self._ask("%s>%d" % (expr, mid)):
-                lo = mid + 1
+            if self._gtNum(expr, mid, HUGE):
+                lo = mid
             else:
                 hi = mid
-        return lo
+        # FINAL INDEPENDENT CHECK: bisection trusts the comparator, which is only PROVEN on
+        # integer literals - a backend/WAF that honours '>' on literals but rewrites it (e.g. to
+        # '>=') for scalar-subquery / fn / arithmetic operands would converge off-by-one. Confirm
+        # the result with a direct equality against the ACTUAL expression; if it isn't decisively
+        # true the read is invalid -> fail closed (never return a silently-wrong count/length/id).
+        if not self._ask("(%s)=%d" % (expr, hi)):
+            raise OracleUndecided("integer read failed final equality check: (%s) != %d" % (expr, hi))
+        return hi
 
     def extractBytes(self, expr):
         """Extract the exact bytes of a string/blob expression via a hex function.
@@ -592,9 +696,23 @@ class _Extraction(object):
         if len(hexstr) % 2 or any(c not in _HEXDIGITS + _HEXDIGITS.lower() for c in hexstr):
             return None
         try:
-            return _unhexlify(hexstr)
+            raw = _unhexlify(hexstr)
         except (TypeError, ValueError, binascii.Error, UnicodeError):
             return None
+        # INDEPENDENT witness: if a byte-length fn was discovered, confirm the recovered byte
+        # count matches it (measured by a DIFFERENT primitive than hex) - so a capped/lossy hex
+        # that silently shortened the value is caught rather than passed off as "the exact bytes".
+        if self.dialect.bytelen is not None:
+            # FAIL CLOSED: once a byte-length witness is selected for certification, an undecided
+            # or mismatched reading means we CANNOT confirm the bytes are whole -> reject, never
+            # treat "couldn't verify" as "matched".
+            try:
+                expected = self.extractInteger(self.dialect.bytelen[1].format(expr=expr))
+            except (OracleUndecided, OverflowError):
+                return None
+            if expected is None or expected != len(raw):
+                return None
+        return raw
 
     def extractText(self, expr, encoding="utf-8", errors="replace"):
         """Extract bytes then decode with a caller-chosen encoding - the reliable
@@ -606,22 +724,23 @@ class _Extraction(object):
             return self.extract(expr)
         return raw.decode(encoding, errors)
 
-    def _likePat(self, prefix_singles, ch, trailing):
-        # build a LIKE/GLOB/SIMILAR-TO pattern literal: `single`*before + one literal
-        # char + `single`*after. only `ch` may be special, escaped if so.
+    def _likePat(self, prefix_singles, ch, trailing, trailing_multi=False):
+        # build a LIKE/GLOB/SIMILAR-TO pattern literal: `single`*before + one literal char +
+        # `single`*after (+ a trailing multi-wildcard when the value CONTINUES past what we
+        # read - a truncated prefix, from limit< length or length> maxlen). Without that
+        # multi the pattern demands an EXACT length and can't match the longer source -> every
+        # char would come back unresolved. only `ch` may be special, escaped if so.
         p = self.dialect.prefix
         multi, single = p.get("multi"), p.get("single")
+        tail = single * trailing + (multi if trailing_multi else "")
         body = single * prefix_singles
         if p.name == "GLOB" and ch in (multi, single, "["):
-            body += "[%s]" % ch                 # GLOB escapes via a char class
-            return body + (single * trailing), ""
+            return body + "[%s]" % ch + tail, ""    # GLOB escapes via a char class
         # SIMILAR TO shares %/_ with LIKE but also has regex metachars; LIKE has only %/_
         special = _SIMILAR_META if p.name == "SIMILAR TO" else (multi, single)
         if ch in special:
-            body += "\\" + ch                   # escape via ESCAPE '\'
-            return body + (single * trailing), " ESCAPE '\\'"
-        body += ch.replace("'", "''")
-        return body + (single * trailing), ""
+            return body + "\\" + ch + tail, " ESCAPE '\\'"   # escape via ESCAPE '\'
+        return body + ch.replace("'", "''") + tail, ""
 
     def _likeIs(self, expr, pattern, esc):
         return self._ask("(%s) %s '%s'%s" % (expr, self.dialect.prefix.name, pattern, esc))
@@ -642,6 +761,10 @@ class _Extraction(object):
         # largest n that still matches (keep a known-true lower bound; the exponential
         # must NOT advance lo past the true region)
         ge = lambda n: self._likeIs(expr, single * n + multi, "")
+        if self.maxlen < 1:                             # capped to nothing: non-empty but unread
+            return ExtractResult("", complete=False, truncated=True,
+                                 queries=self._queries - q0,
+                                 warnings=["maxlen<1: value not read"])
         hi = 1
         while hi < self.maxlen and ge(hi):
             hi = min(hi * 2, self.maxlen)
@@ -650,14 +773,18 @@ class _Extraction(object):
             mid = (lo + hi + 1) // 2
             lo, hi = (mid, hi) if ge(mid) else (lo, mid - 1)
         length = lo
-        truncated = length >= self.maxlen and ge(self.maxlen)
+        # truncated ONLY if a char exists past the cap (ge(maxlen+1)); an exactly-maxlen
+        # value is COMPLETE - the old `ge(maxlen)` test flagged every capped value truncated
+        truncated = length >= self.maxlen and ge(self.maxlen + 1)
         if limit is not None and limit < length:
             truncated, length = True, limit
         out = []
         for i in range(length):
             hit = None
             for c in _FREQ_ORDER:
-                pat, esc = self._likePat(i, c, length - i - 1)
+                # trailing multi-wildcard when the value continues past `length` (truncated
+                # prefix), so the pattern matches the longer source instead of demanding exact len
+                pat, esc = self._likePat(i, c, length - i - 1, trailing_multi=truncated)
                 if self._likeIs(expr, pat, esc):
                     hit = c
                     break
@@ -666,8 +793,8 @@ class _Extraction(object):
         warns = ["contains unresolved char"] if _REPL in value else []
         if p.get("case_insensitive"):
             warns.append("LIKE is case-insensitive: letter case may be ambiguous")
-        return ExtractResult(value, complete=not truncated and not warns, truncated=truncated,
-                             queries=self._queries - q0, warnings=warns)
+        return ExtractResult(value, complete=not truncated and not _hardWarnings(warns),
+                             truncated=truncated, queries=self._queries - q0, warnings=warns)
 
     @staticmethod
     def _decodeHexToken(token, encoding=None):
@@ -678,23 +805,24 @@ class _Extraction(object):
         except (TypeError, ValueError, binascii.Error, UnicodeError):
             return None
         if encoding:
-            return raw.decode(encoding, "replace")
-        # UTF-16LE (SQL Server nvarchar) is *also* valid UTF-8 when ASCII-ish, so a
-        # utf-8-first guess silently mis-decodes it; detect the interleaved-null
-        # signature first
-        if len(raw) >= 2 and len(raw) % 2 == 0 and any(raw[i] == 0 for i in range(1, len(raw), 2)):
+            # a PROVEN codec is authoritative: if the bytes don't decode under it, that is a
+            # FAILURE (return None -> token dropped, result marked incomplete), NOT licence to
+            # reinterpret them as some other codec (00 D8 is an invalid UTF-16LE lone surrogate,
+            # but a valid UTF-16BE 'O with stroke' - guessing again would silently corrupt).
             try:
-                return raw.decode("utf-16-le")
-            except UnicodeDecodeError:
-                pass
-        # UTF-16BE (h2/HSQLDB RAWTOHEX) has nulls at EVEN offsets; catch it before the
-        # utf-8 guess below "succeeds" by reading those nulls as NUL-interleaved text
-        if len(raw) >= 2 and len(raw) % 2 == 0 and any(raw[i] == 0 for i in range(0, len(raw), 2)):
-            try:
-                return raw.decode("utf-16-be")
-            except UnicodeDecodeError:
-                pass
-        for enc in ("utf-8", "utf-16-le", "latin-1"):
+                return raw.decode(encoding, "strict")
+            except (UnicodeDecodeError, LookupError):
+                return None
+        # UNKNOWN codec + an embedded NUL is genuinely AMBIGUOUS: bytes `41 00` are valid UTF-8
+        # ("A" + NUL) AND valid UTF-16LE ("A"), and no primitive lied - with no proven codec
+        # either reading could be right, so neither is exact. Refuse (drop the token -> the caller
+        # falls back to per-char extraction, which round-trips each char against the source).
+        if b"\x00" in raw:
+            return None
+        # no NUL and no proven codec: a best-effort DISPLAY decode (exactness of any non-ASCII
+        # result is gated separately - the dump downgrades non-ASCII under an unknown codec, and
+        # scalar hex recovery refuses to certify unknown-codec non-ASCII bytes).
+        for enc in ("utf-8", "latin-1"):
             try:
                 return raw.decode(enc)
             except (UnicodeDecodeError, ValueError):

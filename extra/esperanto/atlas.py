@@ -119,9 +119,60 @@ _MAX_HEX_CHAR_NIBBLES = 16
 _HEX_Q_ENCODINGS = (("71", "utf-8"), ("0071", "utf-16-be"), ("7100", "utf-16-le"))
 
 
+# scalar expressions that yield the back-end's DECLARED character set NAME, tried in turn -
+# the strongest encoding signal there is (the DB tells us its own charset), and read once. A
+# wrong-family probe errors -> reported False -> skipped, so the first that resolves is the one.
+_CHARSET_PROBES = (
+    "@@character_set_connection",                                           # MySQL/MariaDB/TiDB: the charset
+                                                                            # CAST(x AS CHAR) outputs (what the
+                                                                            # framed dump hexes), NOT @@character_set_database
+    "current_setting('server_encoding')",                                   # PostgreSQL / Cockroach / Crate
+    "(SELECT value FROM nls_database_parameters WHERE parameter='NLS_CHARACTERSET')",  # Oracle
+    "CONVERT(VARCHAR(64),COLLATIONPROPERTY(CONVERT(NVARCHAR(128),SERVERPROPERTY('Collation')),'CodePage'))",  # SQL Server -> code page number
+)
+
+
+# declared charset NAME (normalized: lowercased, non-alphanumerics stripped) -> Python codec.
+# Encodes the vendor QUIRKS that make byte-level guessing wrong: MySQL "latin1" is really
+# Windows-1252, Oracle "WE8MSWIN1252"/PG "WIN1252" too; only "iso-8859-1"-named sets are true
+# Latin-1. This is where reading the DB's own answer beats statistical detection.
+_CHARSET_CODEC = {
+    "utf8": "utf-8", "utf8mb4": "utf-8", "utf8mb3": "utf-8", "al32utf8": "utf-8",
+    "unicode": "utf-8", "utf8unicodeci": "utf-8", "65001": "utf-8",
+    "utf16": "utf-16", "utf16le": "utf-16-le", "utf16be": "utf-16-be", "al16utf16": "utf-16-be", "ucs2": "utf-16-be",
+    "latin1": "cp1252",                                                     # MySQL 'latin1' == Windows-1252
+    "cp1252": "cp1252", "windows1252": "cp1252", "we8mswin1252": "cp1252", "win1252": "cp1252", "1252": "cp1252",
+    "iso88591": "latin-1", "we8iso8859p1": "latin-1", "88591": "latin-1", "28591": "latin-1",
+    "iso885915": "iso-8859-15", "latin9": "iso-8859-15", "we8iso8859p15": "iso-8859-15",
+    "cp1251": "cp1251", "windows1251": "cp1251", "win1251": "cp1251", "cl8mswin1251": "cp1251", "1251": "cp1251",
+    "cp1250": "cp1250", "windows1250": "cp1250", "ee8mswin1250": "cp1250", "1250": "cp1250",
+    "gbk": "gbk", "gb2312": "gbk", "zhs16gbk": "gbk", "936": "gbk", "gb18030": "gb18030",
+    "big5": "big5", "zht16big5": "big5", "950": "big5",
+    "sjis": "shift_jis", "shiftjis": "shift_jis", "cp932": "shift_jis", "ja16sjis": "shift_jis", "932": "shift_jis",
+    "euckr": "euc-kr", "ko16ksc5601": "euc-kr", "51949": "euc-kr",
+    "eucjp": "euc-jp", "ujis": "euc-jp", "ja16euc": "euc-jp",
+    "koi8r": "koi8-r", "cl8koi8r": "koi8-r",
+    "ascii": "ascii", "usascii": "ascii", "us7ascii": "ascii",
+}
+
+
+def _charsetCodec(name):
+    """Map a declared charset NAME (or code-page number) to a Python codec, or None if unknown.
+    Trailing collation qualifiers (MySQL `utf8mb4_general_ci`) are stripped progressively."""
+    import re as _re
+    key = _re.sub(r"[^a-z0-9]", "", (name or "").lower())
+    while key:
+        if key in _CHARSET_CODEC:
+            return _CHARSET_CODEC[key]
+        key = key[:-1]                          # peel trailing collation suffix (utf8mb4generalci -> ... -> utf8mb4)
+    return None
+
+
 # the only code points a hex-framed dump payload can contain (hex digits + N/V markers
-# + the ',' delimiter); lets that value extract via a tiny bisection alphabet
-_HEX_PAYLOAD_CODES = sorted(set(ord(c) for c in ",0123456789ABCDEFNV"))
+# + the length-frame ':'/';' + the legacy ',' delimiter); lets that value extract via a tiny
+# bisection alphabet. MUST include ':' and ';' or the length-framed grammar's chars fall
+# outside the alphabet -> whole-value verify fails -> a costly full-hex re-extraction.
+_HEX_PAYLOAD_CODES = sorted(set(ord(c) for c in ",:;0123456789ABCDEFNV"))
 
 
 # force a byte-ordered, case/accent-sensitive comparison of {x} even where the default
@@ -215,14 +266,22 @@ _BYTELEN = (
 
 
 # cast an arbitrary scalar (int/date/binary) {expr} to text so it can be substringed
+# PREFER UNBOUNDED casts - a bounded VARCHAR(4000) passes discovery (short test value) but
+# SILENTLY TRUNCATES a longer value before it is framed/hexed, corrupting a dump that still
+# looks complete. Unbounded forms are tried first; the discovery probe's exact-length check
+# rejects a CHAR(1)-style truncating cast, so listing CAST(AS CHAR) is safe (MySQL: unbounded;
+# elsewhere: CHAR(1) -> length 3 check fails -> skipped). Oracle VARCHAR2 has a hard 4000 cap,
+# so a >4000 value there is caught by per-cell source verification in dump(), not here.
 _TEXTCAST = (
-    ("cast_varchar", "CAST(({expr}) AS VARCHAR(4000))"),
-    ("cast_text", "CAST(({expr}) AS TEXT)"),
-    ("cast_char", "CAST(({expr}) AS CHAR)"),
-    ("cast_varchar2", "CAST(({expr}) AS VARCHAR2(4000))"),
+    ("cast_text", "CAST(({expr}) AS TEXT)"),                 # PostgreSQL/SQLite/... UNBOUNDED
+    ("cast_char", "CAST(({expr}) AS CHAR)"),                 # MySQL/MariaDB UNBOUNDED (bare CHAR)
+    ("cast_nvarchar_max", "CAST(({expr}) AS NVARCHAR(MAX))"),# SQL Server UNBOUNDED
+    ("cast_varchar_max", "CAST(({expr}) AS VARCHAR(MAX))"),  # SQL Server UNBOUNDED (non-Unicode)
+    ("cast_string", "CAST(({expr}) AS STRING)"),             # BigQuery/Spark UNBOUNDED
+    ("cast_varchar", "CAST(({expr}) AS VARCHAR(4000))"),     # bounded fallbacks (short values only)
+    ("cast_varchar2", "CAST(({expr}) AS VARCHAR2(4000))"),   # Oracle (hard 4000 limit)
     ("to_char", "TO_CHAR({expr})"),
     ("convert_varchar", "CONVERT(VARCHAR(4000),({expr}))"),
-    ("cast_string", "CAST(({expr}) AS STRING)"),
     ("cast_nvarchar", "CAST(({expr}) AS NVARCHAR(4000))"),
 )
 
@@ -410,6 +469,18 @@ _UNICODE_MAX = 0x10FFFF
 # U+FFFD REPLACEMENT CHARACTER: the explicit "could not recover this char" marker
 # (extraction emits it instead of ever silently substituting/dropping a character)
 _REPL = u"\uFFFD"
+
+
+# a warning is INFORMATIONAL (the recovered bytes are whole + usable, only case/accent is
+# uncertain, or the value was cleanly recovered by an alternate route) if it mentions one of
+# these; anything else is an INTEGRITY warning meaning the bytes may be wrong/partial, which
+# clears `complete`. Lets `complete` be a clean invariant: True == trustworthy whole value.
+_SOFT_WARNINGS = ("case", "collation", "recovered via hex")
+
+
+def _hardWarnings(warns):
+    """The integrity-class warnings in `warns` (those that impugn the recovered bytes)."""
+    return [w for w in warns if not any(s in w for s in _SOFT_WARNINGS)]
 
 
 # py2/py3 shim: integer code point -> single char

