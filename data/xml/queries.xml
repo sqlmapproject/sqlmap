@@ -624,9 +624,9 @@
     </dbms>
 
     <dbms value="IBM DB2">
-        <!-- Casting to varchar does not work with version < v9, so we had to use char(254) instead -->
-        <cast query="RTRIM(CAST(%s AS CHAR(254)))"/>
-        <length query="LENGTH(RTRIM(CAST(%s AS CHAR(254))))"/>
+        <!-- VARCHAR(32672) (DB2 max), not CHAR(254) which silently truncated values >254 chars; RTRIM kept to strip CHAR-column blank padding (DB2 <v9, which lacked the VARCHAR cast, is long unsupported) -->
+        <cast query="RTRIM(CAST(%s AS VARCHAR(32672)))"/>
+        <length query="LENGTH(RTRIM(CAST(%s AS VARCHAR(32672))))"/>
         <isnull query="COALESCE(%s,' ')"/>
         <delimiter query="||"/>
         <limit query="ROW_NUMBER() OVER () AS CAP %s) AS qq WHERE CAP"/>
