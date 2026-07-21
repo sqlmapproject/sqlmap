@@ -949,7 +949,7 @@
         </search_db>
         <search_table>
             <inband query="SELECT schemas.name,tables.name FROM tables JOIN schemas ON schema_id=schemas.id WHERE tables.system=false AND %s" condition="tables.name" condition2="schemas.name"/>
-            <blind query="SELECT DISTINCT(schemas.name) FROM tables JOIN schemas ON schema_id=schemas.id WHERE tables.system=false AND %s" query2="SELECT DISTINCT(tables.name) FROM tables JOIN schemas ON schema_id=schemas.id WHERE tables.system=false AND schemas.name='%s'" count="SELECT COUNT(DISTINCT(tables.name)) FROM tables JOIN schemas ON schema_id=schemas.id WHERE tables.system=false AND schemas.name='%s'" count2="SELECT COUNT(DISTINCT(tables.name)) FROM tables JOIN schemas ON schema_id=schemas.id WHERE tables.system=false AND schemas.name='%s'" condition="tables.name" condition2="schemas.name"/>
+            <blind query="SELECT DISTINCT(schemas.name) FROM tables JOIN schemas ON schema_id=schemas.id WHERE tables.system=false AND %s" query2="SELECT DISTINCT(tables.name) FROM tables JOIN schemas ON schema_id=schemas.id WHERE tables.system=false AND schemas.name='%s'" count="SELECT COUNT(DISTINCT(schemas.name)) FROM tables JOIN schemas ON schema_id=schemas.id WHERE tables.system=false AND %s" count2="SELECT COUNT(DISTINCT(tables.name)) FROM tables JOIN schemas ON schema_id=schemas.id WHERE tables.system=false AND schemas.name='%s'" condition="tables.name" condition2="schemas.name"/>
         </search_table>
         <search_column>
             <inband query="SELECT schemas.name,tables.name FROM tables JOIN schemas ON tables.schema_id=schemas.id JOIN columns ON tables.id=columns.table_id WHERE %s" condition="columns.name" condition2="schemas.name" condition3="tables.name"/>
@@ -1159,7 +1159,7 @@
         <concatenate query="%s||%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
         <hex query="TO_HEX(CAST(%s AS VARBINARY))"/>
-        <inference query="CODEPOINT(SUBSTR((%s),%d,1))>%d" dbms_version="&gt;=0.178" query2="SUBSTR((%s),%d,1)>'%c'"/>/>
+        <inference query="CODEPOINT(SUBSTR((%s),%d,1))>%d" dbms_version="&gt;=0.178" query2="SUBSTR((%s),%d,1)>'%c'"/>
         <banner query="version()"/>
         <current_user query="CURRENT_USER"/>
         <current_db query="current_schema"/>
@@ -1367,7 +1367,7 @@
         <hostname query="hostName()"/>
         <table_comment/>
         <column_comment/>
-        <is_dba query="(SELECT access_type FROM system.grants WHERE user_name=currentUser())='ALL'"/>
+        <is_dba query="(SELECT count() FROM system.grants WHERE user_name=currentUser() AND access_type='ALL')&gt;0"/>
         <check_udf/>
         <users>
             <inband query="SELECT name FROM system.users"/>
