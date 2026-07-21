@@ -1061,29 +1061,36 @@ def checkFilteredChars(injection):
     # inference techniques depend on character '>'
     if not any(_ in injection.data for _ in (PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.QUERY)):
         if not checkBooleanExpression("%d>%d" % (randInt + 1, randInt)):
-            # '>' is filtered - blind inference bisection (e.g. ASCII(...)>N) would silently
-            # retrieve nothing. Auto-apply the 'between' tamper (>  ->  NOT BETWEEN 0 AND, SQL
-            # standard, all DBMS) and re-verify, so the run adapts in place instead of forcing a
-            # manual rerun. Skipped when the user chose their own '--tamper' (respect that choice).
-            adapted = False
+            # '>' is filtered - blind inference (bisection and the count/length integer retrievals
+            # all rely on '>') would silently retrieve nothing. Cascade through the '>'-free
+            # comparison rewrites and adopt the first that RE-VERIFIES working, so the run adapts in
+            # place instead of forcing a manual rerun: 'between' (>  ->  NOT BETWEEN 0 AND) first,
+            # then 'greatest' (GREATEST()-based) for when BETWEEN itself is filtered. Skipped when the
+            # user chose their own '--tamper' (respect that choice).
+            adapted = None
 
             if not conf.tamper:
                 from lib.utils.wafbypass import loadTamper
-                function = loadTamper("between")
 
-                if function is not None and function not in (kb.tamperFunctions or []):
+                for name in ("between", "greatest", "sign"):
+                    function = loadTamper(name)
+                    if function is None or function in (kb.tamperFunctions or []):
+                        continue
+
                     kb.tamperFunctions = (kb.tamperFunctions or []) + [function]
                     _ = randomInt()
 
                     if checkBooleanExpression("%d>%d" % (_ + 1, _)):
-                        adapted = True
-                        infoMsg = "the character '>' appears to be filtered by the back-end "
-                        infoMsg += "server; sqlmap automatically applied the 'between' tamper script to adapt"
-                        logger.info(infoMsg)
+                        adapted = name
+                        break
                     else:
                         kb.tamperFunctions.remove(function)
 
-            if not adapted:
+            if adapted:
+                infoMsg = "the character '>' appears to be filtered by the back-end server; "
+                infoMsg += "sqlmap automatically applied the '%s' tamper script to adapt" % adapted
+                logger.info(infoMsg)
+            else:
                 warnMsg = "it appears that the character '>' is "
                 warnMsg += "filtered by the back-end server. You are strongly "
                 warnMsg += "advised to rerun with the '--tamper=between'"
