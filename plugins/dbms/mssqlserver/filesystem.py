@@ -157,7 +157,7 @@ class Filesystem(GenericFilesystem):
             indexRange = getLimitRange(count)
 
             for index in indexRange:
-                chunk = inject.getValue("SELECT TOP 1 %s FROM %s WHERE %s NOT IN (SELECT TOP %d %s FROM %s ORDER BY id ASC) ORDER BY id ASC" % (self.tblField, hexTbl, self.tblField, index, self.tblField, hexTbl), unpack=False, resumeValue=False, charsetType=CHARSET_TYPE.HEXADECIMAL)
+                chunk = inject.getValue("SELECT TOP 1 %s FROM %s WHERE id NOT IN (SELECT TOP %d id FROM %s ORDER BY id ASC) ORDER BY id ASC" % (self.tblField, hexTbl, index, hexTbl), unpack=False, resumeValue=False, charsetType=CHARSET_TYPE.HEXADECIMAL)
                 result.append(chunk)
 
         inject.goStacked("DROP TABLE %s" % hexTbl)
