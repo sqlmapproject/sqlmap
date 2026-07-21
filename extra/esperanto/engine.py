@@ -45,7 +45,8 @@ class Esperanto(_OracleCore, _Discovery, _Extraction, _Enumeration):
         self._hexOrdered = None
         self._backslashEscape = None
         self._codeTmpl = None
-        self._comparator = "gt"         # ordered-compare op: "gt" / "between" / "membership"
+        self._comparator = "gt"         # ordered-compare op: "gt" / "between" / operator-free rung / "membership"
+        self._cmpTemplate = None        # operator-free ordered rung: an "expr > n" template with {expr}/{n}
         self._inOk = True               # IN(...) usable (order-free subset bisection)
         self._lastTruncated = False
         self._discovered = False

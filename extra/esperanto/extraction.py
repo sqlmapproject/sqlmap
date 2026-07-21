@@ -133,8 +133,8 @@ class _Extraction(object):
         # BETWEEN expresses the same range test without the '>'/'<' a WAF may strip.
         if self._comparator == "between":
             return self._ask("%s BETWEEN %d AND %d" % (expr, n + 1, high))
-        if self._comparator == "sign":
-            return self._ask("SIGN((%s)-(%d))=1" % (expr, n))
+        if self._cmpTemplate is not None:       # any operator-free ordered rung (sign/abs/least/nullif/...)
+            return self._ask(self._cmpTemplate.format(expr=expr, n=n))
         return self._ask("%s>%d" % (expr, n))
 
     def _numDefined(self, expr):

