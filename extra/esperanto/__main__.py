@@ -360,7 +360,7 @@ def _httpOracle(url, data=None, cookie=None, headers=None, string=None, code=Non
 
     if "[INFERENCE]" not in (url + (data or "")) and "*" not in (url + (data or "")):
         url = url + "*"                     # no marker given -> inject at the end of the URL by default
-        print("[*] no injection marker ('*' or '[INFERENCE]') given; defaulting to end of URL: %s" % url)
+        print("[i] no injection marker ('*' or '[INFERENCE]') given; defaulting to end of URL: %s" % url)
 
     # ONE kept-alive connection reused across every probe. a blind dump is thousands of
     # requests; opening a fresh TCP+TLS handshake per probe (what urlopen does) is ~0.2s of
@@ -458,7 +458,7 @@ def _httpOracle(url, data=None, cookie=None, headers=None, string=None, code=Non
             if wanted is None:                              # (3) similarity ratio floor
                 mode, base = "ratio", {"t": tc, "f": fc}
     if string is None:
-        print("[*] calibrated oracle: %s%s" % (mode, (" (%r)" % wanted) if mode in ("code", "autostring") else ""))
+        print("[i] calibrated oracle: %s%s" % (mode, (" (%r)" % wanted) if mode in ("code", "autostring") else ""))
 
     def classify(cond):
         body, status = fetch(cond)
@@ -598,7 +598,7 @@ def _report(esp, args):
         else:
             scope = cur
         if scope:
-            print("[*] scoping to database/schema: %s" % scope)
+            print("[i] scoping to database/schema: %s" % scope)
     if args.current_user:
         expr = esp.dialect.identity.get("user")
         print("[*] current user: %s" % (_scalar(esp, expr) if expr else "n/a"))
@@ -606,35 +606,29 @@ def _report(esp, args):
         expr = esp.dialect.identity.get("database")
         print("[*] current database: %s" % (_scalar(esp, expr) if expr else "n/a"))
     if args.tables:
-        print("[*] fetching tables ...")
+        print("[i] fetching tables ...")
         print("[*] tables: %s" % ", ".join(esp.enumerate("table", schema=scope) or ["<none>"]))
     if args.columns:
         if not args.tbl:
             print("[!] --columns needs -T <table>")
         else:
-            print("[*] fetching columns for '%s' ..." % args.tbl)
+            print("[i] fetching columns for '%s' ..." % args.tbl)
             print("[*] columns of %s: %s" % (args.tbl, ", ".join(esp.columns(args.tbl, schema=scope) or ["<none>"])))
-    if args.query:
-        print("[*] fetching %s ..." % args.query)
-        print("[*] %s = %s" % (args.query, _scalar(esp, args.query)))
     if args.dump:
         if not args.tbl:
             print("[!] --dump needs -T <table>")
         else:
             cols = [c.strip() for c in args.col.split(",")] if args.col else None
             if cols is None:                    # enumerate columns FIRST (own phase), so the
-                print("[*] fetching columns for table '%s' ..." % args.tbl)   # 'entries' phase below streams ROWS, not column names
+                print("[i] fetching columns for table '%s' ..." % args.tbl)   # 'entries' phase below streams ROWS, not column names
                 cols = esp.columns(args.tbl, schema=scope) or None
-            print("[*] fetching entries for table '%s' ..." % args.tbl)
-            # NO silent internal 10-row cap: honor --stop, else dump ALL rows (by COUNT) and
-            # always print whether the result is complete.
-            if getattr(args, "stop", None):
-                limit = args.stop
-            else:
-                try:
-                    limit = esp.extractInteger("(SELECT COUNT(*) FROM %s)" % esp.qualify(args.tbl, scope)) or 10
-                except Exception:
-                    limit = 1 << 30
+            print("[i] fetching entries for table '%s' ..." % args.tbl)
+            # NO silent internal cap: dump ALL rows (bounded by the live COUNT) and always
+            # print whether the result came back complete.
+            try:
+                limit = esp.extractInteger("(SELECT COUNT(*) FROM %s)" % esp.qualify(args.tbl, scope)) or 10
+            except Exception:
+                limit = 1 << 30
             result = esp.dump(args.tbl, columns=cols, schema=scope, limit=limit)
             if not result or not result["columns"]:
                 print("[!] could not dump %s" % args.tbl)
@@ -698,11 +692,9 @@ def main(argv=None):
     parser.add_argument("--tables", action="store_true", help="enumerate tables")
     parser.add_argument("--columns", action="store_true", help="enumerate table columns (needs -T)")
     parser.add_argument("--dump", action="store_true", help="dump table entries (needs -T)")
-    parser.add_argument("--sql-query", dest="query", help="run a custom scalar SQL query")
     parser.add_argument("-D", dest="db", help="database/schema to enumerate")
     parser.add_argument("-T", dest="tbl", help="table to enumerate")
     parser.add_argument("-C", dest="col", help="columns to dump (comma-separated)")
-    parser.add_argument("--stop", type=int, help="max rows to dump (default: all)")
     # internal dev/test harness switches - functional but hidden from --help (--live drives the
     # local-Docker DBMS livetest; --waf is a livetest-only fault-injection mode, NOT a real WAF bypass)
     parser.add_argument("--live", action="store_true", help=argparse.SUPPRESS)
@@ -733,18 +725,18 @@ def main(argv=None):
         shown = _previewFramed(partial)
         if shown is None:
             shown = partial
-        _sys.stdout.write("\r\033[K[*] retrieved: %s" % _safeterm(shown[-200:]))
+        _sys.stdout.write("\r\033[K[i] retrieved: %s" % _safeterm(shown[-200:]))
         if len(partial) >= total:               # value complete -> keep it and drop to a new line
             _sys.stdout.write("\n")
         _sys.stdout.flush()
     def _plainLive(value):                      # piped/non-tty: one plain line per value, no control codes
-        _sys.stdout.write("[*] retrieved: %s\n" % _safeterm(value))
+        _sys.stdout.write("[i] retrieved: %s\n" % _safeterm(value))
         _sys.stdout.flush()
     if _tty:
         esp._charProgress = _charLive           # animated char-by-char is the sole feedback on a terminal
     else:
         esp._progress = _plainLive              # logs/pipes get clean per-value lines instead
-    print("[*] discovering the back-end SQL dialect (agnostic mode) ...")
+    print("[i] discovering the back-end SQL dialect (agnostic mode) ...")
     try:
         esp.discover()
         _report(esp, args)

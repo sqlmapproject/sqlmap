@@ -329,12 +329,14 @@ class _Enumeration(object):
         # take the alphabetically-first key column (deterministic); a compound key
         # still yields a usable ordering column for the walk
         keyexpr = "(SELECT MIN(%s) FROM %s WHERE %s)" % (ncol, source, filt)
-        with self._probePhase():        # a catalog that lacks this key structure errors -> "no key", not fatal
-            present = self._ask("%s IS NOT NULL" % keyexpr)
-        if present:
-            res = self.extractResult(keyexpr)   # a key COLUMN NAME becomes SQL -> require an EXACT value
-            if res.exact and res.value:          # (a case-ambiguous name could mis-target)
-                return res.value
+        # discovering the key COLUMN NAME is setup, not data - run it inside the probe phase so a
+        # catalog lacking this key structure degrades to "no key" (not fatal) AND so the name does
+        # not surface on the live "retrieved:" feed (it is a column name, not a dumped entry).
+        with self._probePhase():
+            if self._ask("%s IS NOT NULL" % keyexpr):
+                res = self.extractResult(keyexpr)   # a key COLUMN NAME becomes SQL -> require an EXACT value
+                if res.exact and res.value:          # (a case-ambiguous name could mis-target)
+                    return res.value
         return None
 
     def columnType(self, expr):
