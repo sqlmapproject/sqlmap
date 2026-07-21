@@ -5,10 +5,13 @@ Copyright (c) 2006-2026 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
+from . import __version__
 from .atlas import _REPL
 from .engine import Esperanto, hostExtract
 from .records import (
     OracleUndecided, ExtractResult, QueryBudgetExceeded)
+
+_SITE = "https://sqlmap.org"
 
 # ratio-mode confidence margin: if the true/false similarity scores are within this of each
 # other the page can't be classified, so the oracle returns UNDECIDED rather than guessing.
@@ -331,14 +334,14 @@ def _livetest(only=None, waf=False):
     return ok
 
 
-def _httpOracle(url, data=None, cookie=None, headers=None, string=None, notString=None, code=None):
+def _httpOracle(url, data=None, cookie=None, headers=None, string=None, code=None):
     """A boolean oracle over a real HTTP target, for standalone use. The condition is
     substituted at the injection marker: '[INFERENCE]' is replaced verbatim (you supply
     the context, e.g. `id=1 AND [INFERENCE]`), else a single '*' is replaced with
     ` AND (<condition>)`.
 
     True/false is decided by a reduced port of sqlmap's response differentiation - the
-    Pareto 80%: explicit --string/--not-string/--code win; otherwise it CALIBRATES from
+    Pareto 80%: explicit --string/--code win; otherwise it CALIBRATES from
     two true (1=1) baselines + one false (1=2) and auto-picks the cheapest reliable
     signal - HTTP status code, else a stable text line present in true but not false,
     else a difflib similarity ratio. Two noise-killers borrowed from sqlmap make it
@@ -428,8 +431,6 @@ def _httpOracle(url, data=None, cookie=None, headers=None, string=None, notStrin
     mode, wanted, base = None, None, {}
     if string is not None:
         mode = "string"
-    elif notString is not None:
-        mode = "notstring"
     elif code is not None:
         mode, wanted = "code", int(code)
     else:                                                   # auto-calibrate
@@ -456,7 +457,7 @@ def _httpOracle(url, data=None, cookie=None, headers=None, string=None, notStrin
                     break
             if wanted is None:                              # (3) similarity ratio floor
                 mode, base = "ratio", {"t": tc, "f": fc}
-    if not string and not notString:
+    if string is None:
         print("[*] calibrated oracle: %s%s" % (mode, (" (%r)" % wanted) if mode in ("code", "autostring") else ""))
 
     def classify(cond):
@@ -465,8 +466,6 @@ def _httpOracle(url, data=None, cookie=None, headers=None, string=None, notStrin
             return None                                     # let the engine retry/degrade, never a fake bool
         if mode == "string":
             return string in body
-        if mode == "notstring":
-            return notString not in body
         if mode == "code":
             return status == wanted
         if mode == "autostring":
@@ -647,6 +646,25 @@ def _report(esp, args):
                 _printTable(result["columns"], result["rows"])
 
 
+def _banner():
+    # modest CLI identity, sqlmap-styled: a small globe (DBMS-agnostic/universal) + the Esperanto
+    # green star. Colored only on a TTY; pure-ASCII (no coding header on this file); text columns
+    # aligned at a fixed offset so the escape codes (zero display width) don't skew them.
+    import sys as _sys
+    tty = _sys.stdout.isatty()
+    G = "\033[0;32m" if tty else ""       # esperanto green (the globe)
+    S = "\033[1;32m" if tty else ""       # bright green (the star)
+    W = "\033[1;37m" if tty else ""       # bold white (the name)
+    U = "\033[4;37m" if tty else ""       # underline (the site)
+    R = "\033[0m" if tty else ""
+    return (
+        "     %(G)s___%(R)s\n"
+        "    %(G)s/ _ \\%(R)s    %(W)sesperanto%(R)s {%(ver)s}\n"
+        "   %(G)s| (_) |%(R)s\n"
+        "    %(G)s\\___/ %(S)s*%(R)s  %(U)s%(site)s%(R)s\n"
+    ) % dict(G=G, S=S, W=W, U=U, R=R, ver=__version__, site=_SITE)
+
+
 def main(argv=None):
     """Standalone entry point: drive the engine against a live HTTP target."""
     import argparse
@@ -665,13 +683,14 @@ def main(argv=None):
 
     parser = argparse.ArgumentParser(
         prog="esperanto", formatter_class=_Formatter,
+        usage="esperanto -u URL [options]",     # short synopsis, not an auto-listing of every flag
         description="DBMS-agnostic blind-SQLi enumeration engine (standalone)")
+    parser.add_argument("--version", action="version", version="esperanto %s (%s)" % (__version__, _SITE))
     parser.add_argument("-u", "--url", help="target URL (with a '*'/'[INFERENCE]' marker)")
     parser.add_argument("--data", help="POST data string")
     parser.add_argument("--cookie", help="HTTP Cookie header")
     parser.add_argument("-H", "--header", action="append", help="extra HTTP header (repeatable)")
     parser.add_argument("--string", help="match string for a True response")
-    parser.add_argument("--not-string", dest="not_string", help="match string for a False response")
     parser.add_argument("--code", type=int, help="HTTP code for a True response")
     parser.add_argument("--banner", action="store_true", help="retrieve DBMS banner")
     parser.add_argument("--current-user", action="store_true", dest="current_user", help="retrieve current user")
@@ -697,13 +716,14 @@ def main(argv=None):
     if args.selftest:                       # self-test only on EXPLICIT request
         _selftest()
         return 0
+    print(_banner())                        # CLI identity (after the dev-harness paths above)
     if not args.url:                        # no target and nothing to do -> show help, don't surprise
         parser.print_help()
         return 1
 
     target = args.url if "://" in args.url else ("http://" + args.url)   # tolerate a scheme-less URL
     esp = Esperanto(_httpOracle(target, args.data, args.cookie, args.header,
-                                args.string, args.not_string, args.code))
+                                args.string, args.code))
     import sys as _sys
     _tty = _sys.stdout.isatty()
     def _charLive(partial, total):

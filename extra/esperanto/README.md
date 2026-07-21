@@ -41,7 +41,7 @@ python run.py --self-test
 ```
 
 The `*` (or an explicit `[INFERENCE]`) marks the injection point; without one it defaults to the end
-of the URL. The true/false oracle is taken from `--string` / `--not-string` / `--code`, or
+of the URL. The true/false oracle is taken from `--string` / `--code`, or
 auto-calibrated from the response when none is given.
 
 ## How it works
