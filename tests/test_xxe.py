@@ -88,18 +88,62 @@ class TestBuildDoctype(unittest.TestCase):
         self.assertEqual(out.count("<!DOCTYPE"), 1)
         self.assertIn("[", out)
 
+    def test_splice_survives_quoted_bracket_close_in_subset(self):
+        # a ']>' sequence inside a quoted entity value must NOT be taken as the subset close - the
+        # splice still lands inside the real internal subset and produces a single valid DOCTYPE
+        xml = '<!DOCTYPE r [<!ENTITY a "x]>y">]><r>z</r>'
+        out = xxe._buildDoctype(xml, "r", self.SUBSET)
+        self.assertEqual(out.count("<!DOCTYPE"), 1)
+        self.assertIn(self.SUBSET, out)
+        # our subset must be spliced BEFORE the real subset close, i.e. before the document element
+        self.assertLess(out.index(self.SUBSET), out.index("<r>z</r>"))
+
+
+class TestScanDoctype(unittest.TestCase):
+    """Lexical DOCTYPE scanner: boundaries must be immune to quoted '>', comments and ']>' in values."""
+
+    def test_no_doctype(self):
+        self.assertIsNone(xxe._scanDoctype("<?xml version='1.0'?><r>x</r>"))
+
+    def test_content_start_skips_doctype_with_quoted_bracket(self):
+        # ']>' inside the entity value is NOT the subset end; content starts after the REAL '>'
+        xml = '<!DOCTYPE r [<!ENTITY a "]>trap">]><r>real</r>'
+        cs = xxe._contentStart(xml)
+        self.assertEqual(xml[cs:], "<r>real</r>")
+
+    def test_content_start_skips_doctype_with_comment(self):
+        xml = '<!DOCTYPE r [<!-- ]> not the end --><!ELEMENT r ANY>]><r>real</r>'
+        self.assertEqual(xml[xxe._contentStart(xml):], "<r>real</r>")
+
+    def test_text_node_count_ignores_dtd_bracket_in_value(self):
+        # the '>text<'-looking fragment is inside the DTD entity value, not a body text node
+        xml = '<!DOCTYPE r [<!ENTITY a "]>x">]><r><n>luther</n></r>'
+        self.assertEqual(xxe._textNodeCount(xml), 1)   # only <n>luther</n>
+
 
 class TestPlaceRef(unittest.TestCase):
-    def test_all_text_nodes(self):
+    def test_single_node_preserves_others(self):
+        # ONE location per call - every OTHER value stays intact (no whole-document destruction)
         out = xxe._placeRef("<p><a>one</a><b>two</b></p>", "&e;")
-        self.assertEqual(out.count("&e;"), 2)
-        self.assertNotIn("one", out)
-        self.assertNotIn("two", out)
+        self.assertEqual(out.count("&e;"), 1)
+        self.assertIn("&e;</a>", out)      # default: first text node
+        self.assertIn("two", out)          # second field preserved
 
-    def test_attributes_only_when_requested(self):
-        text = '<u id="1"><n>luther</n></u>'
-        self.assertNotIn('id="&e;"', xxe._placeRef(text, "&e;"))            # attrs off by default
-        self.assertIn('id="&e;"', xxe._placeRef(text, "&e;", attrs=True))   # attrs on
+    def test_index_sweeps_each_node(self):
+        xml = "<p><a>one</a><b>two</b></p>"
+        self.assertEqual(xxe._textNodeCount(xml), 2)
+        out1 = xxe._placeRef(xml, "&e;", index=1)
+        self.assertIn("&e;</b>", out1)     # second text node targeted
+        self.assertIn("one", out1)         # first field preserved
+
+    def test_attribute_seeded_only_as_fallback(self):
+        noText = '<u id="1"><c k="v"/></u>'                                 # no leaf text node
+        self.assertNotIn('="&e;"', xxe._placeRef(noText, "&e;"))            # attrs off -> no seeding
+        self.assertIn('="&e;"', xxe._placeRef(noText, "&e;", attrs=True))   # attrs on -> one attr seeded
+        withText = '<u id="1"><n>luther</n></u>'
+        seeded = xxe._placeRef(withText, "&e;", attrs=True)
+        self.assertIn(">&e;<", seeded)                                      # text node preferred over attr
+        self.assertIn('id="1"', seeded)                                     # attribute preserved
 
     def test_xmlns_preserved(self):
         out = xxe._placeRef('<soap:E xmlns:soap="ns"><b>x</b></soap:E>', "&e;", attrs=True)
@@ -240,6 +284,25 @@ class TestReportMethod(unittest.TestCase):
         finally:
             conf.dumper, conf.method, conf.beep = old_dumper, old_method, old_beep
         self.assertIn("Parameter: XML body (PUT)", captured[0])
+        self.assertIn("Type: XXE injection", captured[0])   # default vuln type
+
+    def test_xxe_internal_entity_is_not_reported_as_xxe(self):
+        # internal-only general-entity expansion is a parser-configuration weakness, NOT confirmed
+        # XXE (which needs external resolution) - it must carry a distinct, weaker vuln type
+        captured = []
+
+        class _Dumper(object):
+            def singleString(self, data, content_type=None):
+                captured.append(data)
+
+        old_dumper, old_method, old_beep = conf.get("dumper"), conf.get("method"), conf.get("beep")
+        conf.dumper, conf.method, conf.beep = _Dumper(), "POST", False
+        try:
+            xxe._report("DTD/internal general entity expansion enabled", "&e;", vulnType="XML parser configuration")
+        finally:
+            conf.dumper, conf.method, conf.beep = old_dumper, old_method, old_beep
+        self.assertIn("Type: XML parser configuration", captured[0])
+        self.assertNotIn("Type: XXE injection", captured[0])
 
 
 class TestHarvestFiles(unittest.TestCase):
@@ -298,6 +361,57 @@ class TestDetectionMocked(unittest.TestCase):
         payload, _ = xxe._tryInternal("<u><n>luther</n></u>", "u", baseline="Hello, luther!")
         self.assertIsNotNone(payload)
 
+    def test_inband_read_rejects_html_escaped_entity_reflection(self):
+        # the app HTML-escapes the reflected entity reference (&amp;<ent>;) between the markers: that is
+        # reflection, NOT an expanded file read - the random entity name survives de-escaping, so it
+        # must be rejected (the P0-5 false positive that fabricated 'file contents')
+        import re as _re
+
+        def mock(body):
+            m = _re.search(r"<!ENTITY (\w+) SYSTEM", body)
+            ent = m.group(1) if m else "e"
+            mk = _re.search(r'(\w{8})&' + _re.escape(ent) + r';(\w{8})', body)   # markers around the ref
+            if mk:
+                m1, m2 = mk.group(1), mk.group(2)
+                return "%s&amp;%s;%s" % (m1, ent, m2)     # ESCAPED reflection, not file content
+            return "no match"
+
+        xxe._send = mock
+        content, _ = xxe._tryInbandFileRead("<u><n>x</n></u>", "u", "/etc/passwd")
+        self.assertIsNone(content)
+
+    def test_inband_read_accepts_genuine_expansion(self):
+        # a genuine file read: the requested path returns real content, a NONEXISTENT path returns
+        # something different -> the matched control passes and the content is accepted
+        import re as _re
+
+        def mock(body):
+            mk = _re.search(r'(\w{8})&\w+;(\w{8})', body)
+            if not (mk and "SYSTEM" in body and "php://filter" not in body):
+                return "nope"
+            if "/etc/passwd" in body:
+                return "%sroot:x:0:0:root:/root:/bin/bash%s" % (mk.group(1), mk.group(2))
+            return "%s%s" % (mk.group(1), mk.group(2))       # nonexistent path -> empty between markers
+
+        xxe._send = mock
+        content, _ = xxe._tryInbandFileRead("<u><n>x</n></u>", "u", "/etc/passwd")
+        self.assertEqual(content, "root:x:0:0:root:/root:/bin/bash")
+
+    def test_inband_read_rejects_path_independent_placeholder(self):
+        # P0-2: a gateway returns a FIXED placeholder for every path (real + nonexistent). The matched
+        # control sees identical content and rejects it as not-genuine file contents.
+        import re as _re
+
+        def mock(body):
+            mk = _re.search(r'(\w{8})&\w+;(\w{8})', body)
+            if not (mk and "SYSTEM" in body and "php://filter" not in body):
+                return "nope"
+            return "%s[external entity disabled]%s" % (mk.group(1), mk.group(2))   # same for ANY path
+
+        xxe._send = mock
+        content, _ = xxe._tryInbandFileRead("<u><n>x</n></u>", "u", "/etc/passwd")
+        self.assertIsNone(content)
+
     def test_internal_echo_rejected(self):
         # endpoint mirrors the raw body back (never parses) -> must NOT be a hit
         xxe._send = lambda body: "You sent: %s" % body
@@ -308,6 +422,30 @@ class TestDetectionMocked(unittest.TestCase):
         xxe._send = lambda body: "Hello, %s!" % xxe.SENTINEL
         payload, _ = xxe._tryInternal("<u><n>luther</n></u>", "u", baseline="already %s here" % xxe.SENTINEL)
         self.assertIsNone(payload)
+
+    def test_location_sweep_finds_non_first_leaf(self):
+        # The first leaf is inside <id> which the (mock) app validates and strips; only the entity ref
+        # placed in the SECOND leaf (<n>) survives and reflects. The sweep must try location #1 and the
+        # engine must latch it so downstream read tiers reuse it - a fixed index=0 would be a false neg.
+        xml = "<u><id>7</id><n>luther</n></u>"
+        self.assertEqual(xxe._textNodeCount(xml), 2)
+
+        def mock(body):
+            # reflect the sentinel only when the entity ref sits in the second leaf (<n>&ent;</n>);
+            # a ref in the first leaf (<id>&ent;</id>) is validated away and never reflects
+            return ("Hello, %s!" % xxe.SENTINEL) if re.search(r"<n>\s*&\w+;", body) else "Hello, !"
+
+        xxe._send = mock
+        xxe._PLACE_INDEX = 0
+        hit = None
+        for i in xxe._sweepLocations(xml):
+            payload, _ = xxe._tryInternal(xml, "u", baseline="Hello, luther!", index=i)
+            if payload:
+                hit = i
+                break
+        self.assertEqual(hit, 1)
+        # location #0 alone (the default) must NOT reflect -> proves the sweep was necessary
+        self.assertIsNone(xxe._tryInternal(xml, "u", baseline="Hello, luther!", index=0)[0])
 
     def test_error_based_positive(self):
         xxe._send = lambda body: 'XML error: failed to load external entity "file:///%s/nonexistent"' % xxe.SENTINEL

@@ -10,6 +10,7 @@ formatting can be exercised without a live target.
 """
 
 import os
+import re
 import sys
 import unittest
 
@@ -181,6 +182,11 @@ class TestBooleanDetection(unittest.TestCase):
 
     def test_detection_returns_extractable_boundary(self):
         def mock(place, parameter, value):
+            # faithful XPath engine: string-length('ab')=2 holds (XPath-only confirm the detector
+            # now requires), =3 does not; plus the true()/false() the break-out probes with
+            m = re.search(r"string-length\('ab'\)=(\d+)", value)
+            if m:
+                return '{"count":7,"entries":[{...}]}' if int(m.group(1)) == 2 else '{"count":0,"entries":[],"error":null}'
             if "true()" in value:
                 return '{"count":7,"entries":[{...}]}'
             elif "false()" in value:
@@ -216,6 +222,71 @@ class TestGridAndTable(unittest.TestCase):
         columns, rows = xpath._treeToTable(node)
         self.assertIn("Path", columns)
         self.assertGreater(len(rows), 0)
+
+
+class TestExtractionCalibration(unittest.TestCase):
+    def test_xpath_or_boundary_calibrates_with_sentinel_base(self):
+        # for an OR-style boundary the extraction base is SENTINEL (not the original), and _makeOracle
+        # must calibrate its true()/false() models on THAT base so they match the extraction payloads
+        from lib.core.enums import PLACE
+        orBoundary = xpath.Boundary("' or ", " and '1'='1", True)
+        self.assertEqual(xpath._extractionBase("origvalue", orBoundary), xpath.SENTINEL)
+
+        sent = []
+
+        def spy(place, parameter, value):
+            sent.append(value)
+            return "TRUE-model-page" if "true()" in value else "FALSE-model-page"
+
+        old = xpath._send
+        xpath._send = spy
+        try:
+            xpath.conf.parameters = {PLACE.GET: "q=x"}
+            xpath.conf.paramDict = {PLACE.GET: {"q": "x"}}
+            oracle = xpath._makeOracle(PLACE.GET, "q", orBoundary, xpath._extractionBase("origvalue", orBoundary))
+        finally:
+            xpath._send = old
+        self.assertIsNotNone(oracle)
+        self.assertTrue(sent)
+        self.assertTrue(all(xpath.SENTINEL in p for p in sent), "calibration used a non-sentinel base: %r" % sent)
+        self.assertFalse(any("origvalue" in p for p in sent))
+
+    def test_transient_failure_on_true_bit_is_not_a_false_bit(self):
+        # A timeout/5xx on a TRUE predicate must NOT be cached as a false bit: resolveBit re-sends and
+        # recovers the correct TRUE, and a PERSISTENT failure aborts (InconclusiveError), never False.
+        from lib.core.enums import PLACE
+        from lib.utils.nonsql import InconclusiveError
+        orBoundary = xpath.Boundary("' or ", " and '1'='1", True)
+        base = xpath._extractionBase("x", orBoundary)
+
+        state = {"armed": False, "failed": set()}
+
+        def flaky(place, parameter, value):
+            page = "TRUE-model-page" if "true()" in value else "FALSE-model-page"
+            # once armed (post-build), the FIRST send of each probe fails transiently, then recovers
+            if state["armed"] and value not in state["failed"]:
+                state["failed"].add(value)
+                return None
+            return page
+
+        old = xpath._send
+        xpath._send = flaky
+        try:
+            xpath.conf.parameters = {PLACE.GET: "q=x"}
+            xpath.conf.paramDict = {PLACE.GET: {"q": "x"}}
+            oracle = xpath._makeOracle(PLACE.GET, "q", orBoundary, base)   # calibrates cleanly
+            self.assertIsNotNone(oracle)
+
+            # a fresh TRUE probe whose FIRST send fails transiently must resolve to True (retry), never False
+            probe = xpath._makePayload(base, orBoundary, "true()") + "[1]"
+            state["armed"] = True
+            self.assertTrue(oracle.extract(probe))
+
+            # a PERSISTENTLY failing probe must raise InconclusiveError, never return False
+            xpath._send = lambda place, parameter, value: None
+            self.assertRaises(InconclusiveError, oracle.extract, probe + "Z")
+        finally:
+            xpath._send = old
 
 
 class TestExtraction(unittest.TestCase):
@@ -288,6 +359,48 @@ class TestExtraction(unittest.TestCase):
                                    lambda b, p, prefix: b.nameStartsWith(p, prefix),
                                    maxLen=32)
         self.assertEqual(fast, linear)
+
+    def test_inconclusive_oracle_aborts_value_not_fabricates(self):
+        # An oracle that stays INCONCLUSIVE (raises InconclusiveError, as resolveBit does after
+        # retries) must abort the value cleanly - _inferString returns None and _inferCount returns
+        # None (unknown) - rather than emitting a length/char/count chosen from an ambiguous bit.
+        from lib.utils.nonsql import InconclusiveError
+        boundary = xpath._BREAKOUT_BOUNDARY["') or true() or ('"]
+        builder = xpath._XPathPayloadBuilder("x", boundary)
+
+        class InconclusiveOracle(object):
+            def extract(self, payload):
+                raise InconclusiveError()
+
+        oracle = InconclusiveOracle()
+        self.assertIsNone(xpath._inferString(oracle, builder, "name(/*)", maxLen=32))
+        # inconclusive count must be None (unknown), NEVER 0 - 0 would read as a leaf and fabricate text
+        self.assertIsNone(xpath._inferCount(oracle, builder, "/*",
+                                            lambda b, p, c: b.childCount(p, c), maxCount=8))
+        self.assertIsNone(xpath._inferValue(oracle, builder, "/*",
+                                            lambda b, p, prefix: b.nameStartsWith(p, prefix), maxLen=32))
+
+    def test_walk_tree_marks_partial_and_does_not_fabricate_text_on_unknown_count(self):
+        # name resolves (real lxml eval), but every child/attribute COUNT probe is inconclusive: the
+        # node must be marked partial, must NOT be treated as a leaf (no fabricated scalar text), and
+        # must not iterate phantom children
+        from lib.utils.nonsql import InconclusiveError
+        boundary = xpath._BREAKOUT_BOUNDARY["') or true() or ('"]
+        builder = xpath._XPathPayloadBuilder("x", boundary)
+        template = _XPATH_TEMPLATES["function_arg"]
+
+        class PartialCountOracle(object):
+            def extract(self, payload):
+                if "count(" in payload:
+                    raise InconclusiveError()               # child/attribute counts are ambiguous
+                return _xpath_eval(template, payload) > 0    # names/strings resolve normally
+
+        node = xpath._walkTree(PartialCountOracle(), builder, "/*")
+        self.assertIsNotNone(node)
+        self.assertEqual(node["name"], "directory")
+        self.assertTrue(node["partial"])
+        self.assertIsNone(node["text"])       # unknown child count must NOT fabricate leaf text
+        self.assertEqual(node["children"], [])
 
 
 class TestBackendFingerprint(unittest.TestCase):

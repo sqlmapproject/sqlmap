@@ -839,11 +839,18 @@ class TestLdapPureHelpers(unittest.TestCase):
         # header + 2 rows + 4 separators (top, under-header, ... actually 3 borders + n rows)
         self.assertEqual(grid.count("+----+----+"), 3)
 
-    def test_charset_excludes_metachars(self):
+    def test_charset_includes_metachars_escaped(self):
+        # filter metacharacters ARE extractable - _ldapLiteral() escapes them, so a value containing
+        # '*'/'('/')'/'\\' is recovered in full rather than truncated at the first one
         for meta in ("*", "(", ")", "\\"):
-            self.assertNotIn(ord(meta), ldap._CHARSET)
+            self.assertIn(ord(meta), ldap._CHARSET)
         self.assertIn(ord("a"), ldap._CHARSET)
         self.assertIn(ord("0"), ldap._CHARSET)
+        # common characters are still tried before the (rare) metacharacters
+        self.assertLess(ldap._CHARSET.index(ord("a")), ldap._CHARSET.index(ord("*")))
+        # the escaping the extractor relies on
+        self.assertEqual(ldap._ldapLiteral("abc*def"), "abc\\2adef")
+        self.assertIn("\\28", ldap._ldapLiteral("x(y)"))
 
     def test_probe_builder_shapes(self):
         b = ldap._ProbeBuilder("*)")
@@ -865,7 +872,7 @@ class _LdapOracleCase(unittest.TestCase):
     match: a payload's trailing assertion '(attr=value*' matches when the directory holds
     `attr` whose value starts with `value`."""
 
-    DIRECTORY = {"uid": "admin", "mail": "bob", "cn": "Administrator"}
+    DIRECTORY = {"objectClass": "top", "uid": "admin", "mail": "bob", "cn": "Administrator"}
 
     def setUp(self):
         self._sparams = conf.get("parameters")
@@ -876,6 +883,9 @@ class _LdapOracleCase(unittest.TestCase):
         conf.parameters = {PLACE.GET: "user=admin"}
         conf.paramDict = {PLACE.GET: {"user": "admin"}}
         conf.cookieDel = None
+        # the boolean tests exercise the content-similarity path; null any explicit user oracle that
+        # an earlier test module may have left set (the engines now honor --string/--regexp globally)
+        conf.string = conf.notString = conf.regexp = conf.code = None
 
         directory = self.DIRECTORY
 
@@ -911,7 +921,9 @@ class TestLdapParamSegment(_LdapOracleCase):
 
 class TestLdapOracle(_LdapOracleCase):
     def _oracle(self):
-        return ldap._makeOracle(PLACE.GET, "user", "TRUE-CONTENT-stable-match-uid")
+        # _makeOracle now recalibrates its own true/false models on the winning breakout + SENTINEL
+        # base (matched (objectClass=*) vs (objectClass=<sentinel>)); pass the breakout, not a template
+        return ldap._makeOracle(PLACE.GET, "user", ")")
 
     def test_exists_true(self):
         oracle, builder = self._oracle(), ldap._ProbeBuilder(")")
@@ -935,9 +947,10 @@ class TestLdapOracle(_LdapOracleCase):
 
     def test_enumerate_entry_keys(self):
         oracle, builder = self._oracle(), ldap._ProbeBuilder(")")
-        keyAttr, values = ldap._enumerateEntryKeys(oracle, builder)
+        keyAttr, values, partial = ldap._enumerateEntryKeys(oracle, builder)
         self.assertEqual(keyAttr, "uid")
         self.assertEqual(values, ["admin"])
+        self.assertFalse(partial)                   # clean end, not an inconclusive abort
 
 
 class TestLdapBoolean(_LdapOracleCase):
@@ -1036,10 +1049,111 @@ class TestGraphqlPureHelpers(unittest.TestCase):
         # non-graphql passes through unchanged
         self.assertEqual(gql._slotValue("raw"), "raw")
 
-    def test_default_for_arg(self):
-        self.assertEqual(gql._defaultForArg({"kind": "SCALAR", "name": "Int"}, None), 0)
-        self.assertEqual(gql._defaultForArg({"kind": "SCALAR", "name": "String"}, None), "x")
-        self.assertEqual(gql._defaultForArg({"kind": "SCALAR", "name": "String"}, "given"), "given")
+    def _nn(self, inner):
+        return {"kind": "NON_NULL", "ofType": inner}
+
+    def test_render_sibling_omits_optionals(self):
+        # OPTIONAL argument (not NON_NULL) with no default -> OMITTED (None), never a bogus sentinel
+        # that would invalidate the query and cause a false negative
+        self.assertIsNone(gql._renderSibling("limit", {"kind": "SCALAR", "name": "Int"}, None))
+        self.assertIsNone(gql._renderSibling("active", {"kind": "SCALAR", "name": "Boolean"}, None))
+        self.assertIsNone(gql._renderSibling("tags", {"kind": "LIST"}, None))
+
+    def test_render_sibling_required_native_syntax(self):
+        # REQUIRED (NON_NULL) argument with no default -> synthesize NATIVE syntax per kind
+        self.assertEqual(gql._renderSibling("limit", self._nn({"kind": "SCALAR", "name": "Int"}), None), "limit:0")
+        self.assertEqual(gql._renderSibling("q", self._nn({"kind": "SCALAR", "name": "String"}), None), 'q:"x"')
+        self.assertEqual(gql._renderSibling("active", self._nn({"kind": "SCALAR", "name": "Boolean"}), None), "active:false")
+        self.assertEqual(gql._renderSibling("ids", self._nn({"kind": "LIST", "ofType": {"kind": "SCALAR", "name": "Int"}}), None), "ids:[]")
+        self.assertEqual(gql._renderSibling("cfg", self._nn({"kind": "INPUT_OBJECT", "name": "Cfg"}), None), "cfg:{}")
+
+    def test_required_nested_input_object_is_recursively_populated(self):
+        # SearchInput!{ filter: FilterInput!{ term: String! (req), note: String (opt) } }: a required
+        # nested input must populate its REQUIRED inner fields recursively, not emit a bare {} the
+        # server rejects; optional inner fields are omitted
+        gql._inputFields.clear()
+        gql._inputFields["SearchInput"] = [("filter", self._nn({"kind": "INPUT_OBJECT", "name": "FilterInput"}), None)]
+        gql._inputFields["FilterInput"] = [
+            ("term", self._nn({"kind": "SCALAR", "name": "String"}), None),
+            ("note", {"kind": "SCALAR", "name": "String"}, None),
+        ]
+        try:
+            out = gql._renderSibling("input", self._nn({"kind": "INPUT_OBJECT", "name": "SearchInput"}), None)
+            self.assertEqual(out, 'input:{filter:{term:"x"}}')       # required term populated, optional note omitted
+        finally:
+            gql._inputFields.clear()
+
+    def test_recursive_input_cycle_is_bounded(self):
+        # a self-referential required input must not recurse forever - it terminates at {}
+        gql._inputFields.clear()
+        gql._inputFields["Node"] = [("child", self._nn({"kind": "INPUT_OBJECT", "name": "Node"}), None)]
+        try:
+            out = gql._renderSibling("n", self._nn({"kind": "INPUT_OBJECT", "name": "Node"}), None)
+            self.assertTrue(out.startswith("n:{child:"))
+            self.assertIn("{}", out)                                 # cycle broken with a bare {}
+        finally:
+            gql._inputFields.clear()
+
+    def test_render_sibling_required_enum_uses_bare_identifier(self):
+        gql._enumValues.clear()
+        gql._enumValues["Role"] = ["ADMIN", "USER"]
+        try:
+            self.assertEqual(gql._renderSibling("role", self._nn({"kind": "ENUM", "name": "Role"}), None), "role:ADMIN")
+        finally:
+            gql._enumValues.clear()
+
+    def test_render_sibling_default_emitted_verbatim(self):
+        # a schema defaultValue is ALREADY a serialized GraphQL literal -> emit VERBATIM, never re-quote
+        self.assertEqual(gql._renderSibling("active", {"kind": "SCALAR", "name": "Boolean"}, "true"), "active:true")
+        self.assertEqual(gql._renderSibling("role", {"kind": "ENUM", "name": "Role"}, "ADMIN"), "role:ADMIN")
+        self.assertEqual(gql._renderSibling("ids", {"kind": "LIST"}, "[1, 2]"), "ids:[1, 2]")
+        self.assertEqual(gql._renderSibling("filter", {"kind": "INPUT_OBJECT"}, "{a: 1}"), "filter:{a: 1}")
+        self.assertEqual(gql._renderSibling("n", {"kind": "SCALAR", "name": "Int"}, "5"), "n:5")
+        self.assertEqual(gql._renderSibling("q", {"kind": "SCALAR", "name": "String"}, '"hello"'), 'q:"hello"')
+
+    def _nnInput(self, name):
+        return {"kind": "NON_NULL", "ofType": {"kind": "INPUT_OBJECT", "name": name}}
+
+    def test_deep_nested_input_slot_discovered_and_rendered(self):
+        # search(input: SearchInput!{ filter: FilterInput!{ credentials: Creds!{ username: String! } } })
+        # the injectable leaf is input.filter.credentials.username, THREE levels deep - it must be both
+        # DISCOVERED as a slot and RENDERED as the full nested literal
+        gql._inputFields.clear()
+        gql._inputFields["SearchInput"] = [("filter", self._nnInput("FilterInput"), None)]
+        gql._inputFields["FilterInput"] = [("credentials", self._nnInput("Creds"), None)]
+        gql._inputFields["Creds"] = [("username", self._nn({"kind": "SCALAR", "name": "String"}), None)]
+        try:
+            slots = []
+            gql._inputSlots("query", "Query", "search",
+                            [("input", self._nnInput("SearchInput"), None)],
+                            "input", self._nnInput("SearchInput"),
+                            "OBJECT", "User", "{ id }",
+                            {"SearchInput": {"kind": "INPUT_OBJECT", "name": "SearchInput", "inputFields": [{"name": "filter", "type": self._nnInput("FilterInput")}]},
+                             "FilterInput": {"kind": "INPUT_OBJECT", "name": "FilterInput", "inputFields": [{"name": "credentials", "type": self._nnInput("Creds")}]},
+                             "Creds": {"kind": "INPUT_OBJECT", "name": "Creds", "inputFields": [{"name": "username", "type": self._nn({"kind": "SCALAR", "name": "String"})}]}},
+                            slots)
+            paths = [s.targetArg for s in slots]
+            self.assertIn("input.filter.credentials.username", paths)
+
+            slot = [s for s in slots if s.targetArg == "input.filter.credentials.username"][0]
+            q = gql._buildQuery(slot, "PWN")
+            self.assertIn('input: {filter:{credentials:{username:"PWN"}}}', q)
+        finally:
+            gql._inputFields.clear()
+
+    def test_recursive_input_slot_cycle_bounded(self):
+        # a self-referential input object must not loop forever during slot discovery
+        gql._inputFields.clear()
+        gql._inputFields["Node"] = [("child", self._nnInput("Node"), None), ("val", self._nn({"kind": "SCALAR", "name": "String"}), None)]
+        try:
+            slots = []
+            tbn = {"Node": {"kind": "INPUT_OBJECT", "name": "Node", "inputFields": [
+                {"name": "child", "type": self._nnInput("Node")}, {"name": "val", "type": self._nn({"kind": "SCALAR", "name": "String"})}]}}
+            gql._inputSlots("mutation", "Mutation", "f", [("n", self._nnInput("Node"), None)],
+                            "n", self._nnInput("Node"), "OBJECT", "R", "{ id }", tbn, slots)
+            self.assertTrue(any(s.targetArg.endswith(".val") for s in slots))   # terminates + finds a leaf
+        finally:
+            gql._inputFields.clear()
 
 
 # A minimal but realistic introspection schema: query user(id: String, limit: Int): User
@@ -1121,7 +1235,7 @@ class TestGraphqlQueryBuilding(unittest.TestCase):
         q = gql._buildQuery(self.strSlot, "x' OR '1'='1")
         self.assertTrue(q.startswith("{user:user("))
         self.assertIn('id:"x\' OR \'1\'=\'1"', q)
-        self.assertIn("limit:0", q)             # required-ish sibling defaulted
+        self.assertNotIn("limit", q)            # optional sibling with no default is OMITTED (P0-2)
         self.assertIn("{ name uid }", q)
 
     def test_build_query_numeric_rejects_non_numeric(self):
@@ -1246,7 +1360,7 @@ class TestGraphqlDumpTable(unittest.TestCase):
             "(SELECT COUNT(*) %s)" % colFrom: "2",
             "(SELECT %s %s %s)" % (d.columnCol, colFrom, d.paginate(d.columnCol, 0)): "id",
             "(SELECT %s %s %s)" % (d.columnCol, colFrom, d.paginate(d.columnCol, 1)): "name",
-            "(SELECT COUNT(*) FROM users)": "2",
+            "(SELECT COUNT(*) FROM %s)" % d.fromIdent("users"): "2",
             d.row(["id", "name"], "users", 0): gql.COL_SEP.join(("1", "alice")),
             d.row(["id", "name"], "users", 1): gql.COL_SEP.join(("2", "bob")),
         }

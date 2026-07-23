@@ -11,6 +11,7 @@ Neo4j Cypher and ArangoDB AQL string break-out.
 """
 
 import re
+import time
 import unittest
 
 from _testutils import bootstrap
@@ -54,6 +55,10 @@ def _mongo(place, parameter, op, value, isArray=False):
 def _es(place, parameter, value):
     if value == "*":
         return MATCH
+    if "AND NOT" in value:                                      # Lucene (rand AND NOT rand) -> nothing
+        return NOMATCH
+    if value.startswith("(NOT ") and value.endswith(")"):       # Lucene (NOT rand) -> everything
+        return MATCH
     if value == ni.NOSQL_SENTINEL:
         return NOMATCH
     if value.startswith("/") and value.endswith("/"):           # Lucene regexp is full-anchored
@@ -87,6 +92,25 @@ class TestNoSqlMongo(unittest.TestCase):
         ni._fetch = lambda *args, **kwargs: MATCH
         self.assertIsNone(ni._detectMongo("GET", "password"))
 
+    def test_resolve_vector_carries_false_model(self):
+        # the LIVE vector must carry a calibrated false model so extraction is dual-model, not one-sided
+        vector = ni._resolve("GET", "password", "password")
+        self.assertIsNotNone(vector)
+        self.assertEqual(vector.falseModel, NOMATCH)          # $in[sentinel] no-match page
+
+    def test_dual_model_extraction_and_unrelated_page_inconclusive(self):
+        template = MATCH
+        falseModel = NOMATCH
+        value = ni._extract(template,
+                            lambda v: ni._fetch("GET", "password", "$regex", v),
+                            lambda n: "^.{%d,}$" % n,
+                            lambda known, klass: "^" + re.escape(known) + klass,
+                            falseModel=falseModel)
+        self.assertEqual(value, SECRET)
+        # an unrelated usable page (neither true nor false model) must be inconclusive, not a false bit
+        self.assertRaises(ni.InconclusiveError,
+                          ni._contentBit, lambda v: "CCCCC unrelated captcha page", "A", MATCH, NOMATCH)
+
 
 class TestNoSqlElasticsearch(unittest.TestCase):
     def setUp(self):
@@ -113,16 +137,19 @@ class TestNoSqlElasticsearch(unittest.TestCase):
 
 
 def _cypher(place, parameter, value):
-    if "'1'='1" in value:
-        return MATCH
-    if "'1'='2" in value:
-        return NOMATCH
+    m = re.search(r"STARTS WITH '([^']*)'", value)              # Cypher-only prefix predicate on 'ab'
+    if m:
+        return MATCH if "ab".startswith(m.group(1)) else NOMATCH
     m = re.search(r"=~ '\^(.*)$", value)                        # the regex body after the =~ operator
     if m:
         try:
             return MATCH if re.match("^(?:%s)$" % m.group(1), SECRET) is not None else NOMATCH
         except re.error:
             return NOMATCH
+    if "'1'='1" in value:
+        return MATCH
+    if "'1'='2" in value:
+        return NOMATCH
     return NOMATCH
 
 
@@ -239,6 +266,16 @@ class TestNoSqlWhere(unittest.TestCase):
         charValue = lambda known, klass: ni._whereDelay("d.%s&&/^%s%s/.test(d.%s)" % (key, ni._javaEscape(known), klass, key))
         self.assertEqual(ni._extract(None, None, lengthValue, charValue, _whereTruth), SECRET)
 
+    def test_where_delay_is_dos_bounded(self):
+        # the per-document busy-loop must be capped to ONE document per query (shared-scope counter),
+        # so a loose/unconditional condition on a large collection cannot block for docCount*timeSec.
+        # The condition and delay budget must still be embedded verbatim (oracle unchanged).
+        payload = ni._whereDelay("true")
+        self.assertIn("__c", payload)                       # shared-scope counter present
+        self.assertIn("__c<1", payload)                     # loop gated on the one-shot cap
+        self.assertIn("(true)", payload)                    # original condition preserved
+        self.assertIn(str(int(ni.conf.timeSec * 1000)), payload)   # delay budget preserved
+
 
 def _jswhere(place, parameter, value):
     # emulate a content-bearing MongoDB $where (server-side JavaScript) endpoint
@@ -295,7 +332,7 @@ class TestNoSqlWhereDump(unittest.TestCase):
         names = [name for name, _ in self.DOC]
         values = dict(self.DOC)
 
-        def fake(place, parameter, bound, expr, threshold):
+        def fake(place, parameter, bound, expr, threshold, strict=False):
             m = re.search(r"Object\.keys\(d\)\[(\d+)\]", expr)
             if m:
                 index = int(m.group(1))
@@ -311,13 +348,95 @@ class TestNoSqlWhereDump(unittest.TestCase):
         ni._whereField = self._orig
 
     def test_dump(self):
-        columns, rows = ni._whereDump("GET", "password", "", 0)
+        columns, rows, bound, complete = ni._whereDump("GET", "password", "", 0)
         self.assertEqual(columns, ["id", "username", "password", "role"])
         self.assertEqual(rows, [["1", "luther", "s3cr3t", "admin"]])
 
     def test_empty_document(self):
         ni._whereField = lambda *args, **kwargs: None
         self.assertIsNone(ni._whereDump("GET", "password", "", 0))
+
+
+class TestNoSqlRecordBinding(unittest.TestCase):
+    """A whole-document dump must be flagged bound only when a unique-record constraint pins it; an
+    unbound dump (no distinguishing sibling) is representative, not one coherent document."""
+
+    def test_vector_bound_defaults_true(self):
+        self.assertTrue(ni.Vector("X", None, None, None).bound)
+        self.assertFalse(ni.Vector("X", None, None, None, bound=False).bound)
+
+    def test_where_vector_unbound_without_sibling(self):
+        # single injected param, no sibling -> _constraint is "" -> $where dump is representative
+        ni.conf.parameters = {ni.PLACE.GET: "name=luther"}
+        ni.conf.paramDict = {ni.PLACE.GET: {"name": "luther"}}
+        self.assertEqual(ni._constraint(ni.PLACE.GET, "name", "==", "&&", prefix="d."), "")
+
+    def test_where_vector_bound_with_sibling(self):
+        # a distinguishing sibling pins the record -> bound constraint is non-empty
+        ni.conf.parameters = {ni.PLACE.GET: "id=7&name=luther"}
+        ni.conf.paramDict = {ni.PLACE.GET: {"name": "luther"}}
+        bound = ni._constraint(ni.PLACE.GET, "name", "==", "&&", prefix="d.")
+        self.assertIn("d.id=='7'", bound)
+        self.assertTrue(bool(bound))
+
+
+class TestNoSqlTriStateOracle(unittest.TestCase):
+    """A failed/blocked NoSQL response is UNKNOWN, retried, then aborts - never a silent false bit."""
+
+    def test_content_bit_retries_transient_then_recovers(self):
+        state = {"n": 0}
+        def fetch(value):
+            state["n"] += 1
+            return None if state["n"] == 1 else "TEMPLATE"      # first send fails, retry recovers
+        self.assertTrue(ni._contentBit(fetch, "A", "TEMPLATE"))
+
+    def test_content_bit_persistent_failure_raises(self):
+        self.assertRaises(ni.InconclusiveError, ni._contentBit, lambda v: None, "A", "TEMPLATE")
+
+    def test_content_bit_error_page_is_not_true(self):
+        # an error page is unusable -> retried -> InconclusiveError, never classified true/false
+        self.assertRaises(ni.InconclusiveError, ni._contentBit,
+                          lambda v: "MongoServerError: unknown operator: $foo", "A", "TEMPLATE")
+
+    def test_extract_aborts_value_on_inconclusive(self):
+        # a persistently failing oracle aborts the value (None), never fabricates a length/char
+        self.assertIsNone(ni._extract("TMPL", lambda v: None,
+                                      lambda n: "len>=%d" % n, lambda k, c: "char", truthFn=None))
+
+    def test_timed_bit_rejects_blocked_slow_response(self):
+        # a slow response that is BLOCKED (WAF/5xx) must not count as a true timing bit
+        self._fv = ni._fetchValue
+        try:
+            ni._lastCode = 429
+            ni._fetchValue = lambda *a, **k: (time.sleep(0.01) or "")     # slow but blocked (_isError via 429)
+            self.assertRaises(ni.InconclusiveError, ni._timedBit, "GET", "q", "payload", 0.0)
+        finally:
+            ni._fetchValue = self._fv
+            ni._lastCode = None
+
+    def test_content_bit_unrelated_page_is_inconclusive_not_false(self):
+        # P0-2: a usable page matching NEITHER the true nor the false model is UNKNOWN, not false -
+        # with both models supplied it must abort (InconclusiveError), never silently return False
+        self.assertRaises(ni.InconclusiveError,
+                          ni._contentBit, lambda v: "CCCCC unrelated soft-WAF page", "A", "AAAAA", "BBBBB")
+
+    def test_content_bit_both_models_classify_true_and_false(self):
+        self.assertTrue(ni._contentBit(lambda v: "AAAAA", "A", "AAAAA", "BBBBB"))
+        self.assertFalse(ni._contentBit(lambda v: "BBBBB", "A", "AAAAA", "BBBBB"))
+
+    def test_detect_where_rejects_blocked_slow_responses(self):
+        # P0-2: delayed BLOCKED responses (zero usable) must NOT establish a $where timing threshold
+        self._fv = ni._fetchValue
+        try:
+            ni.conf.timeSec = 5
+            ni.conf.parameters = {ni.PLACE.GET: "q=1"}
+            ni.conf.paramDict = {ni.PLACE.GET: {"q": "1"}}
+            ni._lastCode = 503
+            ni._fetchValue = lambda *a, **k: (time.sleep(0.02) or None)   # slow AND blocked/failed
+            self.assertIsNone(ni._detectWhere("GET", "q"))
+        finally:
+            ni._fetchValue = self._fv
+            ni._lastCode = None
 
 
 class TestNoSqlEnumDump(unittest.TestCase):
@@ -327,11 +446,13 @@ class TestNoSqlEnumDump(unittest.TestCase):
 
     def setUp(self):
         self._ef, self._fv = ni._enumField, ni._fetchValue
-        ni._fetchValue = lambda *args, **kwargs: "<b>Welcome</b>"        # non-error single-record template
+        # true (any-match '.*') vs false (never-match sentinel) template must be SEPARABLE so _enumDump
+        # can calibrate both models; a constant page would (correctly) disable the dump
+        ni._fetchValue = lambda place, parameter, value: (NOMATCH if ni.NOSQL_SENTINEL in value else MATCH)
         names = [name for name, _ in self.DOC]
         values = dict(self.DOC)
 
-        def fake(place, parameter, template, payloadFor):
+        def fake(place, parameter, template, payloadFor, strict=False, falseModel=None):
             probe = payloadFor("X")                                     # render to inspect the target expression
             m = re.search(r"\(u\)\[(\d+)\]", probe)                     # keys/ATTRIBUTES/OBJECT_NAMES(u)[i]
             if m:
@@ -349,9 +470,11 @@ class TestNoSqlEnumDump(unittest.TestCase):
 
     def _check(self, keysExpr, valueExpr):
         makePayload = lambda expr, rb: "X' OR %s =~ '^%s.*" % (expr, rb)
-        columns, rows = ni._enumDump("GET", "password", makePayload, keysExpr, valueExpr)
+        columns, rows, bound, complete = ni._enumDump("GET", "password", makePayload, keysExpr, valueExpr)
         self.assertEqual(columns, ["id", "username", "password", "role"])
         self.assertEqual(rows, [["1", "luther", "s3cr3t", "admin"]])
+        # a constraint-only enum dump is NOT proven single-record -> the dump reports itself unbound
+        self.assertFalse(bound)
 
     def test_cypher(self):
         self._check(lambda i: "keys(u)[%d]" % i, lambda n: "toString(u[%s])" % ni._propLiteral(n))
@@ -428,7 +551,11 @@ class TestNoSqlRecords(unittest.TestCase):
 
 
 def _numeric(place, parameter, value):
-    # numeric-context oracle: 'OR 1=1' is always-true (rows), 'AND 1=2' is false (no rows)
+    # numeric-context Neo4j: 'OR 1=1' is always-true (rows), 'AND 1=2' is false, PLUS the Cypher-only
+    # STARTS WITH prefix predicate the detector now requires to attribute Neo4j (vs plain SQL)
+    m = re.search(r"STARTS WITH '([^']*)'", value)
+    if m:
+        return MATCH if "ab".startswith(m.group(1)) else NOMATCH
     if "OR 1=1" in value:
         return MATCH
     if "AND 1=2" in value:
@@ -492,7 +619,11 @@ class TestNoSqlNumericN1QL(unittest.TestCase):
 
 
 def _numericAql(place, parameter, value):
-    # numeric-context ArangoDB: only the ||/&& family diverges (OR/AND and REGEXP_CONTAINS do not)
+    # numeric-context ArangoDB: the ||/&& family diverges, PLUS the AQL-only two-arg LIKE(text, search)
+    # function the detector now requires to attribute ArangoDB (SQL's LIKE is an operator, not a function)
+    m = re.search(r"LIKE\('ab', '([^%]*)%'\)", value)
+    if m:
+        return MATCH if "ab".startswith(m.group(1)) else NOMATCH
     return MATCH if "|| 1==1" in value else NOMATCH
 
 
@@ -545,7 +676,7 @@ class TestNoSqlPartiQL(unittest.TestCase):
         self.assertEqual(value, SECRET)
 
     def test_dump_binds_sibling(self):
-        columns, rows = ni._partiqlDump("GET", "password", "password")
+        columns, rows, bound, complete = ni._partiqlDump("GET", "password", "password")
         self.assertEqual(columns, ["password"])
         self.assertEqual(rows, [[SECRET]])
 
@@ -613,6 +744,118 @@ class TestNoSqlCookiePlace(unittest.TestCase):
         self.assertIn("u.session='abc'", constraint)
         self.assertIn("u.username='luther'", constraint)
 
+    def test_constraint_escapes_literal_and_skips_non_identifiers(self):
+        # a quote/backslash in a sibling value must be escaped (not break out of the string literal),
+        # and a non-identifier field name must be skipped rather than alter the predicate structure
+        ni.conf.parameters = {ni.PLACE.GET: "q=x&name=o'brien&weird.field=v&password=p"}
+        ni.conf.paramDict = {ni.PLACE.GET: {"q": "x"}}
+        constraint = ni._constraint(ni.PLACE.GET, "q")
+        self.assertIn("u.name='o\\'brien'", constraint)          # single quote escaped
+        self.assertNotIn("weird.field", constraint)              # dotted (non-identifier) name skipped
+        self.assertIn("u.password='p'", constraint)
+
+
+class TestNoSqlJsonRawReplace(unittest.TestCase):
+    """Parse-failure JSON fallback: mutate ONLY the target key's value span in a JSON-like body, never
+    reconstruct it with a form serializer (which would produce unrelated 'name=value&...' content)."""
+
+    def test_double_quoted_value_replaced_in_place(self):
+        body = '{"name": "luther", "role": "user"}'
+        out = ni._jsonRawReplace(body, "name", {"$ne": None})
+        self.assertEqual(out, '{"name": {"$ne": null}, "role": "user"}')
+        self.assertIn('"role": "user"', out)                    # sibling preserved verbatim
+
+    def test_json_like_single_quotes_not_form_serialized(self):
+        # single-quoted -> json.loads() fails in the real flow; the span replace still works and the
+        # body stays JSON-shaped (no '&', no 'name=value' reconstruction)
+        body = "{'name': 'luther', 'active': true}"
+        out = ni._jsonRawReplace(body, "name", "payload")
+        self.assertIsNotNone(out)
+        self.assertIn("'active': true", out)                    # sibling + JS literal preserved
+        self.assertNotIn("&", out)
+        self.assertTrue(out.strip().startswith("{"))            # still a JSON object, not form content
+
+    def test_bareword_and_numeric_values(self):
+        self.assertEqual(ni._jsonRawReplace('{"age": 42}', "age", 7), '{"age": 7}')
+        self.assertEqual(ni._jsonRawReplace('{"ok": true}', "ok", "x"), '{"ok": "x"}')
+
+    def test_missing_key_returns_none(self):
+        # key absent -> None so the caller SKIPS the probe rather than corrupt the body
+        self.assertIsNone(ni._jsonRawReplace('{"other": "v"}', "name", "x"))
+
+    def test_key_like_text_inside_string_is_not_matched(self):
+        # the reviewer's reproduction: 'name: old' inside the "note" STRING must NOT be mutated - only
+        # the real "name" property is replaced
+        body = '{"note":"name: old", "name":"real"}'
+        out = ni._jsonRawReplace(body, "name", {"$ne": None})
+        self.assertEqual(out, '{"note":"name: old", "name":{"$ne": null}}')
+        self.assertIn('"note":"name: old"', out)                 # decoy string untouched
+
+    def test_key_like_text_inside_single_quoted_string(self):
+        body = "{'note':'name: trap', 'name':'real'}"
+        out = ni._jsonRawReplace(body, "name", "P")
+        self.assertIn("'note':'name: trap'", out)                # decoy untouched
+        self.assertTrue(out.endswith('"P"}'))                    # real value replaced
+
+    def test_key_like_text_inside_comment_is_not_matched(self):
+        body = '{/* name: not here */ "name": "real"}'
+        out = ni._jsonRawReplace(body, "name", "P")
+        self.assertIn("/* name: not here */", out)               # comment untouched
+        self.assertIn('"name": "P"', out)
+
+    def test_object_and_array_values_replaced_whole(self):
+        # an object/array as the original value must be replaced in full, not partially
+        self.assertEqual(ni._jsonRawReplace('{"f": {"a": 1, "b": [2, 3]}, "g": 9}', "f", "X"),
+                         '{"f": "X", "g": 9}')
+        self.assertEqual(ni._jsonRawReplace('{"f": [1, {"x": "}"}, 2], "g": 9}', "f", 0),
+                         '{"f": 0, "g": 9}')
+
+    def test_nested_property_located_at_depth(self):
+        # a nested property (not top-level) is located and replaced without disturbing structure
+        out = ni._jsonRawReplace('{"outer": {"name": "luther"}}', "name", {"$ne": None})
+        self.assertEqual(out, '{"outer": {"name": {"$ne": null}}}')
+
+    def test_brace_inside_string_value_does_not_close_object(self):
+        # a '}' inside a string value must not end the value token early
+        out = ni._jsonRawReplace('{"a": "va}lue", "name": "x"}', "name", "P")
+        self.assertIn('"a": "va}lue"', out)
+        self.assertIn('"name": "P"', out)
+
+    def test_brace_inside_comment_in_value_does_not_close_object(self):
+        # reviewer P0-2 reproduction: a '}' inside a COMMENT within an object value closed it early
+        out = ni._jsonRawReplace('{"f": {/* } */ "a": 1}, "g": 9}', "f", "X")
+        self.assertEqual(out, '{"f": "X", "g": 9}')
+
+    def test_key_like_text_inside_regex_literal_is_not_matched(self):
+        # reviewer P0-2 reproduction: 'name:' inside a /regex/ literal must not be taken as the property
+        out = ni._jsonRawReplace('{pattern: /name: trap/, name: "real"}', "name", "P")
+        self.assertEqual(out, '{pattern: /name: trap/, name: "P"}')
+
+    def test_regex_with_slash_in_char_class(self):
+        # a regex value containing '/' inside a [..] class and a '}' must be skipped whole
+        out = ni._jsonRawReplace('{"re": /[a/}]x/, "name": "y"}', "name", "P")
+        self.assertIn("/[a/}]x/", out)
+        self.assertIn('"name": "P"', out)
+
+    def test_backtick_string_is_not_a_key(self):
+        # a backtick template value containing 'name:' must not be mistaken for the property
+        out = ni._jsonRawReplace('{"tpl": `name: ${x}`, "name": "z"}', "name", "P")
+        self.assertIn("`name: ${x}`", out)
+        self.assertIn('"name": "P"', out)
+
+    def test_regex_value_flags_consumed(self):
+        # P0-6: a regex value's span must include trailing flags, else a dangling 'i' is left behind
+        self.assertEqual(ni._jsonRawReplace('{re: /abc/i, name: "x"}', "re", "P"),
+                         '{re: "P", name: "x"}')
+
+    def test_duplicate_key_at_different_depths_is_skipped(self):
+        # P0-6: with only the leaf key name, an ambiguous body (same key at 2 places) must be SKIPPED,
+        # never guessed - the payload could otherwise reach the wrong field
+        self.assertIsNone(ni._jsonRawReplace('{"outer":{"name":"first"},"name":"second"}', "name", "P"))
+
+    def test_single_occurrence_still_mutates(self):
+        self.assertEqual(ni._jsonRawReplace('{"a":1,"name":"real"}', "name", "P"), '{"a":1,"name":"P"}')
+
 
 class TestNoSqlErrorRegex(unittest.TestCase):
     """The heuristic regex must match real back-end error structures, not bare product names (so an
@@ -658,6 +901,27 @@ class TestNoSqlErrorRegex(unittest.TestCase):
     def test_ignores_benign_text(self):
         for sample in self.NEGATIVES:
             self.assertIsNone(re.search(self.NOSQL_ERROR_REGEX, sample), "should NOT match: %s" % sample)
+
+
+class TestNoSqlNoneSafety(unittest.TestCase):
+    """A blocked/failed request makes _send() return None; the fingerprint/error helpers must not
+    crash calling .lower() on it."""
+
+    def setUp(self):
+        self._f, self._fv = ni._fetch, ni._fetchValue
+        ni._fetch = lambda *a, **k: None
+        ni._fetchValue = lambda *a, **k: None
+        ni.conf.parameters = {"GET": "q=x"}
+        ni.conf.paramDict = {"GET": {"q": "x"}}
+
+    def tearDown(self):
+        ni._fetch, ni._fetchValue = self._f, self._fv
+
+    def test_nosql_failed_fingerprint_does_not_crash(self):
+        # None responses must not raise (was: 'NoneType' has no attribute 'lower')
+        self.assertIn(ni._fingerprintMongo("GET", "q"), ("CouchDB", "MongoDB", "MongoDB/CouchDB-compatible operator back-end"))
+        self.assertIn(ni._fingerprintLucene("GET", "q"), ("Solr", "OpenSearch", "Lucene query_string-compatible back-end"))
+        self.assertIsNone(ni._detectError("GET", "q"))
 
 
 if __name__ == "__main__":

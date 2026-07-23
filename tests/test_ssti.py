@@ -145,6 +145,15 @@ class TestErrorDetection(unittest.TestCase):
         page = ssti._probeError("GET", "q", engine)
         self.assertIsNone(page)
 
+    def test_ssti_static_engine_error_is_not_confirmation(self):
+        # a static template-parser error (present for every value, no arithmetic/boolean evaluation
+        # proof) must NOT confirm SSTI - only reflect the payload and always leak an engine name
+        def mock(place, parameter, value):
+            return "debug: jinja2.exceptions.TemplateSyntaxError (cached). you sent: " + value
+        ssti._send = mock
+        engine, evidence = ssti._fingerprint("GET", "q")
+        self.assertIsNone(engine)   # no evaluation proof -> not a confirmed SSTI
+
     def test_backend_from_error(self):
         page = "jinja2.exceptions.UndefinedError: 'foo' is undefined"
         backend = ssti._backendFromError(page)
@@ -221,6 +230,36 @@ class TestBooleanDetection(unittest.TestCase):
         ssti._send = mock
         template = ssti._detectBoolean("GET", "q", engine)
         self.assertIsNone(template)
+
+    def test_true_marker_in_baseline_rejected(self):
+        """When the true marker ('True') is already present in the untouched baseline it is page
+        furniture, not our evaluated output, so its appearance cannot confirm a boolean oracle."""
+        engine = ssti._ENGINE_TABLE[0]  # Jinja2, trueRendered='True'
+
+        def mock(place, parameter, value):
+            if "{{ True }}" in value:
+                return "flag=True ok"
+            if "{{ False }}" in value:
+                return "flag=True no"       # diverges, but 'True' still shown
+            return "flag=True baseline"     # 'True' already in the baseline
+
+        ssti._send = mock
+        self.assertIsNone(ssti._detectBoolean("GET", "q", engine))
+
+    def test_error_pages_are_not_a_boolean_oracle(self):
+        """Two syntactically invalid true/false payloads that merely trip DIFFERENT engine error
+        messages diverge, but an error page is not a rendered boolean -> no oracle."""
+        engine = ssti._ENGINE_TABLE[0]  # Jinja2
+
+        def mock(place, parameter, value):
+            if "{{ True }}" in value:
+                return "jinja2.exceptions.UndefinedError: x"
+            if "{{ False }}" in value:
+                return "TemplateSyntaxError: y"
+            return "baseline"
+
+        ssti._send = mock
+        self.assertIsNone(ssti._detectBoolean("GET", "q", engine))
 
 
 class TestFingerprint(unittest.TestCase):
@@ -393,6 +432,100 @@ class TestRequestMutation(unittest.TestCase):
         self.assertEqual(result, "a=1&b=xx")
 
 
+class TestRceProof(unittest.TestCase):
+    """Proof-of-execution via a DERIVED challenge: reflection (raw OR transformed) must NOT be accepted."""
+
+    def setUp(self):
+        self.original_send = ssti._send
+
+    def tearDown(self):
+        ssti._send = self.original_send
+
+    def test_derived_executed_needs_product_absent_from_request(self):
+        # the product proves execution: present in the page, absent from baseline
+        self.assertTrue(ssti._derivedExecuted("page 6772561 footer", "baseline", "6772561"))
+        self.assertIsNone(ssti._derivedExecuted("page without it", "baseline", "6772561"))
+        # product already in baseline -> not attributable
+        self.assertIsNone(ssti._derivedExecuted("x 6772561 x", "seen 6772561 here", "6772561"))
+
+    def test_probe_rce_rejects_raw_reflection(self):
+        # an app that echoes the whole request body verbatim: the product ($((A*B)) result) is NEVER in
+        # the request, so it cannot appear in a reflected response -> not RCE-capable
+        engine = ssti._ENGINE_TABLE[0]  # Jinja2 (no _FILE_RCE spec -> file path is a no-op)
+        ssti._send = lambda place, parameter, value: "Hello, %s!" % value   # pure reflection
+        self.assertFalse(ssti._probeRce("GET", "q", engine))
+
+    def test_probe_rce_rejects_url_encoded_reflection(self):
+        # KEY P0-4 case: the app reflects the URL-ENCODED payload. A marker-in-payload check would pass;
+        # the derived product is still absent from any reflected form -> correctly NOT RCE-capable
+        from thirdparty.six.moves.urllib.parse import quote
+        engine = ssti._ENGINE_TABLE[0]
+        ssti._send = lambda place, parameter, value: "reflected: %s" % quote(value, safe="")
+        self.assertFalse(ssti._probeRce("GET", "q", engine))
+
+    def test_probe_rce_all_collisions_do_not_confirm(self):
+        # every generated product collides with the baseline -> every challenge is skipped; the loop
+        # must NOT fall through to success with zero executed payloads (counts confirmations, not iters)
+        engine = ssti._ENGINE_TABLE[0]
+        import lib.techniques.ssti.inject as _m
+        orig = _m.randomInt
+        try:
+            _m.randomInt = lambda n: 2                       # product is always 4
+            ssti._send = lambda place, parameter, value: "result is 4 everywhere"   # baseline contains "4"
+            self.assertFalse(ssti._probeRce("GET", "q", engine))
+        finally:
+            _m.randomInt = orig
+
+    def test_probe_rce_confirms_real_execution(self):
+        # a backend that actually evaluates `echo $((A*B))` returns the PRODUCT as command output
+        engine = ssti._ENGINE_TABLE[0]
+        import re as _re
+
+        def mock(place, parameter, value):
+            m = _re.search(r"echo \$\(\((\d+)\*(\d+)\)\)", value)
+            if m:
+                return "<html>%d</html>" % (int(m.group(1)) * int(m.group(2)))   # shell-evaluated product
+            return "baseline"
+
+        ssti._send = mock
+        self.assertTrue(ssti._probeRce("GET", "q", engine))
+
+    def test_framed_output_markers_are_reflection_proof(self):
+        # markers are shell-concatenated fragments: the completed 'startABstartCD' never appears in the
+        # request, so only genuine execution places them in the page
+        start, end = "aaaaaabbbbbb", "ccccccdddddd"
+        executed = "junk %suid=0(root) gid=0(root)%s junk" % (start, end)
+        self.assertEqual(ssti._framedOutput(executed, start, end), "uid=0(root) gid=0(root)")
+        # a response that lacks the concatenated markers (e.g. reflected 'aaaaaa bbbbbb' separated) -> None
+        self.assertIsNone(ssti._framedOutput("printf %s%s aaaaaa bbbbbb ...", start, end))
+
+    def test_probe_rce_confirms_on_windows_backend(self):
+        # a Windows-hosted engine evaluates `cmd /c set /a A*B` (Unix `$((...))` does nothing) - the
+        # derived product still proves execution, so capability detection works on Windows too
+        engine = ssti._ENGINE_TABLE[0]
+        import re as _re
+
+        def mock(place, parameter, value):
+            m = _re.search(r"set /a (\d+)\*(\d+)", value)        # cmd.exe set /a arithmetic
+            if m and "$((" not in value:
+                return "<html>%d</html>" % (int(m.group(1)) * int(m.group(2)))
+            return "baseline"                                    # the Unix $(( )) family produces nothing here
+
+        ssti._send = mock
+        self.assertTrue(ssti._probeRce("GET", "q", engine))
+
+    def test_windows_framed_builder_shape(self):
+        # the Windows framed command concatenates the marker fragments at runtime via `echo|set /p=`
+        cmd = ssti._winFramed("whoami", "SA", "SB", "EA", "EB")
+        self.assertIn("cmd /c", cmd)
+        self.assertIn("set /p=SA", cmd)
+        self.assertIn("set /p=SB", cmd)
+        self.assertIn("whoami", cmd)
+        # the concatenated markers 'SASB'/'EAEB' are NOT present literally (only the separate fragments)
+        self.assertNotIn("SASB", cmd)
+        self.assertNotIn("EAEB", cmd)
+
+
 class TestExecuteCommand(unittest.TestCase):
     def setUp(self):
         self.original_send = ssti._send
@@ -426,9 +559,12 @@ class TestExecuteCommand(unittest.TestCase):
             "Should have tried the second payload after error skip")
 
     def test_all_error_pages_produce_warning(self):
-        """When all RCE payloads produce template errors, no success is reported.
-        _executeCommand sends baseline + one request per fallback payload."""
+        """When all RCE payloads produce template errors, no success is reported. _executeCommand sends
+        a baseline, then TWO passes over the payloads: a reflection-proof boundary-marker capture pass
+        a framed pass PER OS family (unix + windows), and an unframed baseline-diff fallback pass (the
+        file-based pass sends nothing without a _FILE_RCE spec, as for Jinja2)."""
         engine = ssti._ENGINE_TABLE[0]
+        self.assertNotIn(engine.name, ssti._FILE_RCE)   # guard the arithmetic below
         calls = []
 
         def mock(place, parameter, value):
@@ -437,9 +573,10 @@ class TestExecuteCommand(unittest.TestCase):
 
         ssti._send = mock
         ssti._executeCommand("GET", "q", engine, "test")
-        # 1 baseline + N payload attempts = N+1 calls
-        self.assertEqual(len(calls), len(engine.rcePayloads) + 1,
-            "Should have tried all payloads (baseline + one per fallback) before giving up")
+        # 1 baseline + (families framed + 1 unframed) passes, each over N payloads
+        passes = len(ssti._SHELL_FAMILIES) + 1
+        self.assertEqual(len(calls), 1 + passes * len(engine.rcePayloads),
+            "Should have tried the framed pass per OS family then the unframed pass before giving up")
 
 
 class TestCommandEscaping(unittest.TestCase):
@@ -642,27 +779,51 @@ class TestStruts2Header(unittest.TestCase):
     def test_struts2_wired_for_file_rce(self):
         self.assertIn("Struts2 (OGNL)", ssti._FILE_RCE)   # modern-JDK file-based fallback wired
 
-    def test_s2045_detection_marker_echo(self):
+    def test_s2045_detection_derived_product(self):
         import re
-        # a vulnerable Struts2 evaluates the OGNL and writes the printed marker into the response
+        # a vulnerable Struts2 EVALUATES the OGNL arithmetic and writes the PRODUCT (absent from the header)
         def mock(url, action):
-            m = re.search(r"#w\.print\('([a-z0-9]+)'\)", action)
-            return "<html> %s </html>" % m.group(1) if m else "<html/>"
+            m = re.search(r"#w\.print\((\d+)\*(\d+)\)", action)
+            return "<html> %d </html>" % (int(m.group(1)) * int(m.group(2))) if m else "<html/>"
         ssti._s2045Send = mock
-        self.assertIsNotNone(ssti._probeStruts2Header("http://target"))
+        self.assertTrue(ssti._probeStruts2Header("http://target"))
+
+    def test_s2045_detection_rejects_reflected_header(self):
+        # KEY P0-6 case: the server REFLECTS the Content-Type header verbatim. The literal operands are
+        # echoed but never their product, so no reflection can satisfy the derived challenge -> not vuln
+        ssti._s2045Send = lambda url, action: "You sent Content-Type: %s" % action
+        self.assertIsNone(ssti._probeStruts2Header("http://target"))
 
     def test_s2045_not_vulnerable(self):
         ssti._s2045Send = lambda url, action: "<html>ordinary Struts page, no eval</html>"
         self.assertIsNone(ssti._probeStruts2Header("http://target"))
 
-    def test_s2045_command_output_sliced_from_markers(self):
-        # the shell echoes start/end markers around stdout; the response also carries the action HTML
+    def test_s2045_all_collisions_do_not_confirm(self):
+        # every product collides with the baseline -> no challenge is ever evaluated -> not confirmed
+        import lib.techniques.ssti.inject as _m
+        orig = _m.randomInt
+        try:
+            _m.randomInt = lambda n: 2                       # product is always 4
+            ssti._s2045Send = lambda url, action: "page containing 4"
+            self.assertIsNone(ssti._probeStruts2Header("http://target"))
+        finally:
+            _m.randomInt = orig
+
+    def test_s2045_command_output_sliced_from_derived_markers(self):
+        import re
+        # the shell CONCATENATES the marker fragments (printf %s%s A B -> AB); the concatenation never
+        # appears in the header, so it can only come from execution
         def mock(url, action):
-            m = re.search(r"echo ([a-z0-9]+); .* 2>&1; echo ([a-z0-9]+)", action)
+            m = re.search(r"printf %s%s (\w+) (\w+); .* 2>&1; printf %s%s (\w+) (\w+)", action)
             if not m:
                 return "<html/>"
-            start, end = m.group(1), m.group(2)
+            start, end = m.group(1) + m.group(2), m.group(3) + m.group(4)
             return "<html>%s\nuid=0(root) gid=0(root)\n%s</html>" % (start, end)
-        import re
         ssti._s2045Send = mock
         self.assertEqual(ssti._executeStruts2Header("http://target", "id"), "uid=0(root) gid=0(root)")
+
+    def test_s2045_command_rejects_reflected_header(self):
+        # raw header reflection: the fragments appear separated ('printf %s%s A B'), never concatenated,
+        # so no start/end marker is found -> no fabricated 'output'
+        ssti._s2045Send = lambda url, action: "reflected: %s" % action
+        self.assertIsNone(ssti._executeStruts2Header("http://target", "id"))

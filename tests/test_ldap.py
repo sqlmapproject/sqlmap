@@ -281,6 +281,35 @@ class TestBooleanDetection(unittest.TestCase):
         self.assertEqual(breakout, "*)")
         self.assertIn("*)(objectClass=*", bypass)
 
+    def test_ldap_breakout_uses_matched_false_filter(self):
+        # the false control must share the true control's breakout+attribute+open-fragment shape,
+        # differing ONLY in the assertion value: (attr=*) vs (attr=<sentinel>). It must NEVER be a
+        # bare original+SENTINEL string (an unmatched control a validation layer could diverge on).
+        sent = []
+
+        def spy(place, param, value):
+            sent.append(value)
+            return '{"count":15}' if value.startswith("x*)(objectClass=*") else '{"count":0}'
+
+        ldap._send = spy
+        from lib.core.enums import PLACE
+        template, _, _ = ldap._detectBoolean(PLACE.GET, 'q')
+        self.assertIsNotNone(template)
+        self.assertTrue(any(v.endswith("=%s" % SENTINEL) and "(" in v for v in sent),
+                        "no syntax-matched false LDAP filter control was sent: %r" % sent[:8])
+        self.assertNotIn("x%s" % SENTINEL, sent)   # the discredited bare original+SENTINEL is gone
+
+    def test_ldap_403_is_inconclusive(self):
+        # a 403 (WAF / rate-limit) must NOT enter the oracle as a page - _send returns None
+        from lib.request.connect import Connect
+        from lib.core.enums import PLACE
+        orig = Connect.getPage
+        Connect.getPage = staticmethod(lambda **kw: ("blocked by WAF", {}, 403))
+        try:
+            self.assertIsNone(ldap._send(PLACE.GET, 'q', 'x'))
+        finally:
+            Connect.getPage = orig
+
 
 class TestExtraction(unittest.TestCase):
     def test_inferAttribute_simple(self):
@@ -310,6 +339,47 @@ class TestExtraction(unittest.TestCase):
         builder = ldap._ProbeBuilder(")")
         value = ldap._inferAttribute(oracle, builder, "mail")
         self.assertEqual(value, "admin@example.com")
+
+    def test_inferAttribute_inconclusive_aborts_not_truncates(self):
+        """An oracle that stays INCONCLUSIVE must abort the attribute (return None) rather than
+        truncate it to whatever prefix was recovered before the ambiguous bit."""
+        from lib.utils.nonsql import InconclusiveError
+
+        class InconclusiveOracle(object):
+            def extract(self, payload):
+                raise InconclusiveError()
+
+        builder = ldap._ProbeBuilder(")")
+        self.assertIsNone(ldap._inferAttribute(InconclusiveOracle(), builder, "uid"))
+
+
+class TestMultiValueDump(unittest.TestCase):
+    """Multi-valued LDAP attributes must NOT be 'enumerated' via entry-scoped negation (which excludes
+    the whole entry and mixes entries) - recover ONE matching value and label it honestly."""
+
+    def setUp(self):
+        self._exists, self._infer, self._dumpTable = ldap._exists, ldap._inferAttribute, ldap._dumpTable
+
+    def tearDown(self):
+        ldap._exists, ldap._inferAttribute, ldap._dumpTable = self._exists, self._infer, self._dumpTable
+
+    def test_reports_one_value_and_never_excludes(self):
+        captured = {}
+        exclusionsSeen = []
+
+        ldap._exists = lambda oracle, builder, attr, **kw: attr == "member"
+        def fakeInfer(oracle, builder, attr, constraint=None, exclusions=None, **kw):
+            exclusionsSeen.append(exclusions)
+            return "cn=alice,dc=x" if attr == "member" else None
+        ldap._inferAttribute = fakeInfer
+        ldap._dumpTable = lambda title, cols, rows: captured.update(title=title, cols=cols, rows=rows)
+
+        dumped = ldap._dumpMultiValues(object(), ldap._ProbeBuilder(")"), "GET", "q")
+        self.assertTrue(dumped)
+        self.assertEqual(captured["rows"], [("cn=alice,dc=x",)])          # exactly one value
+        self.assertIn("one matching value", captured["title"].lower())    # honest label
+        # the broken exclusion walk must be gone: _inferAttribute is called WITHOUT exclusions
+        self.assertTrue(all(e in (None, [], ()) for e in exclusionsSeen))
 
 
 class TestIsError(unittest.TestCase):

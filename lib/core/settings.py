@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.7.176"
+VERSION = "1.10.7.177"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -1168,6 +1168,11 @@ OOB_POLL_DELAY = 2         # target's own link + webhook.site's eventually-consi
 # The delay must exceed a DTD-processing control baseline by this many seconds.
 XXE_BLACKHOLE_HOST = "192.0.2.1"
 XXE_TIME_THRESHOLD = 5
+
+# maximum number of distinct leaf text-node locations the in-band reflection probe sweeps to find a
+# working injection point (a schema-validated or non-reflected first node otherwise hides the finding);
+# bounds the request cost on documents with many text nodes
+XXE_LOCATION_SWEEP_MAX = 12
 
 # HQL/JPQL (Hibernate, EclipseLink) injection error signatures for error-based
 # detection and ORM fingerprinting. Each tuple is (backend_name, regex_fragment).

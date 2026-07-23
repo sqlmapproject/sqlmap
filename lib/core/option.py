@@ -2726,6 +2726,14 @@ def _checkTor():
         logger.info(infoMsg)
 
 def _basicOptionValidation():
+    _nonSqlTechniques = [name for name, enabled in (
+        ("--graphql", conf.graphql), ("--nosql", conf.nosql), ("--ldap", conf.ldap),
+        ("--xpath", conf.xpath), ("--ssti", conf.ssti), ("--xxe", conf.xxe), ("--hql", conf.hql)) if enabled]
+    if len(_nonSqlTechniques) > 1:
+        errMsg = "only one non-SQL technique switch may be used at a time (found: %s). " % ", ".join(_nonSqlTechniques)
+        errMsg += "each is a self-contained scan for a different back-end class - pick one"
+        raise SqlmapSyntaxException(errMsg)
+
     if conf.limitStart is not None and not (isinstance(conf.limitStart, int) and conf.limitStart > 0):
         errMsg = "value for option '--start' (limitStart) must be an integer value greater than zero (>0)"
         raise SqlmapSyntaxException(errMsg)

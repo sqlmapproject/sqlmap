@@ -264,14 +264,62 @@ class TestGraphqlBooleanDetection(unittest.TestCase):
 
     def test_boolean_detected(self):
         slot = _slot("query", "Query", "user", "username", "string")
-        oracleType, template = gi._detectBoolean(slot, "http://test/graphql")
+        oracleType, template, _win = gi._detectBoolean(slot, "http://test/graphql")
         self.assertIsNotNone(oracleType)
         self.assertIn("boolean-based", oracleType)
 
     def test_numeric_skipped(self):
         slot = _slot("query", "Query", "byId", "id", "numeric")
-        oracleType, template = gi._detectBoolean(slot, "http://test/graphql")
+        oracleType, template, _win = gi._detectBoolean(slot, "http://test/graphql")
         self.assertIsNone(oracleType)
+
+    def test_graphql_two_true_transport_failures_do_not_confirm(self):
+        # the TRUE query fails transport (-> None), the FALSE succeeds: two None trues must NOT be
+        # read as a reproducible page that "differs" from false (the classic fabricated confirmation)
+        def fakeSend(endpoint, query, variables=None):
+            if "'1'='1" in query:
+                return None, 0            # transport failure on the true payload
+            return NOMATCH, 200
+        gi._gqlSend = fakeSend
+        slot = _slot("query", "Query", "user", "username", "string")
+        oracleType, _, _win = gi._detectBoolean(slot, "http://test/graphql")
+        self.assertIsNone(oracleType)
+
+    def test_graphql_false_page_is_replayed(self):
+        # a FALSE page that does not reproduce (jitter) must not establish an oracle
+        state = {"n": 0}
+        def fakeSend(endpoint, query, variables=None):
+            if "'1'='1" in query:
+                return MATCH, 200
+            state["n"] += 1
+            if state["n"] % 2:                                    # false response is unstable (jitter)
+                return '{"data":{"user":{"id":1,"name":"alpha"}}}', 200
+            return '{"data":{"user":{"totally":"different","shape":"here","x":12345,"y":67890}}}', 200
+        gi._gqlSend = fakeSend
+        slot = _slot("query", "Query", "user", "username", "string")
+        oracleType, _, _win = gi._detectBoolean(slot, "http://test/graphql")
+        self.assertIsNone(oracleType)
+
+    def test_graphql_resolver_error_false_is_not_a_boolean_oracle(self):
+        # P0-3: the FALSE payload trips a stable HTTP-200 resolver error ({data:null, errors:[...]}),
+        # which yields the same {"user":null} observation as a genuine false. That is NOT a boolean
+        # oracle (it belongs to error-based detection) - _detectBoolean must reject the errored pair.
+        def fakeSend(endpoint, query, variables=None):
+            if "'1'='1" in query:                                 # true -> real rows
+                return MATCH, 200
+            return '{"data":{"user":null},"errors":[{"message":"resolver failed","path":["user"]}]}', 200
+        gi._gqlSend = fakeSend
+        slot = _slot("query", "Query", "user", "username", "string")
+        oracleType, _, _win = gi._detectBoolean(slot, "http://test/graphql")
+        self.assertIsNone(oracleType)
+
+    def test_has_errors_and_alias_errored(self):
+        self.assertTrue(gi._hasErrors('{"data":{"user":null},"errors":[{"message":"x"}]}'))
+        self.assertFalse(gi._hasErrors('{"data":{"user":null}}'))
+        # an alias with an error path, or an absent alias, is errored/unknown
+        self.assertTrue(gi._aliasErrored('{"data":{"a0":null},"errors":[{"message":"e","path":["a0"]}]}', "a0"))
+        self.assertTrue(gi._aliasErrored('{"data":{"a1":true}}', "a0"))     # a0 absent
+        self.assertFalse(gi._aliasErrored('{"data":{"a0":true}}', "a0"))
 
 
 class TestGraphqlErrorDetection(unittest.TestCase):
@@ -294,8 +342,29 @@ class TestGraphqlErrorDetection(unittest.TestCase):
 
     def test_error_detected(self):
         slot = _slot("query", "Query", "user", "username", "string")
-        oracleType, detail = gi._detectError(slot, "http://test/graphql")
+        oracleType, detail, _win = gi._detectError(slot, "http://test/graphql")
         self.assertEqual(oracleType, "error-based")
+
+    def test_report_shows_winning_error_payload_not_boolean(self):
+        # boolean payloads do NOT diverge (both -> NOMATCH) so boolean detection fails; only the error
+        # payloads trip a DB error. The reported reproducer must be the WINNING error payload, never the
+        # generic ' OR '1'='1 boolean payload.
+        def fakeSend(endpoint, query, variables=None):
+            if "'1'='" in query:               # both boolean payloads ('1'='1 / '1'='2) -> identical, no oracle
+                return NOMATCH, 200
+            if "'" in query:                    # error payloads (', '', '") -> DB error
+                return DB_ERROR, 500
+            return NOMATCH, 200
+        gi._gqlSend = fakeSend
+        reports = []
+        gi.conf.dumper = type("D", (), {"singleString": lambda self, m: reports.append(m)})()
+        gi.conf.beep = False
+        slot = _slot("query", "Query", "user", "username", "string")
+        oracleType, _oracle, _detail = gi._testSlot(slot, "http://test/graphql")
+        self.assertEqual(oracleType, "error-based")
+        report = next(r for r in reports if "Payload:" in r)
+        self.assertNotIn("'1'='1", report)                 # not the boolean payload
+        self.assertIn("error-based", report)
 
 
 class TestGraphqlParseRows(unittest.TestCase):
@@ -443,8 +512,23 @@ class TestGraphqlDialects(unittest.TestCase):
         d = gi.DIALECTS["SQLite"]
         sql = d.row(["name", "surname"], "users", 3)
         self.assertIn("LIMIT 1 OFFSET 3", sql)                       # per-row, not a whole-table GROUP_CONCAT
-        self.assertIn("COALESCE(CAST(name AS TEXT),'NULL')", sql)
-        self.assertIn("FROM users", sql)
+        self.assertIn('COALESCE(CAST("name" AS TEXT),\'NULL\')', sql)   # column identifier quoted
+        self.assertIn('FROM "users"', sql)                              # table identifier quoted
+
+    def test_row_quotes_reserved_and_mixedcase_identifiers(self):
+        # a reserved word / mixed-case / spaced / quote-bearing name must be quoted, not interpolated raw
+        d = gi.DIALECTS["PostgreSQL"]
+        sql = d.row(["order", 'we"ird'], "myTable", 0)
+        self.assertIn('CAST("order" AS TEXT)', sql)
+        self.assertIn('CAST("we""ird" AS TEXT)', sql)                  # embedded quote doubled
+        d2 = gi.DIALECTS["Microsoft SQL Server"]
+        self.assertIn("[order]", d2.row(["order"], "dbo.t", 0))
+
+    def test_pgsql_schema_qualified_from(self):
+        # a "schema.table" catalog name qualifies AND quotes both parts for the dump FROM
+        d = gi.DIALECTS["PostgreSQL"]
+        self.assertIn('FROM "secret"."users"', d.row(["id"], "secret.users", 0))
+        self.assertEqual(d.fromIdent("secret.users"), '"secret"."users"')
 
     def test_mysql_uses_sleep_delay(self):
         d = gi.DIALECTS["MySQL"]
@@ -529,7 +613,7 @@ def _mockOracle(target):
         tableFrom=None, tableCol=None, columnFrom=None, columnCol=None, paginate=None,
         length=lambda expr: "LEN(%s)" % expr,
         ordinal=lambda expr, pos: "ORD(%s,%d)" % (expr, pos),
-        row=None)
+        row=None, fromIdent=lambda table: table)
 
     def _value(cond):
         pos = None
@@ -579,6 +663,43 @@ class TestGraphqlInference(unittest.TestCase):
         dialect, truth, truthBatch = _mockOracle("")
         self.assertEqual(gi._inferExprBatched(truthBatch, truth, dialect, "EXPR"), "")
 
+    def test_inconclusive_truth_aborts_value_not_fabricates(self):
+        # a persistently-inconclusive oracle must abort the value (None), never coerce to false bits
+        dialect = gi.DIALECTS["SQLite"]
+
+        def truth(cond):
+            raise gi.InconclusiveError()
+
+        def truthBatch(conds):
+            raise gi.InconclusiveError()
+
+        self.assertIsNone(gi._inferExpr(truth, dialect, "EXPR"))
+        self.assertIsNone(gi._inferExprBatched(truthBatch, truth, dialect, "EXPR"))
+
+    def test_make_oracle_batch_transport_failure_raises_not_false(self):
+        # a FAILED batch request must raise InconclusiveError, NOT decay into a list of False bits
+        # (which would silently corrupt every value extracted through the batch path)
+        slot = _slot("query", "Query", "user", "username", "string")
+        MATCHV = '{"data":{"user":{"id":1,"name":"luther"}}}'
+        NOMATCHV = '{"data":{"user":null}}'
+        saved = gi._gqlSend
+        try:
+            def fakeSend(endpoint, query, variables=None):
+                if "1=1" in query:
+                    return MATCHV, 200
+                if "1=2" in query:
+                    return NOMATCHV, 200
+                return MATCHV, 200
+            gi._gqlSend = fakeSend
+            truth, truthBatch = gi._makeOracle(slot, "http://test/graphql")
+            self.assertIsNotNone(truth)
+
+            # now make the batch endpoint fail transport -> must raise, not return [False, ...]
+            gi._gqlSend = lambda endpoint, query, variables=None: (None, 0)
+            self.assertRaises(gi.InconclusiveError, truthBatch, ["1=1", "1=2"])
+        finally:
+            gi._gqlSend = saved
+
 
 class TestGraphqlDumpTable(unittest.TestCase):
     """Whole-table dump: column list + COUNT(*) + one row-scalar per ordinal offset"""
@@ -591,7 +712,7 @@ class TestGraphqlDumpTable(unittest.TestCase):
             "(SELECT COUNT(*) %s)" % colFrom: "2",
             "(SELECT %s %s %s)" % (d.columnCol, colFrom, d.paginate(d.columnCol, 0)): "id",
             "(SELECT %s %s %s)" % (d.columnCol, colFrom, d.paginate(d.columnCol, 1)): "name",
-            "(SELECT COUNT(*) FROM users)": "2",
+            "(SELECT COUNT(*) FROM %s)" % d.fromIdent("users"): "2",
             d.row(["id", "name"], "users", 0): "1~~~null",
             d.row(["id", "name"], "users", 1): "2~~~luther",
         }
@@ -669,6 +790,70 @@ class TestVulnserverGraphqlParser(unittest.TestCase):
         self.assertEqual(sels[0][1], "login")
 
 
+class TestGraphqlMutationPlanner(unittest.TestCase):
+    """Mutation slots are auto-tested (read-like ranked first), impact-classified, dry-run preferred."""
+
+    def test_impact_classification(self):
+        self.assertEqual(gi._mutationImpact("login"), "read-like")
+        self.assertEqual(gi._mutationImpact("verifyToken"), "read-like")
+        self.assertEqual(gi._mutationImpact("createUser"), "write-like")
+        self.assertEqual(gi._mutationImpact("deletePost"), "write-like")
+        self.assertEqual(gi._mutationImpact("frobnicate"), "unknown")
+
+    def test_mixed_names_are_write_like_not_read_like(self):
+        # a read-like substring must NOT mask a write token in the same (camelCase/snake) name
+        for name in ("updateUserPreview", "previewDeleteUser", "getAndDeleteUser", "createSession",
+                     "validateAndRemoveUser", "preview_delete_user", "get-and-delete-user"):
+            self.assertEqual(gi._mutationImpact(name), "write-like", name)
+        # genuine read-like names stay read-like
+        for name in ("login", "verifyToken", "previewReport", "checkSession", "fetchToken"):
+            self.assertEqual(gi._mutationImpact(name), "read-like", name)
+
+    def test_ranking_puts_read_like_first_write_like_last(self):
+        slots = [_slot("mutation", "Mutation", "deleteUser", "id"),
+                 _slot("mutation", "Mutation", "frobnicate", "x"),
+                 _slot("mutation", "Mutation", "login", "username")]
+        ranked = [s.fieldName for s in gi._rankMutations(slots)]
+        self.assertEqual(ranked[0], "login")            # read-like first
+        self.assertEqual(ranked[-1], "deleteUser")      # write-like last
+
+    def test_write_like_mutation_not_auto_enumerated(self):
+        # a write-like mutation is NOT eligible as the bulk-enumeration oracle (non-persistence
+        # unverified), whereas a read-like one is. This is the gate graphqlScan applies.
+        createSlot = _slot("mutation", "Mutation", "createUser", "name")
+        loginSlot = _slot("mutation", "Mutation", "login", "username")
+        self.assertFalse(gi._mutationImpact("createUser") == "read-like" or gi._dryRunVerified(createSlot, "http://x"))
+        self.assertTrue(gi._mutationImpact("login") == "read-like" or gi._dryRunVerified(loginSlot, "http://x"))
+        self.assertFalse(gi._dryRunVerified(createSlot, "http://x"))   # no automatic non-persistence proof
+
+    def test_mutation_oracle_is_never_batched(self):
+        # a mutation must NOT return truthBatch: aliased batching executes the write resolver once per
+        # alias (many writes per request). A boolean-diverging mutation slot yields (truth, None).
+        MATCHV = '{"data":{"createUser":{"id":1,"name":"luther"}}}'
+        NOMATCHV = '{"data":{"createUser":null}}'
+        saved = gi._gqlSend
+        try:
+            gi._gqlSend = lambda endpoint, query, variables=None: (MATCHV if "1=1" in query else NOMATCHV, 200)
+            slot = _slot("mutation", "Mutation", "createUser", "name", "string")
+            truth, truthBatch = gi._makeOracle(slot, "http://test/graphql")
+            self.assertIsNotNone(truth)
+            self.assertIsNone(truthBatch)               # batching disabled for mutations
+        finally:
+            gi._gqlSend = saved
+
+    def test_dryrun_flag_forced_true_even_when_optional(self):
+        # an optional Boolean 'dryRun' sibling is normally omitted; for a mutation probe it is forced
+        # true so the write does not commit
+        allArgs = [
+            ("name", {"kind": "NON_NULL", "name": None, "ofType": {"kind": "SCALAR", "name": "String", "ofType": None}}, None),
+            ("dryRun", {"kind": "SCALAR", "name": "Boolean"}, None),
+        ]
+        slot = gi.Slot("mutation", "Mutation", "createUser", allArgs, "name", "string",
+                        "OBJECT", "User", "{ id }")
+        q = gi._buildQuery(slot, "x")
+        self.assertIn("dryRun:true", q)
+
+
 class TestGraphqlSiblingDefaults(unittest.TestCase):
     """Required sibling arguments must use their real type, not be hardcoded as strings"""
 
@@ -684,8 +869,9 @@ class TestGraphqlSiblingDefaults(unittest.TestCase):
         self.assertIn("limit:0", q)
         self.assertNotIn('limit:"0"', q)
 
-    def test_boolean_sibling_gets_default_string(self):
-        """field(name: String!, active: Boolean!) -- Boolean gets \"x\" since there is no Boolean strategy"""
+    def test_boolean_sibling_uses_native_syntax(self):
+        """field(name: String!, active: Boolean!) -- a required Boolean renders as the native `false`
+        literal, NOT the quoted string "x" (which would make the whole query fail to parse)"""
         allArgs = [
             ("name", {"kind": "NON_NULL", "name": None, "ofType": {"kind": "SCALAR", "name": "String", "ofType": None}}, None),
             ("active", {"kind": "NON_NULL", "name": None, "ofType": {"kind": "SCALAR", "name": "Boolean", "ofType": None}}, None),
@@ -693,7 +879,20 @@ class TestGraphqlSiblingDefaults(unittest.TestCase):
         slot = gi.Slot("query", "Query", "toggle", allArgs, "name", "string",
                         "OBJECT", "User", "{ id }")
         q = gi._buildQuery(slot, "test")
-        self.assertIn('active:"x"', q)
+        self.assertIn('active:false', q)
+        self.assertNotIn('active:"x"', q)
+
+    def test_optional_sibling_is_omitted(self):
+        """field(name: String!, verbose: Boolean) -- an OPTIONAL sibling with no default is omitted,
+        not filled with a bogus sentinel that would invalidate the query"""
+        allArgs = [
+            ("name", {"kind": "NON_NULL", "name": None, "ofType": {"kind": "SCALAR", "name": "String", "ofType": None}}, None),
+            ("verbose", {"kind": "SCALAR", "name": "Boolean"}, None),
+        ]
+        slot = gi.Slot("query", "Query", "toggle", allArgs, "name", "string",
+                        "OBJECT", "User", "{ id }")
+        q = gi._buildQuery(slot, "test")
+        self.assertNotIn("verbose", q)
 
 
 class TestGraphqlScalarReturnSelection(unittest.TestCase):
