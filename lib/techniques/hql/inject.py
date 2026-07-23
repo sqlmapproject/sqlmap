@@ -348,6 +348,19 @@ def _shortEntity(entity):
     return re.split(r"[.$]", entity)[-1] if entity else entity
 
 
+def _exists(truth, predicate):
+    """Existence probe helper: an unmapped entity/attribute makes the ORM query fail
+    to compile (error page), which for a yes/no existence question is a definitive
+    'no'. Unlike value bisection - where a transient error must stay inconclusive so
+    it never freezes a wrong bit - an inconclusive/error existence probe reads as
+    false (matching the pre-recalibration oracle semantics these probes rely on)."""
+
+    try:
+        return truth(predicate)
+    except InconclusiveError:
+        return False
+
+
 def _bruteEntities(truth):
     """Recover mapped entity names through the boolean oracle alone (no reflected
     diagnostic needed): a mapped name keeps the FROM clause valid, an unmapped one
@@ -356,7 +369,7 @@ def _bruteEntities(truth):
 
     retVal = []
     for entity in HQL_COMMON_ENTITIES:
-        if truth("EXISTS(SELECT 1 FROM %s _h)" % entity):
+        if _exists(truth, "EXISTS(SELECT 1 FROM %s _h)" % entity):
             retVal.append(entity)
     return retVal
 
@@ -370,7 +383,7 @@ def _enumFields(truth, entity):
         if len(fields) >= HQL_MAX_FIELDS:
             break
         predicate = "EXISTS(SELECT _h.%s FROM %s _h)" % (field, entity)
-        if truth(predicate):
+        if _exists(truth, predicate):
             fields.append(field)
             logger.info("identified mapped attribute: '%s'" % field)
     return fields

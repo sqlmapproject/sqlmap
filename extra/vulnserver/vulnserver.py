@@ -266,6 +266,10 @@ def _hql_atom(atom):
     if match:
         return match.group(1) == match.group(2)
 
+    match = re.match(r"^(\d+)\s*=\s*(\d+)$", atom)                               # numeric literal 1=1 / 1=2
+    if match:
+        return match.group(1) == match.group(2)
+
     match = re.match(r"^\w+\s*=\s*'([^']*)'$", atom)                             # outer: name = 'X'
     if match:
         return HQL_RECORD["name"] == match.group(1)
