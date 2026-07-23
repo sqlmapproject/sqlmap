@@ -23,8 +23,6 @@ from lib.utils.nonsql import userOracleActive
 from lib.utils.nonsql import InconclusiveError
 from lib.utils.nonsql import INCONCLUSIVE_MARK
 from lib.utils.nonsql import resolveBit
-from lib.utils.nonsql import decide as _decide
-from lib.utils.nonsql import Decision as _Decision
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
