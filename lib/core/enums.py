@@ -439,6 +439,7 @@ class AUTH_TYPE(object):
     DIGEST = "digest"
     BEARER = "bearer"
     NTLM = "ntlm"
+    NEGOTIATE = "negotiate"
     PKI = "pki"
 
 class AUTOCOMPLETE_TYPE(object):

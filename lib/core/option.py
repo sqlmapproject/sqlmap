@@ -1332,8 +1332,11 @@ def _setHTTPHandlers():
         # proxy - the keep-alive handler pools the proxy socket for plain HTTP and the CONNECT-tunnelled
         # socket per origin for HTTPS); '--no-keep-alive' opts out, and they are automatically disabled
         # when incompatible (authentication methods, or chunked transfer-encoding of the request body -
-        # handled by a dedicated, non-pooling handler)
-        conf.keepAlive = not conf.noKeepAlive and not conf.authType and not conf.chunked
+        # handled by a dedicated, non-pooling handler). Negotiate is the one auth exception: its token is
+        # a per-request, end-to-end header (minted fresh each request, no connection-bound handshake), so
+        # persistent connections remain safe and worthwhile.
+        negotiateAuth = (conf.authType or "").lower() == AUTH_TYPE.NEGOTIATE
+        conf.keepAlive = not conf.noKeepAlive and not conf.chunked and (not conf.authType or negotiateAuth)
 
         if conf.keepAlive:
             # persistent connections for both HTTP and HTTPS; the keep-alive HTTPS
@@ -1449,7 +1452,7 @@ def _setAuthCred():
 
 def _setHTTPAuthentication():
     """
-    Check and set the HTTP(s) authentication method (Basic, Digest, Bearer, NTLM or PKI),
+    Check and set the HTTP(s) authentication method (Basic, Digest, Bearer, NTLM, Negotiate or PKI),
     username and password for first three methods, or PEM private key file for
     PKI authentication
     """
@@ -1472,9 +1475,9 @@ def _setHTTPAuthentication():
         errMsg += "but did not provide the type (e.g. --auth-type=\"basic\")"
         raise SqlmapSyntaxException(errMsg)
 
-    elif (conf.authType or "").lower() not in (AUTH_TYPE.BASIC, AUTH_TYPE.DIGEST, AUTH_TYPE.BEARER, AUTH_TYPE.NTLM, AUTH_TYPE.PKI):
+    elif (conf.authType or "").lower() not in (AUTH_TYPE.BASIC, AUTH_TYPE.DIGEST, AUTH_TYPE.BEARER, AUTH_TYPE.NTLM, AUTH_TYPE.NEGOTIATE, AUTH_TYPE.PKI):
         errMsg = "HTTP authentication type value must be "
-        errMsg += "Basic, Digest, Bearer, NTLM or PKI"
+        errMsg += "Basic, Digest, Bearer, NTLM, Negotiate or PKI"
         raise SqlmapSyntaxException(errMsg)
 
     if not conf.authFile:
@@ -1490,11 +1493,12 @@ def _setHTTPAuthentication():
         elif authType == AUTH_TYPE.BEARER:
             conf.httpHeaders.append((HTTP_HEADER.AUTHORIZATION, "Bearer %s" % conf.authCred.strip()))
             return
-        elif authType == AUTH_TYPE.NTLM:
+        elif authType in (AUTH_TYPE.NTLM, AUTH_TYPE.NEGOTIATE):
             # Note: the DOMAIN\username part is colon-free, so the password group takes the full
-            # remainder (a greedy first group would otherwise swallow colons inside the password)
+            # remainder (a greedy first group would otherwise swallow colons inside the password).
+            # For Negotiate, DOMAIN is the Kerberos realm.
             regExp = "^([^:]*\\\\[^:]*):(.*)$"
-            errMsg = "HTTP NTLM authentication credentials value must "
+            errMsg = "HTTP %s authentication credentials value must " % authType
             errMsg += "be in format 'DOMAIN\\username:password'"
         elif authType == AUTH_TYPE.PKI:
             errMsg = "HTTP PKI authentication require "
@@ -1522,6 +1526,12 @@ def _setHTTPAuthentication():
         elif authType == AUTH_TYPE.NTLM:
             from lib.request.ntlm import HTTPNtlmAuthHandler
             authHandler = HTTPNtlmAuthHandler(kb.passwordMgr)
+
+        elif authType == AUTH_TYPE.NEGOTIATE:
+            from lib.request.kerberos import HTTPNegotiateAuthHandler
+            # DOMAIN is the Kerberos realm; the KDC is auto-discovered (env / krb5.conf / DNS SRV / realm)
+            realm, _, user = conf.authUsername.partition('\\')
+            authHandler = HTTPNegotiateAuthHandler(realm, user, conf.authPassword)
     else:
         debugMsg = "setting the HTTP(s) authentication PEM private key"
         logger.debug(debugMsg)
