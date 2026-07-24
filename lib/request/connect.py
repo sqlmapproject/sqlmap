@@ -102,6 +102,7 @@ from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 from lib.core.settings import DEFAULT_USER_AGENT
 from lib.core.settings import EVALCODE_ENCODED_PREFIX
 from lib.core.settings import HTTP_ACCEPT_ENCODING_HEADER_VALUE
+from lib.core.settings import HTTP_ZSTD_AVAILABLE
 from lib.core.settings import HTTP_ACCEPT_HEADER_VALUE
 from lib.core.settings import IPS_WAF_CHECK_PAYLOAD
 from lib.core.settings import IS_WIN
@@ -557,9 +558,11 @@ class Connect(object):
             for key, value in list(headers.items()):
                 if key.upper() == HTTP_HEADER.ACCEPT_ENCODING.upper():
                     # keep only content-codings sqlmap can actually decode (see decodePage): a browser-pasted
-                    # 'Accept-Encoding' (e.g. "gzip, deflate, br, zstd") must not make the server return a body
-                    # we cannot read. Anything else (br, zstd, *, ...) is dropped, falling back to "identity".
-                    value = ','.join(_ for _ in re.split(r"\s*,\s*", value) if _.split(';', 1)[0].strip().lower() in ("gzip", "x-gzip", "deflate", "identity")) or "identity"
+                    # 'Accept-Encoding' must not make the server return a body we cannot read. 'br' is always
+                    # decodable (in-tree decoder), 'zstd' only on interpreters that ship it; anything else is
+                    # dropped, falling back to "identity".
+                    decodable = ["gzip", "x-gzip", "deflate", "br", "identity"] + (["zstd"] if HTTP_ZSTD_AVAILABLE else [])
+                    value = ','.join(_ for _ in re.split(r"\s*,\s*", value) if _.split(';', 1)[0].strip().lower() in decodable) or "identity"
 
                 del headers[key]
                 if isinstance(value, six.string_types):

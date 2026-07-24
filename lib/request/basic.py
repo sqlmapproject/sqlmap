@@ -12,6 +12,13 @@ import logging
 import re
 import zlib
 
+from lib.utils import brotli as _brotli
+
+try:
+    from compression import zstd as _zstd     # Python 3.14+ stdlib (PEP 784); no third-party dependency
+except ImportError:
+    _zstd = None
+
 from lib.core.common import Backend
 from lib.core.common import extractErrorMessage
 from lib.core.common import extractRegexResult
@@ -297,7 +304,7 @@ def decodePage(page, contentEncoding, contentType, percentDecode=True):
     contentEncoding = getText(contentEncoding).lower() if contentEncoding else ""
     contentType = getText(contentType).lower() if contentType else ""
 
-    if contentEncoding in ("gzip", "x-gzip", "deflate"):
+    if contentEncoding in ("gzip", "x-gzip", "deflate", "br", "zstd"):
         if not kb.pageCompress:
             return None
 
@@ -311,6 +318,14 @@ def decodePage(page, contentEncoding, contentType, percentDecode=True):
                     raise Exception("size too large")
 
                 page += obj.flush()
+                if len(page) > MAX_CONNECTION_TOTAL_SIZE:
+                    raise Exception("size too large")
+            elif contentEncoding == "br":
+                page = _brotli.decompress(page, MAX_CONNECTION_TOTAL_SIZE)   # in-tree RFC 7932 decoder (bomb-capped)
+            elif contentEncoding == "zstd":
+                if _zstd is None:
+                    raise Exception("no Zstandard decoder available")
+                page = _zstd.decompress(page)
                 if len(page) > MAX_CONNECTION_TOTAL_SIZE:
                     raise Exception("size too large")
             else:

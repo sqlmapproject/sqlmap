@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.7.183"
+VERSION = "1.10.7.186"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -250,8 +250,16 @@ TIME_DELAY_CANDIDATES = 3
 # Default value for HTTP Accept header
 HTTP_ACCEPT_HEADER_VALUE = "*/*"
 
-# Default value for HTTP Accept-Encoding header
-HTTP_ACCEPT_ENCODING_HEADER_VALUE = "gzip,deflate"
+# Whether the interpreter can decode Zstandard responses (stdlib 'compression.zstd', Python 3.14+ / PEP 784)
+try:
+    import compression.zstd as _zstdModule
+except ImportError:
+    _zstdModule = None
+HTTP_ZSTD_AVAILABLE = _zstdModule is not None
+
+# Default value for HTTP Accept-Encoding header (browser-realistic; 'br' via the in-tree decoder, 'zstd'
+# only when the stdlib provides it - never advertise a content-coding we cannot decode)
+HTTP_ACCEPT_ENCODING_HEADER_VALUE = "gzip, deflate, br%s" % (", zstd" if HTTP_ZSTD_AVAILABLE else "")
 
 # Default timeout for running commands over backdoor
 BACKDOOR_RUN_CMD_TIMEOUT = 5
