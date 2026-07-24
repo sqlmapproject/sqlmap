@@ -15,6 +15,7 @@ import os
 import struct
 import sys
 import tempfile
+import time
 import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -26,6 +27,7 @@ from extra.kerberos import der
 from extra.kerberos import discovery
 from extra.kerberos.aes import AES
 from extra.kerberos.crypto import ENCTYPES, nfold
+from lib.request.kerberos import _expiring
 
 
 def _dnsName(name):
@@ -39,6 +41,31 @@ def _dnsName(name):
 
 def _h(value):
     return binascii.unhexlify(value)
+
+
+def _etypeInfo2Entry(etype, salt=None, iterations=None):
+    parts = [der.tagged(0, der.integer(etype))]
+    if salt is not None:
+        parts.append(der.tagged(1, der.generalString(salt)))
+    if iterations is not None:
+        parts.append(der.tagged(2, der.octetString(struct.pack(">I", iterations))))
+    return der.sequence(*parts)
+
+
+def _preauthError(entries):
+    """The error-field map a KDC_ERR_PREAUTH_REQUIRED reply advertising 'entries' would produce."""
+
+    paData = der.sequence(
+        der.tagged(1, der.integer(19)),                    # PA-ETYPE-INFO2
+        der.tagged(2, der.octetString(der.sequenceOf(entries))),
+    )
+    return {12: der.octetString(der.sequenceOf([paData]))}
+
+
+def _selectEtype(offered, hints):
+    """getTGT's etype choice: the client's own preference order, restricted to what it offered."""
+
+    return next((_ for _ in offered if _ in hints and _ in ENCTYPES), None)
 
 
 class TestKerberosAES(unittest.TestCase):
@@ -168,8 +195,64 @@ class TestKerberosClient(unittest.TestCase):
 
     def test_etype_info2_best_effort(self):
         # a malformed PA-ETYPE-INFO2 must yield no advertised info (fall back to defaults), not crash
-        self.assertEqual(client._parseEtypeInfo2({12: der.octetString(b"\xff\xff\xff")}), [])
-        self.assertEqual(client._parseEtypeInfo2({}), [])
+        self.assertEqual(client._preauthHints({12: der.octetString(b"\xff\xff\xff")}), {})
+        self.assertEqual(client._preauthHints({}), {})
+        self.assertEqual(client._etypeHints(der.octetString(b"\xff\xff\xff")), {})
+
+    def test_etype_info2_hints(self):
+        hints = client._preauthHints(_preauthError([_etypeInfo2Entry(18, "SALT", 4096),
+                                                   _etypeInfo2Entry(23)]))
+        self.assertEqual(hints, {18: (b"SALT", 4096), 23: (None, None)})
+
+    def test_iteration_count_policy(self):
+        # the hint is unauthenticated: a count that would cheapen an offline attack or stall the scan
+        # for hours must be refused, and 0 (nominally 2**32) is not silently taken as the default
+        self.assertIsNone(client._validatedIterations(None))
+        self.assertEqual(client._validatedIterations(4096), 4096)
+        for bogus in (0, 1, 1000, client.MAX_PBKDF2_ITERATIONS + 1, 0xFFFFFFFF):
+            self.assertRaises(client.KerberosError, client._validatedIterations, bogus)
+
+    def test_hint_cannot_override_pinned_salt(self):
+        hints = {18: (b"KDCSALT", 4096)}
+        self.assertEqual(client._hintFor(hints, 18, "PINNED", "PINNED"), ("PINNED", 4096))
+        self.assertEqual(client._hintFor(hints, 18, None, "DEFAULT"), (b"KDCSALT", 4096))
+        self.assertEqual(client._hintFor(hints, 17, None, "DEFAULT"), ("DEFAULT", None))
+
+    def test_etype_selection_honours_client_preference(self):
+        # a spoofed hint must not be able to pull the client onto an etype it never offered, and the
+        # client's own preference order wins over the KDC's
+        hints = client._preauthHints(_preauthError([_etypeInfo2Entry(23), _etypeInfo2Entry(18)]))
+        self.assertEqual(_selectEtype((18, 17), hints), 18)                  # KDC listed rc4 first
+        self.assertEqual(_selectEtype((17, 18), hints), 18)                  # only 18 is hinted
+        self.assertIsNone(_selectEtype((18, 17), client._preauthHints(_preauthError([_etypeInfo2Entry(23)]))))
+
+    def test_authenticator_timestamps_are_unique(self):
+        # an acceptor's replay cache keys on (ctime, cusec), and a threaded scan mints one per request
+        stamps = [client._timestamp() for _ in range(2000)]
+        self.assertEqual(len(set(stamps)), len(stamps))
+        self.assertTrue(all(0 <= cusec <= 999999 for _, cusec in stamps))
+
+    def test_authenticator_carries_seq_number(self):
+        # RFC 4121 expects a sequence number in the GSS mechanism's initial AP-REQ authenticator
+        fields = client._fields(der.peel(der.peel(
+            client._authenticator("EXAMPLE.COM", ["user"], seqNumber=0x11223344))[1])[1])
+        self.assertEqual(client._expInteger(fields[7]), 0x11223344)
+        self.assertNotIn(7, client._fields(der.peel(der.peel(
+            client._authenticator("EXAMPLE.COM", ["user"]))[1])[1]))
+
+    def test_kerberos_time_round_trip(self):
+        self.assertEqual(client._expTime(der.generalizedTime("19700101000010Z")), 10)
+        self.assertIsNone(client._expTime(der.generalizedTime("not-a-time")))
+
+
+class TestKerberosTicketCache(unittest.TestCase):
+    def test_expiring(self):
+        now = time.time()
+        self.assertFalse(_expiring(None))
+        self.assertFalse(_expiring({"endtime": None}))       # a KDC that sent no parsable endtime
+        self.assertFalse(_expiring({"endtime": now + 36000}))
+        self.assertTrue(_expiring({"endtime": now - 1}))     # already expired
+        self.assertTrue(_expiring({"endtime": now + 60}))    # inside the refresh skew
 
 
 class TestKerberosDiscovery(unittest.TestCase):

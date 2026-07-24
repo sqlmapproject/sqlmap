@@ -40,18 +40,27 @@ def _fromKrb5Conf(realm):
     except (IOError, OSError):
         return None
 
-    header = re.search(r"(?im)^\s*%s\s*=\s*\{" % re.escape(realm), content)
+    # scope the search to the [realms] section itself: '[capaths]' uses the identical
+    # 'realm = { ... }' syntax, so a same-named capath block must not shadow the real one
+    section = re.search(r"(?im)^[ \t]*\[realms\][ \t]*$", content)
+    if not section:
+        return None
+    nextSection = re.search(r"(?m)^[ \t]*\[", content[section.end():])
+    sectionEnd = section.end() + nextSection.start() if nextSection else len(content)
+    realms = content[section.end():sectionEnd]
+
+    header = re.search(r"(?im)^\s*%s\s*=\s*\{" % re.escape(realm), realms)
     if not header:
         return None
     start = header.end()                                   # brace-match so a nested '{ }' block cannot truncate us
     depth, i = 1, start
-    while i < len(content) and depth > 0:
-        if content[i] == "{":
+    while i < len(realms) and depth > 0:
+        if realms[i] == "{":
             depth += 1
-        elif content[i] == "}":
+        elif realms[i] == "}":
             depth -= 1
         i += 1
-    block = content[start:i - 1]
+    block = realms[start:i - 1]
     kdc = re.search(r"(?im)^\s*kdc\s*=\s*(\S+)", block)
     return kdc.group(1) if kdc else None
 
@@ -135,11 +144,11 @@ def parseSrv(response):
             offset = _skipName(data, offset)
             if offset + 10 > len(data):
                 break
-            rtype, _cls, _ttl, rdlength = struct.unpack(">HHIH", bytes(data[offset:offset + 10]))
+            rtype, rclass, _ttl, rdlength = struct.unpack(">HHIH", bytes(data[offset:offset + 10]))
             offset += 10
             if offset + rdlength > len(data):
                 break
-            if rtype == _SRV_TYPE and rdlength >= 6:
+            if rtype == _SRV_TYPE and rclass == _IN_CLASS and rdlength >= 6:
                 priority, weight, port = struct.unpack(">HHH", bytes(data[offset:offset + 6]))
                 target = _readName(data, offset + 6)[0].rstrip(".")
                 if target:

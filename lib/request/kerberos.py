@@ -14,6 +14,7 @@ See the file 'LICENSE' for copying permission
 import base64
 import logging
 import threading
+import time
 
 from lib.core.common import getSafeExString
 from lib.core.common import singleTimeLogMessage
@@ -27,10 +28,20 @@ from extra.kerberos.client import KerberosError
 from extra.kerberos.client import spnegoFromTicket
 from extra.kerberos.discovery import discoverKdc
 
+TICKET_REFRESH_SKEW = 300                                  # re-fetch a ticket this long before it expires
+
+def _expiring(ticket):
+    """True for a cached ticket close enough to its expiry to be worth replacing (a scan can easily
+    run longer than the ticket lifetime, and an expired AP-REQ is rejected by every acceptor)."""
+
+    return ticket is not None and ticket.get("endtime") is not None and time.time() + TICKET_REFRESH_SKEW >= ticket["endtime"]
+
 class HTTPNegotiateAuthHandler(_urllib.request.BaseHandler):
     handler_order = 480
 
     def __init__(self, realm, username, password, kdcHost=None, kdcPort=None):
+        # Kerberos realms are case-sensitive, but the credentials arrive in the Windows 'DOMAIN\\user'
+        # form where the domain is not, so normalize here rather than inside the protocol client
         self.realm = realm.upper()
         self.username = username
         self.password = password
@@ -48,6 +59,10 @@ class HTTPNegotiateAuthHandler(_urllib.request.BaseHandler):
                 raise self._tgtFailure
             if host in self._hostFailures:                 # this host already failed -> don't retry it
                 raise self._hostFailures[host]
+            if _expiring(self._tickets.get(host)):         # drop a ticket that a long scan has outlived
+                del self._tickets[host]
+                if _expiring(self._tgt):
+                    self._tgt = None
             if host not in self._tickets:
                 if self._tgt is None:
                     if self.kdcHost is None:               # krb5.conf / DNS SRV / realm-name discovery

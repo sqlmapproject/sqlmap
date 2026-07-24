@@ -10,9 +10,11 @@ See the file 'LICENSE' for copying permission
 # the TGS exchange and AP-REQ follow. Talks to the KDC over TCP (4-byte length framing).
 # Python 2.7 / 3.x.
 
+import calendar
 import os
 import socket
 import struct
+import threading
 import time
 
 from extra.kerberos import der
@@ -47,6 +49,14 @@ PVNO = 5
 DEFAULT_ETYPES = (18, 17, 23)                               # aes256-cts, aes128-cts, rc4-hmac (best first)
 KDC_TIMEOUT = 10                                            # seconds for the KDC TCP exchange
 MAX_KDC_RESPONSE = 8 * 1024 * 1024                          # cap on a KDC reply (guards a hostile length prefix)
+KERBEROS_TIME_FORMAT = "%Y%m%d%H%M%SZ"                      # RFC 4120 KerberosTime (always UTC)
+
+# Bounds on the string-to-key work factor a KDC may ask for. The PA-ETYPE-INFO2 hint carrying it
+# arrives on an *unauthenticated* KRB-ERROR, and the field is a full 32 bits, so an absurd value would
+# either weaken the derived key against offline guessing or burn hours of CPU (RFC 3962 warns about
+# both and recommends configurable bounds). A count of 0 nominally means 2**32, which we cannot honour.
+MIN_PBKDF2_ITERATIONS = 4096                                # the RFC 3962 default; nothing legitimate is lower
+MAX_PBKDF2_ITERATIONS = 1000000
 
 def _enctype(etype):
     if etype not in ENCTYPES:
@@ -87,7 +97,34 @@ def _nonce():
     return struct.unpack(">I", os.urandom(4))[0] & 0x7fffffff
 
 def _kerberosTime(offsetSeconds=0):
-    return time.strftime("%Y%m%d%H%M%SZ", time.gmtime(time.time() + offsetSeconds))
+    return time.strftime(KERBEROS_TIME_FORMAT, time.gmtime(time.time() + offsetSeconds))
+
+_timestampLock = threading.Lock()
+_lastMicros = -1
+
+def _timestamp():
+    """(KerberosTime, microseconds) taken from a single clock reading and unique within the process.
+
+    An acceptor's replay cache rejects a repeated (ctime, cusec) for the same principal and service,
+    and a threaded scan mints an authenticator per request, so the pair must never repeat; a strictly
+    increasing microsecond counter also keeps cusec inside its INTEGER (0..999999) range by construction.
+    """
+
+    global _lastMicros
+
+    with _timestampLock:
+        micros = max(int(time.time() * 1000000), _lastMicros + 1)
+        _lastMicros = micros
+    return time.strftime(KERBEROS_TIME_FORMAT, time.gmtime(micros // 1000000)), micros % 1000000
+
+def _expTime(field):
+    """An [n]-wrapped KerberosTime as epoch seconds (None when absent or unparsable, so an unusual
+    time format degrades ticket-expiry tracking rather than failing the exchange)."""
+
+    try:
+        return calendar.timegm(time.strptime(der.decodeGeneralString(der.peel(field)[1]), KERBEROS_TIME_FORMAT))
+    except ValueError:
+        return None
 
 def _principalName(nameType, components):
     return der.sequence(
@@ -131,31 +168,56 @@ def _raiseIfError(message):
                             _expString(fields[11]) if 11 in fields else None)
     return tag, content
 
-def _parseEtypeInfo2(errorFields):
-    """Extract [(etype, salt, iterations), ...] from a KDC_ERR_PREAUTH_REQUIRED error's PA-ETYPE-INFO2,
-    telling us which etype/salt/s2kparams the KDC expects for the long-term key."""
+def _etypeHints(methodData):
+    """Parse a METHOD-DATA TLV (SEQUENCE OF PA-DATA) into PA-ETYPE-INFO2 hints as
+    {etype: (salt, iterations)}, telling us which etype/salt/s2kparams the KDC expects for the
+    long-term key. The first entry for an etype wins; a malformed hint yields none (so the caller
+    falls back to its defaults) rather than raising."""
 
-    out = []
-    if 12 not in errorFields:                              # no e-data
-        return out
+    hints = {}
     try:
-        methodData = der.peel(errorFields[12])[1]          # e-data OCTET STRING -> METHOD-DATA (SEQ OF PA-DATA)
         for _, paData in der.children(der.peel(methodData)[1]):
             pa = _fields(paData)
             if 1 in pa and 2 in pa and _expInteger(pa[1]) == PA_ETYPE_INFO2:
                 info = der.peel(pa[2])[1]                   # padata-value OCTET STRING -> ETYPE-INFO2 (SEQ OF entry)
                 for _, entry in der.children(der.peel(info)[1]):
                     fields = _fields(entry)
-                    etype = _expInteger(fields[0])
                     salt = _expOctet(fields[1]) if 1 in fields else None   # opaque octets for string2key (RFC 3961), not UTF-8
                     iterations = None
                     if 2 in fields:
                         raw = bytes(der.peel(fields[2])[1]) # s2kparams: 4-byte BE iteration count for AES
                         iterations = struct.unpack(">I", raw)[0] if len(raw) == 4 else None
-                    out.append((etype, salt, iterations))
+                    hints.setdefault(_expInteger(fields[0]), (salt, iterations))
     except (KeyError, IndexError, ValueError, struct.error):
-        del out[:]                                          # malformed hint -> fall back to the default etype/salt
-    return out
+        hints.clear()                                       # malformed hint -> fall back to the default etype/salt
+    return hints
+
+def _preauthHints(errorFields):
+    """The etype hints carried by a KDC_ERR_PREAUTH_REQUIRED error's e-data (best effort)."""
+
+    if 12 not in errorFields:                              # no e-data
+        return {}
+    try:
+        return _etypeHints(der.peel(errorFields[12])[1])   # e-data OCTET STRING -> METHOD-DATA
+    except (KeyError, IndexError, ValueError, struct.error):
+        return {}
+
+def _validatedIterations(iterations):
+    """Refuse a string-to-key work factor outside local policy. The hint is unauthenticated, so a
+    spoofed count could either cheapen an offline attack on the PA-ENC-TIMESTAMP we are about to send
+    or stall the scan for hours; failing loudly beats doing either silently."""
+
+    if iterations is not None and not MIN_PBKDF2_ITERATIONS <= iterations <= MAX_PBKDF2_ITERATIONS:
+        raise KerberosError(-1, "KDC advertised an out-of-policy string-to-key iteration count (%d)" % iterations)
+    return iterations
+
+def _hintFor(hints, etype, salt, chosenSalt):
+    """Apply the hint for 'etype': its salt (unless the caller pinned one) and its work factor."""
+
+    advertisedSalt, iterations = hints.get(etype, (None, None))
+    if salt is None and advertisedSalt is not None:
+        chosenSalt = advertisedSalt
+    return chosenSalt, _validatedIterations(iterations)
 
 def _replyEtype(response):
     """Return the etype of a KDC-REP's enc-part (which etype the KDC used for the client's key)."""
@@ -196,6 +258,8 @@ def _parseRep(response, key, usage, expectedNonce, expectedType):
             "sessionKeyType": _expInteger(keyFields[0]),
             "etype": repEtype,
             "crealm": _expString(rep[3]),
+            # EncKDCRepPart endtime [7]; a scan can outlive the ticket, so the caller can re-fetch
+            "endtime": _expTime(encKdcRep[7]) if 7 in encKdcRep else None,
         }
     except (KeyError, IndexError, ValueError, struct.error):
         raise KerberosError(-1, "malformed KDC reply")
@@ -211,7 +275,8 @@ def _reqBody(realm, snameType, snameComponents, etypes, nonce, cnameComponents=N
     parts.append(der.tagged(8, der.sequenceOf([der.integer(_) for _ in etypes])))   # etype
     return der.sequence(*parts)
 
-def _authenticator(crealm, cnameComponents, cksum=None):
+def _authenticator(crealm, cnameComponents, cksum=None, seqNumber=None):
+    ctime, cusec = _timestamp()                             # both from one clock reading, never repeating
     parts = [
         der.tagged(0, der.integer(PVNO)),
         der.tagged(1, der.generalString(crealm)),
@@ -220,8 +285,10 @@ def _authenticator(crealm, cnameComponents, cksum=None):
     if cksum is not None:
         parts.append(der.tagged(3, der.sequence(der.tagged(0, der.integer(cksum[0])),
                                                  der.tagged(1, der.octetString(cksum[1])))))
-    parts.append(der.tagged(4, der.integer(struct.unpack(">I", os.urandom(4))[0] % 1000000)))  # cusec
-    parts.append(der.tagged(5, der.generalizedTime(_kerberosTime())))               # ctime
+    parts.append(der.tagged(4, der.integer(cusec)))
+    parts.append(der.tagged(5, der.generalizedTime(ctime)))
+    if seqNumber is not None:                               # [7] seq-number, expected of a GSS AP-REQ
+        parts.append(der.tagged(7, der.integer(seqNumber)))
     return der.application(2, der.sequence(*parts))
 
 def _apReq(ticket, encAuthenticator, etype, apOptions=b"\x00\x00\x00\x00"):
@@ -248,10 +315,10 @@ def getTGT(realm, username, password, kdcHost, kdcPort=88, etypes=DEFAULT_ETYPES
     Follows the standard two-step flow: an initial request without pre-auth learns the KDC's expected
     etype/salt/iteration-count from PA-ETYPE-INFO2 (so non-default salts and AES-128-only principals
     work), then a PA-ENC-TIMESTAMP-authenticated request obtains the ticket. Returns
-    {'ticket': <raw Ticket TLV>, 'sessionKey': bytes, 'sessionKeyType': int, 'crealm': str}.
+    {'ticket': <raw Ticket TLV>, 'sessionKey': bytes, 'sessionKeyType': int, 'crealm': str,
+    'endtime': epoch seconds}. 'realm' is used exactly as given (RFC 4120 realms are case-sensitive).
     """
 
-    realm = realm.upper()
     chosenSalt = salt if salt is not None else realm + username
 
     # 1) probe without pre-auth to discover the etype/salt/iterations (or get the TGT outright)
@@ -261,7 +328,10 @@ def getTGT(realm, username, password, kdcHost, kdcPort=88, etypes=DEFAULT_ETYPES
 
     if tag == der.applicationTag(AS_REP):                  # KDC issued the ticket without pre-auth
         etype = _replyEtype(response)                      # derive the key for the etype the KDC actually used
-        clientKey = _enctype(etype).string2key(password, chosenSalt)
+        rep = _fields(der.peel(der.peel(response)[1])[1])
+        # the reply's own padata can still carry the salt/iterations of a non-default principal
+        chosenSalt, iterations = _hintFor(_etypeHints(rep[2]) if 2 in rep else {}, etype, salt, chosenSalt)
+        clientKey = _enctype(etype).string2key(password, chosenSalt, iterations)
         return _parseRep(response, clientKey, USAGE_AS_REP_ENCPART, nonce, AS_REP)
 
     etype, iterations = etypes[0], None
@@ -270,19 +340,21 @@ def getTGT(realm, username, password, kdcHost, kdcPort=88, etypes=DEFAULT_ETYPES
         code = _expInteger(errorFields[6]) if 6 in errorFields else -1
         if code != KDC_ERR_PREAUTH_REQUIRED:
             raise KerberosError(code, _expString(errorFields[11]) if 11 in errorFields else None)
-        for advertisedEtype, advertisedSalt, advertisedIters in _parseEtypeInfo2(errorFields):
-            if advertisedEtype in ENCTYPES:
-                etype = advertisedEtype
-                iterations = advertisedIters
-                if salt is None and advertisedSalt is not None:
-                    chosenSalt = advertisedSalt
+        # the hint is unauthenticated, so it may only choose among the etypes we actually offered, and
+        # in *our* order of preference rather than the KDC's (otherwise it could force a downgrade)
+        hints = _preauthHints(errorFields)
+        for offered in etypes:
+            if offered in hints and offered in ENCTYPES:
+                etype = offered
                 break
+        chosenSalt, iterations = _hintFor(hints, etype, salt, chosenSalt)
 
     enc = _enctype(etype)
     clientKey = enc.string2key(password, chosenSalt, iterations)
 
     # 2) authenticated request with PA-ENC-TIMESTAMP under the discovered etype/salt
-    paTsEnc = der.sequence(der.tagged(0, der.generalizedTime(_kerberosTime())), der.tagged(1, der.integer(0)))
+    patime, pausec = _timestamp()
+    paTsEnc = der.sequence(der.tagged(0, der.generalizedTime(patime)), der.tagged(1, der.integer(pausec)))
     cipher = enc.encrypt(clientKey, USAGE_AS_REQ_PA_ENC_TIMESTAMP, paTsEnc)
     paData = der.sequence(
         der.tagged(1, der.integer(PA_ENC_TIMESTAMP)),
@@ -296,10 +368,10 @@ def getTGT(realm, username, password, kdcHost, kdcPort=88, etypes=DEFAULT_ETYPES
 def getServiceTicket(tgt, realm, username, serviceComponents, kdcHost, kdcPort=88, etypes=DEFAULT_ETYPES):
     """Present the TGT in a PA-TGS-REQ AP-REQ to obtain a ticket for the named service.
 
-    Returns the same shape as getTGT (the 'ticket' is now the service ticket).
+    Returns the same shape as getTGT (the 'ticket' is now the service ticket). Cross-realm referrals
+    are not followed, so 'serviceComponents' must name a service inside 'realm'.
     """
 
-    realm = realm.upper()
     enc = _enctype(tgt["sessionKeyType"])
     nonce = _nonce()
     reqBody = _reqBody(realm, NT_SRV_INST, serviceComponents, etypes, nonce)
@@ -327,6 +399,7 @@ def spnegoFromTicket(service, realm, username):
 
     enc = _enctype(service["sessionKeyType"])
     gssChecksum = (GSS_CHECKSUM_TYPE, struct.pack("<I", 16) + b"\x00" * 16 + struct.pack("<I", GSS_CHECKSUM_FLAGS))
-    authenticator = _authenticator(realm.upper(), [username], cksum=gssChecksum)
+    # seq-number is expected of the GSS mechanism's initial AP-REQ (RFC 4121), so always send one
+    authenticator = _authenticator(realm, [username], cksum=gssChecksum, seqNumber=_nonce())
     encAuth = enc.encrypt(service["sessionKey"], USAGE_AP_REQ_AUTH, authenticator)
     return spnego.negTokenInit(_apReq(service["ticket"], encAuth, service["sessionKeyType"]))

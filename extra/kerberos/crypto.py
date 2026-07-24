@@ -18,6 +18,7 @@ import os
 import struct
 
 from extra.kerberos.aes import AES, _xor                   # _xor reused (no second copy) from the AES core
+from lib.core.decorators import cachedmethod
 from lib.request.ntlm import _md4                          # proven RFC 1320 MD4 (reused, not re-derived)
 
 # RFC 3962 string-to-key default work factor when the KDC advertises no explicit count
@@ -122,8 +123,13 @@ class AESEnctype(object):
             out += bytearray(block)
         return bytes(out[:self.keysize])
 
+    @cachedmethod
     def dk(self, key, constant):
-        """RFC 3961 DK = random-to-key(DR(...)); random-to-key is the identity for AES."""
+        """RFC 3961 DK = random-to-key(DR(...)); random-to-key is the identity for AES.
+
+        Cached: it is a pure function of (key, constant), while a scan mints an authenticator per
+        request from the same handful of long-lived keys, so the pure-Python DR would otherwise be
+        recomputed for every single one."""
 
         return self._dr(key, constant)
 
@@ -222,8 +228,9 @@ class RC4Enctype(object):
 
     @staticmethod
     def _usage(usage):
-        # RFC 4757 section 3: a couple of Kerberos usages map to Microsoft-specific values
-        return struct.pack("<I", {3: 8, 9: 8}.get(usage, usage))
+        # RFC 4757 section 3: a couple of Kerberos usages map to Microsoft-specific values (per the
+        # published errata, usage 9 is NOT folded into 8 - only 3->8 and 23->13 apply)
+        return struct.pack("<I", {3: 8, 23: 13}.get(usage, usage))
 
     def encrypt(self, key, usage, plaintext, confounder=None):
         if confounder is None:
