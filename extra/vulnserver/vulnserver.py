@@ -10,6 +10,8 @@ See the file 'LICENSE' for copying permission
 from __future__ import print_function
 
 import base64
+import hashlib
+import hmac
 import json
 import os
 import random
@@ -37,6 +39,30 @@ try:
         _f.write(XXE_READ_MARKER + "\n")
 except (IOError, OSError):
     pass
+
+# Self-contained JSON Web Token forge/parse for the '/jwt' endpoint, so '--jwt' has a live target in the
+# vuln-test. The signing secret is a common one (crackable from the shipped wordlist), the endpoint accepts
+# unsigned 'alg':'none' tokens (VULN) and reflects 'kid' into a SQL error (injectable key lookup).
+JWT_SECRET = "secret"
+
+def _jwt_b64url(data):
+    return base64.urlsafe_b64encode(data).rstrip(b'=').decode()
+
+def _jwt_forge(header, payload, secret):
+    seg = lambda obj: _jwt_b64url(json.dumps(obj, separators=(',', ':')).encode(UNICODE_ENCODING))
+    signingInput = "%s.%s" % (seg(header), seg(payload))
+    signature = _jwt_b64url(hmac.new(secret.encode(UNICODE_ENCODING), signingInput.encode(UNICODE_ENCODING), hashlib.sha256).digest())
+    return "%s.%s" % (signingInput, signature)
+
+def _jwt_parse(token):
+    try:
+        header, payload, signature = token.split('.')
+        pad = lambda value: value + '=' * (-len(value) % 4)
+        return json.loads(base64.urlsafe_b64decode(pad(header))), json.loads(base64.urlsafe_b64decode(pad(payload))), signature
+    except Exception:
+        return None
+
+JWT_TOKEN = _jwt_forge({"alg": "HS256", "typ": "JWT", "kid": "key1"}, {"user": "guest", "role": "user", "exp": 9999999999}, JWT_SECRET)
 
 if PY3:
     from http.client import FORBIDDEN
@@ -999,6 +1025,28 @@ class ReqHandler(BaseHTTPRequestHandler):
                 output = "<result>%s</result>" % "".join(root.itertext())     # reflects expanded entities
             except Exception as ex:
                 output = "<error>%s: %s</error>" % (type(ex).__name__, ex)    # parser diagnostic (error-based tier)
+
+            self.wfile.write(output.encode(UNICODE_ENCODING, "ignore"))
+            return
+
+        if self.url == "/jwt":
+            self.send_response(OK)
+            self.send_header("Content-type", "text/html; charset=%s" % UNICODE_ENCODING)
+            self.send_header("Connection", "close")
+            self.end_headers()
+
+            parsed = _jwt_parse(self.params.get("session", ""))
+            output = "<html><body>access denied. please sign in.</body></html>"
+            if parsed:
+                header, payload, _ = parsed
+                kid = header.get("kid")
+                if hasattr(kid, "count") and kid.count("'") % 2 == 1:   # str/unicode (py2/py3), not an int/dict
+                    # VULNERABLE: 'kid' feeds a key-lookup query unsanitized -> a lone quote breaks it
+                    output = "<html><body>You have an error in your SQL syntax near '%s'</body></html>" % kid
+                elif (header.get("alg") or "").lower() == "none":
+                    output = "<html><body>welcome back, %s. secret area.</body></html>" % payload.get("user")   # VULN: unsigned accepted
+                elif _jwt_forge(header, payload, JWT_SECRET) == self.params.get("session"):
+                    output = "<html><body>welcome back, %s. secret area.</body></html>" % payload.get("user")
 
             self.wfile.write(output.encode(UNICODE_ENCODING, "ignore"))
             return

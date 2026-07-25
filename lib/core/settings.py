@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.7.188"
+VERSION = "1.10.7.189"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -1229,6 +1229,17 @@ HQL_ERROR_SIGNATURES = (
 )
 
 HQL_ERROR_REGEX = r"(?i)(?:%s)" % '|'.join(regex for _, regex in HQL_ERROR_SIGNATURES)
+
+# Small, fast dictionary the always-on JWT heuristic tries against an HS* signature (the full
+# '--jwt' audit streams the shipped wordlist instead); these are the secrets seen over and over in
+# tutorials, framework defaults and CTFs
+JWT_COMMON_SECRETS = ("secret", "password", "changeme", "admin", "test", "jwt", "key", "private",
+    "your-256-bit-secret", "your_jwt_secret", "supersecret", "secretkey", "s3cr3t", "1234567890",
+    "qwerty", "root", "token", "default", "example", "mysecret", "jwtsecret", "signingkey")
+
+# Upper bound on candidate secrets tried during the offline '--jwt' HMAC crack (keeps a huge custom
+# wordlist from turning an audit into an unbounded brute-force)
+JWT_MAX_CRACK_WORDS = 2000000
 
 # Regexes that pull the mapped entity/root name out of a Hibernate diagnostic (the
 # ORM equivalent of a leaked table name; HQL has no information_schema so error-based

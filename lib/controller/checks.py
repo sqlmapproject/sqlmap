@@ -1276,6 +1276,41 @@ def heuristicCheckSqlInjection(place, parameter):
 
     return kb.heuristicTest
 
+def checkJWT():
+    """
+    Passive, always-on heuristic: surface any JSON Web Token the request carries (cookie, header or
+    parameter) together with its offline weaknesses (alg:none, guessable HMAC secret, unsafe key
+    headers, missing expiry), hinting at '--jwt' for active confirmation and injection.
+    """
+
+    if kb.jwtChecked or conf.jwt:
+        return
+
+    kb.jwtChecked = True
+
+    from lib.utils.jwt import auditJWT
+    from lib.utils.jwt import findJWTs
+    from lib.core.settings import JWT_COMMON_SECRETS
+
+    haystacks = list((conf.parameters or {}).values())
+    haystacks += [value for _, value in (conf.httpHeaders or [])]
+
+    seen = set()
+    for haystack in haystacks:
+        for token in findJWTs(haystack):
+            if token in seen:
+                continue
+            seen.add(token)
+
+            infoMsg = "heuristic (JWT) test shows that the request carries a JSON Web Token (rerun with switch '--jwt')"
+            logger.info(infoMsg)
+
+            for _, severity, summary, __ in auditJWT(token, secrets=JWT_COMMON_SECRETS):
+                logger.info("JWT weakness (%s): %s" % (severity, summary))
+
+            if conf.beep:
+                beep()
+
 def checkDynParam(place, parameter, value):
     """
     This function checks if the URL parameter is dynamic. If it is

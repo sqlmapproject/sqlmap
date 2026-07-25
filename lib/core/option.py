@@ -2244,6 +2244,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.heuristicPage = False
     kb.heuristicTest = None
     kb.hintValue = ""
+    kb.jwtChecked = False
     kb.htmlFp = []
     kb.huffmanModel = {}
     kb.respTruncated = False

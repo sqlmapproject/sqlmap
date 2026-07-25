@@ -16,6 +16,7 @@ from lib.controller.action import action
 from lib.controller.checks import checkConnection
 from lib.controller.checks import checkDynParam
 from lib.controller.checks import checkInternet
+from lib.controller.checks import checkJWT
 from lib.controller.checks import checkNullConnection
 from lib.controller.checks import checkSqlInjection
 from lib.controller.checks import checkStability
@@ -529,12 +530,14 @@ def start():
 
             checkWaf()
 
-            if conf.mineParams and not any((conf.graphql, conf.nosql, conf.ldap, conf.xpath, conf.ssti, conf.xxe, conf.hql)):
+            checkJWT()
+
+            if conf.mineParams and not any((conf.graphql, conf.nosql, conf.ldap, conf.xpath, conf.ssti, conf.xxe, conf.hql, conf.jwt)):
                 from lib.utils.paraminer import mineParameters
                 mineParameters()
 
-            if any((conf.graphql, conf.nosql, conf.ldap, conf.xpath, conf.ssti, conf.xxe, conf.hql)) and (conf.reportJson or conf.resultsFile):
-                singleTimeWarnMessage("'--report-json'/'--results-file' do not (yet) capture non-SQL technique (--graphql/--nosql/--ldap/--xpath/--ssti/--xxe/--hql) findings; these are reported on the console only")
+            if any((conf.graphql, conf.nosql, conf.ldap, conf.xpath, conf.ssti, conf.xxe, conf.hql, conf.jwt)) and (conf.reportJson or conf.resultsFile):
+                singleTimeWarnMessage("'--report-json'/'--results-file' do not (yet) capture non-SQL technique (--graphql/--nosql/--ldap/--xpath/--ssti/--xxe/--hql/--jwt) findings; these are reported on the console only")
 
             if conf.graphql:
                 from lib.techniques.graphql.inject import graphqlScan
@@ -569,6 +572,11 @@ def start():
             if conf.hql:
                 from lib.techniques.hql.inject import hqlScan
                 hqlScan()
+                continue
+
+            if conf.jwt:
+                from lib.techniques.jwt.inject import jwtScan
+                jwtScan()
                 continue
 
             if conf.nullConnection:

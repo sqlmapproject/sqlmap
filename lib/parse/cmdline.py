@@ -808,6 +808,9 @@ def cmdLineParser(argv=None):
         nonsql.add_argument("--hql", dest="hql", action="store_true",
             help="Test for HQL/JPQL (Hibernate ORM) injection")
 
+        nonsql.add_argument("--jwt", dest="jwt", action="store_true",
+            help="Audit JSON Web Tokens (JWT) for weaknesses")
+
         nonsql.add_argument("--oob-server", dest="oobServer",
             help="Out-of-band server for blind '--xxe'")
 
