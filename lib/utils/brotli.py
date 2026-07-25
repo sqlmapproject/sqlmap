@@ -12,11 +12,24 @@ See the file 'LICENSE' for copying permission
 # reference encoder across every quality/window/size. The 122 KB static dictionary + context-lookup
 # table live ZIP-packed in data/txt/brotli-dictionary.tx_ (same convention as wordlist.tx_). Py 2.7 / 3.x.
 
+import hashlib
 import os
+import threading
 import zipfile
 
-_DICTIONARY = None                                         # 122784-byte static dictionary (lazy-loaded)
-_CONTEXT = None                                            # 2048-byte context-lookup table (4 modes x 2 halves x 256)
+_TABLES = None                                             # (dictionary, context) published atomically on first use
+_TABLES_LOCK = threading.Lock()
+
+# provenance: the RFC 7932 Appendix A static dictionary (122784 bytes) + the 2048-byte context-lookup
+# table, extracted byte-for-byte from libbrotlicommon; verified on load so a swapped/corrupt resource
+# fails loudly instead of silently mis-decoding
+_TABLES_SHA256 = "20e42eb1b511c21806d4d227d07e5dd06877d8ce7b3a817f378f313653f35c70"   # sha256 of the 122784-byte dictionary
+_DICTIONARY_SIZE = 122784
+_CONTEXT_SIZE = 2048
+
+# per-stream ceiling on total Huffman lookup-table entries: bounds decoder memory independently of the
+# output cap (a hostile stream can declare many maximal 2^15-entry trees). ~10x the worst legitimate need.
+_MAX_HUFFMAN_TABLE_ENTRIES = 1 << 20
 
 # RFC 7932 Appendix A: words are bucketed by length (4..24); size_bits gives the index width per bucket,
 # offsets the cumulative byte offset of each bucket (derived from size_bits; last bucket end == 122784).
@@ -180,28 +193,45 @@ class BrotliError(Exception):
 
 
 def _loadTables():
-    global _DICTIONARY, _CONTEXT
-    if _DICTIONARY is not None:
-        return
+    global _TABLES
+    tables = _TABLES
+    if tables is not None:                                 # fast path: already published (dict, context) tuple
+        return tables
 
-    path = None
-    try:
-        from lib.core.data import paths
-        path = getattr(paths, "BROTLI_DICTIONARY", None)
-    except ImportError:
-        pass
-    if not path or not os.path.isfile(path):
-        path = os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, "data", "txt", "brotli-dictionary.tx_")
+    with _TABLES_LOCK:
+        if _TABLES is not None:                            # another thread won the race
+            return _TABLES
+        try:
+            path = None
+            try:
+                from lib.core.data import paths
+                path = getattr(paths, "BROTLI_DICTIONARY", None)
+            except ImportError:
+                pass
+            if not path or not os.path.isfile(path):
+                path = os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, "data", "txt", "brotli-dictionary.tx_")
 
-    archive = zipfile.ZipFile(path)                        # ZIP-packed like wordlist.tx_ / catalog-identifiers.tx_
-    try:
-        raw = archive.read(archive.namelist()[0])
-    finally:
-        archive.close()
-    if len(raw) != 122784 + 2048:
-        raise BrotliError("invalid Brotli dictionary table")
-    _DICTIONARY = raw[:122784]
-    _CONTEXT = bytearray(raw[122784:])
+            archive = zipfile.ZipFile(path)                # ZIP-packed like wordlist.tx_ / catalog-identifiers.tx_
+            try:
+                names = archive.namelist()
+                if len(names) != 1:
+                    raise BrotliError("unexpected Brotli dictionary archive layout")
+                raw = archive.read(names[0])
+            finally:
+                archive.close()
+        except BrotliError:
+            raise
+        except Exception as ex:
+            raise BrotliError("could not load the Brotli dictionary (%s)" % ex)
+
+        if len(raw) != _DICTIONARY_SIZE + _CONTEXT_SIZE:
+            raise BrotliError("invalid Brotli dictionary length")
+        if hashlib.sha256(raw[:_DICTIONARY_SIZE]).hexdigest() != _TABLES_SHA256:
+            raise BrotliError("Brotli dictionary integrity check failed")
+
+        # build both, then publish the pair atomically so a concurrent reader never sees a half-set state
+        _TABLES = (raw[:_DICTIONARY_SIZE], bytearray(raw[_DICTIONARY_SIZE:]))
+        return _TABLES
 
 
 class _BitReader(object):
@@ -225,17 +255,23 @@ class _BitReader(object):
             return 0
         if self.bits < count:
             self._fill()
+            if self.bits < count:                          # ran off the end of the stream -> truncated, not zero-padded
+                raise BrotliError("truncated Brotli stream")
         value = self.acc & ((1 << count) - 1)
         self.acc >>= count
         self.bits -= count
         return value
 
     def peek(self, count):
+        # lenient lookahead (a prefix-code peek may legitimately reach past the final byte); only the
+        # matching drop() actually consumes, and drop() rejects consuming more than really remains
         if self.bits < count:
             self._fill()
         return self.acc & ((1 << count) - 1)
 
     def drop(self, count):
+        if self.bits < count:                              # the matched code needs bits the stream does not have
+            raise BrotliError("truncated Brotli stream")
         self.acc >>= count
         self.bits -= count
 
@@ -253,9 +289,16 @@ class _BitReader(object):
             self.bits -= 8
             count -= 1
         if count > 0:
+            if self.pos + count > self.size:
+                raise BrotliError("truncated Brotli stream")
             out += self.data[self.pos:self.pos + count]
             self.pos += count
         return bytes(out)
+
+    def exhausted(self):
+        # true once no whole real bytes remain beyond the current (partial) byte - used to reject
+        # trailing garbage after the final meta-block
+        return self.pos >= self.size and self.bits < 8
 
 
 def _reverseBits(value, count):
@@ -269,54 +312,66 @@ def _reverseBits(value, count):
 class _Huffman(object):
     __slots__ = ("maxLength", "table", "single")
 
-    def __init__(self, lengths):
+    def __init__(self, lengths, budget=None):
         self.single = None
         self.table = None
         self.maxLength = max(lengths) if lengths else 0
-        if self.maxLength == 0:
-            self.single = 0
-            for symbol, length in enumerate(lengths):
-                if length > 0:
-                    self.single = symbol
+        used = [(symbol, length) for symbol, length in enumerate(lengths) if length]
+        if not used:
+            raise BrotliError("empty Brotli prefix code")
+        if self.maxLength == 0 or len(used) == 1:          # a one-symbol code is always that symbol (0 bits)
+            self.single = used[0][0]
+            self.maxLength = 0
             return
 
+        if budget is not None:
+            budget[0] -= (1 << self.maxLength)
+            if budget[0] < 0:
+                raise BrotliError("Brotli decoder table budget exceeded")
+
         counts = [0] * (self.maxLength + 1)
-        for length in lengths:
-            if length:
-                counts[length] += 1
+        for _, length in used:
+            counts[length] += 1
         nextCode = [0] * (self.maxLength + 2)
         code = 0
+        space = 0
         for bits in range(1, self.maxLength + 1):
             code = (code + counts[bits - 1]) << 1
             nextCode[bits] = code
+            space += counts[bits] << (self.maxLength - bits)
+        if space != (1 << self.maxLength):                 # over- or under-subscribed prefix code (must be complete)
+            raise BrotliError("invalid Brotli prefix code")
 
-        self.table = [(0, 0)] * (1 << self.maxLength)
-        for symbol, length in enumerate(lengths):
-            if length:
-                reversed_ = _reverseBits(nextCode[length], length)
-                nextCode[length] += 1
-                step = 1 << length
-                for index in range(reversed_, 1 << self.maxLength, step):
-                    self.table[index] = (symbol, length)
+        self.table = [None] * (1 << self.maxLength)        # None = unreachable slot (rejected on decode)
+        for symbol, length in used:
+            reversed_ = _reverseBits(nextCode[length], length)
+            nextCode[length] += 1
+            step = 1 << length
+            for index in range(reversed_, 1 << self.maxLength, step):
+                self.table[index] = (symbol, length)
 
     def decode(self, reader):
         if self.table is None:
             return self.single
-        symbol, length = self.table[reader.peek(self.maxLength)]
-        reader.drop(length)
-        return symbol
+        entry = self.table[reader.peek(self.maxLength)]
+        if entry is None:                                  # bits matched no code -> malformed stream
+            raise BrotliError("invalid Brotli prefix code")
+        reader.drop(entry[1])
+        return entry[0]
 
 
-def _readSimplePrefix(reader, alphabetSize):
+def _readSimplePrefix(reader, alphabetSize, budget):
     count = reader.readBits(2) + 1
     symbolBits = (alphabetSize - 1).bit_length() or 1
     symbols = [reader.readBits(symbolBits) for _ in range(count)]
-    lengths = [0] * alphabetSize
+    for symbol in symbols:
+        if symbol >= alphabetSize:
+            raise BrotliError("out-of-range symbol in Brotli simple prefix code")
+    if len(set(symbols)) != count:
+        raise BrotliError("duplicate symbol in Brotli simple prefix code")
     if count == 1:
-        huffman = _Huffman([])
-        huffman.single = symbols[0]
-        return huffman
-    if count == 2:
+        pairs = [(symbols[0], 1)]                          # one symbol -> _Huffman makes it a 0-bit code
+    elif count == 2:
         pairs = [(symbols[0], 1), (symbols[1], 1)]
     elif count == 3:
         pairs = [(symbols[0], 1), (symbols[1], 2), (symbols[2], 2)]
@@ -324,12 +379,13 @@ def _readSimplePrefix(reader, alphabetSize):
         pairs = [(symbols[0], 1), (symbols[1], 2), (symbols[2], 3), (symbols[3], 3)]
     else:
         pairs = [(symbols[0], 2), (symbols[1], 2), (symbols[2], 2), (symbols[3], 2)]
+    lengths = [0] * alphabetSize
     for symbol, length in pairs:
         lengths[symbol] = length
-    return _Huffman(lengths)
+    return _Huffman(lengths, budget)
 
 
-def _readComplexPrefix(reader, alphabetSize, skip):
+def _readComplexPrefix(reader, alphabetSize, skip, budget):
     codeLengths = [0] * 18
     space = 32
     for symbol in _CL_ORDER[skip:]:
@@ -340,7 +396,7 @@ def _readComplexPrefix(reader, alphabetSize, skip):
             space -= 32 >> codeLengths[symbol]
         if space <= 0:
             break
-    codeLengthHuffman = _Huffman(codeLengths)
+    codeLengthHuffman = _Huffman(codeLengths, budget)
 
     lengths = [0] * alphabetSize
     symbol = 0
@@ -370,20 +426,20 @@ def _readComplexPrefix(reader, alphabetSize, skip):
             repeat += delta + 3
             emit = repeat - old
             for _ in range(emit):
-                if symbol >= alphabetSize:
-                    break
+                if symbol >= alphabetSize:                 # a run past the alphabet is a malformed stream
+                    raise BrotliError("Brotli code-length run exceeds alphabet")
                 lengths[symbol] = repeatLength
                 symbol += 1
             if repeatLength:
                 space -= emit << (15 - repeatLength)
-    return _Huffman(lengths)
+    return _Huffman(lengths, budget)
 
 
-def _readPrefix(reader, alphabetSize):
+def _readPrefix(reader, alphabetSize, budget):
     header = reader.readBits(2)
     if header == 1:
-        return _readSimplePrefix(reader, alphabetSize)
-    return _readComplexPrefix(reader, alphabetSize, header)
+        return _readSimplePrefix(reader, alphabetSize, budget)
+    return _readComplexPrefix(reader, alphabetSize, header, budget)
 
 
 def _readBlockTypeCount(reader):
@@ -393,19 +449,24 @@ def _readBlockTypeCount(reader):
     return (1 << bits) + 1 + reader.readBits(bits)
 
 
-def _readContextMap(reader, treeCount, size):
+def _readContextMap(reader, treeCount, size, budget):
     maxRun = reader.readBits(4) + 1 if reader.readBits(1) else 0
-    huffman = _readPrefix(reader, treeCount + maxRun)
+    huffman = _readPrefix(reader, treeCount + maxRun, budget)
     contextMap = []
     while len(contextMap) < size:
         code = huffman.decode(reader)
         if code == 0:
             contextMap.append(0)
         elif code <= maxRun:
-            contextMap.extend([0] * ((1 << code) + reader.readBits(code)))
+            run = (1 << code) + reader.readBits(code)
+            if len(contextMap) + run > size:               # a run past the declared map size is malformed
+                raise BrotliError("Brotli context map run overruns the map")
+            contextMap.extend([0] * run)
         else:
-            contextMap.append(code - maxRun)
-    del contextMap[size:]
+            value = code - maxRun
+            if value >= treeCount:                         # references a tree that was not declared
+                raise BrotliError("Brotli context map references an undefined tree")
+            contextMap.append(value)
     if reader.readBits(1):                                 # inverse move-to-front
         moveToFront = list(range(256))
         for i in range(len(contextMap)):
@@ -456,11 +517,8 @@ def decompress(data, maxOutput=100 * 1024 * 1024):
     """Decompress a Brotli (RFC 7932) stream, returning the original bytes. Raises BrotliError on a
     malformed stream or if the output would exceed 'maxOutput' (an anti-decompression-bomb cap)."""
 
-    _loadTables()
-    dictionary = _DICTIONARY
-    context = _CONTEXT
-
     try:
+        dictionary, context = _loadTables()
         reader = _BitReader(data)
         header = reader.readBits(1)
         if header == 0:
@@ -506,12 +564,14 @@ def decompress(data, maxOutput=100 * 1024 * 1024):
                     raise BrotliError("output too large")
                 continue
 
+            budget = [_MAX_HUFFMAN_TABLE_ENTRIES]          # per-meta-block Huffman memory ceiling
+
             typesL = _readBlockTypeCount(reader)
             blockL, typeHuffmanL, lengthHuffmanL, prevTypeL = 1 << 28, None, None, 1
             typeL = 0
             if typesL >= 2:
-                typeHuffmanL = _readPrefix(reader, typesL + 2)
-                lengthHuffmanL = _readPrefix(reader, 26)
+                typeHuffmanL = _readPrefix(reader, typesL + 2, budget)
+                lengthHuffmanL = _readPrefix(reader, 26, budget)
                 code = lengthHuffmanL.decode(reader)
                 blockL = _BLEN_BASE[code] + reader.readBits(_BLEN_EXTRA[code])
 
@@ -519,8 +579,8 @@ def decompress(data, maxOutput=100 * 1024 * 1024):
             blockI, typeHuffmanI, lengthHuffmanI, prevTypeI = 1 << 28, None, None, 1
             typeI = 0
             if typesI >= 2:
-                typeHuffmanI = _readPrefix(reader, typesI + 2)
-                lengthHuffmanI = _readPrefix(reader, 26)
+                typeHuffmanI = _readPrefix(reader, typesI + 2, budget)
+                lengthHuffmanI = _readPrefix(reader, 26, budget)
                 code = lengthHuffmanI.decode(reader)
                 blockI = _BLEN_BASE[code] + reader.readBits(_BLEN_EXTRA[code])
 
@@ -528,8 +588,8 @@ def decompress(data, maxOutput=100 * 1024 * 1024):
             blockD, typeHuffmanD, lengthHuffmanD, prevTypeD = 1 << 28, None, None, 1
             typeD = 0
             if typesD >= 2:
-                typeHuffmanD = _readPrefix(reader, typesD + 2)
-                lengthHuffmanD = _readPrefix(reader, 26)
+                typeHuffmanD = _readPrefix(reader, typesD + 2, budget)
+                lengthHuffmanD = _readPrefix(reader, 26, budget)
                 code = lengthHuffmanD.decode(reader)
                 blockD = _BLEN_BASE[code] + reader.readBits(_BLEN_EXTRA[code])
 
@@ -538,14 +598,14 @@ def decompress(data, maxOutput=100 * 1024 * 1024):
             contextModes = [reader.readBits(2) for _ in range(typesL)]
 
             treesL = _readBlockTypeCount(reader)
-            contextMapL = _readContextMap(reader, treesL, typesL * 64) if treesL >= 2 else [0] * (typesL * 64)
+            contextMapL = _readContextMap(reader, treesL, typesL * 64, budget) if treesL >= 2 else [0] * (typesL * 64)
             treesD = _readBlockTypeCount(reader)
-            contextMapD = _readContextMap(reader, treesD, typesD * 4) if treesD >= 2 else [0] * (typesD * 4)
+            contextMapD = _readContextMap(reader, treesD, typesD * 4, budget) if treesD >= 2 else [0] * (typesD * 4)
 
-            huffmanL = [_readPrefix(reader, 256) for _ in range(treesL)]
-            huffmanI = [_readPrefix(reader, 704) for _ in range(typesI)]
+            huffmanL = [_readPrefix(reader, 256, budget) for _ in range(treesL)]
+            huffmanI = [_readPrefix(reader, 704, budget) for _ in range(typesI)]
             distanceAlphabet = 16 + direct + (48 << postfix)
-            huffmanD = [_readPrefix(reader, distanceAlphabet) for _ in range(treesD)]
+            huffmanD = [_readPrefix(reader, distanceAlphabet, budget) for _ in range(treesD)]
 
             produced = 0
             while produced < metaLength:
@@ -614,6 +674,9 @@ def decompress(data, maxOutput=100 * 1024 * 1024):
                         low = value & ((1 << postfix) - 1)
                         distance = ((((2 + (high & 1)) << extraBits) - 4 + extra) << postfix) + low + direct + 1
 
+                if distance <= 0:                          # a ring/short-code computation must yield >= 1
+                    raise BrotliError("invalid Brotli distance")
+
                 maxDistance = min(len(out), maxBackward)
                 if distanceCode != 0 and distance <= maxDistance:
                     distRing[distIndex & 3] = distance
@@ -637,6 +700,8 @@ def decompress(data, maxOutput=100 * 1024 * 1024):
                         raise BrotliError("invalid dictionary transform")
                     start = _OFFSETS[copyLength] + index * copyLength
                     word = _applyTransform(transformId, dictionary[start:start + copyLength])
+                    if produced + len(word) > metaLength:  # a transformed word must still fit the block
+                        raise BrotliError("dictionary word exceeds meta-block length")
                     out += word
                     produced += len(word)
 
@@ -645,6 +710,13 @@ def decompress(data, maxOutput=100 * 1024 * 1024):
 
             if isLast:
                 break
+
+        # after the final meta-block only zero byte-alignment padding may remain: no whole leftover bytes
+        # (trailing garbage) and the padding bits themselves must be zero (RFC 7932)
+        if reader.bits + (reader.size - reader.pos) * 8 >= 8:
+            raise BrotliError("trailing data after Brotli stream")
+        if reader.acc != 0:
+            raise BrotliError("non-zero Brotli padding bits")
         return bytes(out)
     except BrotliError:
         raise

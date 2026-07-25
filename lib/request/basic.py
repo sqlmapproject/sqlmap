@@ -325,9 +325,14 @@ def decodePage(page, contentEncoding, contentType, percentDecode=True):
             elif contentEncoding == "zstd":
                 if _zstd is None:
                     raise Exception("no Zstandard decoder available")
-                page = _zstd.decompress(page)
+                # bounded streaming decode: cap output at MAX_CONNECTION_TOTAL_SIZE without allocating the
+                # full result first, and enforce the 8 MB window the HTTP 'zstd' coding mandates
+                decompressor = _zstd.ZstdDecompressor(options={_zstd.DecompressionParameter.window_log_max: 23})
+                page = decompressor.decompress(page, max_length=MAX_CONNECTION_TOTAL_SIZE + 1)
                 if len(page) > MAX_CONNECTION_TOTAL_SIZE:
                     raise Exception("size too large")
+                if not decompressor.eof:
+                    raise Exception("incomplete Zstandard stream")
             else:
                 data = gzip.GzipFile("", "rb", 9, io.BytesIO(page))
                 page = data.read(MAX_CONNECTION_TOTAL_SIZE + 1)
