@@ -2360,6 +2360,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
 
     if flushAll:
         kb.checkSitemap = None
+        kb.crawledHosts = set()                            # hosts whose robots.txt / well-known paths were already probed
         kb.headerPaths = {}
         kb.keywords = set(getFileItems(paths.SQL_KEYWORDS))
         kb.lastCtrlCTime = None

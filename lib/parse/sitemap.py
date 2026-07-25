@@ -13,12 +13,18 @@ from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.datatype import OrderedSet
 from lib.core.exception import SqlmapSyntaxException
+from lib.core.settings import MAX_SITEMAP_FETCHES
+from lib.core.settings import MAX_SITEMAP_URLS
 from lib.request.connect import Connect as Request
 from thirdparty.six.moves import http_client as _http_client
 
 abortedFlag = None
 
-def parseSitemap(url, retVal=None, visited=None):
+def parseSitemap(url, retVal=None, visited=None, urlFilter=None):
+    """Parse a sitemap (recursively following nested sitemap indexes). 'urlFilter' - when given - must
+    return True for a URL to be fetched or kept; it is enforced on the initial URL AND every nested
+    sitemap fetched recursively, so a hostile sitemap index cannot pull the crawler out of scope."""
+
     global abortedFlag
 
     if retVal is not None:
@@ -30,10 +36,16 @@ def parseSitemap(url, retVal=None, visited=None):
             retVal = OrderedSet()
             visited = set()
 
-        if url in visited:
+        if url in visited or (urlFilter is not None and not urlFilter(url)):
             return retVal
 
         visited.add(url)
+
+        if len(visited) > MAX_SITEMAP_FETCHES or len(retVal) >= MAX_SITEMAP_URLS:   # bound a hostile sitemap graph
+            if not abortedFlag:                                                     # warn once on the False->True transition
+                logger.warning("sitemap parsing stopped after reaching the fetch/URL limit. sqlmap will use partial list")
+            abortedFlag = True
+            return retVal
 
         try:
             content = Request.getPage(url=url, raise404=True)[0] if not abortedFlag else ""
@@ -45,7 +57,7 @@ def parseSitemap(url, retVal=None, visited=None):
             content = re.sub(r"<!--.*?-->", "", content, flags=re.DOTALL)  # Note: strip (possibly multi-line) XML comments so commented-out <loc> entries aren't harvested
 
             for match in re.finditer(r"<\w*?loc[^>]*>\s*([^<]+)", content, re.I):
-                if abortedFlag:
+                if abortedFlag or len(retVal) >= MAX_SITEMAP_URLS:
                     break
 
                 foundUrl = htmlUnescape(match.group(1).strip())
@@ -60,8 +72,8 @@ def parseSitemap(url, retVal=None, visited=None):
                         kb.followSitemapRecursion = readInput(message, default='N', boolean=True)
 
                     if kb.followSitemapRecursion:
-                        parseSitemap(foundUrl, retVal, visited)
-                else:
+                        parseSitemap(foundUrl, retVal, visited, urlFilter)
+                elif urlFilter is None or urlFilter(foundUrl):
                     retVal.add(foundUrl)
 
     except KeyboardInterrupt:

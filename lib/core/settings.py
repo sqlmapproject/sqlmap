@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.7.187"
+VERSION = "1.10.7.188"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -790,6 +790,21 @@ DUMMY_USER_INJECTION = r"(?i)[^\w](AND|OR)\s+[^\s]+[=><]|\bUNION\b.+\bSELECT\b|\
 # Extensions skipped by crawler
 CRAWL_EXCLUDE_EXTENSIONS = frozenset(("3ds", "3g2", "3gp", "7z", "DS_Store", "a", "aac", "accdb", "access", "adp", "ai", "aif", "aiff", "apk", "ar", "asf", "au", "avi", "bak", "bin", "bk", "bkp", "bmp", "btif", "bz2", "c", "cab", "caf", "cfg", "cgm", "cmx", "com", "conf", "config", "cpio", "cpp", "cr2", "cue", "dat", "db", "dbf", "deb", "debug", "djvu", "dll", "dmg", "dmp", "dng", "doc", "docx", "dot", "dotx", "dra", "dsk", "dts", "dtshd", "dvb", "dwg", "dxf", "dylib", "ear", "ecelp4800", "ecelp7470", "ecelp9600", "egg", "elf", "env", "eol", "eot", "epub", "error", "exe", "f4v", "fbs", "fh", "fla", "flac", "fli", "flv", "fpx", "fst", "fvt", "g3", "gif", "go", "gz", "h", "h261", "h263", "h264", "ico", "ief", "img", "ini", "ipa", "iso", "jar", "java", "jpeg", "jpg", "jpgv", "jpm", "js", "jxr", "ktx", "lock", "log", "lvp", "lz", "lzma", "lzo", "m3u", "m4a", "m4v", "mar", "mdb", "mdi", "mid", "mj2", "mka", "mkv", "mmr", "mng", "mov", "movie", "mp3", "mp4", "mp4a", "mpeg", "mpg", "mpga", "msi", "mxu", "nef", "npx", "nrg", "o", "oga", "ogg", "ogv", "old", "otf", "ova", "ovf", "pbm", "pcx", "pdf", "pea", "pgm", "pic", "pid", "pkg", "png", "pnm", "ppm", "pps", "ppt", "pptx", "ps", "psd", "py", "pya", "pyc", "pyo", "pyv", "qt", "rar", "ras", "raw", "rb", "rgb", "rip", "rlc", "rs", "run", "rz", "s3m", "s7z", "scm", "scpt", "service", "sgi", "shar", "sil", "smv", "so", "sock", "socket", "sqlite", "sqlitedb", "sub", "svc", "swf", "swo", "swp", "sys", "tar", "tbz2", "temp", "tga", "tgz", "tif", "tiff", "tlz", "tmp", "toast", "torrent", "ts", "ttf", "uvh", "uvi", "uvm", "uvp", "uvs", "uvu", "vbox", "vdi", "vhd", "vhdx", "viv", "vmdk", "vmx", "vob", "vxd", "war", "wav", "wax", "wbmp", "wdp", "weba", "webm", "webp", "whl", "wm", "wma", "wmv", "wmx", "woff", "woff2", "wvx", "xbm", "xif", "xls", "xlsx", "xlt", "xm", "xpi", "xpm", "xwd", "xz", "yaml", "yml", "z", "zip", "zipx"))
 
+# Endpoint mining inside JavaScript bundles during crawling (SPA API routes live in .js, invisible to
+# href/src scraping): quoted absolute-path or same-origin-URL string literals (fetch/axios/XHR targets).
+# MAX_* caps per-bundle results so a noisy minified file cannot flood the target list.
+JAVASCRIPT_ENDPOINT_REGEX = r'''["'`](?P<result>(?:https?:)?//[\w.:@-]+/[^"'`\s]*|/[A-Za-z0-9_][^"'`\s]*)["'`]'''
+MAX_JAVASCRIPT_ENDPOINTS = 200
+# only the leading slice of a bundle/source-map is scanned for endpoints - bounds CPU/RAM on a hostile response
+MAX_JAVASCRIPT_MINE_SIZE = 1 * 1024 * 1024
+# max source distance (chars) between a string-constant assignment and a `name + "/suffix"` use it may fold into
+MAX_JAVASCRIPT_FOLD_DISTANCE = 2048
+# cap on Disallow/Allow/Sitemap lines consumed from a (potentially hostile) robots.txt
+MAX_ROBOTS_ENTRIES = 1000
+# bounds on sitemap parsing: number of sitemap documents fetched (recursion fan-out) and total URLs kept
+MAX_SITEMAP_FETCHES = 100
+MAX_SITEMAP_URLS = 100000
+
 # Patterns often seen in HTTP headers containing custom injection marking character '*'
 # Note: the ';q=' quality-value class excludes '*' so a user-placed injection mark right after a
 # quality value (e.g. 'Accept: ...;q=0.9*') is not swallowed (ref: #5357 - header injection was then
@@ -982,6 +997,10 @@ NOSQL_MAX_LENGTH = 1024
 
 # GraphQL endpoint paths to probe when the user supplies a base URL with --graphql (no explicit /graphql)
 GRAPHQL_ENDPOINT_PATHS = ("/graphql", "/api/graphql", "/v1/graphql", "/api/v1/graphql", "/graphql/api", "/graphql/console", "/graphql.php", "/graphiql", "/graph", "/gql", "/query")
+
+# Self-describing JSON endpoint directories probed once per host during crawling: OIDC discovery lists the
+# auth/token/userinfo URLs, OpenAPI/Swagger specs enumerate the whole API (their paths are mined as endpoints)
+WELL_KNOWN_ENDPOINT_PATHS = ("/.well-known/openid-configuration", "/swagger.json", "/openapi.json", "/swagger/v1/swagger.json", "/api-docs", "/v2/api-docs", "/v3/api-docs", "/api/swagger.json", "/api/openapi.json")
 
 # Seed field/argument names used to recover a GraphQL schema from "Did you mean" suggestion error
 # messages when introspection is disabled (the field-suggestion / "Clairvoyance" technique)

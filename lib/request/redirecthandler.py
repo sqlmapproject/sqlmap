@@ -122,7 +122,13 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
                     redurl = _urllib.parse.urljoin(req.get_full_url(), redurl)
 
                 self._infinite_loop_check(req)
-                if conf.scope:
+                crawlRedirectFilter = getattr(threadData, "crawlRedirectFilter", None)
+                if crawlRedirectFilter is not None and not crawlRedirectFilter(redurl):
+                    # a crawler recon/source-map fetch carries the session cookie; it must NOT follow an
+                    # (attacker-controlled) redirect out of scope - reject the hop before it is made, so the
+                    # cookie never reaches the off-scope destination (works even when no explicit --scope is set)
+                    redurl = None
+                elif conf.scope:
                     if not re.search(conf.scope, redurl, re.I):
                         redurl = None
                     else:
