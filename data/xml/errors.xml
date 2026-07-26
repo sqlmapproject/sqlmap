@@ -233,7 +233,7 @@
         <error regexp="cubrid\.jdbc\.driver"/>
     </dbms>
 
-    <dbms value="Cache">
+    <dbms value="InterSystems Cache">
         <error regexp="encountered after end of query"/>
         <error regexp="A comparison operator is required here"/>
     </dbms>
