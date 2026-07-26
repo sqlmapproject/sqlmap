@@ -11,6 +11,7 @@ import codecs
 import collections
 import functools
 import glob
+import importlib
 import inspect
 import json
 import logging
@@ -890,6 +891,7 @@ def _setTamperingFunctions():
                 sys.path.insert(0, dirname)
 
             try:
+                importlib.invalidate_caches()  # Note: a script just written into an already-scanned dir is invisible to a cached FileFinder (e.g. on Windows, coarse mtime)
                 module = __import__(safeFilepathEncode(filename[:-3]))
             except Exception as ex:
                 raise SqlmapSyntaxException("cannot import tamper module '%s' (%s)" % (getUnicode(filename[:-3]), getSafeExString(ex)))
@@ -998,6 +1000,7 @@ def _setPreprocessFunctions():
                 sys.path.insert(0, dirname)
 
             try:
+                importlib.invalidate_caches()  # Note: a script just written into an already-scanned dir is invisible to a cached FileFinder (e.g. on Windows, coarse mtime)
                 module = __import__(safeFilepathEncode(filename[:-3]))
             except Exception as ex:
                 raise SqlmapSyntaxException("cannot import preprocess module '%s' (%s)" % (getUnicode(filename[:-3]), getSafeExString(ex)))
@@ -1081,6 +1084,7 @@ def _setPostprocessFunctions():
                 sys.path.insert(0, dirname)
 
             try:
+                importlib.invalidate_caches()  # Note: a script just written into an already-scanned dir is invisible to a cached FileFinder (e.g. on Windows, coarse mtime)
                 module = __import__(safeFilepathEncode(filename[:-3]))
             except Exception as ex:
                 raise SqlmapSyntaxException("cannot import postprocess module '%s' (%s)" % (getUnicode(filename[:-3]), getSafeExString(ex)))
