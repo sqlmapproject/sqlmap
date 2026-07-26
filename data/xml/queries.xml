@@ -440,8 +440,8 @@
 
    <dbms value="Firebird">
         <!--Firebird doesn't like big VARCHARs-->
-        <cast query="TRIM(CAST(%s AS VARCHAR(8000)))"/>
-        <length query="CHAR_LENGTH(TRIM(%s))"/>
+        <cast query="TRIM(TRAILING FROM CAST(%s AS VARCHAR(8000)))"/>
+        <length query="CHAR_LENGTH(TRIM(TRAILING FROM %s))"/>
         <delimiter query="||"/>
         <limit query="ROWS %d TO %d"/>
         <limitregexp query="\s+ROWS\s+([\d]+)(\s+TO\s+([\d]+))?"/>
@@ -1026,7 +1026,7 @@
    </dbms>
 
     <dbms value="Vertica">
-        <cast query="CAST(%s AS CHARACTER(10000))"/>
+        <cast query="CAST(%s AS VARCHAR(10000))"/>
         <length query="LENGTH(%s)"/>
         <isnull query="COALESCE(%s,' ')"/>
         <delimiter query="||"/>
