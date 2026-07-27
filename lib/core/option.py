@@ -2281,6 +2281,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.maxConnectionsFlag = False
     kb.trueLength = None
     kb.mergeCookies = None
+    kb.mysqlUtf8mb4 = None
     kb.multiThreadMode = False
     kb.multipleCtrlC = False
     kb.negativeLogic = False

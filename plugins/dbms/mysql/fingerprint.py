@@ -95,6 +95,14 @@ class Fingerprint(GenericFingerprint):
 
         return None
 
+    def _checkUtf8mb4(self):
+        # NCHAR (utf8mb3) downgrades 4-byte chars (emoji) to '?'; cache whether utf8mb4 works ('' if not)
+        kb.mysqlUtf8mb4 = hashDBRetrieve(HASHDB_KEYS.MYSQL_UTF8MB4)
+
+        if kb.mysqlUtf8mb4 is None:
+            kb.mysqlUtf8mb4 = "utf8mb4" if inject.checkBooleanExpression("[RANDNUM]=CONVERT([RANDNUM] USING utf8mb4)") else ""
+            hashDBWrite(HASHDB_KEYS.MYSQL_UTF8MB4, kb.mysqlUtf8mb4)
+
     def getFingerprint(self):
         fork = hashDBRetrieve(HASHDB_KEYS.DBMS_FORK)
 
@@ -117,6 +125,8 @@ class Fingerprint(GenericFingerprint):
                 fork = ""
 
             hashDBWrite(HASHDB_KEYS.DBMS_FORK, fork)
+
+        self._checkUtf8mb4()
 
         value = ""
         wsOsFp = Format.getOs("web server", kb.headersFp)
