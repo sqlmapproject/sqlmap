@@ -1347,6 +1347,7 @@
     <dbms value="ClickHouse">
         <cast query="CAST(%s AS Nullable(String))"/>
         <length query="length(%s)"/>
+        <hex query="hex(%s)"/>
         <isnull query="ifNull(%s, '')"/>
         <delimiter query="||"/>
         <limit query="LIMIT %d OFFSET %d"/>

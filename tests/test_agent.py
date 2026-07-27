@@ -108,6 +108,7 @@ NULL_WRAPPER = {
 # hexConvertField: dialects that DO have a hex function, mapped to its token.
 HEX_FUNCTION = {
     "Altibase": "HEX_ENCODE(",
+    "ClickHouse": "hex(",
     "Cubrid": "HEX(",
     "H2": "RAWTOHEX(",
     "IBM DB2": "HEX(",
