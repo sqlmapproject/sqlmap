@@ -530,6 +530,9 @@ class Agent(object):
                 elif Backend.isDbms(DBMS.MYSQL) and kb.get("mysqlUtf8mb4"):
                     # NCHAR (utf8mb3) downgrades 4-byte chars (emoji) to '?'; utf8mb4 preserves them
                     nulledCastedField = "CAST(%s AS CHAR CHARACTER SET utf8mb4)" % field
+                elif Backend.isDbms(DBMS.DERBY) and re.search(r"(?i)\bCOUNT\(", field):
+                    # Derby rejects CAST(INTEGER AS VARCHAR); route the numeric COUNT through a CHAR intermediate
+                    nulledCastedField = rootQuery.cast.query % ("CAST(%s AS CHAR(254))" % field)
                 elif not (Backend.isDbms(DBMS.SQLITE) and not isDBMSVersionAtLeast('3')):
                     nulledCastedField = rootQuery.cast.query % field
 
