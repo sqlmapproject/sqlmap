@@ -644,7 +644,7 @@ class Connect(object):
                         conf.data = getattr(conf.data, UNENCODED_ORIGINAL_VALUE, conf.data)
                     else:
                         post = urldecode(post, convall=True)
-                        post = encodeBase64(post)
+                        post = encodeBase64(post, safe=conf.base64Safe)
 
                 if target and cmdLineOptions.method or method and method not in (HTTPMETHOD.GET, HTTPMETHOD.POST):
                     req = MethodRequest(url, post, headers)
