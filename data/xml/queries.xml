@@ -626,7 +626,7 @@
     <dbms value="IBM DB2">
         <!-- VARCHAR(32672) (DB2 max), not CHAR(254) which silently truncated values >254 chars; RTRIM kept to strip CHAR-column blank padding (DB2 <v9, which lacked the VARCHAR cast, is long unsupported) -->
         <cast query="RTRIM(CAST(%s AS VARCHAR(32672)))"/>
-        <length query="LENGTH(RTRIM(CAST(%s AS VARCHAR(32672))))"/>
+        <length query="CHARACTER_LENGTH(RTRIM(CAST(%s AS VARCHAR(32672))),CODEUNITS32)"/>
         <isnull query="COALESCE(%s,' ')"/>
         <delimiter query="||"/>
         <limit query="ROW_NUMBER() OVER () AS CAP %s) AS qq WHERE CAP"/>
@@ -638,11 +638,11 @@
         <count query="COUNT(%s)"/>
         <comment query="--"/>
         <!-- TODO -->
-        <substring query="SUBSTR((%s),%d,%d)"/>
+        <substring query="SUBSTRING((%s),%d,%d,CODEUNITS32)"/>
         <concatenate query="%s||%s"/>
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END) FROM SYSIBM.SYSDUMMY1"/>
         <hex query="HEX(%s)"/>
-        <inference query="SUBSTR((%s),%d,1)>'%c'"/>
+        <inference query="SUBSTRING((%s),%d,1,CODEUNITS32)>'%c'"/>
         <!-- NOTE: We have to use the complicated UDB OLAP functions in query2 because sqlmap injects isnull query inside MAX function, else we would use: SELECT MAX(versionnumber) FROM sysibm.sysversions -->
         <banner query="SELECT service_level FROM TABLE(sysproc.env_get_inst_info())" query2="SELECT versionnumber FROM (SELECT ROW_NUMBER() OVER (ORDER BY versionnumber DESC) AS CAP,versionnumber FROM sysibm.sysversions) AS qq WHERE CAP=1"/>
         <current_user query="SELECT user FROM SYSIBM.SYSDUMMY1"/>

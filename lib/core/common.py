@@ -4003,7 +4003,7 @@ def decodeIntToUnicode(value):
                     # Reference: https://docs.microsoft.com/en-us/sql/relational-databases/collations/collation-and-unicode-support?view=sql-server-2017 and https://stackoverflow.com/a/14488478
                     # supplementary codepoints (>0xFFFF, _SC collations) aren't 2-byte UTF-16; decode direct
                     retVal = _unichr(value) if value > 0xFFFF else getUnicode(raw, "UTF-16-BE")
-                elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE):     # Note: cases with Unicode code points (e.g. http://www.postgresqltutorial.com/postgresql-ascii/)
+                elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE, DBMS.DB2):     # Note: cases with Unicode code points (e.g. http://www.postgresqltutorial.com/postgresql-ascii/)
                     retVal = _unichr(value)
                 else:
                     retVal = getUnicode(raw, conf.encoding)
