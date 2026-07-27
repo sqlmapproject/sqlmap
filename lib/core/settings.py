@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.7.209"
+VERSION = "1.10.7.210"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -933,6 +933,10 @@ BINARY_FIELDS_TYPE_REGEX = r"(?i)binary|blob|bytea|image|\braw\b"
 # Uppercased keywords of the above, for building an in-SQL "is this column binary-typed?" check when only
 # column names (not types) were fetched - i.e. blind dumping (keep in sync with BINARY_FIELDS_TYPE_REGEX)
 BINARY_FIELDS_TYPE_KEYWORDS = ("BINARY", "BLOB", "BYTEA", "IMAGE", "RAW")
+
+# MySQL-only: BIT and spatial (WKB) columns store raw bytes that the NCHAR text-cast silently NULLs, so they
+# must be hex-extracted too (MSSQL/PostgreSQL 'bit' render fine as 0/1 or a bit-string, hence not global)
+MYSQL_BINARY_CAST_TYPE_REGEX = r"(?i)\A(bit|geometry|point|linestring|polygon|multipoint|multilinestring|multipolygon|geomcollection|geometrycollection)\b"
 
 # Maximum number of redirections to any single URL - this is needed because of the state that cookies introduce
 MAX_SINGLE_URL_REDIRECTIONS = 4

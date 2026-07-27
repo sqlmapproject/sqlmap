@@ -41,6 +41,7 @@ from lib.core.exception import SqlmapMissingMandatoryOptionException
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.core.settings import BINARY_FIELDS_TYPE_REGEX
+from lib.core.settings import MYSQL_BINARY_CAST_TYPE_REGEX
 from lib.core.settings import CHECK_ZERO_COLUMNS_THRESHOLD
 from lib.core.settings import CURRENT_DB
 from lib.core.settings import KEYSET_MIN_ROWS
@@ -178,8 +179,8 @@ class Entries(object):
                 # type is already known from the enumeration above, so this costs no extra request.
                 # (PostgreSQL excluded: its bytea already renders as readable '\xHEX' through the default text
                 # cast, and its hex path needs text input, so auto-hexing would double-encode.)
-                # MySQL BIT stores raw bits that the NCHAR text-cast NULLs (unlike MSSQL/PostgreSQL 'bit', which render as 0/1 or a bit-string), so hex it too
-                autoBinary = [] if Backend.isDbms(DBMS.PGSQL) else [column for column in colList if columns.get(column) and (re.search(BINARY_FIELDS_TYPE_REGEX, getUnicode(columns[column])) or (Backend.isDbms(DBMS.MYSQL) and re.search(r"(?i)\Abit\b", getUnicode(columns[column]))))]
+                # MySQL BIT/spatial store raw bytes the NCHAR text-cast NULLs (unlike MSSQL/PostgreSQL 'bit', which render fine), so hex them too
+                autoBinary = [] if Backend.isDbms(DBMS.PGSQL) else [column for column in colList if columns.get(column) and (re.search(BINARY_FIELDS_TYPE_REGEX, getUnicode(columns[column])) or (Backend.isDbms(DBMS.MYSQL) and re.search(MYSQL_BINARY_CAST_TYPE_REGEX, getUnicode(columns[column]))))]
                 conf.binaryFields = (list(binaryFields) if binaryFields else []) + [_ for _ in autoBinary if not (binaryFields and _ in binaryFields)]
                 if autoBinary:
                     debugMsg = "auto-treating binary column(s) '%s' as binary fields" % ', '.join(unsafeSQLIdentificatorNaming(_) for _ in autoBinary)
