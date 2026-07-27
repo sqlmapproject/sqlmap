@@ -554,7 +554,8 @@ def checkSqlInjection(place, parameter, value):
                             trueRawResponse = "%s%s" % (trueHeaders, truePage)
 
                             if conf.lengths:
-                                kb.trueLength = len(truePage)
+                                # under NULL connection the body is absent, so take the length HEAD/Range reported
+                                kb.trueLength = threadData.lastComparisonPageLength if kb.nullConnection else len(truePage)
                                 trueResult = True
 
                             if trueResult and not (truePage == falsePage and not any((kb.nullConnection, conf.code))):

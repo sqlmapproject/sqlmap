@@ -85,6 +85,7 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
         threadData.lastComparisonHeaders = listToStrValue(_ for _ in headers.headers if not _.startswith("%s:" % URI_HTTP_HEADER)) if headers else ""
         threadData.lastComparisonPage = page
         threadData.lastComparisonCode = code
+        threadData.lastComparisonPageLength = pageLength  # NULL connection carries the length here (no body)
 
     if page is None and pageLength is None:
         return None
@@ -114,9 +115,10 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
     if conf.code:
         return conf.code == code
 
-    # Response content length to match when the query is True
+    # Response content length to match when the query is True (NULL connection supplies the length via
+    # pageLength with no body, so fall back to it rather than len(None)=0 which would stall the oracle)
     if conf.lengths:
-        return len(page or "") == kb.trueLength
+        return (pageLength if page is None else len(page)) == kb.trueLength
 
     seqMatcher = threadData.seqMatcher
     seqMatcher.set_seq1(kb.pageTemplate)
