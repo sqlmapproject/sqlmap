@@ -178,7 +178,8 @@ class Entries(object):
                 # type is already known from the enumeration above, so this costs no extra request.
                 # (PostgreSQL excluded: its bytea already renders as readable '\xHEX' through the default text
                 # cast, and its hex path needs text input, so auto-hexing would double-encode.)
-                autoBinary = [] if Backend.isDbms(DBMS.PGSQL) else [column for column in colList if columns.get(column) and re.search(BINARY_FIELDS_TYPE_REGEX, getUnicode(columns[column]))]
+                # MySQL BIT stores raw bits that the NCHAR text-cast NULLs (unlike MSSQL/PostgreSQL 'bit', which render as 0/1 or a bit-string), so hex it too
+                autoBinary = [] if Backend.isDbms(DBMS.PGSQL) else [column for column in colList if columns.get(column) and (re.search(BINARY_FIELDS_TYPE_REGEX, getUnicode(columns[column])) or (Backend.isDbms(DBMS.MYSQL) and re.search(r"(?i)\Abit\b", getUnicode(columns[column]))))]
                 conf.binaryFields = (list(binaryFields) if binaryFields else []) + [_ for _ in autoBinary if not (binaryFields and _ in binaryFields)]
                 if autoBinary:
                     debugMsg = "auto-treating binary column(s) '%s' as binary fields" % ', '.join(unsafeSQLIdentificatorNaming(_) for _ in autoBinary)
