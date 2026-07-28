@@ -460,6 +460,21 @@ class TestLimitQuery(DbmsStateMixin, unittest.TestCase):
         self.assertIn("NOT IN", out.upper(), msg=out)
 
 
+class TestLimitConditionUserLimit(DbmsStateMixin, unittest.TestCase):
+    """A user LIMIT in --sql-query must be parsed AND stripped for the 'append LIMIT/OFFSET'
+    DBMSes, else limitQuery appends a 2nd LIMIT and blind/error read bogus offsets."""
+
+    APPEND_DBMSES = (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE, DBMS.H2, DBMS.CLICKHOUSE, DBMS.CRATEDB, DBMS.SPANNER, DBMS.HANA)
+
+    def test_user_limit_stripped_and_parsed(self):
+        for dbms in self.APPEND_DBMSES:
+            set_dbms(dbms)
+            expression, limitCond, _, startLimit, stopLimit = agent.limitCondition("SELECT name FROM t ORDER BY y LIMIT 3")
+            self.assertTrue(limitCond, msg=dbms)
+            self.assertEqual((startLimit, stopLimit), (0, 3), msg=dbms)
+            self.assertIsNone(re.search(r"(?i)\bLIMIT\b", expression), msg="%s not stripped: %s" % (dbms, expression))
+
+
 class TestWhereQuery(DbmsStateMixin, unittest.TestCase):
     """whereQuery only acts when conf.dumpWhere is set."""
 

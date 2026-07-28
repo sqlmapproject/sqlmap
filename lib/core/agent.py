@@ -1041,8 +1041,14 @@ class Agent(object):
         else:
             limitRegExp2 = None
 
+        # DBMSes whose paging is a simple appended "LIMIT ... OFFSET ..." (limitQuery '% (1, num)' group,
+        # limitregexp 'query2' for a bare LIMIT, groupstart=2/stop=1): a user-supplied LIMIT must be parsed
+        # AND stripped here, else limitQuery appends a SECOND LIMIT (e.g. '... LIMIT 3 LIMIT 1 OFFSET n' on
+        # ClickHouse) and per-row extraction (blind/error) reads bogus offsets - only UNION was unaffected.
+        limitOffsetAppendDbmses = (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE, DBMS.H2, DBMS.CLICKHOUSE, DBMS.CRATEDB, DBMS.SPANNER, DBMS.HANA)
+
         if (limitRegExp or limitRegExp2) or (Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) and topLimit):
-            if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE, DBMS.H2):
+            if Backend.getIdentifiedDbms() in limitOffsetAppendDbmses:
                 limitGroupStart = queries[Backend.getIdentifiedDbms()].limitgroupstart.query
                 limitGroupStop = queries[Backend.getIdentifiedDbms()].limitgroupstop.query
 
@@ -1084,7 +1090,7 @@ class Agent(object):
 
                 # From now on we need only the expression until the " LIMIT "
                 # (or equivalent, depending on the back-end DBMS) word
-                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE):
+                if Backend.getIdentifiedDbms() in limitOffsetAppendDbmses:
                     stopLimit += startLimit
                     if expression.find(queries[Backend.getIdentifiedDbms()].limitstring.query) > 0:
                         _ = expression.index(queries[Backend.getIdentifiedDbms()].limitstring.query)
