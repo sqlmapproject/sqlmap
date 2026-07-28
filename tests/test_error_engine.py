@@ -18,6 +18,7 @@ pre-set so the MySQL/MSSQL chunk-length probing loop is skipped.
 """
 
 import os
+import re
 import sys
 import unittest
 
@@ -28,6 +29,7 @@ bootstrap()
 from lib.core.data import conf, kb
 from lib.core.datatype import AttribDict
 from lib.core.enums import PAYLOAD, PLACE
+from lib.core.settings import MIN_ERROR_CHUNK_LENGTH
 from lib.request.connect import Connect
 import lib.techniques.error.use as eu
 
@@ -107,6 +109,87 @@ class TestOneShotErrorUse(unittest.TestCase):
         Connect.queryPage = staticmethod(oracle)
         eu.Request.queryPage = staticmethod(oracle)
         self.assertIsNone(eu._oneShotErrorUse("SELECT CONCAT(user())"))
+
+
+class TestErrorChunkLengthHex(unittest.TestCase):
+    """Regression: the error-chunk-length search measures the channel's CHARACTER capacity, which is
+    hex-independent. A hex-wrapped/decoded probe used to mis-detect and pin the length to the minimum,
+    ~doubling request count under --hex (live: 101 vs 45 for a 400-char value). The detected length
+    must be the same with and without --hex."""
+
+    CAP = 60   # mock error channel shows at most CAP chars of the delimited payload (like EXTRACTVALUE)
+
+    def setUp(self):
+        self._saved = {
+            "hexConvert": conf.get("hexConvert"), "charset": conf.get("charset"),
+            "hashDB": conf.get("hashDB"), "parameters": conf.get("parameters"),
+            "paramDict": conf.get("paramDict"), "base64Parameter": conf.get("base64Parameter"),
+            "errorChunkLength": kb.get("errorChunkLength"), "testMode": kb.get("testMode"),
+            "forceWhere": kb.get("forceWhere"), "technique": kb.get("technique"),
+            "inj": (kb.injection.place, kb.injection.parameter, kb.injection.data),
+            "qp": Connect.queryPage,
+        }
+        conf.hexConvert = False
+        conf.charset = None
+        conf.hashDB = None
+        conf.parameters = {PLACE.GET: "id=1"}
+        conf.paramDict = {PLACE.GET: {"id": "1"}}
+        conf.base64Parameter = ()
+        kb.testMode = False
+        kb.forceWhere = None
+        kb.injection.place = PLACE.GET
+        kb.injection.parameter = "id"
+        kb.technique = PAYLOAD.TECHNIQUE.ERROR
+        kb.injection.data = {PAYLOAD.TECHNIQUE.ERROR: _make_vector()}
+        set_dbms("MySQL")
+
+    def tearDown(self):
+        conf.hexConvert = self._saved["hexConvert"]
+        conf.charset = self._saved["charset"]
+        conf.hashDB = self._saved["hashDB"]
+        conf.parameters = self._saved["parameters"]
+        conf.paramDict = self._saved["paramDict"]
+        conf.base64Parameter = self._saved["base64Parameter"]
+        kb.errorChunkLength = self._saved["errorChunkLength"]
+        kb.testMode = self._saved["testMode"]
+        kb.forceWhere = self._saved["forceWhere"]
+        kb.technique = self._saved["technique"]
+        kb.injection.place, kb.injection.parameter, kb.injection.data = self._saved["inj"]
+        Connect.queryPage = self._saved["qp"]
+        eu.Request.queryPage = self._saved["qp"]
+
+    def _install_oracle(self, secret="hello"):
+        cap = self.CAP
+
+        def oracle(payload=None, content=False, raise404=True, **kwargs):
+            m = re.search(r"REPEAT\((?:0x([0-9a-fA-F]{2})|'(.)'),(\d+)\)", payload)      # chunk-length probe
+            if m:
+                raw = (chr(int(m.group(1), 16)) if m.group(1) else m.group(2)) * int(m.group(3))
+            else:
+                raw = secret
+            value = "".join("%02X" % _ for _ in bytearray(raw.encode("latin-1"))) if re.search(r"\bHEX\(", payload) else raw
+            mm = re.search(r"(?:MID|SUBSTRING)\(\(.+\),(\d+),(\d+)\)", payload)
+            if mm:
+                off, ln = int(mm.group(1)), int(mm.group(2))
+                value = value[off - 1:off - 1 + ln]
+            page = "XPATH syntax error: '%s'" % ("%s%s%s" % (kb.chars.start, value, kb.chars.stop))[:cap]
+            return (page, {}, 200) if content else True
+
+        Connect.queryPage = staticmethod(oracle)
+        eu.Request.queryPage = staticmethod(oracle)
+
+    def _detect(self, hexConvert):
+        conf.hexConvert = hexConvert
+        kb.errorChunkLength = None        # force the search to run
+        self._install_oracle()
+        eu._oneShotErrorUse("SELECT data")
+        return kb.errorChunkLength
+
+    def test_hex_chunk_length_matches_plain(self):
+        plain = self._detect(hexConvert=False)
+        hexed = self._detect(hexConvert=True)
+        self.assertGreater(plain, MIN_ERROR_CHUNK_LENGTH)      # the channel holds more than the floor
+        self.assertEqual(hexed, plain, "hex chunk length must equal plain - channel char capacity is hex-independent")
 
 
 if __name__ == "__main__":

@@ -87,7 +87,9 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
                 testQuery = "RPAD('%s',%d,'%s')" % (testChar, current, testChar)
             else:
                 testQuery = "%s('%s',%d)" % ("REPEAT" if Backend.isDbms(DBMS.MYSQL) else "REPLICATE", testChar, current)
-                testQuery = "SELECT %s" % (agent.hexConvertField(testQuery) if conf.hexConvert else testQuery)
+                # chunk length is the channel's CHAR capacity (hex-independent); a hex-wrapped probe doubles
+                # the length and mis-detects (pins to the minimum), so probe plain even under --hex
+                testQuery = "SELECT %s" % testQuery
 
             result = unArrayizeValue(_oneShotErrorUse(testQuery, chunkTest=True))
             seen.add(current)
@@ -206,7 +208,7 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
                 hashDBWrite(expression, "%s%s" % (retVal, PARTIAL_VALUE_MARKER))
             raise
 
-        retVal = decodeDbmsHexValue(retVal) if conf.hexConvert else retVal
+        retVal = decodeDbmsHexValue(retVal) if conf.hexConvert and not chunkTest else retVal
 
         if isinstance(retVal, six.string_types):
             retVal = htmlUnescape(retVal).replace("<br>", "\n")
