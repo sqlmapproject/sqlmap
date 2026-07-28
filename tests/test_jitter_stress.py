@@ -1,0 +1,212 @@
+#!/usr/bin/env python
+
+"""
+Copyright (c) 2006-2026 sqlmap developers (https://sqlmap.org)
+See the file 'LICENSE' for copying permission
+
+Adversarial JITTER stress harness for time-based blind extraction.
+
+Drives the REAL bisection() + REAL wasLastResponseDelayed() against a mock oracle that returns a
+simulated RESPONSE DURATION (base + jitter + timeSec-if-condition-true) instead of a boolean - so
+the actual statistical delay-decision and its re-validation run under controlled network jitter,
+with NO real sleeping (thousands of extractions per second, fully deterministic per seed).
+
+Two tiers:
+  * TestJitterRegression   - ALWAYS runs. Low/mild jitter MUST extract perfectly. A real regression
+                             guard for the time-based decision stack (deterministic, fast, non-flaky).
+  * TestJitterStressSweep  - OPT-IN (set env SQLMAP_JITTER_STRESS=1). The adversarial sweeps that map
+                             the failure surface (Gaussian sigma, heavy-tailed spikes). Informational
+                             + loose bounds only; kept out of normal CI to avoid slowness/flakiness.
+
+Run the sweep on demand:  SQLMAP_JITTER_STRESS=1 python -m unittest tests.test_jitter_stress -v
+"""
+
+import os
+import random
+import re
+import sys
+import unittest
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _testutils import bootstrap, set_dbms, reset_dbms
+bootstrap()
+
+from lib.core.data import conf, kb
+from lib.core.common import getCurrentThreadData, setTechnique
+from lib.core.datatype import AttribDict
+from lib.core.enums import ADJUST_TIME_DELAY, PAYLOAD
+from lib.request.connect import Connect
+import lib.techniques.blind.inference as inf
+
+_TEMPLATE = "EXPR=%s IDX=%d CMP>%d"
+_PARSE = re.compile(r"IDX=(\d+) CMP(.)(\d+)")
+_TIMESEC = 5.0
+_BASE = 0.10          # base (non-delay) round-trip latency, seconds
+_STRESS = os.environ.get("SQLMAP_JITTER_STRESS")
+
+
+def _timeVector():
+    d = AttribDict()
+    d.payload = _TEMPLATE; d.where = 1; d.vector = _TEMPLATE
+    d.comment = ""; d.templatePayload = None; d.matchRatio = None
+    d.trueCode = None; d.falseCode = None
+    return d
+
+
+class _JitterBase(unittest.TestCase):
+    _CONF = ("threads", "api", "verbose", "direct", "disableStats", "timeSec", "predictOutput",
+             "hexConvert", "charset", "firstChar", "lastChar")
+    _KB = ("responseTimeMode", "adjustTimeDelay", "laggingChecked", "partRun", "safeCharEncode",
+           "bruteMode", "fileReadMode", "disableShiftTable", "prependFlag", "originalTimeDelay",
+           "counters", "responseTimes")
+
+    def setUp(self):
+        self._saved_conf = {k: conf.get(k) for k in self._CONF}
+        self._saved_kb = {k: kb.get(k) for k in self._KB}
+        self._saved_inj = kb.injection.data
+        self._saved_qp = Connect.queryPage
+        self._saved_technique = getCurrentThreadData().technique
+
+    def tearDown(self):
+        for k, v in self._saved_conf.items():
+            conf[k] = v
+        for k, v in self._saved_kb.items():
+            kb[k] = v
+        kb.injection.data = self._saved_inj
+        Connect.queryPage = self._saved_qp
+        inf.Request.queryPage = self._saved_qp
+        setTechnique(self._saved_technique)   # setTechnique() sets a thread-local; restore so it can't leak into other modules
+
+    def _configure(self, baselineJitter, rng, nBaseline=30):
+        set_dbms("MySQL")
+        conf.threads = 1; conf.api = False; conf.verbose = 0; conf.direct = False
+        conf.disableStats = False; conf.timeSec = _TIMESEC; conf.predictOutput = False
+        conf.hexConvert = False; conf.charset = None; conf.firstChar = None; conf.lastChar = None
+        kb.responseTimeMode = None
+        kb.adjustTimeDelay = ADJUST_TIME_DELAY.DISABLE   # never prompt / never mutate timeSec
+        kb.laggingChecked = True
+        kb.partRun = None; kb.safeCharEncode = False; kb.bruteMode = False
+        kb.fileReadMode = False; kb.disableShiftTable = False; kb.prependFlag = False
+        kb.originalTimeDelay = _TIMESEC; kb.counters = {}
+        kb.injection.data = {PAYLOAD.TECHNIQUE.TIME: _timeVector()}
+        setTechnique(PAYLOAD.TECHNIQUE.TIME)
+        # jitter is always ADDITIVE (network delays only slow a response, never speed it below base),
+        # so the baseline is right-skewed with a floor at base - like real kb.responseTimes, and with
+        # no fake point-mass at 0 that a clamp (max(0.0, ..)) would create and that would skew stats
+        kb.responseTimes = {None: [_BASE + abs(baselineJitter(rng)) for _ in range(nBaseline)]}
+        kb.data.processChar = None
+
+    def _extract(self, secret, jitter, rng):
+        from lib.core.common import wasLastResponseDelayed
+
+        def oracle(payload=None, timeBasedCompare=False, **kwargs):
+            td = getCurrentThreadData()
+            m = _PARSE.search(payload or "")
+            if not m:
+                td.lastQueryDuration = _BASE + abs(jitter(rng))
+                return False
+            idx, op, thr = int(m.group(1)), m.group(2), int(m.group(3))
+            ch = ord(secret[idx - 1]) if 0 <= idx - 1 < len(secret) else 0
+            cond = (ch > thr) if op == ">" else (ch == thr)
+            if "NOT(" in payload:
+                cond = not cond
+            td.lastQueryDuration = _BASE + abs(jitter(rng)) + (_TIMESEC if cond else 0.0)
+            return wasLastResponseDelayed() if timeBasedCompare else cond
+
+        Connect.queryPage = staticmethod(oracle)
+        inf.Request.queryPage = staticmethod(oracle)   # Note: staticmethod on BOTH (py2 makes a bare function an unbound method)
+        td = getCurrentThreadData()
+        td.shared.value = ""; td.shared.index = [0]; td.shared.start = 0; td.shared.count = 0
+        _, value = inf.bisection(_TEMPLATE, "SELECT secret", length=len(secret), charsetType=None)
+        return value
+
+    def _rate(self, secret, jitter, trials=40, seed0=1000):
+        ok = 0
+        for t in range(trials):
+            rng = random.Random(seed0 + t)
+            self._configure(jitter, rng)
+            try:
+                ok += (self._extract(secret, jitter, rng) == secret)
+            except Exception:
+                pass
+        return ok, trials
+
+
+def _gaussian(sigma):
+    return lambda rng: rng.gauss(0, sigma)
+
+
+def _spike(sigma, p, mag):
+    def f(rng):
+        v = rng.gauss(0, sigma)
+        if rng.random() < p:
+            v += mag
+        return v
+    return f
+
+
+class TestJitterRegression(_JitterBase):
+    """Always-on, deterministic, non-flaky: under low/mild jitter (7*sigma well below timeSec and no
+    heavy tail) the time-based stack MUST reconstruct the value exactly, every seed."""
+
+    SECRET = "Str0ng!"
+
+    def test_no_jitter_is_perfect(self):
+        ok, n = self._rate(self.SECRET, _gaussian(0.0))
+        self.assertEqual(ok, n, "time-based extraction must be flawless with zero jitter (%d/%d)" % (ok, n))
+
+    def test_mild_gaussian_is_perfect(self):
+        # sigma=0.3 -> false bits at base+|N(0,0.3)| (<~1s) stay well under the threshold, << timeSec=5
+        ok, n = self._rate(self.SECRET, _gaussian(0.3))
+        self.assertEqual(ok, n, "mild gaussian jitter must not corrupt extraction (%d/%d)" % (ok, n))
+
+    def test_baseline_spike_does_not_hide_a_genuine_delay(self):
+        # A single latency spike captured in the response-time model must not raise the delay
+        # threshold (avg + 7*stdev) so high that a real timeSec delay is missed. Deterministic.
+        from lib.core.common import wasLastResponseDelayed, average, stdev
+        from lib.core.settings import TIME_STDEV_COEFF
+
+        set_dbms("MySQL")
+        conf.direct = False; conf.disableStats = False; conf.timeSec = _TIMESEC
+        kb.adjustTimeDelay = ADJUST_TIME_DELAY.DISABLE
+        kb.responseTimeMode = None
+        bulk = [0.15, 0.25] * 15                    # clean model, small non-zero stdev
+        kb.responseTimes = {None: bulk + [8.0]}     # one 8s spike poisons the baseline
+        td = getCurrentThreadData()
+        td.lastQueryDuration = _BASE + _TIMESEC      # a genuine time-based delay (~5.1s)
+
+        raw = kb.responseTimes[None]                 # the un-trimmed model WOULD miss it (fix is load-bearing)
+        self.assertLess(td.lastQueryDuration, average(raw) + TIME_STDEV_COEFF * stdev(raw))
+        self.assertTrue(wasLastResponseDelayed())    # with spike-trimming the delay is recognized
+
+
+@unittest.skipUnless(_STRESS, "adversarial jitter sweep is opt-in (set SQLMAP_JITTER_STRESS=1)")
+class TestJitterStressSweep(_JitterBase):
+    """Opt-in failure-surface map. Prints correctness vs jitter and asserts only loose, non-flaky
+    invariants (clean case perfect, degradation is monotone-ish). Use to evaluate hardening changes."""
+
+    SECRET = "Str0ng!"
+
+    def test_gaussian_sweep(self):
+        print("\n[jitter] Gaussian sigma sweep (timeSec=%.0f, base=%.2f):" % (_TIMESEC, _BASE))
+        for sigma in (0.0, 0.3, 0.5, 0.7, 0.9, 1.2):
+            ok, n = self._rate(self.SECRET, _gaussian(sigma))
+            print("  sigma=%.2fs -> %d/%d (%3.0f%%)" % (sigma, ok, n, 100.0 * ok / n))
+            if sigma == 0.0:
+                self.assertEqual(ok, n)
+
+    def test_heavy_tailed_spike_sweep(self):
+        print("\n[jitter] Heavy-tailed spike sweep (base sigma=0.2, spike=+8s):")
+        for p in (0.0, 0.01, 0.03, 0.05, 0.10):
+            ok, n = self._rate(self.SECRET, _spike(0.2, p, 8.0))
+            print("  spike_p=%.2f -> %d/%d (%3.0f%%)" % (p, ok, n, 100.0 * ok / n))
+            if p == 0.0:
+                self.assertEqual(ok, n)
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)
+
+
+def tearDownModule():
+    reset_dbms()
