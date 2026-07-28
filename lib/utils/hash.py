@@ -183,7 +183,7 @@ def mssql_new_passwd(password, salt, uppercase=False):  # since version '2012'
     """
 
     binsalt = decodeHex(salt)
-    unistr = b"".join((_.encode(UNICODE_ENCODING) + b"\0") if ord(_) < 256 else _.encode(UNICODE_ENCODING) for _ in password)
+    unistr = getUnicode(password).encode("utf-16-le")   # MSSQL hashes the password as UCS-2/UTF-16LE
 
     retVal = "0200%s%s" % (salt, sha512(unistr + binsalt).hexdigest())
 
@@ -200,7 +200,7 @@ def mssql_passwd(password, salt, uppercase=False):  # versions '2005' and '2008'
     """
 
     binsalt = decodeHex(salt)
-    unistr = b"".join((_.encode(UNICODE_ENCODING) + b"\0") if ord(_) < 256 else _.encode(UNICODE_ENCODING) for _ in password)
+    unistr = getUnicode(password).encode("utf-16-le")   # MSSQL hashes the password as UCS-2/UTF-16LE
 
     retVal = "0100%s%s" % (salt, sha1(unistr + binsalt).hexdigest())
 
@@ -218,7 +218,7 @@ def mssql_old_passwd(password, salt, uppercase=True):  # version '2000' and befo
     """
 
     binsalt = decodeHex(salt)
-    unistr = b"".join((_.encode(UNICODE_ENCODING) + b"\0") if ord(_) < 256 else _.encode(UNICODE_ENCODING) for _ in password)
+    unistr = getUnicode(password).encode("utf-16-le")   # MSSQL hashes the password as UCS-2/UTF-16LE
 
     retVal = "0100%s%s%s" % (salt, sha1(unistr + binsalt).hexdigest(), sha1(unistr.upper() + binsalt).hexdigest())
 

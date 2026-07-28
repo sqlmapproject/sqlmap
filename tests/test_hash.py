@@ -87,6 +87,31 @@ class TestDbmsSpecificVectors(unittest.TestCase):
         self.assertEqual(H.oracle_old_passwd("tiger", "scott", uppercase=True), "F894844C34402B67")
 
 
+class TestMssqlUnicodePassword(unittest.TestCase):
+    """MSSQL hashes the password as UCS-2/UTF-16LE. A per-char 'utf-8 + NUL' approximation is only
+    correct for ASCII, so non-ASCII passwords (cafe, etc.) hashed WRONG and were uncrackable. The
+    2012+ (SHA-512) ground truth is a live PWDENCRYPT(N'caf'+NCHAR(233)) from Azure SQL Edge."""
+
+    CAFE = u"caf\xe9"
+
+    def test_mssql_new_matches_live_pwdencrypt(self):
+        real = ("0x0200a0d961e49fc45ec4922793c4f0b278587e977b281c10871a30a6e620ab0c24c"
+                "dce517f208252d6e5ca608d958c89aff5c69061cc6c788854e3e0788cb2510e227481990d")
+        self.assertEqual(H.mssql_new_passwd(self.CAFE, salt="a0d961e4", uppercase=False), real)
+
+    def test_mssql_matches_documented_algorithm(self):
+        # 2005/2008: 0x0100 + salt + SHA1(UTF16LE(password) + salt)
+        salt = "4086ceb6"
+        expected = "0x0100%s%s" % (salt, hashlib.sha1(self.CAFE.encode("utf-16-le") + bytearray.fromhex(salt)).hexdigest())
+        self.assertEqual(H.mssql_passwd(self.CAFE, salt=salt, uppercase=False), expected)
+
+    def test_ascii_unchanged(self):
+        # the fix must leave the ASCII path identical (still the documented UTF-16LE form)
+        salt = "4086ceb6"
+        expected = "0x0100%s%s" % (salt, hashlib.sha1(u"testpass".encode("utf-16-le") + bytearray.fromhex(salt)).hexdigest())
+        self.assertEqual(H.mssql_passwd("testpass", salt=salt, uppercase=False), expected)
+
+
 class TestHashRecognition(unittest.TestCase):
     def test_md5_generic(self):
         self.assertEqual(H.hashRecognition("179ad45c6ce2cb97cf1029e212046e81"), HASH.MD5_GENERIC)
