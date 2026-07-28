@@ -2009,7 +2009,10 @@ def parseUnionPage(page):
                 entry = entry.split(kb.chars.start)[-1]
 
             if kb.unionDuplicates:
-                key = entry.lower()
+                # Note: de-dup on the EXACT entry, not entry.lower() - the doubled emission repeats each
+                # row verbatim, so case-folding here would silently drop genuinely case-distinct rows
+                # (e.g. 'Admin' vs 'admin'). Force-uppercased pages are already lower-cased before parsing.
+                key = entry
                 if key not in keys:
                     keys.add(key)
                 else:
@@ -3859,7 +3862,7 @@ def joinValue(value, delimiter=','):
     """
 
     if isListLike(value):
-        retVal = delimiter.join(getText(_ if _ is not None else "None") for _ in value)
+        retVal = delimiter.join(getText(getUnicode(_) if _ is not None else "None") for _ in value)
     else:
         retVal = value
 
@@ -4264,9 +4267,14 @@ def decodeStringEscape(value):
     retVal = value
 
     if value and '\\' in value:
-        charset = "\\%s" % string.whitespace.replace(" ", "")
-        for _ in charset:
+        # Note: shield an escaped backslash ('\\\\') behind a marker BEFORE decoding the whitespace
+        # escapes, then restore it - otherwise decoding '\\\\' -> '\\' first turns a literal '\\n'
+        # into a newline (i.e. the round-trip with encodeStringEscape was not lossless)
+        _marker = "\x00"
+        retVal = retVal.replace("\\\\", _marker)
+        for _ in string.whitespace.replace(" ", ""):
             retVal = retVal.replace(repr(_).strip("'"), _)
+        retVal = retVal.replace(_marker, "\\")
 
     return retVal
 
