@@ -116,6 +116,14 @@ class TestOpenApi(unittest.TestCase):
                 "paths": {"/p": {"get": {}}}}
         self.assertEqual(_targets(spec, None)[0][0], "https://prod.x.io/v3/p")
 
+    def test_server_variable_enum_without_default(self):
+        # a server variable that declares an 'enum' but omits the (spec-required) 'default' must use a
+        # declared enum value, not a placeholder host - else the target is https://1/... (unscannable)
+        spec = {"openapi": "3.0.0", "servers": [{"url": "https://{h}/v1",
+                "variables": {"h": {"enum": ["real.com"]}}}],
+                "paths": {"/x": {"get": {}}}}
+        self.assertEqual(_targets(spec, None)[0][0], "https://real.com/v1/x")
+
     def test_headers_are_hashable_tuples(self):
         # kb.targets is an OrderedSet, so the emitted headers must be hashable (tuple, not list)
         spec = {"openapi": "3.0.0", "paths": {"/x": {"get": {"parameters": [

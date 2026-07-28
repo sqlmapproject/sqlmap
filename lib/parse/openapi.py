@@ -193,7 +193,11 @@ def _baseUrl(spec, origin=None, servers=None):
         variables = servers[0].get("variables")
         if isinstance(variables, dict):
             for name, meta in variables.items():
-                default = meta.get("default", "1") if isinstance(meta, dict) else "1"
+                meta = meta if isinstance(meta, dict) else {}
+                default = meta.get("default")
+                if default is None:               # 'default' is spec-required; when omitted, a declared enum value beats a placeholder host ('1')
+                    enum = meta.get("enum")
+                    default = enum[0] if isinstance(enum, list) and enum else "1"
                 url = url.replace("{%s}" % name, str(default))
         if re.match(r"(?i)[a-z][a-z0-9+.-]*://", url):    # absolute server URL -> used as declared (the host is NOT rewritten to the spec's own origin)
             return url.rstrip('/')
