@@ -27,9 +27,11 @@ from _testutils import bootstrap, set_dbms, reset_dbms
 bootstrap()
 
 from lib.core.data import conf, kb
+from lib.core.datatype import AttribDict
 from lib.core.enums import PAYLOAD, PLACE
 from lib.request.connect import Connect
 import lib.techniques.union.test as ut
+import lib.techniques.union.use as uu
 
 MARKER = "MARKER42"
 VALID_PAGE = "<html>results %s</html>" % MARKER
@@ -101,6 +103,74 @@ class TestOrderByColumnCount(unittest.TestCase):
     def test_detect_beyond_first_step(self):
         # > ORDER_BY_STEP (10): forces the expand-then-bisect branch
         self.assertEqual(self._detect(25), 25)
+
+
+class TestMssqlJsonAggFalsyValues(unittest.TestCase):
+    """Regression: MSSQL UNION dumps use FOR JSON (jsonAggMode), whose output carries native JSON
+    types. A real 0 / '' / false is a value; only JSON null is SQL NULL. The old `row.get(field) or
+    NULL` mapped every falsy value to the literal string 'NULL' - proven live (SELECT 0,'','ok'
+    dumped as NULL,NULL,ok). We drive the REAL _oneShotUnionUse against a mock FOR JSON page."""
+
+    def setUp(self):
+        self._s = {
+            "hexConvert": conf.get("hexConvert"), "parameters": conf.get("parameters"),
+            "paramDict": conf.get("paramDict"), "base64Parameter": conf.get("base64Parameter"),
+            "pageEncoding": conf.get("pageEncoding"), "hashDB": conf.get("hashDB"),
+            "inj": (kb.injection.place, kb.injection.parameter, kb.injection.data),
+            "jsonAggMode": kb.get("jsonAggMode"), "unionDuplicates": kb.get("unionDuplicates"),
+            "forcePartialUnion": kb.get("forcePartialUnion"), "tableFrom": kb.get("tableFrom"),
+            "unionTemplate": kb.get("unionTemplate"), "qp": Connect.queryPage,
+        }
+        conf.hexConvert = False
+        conf.parameters = {PLACE.GET: "id=1"}
+        conf.paramDict = {PLACE.GET: {"id": "1"}}
+        conf.base64Parameter = ()
+        conf.pageEncoding = None
+        conf.hashDB = None
+        v = AttribDict()
+        v.vector = (0, 4, "", "", "", "NULL", PAYLOAD.WHERE.NEGATIVE, False, False, None, None)
+        kb.injection.place = PLACE.GET
+        kb.injection.parameter = "id"
+        kb.injection.data = {PAYLOAD.TECHNIQUE.UNION: v}
+        kb.jsonAggMode = True
+        kb.unionDuplicates = kb.forcePartialUnion = False
+        kb.tableFrom = kb.unionTemplate = None
+        set_dbms("MSSQL")
+
+    def tearDown(self):
+        conf.hexConvert = self._s["hexConvert"]
+        conf.parameters = self._s["parameters"]
+        conf.paramDict = self._s["paramDict"]
+        conf.base64Parameter = self._s["base64Parameter"]
+        conf.pageEncoding = self._s["pageEncoding"]
+        conf.hashDB = self._s["hashDB"]
+        kb.injection.place, kb.injection.parameter, kb.injection.data = self._s["inj"]
+        kb.jsonAggMode = self._s["jsonAggMode"]
+        kb.unionDuplicates = self._s["unionDuplicates"]
+        kb.forcePartialUnion = self._s["forcePartialUnion"]
+        kb.tableFrom = self._s["tableFrom"]
+        kb.unionTemplate = self._s["unionTemplate"]
+        Connect.queryPage = self._s["qp"]
+        uu.Request.queryPage = self._s["qp"]
+
+    def _dump(self, jsonstr):
+        # jsonstr is exactly what MSSQL FOR JSON AUTO, INCLUDE_NULL_VALUES emits (literal to keep key
+        # order stable across py2/py3); object_pairs_hook=OrderedDict preserves that order downstream
+        page = "%s%s%s" % (kb.chars.start, jsonstr, kb.chars.stop)
+
+        def oracle(payload=None, content=False, raise404=True, **kwargs):
+            return (page, {}, 200) if content else True
+
+        Connect.queryPage = staticmethod(oracle)
+        uu.Request.queryPage = staticmethod(oracle)
+        kb.jsonAggMode = True
+        out = uu._oneShotUnionUse("SELECT a,b,c,d FROM users", False)
+        firstRow = out.replace(kb.chars.start, "").split(kb.chars.stop)[0]
+        return firstRow.split(kb.chars.delimiter)
+
+    def test_falsy_values_preserved(self):
+        fields = self._dump('[{"a":0,"b":"","c":"ok","d":null}]')
+        self.assertEqual(fields, ["0", "", "ok", "NULL"])   # only JSON null -> NULL
 
 
 if __name__ == "__main__":
