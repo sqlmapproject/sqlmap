@@ -129,7 +129,11 @@ class TestErrorChunkLengthHex(unittest.TestCase):
             "inj": (kb.injection.place, kb.injection.parameter, kb.injection.data),
             "qp": Connect.queryPage,
             "dbmsHandler": conf.get("dbmsHandler"), "forceDbms": conf.get("forceDbms"),
+            "charsStart": kb.chars.start, "charsStop": kb.chars.stop,
         }
+        # Pin the boundary markers so the CAP-relative channel capacity is deterministic and the
+        # extraction regex can never hit a leaked/odd marker (the default markers are random).
+        kb.chars.start, kb.chars.stop = "qzxjq", "qkvbq"
         conf.hexConvert = False
         conf.charset = None
         conf.hashDB = None
@@ -165,12 +169,17 @@ class TestErrorChunkLengthHex(unittest.TestCase):
         eu.Request.queryPage = self._saved["qp"]
         conf.dbmsHandler = self._saved["dbmsHandler"]
         conf.forceDbms = self._saved["forceDbms"]
+        kb.chars.start = self._saved["charsStart"]
+        kb.chars.stop = self._saved["charsStop"]
 
     def _install_oracle(self, secret="hello"):
         cap = self.CAP
 
         def oracle(payload=None, content=False, raise404=True, **kwargs):
-            m = re.search(r"REPEAT\((?:0x([0-9a-fA-F]{2})|'(.)'),(\d+)\)", payload)      # chunk-length probe
+            # chunk-length probe: recognize every repeat-family builder the search may emit
+            # (REPEAT=MySQL, REPLICATE=MSSQL/Sybase, RPAD=Oracle/Firebird) so a leaked non-MySQL
+            # back-end still exercises the search instead of mis-detecting length 0
+            m = re.search(r"(?:REPEAT|REPLICATE|RPAD)\((?:0x([0-9a-fA-F]{2})|'(.)'),(\d+)", payload)
             if m:
                 raw = (chr(int(m.group(1), 16)) if m.group(1) else m.group(2)) * int(m.group(3))
             else:
