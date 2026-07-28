@@ -1171,7 +1171,7 @@ def cmdLineParser(argv=None):
                 dataToStdout("[!] detected usage of long-option without a starting hyphen ('%s')\n" % argv[i])
                 raise SystemExit
 
-        for verbosity in (_ for _ in argv if re.search(r"\A\-v+\Z", _)):
+        for verbosity in [_ for _ in argv if re.search(r"\A\-v+\Z", _)]:  # Note: list (not a generator) - the loop mutates argv (del), which would desync a live generator and leave a stray '-v' for argparse to choke on
             try:
                 if argv.index(verbosity) == len(argv) - 1 or not argv[argv.index(verbosity) + 1].isdigit():
                     conf.verbose = verbosity.count('v')

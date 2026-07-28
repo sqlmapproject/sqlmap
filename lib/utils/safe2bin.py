@@ -55,6 +55,9 @@ def safecharencode(value):
 
     if isinstance(value, string_types):
         if any(_ not in SAFE_CHARS for _ in value):
+            # NOTE (checked twice, do NOT "fix" by deleting): this marker keeps an already-`\x`-carrying
+            # value (incl. getUnicode's 'reversible' \xNN) from double-escaping to `\\x` in console/CSV.
+            # Dropping it only swaps that for the rare literal-`\x`-in-data round-trip - a bad trade.
             retVal = retVal.replace(HEX_ENCODED_PREFIX, HEX_ENCODED_PREFIX_MARKER)
             retVal = retVal.replace('\\', SLASH_MARKER)
 
