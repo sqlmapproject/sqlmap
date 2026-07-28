@@ -1778,6 +1778,29 @@ class TestValueParallelEligibility(unittest.TestCase):
         self.assertTrue(self._elig(8, True, {PAYLOAD.TECHNIQUE.TIME}, timeless=object()))
 
 
+class TestCharsetCorruptionDetection(unittest.TestCase):
+    """UNION/error charset-mismatch auto-hex trigger: _pageCharsetCorrupted fires on
+    reversibly-decoded high bytes (the '\\xNN' marker) and stays quiet on clean data."""
+
+    def test_detects_reversible_high_bytes(self):
+        # e.g. GBK bytes mis-decoded under utf-8 -> reversible '\xNN' escapes for the bad bytes
+        self.assertTrue(inject._pageCharsetCorrupted(u"\\xd6\\xd0\\xce\\xe2"))
+
+    def test_detects_inside_nested_rows(self):
+        self.assertTrue(inject._pageCharsetCorrupted([[u"1", u"caf\\xe9"], [u"2", u"ok"]]))
+
+    def test_clean_ascii_not_flagged(self):
+        self.assertFalse(inject._pageCharsetCorrupted(u"hello world"))
+
+    def test_clean_unicode_not_flagged(self):
+        # correctly-decoded unicode must not trigger a needless hex re-fetch
+        self.assertFalse(inject._pageCharsetCorrupted(u"\u4e2d\u6587\u6d4b\u8bd5"))
+
+    def test_low_hex_escape_not_flagged(self):
+        # a literal low '\x41' (ASCII 'A') is not an undecodable-byte marker
+        self.assertFalse(inject._pageCharsetCorrupted(u"literal \\x41 text"))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
 

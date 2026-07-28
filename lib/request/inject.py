@@ -62,6 +62,7 @@ from lib.core.exception import SqlmapUserQuitException
 from lib.core.settings import GET_VALUE_UPPERCASE_KEYWORDS
 from lib.core.settings import IS_TTY
 from lib.core.settings import INFERENCE_MARKER
+from lib.core.settings import INVALID_UNICODE_PRIVATE_AREA
 from lib.core.settings import MAX_TECHNIQUES_PER_VALUE
 from lib.core.settings import SQL_SCALAR_REGEX
 from lib.core.settings import UNICODE_ENCODING
@@ -575,6 +576,24 @@ def _threadedInferenceValues(exprBuilder, indices, context=None, charsetType=Non
 
     return results
 
+def _pageCharsetCorrupted(value):
+    """
+    True if a retrieved value carries reversibly-decoded (undecodable) bytes - a sign that the
+    web page charset could not represent the DBMS data (cf. the 'reversible' codec). Such a
+    UNION/error value is silently corrupt and should be re-fetched via DBMS-side hexadecimal.
+    """
+
+    retVal = [False]
+
+    def _(item):
+        if not retVal[0] and isinstance(item, six.string_types):
+            if re.search(r"\\x[89a-f][0-9a-f]", item) or (INVALID_UNICODE_PRIVATE_AREA and any(0xF0000 <= ord(_) <= 0xF00FF for _ in item)):
+                retVal[0] = True
+        return item
+
+    applyFunctionRecursively(value, _)
+    return retVal[0]
+
 @lockedmethod
 @stackedmethod
 def getValue(expression, blind=True, union=True, error=True, time=True, fromUser=False, expected=None, batch=False, unpack=True, resumeValue=True, charsetType=None, firstChar=None, lastChar=None, dump=False, suppressOutput=None, expectingNone=False, safeCharEncode=True):
@@ -671,6 +690,28 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
                     value = errorUse(forgeCaseExpression if expected == EXPECTED.BOOL else query, dump)
                     count += 1
                     found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
+
+                # Auto-recover from a page/DBMS charset mismatch: a UNION/error value carrying
+                # undecodable bytes (the page charset couldn't represent the DBMS data) is silently
+                # corrupt. Re-fetch it via DBMS-side hex, which travels as ASCII regardless of the
+                # page charset - no user '--hex'/'--encoding' knowledge required. Gated, so clean
+                # or ASCII data pays nothing.
+                if (found and not conf.hexConvert and not conf.binaryFields and expected not in (EXPECTED.BOOL, EXPECTED.INT)
+                        and getTechnique() in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)
+                        and Backend.getIdentifiedDbms() and hasattr(queries[Backend.getIdentifiedDbms()], "hex")
+                        and _pageCharsetCorrupted(value)):
+                    warnMsg = "retrieved data appears corrupted because of a charset mismatch between the "
+                    warnMsg += "DBMS and the web page. Re-fetching using hexadecimal encoding"
+                    singleTimeWarnMessage(warnMsg)
+
+                    conf.hexConvert = True
+                    try:
+                        _value = _goUnion(query, unpack, dump) if getTechnique() == PAYLOAD.TECHNIQUE.UNION else errorUse(query, dump)
+                    finally:
+                        conf.hexConvert = False
+
+                    if _value is not None:
+                        value = _value
 
                 if found and conf.dnsDomain:
                     _ = "".join(filterNone(key if isTechniqueAvailable(value) else None for key, value in {'E': PAYLOAD.TECHNIQUE.ERROR, 'Q': PAYLOAD.TECHNIQUE.QUERY, 'U': PAYLOAD.TECHNIQUE.UNION}.items()))
