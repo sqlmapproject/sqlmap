@@ -372,6 +372,7 @@ class _TestSearchInf(Search):
         self.like = ('2', "='%s'")     # exact match (colConsider '2')
         self.dumpFoundTablesCalls = []
         self.dumpFoundColumnCalls = []
+        self.getColumnsCalls = []
 
     def likeOrExact(self, what):
         return self.like
@@ -390,6 +391,7 @@ class _TestSearchInf(Search):
 
     def getColumns(self, onlyColNames=False, colTuple=None, bruteForce=None, dumpMode=False):
         db, tbl, col = conf.db, conf.tbl, conf.col
+        self.getColumnsCalls.append((db, tbl, col))
         if db and tbl:
             kb.data.cachedColumns.setdefault(db, {}).setdefault(tbl, {})
             kb.data.cachedColumns[db][tbl][col] = "varchar"
@@ -532,6 +534,35 @@ class TestSearchInference(_SearchBase):
         self.assertIn("testdb", dbs)
         self.assertIn("users", dbs["testdb"])
         self.assertIn("password", dbs["testdb"]["users"])
+
+    def test_search_column_multi_no_reprocess(self):
+        # Regression: multi-column blind search must process each column exactly once.
+        # The nested table-discovery loop used to walk ALL accumulated columns per outer
+        # pass, re-querying earlier columns (O(n^2) requests) and appending their tables twice.
+        s = _TestSearchInf()
+        conf.col = "cola,colb"
+        conf.db = None
+        conf.tbl = None
+
+        def gv(query, *a, **k):
+            if k.get("expected") == EXPECTED.INT:
+                return "1"                       # 1 db / 1 table per column
+            if "table_schema)" in query:         # DISTINCT(table_schema) -> db-name fetch
+                return "testdb"
+            col = "cola" if "cola" in query else "colb"
+            return "t_%s" % col                  # DISTINCT(table_name) -> table-name fetch
+        smod.inject.getValue = gv
+
+        s.searchColumn()
+
+        # each (db, tbl, col) discovered once - no earlier column re-walked
+        self.assertEqual(len(s.getColumnsCalls), len(set(s.getColumnsCalls)))
+        self.assertEqual(len(s.getColumnsCalls), 2)
+        # and no duplicate table under any found column
+        foundCols = conf.dumper.dbColumnsArg[0]
+        for _dbmap in foundCols.values():
+            for _tbls in _dbmap.values():
+                self.assertEqual(len(_tbls), len(set(_tbls)))
 
     def test_search_column_mysql_lt5_bruteforce_decline(self):
         s = _TestSearchInf()

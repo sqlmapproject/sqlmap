@@ -535,7 +535,10 @@ class Search(object):
                 origDb = conf.db
                 origTbl = conf.tbl
 
-                for column, dbData in foundCols.items():
+                # Note: only the current column - foundCols also holds columns from earlier
+                # colList iterations, and re-walking them here re-issued their table lookups
+                # (O(n^2) blind requests) and duplicated their found tables
+                for column, dbData in ((column, foundCols[column]),):
                     colQuery = "%s%s" % (colCond, colCondParam)
                     colQuery = colQuery % unsafeSQLIdentificatorNaming(column)
 
