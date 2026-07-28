@@ -184,6 +184,25 @@ class TestBrute(DbmsStateMixin, unittest.TestCase):
         self.assertEqual(cols.get(getText(safeSQLIdentificatorNaming("id"))), "numeric")
         self.assertEqual(cols.get(getText(safeSQLIdentificatorNaming("name"))), "non-numeric")
 
+    def test_column_exists_multiple_tables(self):
+        # regression: the found-columns dict must not rebind the 'columns' wordlist list,
+        # else the 2nd table in conf.tbl indexes a dict by int -> KeyError (crash/hang)
+        set_dbms(DBMS.MYSQL)
+        conf.tbl = "users,logs"
+        brute.getFileItems = lambda *a, **k: ["id", "name"]
+
+        def _cbe(expression, expectingNone=True):
+            if not any(_ in expression for _ in ("users", "logs")):
+                return False   # random-name sanity probe
+            return True        # every column exists (type follow-ups don't matter here)
+        brute.inject.checkBooleanExpression = _cbe
+
+        # pre-fix the 2nd table iteration raised KeyError (dict indexed by int); post-fix
+        # both tables are processed and cached (keys are safeSQLIdentificatorNaming'd)
+        result = brute.columnExists("/nonexistent/columns.txt")
+        self.assertEqual(len(result[None]), 2)
+        self.assertTrue(all(cols for cols in result[None].values()))
+
     def test_add_page_text_words_filters(self):
         # restore the real getPageWordSet for this one and drive it directly
         brute.getPageWordSet = self._orig_getPageWordSet

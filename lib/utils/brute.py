@@ -293,7 +293,9 @@ def columnExists(columnFile, regex=None):
             warnMsg = "no column(s) found"
             logger.warning(warnMsg)
         else:
-            columns = {}
+            # Note: a separate name from the 'columns' wordlist (a list reused across the
+            # conf.tbl loop); reusing it here would rebind it to a dict and break later tables
+            columnData = {}
 
             for column in threadData.shared.files:
                 if Backend.getIdentifiedDbms() in (DBMS.MYSQL,):
@@ -306,15 +308,15 @@ def columnExists(columnFile, regex=None):
                     result = inject.checkBooleanExpression("%s" % safeStringFormat("EXISTS(SELECT %s FROM %s WHERE ROUND(%s)=ROUND(%s))", (column, table, column, column)))
 
                 if result:
-                    columns[column] = "numeric"
+                    columnData[column] = "numeric"
                 else:
-                    columns[column] = "non-numeric"
+                    columnData[column] = "non-numeric"
 
             if conf.db not in kb.data.cachedColumns:
                 kb.data.cachedColumns[conf.db] = {}
-            kb.data.cachedColumns[conf.db][table] = columns
+            kb.data.cachedColumns[conf.db][table] = columnData
 
-            for _ in ((conf.db, table, item[0], item[1]) for item in columns.items()):
+            for _ in ((conf.db, table, item[0], item[1]) for item in columnData.items()):
                 if _ not in kb.brute.columns:
                     kb.brute.columns.append(_)
 
