@@ -33,7 +33,13 @@ def tamper(payload, **kwargs):
                 retVal += "\\u00%s" % payload[i + 1:i + 3]
                 i += 3
             else:
-                retVal += '\\u%.4X' % ord(payload[i])
+                ordinal = ord(payload[i])
+                if ordinal > 0xFFFF:
+                    # non-BMP: emit a UTF-16 surrogate pair (a bare 5-hex '\uXXXXX' is invalid)
+                    ordinal -= 0x10000
+                    retVal += "\\u%04X\\u%04X" % (0xD800 + (ordinal >> 10), 0xDC00 + (ordinal & 0x3FF))
+                else:
+                    retVal += "\\u%04X" % ordinal
                 i += 1
 
     return retVal

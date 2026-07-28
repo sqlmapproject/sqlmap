@@ -38,7 +38,12 @@ def tamper(payload, **kwargs):
                 i += 3
             else:
                 if payload[i] not in (string.ascii_letters + string.digits):
-                    retVal += "%%%.2X%%%.2X" % (0xc0 + (ord(payload[i]) >> 6), 0x80 + (ord(payload[i]) & 0x3f))
+                    ordinal = ord(payload[i])
+                    if ordinal <= 0x7FF:
+                        retVal += "%%%.2X%%%.2X" % (0xc0 + (ordinal >> 6), 0x80 + (ordinal & 0x3f))
+                    else:
+                        # the 2-byte overlong form can't hold code points > U+07FF; fall back to real UTF-8
+                        retVal += "".join("%%%.2X" % _ for _ in bytearray(payload[i].encode("utf8")))
                 else:
                     retVal += payload[i]
                 i += 1
