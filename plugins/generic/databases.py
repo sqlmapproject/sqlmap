@@ -418,9 +418,9 @@ class Databases(object):
                     else:
                         for index in indexRange:
                             if Backend.isDbms(DBMS.SYBASE):
-                                query = _query % (db, (kb.data.cachedTables[-1] if kb.data.cachedTables else " "))
+                                query = _query % (db, (tables[-1] if tables else " "))
                             elif Backend.getIdentifiedDbms() in (DBMS.MAXDB, DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB):
-                                query = _query % (kb.data.cachedTables[-1] if kb.data.cachedTables else " ")
+                                query = _query % (tables[-1] if tables else " ")
                             elif Backend.getIdentifiedDbms() in (DBMS.SQLITE, DBMS.FIREBIRD):
                                 query = _query % index
                             elif Backend.getIdentifiedDbms() in (DBMS.HSQLDB, DBMS.INFORMIX, DBMS.FRONTBASE, DBMS.VIRTUOSO):

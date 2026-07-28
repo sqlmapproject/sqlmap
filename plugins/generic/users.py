@@ -648,13 +648,16 @@ class Users(object):
                         break
 
                 if privileges:
-                    kb.data.cachedUsersPrivileges[user] = list(privileges)
+                    # Note: 'user' may be a LIKE-wrapped form (e.g. '%root%') built for the MySQL
+                    # query above; key/record under the real name so the output isn't mislabelled
+                    # (and the retrievedUsers de-dup check, which compares the unwrapped name, works)
+                    kb.data.cachedUsersPrivileges[outuser] = list(privileges)
                 else:
                     warnMsg = "unable to retrieve the privileges "
                     warnMsg += "for user '%s'" % outuser
                     logger.warning(warnMsg)
 
-                retrievedUsers.add(user)
+                retrievedUsers.add(outuser)
 
         if not kb.data.cachedUsersPrivileges:
             errMsg = "unable to retrieve the privileges "
