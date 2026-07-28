@@ -42,8 +42,10 @@ PAYLOADS = [
 ]
 
 KNOWN_FRAGILE = set()  # percentage/escapequotes empty/None crashes were FIXED by the author; now covered below
-# Intentionally expensive by design (generates 4.2M parameters per call to flood Lua-Nginx
-# WAFs) -> ~6s/call. NOT a bug; excluded from execution to keep the unit suite fast.
+# luanginxmore floods 4.2M parameters to overflow Lua-Nginx WAFs (the huge count is intentional).
+# That padding is now built ONCE and cached, not rebuilt per request (it used to cost ~11s + 16MB on
+# EVERY request). Still excluded from the battery below because the one-time cold build is slow;
+# the caching itself is covered by TestLuanginxmoreCached.
 HEAVY = {"luanginxmore"}
 
 # Project contract for falsy input: tamper("") == "" and tamper(None) is None
@@ -142,6 +144,31 @@ class TestKnownTransforms(unittest.TestCase):
         for name, (inp, expected) in self.CASES.items():
             mod = importlib.import_module("tamper.%s" % name)
             self.assertEqual(mod.tamper(inp), expected, msg="tamper '%s'(%r)" % (name, inp))
+
+
+class TestLuanginxmoreCached(unittest.TestCase):
+    """luanginxmore's 4.2M-parameter padding is arbitrary and identical every request, so it must be
+    built once and reused - not regenerated per request (that cost ~11s + 16MB per HTTP request,
+    making the tamper unusable). xrange is shrunk so the test stays instant."""
+
+    def test_prepend_built_once(self):
+        import tamper.luanginxmore as t
+        from lib.core.enums import HINT
+
+        original = t.xrange
+        t._prepend.clear()
+        t.xrange = lambda n: range(min(n, 8))    # 4.2M -> 8 so the build is instant
+        try:
+            h1, h2 = {}, {}
+            t.tamper("1 AND 2>1", hints=h1)
+            t.tamper("1 AND 2>1", hints=h2)
+        finally:
+            t.xrange = original
+            t._prepend.clear()
+
+        # both requests must reuse the SAME cached object; a per-request rebuild yields distinct ones
+        self.assertIs(h1[HINT.PREPEND], h2[HINT.PREPEND])
+        self.assertEqual(h1[HINT.PREPEND].count("="), 8)
 
 
 class TestTamperCount(unittest.TestCase):

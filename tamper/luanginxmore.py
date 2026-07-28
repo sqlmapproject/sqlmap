@@ -17,6 +17,10 @@ from lib.core.settings import DEFAULT_GET_POST_DELIMITER
 
 __priority__ = PRIORITY.HIGHEST
 
+# The 4.2M-parameter padding is arbitrary and serves only to overflow the WAF's parameter count,
+# so it is identical every request - build it once (per delimiter) instead of ~11s/16MB per request.
+_prepend = {}
+
 def dependencies():
     singleTimeWarnMessage("tamper script '%s' is only meant to be run on POST requests" % (os.path.basename(__file__).split(".")[0]))
 
@@ -34,6 +38,9 @@ def tamper(payload, **kwargs):
     hints = kwargs.get("hints", {})
     delimiter = kwargs.get("delimiter", DEFAULT_GET_POST_DELIMITER)
 
-    hints[HINT.PREPEND] = delimiter.join("%s=" % "".join(random.sample(string.ascii_letters + string.digits, 2)) for _ in xrange(4194304))
+    if delimiter not in _prepend:
+        _prepend[delimiter] = delimiter.join("%s=" % "".join(random.sample(string.ascii_letters + string.digits, 2)) for _ in xrange(4194304))
+
+    hints[HINT.PREPEND] = _prepend[delimiter]
 
     return payload
