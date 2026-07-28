@@ -246,8 +246,15 @@ def _dumpComposite(tbl, colList, count, cursorCols, tableRef, entries, lengths):
         if prev is None:
             condition = "1=1"
         else:
-            # ANSI row-value (tuple) comparison advances the composite cursor lexicographically
-            condition = "(%s)>(%s)" % (orderExpr, ','.join(_lit(_) for _ in prev))
+            # Portable lexicographic seek predicate. ANSI row-value comparison ((a,b)>(x,y)) is not
+            # supported on MSSQL/Oracle - there it errored, stopping the walk after the first row -
+            # so expand it to (a>x) OR (a=x AND b>y) OR ... which uses only scalar comparisons.
+            ors = []
+            for i in xrange(len(fields)):
+                terms = ["%s=%s" % (fields[j], _lit(prev[j])) for j in xrange(i)]
+                terms.append("%s>%s" % (fields[i], _lit(prev[i])))
+                ors.append("(%s)" % " AND ".join(terms))
+            condition = "(%s)" % " OR ".join(ors)
 
         tup = []
         for field in fields:
