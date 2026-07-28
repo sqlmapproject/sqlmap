@@ -19,7 +19,8 @@ and at most touches the local filesystem (pointed at a private temp tree) or a
 local SQLite session file. Those side-effecting paths are still pure with
 respect to the network, so they are exercised here against real temp dirs.
 
-All expected values below were probed from actual output, not assumed.
+Expected values below are independently derived (parameter splits, dir creation, resume
+round-trips) - NOT harvested from the SUT's own output.
 """
 
 import atexit

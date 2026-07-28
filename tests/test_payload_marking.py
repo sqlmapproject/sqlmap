@@ -250,9 +250,11 @@ class TestHppReconstruction(unittest.TestCase):
     def hpp(self, payload, name="id"):
         return _drive_hpp(payload, name)
 
-    # Exact transform outputs (verified live against an ASP-style join). We pin the produced
-    # string rather than "reconstruct the SQL", because reconstruction depends on the SQL parser
-    # treating /* */ as a token separator (1/*,*/AND -> "1 AND"), which a string compare can't model.
+    # Expected outputs hand-derived from the HPP rule: each inter-token gap becomes the exact
+    # splitter "/*&<name>=*/". We pin the produced string rather than "reconstruct the SQL",
+    # because reconstruction depends on the SQL parser treating /* */ as a token separator
+    # (1/*,*/AND -> "1 AND"), which a string compare can't model. (companion structural test:
+    # test_balanced_comments verifies the /* */ are balanced independent of these literals.)
     CASES = [
         ("1",            "1"),
         ("1 AND 2=2",    "1/*&id=*/AND/*&id=*/2=2"),

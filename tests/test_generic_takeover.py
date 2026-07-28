@@ -165,9 +165,9 @@ class TestCustomSqlQuery(_GenericBase):
         c = Custom()
         cmod.inject.getValue = lambda query, **k: [["1", "alice"], ["2", "bob"]]
         out = c.sqlQuery("SELECT id, name FROM users;")
-        # SELECT + list-like rows => each row joined into a single scalar string.
-        self.assertEqual(len(out), 2)
-        self.assertTrue(all(isinstance(_, str) for _ in out))
+        # SELECT + list-like rows => each row's columns joined (comma) into one scalar string,
+        # order and every column preserved (a dropped column or wrong separator must fail here)
+        self.assertEqual(out, ["1,alice", "2,bob"])
 
     def test_select_scalar_passthrough(self):
         set_dbms("MySQL")

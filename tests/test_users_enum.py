@@ -160,11 +160,15 @@ class TestUsersEnum(unittest.TestCase):
 
     def test_is_dba_mysql(self):
         umod.inject.getValue = lambda query, *a, **k: "root@localhost"
-        umod.inject.checkBooleanExpression = lambda query, *a, **k: True
         users = Users()
         kb.data.currentUser = ""
+        # drive the oracle BOTH ways so a constant-True stub can't force the result
+        umod.inject.checkBooleanExpression = lambda query, *a, **k: True
         kb.data.isDba = None
         self.assertTrue(users.isDba())
+        umod.inject.checkBooleanExpression = lambda query, *a, **k: False
+        kb.data.isDba = None
+        self.assertFalse(users.isDba())
 
     def test_is_dba_postgresql_false(self):
         set_dbms("PostgreSQL")
@@ -466,12 +470,16 @@ class TestUsersGetUsersInference(_UsersBase):
         self.assertEqual(sorted(res), ["guest@%", "root@localhost"])
 
     def test_is_dba_mssql(self):
-        # MSSQL isDba goes through the generic checkBooleanExpression branch.
+        # MSSQL isDba goes through the generic checkBooleanExpression branch; drive the oracle
+        # BOTH ways so a constant-True stub can't force the result
         set_dbms("Microsoft SQL Server")
-        umod.inject.checkBooleanExpression = lambda query, *a, **k: True
         users = Users()
+        umod.inject.checkBooleanExpression = lambda query, *a, **k: True
         kb.data.isDba = None
         self.assertTrue(users.isDba())
+        umod.inject.checkBooleanExpression = lambda query, *a, **k: False
+        kb.data.isDba = None
+        self.assertFalse(users.isDba())
 
 
 if __name__ == "__main__":

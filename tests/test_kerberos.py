@@ -62,10 +62,6 @@ def _preauthError(entries):
     return {12: der.octetString(der.sequenceOf([paData]))}
 
 
-def _selectEtype(offered, hints):
-    """getTGT's etype choice: the client's own preference order, restricted to what it offered."""
-
-    return next((_ for _ in offered if _ in hints and _ in ENCTYPES), None)
 
 
 class TestKerberosAES(unittest.TestCase):
@@ -219,12 +215,14 @@ class TestKerberosClient(unittest.TestCase):
         self.assertEqual(client._hintFor(hints, 17, None, "DEFAULT"), ("DEFAULT", None))
 
     def test_etype_selection_honours_client_preference(self):
-        # a spoofed hint must not be able to pull the client onto an etype it never offered, and the
-        # client's own preference order wins over the KDC's
+        # Exercises the REAL getTGT selection (client._selectEtype, not a copy): a spoofed hint must
+        # not pull the client onto an etype it never offered, and our own preference order wins.
         hints = client._preauthHints(_preauthError([_etypeInfo2Entry(23), _etypeInfo2Entry(18)]))
-        self.assertEqual(_selectEtype((18, 17), hints), 18)                  # KDC listed rc4 first
-        self.assertEqual(_selectEtype((17, 18), hints), 18)                  # only 18 is hinted
-        self.assertIsNone(_selectEtype((18, 17), client._preauthHints(_preauthError([_etypeInfo2Entry(23)]))))
+        self.assertEqual(client._selectEtype((18, 17), hints), 18)           # 18 offered+hinted
+        self.assertEqual(client._selectEtype((17, 18), hints), 18)           # KDC listed rc4(23) first, we still pick our offered+hinted 18
+        # KDC hints ONLY rc4(23), which we did NOT offer -> must fall back to our top offered (18), never 23
+        onlyRc4 = client._preauthHints(_preauthError([_etypeInfo2Entry(23)]))
+        self.assertEqual(client._selectEtype((18, 17), onlyRc4), 18)
 
     def test_authenticator_timestamps_are_unique(self):
         # an acceptor's replay cache keys on (ctime, cusec), and a threaded scan mints one per request

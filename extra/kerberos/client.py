@@ -309,6 +309,15 @@ def _asReq(realm, username, etypes, nonce, padata=None):
     parts.append(der.tagged(4, reqBody))
     return der.application(AS_REQ, der.sequence(*parts))
 
+def _selectEtype(etypes, hints):
+    """
+    The etype getTGT commits to after a preauth-required hint: OUR first offered etype that is also
+    KDC-hinted and supported, falling back to our top preference. The unauthenticated hint can only
+    reorder WITHIN what we offered - it can never pull us onto an etype we did not offer (anti-downgrade).
+    """
+
+    return next((_ for _ in etypes if _ in hints and _ in ENCTYPES), etypes[0])
+
 def getTGT(realm, username, password, kdcHost, kdcPort=88, etypes=DEFAULT_ETYPES, salt=None):
     """Run the AS exchange and return the TGT and its session key.
 
@@ -343,10 +352,7 @@ def getTGT(realm, username, password, kdcHost, kdcPort=88, etypes=DEFAULT_ETYPES
         # the hint is unauthenticated, so it may only choose among the etypes we actually offered, and
         # in *our* order of preference rather than the KDC's (otherwise it could force a downgrade)
         hints = _preauthHints(errorFields)
-        for offered in etypes:
-            if offered in hints and offered in ENCTYPES:
-                etype = offered
-                break
+        etype = _selectEtype(etypes, hints)
         chosenSalt, iterations = _hintFor(hints, etype, salt, chosenSalt)
 
     enc = _enctype(etype)
