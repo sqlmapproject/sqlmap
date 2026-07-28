@@ -128,6 +128,7 @@ class TestErrorChunkLengthHex(unittest.TestCase):
             "forceWhere": kb.get("forceWhere"), "technique": kb.get("technique"),
             "inj": (kb.injection.place, kb.injection.parameter, kb.injection.data),
             "qp": Connect.queryPage,
+            "dbmsHandler": conf.get("dbmsHandler"), "forceDbms": conf.get("forceDbms"),
         }
         conf.hexConvert = False
         conf.charset = None
@@ -141,6 +142,11 @@ class TestErrorChunkLengthHex(unittest.TestCase):
         kb.injection.parameter = "id"
         kb.technique = PAYLOAD.TECHNIQUE.ERROR
         kb.injection.data = {PAYLOAD.TECHNIQUE.ERROR: _make_vector()}
+        # With testMode=False, getIdentifiedDbms() prefers conf.dbmsHandler._dbms and conf.forceDbms
+        # over the forced DBMS below; a leaked handler/option (e.g. MSSQL) would make the chunk-length
+        # probe emit REPLICATE (not REPEAT) and the oracle mis-detect length 0. Clear both to isolate.
+        conf.dbmsHandler = None
+        conf.forceDbms = None
         set_dbms("MySQL")
 
     def tearDown(self):
@@ -157,6 +163,8 @@ class TestErrorChunkLengthHex(unittest.TestCase):
         kb.injection.place, kb.injection.parameter, kb.injection.data = self._saved["inj"]
         Connect.queryPage = self._saved["qp"]
         eu.Request.queryPage = self._saved["qp"]
+        conf.dbmsHandler = self._saved["dbmsHandler"]
+        conf.forceDbms = self._saved["forceDbms"]
 
     def _install_oracle(self, secret="hello"):
         cap = self.CAP
