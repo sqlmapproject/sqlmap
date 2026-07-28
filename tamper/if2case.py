@@ -14,6 +14,34 @@ __priority__ = PRIORITY.HIGHEST
 def dependencies():
     pass
 
+def _unwrap(expr):
+    """
+    Strips only FULLY-wrapping outer parentheses (e.g. '(1=1)' -> '1=1'), leaving a bare function
+    call such as 'SLEEP(5)' intact - unlike str.strip('()') which would drop its trailing ')'
+    """
+
+    expr = expr.strip()
+
+    while len(expr) > 1 and expr[0] == '(' and expr[-1] == ')':
+        depth = 0
+        wrapper = True
+
+        for i in xrange(len(expr)):
+            if expr[i] == '(':
+                depth += 1
+            elif expr[i] == ')':
+                depth -= 1
+                if depth == 0 and i != len(expr) - 1:  # the opening '(' closes before the end
+                    wrapper = False
+                    break
+
+        if not wrapper:
+            break
+
+        expr = expr[1:-1].strip()
+
+    return expr
+
 def tamper(payload, **kwargs):
     """
     Replaces instances like 'IF(A, B, C)' with 'CASE WHEN (A) THEN (B) ELSE (C) END' counterpart
@@ -62,9 +90,9 @@ def tamper(payload, **kwargs):
                         depth -= 1
 
             if len(commas) == 2 and end:
-                a = payload[index + len("IF("):commas[0]].strip("()")
-                b = payload[commas[0] + 1:commas[1]].lstrip().strip("()")
-                c = payload[commas[1] + 1:end].lstrip().strip("()")
+                a = _unwrap(payload[index + len("IF("):commas[0]])
+                b = _unwrap(payload[commas[0] + 1:commas[1]])
+                c = _unwrap(payload[commas[1] + 1:end])
                 newVal = "CASE WHEN (%s) THEN (%s) ELSE (%s) END" % (a, b, c)
                 payload = payload[:index] + newVal + payload[end + 1:]
             else:
