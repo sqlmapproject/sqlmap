@@ -1522,6 +1522,93 @@ class TestHexConvert(_InferenceCase):
         self.assertEqual(value, decodeDbmsHexValue(hexed))
 
 
+class TestHexEncodedShortcutsGated(_InferenceCase):
+    """Under --hex / --binary-fields the expression is HEX()-wrapped, so the whole-value equality
+    shortcuts (low-card guess, oracle litmus) compare a hex-DECODED value against it and always miss -
+    wasting a probe per cell and tripping a spurious "unreliable" alarm. They must be skipped there.
+    Spying valueMatchCondition (the guess calls it first, 'continue's on None) and the litmus lets us
+    see whether each shortcut was reached without a full injection/agent context."""
+
+    _EXTRA_KB = ("lowCardCache", "dumpCharset", "dumpCharsetStable", "litmusCounter",
+                 "reliabilityAlarm", "huffmanModel", "multiThreadMode", "commonOutputs")
+
+    def setUp(self):
+        _InferenceCase.setUp(self)
+        self._saved_extra_kb = {k: kb.get(k) for k in self._EXTRA_KB}
+        self._saved_noHuffman = conf.get("noHuffman")
+        self._saved_binaryFields = conf.get("binaryFields")
+        self._saved_dbms = kb.get("dbms")
+        self._saved_vmc = inf.valueMatchCondition
+        self._saved_litmus = inf.oracleReliabilityLitmus
+        conf.noHuffman = True            # keep extraction on the classic '>' bisection path
+        conf.binaryFields = None
+        # bisection only builds the nulled/casted (and HEX-wrapped) expression - the step that sets
+        # kb.binaryField - when Backend.getDbms() is truthy; set_dbms() only forces getIdentifiedDbms()
+        kb.dbms = "MySQL"
+        kb.lowCardCache = {}
+        kb.dumpCharset = {}
+        kb.dumpCharsetStable = {}
+        kb.litmusCounter = 0
+        kb.reliabilityAlarm = False
+        kb.huffmanModel = {}
+        kb.multiThreadMode = False
+        kb.commonOutputs = None
+
+    def tearDown(self):
+        inf.valueMatchCondition = self._saved_vmc
+        inf.oracleReliabilityLitmus = self._saved_litmus
+        conf.noHuffman = self._saved_noHuffman
+        conf.binaryFields = self._saved_binaryFields
+        kb.dbms = self._saved_dbms
+        for k, v in self._saved_extra_kb.items():
+            kb[k] = v
+        _InferenceCase.tearDown(self)
+
+    _HEXED = "48656C6C6F"                # hex of "Hello"; all-ASCII so the shortcuts are applicable
+
+    def _run(self, hexConvert, expression="SELECT secret", binaryField=False):
+        conf.hexConvert = hexConvert
+        if binaryField:
+            conf.binaryFields = [agent.getFields(expression)[6]]     # the field bisection will hex-wrap
+        # arm the low-cardinality cache for this column so the guess WOULD fire if not gated
+        kb.lowCardCache[inf.normalizedExpression(expression)] = {"Hello": 3}
+        calls = {"guess": 0, "litmus": 0}
+
+        def vmc_spy(*args, **kwargs):
+            calls["guess"] += 1
+            return None                  # None -> guess loop 'continue's: no probe, no agent context needed
+
+        def litmus_spy(*args, **kwargs):
+            calls["litmus"] += 1
+            return True
+
+        inf.valueMatchCondition = vmc_spy
+        inf.oracleReliabilityLitmus = litmus_spy
+        _, value = self._bisect(self._HEXED, expression=expression, length=len(self._HEXED), dump=True)
+        return value, calls
+
+    def test_shortcuts_fire_without_hex(self):
+        # control: on a normal dump both shortcuts are reached (proves the test can actually see them,
+        # so the skips below are the gate doing its job, not a dead assertion)
+        value, calls = self._run(hexConvert=False)
+        self.assertEqual(value, self._HEXED)                 # no decode without --hex
+        self.assertGreater(calls["guess"], 0, "low-card guess should run on a normal dump")
+        self.assertEqual(calls["litmus"], 1, "oracle litmus should run on a normal dump")
+
+    def test_shortcuts_skipped_under_hex(self):
+        value, calls = self._run(hexConvert=True)
+        self.assertEqual(value, "Hello")                     # extraction still correct (decoded on the way out)
+        self.assertEqual(calls["guess"], 0, "low-card guess must be skipped when the expression is HEX-wrapped")
+        self.assertEqual(calls["litmus"], 0, "oracle litmus must be skipped when the expression is HEX-wrapped")
+        self.assertFalse(kb.reliabilityAlarm, "no false 'unreliable' alarm on a correct --hex dump")
+
+    def test_shortcuts_skipped_under_binary_field(self):
+        value, calls = self._run(hexConvert=False, binaryField=True)
+        self.assertEqual(value, self._HEXED)
+        self.assertEqual(calls["guess"], 0, "shortcuts must be skipped for a --binary-fields column")
+        self.assertEqual(calls["litmus"], 0)
+
+
 class TestProcessCharHook(_InferenceCase):
     def test_process_char_applied_to_each_char(self):
         # kb.data.processChar transforms every assembled character

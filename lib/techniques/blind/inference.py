@@ -268,6 +268,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     finalValue = None
     retrievedLength = 0
     columnKey = None
+    hexEncoded = False
 
     if payload is None:
         return 0, None
@@ -369,6 +370,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         # rows for low-cardinality guessing and for its own per-column online Huffman model.
         columnKey = normalizedExpression(expression) if dump else None
 
+        # Whole-value equality shortcuts (low-card guess, litmus) compare a hex-DECODED value against a
+        # HEX()-wrapped expression -> always miss; skip them when hex-encoding (--hex / --binary-fields).
+        hexEncoded = bool(conf.hexConvert or kb.binaryField)
+
         # Low-cardinality whole-value guessing: when the distinct values already seen for this column are
         # few (<= LOW_CARDINALITY_THRESHOLD), confirm the current cell by equality against each of them
         # (one request on a hit) before per-character extraction - a large win on the enum/flag/status/
@@ -376,7 +381,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
         # Especially valuable for TIME-BASED blind: a hit confirms the whole value in a single delayed
         # request instead of ~7 delays/char x N chars. The repetition gate below ensures it only ever fires
         # on genuinely low-cardinality columns, so unique identifier names never pay a wasted probe/delay.
-        if columnKey is not None and not partialValue:
+        if columnKey is not None and not partialValue and not hexEncoded:
             # Snapshot the shared cache under the lock (value-parallel workers may mutate it concurrently).
             with kb.locks.prediction:
                 seen = dict(kb.lowCardCache.get(columnKey) or ())
@@ -1188,7 +1193,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     # known-answer differential so an always-true / flaky / degraded channel that would otherwise dump
     # SILENT garbage instead raises a one-time "results may be unreliable" warning. First value is always
     # checked (catch it before a whole bad dump), then every ORACLE_LITMUS_CHECK_EVERY-th.
-    if (ORACLE_LITMUS_CHECK_EVERY and finalValue and not kb.reliabilityAlarm and not kb.bruteMode
+    if (ORACLE_LITMUS_CHECK_EVERY and finalValue and not kb.reliabilityAlarm and not kb.bruteMode and not hexEncoded
             and (columnKey is not None or kb.partRun in NAME_PREDICTION_CONTEXTS)):
         with kb.locks.prediction:
             kb.litmusCounter += 1
