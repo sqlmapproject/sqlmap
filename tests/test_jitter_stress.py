@@ -6,17 +6,19 @@ See the file 'LICENSE' for copying permission
 
 Adversarial JITTER stress harness for time-based blind extraction.
 
-Drives the REAL bisection() + REAL wasLastResponseDelayed() against a mock oracle that returns a
-simulated RESPONSE DURATION (base + jitter + timeSec-if-condition-true) instead of a boolean - so
-the actual statistical delay-decision and its re-validation run under controlled network jitter,
-with NO real sleeping (thousands of extractions per second, fully deterministic per seed).
+Drives the REAL bisection() + REAL wasLastResponseDelayed() + REAL validateChar() re-validation
+against a mock oracle that returns a simulated RESPONSE DURATION (base + jitter + timeSec-if-condition-
+true) instead of a boolean - so the whole time-based decision stack runs under controlled network
+jitter, with NO real sleeping (thousands of extractions per second, fully deterministic per seed).
+The delimiter-wrapped template is what lets validateChar's per-char '!=' re-check actually fire (it is
+sqlmap's main defense against a single spike faking one bit); without it the harness is far too harsh.
 
 Two tiers:
-  * TestJitterRegression   - ALWAYS runs. Low/mild jitter MUST extract perfectly. A real regression
-                             guard for the time-based decision stack (deterministic, fast, non-flaky).
-  * TestJitterStressSweep  - OPT-IN (set env SQLMAP_JITTER_STRESS=1). The adversarial sweeps that map
-                             the failure surface (Gaussian sigma, heavy-tailed spikes). Informational
-                             + loose bounds only; kept out of normal CI to avoid slowness/flakiness.
+  * TestJitterRegression   - ALWAYS runs. Low/mild jitter MUST extract perfectly, and a spike in the
+                             baseline model MUST NOT hide genuine delays. Deterministic, fast, non-flaky.
+  * TestJitterStressSweep  - OPT-IN (set env SQLMAP_JITTER_STRESS=1). Adversarial sweeps (Gaussian
+                             sigma, heavy-tailed spikes) mapping where extraction finally degrades.
+                             Informational + loose bounds only; kept out of normal CI (slow/noisy).
 
 Run the sweep on demand:  SQLMAP_JITTER_STRESS=1 python -m unittest tests.test_jitter_stress -v
 """
@@ -35,11 +37,15 @@ from lib.core.data import conf, kb
 from lib.core.common import getCurrentThreadData, setTechnique
 from lib.core.datatype import AttribDict
 from lib.core.enums import ADJUST_TIME_DELAY, PAYLOAD
+from lib.core.settings import PAYLOAD_DELIMITER
 from lib.request.connect import Connect
 import lib.techniques.blind.inference as inf
 
-_TEMPLATE = "EXPR=%s IDX=%d CMP>%d"
-_PARSE = re.compile(r"IDX=(\d+) CMP(.)(\d+)")
+# The comparison must sit BETWEEN PAYLOAD_DELIMITERs: validateChar (inference.py) rewrites '>' to '!='
+# with a regex anchored on the delimiters, and without them that per-char re-validation silently
+# no-ops (defeating sqlmap's main per-request-spike defense and making this harness far too pessimistic).
+_TEMPLATE = "%sEXPR=%%s IDX=%%d CMP>%%d%s" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMITER)
+_PARSE = re.compile(r"IDX=(\d+) CMP(!=|=|>)(\d+)")   # bisection '>'/'=' plus validateChar's '!='
 _TIMESEC = 5.0
 _BASE = 0.10          # base (non-delay) round-trip latency, seconds
 _STRESS = os.environ.get("SQLMAP_JITTER_STRESS")
@@ -107,7 +113,7 @@ class _JitterBase(unittest.TestCase):
                 return False
             idx, op, thr = int(m.group(1)), m.group(2), int(m.group(3))
             ch = ord(secret[idx - 1]) if 0 <= idx - 1 < len(secret) else 0
-            cond = (ch > thr) if op == ">" else (ch == thr)
+            cond = (ch > thr) if op == ">" else (ch != thr) if op == "!=" else (ch == thr)
             if "NOT(" in payload:
                 cond = not cond
             td.lastQueryDuration = _BASE + abs(jitter(rng)) + (_TIMESEC if cond else 0.0)
@@ -183,11 +189,14 @@ class TestJitterRegression(_JitterBase):
 @unittest.skipUnless(_STRESS, "adversarial jitter sweep is opt-in (set SQLMAP_JITTER_STRESS=1)")
 class TestJitterStressSweep(_JitterBase):
     """Opt-in failure-surface map. Prints correctness vs jitter and asserts only loose, non-flaky
-    invariants (clean case perfect, degradation is monotone-ish). Use to evaluate hardening changes."""
+    invariants (clean case perfect). Use to evaluate hardening changes."""
 
     SECRET = "Str0ng!"
 
     def test_gaussian_sweep(self):
+        # Continuous jitter: degrades only once sigma approaches timeSec/7 (7*stdev threshold nears the
+        # real delay). That is the FUNDAMENTAL limit of the statistic - the answer there is a larger
+        # timeSec (--time-sec), not a code change; shown here so a regression that degrades it earlier is visible.
         print("\n[jitter] Gaussian sigma sweep (timeSec=%.0f, base=%.2f):" % (_TIMESEC, _BASE))
         for sigma in (0.0, 0.3, 0.5, 0.7, 0.9, 1.2):
             ok, n = self._rate(self.SECRET, _gaussian(sigma))
@@ -196,8 +205,11 @@ class TestJitterStressSweep(_JitterBase):
                 self.assertEqual(ok, n)
 
     def test_heavy_tailed_spike_sweep(self):
+        # One-off +8s spikes: baseline-trim (stripTimeOutliers) keeps the model clean and validateChar's
+        # '!=' re-check catches a spike that fakes a single bit, so extraction stays ~perfect until an
+        # absurd spike rate (a fifth of all requests). This is the payoff of both defenses together.
         print("\n[jitter] Heavy-tailed spike sweep (base sigma=0.2, spike=+8s):")
-        for p in (0.0, 0.01, 0.03, 0.05, 0.10):
+        for p in (0.0, 0.01, 0.03, 0.05, 0.10, 0.20):
             ok, n = self._rate(self.SECRET, _spike(0.2, p, 8.0))
             print("  spike_p=%.2f -> %d/%d (%3.0f%%)" % (p, ok, n, 100.0 * ok / n))
             if p == 0.0:
