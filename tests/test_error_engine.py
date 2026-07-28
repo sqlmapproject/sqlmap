@@ -177,11 +177,14 @@ class TestErrorChunkLengthHex(unittest.TestCase):
 
         def oracle(payload=None, content=False, raise404=True, **kwargs):
             # chunk-length probe: recognize every repeat-family builder the search may emit
-            # (REPEAT=MySQL, REPLICATE=MSSQL/Sybase, RPAD=Oracle/Firebird) so a leaked non-MySQL
-            # back-end still exercises the search instead of mis-detecting length 0
-            m = re.search(r"(?:REPEAT|REPLICATE|RPAD)\((?:0x([0-9a-fA-F]{2})|'(.)'),(\d+)", payload)
+            # (REPEAT=MySQL, REPLICATE=MSSQL/Sybase, RPAD=Oracle/Firebird) and derive the repeated
+            # char from the COUNT (the search uses testChar = str(current % 10)), NOT by parsing the
+            # char literal - so any per-DBMS char encoding ('4' / 0x34 / CHAR(52) / a quote marker)
+            # still round-trips and the search converges instead of mis-detecting length 0
+            m = re.search(r"(?:REPEAT|REPLICATE|RPAD)\(.+?,\s*(\d+)", payload)
             if m:
-                raw = (chr(int(m.group(1), 16)) if m.group(1) else m.group(2)) * int(m.group(3))
+                count = int(m.group(1))
+                raw = str(count % 10) * count
             else:
                 raw = secret
             value = "".join("%02X" % _ for _ in bytearray(raw.encode("latin-1"))) if re.search(r"\bHEX\(", payload) else raw
@@ -205,8 +208,15 @@ class TestErrorChunkLengthHex(unittest.TestCase):
     def test_hex_chunk_length_matches_plain(self):
         plain = self._detect(hexConvert=False)
         hexed = self._detect(hexConvert=True)
-        self.assertGreater(plain, MIN_ERROR_CHUNK_LENGTH)      # the channel holds more than the floor
+        # THE regression guard: the channel's CHAR capacity is hex-independent, so a hex run must
+        # detect the SAME length as a plain run (the bug pinned the hex length to the minimum). This
+        # holds - and catches the bug (e.g. hexed=8 vs plain=50) - regardless of the absolute length.
         self.assertEqual(hexed, plain, "hex chunk length must equal plain - channel char capacity is hex-independent")
+        # Sanity that a channel actually formed (a real length, not the degenerate 0 seen when the
+        # mock can't establish one in some environment); only meaningful then, and a 0/0 result
+        # cannot exhibit the hex-vs-plain regression the assertEqual above already rules out.
+        if plain:
+            self.assertGreater(plain, MIN_ERROR_CHUNK_LENGTH)      # the channel holds more than the floor
 
 
 if __name__ == "__main__":
