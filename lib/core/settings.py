@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.7.237"
+VERSION = "1.10.7.238"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -231,6 +231,12 @@ CONCAT_VALUE_DELIMITER = '|'
 
 # Coefficient used for a time-based query delay checking (must be >= 7)
 TIME_STDEV_COEFF = 7
+
+# Robust (median/MAD) cutoff for discarding spike outliers from the time-response model before
+# computing avg/stdev - a single network spike landing in the baseline would otherwise inflate the
+# delay threshold and miss genuine delays. Deliberately wide (~10 robust sigmas) so a clean model is
+# left untouched (identical threshold) and only true outliers are dropped.
+TIME_OUTLIER_MAD_COEFF = 10
 
 # Minimum response time that can be even considered as delayed (not a complete requirement)
 MIN_VALID_DELAYED_RESPONSE = 0.5

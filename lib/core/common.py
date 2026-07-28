@@ -183,6 +183,7 @@ from lib.core.settings import STRUCTURAL_ID_REGEX
 from lib.core.settings import STRUCTURAL_TAG_REGEX
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import TEXT_TAG_REGEX
+from lib.core.settings import TIME_OUTLIER_MAD_COEFF
 from lib.core.settings import TIME_STDEV_COEFF
 from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import UNKNOWN_DBMS_VERSION
@@ -2880,6 +2881,38 @@ def wasLastResponseHTTPError():
     threadData = getCurrentThreadData()
     return threadData.lastHTTPError and threadData.lastHTTPError[0] == threadData.lastRequestUID
 
+def stripTimeOutliers(values):
+    """
+    Returns L{values} with high (spike) outliers removed, using a robust median/MAD cutoff.
+
+    A single network spike that lands in the time-response model would otherwise inflate both the
+    average and the standard deviation, exploding the delay threshold (avg + 7*stdev) so that genuine
+    time-delays are no longer recognized. MAD is robust to a minority of outliers, so the cutoff is
+    computed from the clean bulk even when the sample already contains a spike. On a clean model no
+    value exceeds median + 10*MAD, so it is returned unchanged (identical avg/stdev/threshold).
+
+    >>> len(stripTimeOutliers([0.1, 0.12] * 8 + [9.0]))   # a lone 9s spike is dropped (17->16)
+    16
+    >>> len(stripTimeOutliers([0.1, 0.12] * 8))           # a clean model is left intact (no-op)
+    16
+    """
+
+    if not values or len(values) < MIN_TIME_RESPONSES // 2:
+        return values
+
+    ordered = sorted(values)
+    median = ordered[len(ordered) // 2]
+    mad = sorted(abs(_ - median) for _ in values)[len(values) // 2]
+
+    if mad <= 0:  # degenerate (near-constant model) - nothing robust to trim on
+        return values
+
+    cutoff = median + TIME_OUTLIER_MAD_COEFF * 1.4826 * mad
+    retVal = [_ for _ in values if _ <= cutoff]
+
+    # never trim away the bulk (guards a genuinely wide/bimodal model from being gutted)
+    return retVal if len(retVal) >= max(MIN_TIME_RESPONSES // 2, len(values) // 2) else values
+
 def wasLastResponseDelayed():
     """
     Returns True if the last web request resulted in a time-delay
@@ -2889,7 +2922,10 @@ def wasLastResponseDelayed():
     # response times should be inside +-7*stdev([normal response times])
     # Math reference: http://www.answers.com/topic/standard-deviation
 
-    deviation = stdev(kb.responseTimes.get(kb.responseTimeMode, []))
+    # spike outliers (e.g. a GC pause / retransmit during baseline sampling) are stripped first, so a
+    # single lagging response can't inflate the model and hide every genuine delay behind it
+    sample = stripTimeOutliers(kb.responseTimes.get(kb.responseTimeMode, []))
+    deviation = stdev(sample)
     threadData = getCurrentThreadData()
 
     if deviation and not conf.direct and not conf.disableStats:
@@ -2898,7 +2934,7 @@ def wasLastResponseDelayed():
             warnMsg += "with less than %d response times" % MIN_TIME_RESPONSES
             logger.warning(warnMsg)
 
-        lowerStdLimit = average(kb.responseTimes[kb.responseTimeMode]) + TIME_STDEV_COEFF * deviation
+        lowerStdLimit = average(sample) + TIME_STDEV_COEFF * deviation
         retVal = (threadData.lastQueryDuration >= max(MIN_VALID_DELAYED_RESPONSE, lowerStdLimit))
 
         if not kb.testMode and retVal:

@@ -26,6 +26,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _testutils import bootstrap, set_dbms, reset_dbms
 bootstrap()
 
+from lib.core.common import getCurrentThreadData, setTechnique
 from lib.core.data import conf, kb
 from lib.core.datatype import AttribDict
 from lib.core.enums import PAYLOAD, PLACE
@@ -52,6 +53,7 @@ class TestOneShotErrorUse(unittest.TestCase):
             "conf.paramDict": conf.get("paramDict"), "conf.base64Parameter": conf.get("base64Parameter"),
             "kb.errorChunkLength": kb.get("errorChunkLength"), "kb.testMode": kb.get("testMode"),
             "kb.forceWhere": kb.get("forceWhere"), "kb.technique": kb.get("technique"),
+            "td.technique": getCurrentThreadData().technique,
             "kb.inj": (kb.injection.place, kb.injection.parameter, kb.injection.data),
             "qp": Connect.queryPage,
         }
@@ -67,6 +69,7 @@ class TestOneShotErrorUse(unittest.TestCase):
         kb.injection.place = PLACE.GET
         kb.injection.parameter = "id"
         kb.technique = PAYLOAD.TECHNIQUE.ERROR
+        setTechnique(PAYLOAD.TECHNIQUE.ERROR)   # getTechnique() prefers the thread-local; set it so a leaked one can't poison us
         kb.injection.data = {PAYLOAD.TECHNIQUE.ERROR: _make_vector()}
         set_dbms("MySQL")
 
@@ -81,6 +84,7 @@ class TestOneShotErrorUse(unittest.TestCase):
         kb.testMode = self._saved["kb.testMode"]
         kb.forceWhere = self._saved["kb.forceWhere"]
         kb.technique = self._saved["kb.technique"]
+        setTechnique(self._saved["td.technique"])
         kb.injection.place, kb.injection.parameter, kb.injection.data = self._saved["kb.inj"]
         Connect.queryPage = self._saved["qp"]
         eu.Request.queryPage = self._saved["qp"]
@@ -126,6 +130,7 @@ class TestErrorChunkLengthHex(unittest.TestCase):
             "paramDict": conf.get("paramDict"), "base64Parameter": conf.get("base64Parameter"),
             "errorChunkLength": kb.get("errorChunkLength"), "testMode": kb.get("testMode"),
             "forceWhere": kb.get("forceWhere"), "technique": kb.get("technique"),
+            "td.technique": getCurrentThreadData().technique,
             "inj": (kb.injection.place, kb.injection.parameter, kb.injection.data),
             "qp": Connect.queryPage,
             "dbmsHandler": conf.get("dbmsHandler"), "forceDbms": conf.get("forceDbms"),
@@ -145,6 +150,7 @@ class TestErrorChunkLengthHex(unittest.TestCase):
         kb.injection.place = PLACE.GET
         kb.injection.parameter = "id"
         kb.technique = PAYLOAD.TECHNIQUE.ERROR
+        setTechnique(PAYLOAD.TECHNIQUE.ERROR)   # getTechnique() prefers the thread-local; set it so a leaked one can't poison us
         kb.injection.data = {PAYLOAD.TECHNIQUE.ERROR: _make_vector()}
         # With testMode=False, getIdentifiedDbms() prefers conf.dbmsHandler._dbms and conf.forceDbms
         # over the forced DBMS below; a leaked handler/option (e.g. MSSQL) would make the chunk-length
@@ -164,6 +170,7 @@ class TestErrorChunkLengthHex(unittest.TestCase):
         kb.testMode = self._saved["testMode"]
         kb.forceWhere = self._saved["forceWhere"]
         kb.technique = self._saved["technique"]
+        setTechnique(self._saved["td.technique"])
         kb.injection.place, kb.injection.parameter, kb.injection.data = self._saved["inj"]
         Connect.queryPage = self._saved["qp"]
         eu.Request.queryPage = self._saved["qp"]
