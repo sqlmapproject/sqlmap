@@ -513,11 +513,20 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             result = not Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
 
-            if result and timeBasedCompare and getTechniqueData().trueCode:
-                result = threadData.lastCode == getTechniqueData().trueCode
-                if not result:
-                    warnMsg = "detected HTTP code '%s' in validation phase is differing from expected '%s'" % (threadData.lastCode, getTechniqueData().trueCode)
-                    singleTimeWarnMessage(warnMsg)
+            if result and getTechniqueData() is not None:
+                trueCode, falseCode = getTechniqueData().trueCode, getTechniqueData().falseCode
+                if timeBasedCompare:
+                    if trueCode:
+                        result = threadData.lastCode == trueCode
+                        if not result:
+                            warnMsg = "detected HTTP code '%s' in validation phase is differing from expected '%s'" % (threadData.lastCode, trueCode)
+                            singleTimeWarnMessage(warnMsg)
+                # A boolean validation confirmed under an UNEXPECTED HTTP code (a transient 5xx/403/429/..
+                # landing on the validation request itself) is not trustworthy - fail it so the character is
+                # re-extracted, riding out the blip. On a clean target every code is true/false -> no-op.
+                elif threadData.lastCode is not None and any((trueCode, falseCode)) and threadData.lastCode not in (trueCode, falseCode):
+                    result = False
+                    singleTimeWarnMessage("unexpected HTTP code '%s' during validation phase; will re-extract" % threadData.lastCode)
 
             incrementCounter(getTechnique())
 
