@@ -1967,19 +1967,21 @@ def getLimitRange(count, plusOne=False):
 
     if kb.dumpTable:
         if conf.limitStart and conf.limitStop and conf.limitStart > conf.limitStop:
-            limitStop = conf.limitStart
+            limitStop = min(conf.limitStart, count)  # a '--start' beyond the table must not request out-of-range offsets (phantom rows)
             limitStart = conf.limitStop
             reverse = True
         else:
             if isinstance(conf.limitStop, int) and conf.limitStop > 0 and conf.limitStop < limitStop:
                 limitStop = conf.limitStop
 
-            if isinstance(conf.limitStart, int) and conf.limitStart > 0 and conf.limitStart <= limitStop:
+            # NOTE: no '<= limitStop' gate - a '--start' past the row count must yield an EMPTY range
+            # (correctly skipping past every row), not silently fall back to dumping the whole table
+            if isinstance(conf.limitStart, int) and conf.limitStart > 0:
                 limitStart = conf.limitStart
 
     retVal = xrange(limitStart, limitStop + 1) if plusOne else xrange(limitStart - 1, limitStop)
 
-    if reverse:
+    if reverse and len(retVal):  # len() guard: a clamped out-of-range '--start' can leave the range empty
         retVal = xrange(retVal[-1], retVal[0] - 1, -1)
 
     return retVal

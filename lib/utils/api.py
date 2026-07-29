@@ -875,7 +875,8 @@ def download(taskid, target, filename):
 
     if os.path.isfile(path):
         logger.debug("(%s) Retrieved content of file %s" % (taskid, target))
-        content = openFile(path, "rb").read()
+        with openFile(path, "rb") as f:
+            content = f.read()
         return jsonize({"success": True, "file": encodeBase64(content, binary=False)})
     else:
         logger.warning("[%s] File does not exist %s" % (taskid, target))

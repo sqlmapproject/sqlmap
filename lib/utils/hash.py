@@ -1117,7 +1117,7 @@ def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc
                 word = word + suffix
 
             try:
-                current = __functions__[hash_regex](password=word, uppercase=False)
+                current = __functions__[hash_regex](password=getBytes(word, unsafe=False), uppercase=False)
 
                 if current in hashes:
                     for item in attack_info[:]:
@@ -1195,7 +1195,7 @@ def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found
                 word = word + suffix
 
             try:
-                current = __functions__[hash_regex](password=word, uppercase=False, **kwargs)
+                current = __functions__[hash_regex](password=getBytes(word, unsafe=False), uppercase=False, **kwargs)
 
                 if hash_ == current:
                     if hash_regex == HASH.ORACLE_OLD:  # only for cosmetic purposes
@@ -1285,7 +1285,7 @@ def _bruteProcessVariantSalted(attack_info, hash_regex, suffix, retVal, proc_id,
                 ((user, hash_), kwargs) = item
 
                 try:
-                    current = __functions__[hash_regex](password=word, uppercase=False, **kwargs)
+                    current = __functions__[hash_regex](password=getBytes(word, unsafe=False), uppercase=False, **kwargs)
 
                     if hash_ == current:
                         retVal.put((user, hash_, word))

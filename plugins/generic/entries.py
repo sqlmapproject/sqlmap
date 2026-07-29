@@ -333,7 +333,9 @@ class Entries(object):
                                 kb.data.dumpedTable[column] = {"length": len(column), "values": BigArray()}
 
                             for entry in entries:
-                                if entry is None or len(entry) == 0:
+                                # skip a missing/empty ROW container, but NOT an empty-string CELL value
+                                # (single-column dumps yield bare strings; len("")==0 must not drop the row)
+                                if entry is None or (isListLike(entry) and len(entry) == 0):
                                     continue
 
                                 if isinstance(entry, six.string_types):

@@ -67,7 +67,7 @@ def comparison(page, headers, code=None, getRatioValue=False, pageLength=None):
     return _
 
 def _adjust(condition, getRatioValue):
-    if not any((conf.string, conf.notString, conf.regexp, conf.code)):
+    if not any((conf.string, conf.notString, conf.regexp, conf.code, conf.lengths)):
         # Negative logic approach is used in raw page comparison scheme as that what is "different" than original
         # PAYLOAD.WHERE.NEGATIVE response is considered as True; in switch based approach negative logic is not
         # applied as that what is by user considered as True is that what is returned by the comparison mechanism

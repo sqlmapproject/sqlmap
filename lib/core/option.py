@@ -520,7 +520,8 @@ def _setOpenApiTargets():
         checkFile(conf.openApiFile)
         infoMsg = "parsing OpenAPI/Swagger specification from '%s'" % conf.openApiFile
         logger.info(infoMsg)
-        content = openFile(conf.openApiFile).read()
+        with openFile(conf.openApiFile) as f:
+            content = f.read()
 
     tags = [_.strip() for _ in re.split(PARAMETER_SPLITTING_REGEX, conf.openApiTags) if _.strip()] if conf.openApiTags else None
     if tags:
@@ -835,7 +836,8 @@ def _listTamperingFunctions():
         logger.info(infoMsg)
 
         for script in sorted(glob.glob(os.path.join(paths.SQLMAP_TAMPER_PATH, "*.py"))):
-            content = openFile(script, 'r').read()
+            with openFile(script, 'r') as f:
+                content = f.read()
             match = re.search(r'(?s)__priority__.+"""(.+)"""', content)
             if match:
                 comment = match.group(1).strip()

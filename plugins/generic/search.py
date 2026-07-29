@@ -135,8 +135,9 @@ class Search(object):
                     query = agent.limitQuery(index, query, dbCond)
 
                     value = unArrayizeValue(inject.getValue(query, union=False, error=False))
-                    value = safeSQLIdentificatorNaming(value)
-                    foundDbs.append(value)
+                    if not isNoneValue(value):  # guard (mirrors searchTable) so a failed retrieval can't push a None/garbage name
+                        value = safeSQLIdentificatorNaming(value)
+                        foundDbs.append(value)
 
         conf.dumper.lister("found databases", foundDbs)
 

@@ -577,7 +577,7 @@ def getUnicode(value, encoding=None, noneToNull=False):
 
         try:
             return six.text_type(value, encoding or (kb.get("pageEncoding") if kb.get("originalPage") else None) or UNICODE_ENCODING)
-        except UnicodeDecodeError:
+        except (UnicodeDecodeError, LookupError):  # LookupError: an unknown/invalid encoding name must fall back, not crash
             return six.text_type(value, UNICODE_ENCODING, errors="reversible")
     elif isListLike(value):
         value = list(getUnicode(_, encoding, noneToNull) for _ in value)

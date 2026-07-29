@@ -406,7 +406,8 @@ class Connect(object):
                         errMsg = "problem occurred while loading cookies from file '%s'" % conf.liveCookies
                         raise SqlmapValueException(errMsg)
 
-                cookie = openFile(conf.liveCookies).read().strip()
+                with openFile(conf.liveCookies) as f:
+                    cookie = f.read().strip()
                 cookie = re.sub(r"(?i)\ACookie:\s*", "", cookie)
 
         if multipart:
@@ -545,7 +546,8 @@ class Connect(object):
                 headers = forgeHeaders(auxHeaders, headers)
 
             if kb.headersFile:
-                content = openFile(kb.headersFile, 'r').read()
+                with openFile(kb.headersFile, 'r') as f:
+                    content = f.read()
                 for line in content.split("\n"):
                     line = getText(line.strip())
                     if ':' in line:

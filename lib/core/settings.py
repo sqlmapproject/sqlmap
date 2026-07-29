@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.7.242"
+VERSION = "1.10.7.243"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -533,8 +533,11 @@ ERROR_PARSING_REGEXES = (
     r'"(?:errmsg|errorMessage|reason|msg)"\s*:\s*"(?P<result>[^"]+)"'      # generic JSON error-message field (NoSQL document/REST back-ends)
 )
 
-# Regular expression used for parsing charset info from meta html headers
-META_CHARSET_REGEX = r"""(?si)<head\b[^>]*>.*<meta[^>]+charset\s*=\s*["']?(?P<result>[^"'> ]+).*</head>"""
+# Regular expression used for parsing charset info from meta html headers (Note: the tempered token
+# '(?:(?!</head>).)*?' keeps the meta strictly INSIDE <head> - as the old trailing '.*</head>' did -
+# while the bounded meta-attr scan '{0,300}?' keeps it LINEAR; the old greedy form went quadratic and
+# hung for many minutes on an attacker-controlled body full of '<meta' tokens lacking '>'/'</head>')
+META_CHARSET_REGEX = r"""(?si)<head\b[^>]*>(?:(?!</head>).)*?<meta[^>]{0,300}?charset\s*=\s*["']?(?P<result>[^"'> ]+)"""
 
 # Regular expression used for parsing refresh info from meta html headers
 META_REFRESH_REGEX = r'(?i)<meta http-equiv="?refresh"?[^>]+content="?[^">]+;\s*(url=)?["\']?(?P<result>[^\'">]+)'

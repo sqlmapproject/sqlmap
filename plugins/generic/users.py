@@ -627,17 +627,18 @@ class Users(object):
                     elif Backend.isDbms(DBMS.DB2):
                         privs = privilege.split(',')
                         privilege = privs[0]
-                        privs = privs[1]
-                        privs = list(privs.strip())
-                        i = 1
+                        if len(privs) > 1:  # guard a comma-less privilege value (mirrors the inband path)
+                            privs = privs[1]
+                            privs = list(privs.strip())
+                            i = 1
 
-                        for priv in privs:
-                            if priv.upper() in ('Y', 'G'):
-                                for position, db2Priv in DB2_PRIVS.items():
-                                    if position == i:
-                                        privilege += ", " + db2Priv
+                            for priv in privs:
+                                if priv.upper() in ('Y', 'G'):
+                                    for position, db2Priv in DB2_PRIVS.items():
+                                        if position == i:
+                                            privilege += ", " + db2Priv
 
-                            i += 1
+                                i += 1
 
                         privileges.add(privilege)
 
