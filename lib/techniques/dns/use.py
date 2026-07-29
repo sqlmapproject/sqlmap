@@ -87,7 +87,7 @@ def dnsUse(payload, expression):
                     # Note: non-greedy so a '--dns-domain' label that happens to match the random
                     # suffix can't make the match run past the real boundary (the boundary alphabet
                     # excludes hex characters, so it can never under-match into the hex payload)
-                    _ = extractRegexResult(r"%s\.(?P<result>.+?)\.%s" % (prefix, suffix), _, re.I)
+                    _ = extractRegexResult(r"%s\.(?P<result>.+?)\.%s" % (re.escape(prefix), re.escape(suffix)), _, re.I)
                     _ = decodeDbmsHexValue(_)
                     output = (output or "") + _
                     offset += len(_)
