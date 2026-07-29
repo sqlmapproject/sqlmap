@@ -202,7 +202,7 @@ class HASH(object):
     SHA256_UNIX_CRYPT = r'\A\$5\$(?:rounds=\d+\$)?[./0-9A-Za-z]{1,16}\$[./0-9A-Za-z]{43}\Z'
     SHA512_UNIX_CRYPT = r'\A\$6\$(?:rounds=\d+\$)?[./0-9A-Za-z]{1,16}\$[./0-9A-Za-z]{86}\Z'
     JOOMLA = r'\A[0-9a-f]{32}:\w{32}\Z'
-    PHPASS = r'\A\$[PHQS]\$[./0-9a-zA-Z]{31}\Z'
+    PHPASS = r'\A\$(?:[PHQ]\$[./0-9a-zA-Z]{31}|S\$[./0-9a-zA-Z]{52})\Z'  # $P$/$H$/$Q$ (WordPress/phpBB) are 34 chars; Drupal 7 '$S$' is 55 (DRUPAL_HASH_LENGTH)
     APACHE_MD5_CRYPT = r'\A\$apr1\$.{1,8}\$[./a-zA-Z0-9]+\Z'
     UNIX_MD5_CRYPT = r'\A\$1\$.{1,8}\$[./a-zA-Z0-9]+\Z'
     APACHE_SHA1 = r'\A\{SHA\}[a-zA-Z0-9+/]+={0,2}\Z'

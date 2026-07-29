@@ -1058,6 +1058,10 @@ def hashRecognition(value):
     True
     >>> hashRecognition("S:2BFCFDF5895014EE9BB2B9BA067B01E0389BB5711B7B5F82B7235E9E182C") == HASH.ORACLE
     True
+    >>> hashRecognition("$P$9aD9ZLmkpsN4A83G8MefaaP888gVKX0") == HASH.PHPASS
+    True
+    >>> hashRecognition("$S$5iwtD/g.KZT2rwC9DASy/mGYAThkSd3lBFdkONi1Ig1IEpBpqG8W") == HASH.PHPASS
+    True
     >>> hashRecognition("foobar") == None
     True
     """
