@@ -485,11 +485,15 @@ def _confirmRead(page, pattern, baseline):
     return None
 
 
-def _normalizeEscaping(text):
-    """Bounded, non-resolving decode of the common reflection encodings (HTML entities, percent-
-    encoding, JS \\uXXXX / escaped slash) so an ESCAPED entity reference (&amp;e;, &#38;e;, &#x26;e;,
-    %26e%3B, \\u0026e;) is unmasked and can be recognised as reflection rather than file content."""
+def _reflectsEntity(text, ent):
+    """True if the random entity NAME surfaces at ANY bounded de-escaping depth (raw included) - i.e.
+    the parser echoed the reference in some encoding (&amp;e;, &#38;e;, &#x26;e;, %26e%3B, \\u0026e;)
+    rather than expanding the external entity, so it is reflection, not file content. Checked at every
+    step because a further round of htmlUnescape can consume an entity-name prefix that is itself a
+    valid HTML entity (e.g. 'lt...'/'gt...'/'amp...'), which would otherwise mask the reflection."""
     out = getUnicode(text)
+    if ent in out:
+        return True
     for _ in range(3):                          # a few rounds catch double-encoding; capped
         prev = out
         try:
@@ -501,9 +505,11 @@ def _normalizeEscaping(text):
         except Exception:
             pass
         out = out.replace("\\u0026", "&").replace("\\u003b", ";").replace("\\/", "/")
+        if ent in out:
+            return True
         if out == prev:
             break
-    return out
+    return False
 
 
 def _readBetweenMarkers(xml, rootName, systemId, isB64, m1, m2):
@@ -521,14 +527,14 @@ def _readBetweenMarkers(xml, rootName, systemId, isB64, m1, m2):
     data = match.group(1)
     # a reflected (not expanded) entity in ANY encoding: the random entity NAME survives de-escaping ->
     # the parser echoed the reference, it did not resolve the external entity -> not file content
-    if not data.strip() or ent in _normalizeEscaping(data):
+    if not data.strip() or _reflectsEntity(data, ent):
         return None, payload
     if isB64:
         try:
             data = getText(decodeBase64(data.strip()))        # strict base64 also validates real bytes
         except Exception:
             return None, payload
-        if not data or not data.strip() or ent in _normalizeEscaping(data):
+        if not data or not data.strip() or _reflectsEntity(data, ent):
             return None, payload
     return (data if (data and data.strip()) else None), payload
 
