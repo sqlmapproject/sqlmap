@@ -887,7 +887,7 @@ def cmdLineParser(argv=None):
         parser.add_argument("--yuge", dest="yuge", action="store_true",
             help=SUPPRESS)
 
-        parser.add_argument("--murphy-rate", dest="murphyRate", type=int,
+        parser.add_argument("--jitter", dest="jitter", type=int,
             help=SUPPRESS)
 
         parser.add_argument("--debug", dest="debug", action="store_true",

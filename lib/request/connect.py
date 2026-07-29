@@ -113,7 +113,10 @@ from lib.core.settings import MAX_CONNECTION_READ_SIZE
 from lib.core.settings import MAX_CONNECTIONS_REGEX
 from lib.core.settings import MAX_CONNECTION_TOTAL_SIZE
 from lib.core.settings import MAX_CONSECUTIVE_CONNECTION_ERRORS
-from lib.core.settings import MAX_MURPHY_SLEEP_TIME
+from lib.core.settings import MAX_JITTER_SPIKE_TIME
+from lib.core.settings import JITTER_SIGMAS
+from lib.core.settings import JITTER_SPIKE_CHANCE
+from lib.core.settings import JITTER_JUNK_RESPONSES
 from lib.core.settings import META_REFRESH_REGEX
 from lib.core.settings import MAX_TIME_RESPONSES
 from lib.core.settings import MIN_TIME_RESPONSES
@@ -374,16 +377,30 @@ class Connect(object):
 
                     setHTTPHandlers()
 
-        if conf.dummy or conf.murphyRate and randomInt() % conf.murphyRate == 0:
-            if conf.murphyRate:
-                time.sleep(randomInt() % (MAX_MURPHY_SLEEP_TIME + 1))
-
-            page, headers, code = randomStr(int(randomInt()), alphabet=[_unichr(_) for _ in xrange(256)]), None, None if not conf.murphyRate else randomInt(3)
-
+        if conf.dummy:
+            page, headers, code = randomStr(int(randomInt()), alphabet=[_unichr(_) for _ in xrange(256)]), None, None
             threadData.lastPage = page
             threadData.lastCode = code
-
             return page, headers, code
+
+        # Simulated jitter (--jitter=N, testing): ~1 in N requests is perturbed to stress the time-/
+        # boolean-based blind jitter defenses. Half the fired events add realistic response LATENCY
+        # (Gaussian jitter across low->high noise, or an occasional heavy-tailed spike) and let the
+        # genuine request proceed; the other half short-circuit with a transient "junk" response
+        # (gateway 5xx, rate-limit, a same-HTTP-code interstitial/maintenance page, or an empty body).
+        if conf.jitter and randomInt() % conf.jitter == 0:
+            if randomInt() % 2 == 0:
+                if random.random() < JITTER_SPIKE_CHANCE:
+                    time.sleep(random.uniform(MAX_JITTER_SPIKE_TIME / 2.0, MAX_JITTER_SPIKE_TIME))  # heavy-tailed spike
+                else:
+                    time.sleep(abs(random.gauss(0, random.choice(JITTER_SIGMAS))))  # continuous jitter
+                # NOTE: falls through to the genuine request, which now carries the injected latency
+            else:
+                page, code = random.choice(JITTER_JUNK_RESPONSES)
+                headers = None
+                threadData.lastPage = page
+                threadData.lastCode = code
+                return page, headers, code
 
         if conf.liveCookies:
             with kb.locks.liveCookies:

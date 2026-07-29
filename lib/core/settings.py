@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.7.243"
+VERSION = "1.10.7.244"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -180,8 +180,26 @@ IDENTYWAF_PARSE_COUNT_LIMIT = 10
 # Identify WAF/IPS inside limited size of responses
 IDENTYWAF_PARSE_PAGE_LIMIT = 4 * 1024
 
-# Maximum sleep time in "Murphy" (testing) mode
-MAX_MURPHY_SLEEP_TIME = 3
+# Ceiling (seconds) for a simulated heavy-tailed latency spike in '--jitter' (testing) mode
+MAX_JITTER_SPIKE_TIME = 6
+
+# '--jitter=N' fault injection: ~1 in N requests is perturbed to stress the time-/boolean-based blind
+# oracles' jitter defenses. Each fired event either adds realistic response LATENCY - Gaussian jitter
+# spanning low->high network noise, or (JITTER_SPIKE_CHANCE of the time) a heavy-tailed spike - and lets
+# the genuine request proceed, or short-circuits with a transient "junk" HTTP response (gateway 5xx,
+# rate-limit, a same-HTTP-code interstitial/maintenance page, or an empty body). Values come from the
+# offline jitter studies (tests/test_jitter_stress.py, tests/test_boolean_jitter.py).
+JITTER_SIGMAS = (0.3, 0.5, 0.9)  # low / medium / high continuous jitter (seconds)
+JITTER_SPIKE_CHANCE = 0.25       # portion of latency events replaced by a heavy-tailed spike
+JITTER_JUNK_RESPONSES = (
+    ("<html><h1>502 Bad Gateway</h1></html>", 502),
+    ("<html><h1>503 Service Unavailable</h1></html>", 503),
+    ("<html><h1>504 Gateway Time-out</h1></html>", 504),
+    ('{"error": "too many requests"}', 429),
+    ("<html><head><title>Just a moment...</title></head><body>Checking your browser before accessing.</body></html>", 200),
+    ("<html><body>We'll be back shortly. Scheduled maintenance in progress.</body></html>", 200),
+    ("", 200),
+)
 
 # Regular expression used for extracting results from Google search
 GOOGLE_REGEX = r"webcache\.googleusercontent\.com/search\?q=cache:[^:]+:([^+]+)\+&amp;cd=|url\?\w+=((?![^>]+webcache\.googleusercontent\.com)http[^>]+)&(sa=U|rct=j)"

@@ -289,7 +289,7 @@ optDict = {
         "noHuffman": "boolean",
         "profile": "boolean",
         "forceDns": "boolean",
-        "murphyRate": "integer",
+        "jitter": "integer",
         "smokeTest": "boolean",
         "fpTest": "boolean",
         "payloadLint": "boolean",
