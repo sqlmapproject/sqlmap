@@ -46,7 +46,7 @@ def dnsUse(payload, expression):
     count = 0
     offset = 1
 
-    if conf.dnsDomain and Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.ORACLE, DBMS.MYSQL, DBMS.PGSQL):
+    if conf.dnsDomain and Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.ORACLE, DBMS.MYSQL, DBMS.PGSQL, DBMS.H2, DBMS.CLICKHOUSE):
         output = hashDBRetrieve(expression, checkConf=True)
 
         if output and PARTIAL_VALUE_MARKER in output or kb.dnsTest is None:

