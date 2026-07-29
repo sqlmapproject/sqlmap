@@ -51,8 +51,14 @@ _TEMPLATE = "%sEXPR=%%s IDX=%%d CMP>%%d%s" % (_D, _D)   # delimiter-wrapped -> v
 _PARSE = re.compile(r"IDX=(\d+) CMP(!=|=|>)(\d+)")
 _SECRET = "Str0ng!"
 _STRING = "luther"
-_TRUE_BODY = "<html><body>welcome %s, here is your dashboard with 12 private items</body></html>" % _STRING
-_FALSE_BODY = "<html><body>invalid credentials, no such record, please retry</body></html>"
+# realistic-size bodies (shared nav/footer boilerplate) so the "resembles neither model" anomaly guard
+# behaves as on a real page: benign dynamic noise is proportionally tiny (stays a match), while a junk
+# interstitial/maintenance/empty body clearly matches neither
+_BOILER = "<html><head><title>Acme Portal</title></head><body><nav>home about contact help terms privacy account</nav><div class=main>" * 8
+_FOOT = "</div><footer>(c) Acme Corp - all rights reserved - support@acme.example - v4.2</footer></body></html>" * 8
+_TRUE_BODY = _BOILER + "welcome %s, dashboard: orders profile settings billing (12 items)" % _STRING + _FOOT
+_FALSE_BODY = _BOILER + "invalid credentials, no such record found, please retry" + _FOOT
+_INTERSTITIAL = "<html><body>Just a moment... checking your browser before access (DDoS protection)</body></html>"
 _STRESS = os.environ.get("SQLMAP_JITTER_STRESS")
 
 
@@ -97,7 +103,7 @@ class _BooleanJitterBase(unittest.TestCase):
     _KB = ("negativeLogic", "nullConnection", "errorIsNone", "pageTemplate", "matchRatio", "heavilyDynamic",
            "pageStructurallyStable", "skipSeqMatcher", "pageEncoding", "partRun", "safeCharEncode",
            "bruteMode", "fileReadMode", "disableShiftTable", "prependFlag", "timeless", "counters",
-           "originalCode", "originalPage")
+           "originalCode", "originalPage", "trueTemplate", "falseTemplate", "dynamicMarkings")
 
     def setUp(self):
         self._saved_conf = {k: conf.get(k) for k in self._CONF}
@@ -129,6 +135,8 @@ class _BooleanJitterBase(unittest.TestCase):
         kb.partRun = None; kb.safeCharEncode = False; kb.bruteMode = False; kb.fileReadMode = False
         kb.disableShiftTable = False; kb.prependFlag = False; kb.timeless = None; kb.counters = {}
         kb.originalCode = None; kb.originalPage = None
+        # calibrated reference bodies for the same-code anomaly guard (Fix B); no learned dynamic markings
+        kb.trueTemplate = _TRUE_BODY; kb.falseTemplate = _FALSE_BODY; kb.dynamicMarkings = []
         kb.injection.data = {PAYLOAD.TECHNIQUE.BOOLEAN: _vector()}
         setTechnique(PAYLOAD.TECHNIQUE.BOOLEAN)
         kb.data.processChar = None
@@ -222,6 +230,36 @@ class TestBooleanJitterRegression(_BooleanJitterBase):
             return body, 200, "text/html"
 
         self._configure()
+        self.assertEqual(self._extract(respond), _SECRET)
+
+    def test_anomaly_classifier_flags_only_junk(self):
+        # Fix B core: a response resembling NEITHER calibrated model is flagged; the models themselves
+        # and a benign dynamic variant are not. Deterministic, no network.
+        self._configure()
+        self.assertFalse(inf._resemblesNeitherModel(_TRUE_BODY))
+        self.assertFalse(inf._resemblesNeitherModel(_FALSE_BODY))
+        self.assertFalse(inf._resemblesNeitherModel(_TRUE_BODY.replace("dashboard", "dashboard <b>7 new</b> tok=abc123")))
+        for junk in (_INTERSTITIAL, "", "<html><h1>502 Bad Gateway</h1></html>", _TRUE_BODY[:60]):
+            self.assertTrue(inf._resemblesNeitherModel(junk), msg="must flag junk %r" % junk[:40])
+
+    def test_same_code_body_jitter_is_ridden_out(self):
+        # Fix B guard: a transient same-HTTP-code junk page that resembles NEITHER model makes a
+        # character mis-resolve to a wrong (valid) value; the anomaly guard triggers validateChar to
+        # re-extract it. The junk here carries the --string token (so it reads True and pushes the char
+        # HIGH -> a wrong valid char, the case validateChar covers), and is unlike both models -> flagged.
+        junk = "<html><body>notice: %s service temporarily degraded, retry</body></html>" % _STRING
+        poisoned = {"n": 0}
+
+        def respond(payload, cond):
+            m = _PARSE.search(payload)
+            idx = int(m.group(1)) if m else 0
+            if idx == 4 and "!=" not in payload and poisoned["n"] < 3:
+                poisoned["n"] += 1
+                return junk, 200, "text/html"
+            return (_TRUE_BODY if cond else _FALSE_BODY), 200, "text/html"
+
+        self._configure()
+        self.assertTrue(inf._resemblesNeitherModel(junk))   # precondition: the junk IS anomalous
         self.assertEqual(self._extract(respond), _SECRET)
 
 

@@ -7,6 +7,7 @@ See the file 'LICENSE' for copying permission
 
 from __future__ import division
 
+import difflib
 import heapq
 import re
 import time
@@ -26,6 +27,7 @@ from lib.core.common import getTechnique
 from lib.core.common import getTechniqueData
 from lib.core.common import getText
 from lib.core.common import predictValue
+from lib.core.common import removeDynamicContent
 from lib.core.common import hashDBRetrieve
 from lib.core.common import hashDBWrite
 from lib.core.common import incrementCounter
@@ -45,6 +47,7 @@ from lib.core.enums import PAYLOAD
 from lib.core.exception import SqlmapThreadException
 from lib.core.exception import SqlmapUnsupportedFeatureException
 from lib.core.wordlist import Wordlist
+from lib.core.settings import BOOLEAN_MODEL_MATCH_RATIO
 from lib.core.settings import CHAR_INFERENCE_MARK
 from lib.core.settings import HUFFMAN_PROBE_LIMIT
 from lib.core.settings import HUFFMAN_PRIOR_WEIGHTS
@@ -255,6 +258,31 @@ def oracleReliabilityLitmus(expressionUnescaped, value, timeBasedCompare):
         return True   # a transient hiccup is not evidence of an unreliable oracle
 
     return bool(mustBeTrue) and not bool(mustBeFalse)
+
+def _resemblesNeitherModel(page):
+    """
+    Returns True when a boolean extraction response resembles NEITHER the calibrated TRUE nor FALSE
+    model (kb.trueTemplate / kb.falseTemplate). A transient response that keeps the expected HTTP code
+    but swaps the body for junk (WAF/CDN interstitial, captcha, maintenance banner, empty/truncated
+    page) is invisible to the HTTP-code check, so it is flagged here for an extra validateChar re-check.
+
+    This only ever ADDS a re-validation - it never changes a decided bit - so it is a safe no-op on a
+    clean target (every response resembles its own model) and when no models were recorded (a resumed
+    session, or a non-boolean technique).
+    """
+
+    refs = [_ for _ in (kb.trueTemplate, kb.falseTemplate) if _]
+    if not refs:
+        return False
+    if page is None:
+        return True
+
+    cleaned = removeDynamicContent(page)
+    for ref in refs:
+        if difflib.SequenceMatcher(None, removeDynamicContent(ref), cleaned).quick_ratio() >= BOOLEAN_MODEL_MATCH_RATIO:
+            return False
+
+    return True
 
 def bisection(payload, expression, length=None, charsetType=None, firstChar=None, lastChar=None, dump=False):
     """
@@ -714,6 +742,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             firstCheck = False
             lastCheck = False
             unexpectedCode = False
+            unexpectedResponse = False
 
             if continuousOrder:
                 while len(charTbl) > 1:
@@ -787,6 +816,13 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
                             singleTimeWarnMessage(warnMsg)
 
+                        # same-HTTP-code body anomaly (WAF/CDN interstitial, captcha, maintenance, empty
+                        # or truncated body) - invisible to the code check above, so re-validate when the
+                        # response resembles neither calibrated model
+                        elif not unexpectedResponse and not kb.nullConnection and _resemblesNeitherModel(threadData.lastPage):
+                            unexpectedResponse = True
+                            singleTimeWarnMessage("unexpected response content detected. Will use (extra) validation step in similar cases")
+
                     if result:
                         minValue = posValue
 
@@ -826,7 +862,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             retVal = minValue + 1
 
                             if retVal in originalTbl or (retVal == ord('\n') and CHAR_INFERENCE_MARK in payload):
-                                if (timeBasedCompare or unexpectedCode) and kb.get("timeless") is None and not validateChar(idx, retVal):
+                                if (timeBasedCompare or unexpectedCode or unexpectedResponse) and kb.get("timeless") is None and not validateChar(idx, retVal):
                                     if restricted:
                                         # the character fell outside this column's observed range - re-extract
                                         # over the full charset (not timing noise, so no delay increase / retry count)

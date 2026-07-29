@@ -2305,6 +2305,10 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.pageTemplate = None
     kb.pageTemplates = dict()
     kb.pageEncoding = DEFAULT_PAGE_ENCODING
+
+    # calibrated TRUE/FALSE reference bodies for the boolean same-HTTP-code anomaly guard (inference.py)
+    kb.trueTemplate = None
+    kb.falseTemplate = None
     kb.pageStable = None
     kb.pageStructurallyStable = None
     kb.partRun = None

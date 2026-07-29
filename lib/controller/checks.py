@@ -818,6 +818,12 @@ def checkSqlInjection(place, parameter, value):
                         injection.data[stype].trueCode = trueCode
                         injection.data[stype].falseCode = falseCode
 
+                        # reference bodies for inference.py's "resembles neither TRUE nor FALSE model"
+                        # anomaly guard (runtime-only; lets a transient same-HTTP-code junk response
+                        # trigger a validateChar re-check during boolean extraction)
+                        if method == PAYLOAD.METHOD.COMPARISON:
+                            kb.trueTemplate, kb.falseTemplate = truePage, falsePage
+
                         injection.conf.textOnly = conf.textOnly
                         injection.conf.titles = conf.titles
                         injection.conf.code = conf.code
