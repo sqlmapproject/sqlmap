@@ -539,26 +539,35 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 forgedPayload = validationPayload.replace(markingValue, unescapedCharValue)
                 forgedPayload = safeStringFormat(forgedPayload, (expressionUnescaped, idx))
 
-            result = not Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
+            def _check():
+                result = not Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
 
-            if result and getTechniqueData() is not None:
-                trueCode, falseCode = getTechniqueData().trueCode, getTechniqueData().falseCode
-                if timeBasedCompare:
-                    if trueCode:
-                        result = threadData.lastCode == trueCode
-                        if not result:
-                            warnMsg = "detected HTTP code '%s' in validation phase is differing from expected '%s'" % (threadData.lastCode, trueCode)
-                            singleTimeWarnMessage(warnMsg)
-                # A boolean validation confirmed under an UNEXPECTED HTTP code (a transient 5xx/403/429/..
-                # landing on the validation request itself) is not trustworthy - fail it so the character is
-                # re-extracted, riding out the blip. On a clean target every code is true/false -> no-op.
-                elif threadData.lastCode is not None and any((trueCode, falseCode)) and threadData.lastCode not in (trueCode, falseCode):
-                    result = False
-                    singleTimeWarnMessage("unexpected HTTP code '%s' during validation phase; will re-extract" % threadData.lastCode)
+                if result and getTechniqueData() is not None:
+                    trueCode, falseCode = getTechniqueData().trueCode, getTechniqueData().falseCode
+                    if timeBasedCompare:
+                        if trueCode:
+                            result = threadData.lastCode == trueCode
+                            if not result:
+                                warnMsg = "detected HTTP code '%s' in validation phase is differing from expected '%s'" % (threadData.lastCode, trueCode)
+                                singleTimeWarnMessage(warnMsg)
+                    # A boolean validation confirmed under an UNEXPECTED HTTP code (a transient 5xx/403/429/..
+                    # landing on the validation request itself) is not trustworthy - fail it so the character is
+                    # re-extracted, riding out the blip. On a clean target every code is true/false -> no-op.
+                    elif threadData.lastCode is not None and any((trueCode, falseCode)) and threadData.lastCode not in (trueCode, falseCode):
+                        result = False
+                        singleTimeWarnMessage("unexpected HTTP code '%s' during validation phase; will re-extract" % threadData.lastCode)
 
-            incrementCounter(getTechnique())
+                incrementCounter(getTechnique())
+                return result
 
-            return result
+            # Adaptive majority vote: once jitter has been observed this run a single re-check can itself
+            # be corrupted, so confirm the character by best-of-3 independent re-checks. Confidence-gated
+            # -> exact no-op (single check) on a clean run or before any jitter is seen.
+            if kb.get("jitterSeen"):
+                votes = [_check() for _ in xrange(3)]
+                return votes.count(True) >= 2
+
+            return _check()
 
         def huffmanChar(idx):
             """
@@ -823,6 +832,9 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             unexpectedResponse = True
                             singleTimeWarnMessage("unexpected response content detected. Will use (extra) validation step in similar cases")
 
+                        if unexpectedCode or unexpectedResponse:
+                            kb.jitterSeen = True   # latch: jitter observed -> escalate validateChar to a vote
+
                     if result:
                         minValue = posValue
 
@@ -862,7 +874,12 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             retVal = minValue + 1
 
                             if retVal in originalTbl or (retVal == ord('\n') and CHAR_INFERENCE_MARK in payload):
-                                if (timeBasedCompare or unexpectedCode or unexpectedResponse) and kb.get("timeless") is None and not validateChar(idx, retVal):
+                                # Once jitter has been observed this run, confirm EVERY resolved character
+                                # (via the best-of-3 vote in validateChar), not only visibly-glitched ones:
+                                # a same-HTTP-code junk that resembles a model corrupts a bit INVISIBLY, and a
+                                # single-char value (e.g. a boolean --is-dba) has no other char to later trip
+                                # detection. Confidence-gated on kb.jitterSeen -> no-op on a clean target.
+                                if (timeBasedCompare or unexpectedCode or unexpectedResponse or kb.get("jitterSeen")) and kb.get("timeless") is None and not validateChar(idx, retVal):
                                     if restricted:
                                         # the character fell outside this column's observed range - re-extract
                                         # over the full charset (not timing noise, so no delay increase / retry count)
@@ -871,7 +888,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                         kb.originalTimeDelay = conf.timeSec
 
                                     threadData.validationRun = 0
-                                    if (retried or 0) < MAX_REVALIDATION_STEPS:
+                                    kb.jitterSeen = True   # a needed re-extraction is itself a jitter signal (covers time-based)
+                                    # under detected jitter, allow more retries so a transient burst can't exhaust the budget
+                                    maxRevalidation = MAX_REVALIDATION_STEPS * 3 if kb.jitterSeen else MAX_REVALIDATION_STEPS
+                                    if (retried or 0) < maxRevalidation:
                                         errMsg = "invalid character detected. retrying.."
                                         logger.error(errMsg)
 

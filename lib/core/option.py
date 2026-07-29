@@ -2311,6 +2311,9 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     # calibrated TRUE/FALSE reference bodies for the boolean same-HTTP-code anomaly guard (inference.py)
     kb.trueTemplate = None
     kb.falseTemplate = None
+
+    # latched once network jitter is observed, so character validation escalates to a majority vote
+    kb.jitterSeen = False
     kb.pageStable = None
     kb.pageStructurallyStable = None
     kb.partRun = None
