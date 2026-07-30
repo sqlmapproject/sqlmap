@@ -637,7 +637,14 @@ def stdoutEncode(value):
 
         kb.codePage = kb.codePage or ""
 
-    encoding = kb.get("codePage") or getattr(sys.stdout, "encoding", None) or UNICODE_ENCODING
+    # Python 3.6+ writes to the Windows console via WriteConsoleW (PEP 528), so sys.stdout.encoding
+    # (typically 'utf-8') renders Unicode that the legacy OEM/ANSI code page from 'chcp' would replace
+    # with '?'; prefer it there. The chcp-derived code page stays as the fallback (older interpreters,
+    # PYTHONLEGACYWINDOWSSTDIO, or a console encoding Python could not determine) and for Python 2.
+    if six.PY3:
+        encoding = getattr(sys.stdout, "encoding", None) or kb.get("codePage") or UNICODE_ENCODING
+    else:
+        encoding = kb.get("codePage") or getattr(sys.stdout, "encoding", None) or UNICODE_ENCODING
 
     if six.PY3:
         if isinstance(value, (bytes, bytearray)):
