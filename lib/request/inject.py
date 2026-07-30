@@ -594,6 +594,34 @@ def _pageCharsetCorrupted(value):
     applyFunctionRecursively(value, _)
     return retVal[0]
 
+def _looksLikeMisdecodedUtf8(value):
+    """
+    True if a retrieved value looks like UTF-8 data shown through a single-byte (ISO-8859-1) charset -
+    the '<page charset too WIDE>' mismatch that leaves NO undecodable bytes (latin-1 accepts every byte),
+    so _pageCharsetCorrupted() cannot see it, yet the data is silently mojibake (a UTF-8 accent shows as
+    two spurious latin-1 chars).
+
+    Precise by construction: real mojibake re-encodes to latin-1 and decodes back to a DIFFERENT valid
+    UTF-8 string, whereas correctly-decoded UTF-8 ('cafe' with U+00E9) and genuine latin-1 text ('resume')
+    do not (a lone accent is a UTF-8 lead byte with no continuation -> decode fails). So it fires only on
+    the corruption, not on clean data. Complements _pageCharsetCorrupted() (the too-NARROW direction).
+    """
+
+    retVal = [False]
+
+    def _(item):
+        if not retVal[0] and isinstance(item, six.string_types) and any(0x80 <= ord(_) <= 0xFF for _ in item):
+            try:
+                decoded = item.encode("latin-1").decode("utf-8")
+            except (UnicodeEncodeError, UnicodeDecodeError):
+                return item
+            if decoded != item and any(ord(_) > 0x7F for _ in decoded):
+                retVal[0] = True
+        return item
+
+    applyFunctionRecursively(value, _)
+    return retVal[0]
+
 @lockedmethod
 @stackedmethod
 def getValue(expression, blind=True, union=True, error=True, time=True, fromUser=False, expected=None, batch=False, unpack=True, resumeValue=True, charsetType=None, firstChar=None, lastChar=None, dump=False, suppressOutput=None, expectingNone=False, safeCharEncode=True):
@@ -699,7 +727,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
                 if (found and not conf.hexConvert and not conf.binaryFields and expected not in (EXPECTED.BOOL, EXPECTED.INT)
                         and getTechnique() in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)
                         and Backend.getIdentifiedDbms() and hasattr(queries[Backend.getIdentifiedDbms()], "hex")
-                        and _pageCharsetCorrupted(value)):
+                        and (_pageCharsetCorrupted(value) or _looksLikeMisdecodedUtf8(value))):
                     warnMsg = "retrieved data appears corrupted because of a charset mismatch between the "
                     warnMsg += "DBMS and the web page. Re-fetching using hexadecimal encoding"
                     singleTimeWarnMessage(warnMsg)
@@ -710,7 +738,10 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
                     finally:
                         conf.hexConvert = False
 
-                    if _value is not None:
+                    # only adopt the hex re-fetch if it is actually cleaner: a rare mis-trigger (or a
+                    # column whose real charset the hex decode still cannot resolve) must never replace
+                    # the original with equal-or-worse data
+                    if _value is not None and not _pageCharsetCorrupted(_value) and not _looksLikeMisdecodedUtf8(_value):
                         value = _value
 
                 if found and conf.dnsDomain:
