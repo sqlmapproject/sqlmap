@@ -341,7 +341,18 @@ def _b2i_signed(b):
     return n
 
 def _scaled(n, scale):
-    # integer n represents n * 10**scale (scale <= 0); render as an exact decimal string
+    """
+    integer n represents n * 10**scale (scale <= 0); render as an exact decimal string
+
+    >>> _scaled(1234, -2)
+    '12.34'
+    >>> _scaled(-5, -2)
+    '-0.05'
+    >>> _scaled(5, -4)
+    '0.0005'
+    >>> _scaled(7, 0)
+    '7'
+    """
     if scale >= 0:
         return str(n * (10 ** scale))
     digits = "%0*d" % (-scale + 1, abs(n))
