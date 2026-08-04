@@ -48,6 +48,30 @@ class TestHelpers(unittest.TestCase):
         self.assertEqual(hql._shortEntity("User"), "User")
 
 
+class TestOriginalValue(unittest.TestCase):
+    def setUp(self):
+        self.originalParameters = hql.conf.parameters
+        self.originalParamDict = hql.conf.paramDict
+
+    def tearDown(self):
+        hql.conf.parameters = self.originalParameters
+        hql.conf.paramDict = self.originalParamDict
+
+    def test_original_value_parsed_from_raw_query_string(self):
+        hql.conf.parameters = {"GET": "id=1&name=alice"}
+        self.assertEqual(hql._originalValue("GET", "name"), "alice")
+
+    def test_original_value_falls_back_to_param_dict(self):
+        hql.conf.parameters = {}
+        hql.conf.paramDict = {"GET": {"name": "bob"}}
+        self.assertEqual(hql._originalValue("GET", "name"), "bob")
+
+    def test_original_value_missing_returns_empty(self):
+        hql.conf.parameters = {}
+        hql.conf.paramDict = {}
+        self.assertEqual(hql._originalValue("GET", "nope"), "")
+
+
 class TestBoundary(unittest.TestCase):
     def test_wrap_string(self):
         b = hql.Boundary("' OR ", " OR '1'='2", True)
