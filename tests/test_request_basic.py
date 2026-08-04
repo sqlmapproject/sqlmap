@@ -102,9 +102,8 @@ class TestRedirectSetCookieMerge(unittest.TestCase):
             kb.choices.redirect = self._redirect
 
     def test_all_set_cookies_merged_across_redirect(self):
-        import email, io
-        from http.client import HTTPMessage
         from lib.core.enums import HTTP_HEADER, REDIRECTION
+        from thirdparty import six
         from thirdparty.six.moves import urllib as _urllib
         import lib.request.redirecthandler as rh
 
@@ -112,23 +111,32 @@ class TestRedirectSetCookieMerge(unittest.TestCase):
         conf.scope = None
         kb.choices.redirect = REDIRECTION.YES
 
+        raw = ("Location: http://example.com/home\r\n"
+               "Set-Cookie: sid=NEW; Path=/; HttpOnly\r\n"
+               "Set-Cookie: csrf=XYZ; Path=/\r\n\r\n")
+        # build the same headers object type the redirect handler receives on this interpreter:
+        # py3 http.client.HTTPMessage (email.message.Message, get_all) / py2 mimetools.Message (getheaders)
+        if six.PY2:
+            import mimetools
+            headers = mimetools.Message(six.StringIO(raw))
+        else:
+            from email import message_from_string
+            from thirdparty.six.moves.http_client import HTTPMessage
+            headers = message_from_string(raw, _class=HTTPMessage)
+
         # stub the network-following parent so the test touches no socket
         saved = _urllib.request.HTTPRedirectHandler.http_error_302
         _urllib.request.HTTPRedirectHandler.http_error_302 = lambda self, req, fp, code, msg, headers: fp
         try:
             req = _urllib.request.Request("http://example.com/login", headers={"Cookie": "sid=OLD"})
-            raw = ("Location: http://example.com/home\r\n"
-                   "Set-Cookie: sid=NEW; Path=/; HttpOnly\r\n"
-                   "Set-Cookie: csrf=XYZ; Path=/\r\n\r\n")
-            headers = email.message_from_string(raw, _class=HTTPMessage)
-            fp = _urllib.response.addinfourl(io.BytesIO(b""), headers, req.get_full_url())
+            fp = _urllib.response.addinfourl(six.BytesIO(b""), headers, req.get_full_url())
             rh.SmartRedirectHandler().http_error_302(req, fp, 302, "Found", headers)
         finally:
             _urllib.request.HTTPRedirectHandler.http_error_302 = saved
 
         merged = req.headers.get(HTTP_HEADER.COOKIE) or req.headers.get("Cookie") or ""
         self.assertIn("sid=NEW", merged)
-        self.assertIn("csrf=XYZ", merged)   # the 2nd Set-Cookie must survive the redirect
+        self.assertIn("csrf=XYZ", merged)   # the 2nd Set-Cookie must survive the redirect (order-independent)
 
 
 class TestForgeHeadersCookieMerge(unittest.TestCase):

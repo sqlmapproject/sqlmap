@@ -160,7 +160,13 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
                 # Note: multiple cookies arrive as SEPARATE Set-Cookie headers (RFC-6265 forbids folding
                 # them into one comma-joined value), and __getitem__ returns only the FIRST - iterate all
                 # values so 2nd+ cookies (e.g. a CSRF token) are not silently dropped across the redirect
-                setCookies = headers.get_all(HTTP_HEADER.SET_COOKIE) if hasattr(headers, "get_all") else [headers[HTTP_HEADER.SET_COOKIE]]
+                # (get_all on py3 email.message.Message, getheaders on py2 mimetools.Message)
+                if hasattr(headers, "get_all"):
+                    setCookies = headers.get_all(HTTP_HEADER.SET_COOKIE)
+                elif hasattr(headers, "getheaders"):
+                    setCookies = headers.getheaders(HTTP_HEADER.SET_COOKIE)
+                else:
+                    setCookies = [headers[HTTP_HEADER.SET_COOKIE]]
                 for setCookie in setCookies:
                     for match in re.finditer(r"(?:^|,\s*)([^=;,]+)=([^;,]+)", setCookie):
                         key = match.group(1).strip()
