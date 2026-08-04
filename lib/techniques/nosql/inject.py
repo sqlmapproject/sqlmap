@@ -990,7 +990,7 @@ def _resolve(place, parameter, key):
         falseModel = _reproduced(lambda: _fetch(place, parameter, "$in", NOSQL_SENTINEL, isArray=True))   # matches nothing
         return Vector(_fingerprintMongo(place, parameter),
                       lambda value: _fetch(place, parameter, "$regex", value),
-                      lambda n: "^.{%d,}$" % n,
+                      lambda n: "(?s)^.{%d,}$" % n,   # (?s): a value containing '\n' must still match its own length (else the $-anchored probe fails for every n -> empty result)
                       lambda known, klass: "^%s%s" % (re.escape(known), klass),
                       template=template, bypass='{"$ne": null}', falseModel=falseModel)
 

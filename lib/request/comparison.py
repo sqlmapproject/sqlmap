@@ -230,16 +230,20 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
             else:
                 key = (hash(seq1), hash(seq2))
 
-            try:
-                seqMatcher.set_seq1(seq1)
-                seqMatcher.set_seq2(seq2)
-            except:
-                seqMatcher.set_seq1(repr(seq1))
-                seqMatcher.set_seq2(repr(seq2))
-
             ratio = kb.cache.comparison.get(key) if key else None
 
             if ratio is None:
+                # Note: populate the matcher only on a cache MISS - set_seq2() eagerly builds difflib's
+                # O(len(page)) b2j index, and since each response is a fresh string that whole build was
+                # thrown away on every cache hit (the common case after warmup: responses cluster into a
+                # few distinct pages). seqMatcher carries no state across calls that a hit would read.
+                try:
+                    seqMatcher.set_seq1(seq1)
+                    seqMatcher.set_seq2(seq2)
+                except:
+                    seqMatcher.set_seq1(repr(seq1))
+                    seqMatcher.set_seq2(repr(seq2))
+
                 try:
                     try:
                         ratio = seqMatcher.quick_ratio() if not kb.heavilyDynamic else seqMatcher.ratio()

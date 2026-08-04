@@ -1050,7 +1050,7 @@
         <hostname query="SELECT MIN(node_name) FROM v_catalog.nodes"/>
         <table_comment query="SELECT comment FROM v_catalog.comments WHERE object_type='TABLE' AND object_schema='%s' AND object_name='%s'"/>
         <!-- NOTE: Vertica uses "projection columns" in case of column comments (e.g. testusers_super.surname) -->
-        <column_comment query="SELECT comment FROM v_catalog.comments WHERE object_type='COLUMN' AND object_schema='%s' AND object_name LIKE '%.%s'"/>
+        <column_comment query="SELECT comment FROM v_catalog.comments WHERE object_type='COLUMN' AND object_schema='%s' AND object_name LIKE '%s%%.%s'"/>
         <is_dba query="(SELECT is_super_user FROM v_catalog.users WHERE user_name=CURRENT_USER OFFSET 0 LIMIT 1)"/>
         <check_udf query="(SELECT procedure_name='%s' FROM v_catalog.user_procedures WHERE procedure_name='%s' OFFSET 0 LIMIT 1)"/>
         <users>

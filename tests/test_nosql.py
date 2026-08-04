@@ -88,6 +88,34 @@ class TestNoSqlMongo(unittest.TestCase):
                             lambda known, klass: "^" + re.escape(known) + klass)
         self.assertEqual(value, SECRET)
 
+    def test_extract_value_with_newline_not_truncated(self):
+        # Regression: the length probe once used '.{n,}', and PCRE '.' does not match '\n', so a
+        # value with an embedded newline made the $-anchored '^.{n,}$' probe fail for every n ->
+        # empty result (total data loss). The '(?s)' DOTALL fix counts the newline toward the length,
+        # so the recovered value is length-correct (the unreadable newline itself shows as '?', but
+        # extraction no longer collapses to "").
+        secret = "ab\ncd"
+
+        def mongo_nl(place, parameter, op, value, isArray=False):
+            if op == "$ne":
+                return MATCH
+            if op == "$in":
+                return NOMATCH
+            if op == "$regex":
+                try:
+                    return MATCH if re.match(value, secret) is not None else NOMATCH
+                except re.error:
+                    return "<html><body>error</body></html>"
+            return ""
+
+        ni._fetch = mongo_nl
+        vector = ni._resolve("GET", "password", "password")
+        template = ni._fetch("GET", "password", "$ne", ni.NOSQL_SENTINEL)
+        value = ni._extract(template, vector.fetch, vector.lengthValue, vector.charValue, falseModel=vector.falseModel)
+        self.assertIsNotNone(value)
+        self.assertEqual(len(value), len(secret))         # honest length, not truncated / not empty
+        self.assertTrue(value.startswith("ab"))
+
     def test_not_injectable(self):
         ni._fetch = lambda *args, **kwargs: MATCH
         self.assertIsNone(ni._detectMongo("GET", "password"))

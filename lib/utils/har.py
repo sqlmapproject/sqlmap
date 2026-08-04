@@ -125,11 +125,17 @@ class Request(object):
         }
 
         if self.postBody:
-            contentType = self.headers.get("Content-Type")
-            out["postData"] = {
-                "mimeType": contentType,
-                "text": getText(self.postBody).rstrip("\r\n"),
-            }
+            out["postData"] = {"mimeType": self.headers.get("Content-Type")}
+
+            # HAR text must be UTF-8: a binary POST body (e.g. a file upload) that does not decode is
+            # base64-encoded losslessly rather than mangled through a lossy text decode - mirroring the
+            # Response.toDict() contract below (otherwise the exported HAR cannot reproduce the request)
+            raw = self.postBody if isinstance(self.postBody, bytes) else getBytes(self.postBody)
+            try:
+                out["postData"]["text"] = raw.decode("utf-8").rstrip("\r\n")
+            except UnicodeDecodeError:
+                out["postData"]["encoding"] = "base64"
+                out["postData"]["text"] = getText(base64.b64encode(raw))
 
         return out
 

@@ -389,6 +389,30 @@ class TestSqliteDump(_FileDumpCase):
         finally:
             conn.close()
 
+    def test_type_breaking_value_past_sampling_prefix_stays_text(self):
+        # Regression: type inference once sampled only the first 100 values, so a leading-zero /
+        # signed / overflow value at index >= 100 was missed and the column got typed INTEGER,
+        # silently corrupting that value via SQLite affinity on insert. The whole column must be scanned.
+        values = [str(i) for i in range(1, 101)] + ["007"]   # 100 clean ints, then a leading-zero at index 100
+        tv = _PlainOrderedDict([
+            ("__infos__", {"count": len(values), "db": "testdb", "table": "big"}),
+            ("code", {"length": 3, "values": values}),
+        ])
+        conf.dumpFormat = DUMP_FORMAT.SQLITE
+        self.d.dbTableValues(tv)
+
+        import sqlite3
+        conn = sqlite3.connect(os.path.join(self.tmp, "testdb.sqlite3"))
+        try:
+            cur = conn.cursor()
+            cur.execute("PRAGMA table_info(big)")
+            types = {name: ctype for (_cid, name, ctype, _nn, _dv, _pk) in cur.fetchall()}
+            self.assertEqual(types["code"], "TEXT")   # a single non-round-trip value anywhere forces TEXT
+            cur.execute("SELECT code FROM big WHERE code = '007'")
+            self.assertEqual(cur.fetchone(), ("007",))   # stored verbatim, not rewritten to integer 7
+        finally:
+            conn.close()
+
 
 # --- replication backend tests (pure sqlite3, no network/DBMS) -----------------------------------
 

@@ -84,6 +84,53 @@ class TestBasicDecodePage(unittest.TestCase):
         self.assertEqual(getText(decodePage(b"", None, "text/html")), "")
 
 
+class TestRedirectSetCookieMerge(unittest.TestCase):
+    """A 302 that sets more than one cookie sends SEPARATE Set-Cookie headers (RFC-6265 forbids
+    comma-folding them). The handler must merge ALL of them into the follow-up request's Cookie
+    header; a __getitem__ read returns only the first, silently dropping the 2nd+ (e.g. a CSRF token)."""
+
+    _CONF = ("cookieDel", "scope")
+
+    def setUp(self):
+        self._c = dict((k, conf.get(k)) for k in self._CONF)
+        self._redirect = kb.choices.get("redirect") if kb.get("choices") else None
+
+    def tearDown(self):
+        for k, v in self._c.items():
+            conf[k] = v
+        if kb.get("choices"):
+            kb.choices.redirect = self._redirect
+
+    def test_all_set_cookies_merged_across_redirect(self):
+        import email, io
+        from http.client import HTTPMessage
+        from lib.core.enums import HTTP_HEADER, REDIRECTION
+        from thirdparty.six.moves import urllib as _urllib
+        import lib.request.redirecthandler as rh
+
+        conf.cookieDel = None
+        conf.scope = None
+        kb.choices.redirect = REDIRECTION.YES
+
+        # stub the network-following parent so the test touches no socket
+        saved = _urllib.request.HTTPRedirectHandler.http_error_302
+        _urllib.request.HTTPRedirectHandler.http_error_302 = lambda self, req, fp, code, msg, headers: fp
+        try:
+            req = _urllib.request.Request("http://example.com/login", headers={"Cookie": "sid=OLD"})
+            raw = ("Location: http://example.com/home\r\n"
+                   "Set-Cookie: sid=NEW; Path=/; HttpOnly\r\n"
+                   "Set-Cookie: csrf=XYZ; Path=/\r\n\r\n")
+            headers = email.message_from_string(raw, _class=HTTPMessage)
+            fp = _urllib.response.addinfourl(io.BytesIO(b""), headers, req.get_full_url())
+            rh.SmartRedirectHandler().http_error_302(req, fp, 302, "Found", headers)
+        finally:
+            _urllib.request.HTTPRedirectHandler.http_error_302 = saved
+
+        merged = req.headers.get(HTTP_HEADER.COOKIE) or req.headers.get("Cookie") or ""
+        self.assertIn("sid=NEW", merged)
+        self.assertIn("csrf=XYZ", merged)   # the 2nd Set-Cookie must survive the redirect
+
+
 class TestForgeHeadersCookieMerge(unittest.TestCase):
     """A domain-scoped jar cookie (Domain=example.com -> '.example.com') must merge into the
     request for the apex host, not be dropped by a naive endswith() domain check."""

@@ -267,6 +267,27 @@ class TestUsersEnum(unittest.TestCase):
         privileges, areAdmins = users.getPrivileges()
         self.assertIn("root", privileges)
 
+    def test_get_privileges_cache_guard_under_direct(self):
+        # Regression: the inband guard must short-circuit when the cache is already
+        # populated, even under conf.direct. A precedence bug ('not cached and any(...)
+        # or conf.direct') once made the trailing 'or conf.direct' override the guard,
+        # so a second getPrivileges() (e.g. --privileges then --roles under -d) re-ran
+        # the whole enumeration. Assert the second call issues zero injection queries.
+        calls = {"n": 0}
+
+        def counting_gv(query, *a, **k):
+            calls["n"] += 1
+            return [["root", "SUPER"], ["guest", "SELECT"]]
+
+        umod.inject.getValue = counting_gv
+        users = Users()
+        kb.data.cachedUsersPrivileges = {}
+        users.getPrivileges()
+        first = calls["n"]
+        self.assertGreater(first, 0)
+        users.getPrivileges()
+        self.assertEqual(calls["n"] - first, 0, "populated cache must suppress re-enumeration under --direct")
+
     # --- getRoles (delegates to getPrivileges) ------------------------------
 
     def test_get_roles(self):

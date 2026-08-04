@@ -157,8 +157,12 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
                     elif last:
                         cookies[last] += "%s%s" % (delimiter, part)
 
-                if HTTP_HEADER.SET_COOKIE in headers:
-                    for match in re.finditer(r"(?:^|,\s*)([^=;,]+)=([^;,]+)", headers[HTTP_HEADER.SET_COOKIE]):
+                # Note: multiple cookies arrive as SEPARATE Set-Cookie headers (RFC-6265 forbids folding
+                # them into one comma-joined value), and __getitem__ returns only the FIRST - iterate all
+                # values so 2nd+ cookies (e.g. a CSRF token) are not silently dropped across the redirect
+                setCookies = headers.get_all(HTTP_HEADER.SET_COOKIE) if hasattr(headers, "get_all") else [headers[HTTP_HEADER.SET_COOKIE]]
+                for setCookie in setCookies:
+                    for match in re.finditer(r"(?:^|,\s*)([^=;,]+)=([^;,]+)", setCookie):
                         key = match.group(1).strip()
                         if key.lower() not in ("expires", "path", "domain", "max-age", "secure", "httponly", "samesite"):
                             cookies[key] = match.group(2).strip()

@@ -48,7 +48,6 @@ from lib.core.exception import SqlmapGenericException
 from lib.core.exception import SqlmapSystemException
 from lib.core.exception import SqlmapValueException
 from lib.core.replication import Replication
-from lib.core.settings import CHECK_SQLITE_TYPE_THRESHOLD
 from lib.core.settings import DUMP_FILE_BUFFER_SIZE
 from lib.core.settings import HTML_DUMP_CSS_STYLE
 from lib.core.settings import IS_WIN
@@ -554,7 +553,11 @@ class Dump(object):
                 if column != "__infos__":
                     colType = Replication.INTEGER
 
-                    for i in xrange(min(CHECK_SQLITE_TYPE_THRESHOLD, len(tableValues[column]['values']))):
+                    # Note: the type must hold for EVERY value that will be inserted - sampling only a
+                    # prefix would type the column INTEGER/REAL while a later leading-zero/signed/overflow
+                    # value gets silently rewritten by SQLite's affinity (the INTEGER scan breaks early on
+                    # the first non-conforming value, so a genuine TEXT column costs almost nothing)
+                    for i in xrange(len(tableValues[column]['values'])):
                         value = tableValues[column]['values'][i]
                         try:
                             if not value or value == " ":  # NULL
@@ -571,7 +574,7 @@ class Dump(object):
                     if colType is None:
                         colType = Replication.REAL
 
-                        for i in xrange(min(CHECK_SQLITE_TYPE_THRESHOLD, len(tableValues[column]['values']))):
+                        for i in xrange(len(tableValues[column]['values'])):
                             value = tableValues[column]['values'][i]
                             try:
                                 if not value or value == " ":  # NULL

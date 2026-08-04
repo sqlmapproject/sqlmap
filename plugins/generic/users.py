@@ -405,7 +405,7 @@ class Users(object):
         # Set containing the list of DBMS administrators
         areAdmins = set()
 
-        if not kb.data.cachedUsersPrivileges and any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
+        if not kb.data.cachedUsersPrivileges and (any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct):
             if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
                 query = rootQuery.inband.query2
                 condition = rootQuery.inband.condition2

@@ -62,6 +62,22 @@ class TestQueriesXmlCoverage(unittest.TestCase):
             missing = [t for t in self.CORE_TAGS if t not in present]
             self.assertEqual(missing, [], msg="%s missing core tags: %s" % (dbms.get("value"), missing))
 
+    def test_column_comment_queries_format_with_three_args(self):
+        # Regression: getColumns() formats every column_comment query with exactly (db, tbl, name)
+        # via '%'-formatting (plugins/generic/databases.py). A literal LIKE wildcard that is not
+        # escaped to '%%' (or a wrong placeholder count) raises at format time and aborts
+        # '--columns --comments' before any request. Vertica's entry had 'LIKE '%.%s'' (ValueError).
+        tree = ET.parse(os.path.join(ROOT, "data", "xml", "queries.xml"))
+        for dbms in tree.findall(".//dbms"):
+            for node in dbms.iter("column_comment"):
+                query = node.get("query")
+                if query:
+                    try:
+                        query % ("db", "tbl", "col")
+                    except (ValueError, TypeError) as ex:
+                        self.fail("%s column_comment query cannot be formatted with (db, tbl, name): %r (%s)"
+                                  % (dbms.get("value"), query, ex))
+
 
 class TestErrorsXmlCompile(unittest.TestCase):
     def test_all_error_regexes_compile(self):

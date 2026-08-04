@@ -4300,19 +4300,19 @@ def decodeStringEscape(value):
 
     >>> decodeStringEscape("a" + chr(92) + "tb") == "a" + chr(9) + "b"
     True
+    >>> decodeStringEscape(chr(92) + chr(0)) == chr(92) + chr(0)    # a NUL in the data must be preserved, not rewritten to a backslash
+    True
     """
 
     retVal = value
 
     if value and '\\' in value:
-        # Note: shield an escaped backslash ('\\\\') behind a marker BEFORE decoding the whitespace
-        # escapes, then restore it - otherwise decoding '\\\\' -> '\\' first turns a literal '\\n'
-        # into a newline (i.e. the round-trip with encodeStringEscape was not lossless)
-        _marker = "\x00"
-        retVal = retVal.replace("\\\\", _marker)
-        for _ in string.whitespace.replace(" ", ""):
-            retVal = retVal.replace(repr(_).strip("'"), _)
-        retVal = retVal.replace(_marker, "\\")
+        # Note: single left-to-right pass so an escaped backslash ('\\\\') shields the next char
+        # (a literal '\\n' stays '\\n', not a newline) WITHOUT a sentinel that could collide with a
+        # pre-existing byte (e.g. a NUL in the data) and get rewritten on restore
+        _mapping = dict((repr(_).strip("'"), _) for _ in string.whitespace.replace(" ", ""))
+        _mapping["\\\\"] = "\\"
+        retVal = re.sub("|".join(re.escape(_) for _ in ["\\\\"] + list(_mapping)), lambda match: _mapping[match.group(0)], retVal)
 
     return retVal
 

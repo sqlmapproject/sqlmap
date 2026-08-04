@@ -114,6 +114,19 @@ class TestRequest(unittest.TestCase):
         self.assertEqual(d["postData"]["mimeType"], "application/json")
         self.assertIn('{"a":1}', d["postData"]["text"])
 
+    def test_toDict_binary_postbody_base64(self):
+        # Regression: a non-UTF-8 (binary) POST body - e.g. a raw file upload - must be base64-encoded
+        # losslessly, not mangled through a lossy text decode, so the exported HAR reproduces the request.
+        # Mirrors the Response.toDict() contract (see TestResponse.test_toDict_binary_content_encoded).
+        import base64 as _b64
+        payload = b"\xff\xd8\xff\xe0\x00\x10JFIF"      # JPEG header: invalid UTF-8, contains a NUL
+        req = H.Request("POST", "/upload", "HTTP/1.1",
+                        {"Host": "test.com", "Content-Type": "application/octet-stream"},
+                        postBody=payload)
+        d = req.toDict()
+        self.assertEqual(d["postData"]["encoding"], "base64")
+        self.assertEqual(_b64.b64decode(d["postData"]["text"]), payload)   # losslessly reconstructable
+
     def test_url_property(self):
         req = H.Request("GET", "/path?q=1", "HTTP/1.0",
                         {"Host": "example.com"})
