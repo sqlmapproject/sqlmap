@@ -48,6 +48,8 @@ class Filesystem(object):
         self.tblField = "data"
 
     def _checkFileLength(self, localFile, remoteFile, fileRead=False):
+        lengthQuery = None
+
         if Backend.isDbms(DBMS.MYSQL):
             lengthQuery = "LENGTH(LOAD_FILE('%s'))" % remoteFile
 
@@ -69,6 +71,9 @@ class Filesystem(object):
 
         if fileRead and Backend.isDbms(DBMS.PGSQL):
             logger.info("length of read file '%s' cannot be checked on PostgreSQL" % remoteFile)
+            sameFile = True
+        elif lengthQuery is None:
+            logger.info("length of the %s file '%s' cannot be checked on %s" % ("read" if fileRead else "written", remoteFile, Backend.getDbms()))
             sameFile = True
         else:
             logger.debug("checking the length of the remote file '%s'" % remoteFile)
