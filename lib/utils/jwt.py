@@ -14,6 +14,7 @@ from lib.core.convert import decodeBase64
 from lib.core.convert import encodeBase64
 from lib.core.convert import getBytes
 from lib.core.convert import getText
+from thirdparty import six
 
 # a compact JSON Web Token: base64url(header).base64url(payload).base64url(signature); a header always starts
 # with '{"' which base64url-encodes to the literal prefix 'eyJ', so this matches JWTs embedded in a larger value
@@ -46,7 +47,7 @@ def parseJWT(token):
     except Exception:
         return None
 
-    if not isinstance(header, dict) or "alg" not in header:
+    if not isinstance(header, dict) or not isinstance(header.get("alg"), six.string_types):
         return None
 
     return {"header": header, "payload": payload, "signature": signature, "signingInput": token.rsplit('.', 1)[0], "raw": token}

@@ -24,6 +24,7 @@ from lib.core.data import conf
 from lib.core.enums import PLACE
 from lib.utils.jwt import auditJWT
 from lib.utils.jwt import crackHMAC
+from lib.utils.jwt import encodeSegment
 from lib.utils.jwt import findJWTs
 from lib.utils.jwt import forgeJWT
 from lib.utils.jwt import parseJWT
@@ -40,6 +41,12 @@ class JWTUtilsTest(unittest.TestCase):
     def test_parse_rejects_non_jwt(self):
         for value in ("", "a.b", "a.b.c.d", "not.a.jwt", "eyJx.eyJx"):
             self.assertIsNone(parseJWT(value))
+
+    def test_parse_rejects_non_string_alg(self):
+        # RFC 7515: "alg" MUST be a string; a crafted token with e.g. an integer "alg" must not parse
+        # (a permissive gate here would let a non-string "alg" reach auditJWT's alg.strip() and crash)
+        token = "%s.%s." % (encodeSegment({"alg": 123}), encodeSegment({}))
+        self.assertIsNone(parseJWT(token))
 
     def test_forge_none_is_unsigned(self):
         token = forgeJWT({"alg": "none"}, {"user": "admin"})
