@@ -6,9 +6,13 @@ See the file 'LICENSE' for copying permission
 """
 
 import os
+import time
 
 from lib.core.common import Backend
 from lib.core.common import average
+from lib.core.common import getCurrentThreadData
+from lib.core.common import getSafeExString
+from lib.core.common import getUnicode
 from lib.core.common import openFile
 from lib.core.common import randomInt
 from lib.core.common import stdev
@@ -25,17 +29,36 @@ from lib.core.enums import PAYLOAD
 from lib.core.enums import PLACE
 from lib.core.settings import INFERENCE_MARKER
 from lib.core.settings import SLEEP_TIME_MARKER
-from lib.request.inject import getValue
 
-# how many times a true/false condition is re-evaluated to demonstrate repeatability (kills false positives)
+# how many times the differential control is repeated, to show it is stable rather than a coincidence
 PROVE_REPETITIONS = 5
+
+# characters of a datum read through an INFERENTIAL technique (one request per bit), so a time-based point
+# does not spend minutes reading a banner it has already proven it can read
+INFERENTIAL_DATUM_CHARS = 12
 
 # comparison knobs that decide true/false at request time (lib/request/comparison.py reads these globals,
 # not injection.conf); they must be re-pointed at the injection being proven or the oracle returns None
 _COMPARISON_ATTRS = ("string", "notString", "regexp", "code", "textOnly", "titles")
 
-# width the field labels are padded to, so the values line up in a clean column
-_LABEL_WIDTH = 9
+_LABEL_WIDTH = 10
+
+# getValue() gates, so each experiment runs through ONE named technique and the evidence can be attributed
+# to it. Without this the report would credit whatever technique getValue() happened to pick as fastest.
+_GATES = {
+    PAYLOAD.TECHNIQUE.UNION: {"union": True, "error": False, "blind": False, "time": False},
+    PAYLOAD.TECHNIQUE.ERROR: {"union": False, "error": True, "blind": False, "time": False},
+    PAYLOAD.TECHNIQUE.QUERY: {"union": False, "error": True, "blind": False, "time": False},
+    PAYLOAD.TECHNIQUE.BOOLEAN: {"union": False, "error": False, "blind": True, "time": False},
+    PAYLOAD.TECHNIQUE.TIME: {"union": False, "error": False, "blind": False, "time": True},
+    PAYLOAD.TECHNIQUE.STACKED: {"union": False, "error": False, "blind": False, "time": True},
+}
+
+# techniques that return the value inside the response body; the rest infer it one bit at a time
+_INBAND = (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)
+
+# order the experiments run in: cheapest and most demonstrative first
+_ORDER = (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY, PAYLOAD.TECHNIQUE.BOOLEAN, PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED)
 
 
 def _field(label, value):
@@ -75,117 +98,190 @@ def _restoreInjection(saved):
         setattr(conf, attr, value)
 
 
-def _booleanOracle(expression):
+def _exchange():
     """
-    Evaluates a boolean expression strictly through the boolean (inferential) technique. UNION/error are
-    forced off on purpose: for a multi-technique injection getValue() would try those first, and a WAF/IPS
-    that blocks their function-heavy payloads makes them return None, which (with expectingNone) short-
-    circuits the whole call before the boolean technique is ever reached - the real cause of a 0/0 reading.
+    The wire facts of the request that was just sent: (request line, HTTP code, response bytes, seconds).
+    An evidence line without them is an assertion; with them the reader can check the work.
     """
 
-    return getValue(expression, expected=EXPECTED.BOOL, charsetType=CHARSET_TYPE.BINARY, suppressOutput=True, expectingNone=True, union=False, error=False, time=False)
+    threadData = getCurrentThreadData()
+    parts = (threadData.lastRequestMsg or "").replace("\r\n", "\n").split("\n")
+    line = urldecode(parts[1].strip(), convall=True) if len(parts) > 1 else ""
+    return line, threadData.lastCode, len(threadData.lastPage or ""), threadData.lastQueryDuration
 
 
-def _signalArtifacts(expression):
+def _techniques(injection):
+    return [_ for _ in _ORDER if _ in injection.data]
+
+
+def _name(stype):
+    return PAYLOAD.SQLINJECTION.get(stype) or "unknown"
+
+
+def _outcome(ok, detail, exchange):
+    """One evidence row: 'PASS  <detail>  HTTP 200, 402 bytes, 0.045s' plus the request line beneath it."""
+
+    line, code, length, duration = exchange
+    facts = []
+    if code is not None:
+        facts.append("HTTP %s" % code)
+    if length:
+        facts.append("%d bytes" % length)
+    if duration:
+        facts.append("%.3fs" % duration)
+    retVal = ["%-4s %s%s" % ("PASS" if ok else "FAIL", detail, ("  [%s]" % ", ".join(facts)) if facts else "")]
+    if line:
+        retVal.append("     %s" % line)
+    return retVal
+
+
+def _challenge(injection, a, b):
     """
-    Evaluates 'expression' through the boolean oracle and reads back the (HTTP code, page <title>) of the
-    response it produced (queryPage stores both in thread data), so the boolean proof can quote the actual
-    TRUE/FALSE codes and titles rather than a generic flag. Returns (None, None) on any error.
+    The decisive experiment, run once through EVERY confirmed technique.
+
+    The back-end is asked for a*b, where both operands were drawn at random after the scan started. That
+    product exists in no page, cache, log or reflection, and no amount of pattern matching in front of the
+    application can produce it - only something that evaluates SQL can. An in-band technique must return
+    the product itself; an inferential one must answer TRUE to 'a*b=product' AND FALSE to 'a*b=product+1',
+    which costs two requests instead of reading the digits back one bit at a time.
+
+    Running it per technique is the point of the report: on a filtered target it shows exactly which
+    channels the protection closed and which one still carries data.
     """
 
-    from lib.core.common import extractRegexResult, getCurrentThreadData
-    from lib.core.settings import HTML_TITLE_REGEX
+    from lib.request import inject
 
-    try:
-        _booleanOracle(expression)
-        threadData = getCurrentThreadData()
-        return threadData.lastCode, (extractRegexResult(HTML_TITLE_REGEX, threadData.lastPage or "") or "").strip()
-    except Exception:
-        return None, None
-
-
-def _proveBoolean(injection, signal=None):
-    """
-    Demonstrates deterministic boolean control, rendered with the distinguishing signal sqlmap already
-    auto-selected (--string / --code / --title), repeated to show it is stable (not a fluke). The signal
-    line quotes the actual distinguishing artifact: the matched string, the two HTTP codes, or the two
-    page titles - so a reader sees exactly what tells TRUE from FALSE.
-
-    When a mutable 'signal' dict is supplied it is filled with the distinguishing artifact (code-based?
-    and the TRUE/FALSE HTTP codes) so the caller can tell a genuine signal from a blocked-response (WAF)
-    artifact - a TRUE condition that yields an HTTP 4xx is a block, not a database answer.
-    """
-
+    expected = a * b
     retVal = []
-    n = randomInt()
 
-    trues = sum(1 for _ in range(PROVE_REPETITIONS) if _booleanOracle("%d=%d" % (n, n)))
-    falses = sum(1 for _ in range(PROVE_REPETITIONS) if _booleanOracle("%d=%d" % (n, n + 1)) is False)
-
-    line = "condition %d=%d returns TRUE (%d/%d) while %d=%d returns FALSE (%d/%d)" % (n, n, trues, PROVE_REPETITIONS, n, n + 1, falses, PROVE_REPETITIONS)
-    if trues == PROVE_REPETITIONS and falses == PROVE_REPETITIONS:
-        line += ", repeatably"          # only claim repeatability when every repetition agreed
-    retVal.append(line)
-
-    trueCode = trueTitle = falseCode = falseTitle = None
-    if injection.conf.code or injection.conf.titles:           # fetch the real artifacts only when the signal needs them
-        trueCode, trueTitle = _signalArtifacts("%d=%d" % (n, n))
-        falseCode, falseTitle = _signalArtifacts("%d=%d" % (n, n + 1))
-
-    if signal is not None:
-        signal["codeBased"] = bool(injection.conf.code)
-        signal["trueCode"], signal["falseCode"] = trueCode, falseCode
-
-    if injection.conf.string:
-        retVal.append("the response contains %s only when the condition is TRUE" % repr(injection.conf.string).lstrip('u'))
-    elif injection.conf.notString:
-        retVal.append("the response contains %s only when the condition is FALSE" % repr(injection.conf.notString).lstrip('u'))
-    elif injection.conf.code:
-        if trueCode and falseCode and trueCode != falseCode:
-            retVal.append("the response returns HTTP %s when the condition is TRUE and HTTP %s when it is FALSE" % (trueCode, falseCode))
-        else:
-            retVal.append("the response returns HTTP %s only when the condition is TRUE (a different code otherwise)" % injection.conf.code)
-    elif injection.conf.titles:
-        if trueTitle and falseTitle and trueTitle != falseTitle:
-            retVal.append("the page title is %s when the condition is TRUE and %s when it is FALSE" % (repr(trueTitle).lstrip('u'), repr(falseTitle).lstrip('u')))
-        else:
-            retVal.append("the page <title> differs between the TRUE and FALSE responses")
-    else:
-        retVal.append("the TRUE response matches the original page while the FALSE one differs (content similarity)")
+    for stype in _techniques(injection):
+        gate = _GATES[stype]
+        try:
+            if stype in _INBAND:
+                value = inject.getValue("%d*%d" % (a, b), expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS, resumeValue=False, suppressOutput=True, **gate)
+                exchange = _exchange()
+                ok = value is not None and ("%s" % value).strip() == str(expected)
+                detail = "returned %s" % value if value is not None else "no value returned"
+            else:
+                hit = inject.getValue("%d*%d=%d" % (a, b, expected), expected=EXPECTED.BOOL, charsetType=CHARSET_TYPE.BINARY, resumeValue=False, suppressOutput=True, expectingNone=True, **gate)
+                exchange = _exchange()      # quote the TRUE probe: on a time-based point that is where the delay shows
+                miss = inject.getValue("%d*%d=%d" % (a, b, expected + 1), expected=EXPECTED.BOOL, charsetType=CHARSET_TYPE.BINARY, resumeValue=False, suppressOutput=True, expectingNone=True, **gate)
+                ok = bool(hit) and miss is False
+                detail = "confirmed %d, rejected %d" % (expected, expected + 1) if ok else "inconclusive (%s/%s)" % (hit, miss)
+            retVal.append((stype, ok, _outcome(ok, detail, exchange)))
+        except Exception as ex:
+            retVal.append((stype, False, ["FAIL %s" % getSafeExString(ex)]))
 
     return retVal
 
 
-def _proveTime(injection):
+def _datumQuery(stype):
     """
-    Demonstrates time-based blind in plain IT language (jitter / latency / controlled delay), keeping the
-    statistics under the hood. Where the payload uses a parameterizable delay (SLEEP(n)/pg_sleep(n)/WAITFOR),
-    it sweeps the injected delay (0 / T / 2T seconds) and shows the response time tracks it ~1:1 - a controlled
-    delay that network latency or a slow page cannot reproduce. Otherwise (heavy-query delays) it falls back to
-    a baseline-vs-jitter statement.
+    A real datum to read out of the back-end, and its label. Inferential techniques pay one request per
+    bit, so their datum is bounded with the DBMS' own SUBSTRING template instead of a whole banner.
+    """
+
+    dbms = Backend.getIdentifiedDbms()
+    entry = queries.get(dbms) if dbms else None
+    if entry is None:
+        return None, None
+
+    for attr, label in (("banner", "back-end DBMS banner"), ("current_db", "current database"), ("current_user", "current database user")):
+        query = getattr(getattr(entry, attr, None), "query", None)
+        if not query:
+            continue
+        if stype in _INBAND:
+            return query, label
+        template = getattr(getattr(entry, "substring", None), "query", None)
+        if template:
+            return template % (query, 1, INFERENTIAL_DATUM_CHARS), "%s (first %d characters)" % (label, INFERENTIAL_DATUM_CHARS)
+        return query, label
+
+    return None, None
+
+
+def _datum(passing):
+    """
+    Reads a real value out of the back-end through a technique the challenge already proved, and reports
+    which one returned it. The challenge proves execution; this proves data egress.
+    """
+
+    from lib.request import inject
+
+    for stype in passing:
+        query, label = _datumQuery(stype)
+        if not query:
+            continue
+        started = kb.requestCounter
+        try:
+            value = unArrayizeValue(inject.getValue(query, safeCharEncode=False, suppressOutput=True, resumeValue=False, **_GATES[stype]))
+        except Exception:
+            value = None
+        if not value:
+            continue
+        line, code, length, duration = _exchange()
+        head = "%s = %s   [%s]" % (label, repr(getUnicode(value)).lstrip('u'), _name(stype))
+        if stype in _INBAND:
+            head += "  [HTTP %s, %d bytes, %.3fs]" % (code, length, duration or 0.0)
+            return [_field("Read-back", [head, "  %s" % line] if line else [head])]
+        # inferred one bit at a time: a single request line would not represent the exchange
+        return [_field("Read-back", [head, "  recovered bit by bit over %d requests" % (kb.requestCounter - started)])]
+
+    return []
+
+
+def _booleanControl(injection):
+    """
+    The TRUE/FALSE differential, quoted with the artifact that separates them AND with the response facts
+    behind it, so the reader can see what the oracle actually looked at.
+    """
+
+    from lib.request.inject import getValue
+
+    def _ask(expression):
+        result = getValue(expression, expected=EXPECTED.BOOL, charsetType=CHARSET_TYPE.BINARY, suppressOutput=True, expectingNone=True, union=False, error=False, time=False)
+        _line, code, length, _duration = _exchange()
+        return result, code, length
+
+    n = randomInt()
+    trues = falses = 0
+    trueCode = falseCode = trueLength = falseLength = None
+
+    for _ in range(PROVE_REPETITIONS):
+        result, trueCode, trueLength = _ask("%d=%d" % (n, n))
+        trues += bool(result)
+        result, falseCode, falseLength = _ask("%d=%d" % (n, n + 1))
+        falses += result is False
+
+    retVal = ["TRUE  (%d=%d):  %d/%d  [HTTP %s, %s bytes]" % (n, n, trues, PROVE_REPETITIONS, trueCode, trueLength),
+              "FALSE (%d=%d):  %d/%d  [HTTP %s, %s bytes]" % (n, n + 1, falses, PROVE_REPETITIONS, falseCode, falseLength)]
+
+    if injection.conf.string:
+        retVal.append("separated by: the response contains %s only when TRUE" % repr(injection.conf.string).lstrip('u'))
+    elif injection.conf.notString:
+        retVal.append("separated by: the response contains %s only when FALSE" % repr(injection.conf.notString).lstrip('u'))
+    elif injection.conf.code:
+        retVal.append("separated by: the HTTP status code")
+    elif injection.conf.titles:
+        retVal.append("separated by: the page title")
+    else:
+        retVal.append("separated by: response content similarity")
+
+    # a TRUE condition answered by a 4xx is a block, not a database answer - the caller needs to know
+    return retVal, (bool(injection.conf.code) and (trueCode or 0) >= 400)
+
+
+def _timeControl(injection, stype):
+    """
+    Sweeps the injected delay (0 / T / 2T seconds) and shows the response time follows it. The 0s case is
+    the control: a slow application or a congested network cannot switch itself off on command.
     """
 
     from lib.core.agent import agent
-    from lib.core.common import getCurrentThreadData, popValue, pushValue
+    from lib.core.common import popValue, pushValue
     from lib.request.connect import Connect as Request
 
-    retVal = []
-    stype = PAYLOAD.TECHNIQUE.TIME if PAYLOAD.TECHNIQUE.TIME in injection.data else PAYLOAD.TECHNIQUE.STACKED
     vector = (injection.data.get(stype) or {}).get("vector")
-
-    def _baselineStatement():
-        baseline = kb.responseTimes.get(kb.responseTimeMode) or []
-        if len(baseline) >= 2:
-            return "a TRUE condition delays the response well beyond the target's normal latency ~%.3fs (jitter ~%.3fs), repeatably" % (average(baseline), stdev(baseline))
-        return "a TRUE condition delays the response well beyond the target's normal latency and jitter, repeatably"
-
-    if not (vector and SLEEP_TIME_MARKER in vector):
-        retVal.append(_baselineStatement())
-        return retVal
-
-    n = randomInt()
-    base = conf.timeSec or 5
-    measurements = []
 
     benign = []
     for _ in range(3):
@@ -194,6 +290,17 @@ def _proveTime(injection):
             benign.append(getCurrentThreadData().lastQueryDuration)
         except Exception:
             pass
+    baseAvg = average(benign) if benign else 0.0
+    baseStd = stdev(benign) if len(benign) >= 2 else 0.0
+
+    if not (vector and SLEEP_TIME_MARKER in vector):
+        # a heavy-query delay carries no parameterizable seconds, so there is nothing to sweep
+        return ["a TRUE condition delays the response well beyond the normal ~%.3fs (jitter ~%.3fs)" % (baseAvg, baseStd)]
+
+    n = randomInt()
+    base = conf.timeSec or 5
+    measurements = []
+
     for k in (0, base, 2 * base):
         pushValue(conf.timeSec)
         conf.timeSec = k
@@ -207,179 +314,162 @@ def _proveTime(injection):
             conf.timeSec = popValue()
 
     if any(d is None for _, d in measurements):
-        retVal.append(_baselineStatement())
-        return retVal
+        return ["a TRUE condition delays the response well beyond the normal ~%.3fs (jitter ~%.3fs)" % (baseAvg, baseStd)]
 
     d0, dT, d2T = (measurements[0][1], measurements[1][1], measurements[2][1])
-    baseAvg = average(benign) if benign else d0
-    baseStd = stdev(benign) if len(benign) >= 2 else 0.0
+    retVal = ["unmodified request:  %.3fs (jitter ~%.3fs)" % (baseAvg, baseStd),
+              "injected delay:      %s" % "   ".join("%ds -> %.2fs" % (k, d) for k, d in measurements)]
 
-    # only claim 1:1 scaling if the measurements actually track the injected seconds: 0s stays near baseline,
-    # Ts ~ T, 2Ts ~ 2T, monotonic. A heavy-query delay (e.g. SQLite RANDOMBLOB) also rides [SLEEPTIME] but
-    # does NOT scale linearly, so it must NOT be rendered as 1:1 (its sweep is noisy / non-monotonic)
-    linear = d0 < max(0.5, base * 0.5) and abs(dT - base) <= base * 0.5 and abs(d2T - 2 * base) <= base * 0.6 and d2T > dT
-
-    if linear:
-        retVal.append("normal response ~%.3fs (jitter ~%.3fs); injected delay %s" % (baseAvg, baseStd, "  ".join("%ds -> %.2fs" % (k, d) for k, d in measurements)))
-        retVal.append("the response slows ~1:1 with the injected delay - a controlled delay that network latency or a slow page cannot reproduce (the 0s case returns at normal speed)")
-    else:
-        retVal.append("a TRUE condition makes the response take ~%.2fs versus ~%.3fs normal (jitter ~%.3fs), repeatably" % (max(dT, d2T), baseAvg, baseStd))
-        retVal.append("a FALSE condition returns at normal speed - a sustained delay neither network latency nor a slow page reproduces")
-
+    # only claim 1:1 scaling when the measurements really track the injected seconds. A heavy-query delay
+    # also rides [SLEEPTIME] but does not scale linearly, so it must not be rendered as a controlled delay.
+    if d0 < max(0.5, base * 0.5) and abs(dT - base) <= base * 0.5 and abs(d2T - 2 * base) <= base * 0.6 and d2T > dT:
+        retVal.append("the delay follows the injected value ~1:1, and 0s returns at normal speed")
     return retVal
 
 
-def _retrieveProof():
+# response codes a protection returns when it drops a request, rather than the application answering
+_BLOCKED_CODES = (403, 406, 419, 429, 501, 503)
+
+
+def _evasion():
     """
-    Reads values back through the injection to prove it - DBMS-agnostic, weakest-to-strongest:
-
-      1. a random arithmetic product (e.g. 48391*60128): every SQL engine evaluates it, it needs no
-         table/function/FROM (valid even on Oracle), so its WAF surface is tiny - yet the operands are
-         random, so reading the exact product back proves the back-end actually executed injected SQL
-         (not a reflected constant);
-      2. the DBMS banner: a real datum the application never returns on its own (the strongest proof).
-
-    Whatever evasion the run already adopted (tamper scripts) applies here too - this is not tied to any one
-    DBMS or tamper. Returns a list of (label, text) rungs; both, one, or none may be present.
+    What the proof had to get through. On a filtered target this is the part that matters: the evidence
+    above is worth much more when the report also states that a protection was in the path and what was
+    needed to carry data past it.
     """
-
-    from lib.request import inject
 
     retVal = []
-
-    a, b = randomInt(4), randomInt(4)   # 4-digit operands: product stays < 2^31 so it never overflows a 32-bit INT (e.g. PostgreSQL int4), yet is unguessable
-    try:
-        result = inject.getValue("%d*%d" % (a, b), expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS, resumeValue=False, suppressOutput=True)
-    except Exception:
-        result = None
-    if result is not None and ("%s" % result).strip() == str(a * b):
-        retVal.append(("Computed", "%d*%d = %d returned by the back-end - it executed the injected SQL (works on any DBMS)" % (a, b, a * b)))
-
-    label = value = None
-    for requested, candidate, lbl in (                          # reuse a value the user's own switches already pulled
-        (conf.getBanner, getattr(kb.data, "banner", None), "back-end DBMS banner"),
-        (conf.getCurrentUser, getattr(kb.data, "currentUser", None), "current database user"),
-        (conf.getCurrentDb, getattr(kb.data, "currentDb", None), "current database"),
-    ):
-        if requested and candidate:
-            label, value = lbl, unArrayizeValue(candidate)
-            break
-
-    if value is None:
-        dbms = Backend.getIdentifiedDbms()
-        banner = getattr(queries.get(dbms), "banner", None) if dbms else None
-        query = getattr(banner, "query", None) if banner else None
-        if query:
-            try:
-                value = unArrayizeValue(inject.getValue(query, safeCharEncode=False, suppressOutput=True))
-                label = "back-end DBMS banner"
-            except Exception:
-                value = None
-
-    if value:
-        retVal.append(("Retrieved", "%s %s - a real value read out of the back-end (the strongest proof)" % (label, repr(value).lstrip('u'))))
-
+    if kb.identifiedWafs:
+        retVal.append("protection identified: %s" % ", ".join(sorted(kb.identifiedWafs)))
+    elif kb.wafBypass is not None:
+        retVal.append("protection detected in front of the application (not fingerprinted)")
+    if kb.wafBypass:
+        retVal.append("automatic bypass applied: non-scanner User-Agent and browser-like headers")
+    names = ", ".join(sorted(_.__name__.rsplit('.', 1)[-1] for _ in (kb.tamperFunctions or [])))
+    if names or conf.tamper:
+        retVal.append("tamper scripts in effect: %s" % (names or conf.tamper))
+    blocked = ", ".join("%d x%d" % (code, count) for code, count in sorted((kb.httpErrorCodes or {}).items()) if code in _BLOCKED_CODES)
+    if blocked:
+        retVal.append("responses refused by the protection during the run: %s" % blocked)
+    if kb.droppingRequests:
+        retVal.append("the target dropped or reset requests during the scan (retried)")
+    if conf.delay:
+        retVal.append("requests were delayed by %.2fs each" % conf.delay)
     return retVal
+
+
+def _proveInjection(injection):
+    """
+    Runs every experiment for one injection point and renders its block. Returns (fields, proven).
+    """
+
+    saved = _activateInjection(injection)
+    started = kb.requestCounter
+
+    try:
+        a, b = randomInt(4), randomInt(4)   # 4-digit operands: the product stays inside a 32-bit INT on every DBMS, yet is unguessable
+        rows = _challenge(injection, a, b)
+        passing = [stype for stype, ok, _ in rows if ok]
+
+        blocked = None
+        control = []
+        stype = passing[0] if passing else (_techniques(injection) or [None])[0]
+
+        if PAYLOAD.TECHNIQUE.BOOLEAN in injection.data:
+            control, blocked = _booleanControl(injection)
+            controlLabel = "boolean differential"
+        elif PAYLOAD.TECHNIQUE.TIME in injection.data or PAYLOAD.TECHNIQUE.STACKED in injection.data:
+            control = _timeControl(injection, PAYLOAD.TECHNIQUE.TIME if PAYLOAD.TECHNIQUE.TIME in injection.data else PAYLOAD.TECHNIQUE.STACKED)
+            controlLabel = "timing control"
+        else:
+            controlLabel = None
+
+        readback = _datum(passing)
+    finally:
+        _restoreInjection(saved)
+
+    paramType = conf.method if conf.method not in (None, HTTPMETHOD.GET, HTTPMETHOD.POST) else injection.place
+    fields = [_field("Parameter", "%s (%s)" % (injection.parameter, paramType)),
+              _field("Techniques", ", ".join(_name(_) for _ in _techniques(injection)) or "none")]
+
+    challenge = ["the back-end must compute %d*%d = %d, drawn at random after the scan started" % (a, b, a * b),
+                 "(the product is in no page, cache or reflection - only something that evaluates SQL can return it)"]
+    for stype, _ok, lines in rows:
+        challenge.append("%s:" % _name(stype))
+        challenge.extend("  %s" % _ for _ in lines)
+    fields.append(_field("Challenge", challenge))
+
+    fields.extend(readback)
+
+    if control:
+        fields.append(_field("Control", ["%s" % controlLabel] + ["  %s" % _ for _ in control]))
+
+    evasion = _evasion()
+    if evasion:
+        fields.append(_field("Evasion", evasion))
+
+    proven = bool(passing)
+    if proven:
+        through = " through the protection in front of the application" if (kb.identifiedWafs or kb.wafBypass) else ""
+        verdict = ["PROVEN - the back-end executed injected SQL and returned the result%s" % through,
+                   "channels that carry data: %s" % ", ".join(_name(_) for _ in passing)]
+        failed = [_name(stype) for stype, ok, _ in rows if not ok]
+        if failed:
+            verdict.append("channels that did NOT answer: %s" % ", ".join(failed))
+    else:
+        verdict = ["NOT PROVEN - no technique returned the computed value"]
+        if blocked:
+            verdict.append("a TRUE condition answers with an HTTP error - that is a block, not a database answer")
+        if kb.identifiedWafs or kb.droppingRequests or blocked:
+            verdict.append("a protection is interfering, so this may be a real injection whose data channel is blocked")
+            verdict.append("=> re-test without the protection, or with '--tamper', then prove again")
+        else:
+            verdict.append("the reported injection point reproduces a differential but cannot execute SQL")
+            verdict.append("=> treat it as a FALSE POSITIVE unless a side effect proves otherwise (e.g. '--os-shell')")
+
+    verdict.append("%d requests spent on this proof" % (kb.requestCounter - started))
+    fields.append(_field("Verdict", verdict))
+
+    return fields, proven
 
 
 def proveExploitation():
     """
-    Renders a report-grade, best-effort demonstration of exploitation for the confirmed injection point
-    (option '--proof'), in the same style as sqlmap's injection-point summary so it reads naturally: the
-    target URL and the confirmed injection point (parameter / type / title / payload), then the strongest
-    proof first - an actual value read out of the back-end (drilling from the plain read to a more evasive
-    one so a WAF/IPS does not stop it) - backed by a deterministic boolean differential (rendered with the
-    distinguishing --string/--code/--title signal) or a statistical time-based demonstration. Written both
-    to stdout and to '<output>/proof.txt'.
+    Renders a verifiable demonstration of exploitation for every confirmed injection point (switch
+    '--proof'). It does not restate what detection reported: each claim is an experiment with a control,
+    an unpredictable expected value, and the request line, HTTP status, response size and timing that
+    produced it - and every claim is attributed to the technique that produced it. Written to stdout and
+    to '<output>/proof.txt'.
     """
 
-    if not kb.injections or not any(getattr(_, "place", None) for _ in kb.injections):
+    injections = [_ for _ in (kb.injections or []) if getattr(_, "place", None)]
+    if not injections:
         return
-
-    injection = kb.injection if getattr(kb.injection, "place", None) else kb.injections[0]
-
-    signal = {}
-    saved = _activateInjection(injection)
-    try:
-        if PAYLOAD.TECHNIQUE.BOOLEAN in injection.data:
-            stype = PAYLOAD.TECHNIQUE.BOOLEAN
-            proof = _proveBoolean(injection, signal)
-        elif PAYLOAD.TECHNIQUE.TIME in injection.data or PAYLOAD.TECHNIQUE.STACKED in injection.data:
-            stype = PAYLOAD.TECHNIQUE.TIME if PAYLOAD.TECHNIQUE.TIME in injection.data else PAYLOAD.TECHNIQUE.STACKED
-            proof = _proveTime(injection)
-        elif PAYLOAD.TECHNIQUE.ERROR in injection.data:
-            stype = PAYLOAD.TECHNIQUE.ERROR
-            proof = ["the back-end error message returns the requested value directly"]
-        elif PAYLOAD.TECHNIQUE.UNION in injection.data:
-            stype = PAYLOAD.TECHNIQUE.UNION
-            proof = ["the requested value is rendered inside the application response"]
-        else:
-            stype = next(iter(injection.data), None)
-            proof = []
-
-        rungs = _retrieveProof()
-    finally:
-        _restoreInjection(saved)
-
-    from lib.core.agent import agent
 
     target = conf.url or ""
     if conf.parameters.get(PLACE.GET) and "?" not in target:        # spell out the full GET target, not just the path
         target += "?%s" % conf.parameters[PLACE.GET]
 
-    paramType = conf.method if conf.method not in (None, HTTPMETHOD.GET, HTTPMETHOD.POST) else injection.place
-    sdata = injection.data.get(stype)
-
     fields = [_field("Target", target)]
     if conf.parameters.get(PLACE.POST):
         fields.append(_field("Data", conf.parameters[PLACE.POST]))
-    fields.append(_field("Parameter", "%s (%s)" % (injection.parameter, paramType)))
-    if sdata is not None:
-        fields.append(_field("Technique", PAYLOAD.SQLINJECTION[stype]))
-        if sdata.payload:
-            payload = urldecode(agent.adjustLateValues(sdata.payload), unsafe="&", spaceplus=(injection.place != PLACE.GET and kb.postSpaceToPlus))
-            fields.append(_field("Payload", payload))
-    # Reading a value back out of the back-end is the GATE, not a bonus: it is the only thing that
-    # distinguishes a real injection from a differential that merely correlates with the payload. A
-    # WAF/IPS that answers blocked payloads with a distinct HTTP status (e.g. 403 when TRUE, 200 when
-    # FALSE) reproduces a perfect, repeatable boolean differential WITHOUT any SQL ever executing - so
-    # the differential alone is exactly the signal detection already (mis)read. If nothing could be read
-    # back, exploitation is NOT proven; say so plainly instead of echoing the detection verdict.
-    proven = bool(rungs)
+    if Backend.getIdentifiedDbms():
+        fields.append(_field("Back-end", Backend.getIdentifiedDbms()))
+    fields.append(_field("Verified", time.strftime("%Y-%m-%d %H:%M:%S")))
 
-    # whether ANY confirmed technique here can return data inline; a stacked-query-only point cannot, so a
-    # failed read-back below is expected there and must NOT be spun into a "false positive" verdict
-    canReadBack = any(_ in injection.data for _ in (PAYLOAD.TECHNIQUE.BOOLEAN, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.TIME))
+    proven = 0
+    for injection in injections:
+        block, ok = _proveInjection(injection)
+        proven += int(ok)
+        fields.append("")
+        fields.extend(block)
 
-    if proven:
-        if proof:
-            fields.append(_field("Proof", proof))
-        for label, text in rungs:
-            fields.append(_field(label, text))
-        header = "sqlmap proved exploitation of the following injection point"
+    if proven == len(injections):
+        header = "sqlmap proved exploitation of the following injection point(s)"
+    elif proven:
+        header = "sqlmap proved exploitation of %d of %d reported injection point(s)" % (proven, len(injections))
     else:
-        if proof:
-            fields.append(_field("Observed", proof))     # the differential is observed, but unconfirmed
-        suspectWaf = bool(signal.get("codeBased")) and (signal.get("trueCode") or 0) >= 400
-        wafInterfering = suspectWaf or kb.droppingRequests or bool(kb.identifiedWafs)
-        verdict = ["no value could be read back through the injection (tried a random arithmetic product and the DBMS banner)"]
-        if suspectWaf:
-            verdict.append("the TRUE/FALSE difference is only an HTTP %s (blocked) response - characteristic of a WAF/IPS, not a database answer" % signal.get("trueCode"))
-        if not canReadBack:
-            # e.g. stacked-query-only: no confirmed technique returns data inline, so a value cannot be read
-            # back here - that is expected by design and is NOT evidence of a false positive
-            verdict.append("this injection point exposes no data-returning channel (e.g. stacked queries), so a value cannot be read back inline - expected here, not a false positive")
-            verdict.append("=> confirm exploitation through a side effect instead (e.g. '--os-shell', or '--sql-query' run with '--technique=S')")
-        elif wafInterfering:
-            # behind a WAF, an unconfirmed read-back is ambiguous: a genuine injection whose data-retrieval
-            # payloads are being blocked looks the same as a pure WAF artifact - so don't assert "false
-            # positive", point the user at the way to disambiguate instead
-            verdict.append("a WAF/IPS is interfering: this may be a real injection whose data-retrieval is blocked, or a false positive")
-            verdict.append("=> exploitation is NOT proven; re-test directly (no WAF) or with --tamper, then re-prove")
-        else:
-            verdict.append("=> exploitation is NOT proven; the reported injection is likely a FALSE POSITIVE")
-        fields.append(_field("Verdict", verdict))
-        header = "sqlmap could NOT prove exploitation of the reported injection point"
+        header = "sqlmap could NOT prove exploitation of the reported injection point(s)"
 
     data = "\n".join(fields)
     conf.dumper.string(header, data)
