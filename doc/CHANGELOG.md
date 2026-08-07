@@ -84,6 +84,7 @@
 * Removed the time outliers from the time statistics.
 * Improved the detection of the SQL dialect of the target.
 * The switch `--xpath` no longer reports an injection when the page changes only because it shows the payload again. Reflection is not proof that an expression was evaluated.
+* sqlmap now makes sure that the random markers around the retrieved data are all different. Two equal markers made the error-based technique give back the wrong character.
 
 ## Quality
 

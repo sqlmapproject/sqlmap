@@ -2193,9 +2193,16 @@ def _setKnowledgeBaseAttributes(flushAll=True):
 
     kb.chars = AttribDict()
     kb.chars.delimiter = randomStr(length=6, lowercase=True)
-    kb.chars.start = "%s%s%s" % (KB_CHARS_BOUNDARY_CHAR, randomStr(length=3, alphabet=KB_CHARS_LOW_FREQUENCY_ALPHABET), KB_CHARS_BOUNDARY_CHAR)
-    kb.chars.stop = "%s%s%s" % (KB_CHARS_BOUNDARY_CHAR, randomStr(length=3, alphabet=KB_CHARS_LOW_FREQUENCY_ALPHABET), KB_CHARS_BOUNDARY_CHAR)
-    kb.chars.at, kb.chars.space, kb.chars.dollar, kb.chars.hash_ = ("%s%s%s" % (KB_CHARS_BOUNDARY_CHAR, _, KB_CHARS_BOUNDARY_CHAR) for _ in randomStr(length=4, lowercase=True))
+    # NOTE: markers have to be mutually distinct (e.g. equal start/stop makes the delimited output ambiguous, while equal replacement markers make _errorReplaceChars() restore the wrong character)
+    _ = set()
+    while len(_) < 2:
+        _.add(randomStr(length=3, alphabet=KB_CHARS_LOW_FREQUENCY_ALPHABET))
+    kb.chars.start, kb.chars.stop = ("%s%s%s" % (KB_CHARS_BOUNDARY_CHAR, __, KB_CHARS_BOUNDARY_CHAR) for __ in _)
+
+    _ = set()
+    while len(_) < 4:
+        _.add(randomStr(length=1, lowercase=True))
+    kb.chars.at, kb.chars.space, kb.chars.dollar, kb.chars.hash_ = ("%s%s%s" % (KB_CHARS_BOUNDARY_CHAR, __, KB_CHARS_BOUNDARY_CHAR) for __ in _)
 
     kb.checkWafMode = False
     kb.choices = AttribDict(keycheck=False)
