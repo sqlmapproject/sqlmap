@@ -722,13 +722,12 @@ class Connect(object):
 
                 if conf.http2:
                     from lib.request.http2 import open_url as http2OpenUrl
+                    from lib.request.http2 import proxy_tuple
 
-                    h2proxy = None
-                    if conf.proxy:
-                        _proxyParts = _urllib.parse.urlsplit(conf.proxy if "://" in conf.proxy else "http://%s" % conf.proxy)
-                        if (_proxyParts.scheme or "").lower().startswith("socks"):
-                            raise SqlmapMissingDependence("native HTTP/2 client does not support SOCKS proxies (omit '--http2' or use an HTTP proxy)")
-                        h2proxy = (_proxyParts.hostname, _proxyParts.port or 8080, conf.proxyCred or None)
+                    try:
+                        h2proxy = proxy_tuple(conf.proxy, conf.proxyCred)
+                    except ValueError:
+                        raise SqlmapMissingDependence("native HTTP/2 client does not support SOCKS proxies (omit '--http2' or use an HTTP proxy)")
 
                     try:
                         conn = http2OpenUrl(url, method or (HTTPMETHOD.POST if post is not None else HTTPMETHOD.GET), headers, post, timeout, follow_redirects=kb.choices.redirect != REDIRECTION.NO, proxy=h2proxy)
@@ -1151,6 +1150,15 @@ class Connect(object):
         # Snapshot the pristine payload for the timeless oracle before placement/tampering rewrites it,
         # so its sentinel-bracketed comparison can be negated to build the symmetric-oracle pair.
         timelessOrigValue = value if (timeBasedCompare and kb.get("timeless") is not None) else None
+
+        # Timeless disengaged mid-value: bisection froze its comparison template from the heavy (no-delay)
+        # vector when this value started, so it keeps forging heavy payloads until it builds the next one -
+        # and wall-clock comparison reads every one of them as False. Re-forge those stragglers onto the
+        # restored vector. Only fires while such a payload is actually in flight (it must still carry the
+        # timeless sentinels), so it is a no-op on any ordinary time-based scan.
+        if timeBasedCompare and value and kb.get("timelessRestore") and kb.get("timeless") is None:
+            from lib.request.timeless import restoreClassicValue
+            value = restoreClassicValue(value, kb.timelessRestore) or value
 
         get = None
         post = None
@@ -1643,6 +1651,18 @@ class Connect(object):
             elif postUrlEncode:
                 post = urlencode(post, spaceplus=kb.postSpaceToPlus)
 
+        # The timeless path returns before the ordinary send, so run the '--safe-url'/'--safe-req' keep-alive
+        # for it too - a long extraction otherwise loses the session it depends on. Not under buildOnly:
+        # that is the timeless oracle assembling the very requests of this comparison, and counting each of
+        # them would fire the safe request several times per bit.
+        if (conf.safeFreq or 0) > 0 and not buildOnly:
+            kb.queryCounter += 1
+            if kb.queryCounter % conf.safeFreq == 0:
+                if conf.safeUrl:
+                    Connect.getPage(url=conf.safeUrl, post=conf.safePost, cookie=cookie, direct=True, silent=True, ua=ua, referer=referer, host=host)
+                elif kb.safeReq:
+                    Connect.getPage(url=kb.safeReq.url, post=kb.safeReq.post, method=kb.safeReq.method, auxHeaders=kb.safeReq.headers)
+
         # When the timeless oracle is engaged (by action() at the start of extraction, so the heavy vector
         # is in place before any payload is built), a boolean comparison is answered by relative HTTP/2
         # response order instead of wall-clock timing - orders of magnitude faster and jitter-immune, and
@@ -1650,25 +1670,38 @@ class Connect(object):
         # as it would be sent (buildOnly) and the bit is read from a coalesced pair. Not engaged -> timing.
         if timeBasedCompare and kb.get("timeless") is not None:
             from lib.request.timeless import CONNECTIVITY_ERRORS
+            from lib.request.timeless import TimelessUnusable
+            from lib.request.timeless import disengage
             from lib.request.timeless import negatePayload
             # Build the condition and negation requests through the SAME path (queryPage buildOnly on the
             # raw pre-placement value) so the pair differs ONLY by the negated comparison - building cond
             # from the already-placed uri/get/post while neg goes through fresh placement would make them
             # non-corresponding and flip the order.
             negValue = negatePayload(timelessOrigValue)
-            condSpec = Connect.queryPage(timelessOrigValue, place=place, buildOnly=True)
-            negSpec = Connect.queryPage(negValue, place=place, buildOnly=True) if negValue is not None else None
             try:
+                if negValue is None:
+                    # No sentinels (a tamper script mangled them, or a non-timeless vector slipped through):
+                    # the symmetric oracle cannot be built, and there is no calibrated alternative reading.
+                    raise TimelessUnusable("payload carries no negatable comparison")
+                condSpec = Connect.queryPage(timelessOrigValue, place=place, buildOnly=True)
+                negSpec = Connect.queryPage(negValue, place=place, buildOnly=True)
                 return kb.timeless.readBitFromSpecs(condSpec, negSpec)
             except CONNECTIVITY_ERRORS as ex:
-                # The oracle's own per-pair retries (see _pairOrder) are exhausted - the target has stopped
-                # negotiating HTTP/2 altogether (e.g. a load-balanced backend that only some nodes speak it
-                # on), not just dropped one connection. Disengage (restores the classic time-based vector)
-                # and fall through below to the normal wall-clock comparison instead of crashing the scan.
-                from lib.request.timeless import disengage
-                warnMsg = "HTTP/2 timeless timing lost connectivity ('%s'). Falling back to classic time-based" % getSafeExString(ex)
+                # Either the oracle can no longer be trusted (a fresh connection failed calibration, the
+                # responses drifted off the calibrated control) or the target stopped negotiating HTTP/2
+                # altogether. Disengage - which restores the classic time-based vector - and answer this
+                # comparison the wall-clock way instead of crashing the scan. The payload in flight was
+                # forged from the heavy (millisecond) vector, so it has to be re-forged onto the restored
+                # one first: re-sending it as-is would read False whatever the truth.
+                warnMsg = "HTTP/2 timeless timing is no longer reliable ('%s'). Falling back to classic time-based" % getSafeExString(ex)
                 singleTimeWarnMessage(warnMsg)
                 disengage()
+                # Re-run this comparison the wall-clock way. The payload in flight was forged from the
+                # heavy (millisecond) vector, so re-sending it as-is would read False whatever the truth -
+                # the straggler rewrite at the top of queryPage puts it back on the restored vector, the
+                # same way it will handle the rest of this value.
+                if kb.get("timelessRestore"):
+                    return Connect.queryPage(timelessOrigValue, place=place, content=content, getRatioValue=getRatioValue, silent=silent, method=method, timeBasedCompare=timeBasedCompare, noteResponseTime=noteResponseTime, auxHeaders=auxHeaders, response=response, raise404=raise404, removeReflection=removeReflection, disableTampering=disableTampering, ignoreSecondOrder=ignoreSecondOrder)
 
         if timeBasedCompare and not conf.disableStats:
             if len(kb.responseTimes.get(kb.responseTimeMode, [])) < MIN_TIME_RESPONSES:
@@ -1711,14 +1744,6 @@ class Connect(object):
                     warnMsg += "value for option '--time-sec' as possible (e.g. "
                     warnMsg += "10 or more)"
                     logger.critical(warnMsg)
-
-        if (conf.safeFreq or 0) > 0:
-            kb.queryCounter += 1
-            if kb.queryCounter % conf.safeFreq == 0:
-                if conf.safeUrl:
-                    Connect.getPage(url=conf.safeUrl, post=conf.safePost, cookie=cookie, direct=True, silent=True, ua=ua, referer=referer, host=host)
-                elif kb.safeReq:
-                    Connect.getPage(url=kb.safeReq.url, post=kb.safeReq.post, method=kb.safeReq.method, auxHeaders=kb.safeReq.headers)
 
         start = time.time()
 

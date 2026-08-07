@@ -1557,6 +1557,24 @@ def _quote_target_component(value, safe):
     return quote(value, safe=safe)
 
 
+def proxy_tuple(proxy, cred=None):
+    """Convert a sqlmap '--proxy' value into the (host, port, cred) tuple the `proxy` parameter of this
+    client expects. Returns None when unset. SOCKS is not supported by the native client, so it raises
+    ValueError and leaves it to the caller to decide how to surface that (hard error / skip the feature).
+
+    >>> proxy_tuple("http://127.0.0.1:8080")
+    ('127.0.0.1', 8080, None)
+    >>> proxy_tuple("127.0.0.1")
+    ('127.0.0.1', 8080, None)
+    """
+    if not proxy:
+        return None
+    parts = urlsplit(proxy if "://" in proxy else "http://%s" % proxy)
+    if (parts.scheme or "").lower().startswith("socks"):
+        raise ValueError("native HTTP/2 client does not support SOCKS proxies")
+    return (parts.hostname, parts.port or 8080, cred or None)
+
+
 def open_url(url, method="GET", headers=None, body=None, timeout=30, follow_redirects=True,
              max_redirects=10, proxy=None, verify=False, ssl_context=None):
     req_headers = headers or {}

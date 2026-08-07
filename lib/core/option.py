@@ -2357,6 +2357,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.technique = None
     kb.timeless = None          # active HTTP/2 timeless-timing oracle (lib/request/timeless.py) or None
     kb.timelessHinted = False   # whether the "target speaks HTTP/2 -> try --timeless" nudge was shown (once/run)
+    kb.timelessRestore = None   # classic time-based vector to re-forge stragglers onto after disengaging
     kb.tempDir = None
     kb.testMode = False
     kb.testOnlyCustom = False
