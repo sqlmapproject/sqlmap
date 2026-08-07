@@ -96,6 +96,8 @@ def vulnTest(tests=None, label="vuln"):
         ("-u \"<base>nosql?name=luther&password=x\" -p password --nosql --flush-session", ("is vulnerable to NoSQL injection", "back-end: 'MongoDB'", "NoSQL: GET parameter 'password'", "s3cr3t")),   # NoSQL (MongoDB) operator-injection detection + blind regexp extraction
         ("-u \"<base>graphql\" --graphql --flush-session --disable-hashing", ("found GraphQL endpoint", "introspection returned", "enumerated 6 injectable argument slot(s): 4 query, 2 mutation", "SQL injection via GraphQL (boolean-based)", "in-band data exposure", "back-end DBMS: 'SQLite'", "banner: '3.", "GraphQL database tables", "fetched 30 entries from table 'creds'", "db3a16990a0008a3b04707fdef6584a0", "GraphQL scan complete")),   # GraphQL: endpoint detection + introspection + query-slots-first (mutations only as fallback) + boolean-blind/in-band + back-end fingerprint + batched blind dump of an injection-only table (SQLite-backed)
         ("-u \"<base>ldap/search?q=x\" --ldap --flush-session --disable-hashing", ("is vulnerable to LDAP injection", "Title: LDAP in-band data exposure", "LDAP: GET parameter 'q' in-band entries", "in-band data exposure", "LDAP scan complete")),   # LDAP: error-based detection (unbalanced paren) + boolean oracle + directory attribute extraction via blind substring probing
+        ("-u \"<base>xslt/element?tpl=x\" --xslt --flush-session --disable-hashing", ("is vulnerable to XSLT injection", "element context", "Engine: libxslt", "Type: XSLT injection", "XSLT scan complete")),   # XSLT: the engine names itself through system-property('xsl:vendor') in the element slot - a value the application cannot produce on its own
+        ("-u \"<base>xslt/value?sort=name\" --xslt --flush-session --disable-hashing", ("is vulnerable to XSLT injection", "value context", "XSLT compile-differential", "XSLT scan complete")),   # XSLT: the value slot reflects nothing, so detection rests on the compile differential plus positive XPath-syntax evidence
         ("-u \"<base>xpath/search?q=x\" --xpath --flush-session --disable-hashing", ("is vulnerable to XPath injection", "Title: XPath boolean-based blind", "XPath: GET parameter 'q' XML tree", "extracted", "XPath scan complete")),   # XPath: error-based detection + boolean oracle + blind XML tree-walking via starts-with character extraction
         ("-u \"<base>ssti/search?q=x\" --ssti --flush-session --disable-hashing", ("is vulnerable to SSTI", "Title: SSTI Jinja2 injection", "back-end template engine: 'Jinja2'", "in-band arithmetic proof confirmed", "SSTI scan complete")),   # SSTI: Jinja2 detection via arithmetic control-pair + boolean oracle + distinguishing probe
         ("-u \"<base>hql/search?name=admin\" -p name --hql --flush-session --disable-hashing", ("is vulnerable to HQL injection", "back-end: 'Hibernate'", "entity 'Users'", "s3cr3t", "HQL scan complete")),   # HQL: error-based Hibernate fingerprint + boolean oracle + error-leaked entity + blind attribute enumeration and substring value extraction
@@ -109,14 +111,14 @@ def vulnTest(tests=None, label="vuln"):
         ("--purge -v 3", ("~ERROR", "~CRITICAL", "deleting the whole directory tree")),
     )
 
-    # The vulnserver's XPath and XXE endpoints render with lxml and its SSTI endpoint with jinja2; where
+    # The vulnserver's XPath, XXE and XSLT endpoints render with lxml and its SSTI endpoint with jinja2; where
     # those optional third-party engines are not importable (e.g. PyPy 2.7, which has no lxml wheel), skip
     # just those entries instead of failing the whole run - the rest of the suite is unaffected.
     try:
         __import__("lxml")
     except ImportError:
-        TESTS = tuple(_ for _ in TESTS if "--xpath" not in _[0] and "--xxe" not in _[0])
-        logger.warning("skipping the XPath and XXE vuln-test entries ('lxml' not available)")
+        TESTS = tuple(_ for _ in TESTS if not any(_flag in _[0] for _flag in ("--xpath", "--xxe", "--xslt")))
+        logger.warning("skipping the XPath, XXE and XSLT vuln-test entries ('lxml' not available)")
     try:
         __import__("jinja2")
     except ImportError:

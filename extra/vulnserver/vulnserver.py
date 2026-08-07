@@ -351,6 +351,23 @@ def hql_evaluate(value):
 
 # --- XPath endpoint (vulnerable search and login, backed by an in-memory XML document) ------------
 
+XSLT_DOC = """<?xml version="1.0"?><catalog><item><name>luther</name><price>10</price></item>\
+<item><name>fluffy</name><price>20</price></item></catalog>"""
+
+# The element slot: user input lands BETWEEN elements, so it can introduce whole XSLT instructions.
+XSLT_ELEMENT_SHEET = """<?xml version="1.0"?>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:output method="html"/><xsl:template match="/"><html><body><div>%s</div></body></html></xsl:template>
+</xsl:stylesheet>"""
+
+# The value slot: user input lands INSIDE select="...", so it can only carry an XPath expression.
+XSLT_VALUE_SHEET = """<?xml version="1.0"?>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:output method="html"/><xsl:template match="/"><html><body><table>
+<xsl:for-each select="catalog/item"><xsl:sort select="%s"/><tr><td><xsl:value-of select="name"/></td></tr></xsl:for-each>
+</table></body></html></xsl:template>
+</xsl:stylesheet>"""
+
 XPATH_XML = """<?xml version="1.0" encoding="UTF-8"?>
 <directory>
   <department name="IT Operations">
@@ -1174,6 +1191,27 @@ class ReqHandler(BaseHTTPRequestHandler):
             except _HqlError as ex:
                 output = json.dumps({"results": [], "count": 0, "error": str(ex)})
 
+            self.wfile.write(output.encode(UNICODE_ENCODING))
+            return
+
+        if self.url in ("/xslt/element", "/xslt/value"):
+            # VULNERABLE: user input is concatenated into a stylesheet which is then compiled and applied
+            element = self.url.endswith("element")
+            source = self.params.get("tpl" if element else "sort", "" if element else "name")
+            try:
+                from lxml import etree
+                sheet = (XSLT_ELEMENT_SHEET if element else XSLT_VALUE_SHEET) % source
+                transform = etree.XSLT(etree.fromstring(sheet.encode("utf-8")))
+                output = str(transform(etree.fromstring(XSLT_DOC.encode("utf-8"))))
+                code = OK
+            except Exception as ex:
+                output = "<html><body><h1>XSLT error</h1><pre>%s: %s</pre></body></html>" % (type(ex).__name__, ex)
+                code = INTERNAL_SERVER_ERROR
+
+            self.send_response(code)
+            self.send_header("Content-type", "text/html; charset=%s" % UNICODE_ENCODING)
+            self.send_header("Connection", "close")
+            self.end_headers()
             self.wfile.write(output.encode(UNICODE_ENCODING))
             return
 

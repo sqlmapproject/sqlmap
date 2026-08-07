@@ -88,6 +88,7 @@ from lib.core.settings import INFERENCE_EQUALS_CHAR
 from lib.core.settings import LDAP_ERROR_REGEX
 from lib.core.settings import SSTI_ERROR_REGEX
 from lib.core.settings import XPATH_ERROR_REGEX
+from lib.core.settings import XSLT_ERROR_REGEX
 from lib.core.settings import XXE_ERROR_REGEX
 from lib.core.settings import IPS_WAF_CHECK_PAYLOAD
 from lib.core.settings import IPS_WAF_CHECK_RATIO
@@ -1188,13 +1189,13 @@ def heuristicCheckSqlInjection(place, parameter):
             kb.ignoreCasted = readInput(message, default='Y' if conf.multipleTargets else 'N', boolean=True)
 
     elif result:
-        infoMsg += "be injectable"
+        infoMsg += "be SQL injectable"
         if Backend.getErrorParsedDBMSes():
             infoMsg += " (possible DBMS: '%s')" % Format.getErrorParsedDBMSes()
         logger.info(infoMsg)
 
     else:
-        infoMsg += "not be injectable"
+        infoMsg += "not be SQL injectable"
         logger.warning(infoMsg)
 
     kb.heuristicMode = True
@@ -1268,6 +1269,12 @@ def heuristicCheckSqlInjection(place, parameter):
         infoMsg = "heuristic (HQL) test shows that %sparameter '%s' might be vulnerable to HQL/JPQL (Hibernate ORM) injection (rerun with switch '--hql')" % ("%s " % paramType if paramType != parameter else "", parameter)
         logger.info(infoMsg)
 
+        if conf.beep:
+            beep()
+
+    if not conf.xslt and re.search(XSLT_ERROR_REGEX, page or ""):
+        infoMsg = "heuristic (XSLT) test shows that %sparameter '%s' might be vulnerable to XSLT injection (rerun with switch '--xslt')" % ("%s " % paramType if paramType != parameter else "", parameter)
+        logger.info(infoMsg)
         if conf.beep:
             beep()
 

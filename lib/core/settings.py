@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.8.12"
+VERSION = "1.10.8.13"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -1168,7 +1168,9 @@ XPATH_ERROR_SIGNATURES = (
     ("eXist", r"org\.exist\.xquery\.(?:XPathException|XQueryException)"),
     ("eXist", r"exerr:ERROR"),
     ("Python ElementTree", r"xml\.etree\.ElementTree\.(?:ParseError|Element)"),
-    ("Generic XPath", r"(?:XPath|XSLT).*?(?:error|exception|syntax)"),
+    # NOT XSLT: a dedicated '--xslt' engine owns those errors now, and claiming them here made every
+    # XSLT parser error suggest '--xpath' as well
+    ("Generic XPath", r"XPath.*?(?:error|exception|syntax)"),
     ("Generic XPath", r"Invalid XPath|XPath evaluation failed"),
 )
 
@@ -1183,6 +1185,90 @@ XPATH_MAX_DEPTH = 32
 
 # Upper bound for the value-length search during XPath blind extraction
 XPATH_MAX_LENGTH = 256
+
+# XQuery (XPath 2.0/3.x) supersets XPath 1.0, so the same injection boundary reaches a much richer
+# language. These probes are TRUE on an XQuery processor and a SYNTAX ERROR on an XPath 1.0 one, which is
+# what makes them a capability test rather than a guess: string-join/matches/upper-case simply do not
+# exist in 1.0. Engines: Saxon, BaseX, eXist-db, MarkLogic, Zorba.
+XQUERY_CAPABILITY_PROBES = (
+    "string-join(('a','b'),'')='ab'",
+    "upper-case('a')='A'",
+    "matches('a','a')",
+)
+
+# XQuery file-read primitive: fn:unparsed-text() returns a text file as a string, so the existing blind
+# character bisection recovers it unchanged. doc() is the XML equivalent (and the OOB vector when it is
+# handed an http:// URI).
+XQUERY_FILE_READ = "unparsed-text(%s)"
+XQUERY_MAX_FILE_LENGTH = 4096
+
+# Proactive harvest for a confirmed XQuery back-end. Deliberately SHORT: unlike an in-band read, every
+# character here costs a bisection round-trip, so this is the identity/secret minimum rather than the
+# broad sweep an in-band engine can afford.
+XQUERY_FILE_HARVEST = (
+    "/etc/passwd",
+    "/etc/hostname",
+    "/proc/self/environ",
+    "/proc/self/cmdline",
+    "c:/windows/win.ini",
+)
+# Characters recovered from the ONE file the harvest extracts a sample from. Every character costs about
+# eight bisection round-trips, so a full /etc/passwd would be thousands of requests against the target.
+# The harvest therefore PROVES readability across the list for ~1 request each and samples a short prefix
+# from the first hit only. An explicit '--file-read' is a deliberate request and still gets the full
+# XQUERY_MAX_FILE_LENGTH.
+XQUERY_HARVEST_CHARS = 32
+
+# XSLT injection ('--xslt'). Compile/runtime errors are per-engine and are what reaches a target whose
+# output is fixed, so they double as the fingerprint when nothing can be reflected.
+# Ordered MOST SPECIFIC FIRST and matched in order: PHP's XSLTProcessor and lxml are both libxslt
+# underneath and emit its wording too, so the generic libxslt entry has to come last or it would shadow
+# the binding that actually tells the tester what they are talking to.
+XSLT_ERROR_SIGNATURES = (
+    ("PHP XSLTProcessor", r"XSLTProcessor::(?:importStylesheet|transformTo\w+)\(\)"),
+    ("libxslt / lxml", r"lxml\.etree\.(?:XSLT(?:Parse|Apply|)Error|XPathEvalError)"),
+    ("Saxon", r"(?:net\.sf\.saxon\.|SaxonApiException|Static error(?:s)? (?:in|at)|XTDE\d{4}|XTSE\d{4})"),
+    ("Xalan / Java JAXP", r"(?:javax\.xml\.transform\.Transformer(?:Configuration)?Exception|org\.apache\.xalan|XSLT Error)"),
+    (".NET XslCompiledTransform", r"System\.Xml\.Xsl\.(?:XslLoadException|XsltException)"),
+    # Anchored to XSLT vocabulary on purpose: this regex also drives the GLOBAL heuristic hint in
+    # checks.py, and bare "compilation error" / "Invalid expression" match gcc, javac and regex failures,
+    # which would suggest '--xslt' on targets that have nothing to do with XSLT.
+    ("libxslt", r"(?:xsltParseStylesheet|xsltApplyStylesheet|xsltCompilePattern|xsl:\w+ : |xmlXPathEval|XPath error : )"),
+    ("Generic XSLT", r"(?:XSLT|xsl:stylesheet).{0,40}?(?:error|exception|fail)"),
+)
+
+XSLT_ERROR_REGEX = r"(?i)(?:%s)" % '|'.join(regex for _, regex in XSLT_ERROR_SIGNATURES)
+
+# system-property() names the processor from inside the transformation, so a response carrying it is the
+# engine speaking rather than the application echoing.
+XSLT_VENDOR_PROPERTIES = ("xsl:vendor", "xsl:version", "xsl:vendor-url", "xsl:product-name", "xsl:product-version")
+
+# Extension surfaces that would turn XSLT injection into code execution or a file WRITE. sqlmap reports
+# their availability and never invokes them - probing whether a function EXISTS is not exercising it.
+XSLT_RCE_PROBES = (
+    ("PHP registerPHPFunctions (php:function)", "string(function-available('php:function'))"),
+    ("EXSLT exsl:document (file write)", "string(element-available('exsl:document'))"),
+    ("Saxon saxon:eval", "string(function-available('saxon:eval'))"),
+    ("Xalan java: extension namespace", "string(function-available('java:java.lang.Runtime.getRuntime'))"),
+)
+
+XSLT_MAX_FILE_LENGTH = 65536
+
+# XSLT 1.0's document() parses its target as XML, so a text file simply fails to load - only an XSLT 2.0+
+# engine reaches arbitrary text through unparsed-text(). These are the high-value paths that ARE XML, so
+# the auto-harvest still returns something on a 1.0 engine (which is most of the installed base).
+XSLT_XML_HARVEST = (
+    "/var/www/html/WEB-INF/web.xml",
+    "/usr/local/tomcat/conf/tomcat-users.xml",
+    "/usr/local/tomcat/conf/server.xml",
+    "/opt/tomcat/conf/tomcat-users.xml",
+    "/etc/tomcat/tomcat-users.xml",
+    "c:/inetpub/wwwroot/web.config",
+    "c:/windows/system32/inetsrv/config/applicationHost.config",
+)
+
+# Bound on the proactive harvest so a confirmed finding cannot turn into hundreds of requests.
+XSLT_MAX_HARVEST = 12
 
 # SSTI error signatures per template engine for detection and fingerprinting.
 # Each tuple is (engine_name, regex_fragment).

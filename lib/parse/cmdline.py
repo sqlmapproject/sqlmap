@@ -802,6 +802,9 @@ def cmdLineParser(argv=None):
         nonsql.add_argument("--ssti", dest="ssti", action="store_true",
             help="Test for server-side template injection")
 
+        nonsql.add_argument("--xslt", dest="xslt", action="store_true",
+            help="Test for XSLT injection")
+
         nonsql.add_argument("--xxe", dest="xxe", action="store_true",
             help="Test for XML External Entity (XXE) injection")
 

