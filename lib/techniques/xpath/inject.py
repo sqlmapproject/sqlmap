@@ -24,6 +24,7 @@ from lib.utils.nonsql import INCONCLUSIVE_MARK
 from lib.utils.nonsql import userDecision
 from lib.utils.nonsql import InconclusiveError
 from lib.utils.nonsql import resolveBit
+from lib.utils.nonsql import stripReflection
 from lib.utils.nonsql import sqlErrorPresent
 from lib.utils.nonsql import blockedStatus
 from lib.utils.nonsql import ratio as _ratio
@@ -165,7 +166,9 @@ def _send(place, parameter, value):
         # true/false differential, and even the XPath-only confirm battery, without a single expression
         # ever being evaluated. That reported XSLT (and plain reflective) endpoints as XPath-injectable.
         # On a genuinely blind target the payload is not in the page, so this is a no-op.
-        page = removeReflectiveValues(page, value, suppressWarning=True)
+        # Two layers on purpose: sqlmap's scan-wide heuristic (which can switch itself off) AND a plain
+        # deterministic strip that cannot. See stripReflection().
+        page = stripReflection(removeReflectiveValues(page, value, suppressWarning=True), value)
         # A transport failure or a BLOCKED/ERROR status (5xx, 403/429 WAF/rate-limit) is NOT a usable
         # oracle sample: returning "" for it would let a one-sided failure fake a true/false divergence
         # (an empty body cannot be told apart from a dead connection). Signal it as None -> the boolean

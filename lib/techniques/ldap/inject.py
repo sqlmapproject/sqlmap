@@ -22,6 +22,7 @@ from lib.utils.nonsql import InconclusiveError
 from lib.utils.nonsql import INCONCLUSIVE_MARK
 from lib.utils.nonsql import userDecision
 from lib.utils.nonsql import resolveBit
+from lib.utils.nonsql import stripReflection
 from lib.utils.nonsql import sqlErrorPresent
 from lib.utils.nonsql import blockedStatus
 from lib.utils.nonsql import ratio as _ratio
@@ -179,7 +180,9 @@ def _send(place, parameter, value):
         # true/false differential without a single expression being evaluated - that reported plain
         # reflective search pages as injectable. On a blind target the payload is not in the page, so
         # this is a no-op.
-        return removeReflectiveValues(page, value, suppressWarning=True) or ""
+        # Two layers on purpose: sqlmap's scan-wide heuristic (which can switch itself off) AND a plain
+        # deterministic strip that cannot. See stripReflection().
+        return stripReflection(removeReflectiveValues(page, value, suppressWarning=True), value) or ""
     except Exception as ex:
         logger.debug("LDAP probe request failed: %s" % getUnicode(ex))
         return None

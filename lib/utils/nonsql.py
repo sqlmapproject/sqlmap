@@ -14,7 +14,11 @@ in one place rather than drifting across six files.
 import difflib
 import re
 
+from lib.core.common import urldecode
+from lib.core.common import urlencode
+from lib.core.convert import getUnicode
 from lib.core.data import conf
+from lib.core.settings import REFLECTED_VALUE_MARKER
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.parse.html import htmlParser
 
@@ -36,6 +40,42 @@ def ratio(first, second):
     """Content-similarity ratio shared by every non-SQL detector (difflib quick_ratio over the two
     response bodies) - one implementation instead of six identical copies."""
     return difflib.SequenceMatcher(None, first or "", second or "").quick_ratio()
+
+
+def stripReflection(page, payload):
+    """
+    Remove the payload from the page before any two responses are compared.
+
+    An endpoint that merely ECHOES the parameter returns a different page for every different payload, so
+    a true/false differential is satisfied without a single expression, filter or operator ever being
+    interpreted. That is not injection, and it is how plain reflective search pages were reported as
+    XPath / LDAP / NoSQL injectable.
+
+    Deliberately NOT lib.core.common.removeReflectiveValues: that one is a scan-wide heuristic which
+    switches ITSELF OFF after REFLECTIVE_MISS_THRESHOLD misses, after a regex timeout, and during
+    heuristic mode - so a detection guard built on it silently stops guarding mid-scan. This is a plain,
+    deterministic substring removal with no global state and no failure mode. The two are complementary,
+    and the engines apply both.
+
+    The raw, URL-decoded and URL-encoded forms are all removed: a payload travels encoded, and an
+    application may echo whichever of the three it happened to hold.
+    """
+
+    if not page or not payload:
+        return page
+
+    retVal = getUnicode(page)
+    forms = set()
+    for form in (payload, urldecode(payload, convall=True), urlencode(payload, safe="")):
+        try:
+            forms.add(getUnicode(form))
+        except Exception:
+            pass
+    # longest first, so a shorter form cannot chop a longer one into unremovable pieces
+    for form in sorted(filter(None, forms), key=len, reverse=True):
+        if form in retVal:
+            retVal = retVal.replace(form, REFLECTED_VALUE_MARKER)
+    return retVal
 
 
 def blockedStatus(code):

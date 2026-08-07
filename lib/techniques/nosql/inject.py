@@ -23,7 +23,9 @@ from lib.utils.nonsql import ratio as _ratio
 from lib.utils.nonsql import userOracleActive
 from lib.utils.nonsql import InconclusiveError
 from lib.utils.nonsql import INCONCLUSIVE_MARK
+from thirdparty import six
 from lib.utils.nonsql import resolveBit
+from lib.utils.nonsql import stripReflection
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -372,7 +374,15 @@ def _send(place, parameter, segment=None, jsonValue=_UNSET):
     # differential - and the wildcard always-true check - without a single operator being interpreted.
     # That reported a plain reflective search page as a "Lucene query_string-compatible back-end". On a
     # blind target the payload is not in the page, so this is a no-op.
-    return removeReflectiveValues(page, payload, suppressWarning=True) or ""
+    # Two layers on purpose: sqlmap's scan-wide heuristic (which can switch itself off) AND a plain
+    # deterministic strip that cannot. See stripReflection().
+    # Strip the VALUE as well as the whole parameter string: `payload` here is "q=*", while the page
+    # echoes just "*", so removing only the former leaves the reflection in place.
+    page = removeReflectiveValues(page, payload, suppressWarning=True)
+    for _reflected in (payload, segment, jsonValue if jsonValue is not _UNSET else None):
+        if isinstance(_reflected, six.string_types) and _reflected:
+            page = stripReflection(page, _reflected)
+    return page or ""
 
 def _isError(page):
     # a server-error status, a recognizable NoSQL error body, OR a recognized SQL/DBMS error marks a
