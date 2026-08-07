@@ -1,3 +1,93 @@
+# Version 2.0 (WIP)
+
+* [View changes](https://github.com/sqlmapproject/sqlmap/compare/1.10...master)
+
+## Injection techniques
+
+* Added the switch `--nosql`. It tests for NoSQL injection. It also dumps the data that it finds.
+* Added the switch `--xpath`. It tests for XPath injection.
+* Added the switch `--ldap`. It tests for LDAP injection.
+* Added the switch `--ssti`. It tests for server-side template injection. It also covers Struts2 and OGNL.
+* Added the switch `--graphql`. It tests for GraphQL injection.
+* Added the switch `--hql`. It tests for HQL and JPQL (Hibernate ORM) injection.
+* Added the switch `--xxe`. It tests for XML External Entity injection. It uses in-band, error-based, and out-of-band channels.
+* Added the switch `--jwt`. It examines JSON Web Tokens for weak keys and for injection in the claims.
+
+## Speed
+
+* Added the switch `--timeless`. It reads each blind bit from the HTTP/2 response order. It does not use a delay. sqlmap calibrates the target first, and it uses the usual time-based technique if the target is not applicable.
+* Added set-membership (Huffman) retrieval for blind dumps. It needs fewer requests for each character. Use `--no-huffman` to stop it.
+* Added keyset (seek) pagination for blind table dumps. Use `--no-keyset` to stop it.
+* Added parallel retrieval of values in blind mode. Each thread retrieves a different value.
+* Made Keep-Alive the default. Use the switch `--no-keep-alive` to stop it.
+* Added the reuse of HTTP/2 connections.
+* Added the switch `--lengths`. It compares the pages only by the content length.
+* Made the HashDB operations faster.
+* Made the tamper script `luanginxmore` much faster.
+
+## Targets and results
+
+* Added the option `--openapi`. It makes the list of targets from an OpenAPI or Swagger document. The options `--openapi-base` and `--openapi-tags` limit that list.
+* Added the switch `--mine-params`. It finds hidden GET parameters.
+* Added the switch `--proof`. It proves the exploitation of each injection point that it finds.
+* Added the option `--report-json`. It writes the results of the run to a JSON file.
+* Added the switch `--procs`. It retrieves the stored procedures and their source code.
+* Added the option `--exclude`. It gives the databases that sqlmap must not enumerate.
+* Added JSONL as a dump format.
+* Added the use of sqlmap as a library.
+* Added experimental support for gRPC-Web (text) requests.
+* Improved the crawler. It now finds the endpoints in JavaScript files.
+
+## Back-end DBMS
+
+* Added support for SAP HANA.
+* Added support for Snowflake.
+* Added support for Google Cloud Spanner.
+* Added support for DuckDB and Trino as forks.
+* Added the switch `--esperanto`. It enumerates a back-end DBMS that sqlmap cannot identify.
+* Added error-based payloads for CUBRID, InterSystems Cache, Virtuoso, H2, Firebird, and Vertica.
+* Added time-based payloads for CUBRID.
+* Added out-of-band DNS channels for H2 and ClickHouse.
+* Added PostgreSQL command execution through a PL extension.
+* Added the tamper scripts `blindbinary`, `dollarquote`, `infoschema2innodb`, `oraclequote`, and `sign`.
+
+## Fewer dependencies
+
+* Added an HTTP/2 client. It uses only the standard library.
+* Added WebSocket support. It uses only the standard library.
+* Added the decoding of Brotli and Zstandard responses. It uses only the standard library.
+* Added Kerberos and Negotiate authentication. It uses only the standard library.
+* Added NTLM authentication. This removed a deprecated third-party library.
+* Rewrote the Keep-Alive handler. This removed the third-party package `keepalive`.
+* Removed the third-party packages `multipart`, `odict`, and `prettyprint`.
+* Replaced SocksiPy with PySocks.
+
+## Security
+
+* Removed all use of `pickle`. sqlmap now uses JSON for the session data and for the other serialized data.
+* The REST API now requires authentication credentials.
+* Put the `eval` behavior behind the environment variable `SQLMAP_UNSAFE_EVAL`.
+* Put the option `--alert` behind the environment variable `SQLMAP_UNSAFE_ALERT`.
+* Hardened the Brotli and the Zstandard decoders against hostile input.
+
+## Correctness
+
+* Made the boolean inference more reliable when the network has much jitter.
+* Added automatic recovery when the page charset and the data charset do not agree.
+* sqlmap now finds binary fields automatically in blind mode.
+* Added support for the response code 429 (rate limit).
+* Corrected the retrieval of UTF8MB4 characters from MySQL.
+* Corrected the Set-Cookie behavior in redirections. Added support for domain cookies.
+* sqlmap now keeps the value of an injected Host header.
+* Removed the time outliers from the time statistics.
+* Improved the detection of the SQL dialect of the target.
+
+## Quality
+
+* Added a unit test suite. It has more than 90 modules, and it runs on Python 2 and Python 3.
+* Added pyflakes and more self-test stages to the CI/CD pipeline.
+* Added `doc/ARCHITECTURE.md`.
+
 # Version 1.10 (2026-01-01)
 
 * [View changes](https://github.com/sqlmapproject/sqlmap/compare/1.9...1.10)

@@ -17,3 +17,4 @@ thirdparty/.DS_Store
 CLAUDE.md
 .coverage
 .codegraph/
+.claude/
