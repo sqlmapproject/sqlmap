@@ -26,6 +26,8 @@ from extra.dbwire import IntegrityError
 from extra.dbwire import InterfaceError
 from extra.dbwire import NotSupportedError
 from extra.dbwire import OperationalError
+from extra.dbwire import connection_lost
+from extra.dbwire import keepalive
 
 # operation codes
 _op_connect = 1
@@ -286,12 +288,18 @@ class _Wire(object):
         self._rc, self._wc = rc, wc
 
     def send(self, data):
-        self._sock.sendall(self._wc.translate(data) if self._wc else data)
+        try:
+            self._sock.sendall(self._wc.translate(data) if self._wc else data)
+        except (socket.error, OSError) as ex:
+            raise connection_lost(ex)
 
     def _recv_raw(self, n):
         buf = b""
         while len(buf) < n:
-            chunk = self._sock.recv(n - len(buf))
+            try:
+                chunk = self._sock.recv(n - len(buf))
+            except (socket.error, OSError) as ex:
+                raise connection_lost(ex)
             if not chunk:
                 raise InterfaceError("connection closed by server")
             buf += chunk
@@ -494,23 +502,36 @@ class Connection(object):
         self._send(_pack_int(_op_allocate_statement) + _pack_int(self._db_handle))
         stmt = self._response()[0]
 
-        desc_items = bytes(bytearray([_isc_info_sql_stmt_type])) + _INFO_SQL_SELECT_DESCRIBE_VARS
-        self._send(_pack_int(_op_prepare_statement) + _pack_int(self._trans_handle) + _pack_int(stmt) +
-                   _pack_int(3) + _pack_bytes(qbytes) + _pack_bytes(desc_items) + _pack_int(1024))
-        buf = self._response()[2]
-        stmt_type, columns = self._parse_describe(stmt, buf)
+        try:
+            desc_items = bytes(bytearray([_isc_info_sql_stmt_type])) + _INFO_SQL_SELECT_DESCRIBE_VARS
+            self._send(_pack_int(_op_prepare_statement) + _pack_int(self._trans_handle) + _pack_int(stmt) +
+                       _pack_int(3) + _pack_bytes(qbytes) + _pack_bytes(desc_items) + _pack_int(1024))
+            buf = self._response()[2]
+            stmt_type, columns = self._parse_describe(stmt, buf)
 
-        exec_msg = (_pack_int(_op_execute) + _pack_int(stmt) + _pack_int(self._trans_handle) +
-                    _pack_bytes(b"") + _pack_int(0) + _pack_int(0) + _pack_int(0))
-        self._send(exec_msg)
-        self._response()
+            exec_msg = (_pack_int(_op_execute) + _pack_int(stmt) + _pack_int(self._trans_handle) +
+                        _pack_bytes(b"") + _pack_int(0) + _pack_int(0) + _pack_int(0))
+            self._send(exec_msg)
+            self._response()
 
-        description, rows = None, []
-        if stmt_type == _isc_info_sql_stmt_select and columns:
-            description = [(c.name, c.sqltype, None, None, None, None, None) for c in columns]
-            rows = self._fetch(stmt, columns)
-        self._send(_pack_int(_op_free_statement) + _pack_int(stmt) + _pack_int(_DSQL_drop))
-        self._response()
+            description, rows = None, []
+            if stmt_type == _isc_info_sql_stmt_select and columns:
+                description = [(c.name, c.sqltype, None, None, None, None, None) for c in columns]
+                rows = self._fetch(stmt, columns)
+        finally:
+            # release the server-side handle even when prepare/execute/fetch raised: a connection that
+            # survives a few failed statements would otherwise hold every one of them until it detaches
+            try:
+                self._send(_pack_int(_op_free_statement) + _pack_int(stmt) + _pack_int(_DSQL_drop))
+                self._response()
+            except Exception:
+                pass
+
+        # dbwire statements are autonomous (see README), but Firebird has no auto-commit mode: everything
+        # runs inside the one transaction opened at attach. Without this, DML is lost when the caller
+        # closes the connection without an explicit commit(). commit-retaining makes the work durable and
+        # keeps the transaction handle valid, so the connection stays usable for the next statement.
+        self.commit()
         return description, rows
 
     def _parse_describe(self, stmt, buf):
@@ -737,6 +758,7 @@ def connect(host=None, port=3050, user=None, password=None, database=None, conne
 
     try:
         sock = socket.create_connection((host or "localhost", int(port or 3050)), timeout=connect_timeout)
+        keepalive(sock)
         sock.settimeout(None)
     except (socket.error, socket.timeout) as ex:
         raise OperationalError("could not connect to '%s:%s' (%s)" % (host, port, ex))

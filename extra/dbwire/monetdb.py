@@ -22,6 +22,8 @@ import struct
 from extra.dbwire import InterfaceError
 from extra.dbwire import NotSupportedError
 from extra.dbwire import OperationalError
+from extra.dbwire import connection_lost
+from extra.dbwire import keepalive
 from extra.dbwire import ProgrammingError
 
 _MAX_BLOCK = 0xffff >> 1
@@ -29,7 +31,10 @@ _MAX_BLOCK = 0xffff >> 1
 def _recvn(sock, n):
     buf = b""
     while len(buf) < n:
-        chunk = sock.recv(n - len(buf))
+        try:
+            chunk = sock.recv(n - len(buf))
+        except (socket.error, OSError) as ex:
+            raise connection_lost(ex)
         if not chunk:
             raise InterfaceError("connection closed by server")
         buf += chunk
@@ -52,7 +57,10 @@ def _putblock(sock, text):
         chunk = data[off:off + _MAX_BLOCK]
         off += _MAX_BLOCK
         last = off >= len(data)
-        sock.sendall(struct.pack("<H", (len(chunk) << 1) | (1 if last else 0)) + chunk)
+        try:
+            sock.sendall(struct.pack("<H", (len(chunk) << 1) | (1 if last else 0)) + chunk)
+        except (socket.error, OSError) as ex:
+            raise connection_lost(ex)
         if last:
             break
 
@@ -186,6 +194,7 @@ def connect(host=None, port=50000, user=None, password=None, database=None, conn
     host, port = host or "localhost", int(port or 50000)
     try:
         sock = socket.create_connection((host, port), timeout=connect_timeout)
+        keepalive(sock)
         sock.settimeout(None)
     except (socket.error, socket.timeout) as ex:
         raise OperationalError("could not connect to '%s:%s' (%s)" % (host, port, ex))
@@ -202,6 +211,7 @@ def connect(host=None, port=50000, user=None, password=None, database=None, conn
                     sock.close()
                     host, port, database = m.group(1), int(m.group(2)), m.group(3) or database
                     sock = socket.create_connection((host, port), timeout=connect_timeout)
+                    keepalive(sock)
                     sock.settimeout(None)
                 continue  # merovingian proxy redirect: keep reading the next challenge on this socket
             if block[0] == "!":

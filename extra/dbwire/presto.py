@@ -25,6 +25,7 @@ except ImportError:
 from extra.dbwire import InterfaceError
 from extra.dbwire import NotSupportedError
 from extra.dbwire import OperationalError
+from extra.dbwire import http_origin
 from extra.dbwire import ProgrammingError
 
 def _convert(value, coltype):
@@ -72,9 +73,16 @@ class Cursor(object):
     def close(self):
         self._rows = []
 
+def _split_pair(item):
+    """'key=value' -> (key, value); a bare 'key' keeps a None value (Trino sends both forms)."""
+
+    key, sep, value = item.strip().partition("=")
+    return key.strip(), (value.strip() if sep else None)
+
+
 class Connection(object):
     def __init__(self, host, port, user, password, catalog, schema, timeout):
-        self._statement_url = "http://%s:%d/v1/statement" % (host, port)
+        self._statement_url = "%s/v1/statement" % http_origin(host, port)
         self._timeout = timeout
         self._headers = {"Content-Type": "text/plain"}
         for prefix in ("X-Presto-", "X-Trino-"):
@@ -84,8 +92,8 @@ class Connection(object):
             # request ("Schema is set but catalog is not"), so never force a "default" schema
             if catalog:
                 self._headers[prefix + "Catalog"] = catalog
-            if schema:
-                self._headers[prefix + "Schema"] = schema
+                if schema:              # only inside the catalog branch: a Schema alone is rejected
+                    self._headers[prefix + "Schema"] = schema
         if password:
             token = base64.b64encode(("%s:%s" % (user or "", password)).encode("utf-8")).decode("ascii")
             self._headers["Authorization"] = "Basic %s" % token
@@ -102,16 +110,54 @@ class Connection(object):
     def close(self):
         pass  # HTTP is stateless
 
+    def _apply_state(self, info):
+        """
+        Carry the session state the server hands back into the headers of every later request.
+
+        The client protocol is stateless on the wire, so the SERVER cannot remember anything: it reports
+        each change as a response header and the client is required to echo it back. Ignoring them makes
+        'USE', 'SET SESSION', 'SET ROLE' and 'START TRANSACTION' appear to succeed and then silently have
+        no effect on the next statement.
+        """
+
+        for prefix in ("X-Presto-", "X-Trino-"):
+            for suffix, header in (("Catalog", "Catalog"), ("Schema", "Schema"), ("Path", "Path")):
+                value = info.get((prefix + "Set-" + suffix).lower())
+                if value:
+                    self._headers[prefix + header] = value
+            started = info.get((prefix + "Started-Transaction-Id").lower())
+            if started:
+                self._headers[prefix + "Transaction-Id"] = started
+            if info.get((prefix + "Clear-Transaction-Id").lower()):
+                self._headers.pop(prefix + "Transaction-Id", None)
+            # Set-Session / Set-Role accumulate as comma-separated 'key=value' pairs, and the matching
+            # Clear-* header removes one by name
+            for kind in ("Session", "Role"):
+                current = dict(_split_pair(_) for _ in (self._headers.get(prefix + kind) or "").split(",") if _)
+                for item in (info.get((prefix + "Set-" + kind).lower()) or "").split(","):
+                    if item.strip():
+                        key, value = _split_pair(item)
+                        current[key] = value
+                for key in (info.get((prefix + "Clear-" + kind).lower()) or "").split(","):
+                    current.pop(key.strip(), None)
+                if current:
+                    self._headers[prefix + kind] = ",".join("%s=%s" % (k, v) if v is not None else k for k, v in sorted(current.items()))
+                else:
+                    self._headers.pop(prefix + kind, None)
+
     def _request(self, url, data=None):
         req = Request(url, data=data.encode("utf-8") if data is not None else None, headers=self._headers)
         try:
-            body = urlopen(req, timeout=self._timeout).read().decode("utf-8", "replace")
+            response = urlopen(req, timeout=self._timeout)
+            body = response.read().decode("utf-8", "replace")
         except HTTPError as ex:
             raise ProgrammingError("(remote) HTTP %s: %s" % (ex.code, ex.read().decode("utf-8", "replace")[:200]))
         except URLError as ex:
             raise OperationalError("(remote) %s" % ex)
         except (socket.timeout, socket.error) as ex:
             raise OperationalError("(remote) %s" % ex)
+        info = response.info()
+        self._apply_state(dict((k.lower(), v) for k, v in (info.items() if hasattr(info, "items") else [])))
         try:
             return json.loads(body)
         except ValueError as ex:

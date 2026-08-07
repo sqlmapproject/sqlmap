@@ -23,6 +23,8 @@ from extra.dbwire import InterfaceError
 from extra.dbwire import IntegrityError
 from extra.dbwire import NotSupportedError
 from extra.dbwire import OperationalError
+from extra.dbwire import connection_lost
+from extra.dbwire import keepalive
 from extra.dbwire import ProgrammingError
 
 _MAGIC = b"CUBRK"
@@ -257,7 +259,10 @@ class Connection(object):
     def _recvn(self, n):
         buf = b""
         while len(buf) < n:
-            chunk = self._sock.recv(n - len(buf))
+            try:
+                chunk = self._sock.recv(n - len(buf))
+            except (socket.error, OSError) as ex:
+                raise connection_lost(ex)
             if not chunk:
                 raise InterfaceError("connection closed by server")
             buf += chunk
@@ -267,6 +272,7 @@ class Connection(object):
         # broker handshake (may redirect to a dedicated CAS worker port), then cleartext OPEN_DATABASE login
         try:
             sock = socket.create_connection((self._host, self._port), timeout=self._timeout)
+            keepalive(sock)
             sock.settimeout(None)
             sock.sendall(_MAGIC + struct.pack(">BB", _CLIENT_JDBC, _CAS_VERSION) + b"\x00\x00\x00")
             self._sock = sock
@@ -276,6 +282,7 @@ class Connection(object):
             if port > 0:  # redirected to a CAS worker: reconnect there, no second handshake
                 self._safe_close()
                 sock = socket.create_connection((self._host, port), timeout=self._timeout)
+                keepalive(sock)
                 sock.settimeout(None)
                 self._sock = sock
         except (socket.error, socket.timeout) as ex:
@@ -299,7 +306,10 @@ class Connection(object):
 
     def _send(self, payload):
         # frame: [payload_len(4)][cas_info(4)][payload]
-        self._sock.sendall(struct.pack(">i", len(payload)) + self._cas_info + payload)
+        try:
+            self._sock.sendall(struct.pack(">i", len(payload)) + self._cas_info + payload)
+        except (socket.error, OSError) as ex:
+            raise connection_lost(ex)
 
     def _read_response(self):
         (data_length,) = struct.unpack(">i", self._recvn(4))
@@ -344,6 +354,17 @@ class Connection(object):
     def _query(self, query):
         reader = self._call(_Writer(_FC_PREPARE).arg_nts(query).arg_byte(0).arg_byte(0))
         handle = reader.int()
+        try:
+            return self._execute(handle, reader)
+        finally:
+            # release the broker-side request handle even when execute/fetch raised: a connection that
+            # survives a few failed statements would otherwise hold every one of them until it closes
+            try:
+                self._call(_Writer(_FC_CLOSE_REQ_HANDLE).arg_int(handle))
+            except Exception:
+                pass
+
+    def _execute(self, handle, reader):
         reader.int()                 # result cache lifetime
         stmt_type = reader.byte()
         reader.int()                 # bind count
@@ -374,7 +395,6 @@ class Connection(object):
             rows += self._fetch_remaining(handle, columns, len(rows), total)
         elif result_infos:
             rowcount = result_infos[0]
-        self._call(_Writer(_FC_CLOSE_REQ_HANDLE).arg_int(handle))
         return description, rows, rowcount
 
     def _fetch_remaining(self, handle, columns, fetched, total):

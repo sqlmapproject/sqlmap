@@ -19,10 +19,13 @@ import socket
 try:
     from urllib.request import Request, urlopen        # Python 3
     from urllib.error import HTTPError, URLError
+    from urllib.parse import quote
 except ImportError:
     from urllib2 import Request, urlopen, HTTPError, URLError  # Python 2
+    from urllib import quote
 
 from extra.dbwire import OperationalError
+from extra.dbwire import http_origin
 from extra.dbwire import ProgrammingError
 
 # TabSeparated backslash escapes -> the literal byte they denote
@@ -87,7 +90,8 @@ class Cursor(object):
 
 class Connection(object):
     def __init__(self, host, port, user, password, database, timeout):
-        self._url = "http://%s:%d/?database=%s&default_format=TabSeparatedWithNames" % (host, port, database or "default")
+        # quote the database: a name with a reserved character would otherwise inject into the query string
+        self._url = "%s/?database=%s&default_format=TabSeparatedWithNames" % (http_origin(host, port), quote(database or "default", safe=""))
         self._headers = {}
         if user or password:
             token = base64.b64encode(("%s:%s" % (user or "", password or "")).encode("utf-8")).decode("ascii")

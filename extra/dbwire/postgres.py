@@ -28,6 +28,8 @@ from extra.dbwire import IntegrityError
 from extra.dbwire import InterfaceError
 from extra.dbwire import NotSupportedError
 from extra.dbwire import OperationalError
+from extra.dbwire import connection_lost
+from extra.dbwire import keepalive
 from extra.dbwire import ProgrammingError
 
 _PROTOCOL_VERSION = 196608  # 3.0
@@ -71,7 +73,10 @@ def _xor(a, b):
 def _recvn(sock, n):
     buf = b""
     while len(buf) < n:
-        chunk = sock.recv(n - len(buf))
+        try:
+            chunk = sock.recv(n - len(buf))
+        except (socket.error, OSError) as ex:
+            raise connection_lost(ex)
         if not chunk:
             raise InterfaceError("connection closed by server")
         buf += chunk
@@ -85,7 +90,10 @@ def _read_message(sock):
     return mtype, _recvn(sock, length - 4)
 
 def _send(sock, mtype, payload):
-    sock.sendall((mtype or b"") + struct.pack("!I", len(payload) + 4) + payload)
+    try:
+        sock.sendall((mtype or b"") + struct.pack("!I", len(payload) + 4) + payload)
+    except (socket.error, OSError) as ex:
+        raise connection_lost(ex)
 
 def _error_message(payload):
     # ErrorResponse/NoticeResponse: series of (byte field-code, cstring value), terminated by a NUL byte.
@@ -226,7 +234,7 @@ class Connection(object):
         return description, rows, 0, rowcount
 
 def _authenticate(sock, user, password):
-    cfirst_bare = None
+    client_nonce = cfirst_bare = salted = auth_message = None
     while True:
         mtype, payload = _read_message(sock)
         if mtype in (b"N", b"S"):  # NoticeResponse / ParameterStatus may legally precede AuthenticationOk
@@ -248,8 +256,8 @@ def _authenticate(sock, user, password):
         elif code == 10:  # SASL (SCRAM-SHA-256)
             if not hasattr(hashlib, "pbkdf2_hmac"):
                 raise NotSupportedError("SCRAM-SHA-256 authentication requires Python >= 2.7.8 (hashlib.pbkdf2_hmac)")
-            nonce = base64.b64encode(os.urandom(18)).decode("ascii")
-            cfirst_bare = "n=,r=%s" % nonce
+            client_nonce = base64.b64encode(os.urandom(18)).decode("ascii")
+            cfirst_bare = "n=,r=%s" % client_nonce
             client_first = "n,," + cfirst_bare
             _send(sock, b"p", b"SCRAM-SHA-256\x00" + struct.pack("!I", len(client_first)) + client_first.encode("ascii"))
         elif code == 11:  # SASLContinue (server-first)
@@ -259,6 +267,13 @@ def _authenticate(sock, user, password):
                 snonce, salt, iterations = attrs["r"], base64.b64decode(attrs["s"]), int(attrs["i"])
             except (KeyError, ValueError, binascii.Error, UnicodeDecodeError) as ex:
                 raise OperationalError("malformed SCRAM server-first message (%s)" % ex)
+            # RFC 5802 5.1: the server nonce MUST start with the client nonce and MUST add material of its
+            # own. Skipping this lets anything that can answer the TCP connection replay a recorded
+            # server-first and drive the exchange - and dbwire has no TLS layer underneath to catch it.
+            if not client_nonce or not snonce.startswith(client_nonce) or len(snonce) <= len(client_nonce):
+                raise OperationalError("SCRAM server nonce does not extend the client nonce (rogue server?)")
+            if iterations < 4096:   # RFC 5802 recommends >= 4096; a tiny count cheapens an offline attack
+                raise OperationalError("SCRAM iteration count %d is too low" % iterations)
             salted = hashlib.pbkdf2_hmac("sha256", (password or "").encode("utf-8"), salt, iterations)
             client_key = hmac.new(salted, b"Client Key", hashlib.sha256).digest()
             stored_key = hashlib.sha256(client_key).digest()
@@ -267,8 +282,26 @@ def _authenticate(sock, user, password):
             client_sig = hmac.new(stored_key, auth_message.encode("ascii"), hashlib.sha256).digest()
             proof = base64.b64encode(_xor(client_key, client_sig)).decode("ascii")
             _send(sock, b"p", ("%s,p=%s" % (client_final_noproof, proof)).encode("ascii"))
-        elif code == 12:  # SASLFinal
-            pass
+        elif code == 12:  # SASLFinal (server-final): verify the server too, or the handshake is one-way
+            # Without this the client proves itself to the server and simply trusts whatever answers back.
+            # ServerSignature = HMAC(ServerKey, AuthMessage) can only be produced by a peer that holds the
+            # stored credentials, so comparing it is what makes the exchange mutual (RFC 5802 5, 5.1).
+            if salted is None or auth_message is None:
+                raise OperationalError("unexpected SCRAM server-final message")
+            try:
+                attrs = dict(kv.split("=", 1) for kv in payload[4:].decode("ascii").split(","))
+            except (ValueError, UnicodeDecodeError) as ex:
+                raise OperationalError("malformed SCRAM server-final message (%s)" % ex)
+            if "e" in attrs:
+                raise OperationalError("SCRAM authentication failed (%s)" % attrs["e"])
+            try:
+                signature = base64.b64decode(attrs["v"])
+            except (KeyError, binascii.Error, ValueError) as ex:
+                raise OperationalError("malformed SCRAM server signature (%s)" % ex)
+            server_key = hmac.new(salted, b"Server Key", hashlib.sha256).digest()
+            expected = hmac.new(server_key, auth_message.encode("ascii"), hashlib.sha256).digest()
+            if not hmac.compare_digest(signature, expected):
+                raise OperationalError("SCRAM server signature mismatch (rogue server?)")
         else:
             raise InterfaceError("unsupported authentication request %d" % code)
 
@@ -279,6 +312,7 @@ def _raise_server_error_as_operational(payload):
 def connect(host=None, port=5432, user=None, password=None, database=None, connect_timeout=None, **kwargs):
     try:
         sock = socket.create_connection((host or "localhost", int(port or 5432)), timeout=connect_timeout)
+        keepalive(sock)
         sock.settimeout(None)
     except (socket.error, socket.timeout) as ex:
         raise OperationalError("could not connect to '%s:%s' (%s)" % (host, port, ex))

@@ -22,6 +22,8 @@ from extra.dbwire import DatabaseError
 from extra.dbwire import InterfaceError
 from extra.dbwire import NotSupportedError
 from extra.dbwire import OperationalError
+from extra.dbwire import connection_lost
+from extra.dbwire import keepalive
 from extra.dbwire import ProgrammingError
 
 # capability flags
@@ -50,6 +52,9 @@ def _xor(a, b):
 def _u8(data, off):
     return struct.unpack("<B", data[off:off + 1])[0]
 
+def _u16(data, off):
+    return struct.unpack("<H", data[off:off + 2])[0]
+
 def _cstring(data, off):
     # NUL-terminated string, tolerant of a missing terminator (returns the remainder)
     end = data.find(b"\x00", off)
@@ -60,7 +65,10 @@ def _cstring(data, off):
 def _recvn(sock, n):
     buf = b""
     while len(buf) < n:
-        chunk = sock.recv(n - len(buf))
+        try:
+            chunk = sock.recv(n - len(buf))
+        except (socket.error, OSError) as ex:
+            raise connection_lost(ex)
         if not chunk:
             raise InterfaceError("connection closed by server")
         buf += chunk
@@ -84,7 +92,10 @@ def _read_packet(sock):
 def _send_packet(sock, seq, payload):
     while True:  # split payloads >= 16 MB into 0xffffff-sized packets (with a trailing short packet)
         chunk = payload[:0xffffff]
-        sock.sendall(struct.pack("<I", len(chunk))[0:3] + struct.pack("<B", seq & 0xff) + chunk)
+        try:
+            sock.sendall(struct.pack("<I", len(chunk))[0:3] + struct.pack("<B", seq & 0xff) + chunk)
+        except (socket.error, OSError) as ex:
+            raise connection_lost(ex)
         seq = (seq + 1) & 0xff
         payload = payload[0xffffff:]
         if len(chunk) < 0xffffff:
@@ -283,6 +294,7 @@ def _finish_auth(sock, password, plugin, salt):
 def connect(host=None, port=3306, user=None, password=None, database=None, connect_timeout=None, **kwargs):
     try:
         sock = socket.create_connection((host or "localhost", int(port or 3306)), timeout=connect_timeout)
+        keepalive(sock)
         sock.settimeout(None)
     except (socket.error, socket.timeout) as ex:
         raise OperationalError("could not connect to '%s:%s' (%s)" % (host, port, ex))
@@ -296,10 +308,10 @@ def connect(host=None, port=3306, user=None, password=None, database=None, conne
         _, off = _cstring(payload, off)                 # server version
         off += 4                                        # connection id
         salt = payload[off:off + 8]; off += 8 + 1       # auth-plugin-data part 1 (+ filler)
-        off += 2                                        # capability flags (lower)
+        server_caps = _u16(payload, off); off += 2      # capability flags (lower)
         off += 1                                        # character set
         off += 2                                        # status flags
-        off += 2                                        # capability flags (upper)
+        server_caps |= _u16(payload, off) << 16; off += 2   # capability flags (upper)
         auth_data_len = _u8(payload, off); off += 1
         off += 10                                       # reserved
         salt += payload[off:off + max(13, auth_data_len - 8) - 1]  # part 2 (drop trailing NUL)
@@ -315,19 +327,31 @@ def connect(host=None, port=3306, user=None, password=None, database=None, conne
             plugin = "mysql_native_password"
             auth_response = _scramble_native(password or "", salt)
 
-        flags = (_CLIENT_LONG_PASSWORD | _CLIENT_LONG_FLAG | _CLIENT_PROTOCOL_41 |
-                 _CLIENT_TRANSACTIONS | _CLIENT_SECURE_CONNECTION | _CLIENT_PLUGIN_AUTH)
+        # capabilities are NEGOTIATED: each side advertises what it can do and only the intersection is in
+        # play. Sending a fixed set makes the client claim features a proxy/fork/older server never offered,
+        # which is how a handshake ends up desynchronized rather than cleanly refused.
+        if not (server_caps & _CLIENT_PROTOCOL_41):
+            raise OperationalError("server does not support the 4.1 protocol, which this client requires")
+        wanted = (_CLIENT_LONG_PASSWORD | _CLIENT_LONG_FLAG | _CLIENT_PROTOCOL_41 |
+                  _CLIENT_TRANSACTIONS | _CLIENT_SECURE_CONNECTION | _CLIENT_PLUGIN_AUTH)
         if database:
-            flags |= _CLIENT_CONNECT_WITH_DB
+            wanted |= _CLIENT_CONNECT_WITH_DB
+        flags = wanted & server_caps
+        flags |= _CLIENT_PROTOCOL_41 | _CLIENT_SECURE_CONNECTION     # mandatory for the packets built below
+        if database and not (flags & _CLIENT_CONNECT_WITH_DB):
+            raise OperationalError("server does not support selecting a database during the handshake")
+        if not (flags & _CLIENT_PLUGIN_AUTH):
+            plugin = None       # pre-4.1.1 style: no trailing plugin name in the handshake response
         response = struct.pack("<I", flags) + struct.pack("<I", _MAX_PACKET) + struct.pack("<B", 45) + (b"\x00" * 23)
         response += (user or "").encode("utf-8") + b"\x00"
         response += struct.pack("<B", len(auth_response)) + auth_response
         if database:
             response += database.encode("utf-8") + b"\x00"
-        response += plugin.encode("ascii") + b"\x00"
+        if plugin:
+            response += plugin.encode("ascii") + b"\x00"
         _send_packet(sock, seq + 1, response)
 
-        _finish_auth(sock, password or "", plugin, salt)
+        _finish_auth(sock, password or "", plugin or "mysql_native_password", salt)
     except (DatabaseError, InterfaceError):
         _safe_close(sock)
         raise

@@ -22,9 +22,12 @@ from extra.dbwire import DatabaseError
 from extra.dbwire import InterfaceError
 from extra.dbwire import NotSupportedError
 from extra.dbwire import OperationalError
+from extra.dbwire import connection_lost
+from extra.dbwire import keepalive
 from extra.dbwire import ProgrammingError
 
 _MAX_MESSAGE_LENGTH = 0x40000000
+_DONE_COUNT = 0x0010     # DONE status bit: DoneRowCount carries a valid affected-row count
 
 # packet types
 _PKT_SQL_BATCH = 0x01
@@ -38,7 +41,10 @@ def _u8(data, off):
 def _recvn(sock, n):
     buf = b""
     while len(buf) < n:
-        chunk = sock.recv(n - len(buf))
+        try:
+            chunk = sock.recv(n - len(buf))
+        except (socket.error, OSError) as ex:
+            raise connection_lost(ex)
         if not chunk:
             raise InterfaceError("connection closed by server")
         buf += chunk
@@ -54,23 +60,32 @@ def _send_message(sock, mtype, data):
         off += chunk_size
         last = off >= len(data)
         header = struct.pack(">BBHHBB", mtype, _STATUS_EOM if last else 0x00, len(chunk) + 8, 0, packet_id & 0xff, 0)
-        sock.sendall(header + chunk)
+        try:
+            sock.sendall(header + chunk)
+        except (socket.error, OSError) as ex:
+            raise connection_lost(ex)
         packet_id += 1
         if last:
             break
 
 def _read_message(sock):
-    # reassemble a full TDS message across packets (EOM status bit marks the last)
-    body = b""
+    # reassemble a full TDS message across packets (EOM status bit marks the last). The packet length is a
+    # 16-bit field, so bounding IT against _MAX_MESSAGE_LENGTH can never trigger - a hostile peer simply
+    # never sets EOM and streams packets forever. Bound the accumulated message instead, and collect the
+    # chunks in a list so reassembly stays linear rather than re-copying a growing immutable buffer.
+    chunks, total = [], 0
     while True:
         header = _recvn(sock, 8)
         mtype, status, length = struct.unpack(">BBH", header[:4])
-        if length < 8 or length > _MAX_MESSAGE_LENGTH:
+        if length < 8:
             raise InterfaceError("invalid TDS packet length (%d)" % length)
-        body += _recvn(sock, length - 8)
+        total += length - 8
+        if total > _MAX_MESSAGE_LENGTH:
+            raise InterfaceError("TDS message exceeds the maximum allowed length (%d bytes)" % _MAX_MESSAGE_LENGTH)
+        chunks.append(_recvn(sock, length - 8))
         if status & _STATUS_EOM:
             break
-    return body
+    return b"".join(chunks)
 
 # ---- PRELOGIN ----------------------------------------------------------------------------------------
 
@@ -465,12 +480,12 @@ def _decode_value(col, data, off):
 
 def _parse_tokens(sock, login=False):
     data = _read_message(sock)
-    off, columns, rows, description, error = 0, [], [], None, None
+    off, columns, rows, description, error, affected = 0, [], [], None, None, None
     while off < len(data):
         token = _u8(data, off); off += 1
         if token == 0x81:  # COLMETADATA (a new result set: drop any prior rows so only the last is returned)
             (count,) = struct.unpack("<H", data[off:off + 2]); off += 2
-            columns, rows = [], []
+            columns, rows, affected = [], [], None
             if count == 0xffff:
                 continue
             for _ in range(count):
@@ -518,6 +533,9 @@ def _parse_tokens(sock, login=False):
         elif token == 0xa9:  # ORDER
             (tlen,) = struct.unpack("<H", data[off:off + 2]); off += 2 + tlen
         elif token in (0xfd, 0xfe, 0xff):  # DONE / DONEPROC / DONEINPROC
+            status, _curcmd, rowcount = struct.unpack("<HHq", data[off:off + 12])
+            if status & _DONE_COUNT:        # only then is DoneRowCount meaningful (MS-TDS 2.2.7.5)
+                affected = rowcount if affected is None else affected + rowcount
             off += 12
         else:
             raise InterfaceError("unexpected TDS token 0x%02x" % token)
@@ -526,7 +544,7 @@ def _parse_tokens(sock, login=False):
         if login:
             raise OperationalError("(remote) %s" % error)
         raise ProgrammingError("(remote) %s" % error)
-    return description, rows
+    return description, rows, affected
 
 class Cursor(object):
     def __init__(self, connection):
@@ -540,8 +558,10 @@ class Cursor(object):
         if params is not None:
             raise NotSupportedError("parameter binding is not supported; pass a fully-formed query string")
         self.description, self.rowcount, self._rows, self._pos = None, -1, [], 0
-        self.description, self._rows = self.connection._query(query)
-        self.rowcount = len(self._rows)
+        self.description, self._rows, affected = self.connection._query(query)
+        # a result-producing statement reports what it returned; DML has no rows, so the server's
+        # DoneRowCount is the only place its affected-row count exists
+        self.rowcount = len(self._rows) if self.description is not None else (affected if affected is not None else -1)
         return self
 
     def fetchall(self):
@@ -590,6 +610,7 @@ class Connection(object):
 def connect(host=None, port=1433, user=None, password=None, database=None, connect_timeout=None, **kwargs):
     try:
         sock = socket.create_connection((host or "localhost", int(port or 1433)), timeout=connect_timeout)
+        keepalive(sock)
         sock.settimeout(None)
     except (socket.error, socket.timeout) as ex:
         raise OperationalError("could not connect to '%s:%s' (%s)" % (host, port, ex))

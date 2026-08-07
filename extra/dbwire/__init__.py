@@ -48,3 +48,44 @@ class InternalError(DatabaseError):
 
 class NotSupportedError(DatabaseError):
     pass
+
+def http_origin(host, port):
+    """
+    'http://host:port', with a literal IPv6 address bracketed as RFC 3986 requires. Without the brackets
+    the colons in the address are parsed as the port separator and the URL is simply wrong.
+    """
+
+    host = host or "localhost"
+    if ":" in host and not host.startswith("["):
+        host = "[%s]" % host
+    return "http://%s:%d" % (host, int(port))
+
+
+def connection_lost(ex):
+    """
+    Turn a raw socket/OS failure into the DB-API hierarchy above.
+
+    Callers of a PEP 249 driver only ever catch Error and its subclasses, so a bare socket.error escaping
+    from a send/recv leaves them with an unhandled traceback instead of a handled connection failure.
+    """
+
+    return OperationalError("connection lost (%s)" % ex)
+
+def keepalive(sock):
+    """
+    Ask the kernel to probe an idle connection, so a peer that dies without a FIN is eventually detected.
+
+    Deliberately NOT a read timeout: a legitimate query can take minutes on a big table, and a fixed
+    deadline would kill it. Keepalive distinguishes a dead peer from a slow one, which is the actual
+    failure being guarded against. Best-effort - the options are not portable everywhere.
+    """
+
+    import socket as _socket
+
+    try:
+        sock.setsockopt(_socket.SOL_SOCKET, _socket.SO_KEEPALIVE, 1)
+        for name, value in (("TCP_KEEPIDLE", 60), ("TCP_KEEPINTVL", 10), ("TCP_KEEPCNT", 5)):
+            if hasattr(_socket, name):
+                sock.setsockopt(_socket.IPPROTO_TCP, getattr(_socket, name), value)
+    except Exception:
+        pass
