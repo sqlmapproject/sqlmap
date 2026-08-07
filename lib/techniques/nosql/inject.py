@@ -14,6 +14,7 @@ from collections import OrderedDict
 
 from lib.core.common import beep
 from lib.core.common import randomStr
+from lib.core.common import removeReflectiveValues
 from lib.core.convert import getUnicode
 from lib.utils.nonsql import userDecision
 from lib.utils.nonsql import sqlErrorPresent
@@ -366,7 +367,12 @@ def _send(place, parameter, segment=None, jsonValue=_UNSET):
     finally:
         conf.skipUrlEncode = skipUrlEncode
 
-    return page or ""
+    # Strip the payload back out before anything compares pages. An endpoint that merely ECHOES the
+    # parameter differs between any two probes because the payloads differ, which satisfies a true/false
+    # differential - and the wildcard always-true check - without a single operator being interpreted.
+    # That reported a plain reflective search page as a "Lucene query_string-compatible back-end". On a
+    # blind target the payload is not in the page, so this is a no-op.
+    return removeReflectiveValues(page, payload, suppressWarning=True) or ""
 
 def _isError(page):
     # a server-error status, a recognizable NoSQL error body, OR a recognized SQL/DBMS error marks a

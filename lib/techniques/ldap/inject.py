@@ -12,6 +12,7 @@ from collections import namedtuple
 
 from lib.core.common import beep
 from lib.core.common import randomStr
+from lib.core.common import removeReflectiveValues
 from lib.core.convert import getUnicode
 from lib.core.data import conf
 from lib.core.data import logger
@@ -173,7 +174,12 @@ def _send(place, parameter, value):
         # oracle sample - signal None so `_boolean`/`extract` (which reject None) can't decide on it
         if blockedStatus(code):
             return None
-        return page or ""
+        # Strip the payload back out before anything compares pages. An endpoint that merely ECHOES the
+        # parameter differs between any two probes because the payloads differ, which satisfies a
+        # true/false differential without a single expression being evaluated - that reported plain
+        # reflective search pages as injectable. On a blind target the payload is not in the page, so
+        # this is a no-op.
+        return removeReflectiveValues(page, value, suppressWarning=True) or ""
     except Exception as ex:
         logger.debug("LDAP probe request failed: %s" % getUnicode(ex))
         return None

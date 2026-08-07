@@ -1194,6 +1194,18 @@ class ReqHandler(BaseHTTPRequestHandler):
             self.wfile.write(output.encode(UNICODE_ENCODING))
             return
 
+        if self.url == "/echo":
+            # A pure reflector: no engine of any kind behind it, it only shows the parameter back. Every
+            # non-SQL switch must stay silent here. A differential built on "the page changed" is
+            # satisfied by reflection alone, which is how several engines reported this shape as
+            # injectable - so this endpoint is the regression gate for that whole class.
+            self.send_response(OK)
+            self.send_header("Content-type", "text/html; charset=%s" % UNICODE_ENCODING)
+            self.send_header("Connection", "close")
+            self.end_headers()
+            self.wfile.write(("<html><body>you searched for: %s</body></html>" % self.params.get("q", "")).encode(UNICODE_ENCODING))
+            return
+
         if self.url in ("/xslt/element", "/xslt/value"):
             # VULNERABLE: user input is concatenated into a stylesheet which is then compiled and applied
             element = self.url.endswith("element")
