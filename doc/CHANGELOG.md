@@ -10,6 +10,7 @@
 * Added the switch `--ssti`. It tests for server-side template injection. It also covers Struts2 and OGNL.
 * Added the switch `--graphql`. It tests for GraphQL injection.
 * Added the switch `--hql`. It tests for HQL and JPQL (Hibernate ORM) injection.
+* Added the switch `--xslt`. It tests for XSLT injection. The engine names itself in the response. sqlmap then dumps the XML document that the stylesheet transforms. It also reads the files that the engine can reach.
 * Added the switch `--xxe`. It tests for XML External Entity injection. It uses in-band, error-based, and out-of-band channels.
 * Added the switch `--jwt`. It examines JSON Web Tokens for weak keys and for injection in the claims.
 
@@ -45,6 +46,7 @@
 * Added support for Google Cloud Spanner.
 * Added support for DuckDB and Trino as forks.
 * Added the switch `--esperanto`. It enumerates a back-end DBMS that sqlmap cannot identify.
+* Added XQuery support to the switch `--xpath`. XQuery is a superset of XPath, so the same injection point gives more. On a back-end that supports it, sqlmap reads a file through `unparsed-text()`.
 * Added error-based payloads for CUBRID, InterSystems Cache, Virtuoso, H2, Firebird, and Vertica.
 * Added time-based payloads for CUBRID.
 * Added out-of-band DNS channels for H2 and ClickHouse.
@@ -81,6 +83,7 @@
 * sqlmap now keeps the value of an injected Host header.
 * Removed the time outliers from the time statistics.
 * Improved the detection of the SQL dialect of the target.
+* The switch `--xpath` no longer reports an injection when the page changes only because it shows the payload again. Reflection is not proof that an expression was evaluated.
 
 ## Quality
 
