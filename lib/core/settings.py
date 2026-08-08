@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.8.17"
+VERSION = "1.10.8.18"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -1008,13 +1008,19 @@ NOSQL_ERRORS = (
     ("CouchDB", r'"error"\s*:\s*"(?:bad_request|query_parse_error|missing_named_query)"|invalid operator: ?\$'),
     ("Elasticsearch", r'"type"\s*:\s*"[a-z_]*?(?:query_shard|x_content_parse|parsing|search_phase_execution|illegal_argument|too_many_clauses|number_format|script)_exception"|Failed to parse query \['),
     ("Solr", r"org\.apache\.solr\.[\w.]*(?:SyntaxError|SolrException)"),
-    ("Neo4j", r"Neo\.(?:ClientError|DatabaseError|TransientError|ClientNotification)\.|\bNeo4jError\b|even number of non-escaped quotes|Failed to parse string literal|expected an expression|'(?:UNWIND|OPTIONAL|DETACH|FOREACH|MERGE|LOAD CSV)'"),
+    # NOTE: 'MERGE' is not Cypher-only. It is standard SQL, so it matched "Incorrect syntax near 'MERGE'"
+    ("Neo4j", r"Neo\.(?:ClientError|DatabaseError|TransientError|ClientNotification)\.|\bNeo4jError\b|even number of non-escaped quotes|Failed to parse string literal|expected an expression|'(?:UNWIND|OPTIONAL|DETACH|FOREACH|LOAD CSV)'"),
     ("ArangoDB", r"\bArangoError\b|AQL: (?:syntax|parse) error"),
-    ("Cassandra", r"line \d+:\d+ (?:no viable alternative at input|(?:mismatched|extraneous) input '.*?' expecting)|org\.apache\.cassandra|com\.datastax|\bInvalid(?:Request|Query)Exception\b"),
+    # NOTE: the ANTLR "line N:M no viable alternative" line is not evidence of Cassandra on its own -
+    # Hibernate 6 and Trino emit it word for word. What IS particular to the CQL grammar: the driver
+    # exception in front of it, the ANTLR3 lexer wording ('mismatched character', which the ANTLR4
+    # parsers do not have), and the "(...[TOKEN]...)" excerpt that CQL appends to the offending token
+    ("Cassandra", r"\b(?:ResponseError|SyntaxException|InvalidRequestException|InvalidQueryException)\b[^\n]{0,60}?line \d+:\d+ (?:no viable alternative at input|(?:mismatched|extraneous) input)|line \d+:\d+ (?:mismatched character|no viable alternative at input '[^']*' \(\.\.\.)|org\.apache\.cassandra|com\.datastax|\bInvalid(?:Request|Query)Exception\b"),
     ("Redis", r"\bWRONGTYPE\b|ERR Error (?:compiling|running) script|@user_script|\bReplyError\b"),
     ("Memcached", r"CLIENT_ERROR bad|SERVER_ERROR object too large"),
     ("InfluxDB", r"error parsing query|unable to parse '[^']*': found"),
     ("HBase/Phoenix", r"org\.apache\.phoenix|PhoenixParserException|org\.apache\.hadoop\.hbase"),
+    ("DynamoDB", r"Statement wasn't well formed, can't be processed|software\.amazon\.awssdk\.services\.dynamodb|com\.amazonaws\.services\.dynamodbv2|\bDynamoDb(?:Exception|Error)\b"),
 )
 NOSQL_ERROR_REGEX = "(?:%s)" % '|'.join(regex for _, regex in NOSQL_ERRORS)
 
@@ -1087,14 +1093,17 @@ GRAPHQL_PARSE_ERRORS = (
     r"\bExpected Name,\s*found\b",
     r"\bUnexpected\s+<EOF>\b",
 )
+# NOTE: graphql-js quotes the offending name, and the response carries those quotes backslash-escaped
+# inside the JSON body ('Cannot query field \"x\" on type \"Query\"'). Without the optional backslash
+# none of these ever matched a real answer - only a pretty-printed one
 GRAPHQL_VALIDATION_ERRORS = (
     r'"code"\s*:\s*"GRAPHQL_VALIDATION_FAILED"',
-    r"\bCannot query field\s+\"[^\"]+\"\s+on type\s+\"[^\"]+\"",
-    r"\bUnknown argument\s+\"[^\"]+\"\s+on field\s+\"[^\"]+\"",
-    r"\bField\s+\"[^\"]+\"\s+argument\s+\"[^\"]+\"\s+of type\s+\"[^\"]+\"\s+is required\b",
-    r"\bVariable\s+\"\$[^\"]+\"\s+got invalid value\b",
+    r"\bCannot query field\s+\\?\"[^\"\\]+\\?\"\s+on type\s+\\?\"[^\"\\]+\\?\"",
+    r"\bUnknown argument\s+\\?\"[^\"\\]+\\?\"\s+on field\s+\\?\"[^\"\\]+\\?\"",
+    r"\bField\s+\\?\"[^\"\\]+\\?\"\s+argument\s+\\?\"[^\"\\]+\\?\"\s+of type\s+\\?\"[^\"\\]+\\?\"\s+is required\b",
+    r"\bVariable\s+\\?\"\$[^\"\\]+\\?\"\s+got invalid value\b",
     r"\bExpected type\s+[^,]+,\s*found\b",
-    r"\bDid you mean\s+\"[^\"]+\"\b",
+    r"\bDid you mean\s+\\?\"[^\"\\]+\\?\"",
 )
 GRAPHQL_APQ_ERRORS = (
     r"\bPersistedQueryNotFound\b",
@@ -1150,17 +1159,25 @@ LDAP_FINGERPRINT_ATTRIBUTES = (
 # fingerprinting (matched against HTTP response bodies). Each tuple is
 # (backend_name, regex_fragment).
 XPATH_ERROR_SIGNATURES = (
-    ("Java JAXP / Xalan", r"(?:javax\.xml\.(?:xpath\.XPathExpressionException|transform\.Transformer(?:Configuration)?Exception)|com\.sun\.org\.apache\.xpath\.(?:XPathException|XPathProcessorException)|org\.apache\.xpath|org\.xml\.sax\.SAX(?:Parse)?Exception)"),
+    # NOTE: neither javax.xml.transform.Transformer*Exception nor org.xml.sax.SAX*Exception belongs
+    # here. The first is the XSLT transformer and the second is the XML parser, so claiming them made
+    # every stylesheet failure and every malformed-XML response suggest '--xpath' as well. A real
+    # Xalan XPath failure always carries javax.xml.xpath.XPathExpressionException
+    ("Java JAXP / Xalan", r"(?:javax\.xml\.xpath\.XPathExpressionException|com\.sun\.org\.apache\.xpath\.(?:XPathException|XPathProcessorException)|org\.apache\.xpath)"),
     ("Java JAXP / Xalan", r"XPath (?:expression|syntax) error"),
     ("Java JAXP / Saxon", r"net\.sf\.saxon\.(?:trans\.XPathException|s9api\.SaxonApiException)"),
-    ("Java JAXP / Saxon", r"(?:XPST|XPTY|XPDY|XQST|XTDE)\d{4}:"),
-    (".NET XPathNavigator", r"System\.Xml\.(?:XPath\.XPathException|XmlException)"),
+    # NOTE: XTDE is an XSLT Transformation Dynamic Error, so it stays with '--xslt'
+    ("Java JAXP / Saxon", r"(?:XPST|XPTY|XPDY|XQST)\d{4}:"),
+    (".NET XPathNavigator", r"System\.Xml\.XPath\.XPathException"),
     (".NET XPathNavigator", r"Expression must evaluate to a node-set"),
     (".NET XPathNavigator", r"has an invalid (?:token|qualified name)"),
     ("lxml / libxml2", r"(?:lxml\.etree\.(?:XPath(?:Eval|Document|Syntax)?Error)|libxml2|xmlXPath(?:CompOp|Eval|Err))"),
-    ("lxml / libxml2", r"(?:XPath error|Invalid (?:expression|predicate))"),
+    # NOTE: 'Invalid expression' on its own is not an XPath error. libxml2 always prefixes it with
+    # "XPath error : ", and PHP always names the failing method, so both are covered without the
+    # bare form - which otherwise matched any calculator or formula field
+    ("lxml / libxml2", r"XPath error"),
     ("PHP SimpleXML / DOMXPath", r"(?:SimpleXMLElement::xpath\(\)|DOMXPath::(?:query|evaluate)\(\))"),
-    ("PHP SimpleXML / DOMXPath", r"Invalid expression|xmlXPathEval"),
+    ("PHP SimpleXML / DOMXPath", r"xmlXPathEval"),
     ("Saxon (standalone)", r"(?:net\.sf\.saxon\.(?:s9api\.SaxonApiException|trans\.XPathException)|Saxon error)"),
     ("Saxon (standalone)", r"Static error\(s\) in query"),
     ("BaseX", r"org\.basex\.(?:query\.QueryException|core\.BaseXException)"),
@@ -1226,14 +1243,22 @@ XQUERY_HARVEST_CHARS = 32
 # the binding that actually tells the tester what they are talking to.
 XSLT_ERROR_SIGNATURES = (
     ("PHP XSLTProcessor", r"XSLTProcessor::(?:importStylesheet|transformTo\w+)\(\)"),
-    ("libxslt / lxml", r"lxml\.etree\.(?:XSLT(?:Parse|Apply|)Error|XPathEvalError)"),
-    ("Saxon", r"(?:net\.sf\.saxon\.|SaxonApiException|Static error(?:s)? (?:in|at)|XTDE\d{4}|XTSE\d{4})"),
-    ("Xalan / Java JAXP", r"(?:javax\.xml\.transform\.Transformer(?:Configuration)?Exception|org\.apache\.xalan|XSLT Error)"),
+    # NOTE: XPathEvalError is raised by a plain tree.xpath() call, so it belongs to '--xpath'. lxml
+    # raises XSLTParseError / XSLTApplyError for a stylesheet
+    ("libxslt / lxml", r"lxml\.etree\.XSLT(?:Parse|Apply)?Error"),
+    # NOTE: Saxon is one product for XPath, XQuery and XSLT, so the package name alone proves nothing.
+    # Only the XSLT-exclusive evidence is kept (XTSE static / XTDE dynamic codes, the style package)
+    ("Saxon", r"(?:net\.sf\.saxon\.style\.|XTDE\d{4}|XTSE\d{4}|Failed to compile stylesheet)"),
+    # NOTE: only the 'Configuration' form is exclusive to a stylesheet. javax.xml.xpath wraps a plain
+    # XPath failure in a bare TransformerException, and a Xalan run-time failure names org.apache.xalan
+    ("Xalan / Java JAXP", r"(?:javax\.xml\.transform\.TransformerConfigurationException|org\.apache\.xalan|XSLT Error)"),
     (".NET XslCompiledTransform", r"System\.Xml\.Xsl\.(?:XslLoadException|XsltException)"),
     # Anchored to XSLT vocabulary on purpose: this regex also drives the GLOBAL heuristic hint in
     # checks.py, and bare "compilation error" / "Invalid expression" match gcc, javac and regex failures,
     # which would suggest '--xslt' on targets that have nothing to do with XSLT.
-    ("libxslt", r"(?:xsltParseStylesheet|xsltApplyStylesheet|xsltCompilePattern|xsl:\w+ : |xmlXPathEval|XPath error : )"),
+    # NOTE: xmlXPathEval is the libxml2 XPath entry point, which '--xpath' owns. libxslt names the
+    # stylesheet file instead, and that is what tells the two apart
+    ("libxslt", r"(?:xsltParseStylesheet|xsltApplyStylesheet|xsltCompilePattern|xsltLoadStylesheet|xsl:\w+ : |(?:runtime|compilation) error: file [^\n]{0,120}\.xsl)"),
     ("Generic XSLT", r"(?:XSLT|xsl:stylesheet).{0,40}?(?:error|exception|fail)"),
 )
 
@@ -1274,15 +1299,25 @@ XSLT_MAX_HARVEST = 12
 # Each tuple is (engine_name, regex_fragment).
 SSTI_ERROR_SIGNATURES = (
     ("Jinja2", r"jinja2\.exceptions\.\w+|TemplateSyntaxError|UndefinedError|TemplateNotFound|TemplateAssertionError"),
-    ("Twig", r"Twig[\\_]Error|Twig[\\_]Environment|Unknown (?:filter|function|test|tag)"),
-    ("Freemarker", r"freemarker\.(?:core|template|extract|cache)\.\w+|ParseException|InvalidReferenceException|TemplateException"),
+    # NOTE: 'at line: N char: N' (with those colons) is how Mako, and only Mako, points at the fault
+    ("Mako", r"mako\.exceptions\.\w+|at line: \d+ char: \d+"),
+    # NOTE: Twig quotes the offending name ('Unknown "upper" filter'). Without the quotes this also
+    # matched the 'Unknown function' of Neo4j and Cassandra, which suggested '--ssti' on a NoSQL error
+    ("Twig", "Twig[\\\\_]Error|Twig[\\\\_]Environment|Unknown \"[^\"]+\" (?:filter|function|test|tag)"),
+    # NOTE: a bare 'ParseException' is not Freemarker. It also matched java.text.ParseException,
+    # org.xml.sax.SAXParseException and REXML::ParseException. The package prefix is always present
+    ("Freemarker", r"freemarker\.(?:core|template|extract|cache)\.\w+|InvalidReferenceException|TemplateException"),
     ("Velocity", r"org\.apache\.velocity\.(?:runtime|exception)\.\w+|ParseErrorException|MethodInvocationException|ResourceNotFoundException"),
     ("Spring EL / Thymeleaf", r"org\.springframework\.expression\.\w+|org\.thymeleaf\.\w+|SpelEvaluationException|TemplateProcessingException|ExpressionParsingException"),
     ("Struts2 (OGNL)", r"ognl\.(?:OgnlException|NoSuchPropertyException|MethodFailedException|InappropriateExpressionException|ExpressionSyntaxException)|com\.opensymphony\.xwork2|org\.apache\.struts2|There is no Action mapped for|Struts (?:Problem Report|has detected an unhandled exception)"),
     ("ERB", r"\(erb\):\d+|NameError.*undefined local variable"),
-    ("Pug/Jade", r"pug|jade|ParseError"),
-    ("Handlebars", r"handlebars|Handlebars|Parse error on line"),
-    ("Generic SSTI", r"template.*?(?:error|syntax|exception)"),
+    # NOTE: these must stay anchored to a diagnostic. The bare product names matched any page that
+    # carries the word 'pug'/'jade'/'handlebars' (a surname, a colour, a <script src=> of the runtime),
+    # and the bare 'ParseError' matched lxml.etree.XSLTParseError and ElementTree.ParseError
+    ("Pug/Jade", "\\.(?:pug|jade):\\d+|(?:Pug|Jade):\\d+|unexpected token \"(?:indent|outdent|start-attributes|interpolation|attrs)\""),
+    ("Handlebars", r"handlebars[^\n]{0,60}?(?:error|exception)|Parse error on line \d+"),
+    # NOTE: 'template.*?error' matched any line holding both words, down to a CSS comment
+    ("Generic SSTI", r"\bTemplate(?:Syntax|Render|Assertion|Parse)?(?:Error|Exception)\b|\btemplate[^\n]{0,40}?(?:syntax error|render error|parse error|error on line)|\b(?:syntax|parse) error in template\b"),
 )
 
 SSTI_ERROR_REGEX = r"(?i)(?:%s)" % '|'.join(regex for _, regex in SSTI_ERROR_SIGNATURES)
@@ -1294,12 +1329,17 @@ SSTI_ERROR_REGEX = r"(?i)(?:%s)" % '|'.join(regex for _, regex in SSTI_ERROR_SIG
 XXE_ERROR_SIGNATURES = (
     ("libxml2 (PHP/lxml)", r"(?:failed to load (?:external entity|\")|xmlParseEntityRef|Entity '[^']*' not defined|EntityRef: expecting|Detected an entity reference loop|String not started expecting|StartTag: invalid element name|Start tag expected|Extra content at the end of the document|Premature end of data|error parsing DTD|internal error: Huge input lookup)"),
     ("PHP simplexml/DOM", r"(?:simplexml_load_string\(\)|DOMDocument::load(?:XML)?\(\)|SimpleXMLElement::__construct\(\))"),
-    ("Java (Xerces/JAXP)", r"(?:org\.xml\.sax\.SAXParseException|com\.sun\.org\.apache\.xerces|javax\.xml\.stream\.XMLStreamException|The (?:entity|element type) \"[^\"]*\" was referenced|DOCTYPE is disallowed when the feature|External (?:DTD|parsed entities|Entity): failed|must be declared|had to be read but the maximum)"),
+    # NOTE: 'must be declared' has to keep the quoted name in front of it. On its own it matched the
+    # "variable 'x' must be declared before it is used" of TypeScript and of every other compiler
+    ("Java (Xerces/JAXP)", r"(?:org\.xml\.sax\.SAXParseException|com\.sun\.org\.apache\.xerces|javax\.xml\.stream\.XMLStreamException|The (?:entity|element type) \"[^\"]*\" was referenced|DOCTYPE is disallowed when the feature|External (?:DTD|parsed entities|Entity): failed|\"[^\"]*\" must be declared|had to be read but the maximum)"),
     (".NET System.Xml", r"(?:System\.Xml\.XmlException|For security reasons DTD is prohibited|Reference to undeclared entity|An error occurred while parsing EntityName|XmlTextReaderImpl)"),
     ("Python expat", r"(?:xml\.parsers\.expat\.ExpatError|undefined entity|not well-formed \(invalid token\)|ExpatError)"),
     ("Ruby Nokogiri/REXML", r"(?:Nokogiri::XML::SyntaxError|REXML::ParseException|Entity .* not defined)"),
     ("Go encoding/xml", r"XML syntax error on line \d+"),
-    ("Generic XML", r"(?:XML (?:parsing|parse|syntax) error|malformed XML|unexpected (?:end of|<) )"),
+    # NOTE: 'unexpected end of ...' is what every parser says, not what an XML parser says. It matched
+    # the "Unexpected end of query" of BaseX, the "Unexpected <EOF>" of GraphQL and the "Unexpected end
+    # of file" of Freemarker. libxml2 says "Premature end of data", which is covered above
+    ("Generic XML", r"(?:XML (?:parsing|parse|syntax) error|malformed XML)"),
 )
 
 XXE_ERROR_REGEX = r"(?i)(?:%s)" % '|'.join(regex for _, regex in XXE_ERROR_SIGNATURES)
@@ -1343,8 +1383,11 @@ XXE_LOCATION_SWEEP_MAX = 12
 # which is what distinguishes HQL injection from ordinary SQL injection.
 HQL_ERROR_SIGNATURES = (
     ("Hibernate", r"org\.hibernate\.(?:query|hql|QueryException|exception\.SQLGrammarException)"),
-    ("Hibernate", r"(?:QuerySyntaxException|QueryException|SemanticException|PathElementException|UnknownEntityException|InterpretationException)"),
-    ("Hibernate", r"(?:token recognition error at|unexpected (?:token|end of subtree|AST node)|Could not (?:resolve|interpret) (?:attribute|root entity|path|property)|line \d+:\d+ (?:no viable alternative|mismatched input|token recognition error))"),
+    # NOTE: a bare 'QueryException' belongs to org.basex.query too (an XQuery engine), and the bare
+    # ANTLR "line N:M ..." line is emitted by Cassandra and Trino as well. Both are dropped: the
+    # package-qualified fragment above already covers org.hibernate.QueryException
+    ("Hibernate", r"(?:QuerySyntaxException|SemanticException|PathElementException|UnknownEntityException|InterpretationException)"),
+    ("Hibernate", r"(?:unexpected (?:token:|end of subtree|AST node)|Could not (?:resolve|interpret) (?:attribute|root entity|path|property))"),
     ("EclipseLink / JPQL", r"(?:org\.eclipse\.persistence\.exceptions\.JPQLException|Exception \[EclipseLink|Problem compiling \[|An exception occurred while creating a query)"),
     ("JPA / JPQL", r"(?:javax|jakarta)\.persistence\.(?:PersistenceException|Query(?:Syntax|Timeout)?Exception)"),
     ("Generic HQL/JPQL", r"(?:HQL|JPQL|EJBQL)\b.*?(?:error|exception|syntax|not (?:mapped|resolve))"),

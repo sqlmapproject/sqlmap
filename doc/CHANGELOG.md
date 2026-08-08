@@ -85,6 +85,9 @@
 * Improved the detection of the SQL dialect of the target.
 * The switch `--xpath` no longer reports an injection when the page changes only because it shows the payload again. Reflection is not proof that an expression was evaluated.
 * sqlmap now makes sure that the random markers around the retrieved data are all different. Two equal markers made the error-based technique give back the wrong character.
+* Made the heuristic hints of the non-SQL switches exclusive. A signature no longer matches the errors of a different engine, an ordinary SQL error, or a page that only contains the name of a template engine.
+* Corrected the GraphQL validation signatures. They now match the quotes in the way that the JSON body escapes them.
+* Added the error signatures of Mako and of DynamoDB. sqlmap did not recognise the errors of these two back-ends.
 
 ## Quality
 
