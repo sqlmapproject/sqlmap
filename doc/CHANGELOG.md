@@ -10,7 +10,9 @@
 * Added the switch `--ssti`. It tests for server-side template injection. It also covers Struts2 and OGNL.
 * Added the switch `--graphql`. It tests for GraphQL injection.
 * Added the switch `--hql`. It tests for HQL and JPQL (Hibernate ORM) injection.
-* Added the switch `--xslt`. It tests for XSLT injection. The engine names itself in the response. sqlmap then dumps the XML document that the stylesheet transforms. It also reads the files that the engine can reach.
+* Added the switch `--sparql`. It tests for SPARQL injection in triple stores (Apache Jena, Virtuoso, Blazegraph, GraphDB). It confirms the finding with a SPARQL-only construct and then blindly dumps the predicates and the triple objects of the default graph.
+* Added the switch `--odata`. It tests for OData `$filter` injection (Microsoft OData, Apache Olingo). It confirms the finding with an OData-only function, tells the version apart, and blindly dumps the entities, including the properties that the endpoint does not return.
+* Added the switch `--xslt`. It tests for XSLT injection. The engine names itself in the response. sqlmap then dumps the XML document that the stylesheet transforms. It also reads the files that the engine can reach. When the engine exposes an extension bridge (PHP `php:function` or the Xalan `java:` namespace), sqlmap reads any file through it, and with `--os-cmd` or `--os-shell` it runs operating system commands.
 * Added the switch `--xxe`. It tests for XML External Entity injection. It uses in-band, error-based, and out-of-band channels.
 * Added the switch `--jwt`. It examines JSON Web Tokens for weak keys and for injection in the claims.
 

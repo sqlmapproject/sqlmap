@@ -65,6 +65,7 @@ def _jwt_parse(token):
 JWT_TOKEN = _jwt_forge({"alg": "HS256", "typ": "JWT", "kid": "key1"}, {"user": "guest", "role": "user", "exp": 9999999999}, JWT_SECRET)
 
 if PY3:
+    from http.client import BAD_REQUEST
     from http.client import FORBIDDEN
     from http.client import INTERNAL_SERVER_ERROR
     from http.client import NOT_FOUND
@@ -77,6 +78,7 @@ if PY3:
 else:
     from BaseHTTPServer import BaseHTTPRequestHandler
     from BaseHTTPServer import HTTPServer
+    from httplib import BAD_REQUEST
     from httplib import FORBIDDEN
     from httplib import INTERNAL_SERVER_ERROR
     from httplib import NOT_FOUND
@@ -348,6 +350,255 @@ def hql_evaluate(value):
 
     clause = "name = '%s'" % value
     return any(all(_hql_atom(a) for a in term.split(" AND ")) for term in clause.split(" OR "))
+
+# --- SPARQL endpoint (vulnerable name search over a tiny in-memory triple store) ------------------
+
+class _SparqlError(Exception):
+    pass
+
+# (subject, predicate, object) triples of the default graph. Objects are what a blind dump recovers.
+SPARQL_TRIPLES = (
+    ("http://example.org/p1", "http://xmlns.com/foaf/0.1/name", "luther"),
+    ("http://example.org/p1", "http://xmlns.com/foaf/0.1/mbox", "luther@example.org"),
+    ("http://example.org/secret", "http://example.org/flag", "S3CR3Tvalue"),
+)
+_SPARQL_PREDICATES = sorted(set(_[1] for _ in SPARQL_TRIPLES))
+_SPARQL_OBJECTS = sorted(_[2] for _ in SPARQL_TRIPLES)
+
+
+def _sparql_bind(inner, offset):
+    """The string/integer a sub-pattern binds to ?v, or None when the OFFSET is past the end."""
+
+    if "COUNT(*)" in inner:
+        return len(SPARQL_TRIPLES)
+    if "COUNT(DISTINCT ?p)" in inner:
+        return len(_SPARQL_PREDICATES)
+    if "DISTINCT ?p" in inner:
+        return _SPARQL_PREDICATES[offset] if offset < len(_SPARQL_PREDICATES) else None
+    if "SELECT ?o" in inner:
+        return _SPARQL_OBJECTS[offset] if offset < len(_SPARQL_OBJECTS) else None
+    return None
+
+
+def _sparql_cmp(value, cmp):
+    """Evaluate one comparison on the bound ?v, mirroring SPARQL semantics (an out-of-range SUBSTR is
+    the empty string, which is lexicographically below any real character)."""
+
+    match = re.match(r"^\?v >= (\d+)$", cmp)
+    if match:
+        return isinstance(value, int) and value >= int(match.group(1))
+    match = re.match(r"^STRLEN\(STR\(\?v\)\) >= (\d+)$", cmp)
+    if match:
+        return len("%s" % value) >= int(match.group(1))
+    # a quote or a backslash arrives ECHAR-escaped, the way a real store receives it inside a literal
+    match = re.match(r'^SUBSTR\(STR\(\?v\),(\d+),1\) >= "(\\.|.)"$', cmp)
+    if match:
+        pos, ch = int(match.group(1)), match.group(2)
+        ch = {'\\"': '"', "\\\\": "\\"}.get(ch, ch)
+        text = "%s" % value
+        return (text[pos - 1] if pos <= len(text) else "") >= ch
+    return False
+
+
+def _sparql_predicate(pred):
+    """Evaluate one injected FILTER predicate against the store."""
+
+    pred = pred.strip()
+    if pred in ("1=1", "(1=1)"):
+        return True
+    if pred in ("1=2", "(1=2)"):
+        return False
+    if "FILTER(!isIRI(?zo))" in pred:               # the confirm contradiction (two FILTERs)
+        return False
+    if pred == "EXISTS { ?zs ?zp ?zo }":            # the confirm positive
+        return bool(SPARQL_TRIPLES)
+    match = re.match(r"^EXISTS \{ SELECT \?v WHERE \{ (.*) FILTER\((.*)\) \} \}$", pred)
+    if match:
+        inner, cmp = match.group(1).strip(), match.group(2).strip()
+        offset = 0
+        off = re.search(r"OFFSET (\d+)", inner)
+        if off:
+            offset = int(off.group(1))
+        value = _sparql_bind(inner, offset)
+        return value is not None and _sparql_cmp(value, cmp)
+    return False
+
+
+def sparql_evaluate(value):
+    """Evaluate the injected FILTER of SELECT ... FILTER(?name = "<value>"). A well-formed boundary
+    reduces to its injected predicate; anything that leaves the string literal unbalanced raises a
+    Jena-style parser error (the fingerprint surface)."""
+
+    # recognised OR-style boundaries: <base><quote> || (<PRED>) || <tail>
+    for quote, tail in (('"', '""!="'), ("'", "''!='")):
+        marker = '%s || (' % quote
+        suffix = ') || %s' % tail
+        if marker in value and value.endswith(suffix):
+            pred = value.split(marker, 1)[1][:-len(suffix)]
+            return _sparql_predicate(pred)
+    # numeric boundary: <base>) || (<PRED>) || (1=1
+    if ") || (" in value and value.endswith(") || (1=1"):
+        pred = value.split(") || (", 1)[1][:-len(") || (1=1")]
+        return _sparql_predicate(pred)
+    # a bare, unbalanced break-out (the error probe) trips the parser
+    if value.count('"') % 2 or value.rstrip().endswith(("'", ")", ".")):
+        raise _SparqlError("Parse error: Lexical error at line 1, column %d.  Encountered: <EOF>" % (len(value) + 40))
+    # the untouched original value simply matches its row
+    return any(o == value for _s, p, o in SPARQL_TRIPLES if p.endswith("name"))
+
+# --- OData endpoint (vulnerable $filter over a tiny in-memory entity set) --------------------------
+
+class _ODataError(Exception):
+    pass
+
+# entities of the "Products" set. 'Secret' is readable via $filter yet never $select-ed, so a blind dump
+# recovers a property the endpoint does not otherwise expose.
+ODATA_ENTITIES = (
+    {"Id": 1, "Name": "luther", "Secret": "S3CR3Tvalue"},
+    {"Id": 2, "Name": "fluffy", "Secret": "hunter2"},
+    {"Id": 3, "Name": "wu", "Secret": "letmein"},
+)
+_ODATA_FIELDS = ("Id", "Name", "Secret")
+
+
+def _odata_depths(expr):
+    """Paren depth after each character, IGNORING parens that sit inside a string literal (OData escapes
+    an inner quote by doubling it). Counting them blind made this evaluator reject filters that a real
+    OData service accepts - `substring(Name,0,1) eq '('` returned 400 here and 200 from ASP.NET Core -
+    which would let a genuine client-side bug hide behind a target-side one."""
+
+    depths = []
+    depth, inside, index = 0, False, 0
+    while index < len(expr):
+        ch = expr[index]
+        if inside:
+            if ch == "'":
+                if expr[index:index + 2] == "''":
+                    depths.append(depth)                # a doubled quote stays inside the literal
+                    index += 1
+                else:
+                    inside = False
+        elif ch == "'":
+            inside = True
+        elif ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth -= 1
+        depths.append(depth)
+        index += 1
+    return depths
+
+
+def _odata_split(expr, sep):
+    """Split on `sep` at paren depth zero (so 'a and (b or c)' is not broken inside the parentheses)."""
+    parts, buf = [], []
+    for token in expr.split(sep):
+        buf.append(token)
+        chunk = sep.join(buf)
+        depths = _odata_depths(chunk)
+        if not depths or depths[-1] == 0:
+            parts.append(chunk)
+            buf = []
+    if buf:
+        parts.append(sep.join(buf))
+    return parts
+
+
+def _odata_wrapped(expr):
+    """True when the whole expression is enclosed by one matching paren pair."""
+    if not (expr.startswith("(") and expr.endswith(")")):
+        return False
+    depths = _odata_depths(expr)
+    return depths[-1] == 0 and all(_ > 0 for _ in depths[:-1])
+
+
+def _odata_eval(entity, expr):
+    """Recursively evaluate an OData boolean expression for one entity ('or' lowest precedence, then
+    'and', then a leaf atom), so parenthesised sub-expressions nest correctly."""
+    expr = expr.strip()
+    while _odata_wrapped(expr):
+        expr = expr[1:-1].strip()
+    ors = _odata_split(expr, " or ")
+    if len(ors) > 1:
+        return any(_odata_eval(entity, o) for o in ors)
+    ands = _odata_split(expr, " and ")
+    if len(ands) > 1:
+        return all(_odata_eval(entity, a) for a in ands)
+    return _odata_atom(entity, expr)
+
+
+def _odata_atom(entity, atom):
+    """Evaluate one leaf OData boolean atom against one entity, mirroring the shapes sqlmap emits. Raises
+    _ODataError on an unknown property (a 400 surface)."""
+
+    atom = atom.strip()
+    while _odata_wrapped(atom):
+        atom = atom[1:-1].strip()
+
+    match = re.match(r"^length\('([^']*)'\) eq (\d+)$", atom)
+    if match:
+        return len(match.group(1)) == int(match.group(2))
+    match = re.match(r"^startswith\('([^']*)','([^']*)'\)$", atom)
+    if match:
+        return match.group(1).startswith(match.group(2))
+    match = re.match(r"^contains\('([^']*)','([^']*)'\)$", atom)
+    if match:
+        return match.group(2) in match.group(1)
+    if atom.startswith("substringof("):
+        raise _ODataError("substringof is not a v4 function")
+    match = re.match(r"^'([^']*)' eq '([^']*)'$", atom)
+    if match:
+        return match.group(1) == match.group(2)
+    match = re.match(r"^(\d+) eq (\d+)$", atom)
+    if match:
+        return match.group(1) == match.group(2)
+    match = re.match(r"^(\w+) eq '([^']*)'$", atom)                      # <strprop> eq '<lit>'
+    if match:
+        if match.group(1) not in _ODATA_FIELDS:
+            raise _ODataError("Could not find a property named '%s' on type 'Default.Product'." % match.group(1))
+        return "%s" % entity.get(match.group(1)) == match.group(2)
+    match = re.match(r"^(\w+) ne null$", atom)                           # existence probe
+    if match:
+        if match.group(1) not in _ODATA_FIELDS:
+            raise _ODataError("Could not find a property named '%s' on type 'Default.Product'." % match.group(1))
+        return entity.get(match.group(1)) is not None
+    match = re.match(r"^(\w+) (eq|ge|gt|le|lt) (-?\d+)$", atom)          # <intprop> <op> <int>
+    if match:
+        prop, op, num = match.group(1), match.group(2), int(match.group(3))
+        if prop not in _ODATA_FIELDS:
+            raise _ODataError("Could not find a property named '%s' on type 'Default.Product'." % prop)
+        val = entity.get(prop)
+        if not isinstance(val, int):
+            return False
+        return {"eq": val == num, "ge": val >= num, "gt": val > num, "le": val <= num, "lt": val < num}[op]
+    match = re.match(r"^length\((\w+)\) (eq|ge) (\d+)$", atom)           # length(<prop>) <op> N
+    if match:
+        prop, op, num = match.group(1), match.group(2), int(match.group(3))
+        if prop not in _ODATA_FIELDS:
+            raise _ODataError("Could not find a property named '%s' on type 'Default.Product'." % prop)
+        length = len("%s" % entity.get(prop, ""))
+        return length == num if op == "eq" else length >= num
+    # substring(<prop>,pos,1) eq 'c' - an inner quote arrives DOUBLED, the way the OData spec escapes it
+    match = re.match(r"^substring\((\w+),(\d+),1\) eq '(''|.)'$", atom)
+    if match:
+        prop, pos, ch = match.group(1), int(match.group(2)), match.group(3)
+        ch = "'" if ch == "''" else ch
+        if prop not in _ODATA_FIELDS:
+            raise _ODataError("Could not find a property named '%s' on type 'Default.Product'." % prop)
+        text = "%s" % entity.get(prop, "")
+        return pos < len(text) and text[pos] == ch                      # 0-indexed, ordinal (case-sensitive)
+    raise _ODataError("Syntax error at position 0 in '%s'." % atom)
+
+
+def odata_evaluate(name):
+    """Return the entities matched by $filter=Name eq '<name>'. A balanced break-out reduces to its
+    injected predicate; an unbalanced string literal raises a Microsoft-OData-style parser error."""
+
+    expr = "Name eq '%s'" % name
+    if expr.count("'") % 2:
+        raise _ODataError("The query specified in the URI is not valid. There is an unterminated string "
+                          "literal at position 8 in '%s'." % expr)
+    return [entity for entity in ODATA_ENTITIES if _odata_eval(entity, expr)]
 
 # --- XPath endpoint (vulnerable search and login, backed by an in-memory XML document) ------------
 
@@ -1192,6 +1443,52 @@ class ReqHandler(BaseHTTPRequestHandler):
                 output = json.dumps({"results": [], "count": 0, "error": str(ex)})
 
             self.wfile.write(output.encode(UNICODE_ENCODING))
+            return
+
+        if self.url == "/sparql/search":
+            # VULNERABLE: the parameter is concatenated into a FILTER string literal of a SPARQL query,
+            # SELECT ?name WHERE { ?p foaf:name ?name . FILTER(?name = "<q>") }. A broken-out FILTER
+            # becomes an attacker-controlled boolean (boolean-based blind); a syntax break surfaces a
+            # Jena-style parser error.
+            q = self.params.get("q", "luther")
+            try:
+                matched = sparql_evaluate(q)
+                rows = "".join("<li>%s</li>" % o for _s, p, o in SPARQL_TRIPLES
+                               if p.endswith("name") and matched)
+                self.send_response(OK)
+                self.send_header("Content-type", "text/html; charset=%s" % UNICODE_ENCODING)
+                self.send_header("Connection", "close")
+                self.end_headers()
+                self.wfile.write(("<html><body><ul>%s</ul></body></html>" % rows).encode(UNICODE_ENCODING))
+            except _SparqlError as ex:
+                self.send_response(INTERNAL_SERVER_ERROR)
+                self.send_header("Content-type", "text/html; charset=%s" % UNICODE_ENCODING)
+                self.send_header("Connection", "close")
+                self.end_headers()
+                self.wfile.write(("<html><body><pre>%s</pre></body></html>" % str(ex)).encode(UNICODE_ENCODING))
+            return
+
+        if self.url == "/odata/search":
+            # VULNERABLE: the parameter is concatenated into an OData $filter string literal,
+            # $filter=Name eq '<name>'. A broken-out filter becomes an attacker-controlled boolean
+            # (boolean-based blind); an unbalanced literal surfaces a Microsoft-OData parser error (400).
+            # The response only shows Id and Name (as if $select=Id,Name), yet 'Secret' stays reachable
+            # through the injected filter - the property a blind dump recovers.
+            name = self.params.get("name", "luther")
+            try:
+                matched = odata_evaluate(name)
+                rows = "".join("<li>%s: %s</li>" % (e["Id"], e["Name"]) for e in matched)
+                self.send_response(OK)
+                self.send_header("Content-type", "text/html; charset=%s" % UNICODE_ENCODING)
+                self.send_header("Connection", "close")
+                self.end_headers()
+                self.wfile.write(("<html><body><ul>%s</ul></body></html>" % rows).encode(UNICODE_ENCODING))
+            except _ODataError as ex:
+                self.send_response(BAD_REQUEST)
+                self.send_header("Content-type", "application/json; charset=%s" % UNICODE_ENCODING)
+                self.send_header("Connection", "close")
+                self.end_headers()
+                self.wfile.write(json.dumps({"error": {"message": str(ex)}}).encode(UNICODE_ENCODING))
             return
 
         if self.url == "/echo":

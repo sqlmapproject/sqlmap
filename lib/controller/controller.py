@@ -532,12 +532,12 @@ def start():
 
             checkJWT()
 
-            if conf.mineParams and not any((conf.graphql, conf.nosql, conf.ldap, conf.xpath, conf.ssti, conf.xxe, conf.xslt, conf.hql, conf.jwt)):
+            if conf.mineParams and not any((conf.graphql, conf.nosql, conf.ldap, conf.xpath, conf.ssti, conf.xxe, conf.xslt, conf.hql, conf.sparql, conf.odata, conf.jwt)):
                 from lib.utils.paraminer import mineParameters
                 mineParameters()
 
-            if any((conf.graphql, conf.nosql, conf.ldap, conf.xpath, conf.ssti, conf.xxe, conf.xslt, conf.hql, conf.jwt)) and (conf.reportJson or conf.resultsFile):
-                singleTimeWarnMessage("'--report-json'/'--results-file' do not (yet) capture non-SQL technique (--graphql/--nosql/--ldap/--xpath/--ssti/--xslt/--xxe/--hql/--jwt) findings; these are reported on the console only")
+            if any((conf.graphql, conf.nosql, conf.ldap, conf.xpath, conf.ssti, conf.xxe, conf.xslt, conf.hql, conf.sparql, conf.odata, conf.jwt)) and (conf.reportJson or conf.resultsFile):
+                singleTimeWarnMessage("'--report-json'/'--results-file' do not (yet) capture non-SQL technique (--graphql/--nosql/--ldap/--xpath/--ssti/--xslt/--xxe/--hql/--sparql/--odata/--jwt) findings; these are reported on the console only")
 
             if conf.graphql:
                 from lib.techniques.graphql.inject import graphqlScan
@@ -577,6 +577,16 @@ def start():
             if conf.hql:
                 from lib.techniques.hql.inject import hqlScan
                 hqlScan()
+                continue
+
+            if conf.sparql:
+                from lib.techniques.sparql.inject import sparqlScan
+                sparqlScan()
+                continue
+
+            if conf.odata:
+                from lib.techniques.odata.inject import odataScan
+                odataScan()
                 continue
 
             if conf.jwt:

@@ -40,6 +40,8 @@ from lib.core.settings import SSTI_ERROR_REGEX
 from lib.core.settings import XPATH_ERROR_REGEX
 from lib.core.settings import XSLT_ERROR_REGEX
 from lib.core.settings import XXE_ERROR_REGEX
+from lib.core.settings import SPARQL_ERROR_REGEX
+from lib.core.settings import ODATA_ERROR_REGEX
 
 ENGINES = (
     ("nosql", NOSQL_ERROR_REGEX),
@@ -50,6 +52,8 @@ ENGINES = (
     ("hql", HQL_ERROR_REGEX),
     ("xslt", XSLT_ERROR_REGEX),
     ("xxe", XXE_ERROR_REGEX),
+    ("sparql", SPARQL_ERROR_REGEX),
+    ("odata", ODATA_ERROR_REGEX),
 )
 
 # (owning engine, back-end, verbatim error output). NOBODY means no engine may match it
@@ -141,6 +145,19 @@ CORPUS = (
     ("xpath", "xquery (live)", "error Stopped at /app/, 3/25: [XPST0003] Expecting function argument, found ':'."),
     ("xslt", "libxslt (live)", "XSLT error StartTag: invalid element name, line 4, column 45 ( , line 4)"),
     ("xxe", "libxml2 (live)", "Parsed document; content: Parser warnings: failed to load \"file:///nonexistent\": No such file or directory"),
+
+    ("sparql", "Jena / Fuseki", "org.apache.jena.query.QueryParseException: Encountered \" <VAR1> \"?x\"\" at line 1"),
+    ("sparql", "Virtuoso", "Virtuoso 37000 Error SP030: SPARQL compiler, line 1: syntax error at '}'"),
+    ("sparql", "RDF4J / GraphDB", "org.eclipse.rdf4j.query.parser.sparql.ast.VisitorException: MalformedQueryException"),
+    ("sparql", "Stardog", "com.complexible.stardog.plan.eval.operator.OperatorException: parse error"),
+    # captured live off Apache Jena Fuseki with a broken-out string literal
+    ("sparql", "Jena (live)", "Parse error: Lexical error at line 1, column 136.  Encountered: <EOF> after prefix"),
+
+    ("odata", "Microsoft OData", "The query specified in the URI is not valid. Syntax error at position 12 in 'Name eq'."),
+    ("odata", "Olingo (Java)", "org.apache.olingo.server.api.ODataApplicationException: The URI is malformed"),
+    # captured live off ASP.NET Core OData with a broken-out $filter string literal
+    ("odata", "Microsoft OData (live)", "The query specified in the URI is not valid. There is an unterminated string literal at position 17 in 'Name eq 'luther'''."),
+    ("odata", "Microsoft OData property (live)", "The query specified in the URI is not valid. Could not find a property named 'Xyz' on type 'Default.Product'."),
 
     # a plain SQL injection error belongs to the SQL engine. No non-SQL switch may claim it
     (NOBODY, "MySQL", "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version"),

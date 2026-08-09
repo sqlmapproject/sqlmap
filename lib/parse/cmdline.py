@@ -811,6 +811,12 @@ def cmdLineParser(argv=None):
         nonsql.add_argument("--hql", dest="hql", action="store_true",
             help="Test for HQL/JPQL (Hibernate ORM) injection")
 
+        nonsql.add_argument("--sparql", dest="sparql", action="store_true",
+            help="Test for SPARQL injection")
+
+        nonsql.add_argument("--odata", dest="odata", action="store_true",
+            help="Test for OData $filter injection")
+
         nonsql.add_argument("--jwt", dest="jwt", action="store_true",
             help="Audit JSON Web Tokens (JWT) for weaknesses")
 

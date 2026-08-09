@@ -944,11 +944,12 @@ def _setTamperingFunctions():
             warnMsg += "a good idea"
             logger.warning(warnMsg)
 
-        # tamper scripts rewrite SQL injection payloads; the self-contained non-SQL engines
-        # (--graphql/--nosql/--ldap/--xpath/--ssti/--xslt/--xxe) do not run payloads through the tampering
-        # hook, so warn instead of silently ignoring the user's '--tamper'. One tuple drives both the test
-        # and the name lookup - keeping two lists in step is exactly how this raised StopIteration.
-        _nonSqlEngines = ("graphql", "nosql", "ldap", "xpath", "ssti", "xslt", "xxe")
+        # tamper scripts rewrite SQL injection payloads; the self-contained non-SQL engines do not run
+        # payloads through the tampering hook, so warn instead of silently ignoring the user's
+        # '--tamper'. One tuple drives both the test and the name lookup - keeping two lists in step is
+        # exactly how this raised StopIteration, and leaving an engine OUT (as '--hql' was) is how the
+        # warning silently stops covering one.
+        _nonSqlEngines = ("graphql", "nosql", "ldap", "xpath", "ssti", "xslt", "xxe", "hql", "sparql", "odata")
         if kb.tamperFunctions and any(conf.get(_) for _ in _nonSqlEngines):
             engine = next(_ for _ in _nonSqlEngines if conf.get(_))
             warnMsg = "tamper scripts are applied to SQL injection payloads only and "
@@ -2764,7 +2765,7 @@ def _checkTor():
 def _basicOptionValidation():
     _nonSqlTechniques = [name for name, enabled in (
         ("--graphql", conf.graphql), ("--nosql", conf.nosql), ("--ldap", conf.ldap),
-        ("--xpath", conf.xpath), ("--ssti", conf.ssti), ("--xxe", conf.xxe), ("--xslt", conf.xslt), ("--hql", conf.hql)) if enabled]
+        ("--xpath", conf.xpath), ("--ssti", conf.ssti), ("--xxe", conf.xxe), ("--xslt", conf.xslt), ("--hql", conf.hql), ("--sparql", conf.sparql), ("--odata", conf.odata)) if enabled]
     if len(_nonSqlTechniques) > 1:
         errMsg = "only one non-SQL technique switch may be used at a time (found: %s). " % ", ".join(_nonSqlTechniques)
         errMsg += "each is a self-contained scan for a different back-end class - pick one"

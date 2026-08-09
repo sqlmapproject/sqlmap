@@ -24,7 +24,10 @@ from _testutils import bootstrap
 bootstrap()
 
 from lib.core.settings import XSLT_ERROR_REGEX
-from lib.core.settings import XSLT_RCE_PROBES
+from lib.core.settings import XSLT_BRIDGES
+from lib.core.settings import XSLT_BRIDGE_PHP
+from lib.core.settings import XSLT_BRIDGE_JAVA
+from lib.core.settings import XSLT_ADVISORY_PROBES
 from lib.core.settings import XSLT_VENDOR_PROPERTIES
 from lib.core.settings import XQUERY_CAPABILITY_PROBES
 from lib.core.settings import XQUERY_FILE_READ
@@ -53,6 +56,48 @@ class XsltPayloadTest(unittest.TestCase):
 
     def test_both_slots_are_probed(self):
         self.assertEqual([_ for _, __ in _xslt._BUILDERS], [_xslt.CONTEXT_ELEMENT, _xslt.CONTEXT_VALUE])
+
+
+class XsltAttributeEscapingTest(unittest.TestCase):
+    """Every slot lands inside select="...". XPath 1.0 has no escape character, so _quote() falls back
+    to DOUBLE quotes for any value holding an apostrophe - and unescaped those terminate the attribute,
+    the stylesheet never compiles, and the probe silently returns nothing. Live against libxslt that
+    was '--os-cmd="echo \'hi\'"' reporting "no output captured", and '--file-read' of a path with an
+    apostrophe or an '&' failing while the same file at a plain path read fine."""
+
+    #                     command / path                       what makes it hostile
+    HOSTILE = ("echo 'hello world'",                            # apostrophes -> _quote uses "..."
+               "grep -r 'x' /etc",
+               "/tmp/o'brien.xml",
+               "/tmp/a&b.xml",                                  # bare '&' ends the attribute value
+               "cat /etc/passwd && id",
+               "/tmp/<script>.xml")
+
+    def _wellFormed(self, payload):
+        from xml.dom.minidom import parseString
+        parseString('<r xmlns:xsl="http://www.w3.org/1999/XSL/Transform">%s</r>' % payload)
+
+    def test_element_payloads_stay_well_formed_xml(self):
+        for value in self.HOSTILE:
+            self._wellFormed(_xslt._elementPayload(_xslt._wrap("php:function('system',%s)" % _xslt._quote(value))))
+
+    def test_bridge_payloads_stay_well_formed_xml(self):
+        for label, _kind, prefix, uri, readT, execT in XSLT_BRIDGES:
+            for value in self.HOSTILE:
+                for template in [_ for _ in (readT, execT) if _]:
+                    payload = _xslt._bridgeElementPayload(prefix, uri, template % _xslt._quote(value))
+                    self._wellFormed(payload)
+
+    def test_value_slot_payloads_stay_attribute_safe(self):
+        for value in self.HOSTILE:
+            payload = _xslt._valuePayload(_xslt._wrap("string(%s)" % _xslt._quote(value)))
+            self._wellFormed('<xsl:value-of select="%s"/>' % payload)
+
+    def test_escaping_is_minimal(self):
+        # '>' and "'" are legal inside a double-quoted attribute and must survive untouched, so a shell
+        # redirect and an XPath literal stay readable in the payload log
+        self.assertEqual(_xslt._attr("a>b'c"), "a>b'c")
+        self.assertEqual(_xslt._attr('x&y<z"w'), "x&amp;y&lt;z&quot;w")
 
 
 class XsltReflectionSafetyTest(unittest.TestCase):
@@ -161,21 +206,37 @@ class XsltFingerprintTest(unittest.TestCase):
             self.assertTrue(prop.startswith("xsl:"), prop)
 
 
-class XsltRcePolicyTest(unittest.TestCase):
-    """The extension surfaces are reported, never invoked - the probes must only ASK whether a function
-    exists, never call it."""
+class XsltBridgePolicyTest(unittest.TestCase):
+    """Read/exec bridges are DRIVEN (file read is automatic, command exec only under --os-cmd/--os-shell);
+    the file-WRITE and eval surfaces are advisory - reported, never invoked."""
 
-    def test_probes_only_test_availability(self):
-        for label, expression in XSLT_RCE_PROBES:
+    def test_every_bridge_is_well_formed(self):
+        for label, kind, prefix, uri, readT, execT in XSLT_BRIDGES:
+            self.assertIn(kind, (XSLT_BRIDGE_PHP, XSLT_BRIDGE_JAVA), label)
+            self.assertTrue(prefix and uri.startswith("http"), label)
+            self.assertIn("%s", readT, label)               # read template takes the quoted path
+            self.assertNotIn("%s%s", readT, label)
+            if execT is not None:
+                self.assertIn("%s", execT, label)
+
+    def test_labels_name_the_primitive(self):
+        joined = " ".join(bridge[0] for bridge in XSLT_BRIDGES).lower()
+        self.assertIn("php", joined)
+        self.assertIn("java", joined)
+
+    def test_advisory_probes_only_ask_availability(self):
+        # the file-write / eval surfaces must be pure availability checks, never a call that acts
+        for label, expression in XSLT_ADVISORY_PROBES:
             self.assertTrue(expression.startswith("string(function-available(")
                             or expression.startswith("string(element-available("), expression)
             self.assertNotIn("Runtime.exec", expression)
             self.assertNotIn("system(", expression)
+            self.assertNotIn("document(", expression.replace("element-available", ""))
 
-    def test_labels_say_what_the_primitive_is(self):
-        joined = " ".join(label for label, _ in XSLT_RCE_PROBES).lower()
-        for expected in ("php", "exsl", "saxon", "java"):
-            self.assertIn(expected, joined)
+    def test_write_surface_is_advisory_not_a_bridge(self):
+        # exsl:document is a WRITE primitive and must never sit among the driven read/exec bridges
+        self.assertTrue(any("exsl" in label.lower() for label, _ in XSLT_ADVISORY_PROBES))
+        self.assertFalse(any("exsl" in bridge[0].lower() for bridge in XSLT_BRIDGES))
 
 
 class XQueryTierTest(unittest.TestCase):

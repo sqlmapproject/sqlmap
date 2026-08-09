@@ -86,6 +86,8 @@ from lib.core.settings import HEURISTIC_CHECK_ALPHABET
 from lib.core.settings import HQL_ERROR_REGEX
 from lib.core.settings import INFERENCE_EQUALS_CHAR
 from lib.core.settings import LDAP_ERROR_REGEX
+from lib.core.settings import ODATA_ERROR_REGEX
+from lib.core.settings import SPARQL_ERROR_REGEX
 from lib.core.settings import SSTI_ERROR_REGEX
 from lib.core.settings import XPATH_ERROR_REGEX
 from lib.core.settings import XSLT_ERROR_REGEX
@@ -1275,6 +1277,20 @@ def heuristicCheckSqlInjection(place, parameter):
     if not conf.xslt and re.search(XSLT_ERROR_REGEX, page or ""):
         infoMsg = "heuristic (XSLT) test shows that %sparameter '%s' might be vulnerable to XSLT injection (rerun with switch '--xslt')" % ("%s " % paramType if paramType != parameter else "", parameter)
         logger.info(infoMsg)
+        if conf.beep:
+            beep()
+
+    if not conf.sparql and re.search(SPARQL_ERROR_REGEX, page or ""):
+        infoMsg = "heuristic (SPARQL) test shows that %sparameter '%s' might be vulnerable to SPARQL injection (rerun with switch '--sparql')" % ("%s " % paramType if paramType != parameter else "", parameter)
+        logger.info(infoMsg)
+
+        if conf.beep:
+            beep()
+
+    if not conf.odata and re.search(ODATA_ERROR_REGEX, page or ""):
+        infoMsg = "heuristic (OData) test shows that %sparameter '%s' might be vulnerable to OData $filter injection (rerun with switch '--odata')" % ("%s " % paramType if paramType != parameter else "", parameter)
+        logger.info(infoMsg)
+
         if conf.beep:
             beep()
 

