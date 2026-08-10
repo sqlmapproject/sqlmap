@@ -506,7 +506,7 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
-        elif all(_ in excMsg for _ in ("FileNotFoundError: [Errno 2] No such file or directory", "cwd = os.getcwd()")):
+        elif all(_ in excMsg for _ in ("FileNotFoundError: [Errno 2] No such file or directory", "os.getcwd()")):
             errMsg = "invalid runtime environment ('%s')" % excMsg.split("Error: ")[-1].strip()
             logger.critical(errMsg)
             raise SystemExit
