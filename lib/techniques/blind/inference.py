@@ -868,6 +868,19 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                 maxChar = maxValue = charTbl[-1]
                                 minValue = charTbl[0]
                             else:
+                                # every probe answered positively - the response model was calibrated on
+                                # the bare page while each probe also pays the query's own cost (e.g.
+                                # COUNT(*) on a huge table), so re-key it and let it rebuild on the payload
+                                if timeBasedCompare and kb.responseTimeMode is None and not conf.disableStats:
+                                    kb.responseTimeMode = expression
+
+                                    warnMsg = "all inference probes for the current value answered "
+                                    warnMsg += "positively. Recalibrating the time-based response model "
+                                    warnMsg += "against the payload's own query cost"
+                                    logger.warning(warnMsg)
+
+                                    return getChar(idx, originalTbl, continuousOrder, expand, shiftTable, retried, restricted)
+
                                 kb.disableShiftTable = True
                                 return None
                         else:

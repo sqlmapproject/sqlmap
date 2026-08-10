@@ -36,8 +36,8 @@ bootstrap()
 from lib.core.data import conf, kb
 from lib.core.common import getCurrentThreadData, setTechnique
 from lib.core.datatype import AttribDict
-from lib.core.enums import ADJUST_TIME_DELAY, PAYLOAD
-from lib.core.settings import PAYLOAD_DELIMITER
+from lib.core.enums import ADJUST_TIME_DELAY, CHARSET_TYPE, PAYLOAD
+from lib.core.settings import MIN_TIME_RESPONSES, PAYLOAD_DELIMITER, TIME_STDEV_COEFF
 from lib.request.connect import Connect
 import lib.techniques.blind.inference as inf
 
@@ -48,6 +48,7 @@ _TEMPLATE = "%sEXPR=%%s IDX=%%d CMP>%%d%s" % (PAYLOAD_DELIMITER, PAYLOAD_DELIMIT
 _PARSE = re.compile(r"IDX=(\d+) CMP(!=|=|>)(\d+)")   # bisection '>'/'=' plus validateChar's '!='
 _TIMESEC = 5.0
 _BASE = 0.10          # base (non-delay) round-trip latency, seconds
+_QUERY_COST = 2.0     # what the injected subquery itself costs (e.g. COUNT(*) over a large table)
 _STRESS = os.environ.get("SQLMAP_JITTER_STRESS")
 
 
@@ -62,9 +63,9 @@ def _timeVector():
 class _JitterBase(unittest.TestCase):
     _CONF = ("threads", "api", "verbose", "direct", "disableStats", "timeSec", "predictOutput",
              "hexConvert", "charset", "firstChar", "lastChar")
-    _KB = ("responseTimeMode", "adjustTimeDelay", "laggingChecked", "partRun", "safeCharEncode",
-           "bruteMode", "fileReadMode", "disableShiftTable", "prependFlag", "originalTimeDelay",
-           "counters", "responseTimes")
+    _KB = ("responseTimeMode", "responseTimePayload", "adjustTimeDelay", "laggingChecked", "partRun",
+           "safeCharEncode", "bruteMode", "fileReadMode", "disableShiftTable", "prependFlag",
+           "originalTimeDelay", "counters", "responseTimes")
 
     def setUp(self):
         self._saved_conf = {k: conf.get(k) for k in self._CONF}
@@ -89,6 +90,7 @@ class _JitterBase(unittest.TestCase):
         conf.disableStats = False; conf.timeSec = _TIMESEC; conf.predictOutput = False
         conf.hexConvert = False; conf.charset = None; conf.firstChar = None; conf.lastChar = None
         kb.responseTimeMode = None
+        kb.responseTimePayload = None
         kb.adjustTimeDelay = ADJUST_TIME_DELAY.DISABLE   # never prompt / never mutate timeSec
         kb.laggingChecked = True
         kb.partRun = None; kb.safeCharEncode = False; kb.bruteMode = False
@@ -184,6 +186,69 @@ class TestJitterRegression(_JitterBase):
         raw = kb.responseTimes[None]                 # the un-trimmed model WOULD miss it (fix is load-bearing)
         self.assertLess(td.lastQueryDuration, average(raw) + TIME_STDEV_COEFF * stdev(raw))
         self.assertTrue(wasLastResponseDelayed())    # with spike-trimming the delay is recognized
+
+
+class TestTimeModelSaturation(_JitterBase):
+    """Always-on: an expression whose own SQL is slower than the plain page must not saturate the
+    oracle. kb.responseTimeMode is only keyed for dump pagination, so elsewhere even a FALSE probe
+    lands above the threshold and the digit search runs off the top of the charset."""
+
+    SECRET = "309586433"
+    EXPRESSION = "SELECT LTRIM(STR(COUNT(*))) FROM Database.dbo.Final"   # no ORDER BY -> mode stays None
+
+    def _costAwareOracle(self, secret, jitter, rng):
+        from lib.core.common import wasLastResponseDelayed
+
+        def oracle(payload=None, timeBasedCompare=False, **kwargs):
+            td = getCurrentThreadData()
+
+            # like connect.py: the model is built by replaying kb.responseTimePayload, and only a
+            # false-payload replay carries the subquery cost (the bare original request does not)
+            if timeBasedCompare and not conf.disableStats:
+                if len(kb.responseTimes.get(kb.responseTimeMode, [])) < MIN_TIME_RESPONSES:
+                    cost = _QUERY_COST if kb.responseTimePayload else 0.0
+                    kb.responseTimes.setdefault(kb.responseTimeMode, [])
+                    while len(kb.responseTimes[kb.responseTimeMode]) < MIN_TIME_RESPONSES:
+                        kb.responseTimes[kb.responseTimeMode].append(_BASE + cost + abs(jitter(rng)))
+
+            m = _PARSE.search(payload or "")
+            if not m:
+                td.lastQueryDuration = _BASE + abs(jitter(rng))
+                return False
+
+            idx, op, thr = int(m.group(1)), m.group(2), int(m.group(3))
+            ch = ord(secret[idx - 1]) if 0 <= idx - 1 < len(secret) else 0
+            cond = (ch > thr) if op == ">" else (ch != thr) if op == "!=" else (ch == thr)
+            if "NOT(" in payload:
+                cond = not cond
+
+            # every probe pays the subquery cost, the injected sleep only when the condition holds
+            td.lastQueryDuration = _BASE + _QUERY_COST + abs(jitter(rng)) + (_TIMESEC if cond else 0.0)
+            return wasLastResponseDelayed() if timeBasedCompare else cond
+
+        return oracle
+
+    def test_saturated_model_is_recalibrated(self):
+        from lib.core.common import average, stdev
+
+        rng = random.Random(1234)
+        jitter = _gaussian(0.05)          # small but non-zero, so the stdev branch is the one used
+        self._configure(jitter, rng)
+        kb.responseTimes = {}             # let the oracle calibrate, the way connect.py does
+
+        oracle = self._costAwareOracle(self.SECRET, jitter, rng)
+        Connect.queryPage = staticmethod(oracle)
+        inf.Request.queryPage = staticmethod(oracle)
+
+        td = getCurrentThreadData()
+        td.shared.value = ""; td.shared.index = [0]; td.shared.start = 0; td.shared.count = 0
+        _, value = inf.bisection(_TEMPLATE, self.EXPRESSION, length=len(self.SECRET), charsetType=CHARSET_TYPE.DIGITS)
+
+        cheap = kb.responseTimes[None]               # against the bare-page model even a FALSE probe reads delayed
+        self.assertGreater(_BASE + _QUERY_COST, average(cheap) + TIME_STDEV_COEFF * stdev(cheap))
+
+        self.assertEqual(kb.responseTimeMode, self.EXPRESSION)   # the walk-off re-keyed the model
+        self.assertEqual(value, self.SECRET)
 
 
 @unittest.skipUnless(_STRESS, "adversarial jitter sweep is opt-in (set SQLMAP_JITTER_STRESS=1)")
