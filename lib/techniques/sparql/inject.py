@@ -58,6 +58,7 @@ from lib.core.settings import SPARQL_ERROR_SIGNATURES
 from lib.core.settings import SPARQL_MAX_LENGTH
 from lib.core.settings import SPARQL_MAX_PREDICATES
 from lib.core.settings import SPARQL_MAX_RECORDS
+from lib.core.settings import SQLMAP_ENVIRONMENT_PREFIX
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.request.connect import Connect as Request
 from lib.utils.xrange import xrange
@@ -397,6 +398,12 @@ def _inferString(truth, inner, maxLen=SPARQL_MAX_LENGTH):
                 hi = mid - 1
         length = lo
 
+        if length >= maxLen:
+            # the bisection is bounded, so a value at the bound is a FLOOR, not a measurement - saying
+            # nothing here hands back a prefix that reads exactly like a complete IRI or literal
+            logger.warning("value is at least %d characters; it is truncated at the cap "
+                           "(raise it with %s_SPARQL_MAX_LENGTH)" % (maxLen, SQLMAP_ENVIRONMENT_PREFIX))
+
         chars = []
         last = len(_CS_ORDS) - 1
         for pos in xrange(1, length + 1):
@@ -445,7 +452,13 @@ def _dumpGraph(truth):
     if predicates is None or triples is None:
         logger.warning("dump aborted: the oracle could not resolve the graph size; detection stands")
         return
-    logger.info("default graph holds %d distinct predicate(s) and %d triple(s)" % (predicates, triples))
+    # _inferCount bisects inside a bound, so a count sitting ON that bound is a floor, not a count
+    saturated = predicates >= SPARQL_MAX_PREDICATES
+    logger.info("default graph holds %s%d distinct predicate(s) and %d triple(s)"
+                % ("at least " if saturated else "", predicates, triples))
+    if saturated:
+        logger.warning("the predicate count hit the %d cap, so the list below is partial "
+                       "(raise it with %s_SPARQL_MAX_PREDICATES)" % (SPARQL_MAX_PREDICATES, SQLMAP_ENVIRONMENT_PREFIX))
 
     predRows = []
     for offset in xrange(min(predicates, SPARQL_MAX_PREDICATES)):

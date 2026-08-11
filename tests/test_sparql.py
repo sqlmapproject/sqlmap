@@ -325,5 +325,60 @@ class TestDetectionAndExtraction(unittest.TestCase):
         self.assertIsNone(template)      # no true/false divergence -> not even boolean-detected
 
 
+class _Dumper(object):
+    """Stands in for conf.dumper, which the offline bootstrap does not build."""
+
+    def __init__(self):
+        self.output = []
+
+    def singleString(self, value):
+        self.output.append(value)
+
+
+class TestCapsAreDisclosed(unittest.TestCase):
+    """Both bounds here are bisection bounds, so a result sitting ON one is a FLOOR, not a measurement.
+    A capped IRI reads exactly like a whole one, and a capped predicate count reads like the size of
+    the graph - the reader has no way to tell unless it is said."""
+
+    def setUp(self):
+        self.saved, self.savedParams = sparql._send, sparql.conf.parameters
+        sparql._send = _mockSend
+        sparql.conf.parameters = {sparql.PLACE.GET: "q=luther"}
+        sparql.SENTINEL = "zzsentinelzz"
+        self.savedDumper, sparql.conf.dumper = sparql.conf.get("dumper"), _Dumper()
+        self.savedWarning, self.warnings = sparql.logger.warning, []
+        sparql.logger.warning = lambda message, *args: self.warnings.append(message % args if args else message)
+
+    def tearDown(self):
+        sparql._send, sparql.conf.parameters = self.saved, self.savedParams
+        sparql.conf.dumper = self.savedDumper
+        sparql.logger.warning = self.savedWarning
+
+    def _truth(self):
+        _t, _p, boundary = sparql._detectBoolean(sparql.PLACE.GET, "q")
+        truth = sparql._makeOracle(sparql.PLACE.GET, "q", boundary)
+        self.assertIsNotNone(truth)
+        return truth
+
+    def test_truncated_value_is_reported(self):
+        value = sparql._inferString(self._truth(), sparql._nthObject(0), maxLen=4)
+        self.assertEqual(value, _OBJECTS[0][:4])
+        self.assertTrue(any("at least 4 characters" in _ for _ in self.warnings), self.warnings)
+
+    def test_value_that_fits_is_silent(self):
+        value = sparql._inferString(self._truth(), sparql._nthObject(0), maxLen=64)
+        self.assertEqual(value, _OBJECTS[0])
+        self.assertEqual(self.warnings, [])
+
+    def test_saturated_predicate_count_is_reported_as_a_floor(self):
+        saved, sparql.SPARQL_MAX_PREDICATES = sparql.SPARQL_MAX_PREDICATES, 2
+        try:
+            sparql._dumpGraph(self._truth())
+        finally:
+            sparql.SPARQL_MAX_PREDICATES = saved
+
+        self.assertTrue(any("hit the 2 cap" in _ for _ in self.warnings), self.warnings)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

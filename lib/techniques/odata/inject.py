@@ -55,6 +55,7 @@ from lib.core.settings import ODATA_KEY_CANDIDATES
 from lib.core.settings import ODATA_MAX_KEY
 from lib.core.settings import ODATA_MAX_LENGTH
 from lib.core.settings import ODATA_MAX_RECORDS
+from lib.core.settings import SQLMAP_ENVIRONMENT_PREFIX
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.request.connect import Connect as Request
 from lib.utils.xrange import xrange
@@ -416,6 +417,9 @@ def _findKeyAndEntities(place, parameter, boundary, emptyPage, errorSurface=True
             else:
                 misses += 1
         if present:
+            if len(present) >= ODATA_MAX_RECORDS:
+                logger.warning("stopped at the %d-entity cap, so further entities are left undumped "
+                               "(raise it with %s_ODATA_MAX_RECORDS)" % (ODATA_MAX_RECORDS, SQLMAP_ENVIRONMENT_PREFIX))
             return candidate, present
     return None, []
 
@@ -462,6 +466,12 @@ def _inferField(oracle, key, keyValue, field, maxLen=ODATA_MAX_LENGTH, useIn=Non
             else:
                 hi = mid - 1
         length = lo
+
+        if length >= maxLen:
+            # the bisection is bounded, so a value at the bound is a FLOOR, not a measurement - saying
+            # nothing here hands back a prefix that reads exactly like a complete value
+            logger.warning("property '%s' is at least %d characters; the recovered value is truncated "
+                           "at the cap (raise it with %s_ODATA_MAX_LENGTH)" % (field, maxLen, SQLMAP_ENVIRONMENT_PREFIX))
 
         chars = []
         for pos in xrange(length):

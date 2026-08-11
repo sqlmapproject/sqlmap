@@ -340,6 +340,52 @@ class TestDetectionAndExtraction(unittest.TestCase):
         self.assertIsNone(template)
 
 
+class TestCapsAreDisclosed(unittest.TestCase):
+    """Every bound here is a bisection bound, so a result sitting ON it is a FLOOR, not a measurement.
+    Handing back a capped prefix (or a capped entity list) with no word said reads exactly like a
+    complete answer - the one failure mode a blind dumper must never have."""
+
+    def setUp(self):
+        self.saved, self.savedParams = odata._send, odata.conf.parameters
+        odata._send = _mockSend
+        odata.conf.parameters = {odata.PLACE.GET: "name=luther"}
+        odata.SENTINEL = "zzsentinelzz"
+        self.savedWarning, self.warnings = odata.logger.warning, []
+        odata.logger.warning = lambda message, *args: self.warnings.append(message % args if args else message)
+
+    def tearDown(self):
+        odata._send, odata.conf.parameters = self.saved, self.savedParams
+        odata.logger.warning = self.savedWarning
+
+    def _oracle(self):
+        _t, _p, boundary = odata._detectBoolean(odata.PLACE.GET, "name")
+        oracle = odata._makeOracle(odata.PLACE.GET, "name", boundary, truePredicate="(Id eq 1)")
+        self.assertIsNotNone(oracle)
+        return oracle
+
+    def test_truncated_value_is_reported(self):
+        value = odata._inferField(self._oracle(), "Id", 1, "Secret", maxLen=4)
+        self.assertEqual(value, "S3CR")
+        self.assertTrue(any("at least 4 characters" in _ for _ in self.warnings), self.warnings)
+
+    def test_value_that_fits_is_silent(self):
+        value = odata._inferField(self._oracle(), "Id", 1, "Name", maxLen=64)
+        self.assertEqual(value, "luther")
+        self.assertEqual(self.warnings, [])
+
+    def test_entity_cap_is_reported(self):
+        savedCap, odata.ODATA_MAX_RECORDS = odata.ODATA_MAX_RECORDS, 2
+        try:
+            _t, _p, boundary = odata._detectBoolean(odata.PLACE.GET, "name")
+            key, keys = odata._findKeyAndEntities(odata.PLACE.GET, "name", boundary, _EMPTY)
+        finally:
+            odata.ODATA_MAX_RECORDS = savedCap
+
+        self.assertEqual(key, "Id")
+        self.assertEqual(keys, [1, 2])          # the third entity exists but is beyond the cap...
+        self.assertTrue(any("2-entity cap" in _ for _ in self.warnings), self.warnings)
+
+
 _LITERAL = r"'(?:[^']|'')*'"
 _IN_REGEX = re.compile(r"(?P<lhs>substring\(\w+,\d+,1\)|%s) in \((?P<items>%s(?:,%s)*)\)"
                        % (_LITERAL, _LITERAL, _LITERAL))
