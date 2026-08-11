@@ -688,7 +688,7 @@ class TestBasicOptionValidation(_BackendGuard):
         "textOnly", "nullConnection", "uValues", "uChar", "base64Parameter",
         "tamper", "eta", "verbose", "direct", "url", "dbms", "tor", "proxy",
         "ignoreProxy", "regexp", "timeSec", "torPort", "torType", "dumpFormat",
-        "technique", "threads", "predictOutput", "optimize", "csrfToken",
+        "technique", "threads", "optimize", "csrfToken",
         "csrfUrl", "string", "notString", "noCast", "hexConvert",
     )
 
@@ -701,7 +701,6 @@ class TestBasicOptionValidation(_BackendGuard):
         conf.direct = False
         conf.tor = False
         conf.ignoreProxy = False
-        conf.predictOutput = False
         conf.optimize = False
         conf.noCast = False
         conf.hexConvert = False
@@ -1136,7 +1135,7 @@ class TestBasicOptionValidationExtra(unittest.TestCase):
         "textOnly", "nullConnection", "uValues", "uChar", "base64Parameter",
         "tamper", "eta", "verbose", "direct", "url", "dbms", "tor", "proxy",
         "ignoreProxy", "regexp", "timeSec", "torPort", "torType", "dumpFormat",
-        "technique", "threads", "predictOutput", "optimize", "csrfToken",
+        "technique", "threads", "optimize", "csrfToken",
         "csrfUrl", "csrfMethod", "csrfData", "string", "notString", "noCast",
         "hexConvert", "titles", "dumpTable", "search", "dumpAll", "data",
         "requestFile", "forms", "googleDork", "bulkFile", "chunked",
@@ -1155,7 +1154,6 @@ class TestBasicOptionValidationExtra(unittest.TestCase):
         conf.direct = False
         conf.tor = False
         conf.ignoreProxy = False
-        conf.predictOutput = False
         conf.optimize = False
         conf.noCast = False
         conf.hexConvert = False

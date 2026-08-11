@@ -98,7 +98,7 @@ def _vector():
 
 class _BooleanJitterBase(unittest.TestCase):
     _CONF = ("threads", "api", "verbose", "direct", "string", "notString", "regexp", "code", "lengths",
-             "titles", "textOnly", "predictOutput", "hexConvert", "charset", "firstChar", "lastChar",
+             "titles", "textOnly", "hexConvert", "charset", "firstChar", "lastChar",
              "ignoreCode", "ignoreTimeouts")
     _KB = ("negativeLogic", "nullConnection", "errorIsNone", "pageTemplate", "matchRatio", "heavilyDynamic",
            "pageStructurallyStable", "skipSeqMatcher", "pageEncoding", "partRun", "safeCharEncode",
@@ -126,7 +126,7 @@ class _BooleanJitterBase(unittest.TestCase):
         set_dbms("MySQL")
         conf.threads = 1; conf.api = False; conf.verbose = 0; conf.direct = False
         conf.string = _STRING; conf.notString = None; conf.regexp = None; conf.code = None
-        conf.lengths = None; conf.titles = None; conf.textOnly = None; conf.predictOutput = False
+        conf.lengths = None; conf.titles = None; conf.textOnly = None
         conf.hexConvert = False; conf.charset = None; conf.firstChar = None; conf.lastChar = None
         conf.ignoreCode = []; conf.ignoreTimeouts = False
         kb.negativeLogic = False; kb.nullConnection = False; kb.errorIsNone = True

@@ -61,7 +61,7 @@ def _timeVector():
 
 
 class _JitterBase(unittest.TestCase):
-    _CONF = ("threads", "api", "verbose", "direct", "disableStats", "timeSec", "predictOutput",
+    _CONF = ("threads", "api", "verbose", "direct", "disableStats", "timeSec",
              "hexConvert", "charset", "firstChar", "lastChar")
     _KB = ("responseTimeMode", "responseTimePayload", "adjustTimeDelay", "laggingChecked", "partRun",
            "safeCharEncode", "bruteMode", "fileReadMode", "disableShiftTable", "prependFlag",
@@ -87,7 +87,7 @@ class _JitterBase(unittest.TestCase):
     def _configure(self, baselineJitter, rng, nBaseline=30):
         set_dbms("MySQL")
         conf.threads = 1; conf.api = False; conf.verbose = 0; conf.direct = False
-        conf.disableStats = False; conf.timeSec = _TIMESEC; conf.predictOutput = False
+        conf.disableStats = False; conf.timeSec = _TIMESEC
         conf.hexConvert = False; conf.charset = None; conf.firstChar = None; conf.lastChar = None
         kb.responseTimeMode = None
         kb.responseTimePayload = None

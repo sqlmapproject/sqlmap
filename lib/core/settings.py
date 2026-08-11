@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.8.27"
+VERSION = "1.10.8.28"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -1790,7 +1790,15 @@ th{
 }
 </style>"""
 
-# Leaving (dirty) possibility to change values from here (e.g. `export SQLMAP__MAX_NUMBER_OF_THREADS=20`)
+# Leaving (dirty) possibility to change values from here (e.g. `export SQLMAP__MAX_NUMBER_OF_THREADS=20`).
+#
+# NOTE the SECOND underscore is deliberate and must stay. sqlmap scans os.environ TWICE, for two
+# different things: this loop binds settings CONSTANTS at import, while `_mergeOptions` (option.py)
+# binds conf OPTIONS at boot, matching `SQLMAP_<OPTION>` against optDict - that is how `SQLMAP_DBMS=mysql`
+# acts as '--dbms=mysql'. The extra underscore is what keeps the two from reading each other's variables,
+# and they really would collide: `DBMS` and `OS` name both a conf option and a global bound here (the
+# enum classes), so on a single underscore `SQLMAP_DBMS=mysql` would set '--dbms' AND rebind the DBMS
+# enum class to the string "mysql". So: `SQLMAP_<option>` sets an option, `SQLMAP__<CONSTANT>` a constant.
 for key, value in os.environ.items():
     if key.upper().startswith("%s_" % SQLMAP_ENVIRONMENT_PREFIX):
         _ = key[len(SQLMAP_ENVIRONMENT_PREFIX) + 1:].upper()
@@ -1810,5 +1818,8 @@ for key, value in os.environ.items():
                     pass
             elif isinstance(original, (list, tuple)):
                 globals()[_] = [__.strip() for __ in value.split(',')]
-            else:
+            elif isinstance(original, six.string_types):
                 globals()[_] = value
+            # anything else (dict, frozenset, enum class, compiled regex) is left alone: a raw string is
+            # not a usable substitute for one, and swapping it in fails far from here and silently - a
+            # frozenset turned into a string still answers `in`, just by substring

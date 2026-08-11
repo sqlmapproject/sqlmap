@@ -39,7 +39,7 @@ TEMPLATE = "EXPR=%s IDX=%d CMP>%d"
 _PARSE = re.compile(r"IDX=(\d+) CMP(.)(\d+)")
 
 # conf/kb knobs bisection reads on the simple single-threaded, no-prediction path
-_CONF = {"predictOutput": False, "threads": 1, "api": False, "verbose": 0, "hexConvert": False,
+_CONF = {"threads": 1, "api": False, "verbose": 0, "hexConvert": False,
          "charset": None, "firstChar": None, "lastChar": None, "timeSec": 5}
 _KB = {"partRun": None, "safeCharEncode": False, "bruteMode": False, "fileReadMode": False,
        "disableShiftTable": False, "originalTimeDelay": 5, "prependFlag": False}
