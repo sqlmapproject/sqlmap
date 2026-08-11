@@ -23,7 +23,9 @@ def profile(profileOutputFile=None):
         os.remove(profileOutputFile)
 
     # Start sqlmap main function and generate a raw profile file
-    cProfile.run("start()", profileOutputFile)
+    # Note: run() would exec inside __main__, which on pip installs is the console script, not sqlmap.py
+    from lib.controller.controller import start
+    cProfile.runctx("start()", {"start": start}, {}, profileOutputFile)
 
     infoMsg = "execution profiled and stored into file '%s' (e.g. 'gprof2dot -f pstats %s | dot -Tpng -o /tmp/sqlmap_profile.png')" % (profileOutputFile, profileOutputFile)
     logger.info(infoMsg)

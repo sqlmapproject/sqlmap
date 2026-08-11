@@ -221,7 +221,6 @@ def main():
                 from lib.controller.controller import start
                 if conf.profile:
                     from lib.core.profiling import profile
-                    globals()["start"] = start
                     profile()
                 else:
                     try:
