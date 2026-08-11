@@ -33,6 +33,7 @@ optDict = {
         "liveCookies": "string",
         "loadCookies": "string",
         "dropSetCookie": "boolean",
+        "http10": "boolean",
         "http2": "boolean",
         "agent": "string",
         "mobile": "boolean",
@@ -120,6 +121,7 @@ optDict = {
 
     "Techniques": {
         "technique": "string",
+        "disableStats": "boolean",
         "nosql": "boolean",
         "graphql": "boolean",
         "ldap": "boolean",
@@ -260,6 +262,7 @@ optDict = {
         "scope": "string",
         "skipHeuristics": "boolean",
         "skipWaf": "boolean",
+        "tablePrefix": "string",
         "testFilter": "string",
         "testSkip": "string",
         "timeLimit": "float",
