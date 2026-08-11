@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.8.23"
+VERSION = "1.10.8.24"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -1496,9 +1496,15 @@ ODATA_ERROR_SIGNATURES = (
 
 ODATA_ERROR_REGEX = r"(?i)(?:%s)" % '|'.join(regex for _, regex in ODATA_ERROR_SIGNATURES)
 
-# Printable-ASCII codepoint bounds for the (lexicographic, binary-search) OData blind character scan
+# Printable-ASCII codepoint bounds for the OData blind character scan
 ODATA_CHAR_MIN = 0x20
 ODATA_CHAR_MAX = 0x7e
+
+# Candidate characters per set-membership probe on a service without the v4.01 'in' operator, where a
+# set has to be spelled as a disjunction of equalities. Each term costs the parser ~8 of the 100 nodes
+# ASP.NET Core OData allows by default (MaxNodeCount), measured to reject at 11 terms - so this leaves
+# headroom for a longer key/property name in the same filter
+ODATA_CHARSET_BLOCK = 8
 
 ODATA_MAX_LENGTH = 256          # a single property value
 ODATA_MAX_RECORDS = 20          # entities blind-dumped

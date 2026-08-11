@@ -20,6 +20,7 @@ from _testutils import bootstrap
 bootstrap()
 
 import lib.techniques.odata.inject as odata
+from lib.core.settings import ODATA_CHARSET_BLOCK
 from lib.core.settings import ODATA_ERROR_REGEX
 
 _ENTITIES = (
@@ -337,6 +338,87 @@ class TestDetectionAndExtraction(unittest.TestCase):
         odata._send = lambda place, parameter, value, raw=False: _render(_ENTITIES)  # always same
         template, _p, _b = odata._detectBoolean(odata.PLACE.GET, "name")
         self.assertIsNone(template)
+
+
+_LITERAL = r"'(?:[^']|'')*'"
+_IN_REGEX = re.compile(r"(?P<lhs>substring\(\w+,\d+,1\)|%s) in \((?P<items>%s(?:,%s)*)\)"
+                       % (_LITERAL, _LITERAL, _LITERAL))
+
+
+def _expandIn(expr):
+    """Rewrite a v4.01 "X in (a,b,c)" into the equivalent v4.0 disjunction - all the mock parser needs
+    in order to model a service that offers the operator, without teaching _atom() a second syntax."""
+
+    def expand(match):
+        lhs = match.group("lhs")
+        return "(%s)" % " or ".join("%s eq %s" % (lhs, _) for _ in re.findall(_LITERAL, match.group("items")))
+
+    return _IN_REGEX.sub(expand, expr)
+
+
+def _mockSendIn(place, parameter, value, raw=False):
+    """A v4.01 service: identical semantics, but it also parses the 'in' operator."""
+    return _mockSend(place, parameter, _expandIn(value), raw)
+
+
+class TestSetMembershipRecovery(unittest.TestCase):
+    """Character recovery asks about a whole candidate SET per request. .NET string comparison is
+    culture-aware and case-folding, so a lexicographic bisection is unusable - but set membership needs
+    no ordering and halves the space just the same. This pins the cost: the linear scan this replaced
+    spent one request per candidate, up to the whole charset for a single character."""
+
+    def setUp(self):
+        self.saved, self.savedParams = odata._send, odata.conf.parameters
+        odata.conf.parameters = {odata.PLACE.GET: "name=luther"}
+        odata.SENTINEL = "zzsentinelzz"
+        self.sent = []
+
+    def tearDown(self):
+        odata._send, odata.conf.parameters = self.saved, self.savedParams
+
+    def _extract(self, service, field="Secret"):
+        def counting(place, parameter, value, raw=False):
+            self.sent.append(value)
+            return service(place, parameter, value, raw)
+
+        odata._send = counting
+        _t, _p, boundary = odata._detectBoolean(odata.PLACE.GET, "name")
+        oracle = odata._makeOracle(odata.PLACE.GET, "name", boundary, truePredicate="(Id eq 1)")
+        self.assertIsNotNone(oracle)
+        before = len(self.sent)
+        return odata._inferField(oracle, "Id", 1, field), len(self.sent) - before
+
+    def test_v40_service_extracts_under_a_linear_scan(self):
+        value, cost = self._extract(_mockSend)
+        self.assertEqual(value, "S3CR3Tvalue")
+        self.assertLess(cost, len(value) * len(odata._CS_ORDS))
+
+    def test_v401_service_extracts_the_same_value(self):
+        value, cost = self._extract(_mockSendIn)
+        self.assertEqual(value, "S3CR3Tvalue")
+        self.assertLess(cost, len(value) * len(odata._CS_ORDS))
+
+    def test_in_encoding_is_used_only_when_offered(self):
+        self._extract(_mockSendIn)
+        self.assertTrue(any(" in (" in _ for _ in self.sent))
+        self.sent = []
+        self._extract(_mockSend)
+        self.assertFalse(any("substring(Secret,0,1) in (" in _ for _ in self.sent))
+
+    def test_disjunction_stays_inside_the_node_budget(self):
+        """Every 'or' term costs the service's parser ~8 of the 100 nodes ASP.NET Core OData allows by
+        default (MaxNodeCount); an 11-term disjunction was measured being rejected outright."""
+
+        self._extract(_mockSend)
+        for value in self.sent:
+            self.assertLessEqual(value.count("substring("), ODATA_CHARSET_BLOCK)
+
+    def test_split_point_never_degenerates(self):
+        """A cut of 0 or of len(candidates) would leave the set unchanged and loop forever."""
+
+        for size in range(2, len(odata._CS_ORDS) + 1):
+            cut = odata._splitPoint(odata._CS_ORDS[:size])
+            self.assertTrue(0 < cut < size, "size %d cut %d" % (size, cut))
 
 
 if __name__ == "__main__":
