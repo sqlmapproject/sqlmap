@@ -278,10 +278,32 @@ class XQueryTierTest(unittest.TestCase):
 
 class SwitchWiringTest(unittest.TestCase):
     def test_switch_is_registered_and_mutually_exclusive(self):
+        from lib.core.data import conf
+        from lib.core.exception import SqlmapSyntaxException
         from lib.core.optiondict import optDict
+        from lib.core.settings import NONSQL_TECHNIQUES
+
         self.assertEqual(optDict["Techniques"].get("xslt"), "boolean")
 
-        self.assertIn('("--xslt", conf.xslt)', _source("lib", "core", "option.py"))
+        # exclusivity used to be asserted by grepping option.py for a literal `("--xslt", conf.xslt)`
+        # pair; the switches now come from one registry, so assert the PROPERTY instead of the spelling
+        self.assertIn("xslt", NONSQL_TECHNIQUES)
+
+        saved = dict((_, conf.get(_)) for _ in NONSQL_TECHNIQUES)
+        try:
+            from lib.core.option import _basicOptionValidation
+
+            for _ in NONSQL_TECHNIQUES:
+                conf[_] = False
+            conf.xslt = conf.nosql = True
+            try:
+                _basicOptionValidation()
+            except SqlmapSyntaxException as ex:
+                self.assertIn("--xslt", str(ex))
+            else:
+                self.fail("'--xslt --nosql' was accepted")
+        finally:
+            conf.update(saved)
 
     def test_controller_dispatches_the_scan(self):
         self.assertIn("from lib.techniques.xslt.inject import xsltScan", _source("lib", "controller", "controller.py"))

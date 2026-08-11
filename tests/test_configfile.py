@@ -104,19 +104,27 @@ class TestConfigFileRoundTrip(unittest.TestCase):
         handle, path = tempfile.mkstemp(suffix=".ini")
         os.close(handle)
 
+        # `conf` is the process-wide singleton every other test file shares, so this one saves and
+        # restores the WHOLE of it. Clearing it (or leaving a key behind) is not a local mistake: an
+        # emptied conf makes `conf.get("direct")` answer for the rest of the run, which silently turns
+        # urlencode() into the identity function in test files that run later.
+        saved = dict(conf)
+
         try:
             conf.url = "http://127.0.0.1:1/?id=1"
             conf.commonTables = True
             conf.tablePrefix = "zzz"
             saveConfig(conf, path)
 
-            conf.clear()
+            conf.url, conf.commonTables, conf.tablePrefix = None, False, "overwritten"
             configFileParser(path)
 
             self.assertEqual(conf.url, "http://127.0.0.1:1/?id=1")
             self.assertTrue(conf.commonTables)
             self.assertEqual(conf.tablePrefix, "zzz")
         finally:
+            conf.clear()
+            conf.update(saved)
             os.unlink(path)
 
 

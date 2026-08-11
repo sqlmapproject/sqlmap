@@ -161,9 +161,14 @@ class _TargetTestBase(unittest.TestCase):
 
 class TestRestoreMergedOptions(_TargetTestBase):
     def test_restores_each_option_from_mergedOptions(self):
+        # conf is restored as carefully as mergedOptions: this leaves 'VAL_<opt>' in conf otherwise,
+        # and conf.string / conf.textOnly are read by the shared page-comparison oracle - a stray
+        # sentinel there makes every later boolean differential in the process answer false
         saved = {}
+        savedConf = {}
         for opt in RESTORE_MERGED_OPTIONS:
             saved[opt] = mergedOptions.get(opt)
+            savedConf[opt] = conf.get(opt)
             mergedOptions[opt] = "VAL_%s" % opt
             conf[opt] = "tampered"
         try:
@@ -174,6 +179,8 @@ class TestRestoreMergedOptions(_TargetTestBase):
         finally:
             for opt, v in saved.items():
                 mergedOptions[opt] = v
+            for opt, v in savedConf.items():
+                conf[opt] = v
 
 
 class TestSetAuxOptions(_TargetTestBase):
