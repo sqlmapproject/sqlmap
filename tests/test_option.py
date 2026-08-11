@@ -19,6 +19,7 @@ shared state stays pristine for the other test files in the suite.
 import contextlib
 import logging
 import os
+import re
 import socket
 import sys
 import tempfile
@@ -28,13 +29,17 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _testutils import bootstrap
 bootstrap()
 
+_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 from lib.core.data import conf, kb, logger
 from lib.core.common import Backend
 from lib.core.enums import AUTH_TYPE
+from lib.core.optiondict import optDict
 from lib.core.enums import HTTP_HEADER
 from lib.core.settings import DEFAULT_USER_AGENT
 from lib.core.settings import IGNORE_CODE_WILDCARD
 from lib.core.settings import MAX_CONNECT_RETRIES
+from lib.core.settings import NONSQL_TECHNIQUES
 from lib.core.exception import SqlmapFilePathException
 from lib.core.exception import SqlmapGenericException
 from lib.core.exception import SqlmapMissingMandatoryOptionException
@@ -712,6 +717,37 @@ class TestBasicOptionValidation(_BackendGuard):
         with _preserve(conf, *self._KEYS):
             self._base()
             option._basicOptionValidation()  # must not raise
+
+    def test_one_non_sql_technique_at_a_time(self):
+        """Every pair must be refused, and refused BY NAME - assertRaises alone would be satisfied by
+        any unrelated validation error, which is how a missing entry hid here in the first place."""
+
+        with _preserve(conf, *(self._KEYS + NONSQL_TECHNIQUES)):
+            for name in NONSQL_TECHNIQUES:
+                for other in NONSQL_TECHNIQUES:
+                    if other == name:
+                        continue
+                    self._base()
+                    for _ in NONSQL_TECHNIQUES:
+                        conf[_] = False
+                    conf[name] = conf[other] = True
+                    try:
+                        option._basicOptionValidation()
+                    except SqlmapSyntaxException as ex:
+                        message = str(ex)
+                        self.assertIn("--%s" % name, message)
+                        self.assertIn("--%s" % other, message)
+                    else:
+                        self.fail("'--%s --%s' was accepted" % (name, other))
+
+    def test_single_non_sql_technique_passes(self):
+        with _preserve(conf, *(self._KEYS + NONSQL_TECHNIQUES)):
+            for name in NONSQL_TECHNIQUES:
+                self._base()
+                for _ in NONSQL_TECHNIQUES:
+                    conf[_] = False
+                conf[name] = True
+                option._basicOptionValidation()  # must not raise
 
     def test_bad_level_raises(self):
         with _preserve(conf, *self._KEYS):
@@ -1584,6 +1620,32 @@ class TestOptionSetAuthCred(unittest.TestCase):
             kb.passwordMgr.find_user_password(None, "http://host:80"),
             ("u", "p"),
         )
+
+
+class TestNonSqlTechniqueRegistry(unittest.TestCase):
+    """NONSQL_TECHNIQUES governs three things that used to be spelled out separately: the target loop's
+    branches, the '--mine-params'/'--report-json' gates, and the one-at-a-time validation. They had
+    already drifted - '--jwt' was in the branches but not the validation, so '--jwt --nosql' was
+    accepted and then ran NEITHER (the nosql branch wins, and conf.jwt suppresses the passive JWT
+    heuristic). Anchoring the list to the branches that consume it is what makes the next engine safe."""
+
+    def _read(self, *parts):
+        with open(os.path.join(_ROOT, *parts)) as f:
+            return f.read()
+
+    def test_every_branch_is_registered(self):
+        branches = set(re.findall(r"from lib\.techniques\.(\w+)\.inject import", self._read("lib", "controller", "controller.py")))
+        self.assertTrue(branches)
+        self.assertEqual(sorted(branches - set(NONSQL_TECHNIQUES)), [])
+
+    def test_every_registered_technique_has_a_branch_and_a_switch(self):
+        controller = self._read("lib", "controller", "controller.py")
+        cmdline = self._read("lib", "parse", "cmdline.py")
+
+        for name in NONSQL_TECHNIQUES:
+            self.assertIn("from lib.techniques.%s.inject import" % name, controller, name)
+            self.assertIn('dest="%s"' % name, cmdline, name)
+            self.assertEqual(optDict["Techniques"].get(name), "boolean", name)
 
 
 if __name__ == "__main__":

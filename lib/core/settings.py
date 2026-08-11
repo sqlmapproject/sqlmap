@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.8.26"
+VERSION = "1.10.8.27"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -1415,6 +1415,13 @@ HQL_ERROR_SIGNATURES = (
 )
 
 HQL_ERROR_REGEX = r"(?i)(?:%s)" % '|'.join(regex for _, regex in HQL_ERROR_SIGNATURES)
+
+# The self-contained non-SQL technique switches, by conf option name (each is also its switch spelling,
+# '--<name>'). Each is a whole scan for a different back-end class, so at most one may run: the target
+# loop branches on them and the option validation rejects a pair. Kept in ONE place because it used to
+# be spelled out at every site and had already drifted - '--jwt' was missing from the validation, which
+# let '--jwt --nosql' through to run neither (conf.jwt also suppresses the passive JWT heuristic)
+NONSQL_TECHNIQUES = ("graphql", "nosql", "ldap", "xpath", "ssti", "xxe", "xslt", "hql", "sparql", "odata", "jwt")
 
 # Small, fast dictionary the always-on JWT heuristic tries against an HS* signature (the full
 # '--jwt' audit streams the shipped wordlist instead); these are the secrets seen over and over in

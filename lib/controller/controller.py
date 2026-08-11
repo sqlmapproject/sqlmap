@@ -70,6 +70,7 @@ from lib.core.exception import SqlmapValueException
 from lib.core.settings import ASP_NET_CONTROL_REGEX
 from lib.core.settings import CSRF_TOKEN_PARAMETER_INFIXES
 from lib.core.settings import DEFAULT_GET_POST_DELIMITER
+from lib.core.settings import NONSQL_TECHNIQUES
 from lib.core.settings import EMPTY_FORM_FIELDS_REGEX
 from lib.core.settings import GOOGLE_ANALYTICS_COOKIE_REGEX
 from lib.core.settings import HASHDB_STALE_DAYS
@@ -532,12 +533,12 @@ def start():
 
             checkJWT()
 
-            if conf.mineParams and not any((conf.graphql, conf.nosql, conf.ldap, conf.xpath, conf.ssti, conf.xxe, conf.xslt, conf.hql, conf.sparql, conf.odata, conf.jwt)):
+            if conf.mineParams and not any(conf.get(_) for _ in NONSQL_TECHNIQUES):
                 from lib.utils.paraminer import mineParameters
                 mineParameters()
 
-            if any((conf.graphql, conf.nosql, conf.ldap, conf.xpath, conf.ssti, conf.xxe, conf.xslt, conf.hql, conf.sparql, conf.odata, conf.jwt)) and (conf.reportJson or conf.resultsFile):
-                singleTimeWarnMessage("'--report-json'/'--results-file' do not (yet) capture non-SQL technique (--graphql/--nosql/--ldap/--xpath/--ssti/--xslt/--xxe/--hql/--sparql/--odata/--jwt) findings; these are reported on the console only")
+            if any(conf.get(_) for _ in NONSQL_TECHNIQUES) and (conf.reportJson or conf.resultsFile):
+                singleTimeWarnMessage("'--report-json'/'--results-file' do not (yet) capture non-SQL technique (%s) findings; these are reported on the console only" % '/'.join("--%s" % _ for _ in NONSQL_TECHNIQUES))
 
             if conf.graphql:
                 from lib.techniques.graphql.inject import graphqlScan

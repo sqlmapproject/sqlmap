@@ -128,6 +128,7 @@ from lib.core.settings import PARAMETER_SPLITTING_REGEX
 from lib.core.settings import PRECONNECT_CANDIDATE_TIMEOUT
 from lib.core.settings import PROXY_ENVIRONMENT_VARIABLES
 from lib.core.settings import SOCKET_PRE_CONNECT_QUEUE_SIZE
+from lib.core.settings import NONSQL_TECHNIQUES
 from lib.core.settings import SQLMAP_ENVIRONMENT_PREFIX
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import SUPPORTED_OS
@@ -2763,9 +2764,7 @@ def _checkTor():
         logger.info(infoMsg)
 
 def _basicOptionValidation():
-    _nonSqlTechniques = [name for name, enabled in (
-        ("--graphql", conf.graphql), ("--nosql", conf.nosql), ("--ldap", conf.ldap),
-        ("--xpath", conf.xpath), ("--ssti", conf.ssti), ("--xxe", conf.xxe), ("--xslt", conf.xslt), ("--hql", conf.hql), ("--sparql", conf.sparql), ("--odata", conf.odata)) if enabled]
+    _nonSqlTechniques = ["--%s" % _ for _ in NONSQL_TECHNIQUES if conf.get(_)]
     if len(_nonSqlTechniques) > 1:
         errMsg = "only one non-SQL technique switch may be used at a time (found: %s). " % ", ".join(_nonSqlTechniques)
         errMsg += "each is a self-contained scan for a different back-end class - pick one"
