@@ -132,6 +132,10 @@ class _Reader(object):
         v = struct.unpack_from(">d", self._buf, self._off)[0]; self._off += 8; return v
 
     def raw(self, n):
+        # a slice past the end returns short data *silently*, which would hand a truncated value to the
+        # caller (the fixed-width readers above raise struct.error instead)
+        if n < 0 or n > self.remaining():
+            raise InterfaceError("CAS response too short (wanted %d of %d bytes)" % (n, self.remaining()))
         v = self._buf[self._off:self._off + n]; self._off += n; return bytes(v)
 
     def skip(self, n):
@@ -371,9 +375,15 @@ class Connection(object):
         reader.byte()                # is_updatable
         columns = self._parse_columns(reader, reader.int())
 
+        # args: handle, flag, max_col_size, max_row, binds, fetch_flag, auto_commit, forward_only_cursor,
+        # cache_time, query_timeout. auto_commit makes the CAS worker commit the statement and end the
+        # transaction - without it DML is rolled back when the connection drops, whatever _open() asked
+        # SET_DB_PARAMETER for. It must stay off for a SELECT: ending the transaction there invalidates the
+        # request handle the paged _fetch_remaining() still reads from.
+        select = stmt_type == _STMT_SELECT
         exec_writer = (_Writer(_FC_EXECUTE).arg_int(handle).arg_byte(0).arg_int(0).arg_int(0)
-                       .arg_null().arg_byte(1 if stmt_type == _STMT_SELECT else 0)
-                       .arg_byte(0).arg_byte(1).arg_cache_time().arg_int(0))
+                       .arg_null().arg_byte(1 if select else 0)
+                       .arg_byte(0 if select else 1).arg_byte(1).arg_cache_time().arg_int(0))
         reader = self._call(exec_writer)
 
         total = reader.int()

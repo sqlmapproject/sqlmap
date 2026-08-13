@@ -31,7 +31,10 @@ bootstrap()
 
 import extra.dbwire as dbwire
 from extra.dbwire import connection_lost
+from extra.dbwire import cubrid as _cubrid
+from extra.dbwire import firebird as _firebird
 from extra.dbwire import http_origin
+from extra.dbwire import monetdb as _monetdb
 from extra.dbwire import mysql as _mysql
 from extra.dbwire import postgres as _postgres
 from extra.dbwire import presto as _presto
@@ -312,6 +315,76 @@ class TrinoSessionStateTest(unittest.TestCase):
         c = _presto.Connection("h", 8080, "u", None, None, "tiny", 10)
         self.assertNotIn("X-Trino-Schema", c._headers)
         self.assertNotIn("X-Presto-Schema", c._headers)
+
+
+class CubridAutoCommitTest(unittest.TestCase):
+    """CUBRID has no server-side autocommit switch that outlives a statement: the EXECUTE request carries
+    its own auto_commit byte, and a statement sent with it clear is rolled back when the CAS worker goes
+    away. It must stay clear for a SELECT, whose request handle the paged fetch still reads from."""
+
+    def _auto_commit_byte(self, stmt_type):
+        connection = object.__new__(_cubrid.Connection)
+        connection._protocol_version = 8
+        connection._sock = None
+        sent = []
+
+        def _call(writer):
+            sent.append(writer.payload())
+            # EXECUTE response: total(4) cache_reusable(1) result_count(4) includes_column_info(1) shard_id(4)
+            return _cubrid._Reader(struct.pack(">iBiBi", 0, 0, 0, 0, 0))
+
+        connection._call = _call
+        prepare = _cubrid._Reader(struct.pack(">iBiBi", 0, stmt_type, 0, 0, 0))
+        connection._execute(1, prepare)
+
+        args, off = [], 1                       # skip the function code, then walk [len(4)][value] args
+        payload = sent[0]
+        while off < len(payload):
+            (length,) = struct.unpack(">i", payload[off:off + 4])
+            args.append(payload[off + 4:off + 4 + length])
+            off += 4 + length
+        return bytearray(args[6])[0]            # handle, flag, max_col_size, max_row, binds, fetch, auto_commit
+
+    def test_dml_is_committed_by_the_execute_request(self):
+        self.assertEqual(self._auto_commit_byte(_cubrid._STMT_SELECT + 1), 1)
+
+    def test_select_does_not_end_the_transaction(self):
+        self.assertEqual(self._auto_commit_byte(_cubrid._STMT_SELECT), 0)
+
+
+class BoundedReadTest(unittest.TestCase):
+    """A length taken off the wire is attacker/corruption controlled: unchecked, it either reads until
+    memory runs out or (on a short buffer) hands back silently truncated data."""
+
+    def test_cubrid_short_response_is_not_silently_truncated(self):
+        reader = _cubrid._Reader(b"AB")
+        self.assertRaises(dbwire.InterfaceError, reader.raw, 8)
+        self.assertRaises(dbwire.InterfaceError, reader.raw, -1)
+
+    def test_firebird_rejects_an_out_of_range_length(self):
+        wire = _firebird._Wire(FakeSocket())
+        self.assertRaises(dbwire.InterfaceError, wire.recv, -1)
+        self.assertRaises(dbwire.InterfaceError, wire.recv, _firebird._MAX_MESSAGE_LENGTH + 1)
+
+    def test_monetdb_unterminated_block_stream_is_bounded(self):
+        """The MAPI block length is a 15-bit field, so only the accumulated response can be bounded."""
+
+        block = struct.pack("<H", (4000 << 1) | 0) + b"A" * 4000       # last-flag clear -> never ends
+        sock = FakeSocket(block * 32)
+        original = sock.recv
+
+        def recv(count):
+            if not sock.inbound:
+                sock.feed(block * 32)
+            return original(count)
+
+        sock.recv = recv
+        saved = _monetdb._MAX_MESSAGE_LENGTH
+        try:
+            _monetdb._MAX_MESSAGE_LENGTH = 100000
+            self.assertRaises(dbwire.InterfaceError, _monetdb._getblock, sock)
+        finally:
+            _monetdb._MAX_MESSAGE_LENGTH = saved
 
 
 class HelperTest(unittest.TestCase):

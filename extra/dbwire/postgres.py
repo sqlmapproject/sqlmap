@@ -321,9 +321,9 @@ def connect(host=None, port=5432, user=None, password=None, database=None, conne
     for key, value in (("user", user or ""), ("database", database or user or ""), ("client_encoding", "UTF8")):
         params += key.encode("ascii") + b"\x00" + ("%s" % value).encode("utf-8") + b"\x00"
     params += b"\x00"
-    _send(sock, b"", struct.pack("!I", _PROTOCOL_VERSION) + params)
 
     try:
+        _send(sock, b"", struct.pack("!I", _PROTOCOL_VERSION) + params)  # StartupMessage
         _authenticate(sock, user, password)
         while True:  # drain until ReadyForQuery (ParameterStatus/BackendKeyData/NoticeResponse)
             mtype, payload = _read_message(sock)

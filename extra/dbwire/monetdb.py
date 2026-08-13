@@ -27,6 +27,7 @@ from extra.dbwire import keepalive
 from extra.dbwire import ProgrammingError
 
 _MAX_BLOCK = 0xffff >> 1
+_MAX_MESSAGE_LENGTH = 0x40000000  # cap on a (re-assembled) response, to bound a hostile/corrupt stream
 
 def _recvn(sock, n):
     buf = b""
@@ -41,14 +42,19 @@ def _recvn(sock, n):
     return buf
 
 def _getblock(sock):
-    out = b""
+    # the block length is a 15-bit field, so bounding IT is pointless - a peer that never sets the last-flag
+    # simply streams blocks forever. Bound the accumulated response instead (as the other wire modules do).
+    chunks, total = [], 0
     while True:
         (header,) = struct.unpack("<H", _recvn(sock, 2))
         length, last = header >> 1, header & 1
-        out += _recvn(sock, length)
+        total += length
+        if total > _MAX_MESSAGE_LENGTH:
+            raise InterfaceError("backend message too large (%d bytes)" % total)
+        chunks.append(_recvn(sock, length))
         if last:
             break
-    return out.decode("utf-8", "replace")
+    return b"".join(chunks).decode("utf-8", "replace")
 
 def _putblock(sock, text):
     data = text.encode("utf-8")

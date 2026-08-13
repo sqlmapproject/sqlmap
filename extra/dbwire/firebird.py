@@ -142,6 +142,8 @@ _GDS_INTEGRITY = frozenset((335544838, 335544879, 335544880, 335544466, 33554466
 _GDS_DATA = frozenset((335544321,))
 _GDS_WARNING = 335544434
 
+_MAX_MESSAGE_LENGTH = 0x40000000  # cap on a wire-supplied length, to bound a hostile/corrupt stream
+
 # SRP-6a group used by Firebird (fixed 1024-bit prime, generator 2)
 _SRP_N = int("E67D2E994B2F900C3F41F08F5BB2627ED0D49EE1FE767A52EFCD565CD6E768812C3E1E9CE8F0A8BEA6CB13CD29DDE"
              "BF7A96D4A93B55D488DF099A15C89DCB0640738EB2CBDD9A8F7BAB561AB1B0DC1C6CDABF303264A08D1BCA932D1F"
@@ -306,6 +308,10 @@ class _Wire(object):
         return buf
 
     def recv(self, n, align=False):
+        # every length here comes off the wire (response buffers, status strings, per-value lengths): a
+        # negative one would silently return short data, a huge one would read until memory ran out
+        if n < 0 or n > _MAX_MESSAGE_LENGTH:
+            raise InterfaceError("invalid Firebird length (%d)" % n)
         total = n + ((4 - n % 4) % 4) if align else n
         data = self._recv_raw(total)
         if self._rc:
