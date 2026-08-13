@@ -26,6 +26,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _testutils import bootstrap, set_dbms, reset_dbms
 bootstrap()
 
+from lib.core.agent import agent
 from lib.core.data import conf, kb
 from lib.core.datatype import AttribDict
 from lib.core.enums import PAYLOAD, PLACE
@@ -74,6 +75,12 @@ class TestOrderByColumnCount(unittest.TestCase):
         ut.Request.queryPage = self._sqp
 
     def _detect(self, true_count):
+        # canary: a leaked agent.payload stub (another module patching the shared singleton and
+        # restoring it by assignment) makes every probe below identical, so the ORDER BY oracle turns
+        # unusable and this test used to fail as a bare 'None != 25'. Name the cause instead.
+        self.assertNotIn("payload", agent.__dict__,
+                         "agent.payload is stubbed - a test module leaked it (see _testutils.save_attrs)")
+
         def oracle(payload=None, place=None, content=False, raise404=True, **kwargs):
             m = re.search(r"ORDER BY (\d+)", payload or "")
             cols = int(m.group(1)) if m else 1

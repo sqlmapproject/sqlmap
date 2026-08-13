@@ -30,7 +30,7 @@ import tempfile
 import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _testutils import bootstrap, set_dbms, reset_dbms
+from _testutils import bootstrap, set_dbms, reset_dbms, save_attrs, restore_attrs
 bootstrap()
 
 from lib.core.data import conf, kb
@@ -94,9 +94,7 @@ class _UnionCase(unittest.TestCase):
         self._scounters = kb.get("counters")
         self._sinj_data = kb.injection.data
         self._shashdb = conf.get("hashDB")
-        self._s_forge = agent.forgeUnionQuery
-        self._s_concat = agent.concatQuery
-        self._s_payload = agent.payload
+        self._s_agent = save_attrs(agent, "forgeUnionQuery", "concatQuery", "payload")
         self._s_escape = unescaper.escape
 
         for k, v in _UU_CONF.items():
@@ -131,9 +129,7 @@ class _UnionCase(unittest.TestCase):
         kb.counters = self._scounters
         kb.injection.data = self._sinj_data
         conf.hashDB = self._shashdb
-        agent.forgeUnionQuery = self._s_forge
-        agent.concatQuery = self._s_concat
-        agent.payload = self._s_payload
+        restore_attrs(self._s_agent)
         unescaper.escape = self._s_escape
 
     def _install_page(self, page):
@@ -325,11 +321,8 @@ class _UnionLimitCase(unittest.TestCase):
         self._sinj_data = kb.injection.data
         self._shashdb = conf.get("hashDB")
         self._sbatch = conf.get("batch")
-        self._s_forge = agent.forgeUnionQuery
-        self._s_concat = agent.concatQuery
-        self._s_payload = agent.payload
+        self._s_agent = save_attrs(agent, "forgeUnionQuery", "concatQuery", "payload", "_lastexpr")
         self._s_escape = unescaper.escape
-        self._s_lastexpr = getattr(agent, "_lastexpr", None)
         self._s_initTechnique = uu.initTechnique
 
         for k, v in _UU_CONF_LIMIT.items():
@@ -372,11 +365,8 @@ class _UnionLimitCase(unittest.TestCase):
         kb.counters = self._scounters
         kb.injection.data = self._sinj_data
         conf.hashDB = self._shashdb
-        agent.forgeUnionQuery = self._s_forge
-        agent.concatQuery = self._s_concat
-        agent.payload = self._s_payload
+        restore_attrs(self._s_agent)
         unescaper.escape = self._s_escape
-        agent._lastexpr = self._s_lastexpr
         uu.initTechnique = self._s_initTechnique
 
         if self._s_columns is None:
@@ -500,10 +490,7 @@ class _ErrorCase(unittest.TestCase):
         self._shashdb = conf.get("hashDB")
         self._sbatch = conf.get("batch")
 
-        self._s_prefix = agent.prefixQuery
-        self._s_suffix = agent.suffixQuery
-        self._s_payload = agent.payload
-        self._s_nullcast = agent.nullAndCastField
+        self._s_agent = save_attrs(agent, "prefixQuery", "suffixQuery", "payload", "nullAndCastField")
         self._s_escape = unescaper.escape
 
         # restore thread state we touch
@@ -557,10 +544,7 @@ class _ErrorCase(unittest.TestCase):
         kb.injection.data = self._sinj_data
         conf.hashDB = self._shashdb
 
-        agent.prefixQuery = self._s_prefix
-        agent.suffixQuery = self._s_suffix
-        agent.payload = self._s_payload
-        agent.nullAndCastField = self._s_nullcast
+        restore_attrs(self._s_agent)
         unescaper.escape = self._s_escape
 
         td = getCurrentThreadData()

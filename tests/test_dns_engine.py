@@ -38,7 +38,7 @@ import time
 import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _testutils import bootstrap, set_dbms, reset_dbms
+from _testutils import bootstrap, set_dbms, reset_dbms, save_attrs, restore_attrs
 bootstrap()
 
 from lib.core.agent import agent
@@ -131,7 +131,7 @@ class _DnsCase(unittest.TestCase):
         # (agent.prefixQuery/agent.payload, needing a full kb.injection). That plumbing is
         # generic - not DNS logic - and the mock oracle ignores the payload, so stub it to a
         # pass-through; the DNS-specific snippet/substring/chunking still runs for real.
-        self._saved_prefixQuery, self._saved_payload = agent.prefixQuery, agent.payload
+        self._s_agent = save_attrs(agent, "prefixQuery", "payload")
         agent.prefixQuery = lambda expression, *a, **k: expression
         agent.payload = lambda place=None, parameter=None, value=None, newValue=None, where=None: newValue or ""
         set_dbms(self.DBMS_NAME)
@@ -148,7 +148,7 @@ class _DnsCase(unittest.TestCase):
         dnsmod.randomStr = self._saved_randomStr
         dnstestmod.randomInt = self._saved_randomInt
         dnsmod.hashDBRetrieve, dnsmod.hashDBWrite = self._saved_hdbR, self._saved_hdbW
-        agent.prefixQuery, agent.payload = self._saved_prefixQuery, self._saved_payload
+        restore_attrs(self._s_agent)
 
     def _install_oracle(self, secret, working=True, force=None):
         """
@@ -293,10 +293,12 @@ class TestDnsLabelInvariant(_DnsCase):
         # "SUBSTRING((...) FROM 1 FOR 13)"; the substring LENGTH argument (the source's real
         # chunk_length) is the last integer literal in it. Capture it per iteration so the oracle
         # emits a chunk of exactly that size - the source's arithmetic, not a copy of it.
-        saved_hexConvertField = agent.hexConvertField
+        real_hexConvertField = agent.hexConvertField     # the spy delegates to it
+        saved_hexConvertField = save_attrs(agent, "hexConvertField")
+
         def spy_hexConvertField(field):
             source_chunk_lengths.append(int(re.findall(r"\d+", field)[-1]))
-            return saved_hexConvertField(field)
+            return real_hexConvertField(field)
         agent.hexConvertField = spy_hexConvertField
 
         def oracle(payload=None, *args, **kwargs):
@@ -328,7 +330,7 @@ class TestDnsLabelInvariant(_DnsCase):
         try:
             result = dnsmod.dnsUse("%s AND %d=%d", "user()")
         finally:
-            agent.hexConvertField = saved_hexConvertField
+            restore_attrs(saved_hexConvertField)
 
         # round-trip must still work (the source must actually reassemble what it chunked)
         self.assertEqual(result, secret)

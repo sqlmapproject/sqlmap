@@ -27,7 +27,7 @@ import time
 import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _testutils import bootstrap
+from _testutils import bootstrap, save_attrs, restore_attrs
 bootstrap()
 
 import lib.controller.checks as checks
@@ -88,13 +88,11 @@ class _ChecksTestBase(unittest.TestCase):
     def setUp(self):
         self._snap = _snapshot()
         # remember the real seams so monkeypatches can't leak. agent.payload /
-        # addPayloadDelimiters are class methods on a shared singleton: patching
-        # sets an *instance* attribute, so it's restored by deleting that
-        # attribute (reassigning would leave a stale bound method behind).
+        # addPayloadDelimiters are class methods on a shared singleton, so they need
+        # save_attrs()/restore_attrs() rather than a plain reassignment (see _testutils).
         self._origQueryPage = checks.Request.queryPage
         self._origGetPage = checks.Request.getPage
-        self._agentHadPayload = "payload" in checks.agent.__dict__
-        self._agentHadAddDelims = "addPayloadDelimiters" in checks.agent.__dict__
+        self._savedAgent = save_attrs(checks.agent, "payload", "addPayloadDelimiters")
         self._origReadInput = checks.readInput
         self._origDbmsErr = checks.wasLastResponseDBMSError
         self._origHttpErr = checks.wasLastResponseHTTPError
@@ -111,10 +109,7 @@ class _ChecksTestBase(unittest.TestCase):
     def tearDown(self):
         checks.Request.queryPage = self._origQueryPage
         checks.Request.getPage = self._origGetPage
-        if not self._agentHadPayload and "payload" in checks.agent.__dict__:
-            del checks.agent.payload
-        if not self._agentHadAddDelims and "addPayloadDelimiters" in checks.agent.__dict__:
-            del checks.agent.addPayloadDelimiters
+        restore_attrs(self._savedAgent)
         checks.readInput = self._origReadInput
         checks.wasLastResponseDBMSError = self._origDbmsErr
         checks.wasLastResponseHTTPError = self._origHttpErr

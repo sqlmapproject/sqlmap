@@ -114,6 +114,37 @@ def reset_dbms():
     kb.dbmsVersion = [UNKNOWN_DBMS_VERSION]
 
 
+# --- patching shared singletons (agent, unescaper, ...) ---
+
+_MISSING = object()
+
+
+def save_attrs(obj, *names):
+    """Snapshot attributes of a shared singleton so tearDown can restore them EXACTLY.
+
+    agent.payload and friends are methods on the CLASS: patching one sets an *instance* attribute
+    that shadows it, and restoring by assignment leaves that instance attribute behind holding a
+    bound method. Harmless on its own - but invisible state, and a later module whose cleanup keys
+    on "did this attribute exist before me?" then reads True, skips its own del, and leaks its stub
+    into every module that follows (test_techniques + test_checks did exactly that to
+    test_union_engine, whose real payloads silently became the string "PAYLOAD").
+
+    Pair with restore_attrs(); it deletes what was not there before and restores what was.
+    """
+
+    return [(obj, name, obj.__dict__.get(name, _MISSING)) for name in names]
+
+
+def restore_attrs(saved):
+    """Undo save_attrs(), leaving obj.__dict__ exactly as it was found."""
+
+    for obj, name, value in saved:
+        if value is _MISSING:
+            obj.__dict__.pop(name, None)
+        else:
+            setattr(obj, name, value)
+
+
 # --- property/fuzz testing harness (shared so individual test files don't each reinvent it) ---
 
 _PROPERTY_BASE = 0x51A1

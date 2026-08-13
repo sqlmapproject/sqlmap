@@ -16,7 +16,7 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _testutils import bootstrap
+from _testutils import bootstrap, save_attrs, restore_attrs
 bootstrap()
 
 from lib.core.settings import (JSON_RECOGNITION_REGEX, JSON_LIKE_RECOGNITION_REGEX,
@@ -219,7 +219,7 @@ def _drive_hpp(payload, name="id"):
         captured["value"] = value
         raise _Sentinel()
 
-    orig_remove = agent.removePayloadDelimiters
+    saved_remove = save_attrs(agent, "removePayloadDelimiters")
     agent.removePayloadDelimiters = _capture
     try:
         conf.direct = False
@@ -238,7 +238,7 @@ def _drive_hpp(payload, name="id"):
         except _Sentinel:
             pass
     finally:
-        agent.removePayloadDelimiters = orig_remove
+        restore_attrs(saved_remove)
 
     _ = re.escape(PAYLOAD_DELIMITER)
     return re.search(r"(?s)%s(?P<result>.*?)%s" % (_, _), captured["value"]).group("result")
