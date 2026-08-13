@@ -9,7 +9,7 @@ See the file 'LICENSE' for copying permission
 Minimal pure-python TDS (Tabular Data Stream) client for Microsoft SQL Server (stdlib only).
 
 LOGIN7 / TDS 7.4 is the Microsoft dialect. Sybase ASE speaks TDS 5.0 - same 8-byte packet framing, but a
-LOGINREC login and its own token/type dialect - which is not implemented yet, so ASE still needs pymssql.
+LOGINREC login and its own token/type dialect - and lives in sybase.py, which reuses the framing below.
 
 Cleartext login only (TDS pre-login encryption negotiated to NOT_SUP); a server that forces encryption
 would need TLS-in-TDS which is out of scope for the dependency-free client. Implements PRELOGIN, LOGIN7,
@@ -43,9 +43,9 @@ _STATUS_EOM = 0x01
 def _u8(data, off):
     return struct.unpack("<B", data[off:off + 1])[0]
 
-def _send_message(sock, mtype, data):
-    # split into <= 4096-byte packets (8-byte header + <=4088 data); only the last carries the EOM status bit
-    chunk_size = 4088
+def _send_message(sock, mtype, data, chunk_size=4088):
+    # split into <= 4096-byte packets (8-byte header + <=4088 data); only the last carries the EOM status
+    # bit. chunk_size is smaller for a TDS 5 login, whose packet size is not negotiated yet (see sybase.py)
     packet_id = 0
     off = 0
     while True:

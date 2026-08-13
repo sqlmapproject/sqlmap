@@ -145,7 +145,7 @@ class Enumeration(GenericEnumeration):
 
         for db in dbs:
             for blind in blinds:
-                query = rootQuery.inband.query % db
+                query = rootQuery.inband.query % ((db,) * 7)
                 retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.name' % kb.aliasName], blind=blind, alias=kb.aliasName)
 
                 if retVal:
@@ -276,7 +276,7 @@ class Enumeration(GenericEnumeration):
             logger.info(infoMsg)
 
             for blind in blinds:
-                query = rootQuery.inband.query % (conf.db, conf.db, conf.db, conf.db, conf.db, conf.db, conf.db, unsafeSQLIdentificatorNaming(tbl))
+                query = rootQuery.inband.query % (conf.db, conf.db, conf.db, conf.db, conf.db, safeSQLIdentificatorNaming(tbl, True))
                 retVal = pivotDumpTable("(%s) AS %s" % (query, kb.aliasName), ['%s.name' % kb.aliasName, '%s.usertype' % kb.aliasName], blind=blind, alias=kb.aliasName)
 
                 if retVal:

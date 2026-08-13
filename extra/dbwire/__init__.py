@@ -11,8 +11,9 @@ sqlmap's direct ('-d') connection when no native driver (and no SQLAlchemy) is i
 
 Design note: connectors speak a *wire protocol*, not a product, so a single client covers the whole
 compatible family - e.g. the PostgreSQL client also serves CockroachDB, CrateDB, Redshift and Greenplum;
-a MySQL client serves MariaDB/TiDB/Aurora. Each module exposes a small PEP 249 (DB-API 2.0) subset
-(connect(), Connection.cursor()/commit()/close(), Cursor.execute()/fetchall()).
+a MySQL client serves MariaDB/TiDB/Aurora. Where a family split the protocol, so does the client: tds.py
+speaks Microsoft's TDS 7.x and sybase.py the TDS 5.0 that ASE kept. Each module exposes a small PEP 249
+(DB-API 2.0) subset (connect(), Connection.cursor()/commit()/close(), Cursor.execute()/fetchall()).
 """
 
 import socket

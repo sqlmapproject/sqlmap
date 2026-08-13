@@ -124,6 +124,28 @@ SYBASE_TYPES = {
     3: "binary",
     19: "text",
     20: "image",
+    # the rest of master..systypes on ASE 15/16 - without these, --schema prints the raw user type number
+    # for columns as ordinary as bigint, date and univarchar
+    34: "unichar",
+    35: "univarchar",
+    36: "unitext",
+    37: "date",
+    38: "time",
+    39: "daten",
+    40: "timen",
+    42: "longsysname",
+    43: "bigint",
+    44: "usmallint",
+    45: "uint",
+    46: "ubigint",
+    47: "uintn",
+    48: "bigdatetime",
+    49: "bigtime",
+    50: "bigdatetimen",
+    51: "bigtimen",
+    53: "text_locator",
+    54: "image_locator",
+    55: "unitext_locator",
 }
 
 ALTIBASE_TYPES = {
@@ -266,7 +288,7 @@ DBWIRE_MODULES = {
     DBMS.CRATEDB: "postgres",  # CrateDB speaks the PostgreSQL wire protocol
     DBMS.MYSQL: "mysql",
     DBMS.MSSQL: "tds",
-    DBMS.SYBASE: "tds",
+    DBMS.SYBASE: "sybase",  # ASE speaks TDS 5.0, a different login and token dialect than Microsoft's 7.x
     DBMS.CLICKHOUSE: "clickhouse",
     DBMS.MONETDB: "monetdb",
     DBMS.PRESTO: "presto",

@@ -79,6 +79,43 @@ class TestQueriesXmlCoverage(unittest.TestCase):
                                   % (dbms.get("value"), query, ex))
 
 
+    def test_tds_table_queries_carry_the_owner(self):
+        # Regression: safeSQLIdentificatorNaming() prepends DEFAULT_MSSQL_SCHEMA ('dbo.') to any MSSQL or
+        # Sybase table name that has no dot in it. A <tables> query that projects the bare name therefore
+        # makes every table owned by anyone but dbo unreachable: --columns/--count/--dump all end up asking
+        # for 'db.dbo.<table>'. Both dialects must join sysusers and project '<owner>.<table>'.
+        tree = ET.parse(os.path.join(ROOT, "data", "xml", "queries.xml"))
+        seen = 0
+        for dbms in tree.findall(".//dbms"):
+            if dbms.get("value") not in ("Microsoft SQL Server", "Sybase"):
+                continue
+            for node in dbms.iter("tables"):
+                query = (node.find("inband") if node.find("inband") is not None else node).get("query") or ""
+                if not query:
+                    continue
+                seen += 1
+                self.assertIn("sysusers", query, msg="%s <tables> does not resolve the table owner" % dbms.get("value"))
+                self.assertIn("+'.'+", query, msg="%s <tables> does not qualify the table with its owner" % dbms.get("value"))
+        self.assertEqual(seen, 2)
+
+    def test_sybase_catalog_queries_take_the_argument_count_the_plugin_passes(self):
+        # plugins/dbms/sybase/enumeration.py formats these with ((db,) * 7) and (db, db, db, db, db, table).
+        # pivotDumpTable() then selects '<alias>.name' (and '<alias>.usertype'), so those output column
+        # names have to survive the projection.
+        tree = ET.parse(os.path.join(ROOT, "data", "xml", "queries.xml"))
+        sybase = [_ for _ in tree.findall(".//dbms") if _.get("value") == "Sybase"][0]
+        tables = sybase.find("tables").find("inband").get("query")
+        columns = sybase.find("columns").find("inband").get("query")
+        self.assertEqual(tables.count("%s"), 7)
+        self.assertEqual(columns.count("%s"), 6)
+        self.assertIn("AS name", tables)
+        self.assertIn("usertype", columns)
+        # the table has to be resolved by owner, not by a bare sysobjects.name match: two owners can hold
+        # a same-named table, and matching on the name alone returned both tables' columns merged
+        self.assertIn("object_id(", columns)
+        self.assertNotIn("sysobjects.name='%s'", columns)
+
+
 class TestErrorsXmlCompile(unittest.TestCase):
     def test_all_error_regexes_compile(self):
         tree = ET.parse(os.path.join(ROOT, "data", "xml", "errors.xml"))

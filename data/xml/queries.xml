@@ -598,11 +598,11 @@
             <blind/>
         </dbs>
         <tables>
-            <inband query="SELECT name FROM %s..sysobjects WHERE type IN ('U','V')"/>
+            <inband query="SELECT %s..sysusers.name+'.'+%s..sysobjects.name AS name FROM %s..sysobjects,%s..sysusers WHERE %s..sysobjects.uid=%s..sysusers.uid AND %s..sysobjects.type IN ('U','V')"/>
             <blind/>
         </tables>
         <columns>
-            <inband query="SELECT %s..syscolumns.name,%s..syscolumns.usertype FROM %s..syscolumns,%s..sysobjects WHERE %s..syscolumns.id=%s..sysobjects.id AND %s..sysobjects.name='%s'" condition="[DB]..syscolumns.name"/>
+            <inband query="SELECT %s..syscolumns.name,%s..syscolumns.usertype FROM %s..syscolumns WHERE %s..syscolumns.id=object_id('%s.%s')" condition="[DB]..syscolumns.name"/>
             <blind/>
         </columns>
         <dump_table>

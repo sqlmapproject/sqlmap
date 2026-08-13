@@ -40,6 +40,7 @@ from extra.dbwire import mysql as _mysql
 from extra.dbwire import postgres as _postgres
 from extra.dbwire import presto as _presto
 from extra.dbwire import recvn
+from extra.dbwire import sybase as _sybase
 from extra.dbwire import tds as _tds
 
 
@@ -348,6 +349,158 @@ class TdsFramingTest(unittest.TestCase):
         self.assertIsNone(_tds._parse_tokens(sock)[2])
 
 
+class SybaseLoginTest(unittest.TestCase):
+    """The TDS 5.0 LOGINREC is one fixed-layout record: every field sits at a byte offset the server counts
+    on, so a field that changes width silently shifts the credentials into the reserved area."""
+
+    def _loginrec(self):
+        return _sybase._loginrec("dbwire", "tester", "guest1234", "dbwire", "srv", "utf8", 2048)
+
+    def test_field_offsets_match_the_fixed_layout(self):
+        login = self._loginrec()
+        self.assertEqual(len(login), 568 + 35, "LOGINREC is not the fixed 568 bytes plus a CAPABILITY token")
+        for offset, size, expected in ((0, 30, b"dbwire"), (31, 30, b"tester"), (62, 30, b"guest1234"),
+                                       (140, 30, b"dbwire"), (171, 30, b"srv"), (462, 10, b"dbwire"),
+                                       (525, 30, b"utf8"), (557, 6, b"2048")):
+            self.assertEqual(login[offset:offset + size].rstrip(b"\x00"), expected, offset)
+            self.assertEqual(login[offset + size:offset + size + 1], struct.pack("<B", len(expected)), offset)
+        self.assertEqual(login[458:462], b"\x05\x00\x00\x00", "TDS version is not 5.0.0.0")
+        self.assertEqual(login[202:204], b"\x00\x09", "remote password is not prefixed with its length")
+        self.assertEqual(login[457:458], struct.pack("<B", 11), "remote password length excludes the prefix")
+
+    def test_no_optional_capability_is_claimed(self):
+        """A claimed capability makes the server answer in that format. Everything this client cannot parse
+        - wide ROWFMT2 rows above all - has to stay unclaimed, so the server converts down to the baseline."""
+
+        capability = self._loginrec()[568:]
+        self.assertEqual(bytearray(capability)[0], 0xe2)
+        self.assertEqual(capability[3:5], b"\x01\x0e")           # request capabilities, 14 bytes
+        self.assertEqual(capability[5:19], b"\x00" * 14)
+        self.assertEqual(capability[19:21], b"\x02\x0e")         # response capabilities, 14 bytes
+        self.assertEqual(capability[21:35], b"\x00" * 14)
+
+
+class SybaseTokenTest(unittest.TestCase):
+    """Fixtures are bytes recorded off ASE 16's wire."""
+
+    def _response(self, blob):
+        class Replay(object):
+            def __init__(self, data):
+                self.data = bytearray(data)
+
+            def recv(self, count):
+                chunk = bytes(self.data[:count]); del self.data[:count]; return chunk
+
+        packet = struct.pack(">BBHHBB", 4, 1, len(blob) + 8, 0, 0, 0) + blob
+        return _sybase.Connection(Replay(packet), "utf-8")._read_response()
+
+    def test_rowfmt_and_row(self):
+        blob = (b"\xee\x19\x00\x02\x00\x03one\x10\x07\x00\x00\x00\x38\x00"
+                b"\x03txt\x10\x02\x00\x00\x00\x27\x03\x00"
+                b"\xd1\x01\x00\x00\x00\x03abc"
+                b"\xfd\x10\x00\x02\x00\x01\x00\x00\x00")
+        description, rows, affected = self._response(blob)
+        self.assertEqual([_[0] for _ in description], ["one", "txt"])
+        self.assertEqual(rows, [("1", "abc")])
+        self.assertEqual(affected, 1)
+
+    def test_done_row_count_is_four_bytes(self):
+        """Microsoft widened DoneRowCount to 8 bytes; ASE did not, so reading 8 here eats the next token."""
+
+        description, rows, affected = self._response(b"\xfd\x10\x00\x02\x00\x2a\x00\x00\x00")
+        self.assertIsNone(description)
+        self.assertEqual(affected, 42)
+        self.assertIsNone(self._response(b"\xfd\x00\x00\x02\x00\x2a\x00\x00\x00")[2],
+                          "a row count without the DONE_COUNT status bit is meaningless")
+
+    def test_server_error_is_raised_and_informational_message_is_not(self):
+        def eed(number, severity, message):
+            body = (struct.pack("<i", number) + struct.pack("<3B", 1, severity, 5) + b"ZZZZZ" +
+                    b"\x00" + struct.pack("<H", 1) + struct.pack("<H", len(message)) + message +
+                    struct.pack("<B", 8) + b"MYSYBASE" + b"\x00" + struct.pack("<H", 1))
+            return b"\xe5" + struct.pack("<H", len(body)) + body
+
+        # severity 10 and below is informational - 'Changed database context' arrives on every USE
+        self._response(eed(5701, 10, b"Changed database context to 'master'.") +
+                       b"\xfd\x00\x00\x02\x00\x00\x00\x00\x00")
+        fatal = eed(208, 16, b"nope not found. Specify owner.objectname")
+        try:
+            self._response(fatal + b"\xfd\x02\x00\x02\x00\x00\x00\x00\x00")
+            self.fail("a severity 16 server error was swallowed")
+        except dbwire.ProgrammingError as ex:
+            self.assertIn("not found", str(ex))
+
+    def test_packet_size_negotiation_is_honoured(self):
+        """A packet bigger than the login negotiated is not refused, the connection is dropped - so the
+        server's answer to the requested size has to become the send chunk size."""
+
+        envchange = b"\xe3\x07\x00\x04\x04" + b"8192" + b"\x00"
+        class Replay(object):
+            def __init__(self, data):
+                self.data = bytearray(data)
+
+            def recv(self, count):
+                chunk = bytes(self.data[:count]); del self.data[:count]; return chunk
+
+        blob = envchange + b"\xfd\x00\x00\x02\x00\x00\x00\x00\x00"
+        connection = _sybase.Connection(Replay(struct.pack(">BBHHBB", 4, 1, len(blob) + 8, 0, 0, 0) + blob), "utf-8")
+        self.assertEqual(connection._chunk, _sybase._PACKET_SIZE - 8)
+        connection._read_response()
+        self.assertEqual(connection._chunk, 8192 - 8)
+
+
+class SybaseDecoderTest(unittest.TestCase):
+    def _column(self, dtype, scale=0, usertype=0):
+        col = _sybase._Column()
+        col.name, col.type, col.size, col.scale, col.usertype = "c", dtype, 0, scale, usertype
+        return col
+
+    def test_numeric_is_the_mirror_image_of_the_microsoft_encoding(self):
+        """ASE sends a big-endian magnitude with 1 meaning negative; Microsoft sends little-endian with 1
+        meaning positive. Sharing one decoder between the two silently returns wrong numbers."""
+
+        for raw, scale, expected in ((b"\x01\x00\x00\xbcaN", 3, "-12345.678"),
+                                     (b"\x00\x00\x00'\x0f", 2, "99.99"),
+                                     (b"\x00\x00\x00\x00\x01", 0, "1"),
+                                     (b"\x01\x00\x00\x00\x01", 0, "-1")):
+            self.assertEqual(_sybase._decode_numeric(raw, scale), expected, raw)
+        self.assertNotEqual(_sybase._decode_numeric(b"\x01\x00\x00\xbcaN", 3),
+                            _tds._decode_numeric(b"\x01\x00\x00\xbcaN", 3))
+
+    def test_date_and_time_columns_survive_the_servers_conversion(self):
+        """Unclaimed date/time capabilities make ASE send both as a plain datetime; only the user type still
+        says how much of it the column holds."""
+
+        raw = struct.pack("<iI", 46245, 0)
+        self.assertEqual(_sybase._decode_value(self._column(0x6f, usertype=37), raw, "utf-8"), "2026-08-13")
+        raw = struct.pack("<iI", 0, 11001600)
+        self.assertEqual(_sybase._decode_value(self._column(0x6f, usertype=38), raw, "utf-8"), "10:11:12")
+        raw = struct.pack("<iI", 46245, 11001704)
+        self.assertTrue(_sybase._decode_value(self._column(0x6f), raw, "utf-8").startswith("2026-08-13 10:11:12"))
+
+    def test_unicode_columns_are_told_apart_by_user_type(self):
+        """univarchar travels as LONGBINARY: without the user type it would be hex-dumped as binary."""
+
+        raw = u"\u017eabac".encode("utf-16-le")
+        self.assertEqual(_sybase._decode_value(self._column(0xe1, usertype=35), raw, "utf-8"), u"\u017eabac")
+        self.assertEqual(_sybase._decode_value(self._column(0xe1), raw, "utf-8"), raw)
+
+    def test_integers_and_money(self):
+        self.assertEqual(_sybase._decode_value(self._column(0x26), b"\xc8", "utf-8"), "200")   # tinyint
+        self.assertEqual(_sybase._decode_value(self._column(0x26), b"\xf9\xff", "utf-8"), "-7")
+        self.assertEqual(_sybase._decode_value(self._column(0x26), b"\xff" * 7 + b"\x7f", "utf-8"),
+                         "9223372036854775807")
+        self.assertEqual(_sybase._decode_value(self._column(0x6e), b"\x00\x00\x00\x00\x40\xe2\x01\x00", "utf-8"),
+                         "12.3456")
+
+    def test_a_zero_length_value_is_null(self):
+        """TDS 5 has no separate NULL marker for a length-prefixed value - and neither has ASE."""
+
+        col = self._column(0x27)
+        self.assertIsNone(_sybase._read_value(col, b"\x00", 0, "utf-8")[0])
+        self.assertEqual(_sybase._read_value(col, b"\x03abc", 0, "utf-8")[0], "abc")
+
+
 class TrinoSessionStateTest(unittest.TestCase):
     """Trino is stateless on the wire: the server reports each session change as a response header and the
     client must echo it back, or USE / SET SESSION silently do nothing on the next statement."""
@@ -534,7 +687,7 @@ class HelperTest(unittest.TestCase):
         self.assertRaises(dbwire.InterfaceError, recvn, FakeSocket(b"AB"), 4)
 
     def test_every_module_exposes_the_dbapi_surface(self):
-        for name in ("postgres", "mysql", "tds", "firebird", "cubrid", "monetdb", "clickhouse", "presto"):
+        for name in ("postgres", "mysql", "tds", "sybase", "firebird", "cubrid", "monetdb", "clickhouse", "presto"):
             module = __import__("extra.dbwire.%s" % name, fromlist=["connect"])
             self.assertTrue(callable(getattr(module, "connect", None)), name)
 
