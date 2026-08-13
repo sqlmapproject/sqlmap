@@ -11,9 +11,11 @@ sqlmap's direct ('-d') connection when no native driver (and no SQLAlchemy) is i
 
 Design note: connectors speak a *wire protocol*, not a product, so a single client covers the whole
 compatible family - e.g. the PostgreSQL client also serves CockroachDB, CrateDB, Redshift and Greenplum;
-a MySQL client serves MariaDB/TiDB/Aurora; a TDS client serves MSSQL/Sybase. Each module exposes a small
-PEP 249 (DB-API 2.0) subset (connect(), Connection.cursor()/commit()/close(), Cursor.execute()/fetchall()).
+a MySQL client serves MariaDB/TiDB/Aurora. Each module exposes a small PEP 249 (DB-API 2.0) subset
+(connect(), Connection.cursor()/commit()/close(), Cursor.execute()/fetchall()).
 """
+
+import socket
 
 __version__ = "0.1"
 
@@ -71,6 +73,21 @@ def connection_lost(ex):
 
     return OperationalError("connection lost (%s)" % ex)
 
+def handshake_done(sock):
+    """
+    Drop the connect deadline, once the login exchange is over.
+
+    connect_timeout has to stay armed THROUGH the handshake, not just the TCP connect: a peer that
+    accepts the connection and then says nothing (a wrong port, a silent proxy, a dropping firewall) is
+    perfectly alive as far as keepalive() below is concerned, so an unbounded login read waits forever.
+    A query is the opposite case - see keepalive().
+    """
+
+    try:
+        sock.settimeout(None)
+    except Exception:
+        pass
+
 def keepalive(sock):
     """
     Ask the kernel to probe an idle connection, so a peer that dies without a FIN is eventually detected.
@@ -80,12 +97,29 @@ def keepalive(sock):
     failure being guarded against. Best-effort - the options are not portable everywhere.
     """
 
-    import socket as _socket
-
     try:
-        sock.setsockopt(_socket.SOL_SOCKET, _socket.SO_KEEPALIVE, 1)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
         for name, value in (("TCP_KEEPIDLE", 60), ("TCP_KEEPINTVL", 10), ("TCP_KEEPCNT", 5)):
-            if hasattr(_socket, name):
-                sock.setsockopt(_socket.IPPROTO_TCP, getattr(_socket, name), value)
+            if hasattr(socket, name):
+                sock.setsockopt(socket.IPPROTO_TCP, getattr(socket, name), value)
     except Exception:
         pass
+
+def recvn(sock, n):
+    """
+    Read exactly n bytes off `sock`, or raise - every wire protocol here is framed, so a short read is a
+    desynchronized stream, not a smaller message.
+
+    Shared because it was five identical copies: a fix to the recv loop has to land once, not per module.
+    """
+
+    buf = b""
+    while len(buf) < n:
+        try:
+            chunk = sock.recv(n - len(buf))
+        except (socket.error, OSError) as ex:
+            raise connection_lost(ex)
+        if not chunk:
+            raise InterfaceError("connection closed by server")
+        buf += chunk
+    return buf

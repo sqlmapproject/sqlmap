@@ -30,6 +30,7 @@ from _testutils import bootstrap
 bootstrap()
 
 import extra.dbwire as dbwire
+from extra.dbwire import clickhouse as _clickhouse
 from extra.dbwire import connection_lost
 from extra.dbwire import cubrid as _cubrid
 from extra.dbwire import firebird as _firebird
@@ -38,6 +39,7 @@ from extra.dbwire import monetdb as _monetdb
 from extra.dbwire import mysql as _mysql
 from extra.dbwire import postgres as _postgres
 from extra.dbwire import presto as _presto
+from extra.dbwire import recvn
 from extra.dbwire import tds as _tds
 
 
@@ -47,6 +49,7 @@ class FakeSocket(object):
     def __init__(self, inbound=b""):
         self.inbound = bytearray(inbound)
         self.sent = bytearray()
+        self.timeouts = []
         self.closed = False
 
     def feed(self, data):
@@ -62,8 +65,8 @@ class FakeSocket(object):
     def sendall(self, data):
         self.sent.extend(data)
 
-    def settimeout(self, _value):
-        pass
+    def settimeout(self, value):
+        self.timeouts.append(value)
 
     def setsockopt(self, *_args):
         pass
@@ -180,20 +183,23 @@ class PostgresScramTest(unittest.TestCase):
         self.assertRaises(dbwire.OperationalError, _postgres._authenticate, sock, "user", "secret")
 
 
-class MysqlCapabilityTest(unittest.TestCase):
-    def _handshake(self, server_caps):
-        payload = b"\x0a" + b"8.0.0-fake\x00" + struct.pack("<I", 1) + b"12345678" + b"\x00"
-        payload += struct.pack("<H", server_caps & 0xffff)
-        payload += b"\x21" + struct.pack("<H", 2)
-        payload += struct.pack("<H", (server_caps >> 16) & 0xffff)
-        payload += struct.pack("<B", 21) + (b"\x00" * 10) + b"123456789012\x00"
-        payload += b"mysql_native_password\x00"
-        return payload
+def _mysql_handshake(server_caps):
+    """The initial handshake packet of a server advertising `server_caps`."""
 
+    payload = b"\x0a" + b"8.0.0-fake\x00" + struct.pack("<I", 1) + b"12345678" + b"\x00"
+    payload += struct.pack("<H", server_caps & 0xffff)
+    payload += b"\x21" + struct.pack("<H", 2)
+    payload += struct.pack("<H", (server_caps >> 16) & 0xffff)
+    payload += struct.pack("<B", 21) + (b"\x00" * 10) + b"123456789012\x00"
+    payload += b"mysql_native_password\x00"
+    return payload
+
+
+class MysqlCapabilityTest(unittest.TestCase):
     def _connect_with(self, server_caps):
         """Drive the real handshake path with a fake server advertising `server_caps`."""
 
-        payload = self._handshake(server_caps)
+        payload = _mysql_handshake(server_caps)
         sock = FakeSocket(struct.pack("<I", len(payload))[:3] + b"\x00" + payload)
         self._last_sock = sock
         saved = socket.create_connection
@@ -226,6 +232,69 @@ class MysqlCapabilityTest(unittest.TestCase):
         self.assertEqual(flags & ~caps, 0, "client claimed capabilities the server did not advertise")
         self.assertTrue(flags & _mysql._CLIENT_PROTOCOL_41)
         self.assertFalse(flags & _mysql._CLIENT_PLUGIN_AUTH, "PLUGIN_AUTH was not advertised by the server")
+
+
+def _mysql_packets(data):
+    """Splits a recorded client byte stream into MySQL packet payloads."""
+
+    out, off = [], 0
+    while off + 4 <= len(data):
+        length = struct.unpack("<I", data[off:off + 3] + b"\x00")[0]
+        out.append(bytes(data[off + 4:off + 4 + length]))
+        off += 4 + length
+    return out
+
+
+class MysqlConnectTranscriptTest(unittest.TestCase):
+    """connect() has to keep the connect deadline armed until the login exchange is over, and the charset
+    has to end up set - a swallowed 'SET NAMES' failure decodes every later row as utf-8 that never was."""
+
+    _OK = b"\x00\x00\x00\x02\x00\x00\x00"
+    _ERR = b"\xff" + struct.pack("<H", 1115) + b"#42000" + b"Unknown character set: 'utf8mb4'"
+
+    def _packet(self, payload, seq=0):
+        return struct.pack("<I", len(payload))[:3] + struct.pack("<B", seq) + payload
+
+    def _connect(self, *replies):
+        caps = (_mysql._CLIENT_PROTOCOL_41 | _mysql._CLIENT_SECURE_CONNECTION | _mysql._CLIENT_PLUGIN_AUTH)
+        handshake = _mysql_handshake(caps)
+        inbound = self._packet(handshake) + b"".join(self._packet(_, 2) for _ in replies)
+        sock = FakeSocket(inbound)
+        saved = socket.create_connection
+        socket.create_connection = lambda *a, **k: sock
+        try:
+            connection = _mysql.connect(host="h", port=3306, user="u", password="p", database=None, connect_timeout=7)
+        finally:
+            socket.create_connection = saved
+        return connection, sock
+
+    def test_deadline_is_dropped_only_once_logged_in(self):
+        _connection, sock = self._connect(self._OK, self._OK, self._OK)
+        self.assertIsNone(sock.timeouts[-1], "connect deadline outlived the handshake")
+        self.assertNotIn(None, sock.timeouts[:-1], "connect deadline was dropped before the handshake")
+
+    def test_deadline_is_kept_when_the_server_goes_silent(self):
+        """A peer that accepts the connection and then says nothing is alive as far as keepalive() is
+        concerned - without a deadline the login read never returns."""
+
+        try:
+            self._connect()                 # nothing after the handshake packet
+            self.fail("a silent server was accepted")
+        except dbwire.Error:
+            pass
+
+    def test_charset_falls_back_when_utf8mb4_is_rejected(self):
+        """Pre-5.5.3 servers have no utf8mb4."""
+
+        _connection, sock = self._connect(self._OK, self._ERR, self._OK, self._OK)
+        queries = [_[1:] for _ in _mysql_packets(sock.sent) if _[:1] == b"\x03"]
+        self.assertEqual(queries[:2], [b"SET NAMES utf8mb4", b"SET NAMES utf8"])
+        self.assertIn(b"SET autocommit=1", queries)
+
+    def test_charset_fallback_is_not_sent_when_utf8mb4_is_accepted(self):
+        _connection, sock = self._connect(self._OK, self._OK, self._OK)
+        queries = [_[1:] for _ in _mysql_packets(sock.sent) if _[:1] == b"\x03"]
+        self.assertEqual(queries, [b"SET NAMES utf8mb4", b"SET autocommit=1"])
 
 
 class TdsFramingTest(unittest.TestCase):
@@ -387,6 +456,61 @@ class BoundedReadTest(unittest.TestCase):
             _monetdb._MAX_MESSAGE_LENGTH = saved
 
 
+class DecoderTest(unittest.TestCase):
+    """Byte fixtures for the socket-free decoders, taken from what the real servers put on the wire."""
+
+    def test_tds_column_name_is_a_character_count(self):
+        """COLMETADATA ColName is B_VARCHAR - a length in UCS-2 characters (MS-TDS 2.2.7.4), so the count
+        byte is followed by twice as many bytes."""
+
+        data = struct.pack("<B", 3) + u"abc".encode("utf-16-le") + b"TRAILING"
+        self.assertEqual(_tds._read_b_varchar(data, 0), ("abc", 7))
+        self.assertEqual(_tds._read_b_varchar(struct.pack("<B", 0) + b"X", 0), ("", 1))
+
+    def test_clickhouse_tabseparated_escapes(self):
+        """ClickHouse escapes only \\t \\n \\r \\0 \\b \\f \\' \\\\ - a control byte such as 0x01 is written
+        raw, and a String holding invalid UTF-8 comes back as bytes rather than mojibake."""
+
+        self.assertIsNone(_clickhouse._unescape(b"\\N"))
+        self.assertEqual(_clickhouse._unescape(b"tab\\there"), b"tab\there")
+        self.assertEqual(_clickhouse._unescape(b"nl\\nx"), b"nl\nx")
+        self.assertEqual(_clickhouse._unescape(b"a\\\\b"), b"a\\b")
+        self.assertEqual(_clickhouse._unescape(b"\\0"), b"\x00")
+        self.assertEqual(_clickhouse._unescape(b"\x01\x02"), b"\x01\x02")
+        self.assertEqual(_clickhouse._decode_cell(b"\x00\xff\x80"), b"\x00\xff\x80")
+
+    def test_postgres_bytea_both_output_formats(self):
+        """bytea arrives as text in whatever bytea_output the server is set to. 'escape' renders a literal
+        backslash as '\\\\', so it can never collide with the '\\x' hex-format prefix."""
+
+        for wire, expected in ((b"\\x5c78414243", b"\\xABC"),   # hex format
+                               (b"\\\\xABC", b"\\xABC"),        # escape format, value starts with a backslash
+                               (b"\\x00ff80", b"\x00\xff\x80"),
+                               (b"\\000\\377\\200", b"\x00\xff\x80"),
+                               (b"\\\\", b"\\"),
+                               (b"\\\\001", b"\\001")):
+            self.assertEqual(_postgres._decode_bytea(wire), expected, wire)
+
+    def test_monetdb_quoted_values_keep_the_delimiter_out(self):
+        """mserver escapes tab/quote/newline/backslash INSIDE a quoted value, so the literal ',\\t' field
+        delimiter cannot occur in one; control bytes arrive as C octal escapes."""
+
+        line = u'[ 2,\t"a,\\tb",\t"q\\"uote",\t"ctl:\\001",\t"euro-\u20ac",\tNULL\t]'
+        description, rows = _monetdb._parse_result(u"%% id,\tv # name\n%s" % line)
+        self.assertEqual([_[0] for _ in description], ["id", "v"])
+        self.assertEqual(rows, [("2", "a,\tb", 'q"uote', "ctl:\x01", u"euro-\u20ac", None)])
+
+    def test_cubrid_error_classification(self):
+        """CUBRID points at the offending token as "before '<fragment>'"; a coercion failure is a DataError."""
+
+        for message, expected in (("(remote) Syntax: In line 1, column 1 before ' 1'", dbwire.ProgrammingError),
+                                  ("(remote) Unknown class \"public.t\".", dbwire.ProgrammingError),
+                                  ("(remote) Cannot coerce value of domain \"character\" to domain \"integer\".",
+                                   dbwire.DataError),
+                                  ("(remote) unique constraint violated", dbwire.IntegrityError)):
+            self.assertRaises(expected, _cubrid.Connection._raise, -494, message)
+
+
 class HelperTest(unittest.TestCase):
     def test_socket_failure_maps_into_the_dbapi_hierarchy(self):
         """Callers of a PEP 249 driver only catch Error and its subclasses."""
@@ -399,6 +523,15 @@ class HelperTest(unittest.TestCase):
         self.assertEqual(http_origin("::1", 8123), "http://[::1]:8123")
         self.assertEqual(http_origin("[fe80::1]", 8123), "http://[fe80::1]:8123")
         self.assertEqual(http_origin(None, 8123), "http://localhost:8123")
+
+    def test_recvn_reads_exactly_n_bytes_across_chunks(self):
+        """Shared by every socket module: a framed protocol has no notion of a short read."""
+
+        sock = FakeSocket(b"ABCDEFGH")
+        original = sock.recv
+        sock.recv = lambda _count: original(3)          # dribble the stream 3 bytes at a time
+        self.assertEqual(recvn(sock, 8), b"ABCDEFGH")
+        self.assertRaises(dbwire.InterfaceError, recvn, FakeSocket(b"AB"), 4)
 
     def test_every_module_exposes_the_dbapi_surface(self):
         for name in ("postgres", "mysql", "tds", "firebird", "cubrid", "monetdb", "clickhouse", "presto"):

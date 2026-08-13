@@ -23,7 +23,9 @@ from extra.dbwire import InterfaceError
 from extra.dbwire import NotSupportedError
 from extra.dbwire import OperationalError
 from extra.dbwire import connection_lost
+from extra.dbwire import handshake_done
 from extra.dbwire import keepalive
+from extra.dbwire import recvn
 from extra.dbwire import ProgrammingError
 
 # capability flags
@@ -62,31 +64,19 @@ def _cstring(data, off):
         return data[off:], len(data)
     return data[off:end], end + 1
 
-def _recvn(sock, n):
-    buf = b""
-    while len(buf) < n:
-        try:
-            chunk = sock.recv(n - len(buf))
-        except (socket.error, OSError) as ex:
-            raise connection_lost(ex)
-        if not chunk:
-            raise InterfaceError("connection closed by server")
-        buf += chunk
-    return buf
-
 def _read_packet(sock):
-    header = _recvn(sock, 4)
+    header = recvn(sock, 4)
     length = struct.unpack("<I", header[0:3] + b"\x00")[0]
     seq = _u8(header, 3)
-    payload = _recvn(sock, length)
+    payload = recvn(sock, length)
     total = length
     while length == 0xffffff:  # payload continues in the next packet
-        header = _recvn(sock, 4)
+        header = recvn(sock, 4)
         length = struct.unpack("<I", header[0:3] + b"\x00")[0]
         total += length
         if total > _MAX_MESSAGE_LENGTH:
             raise InterfaceError("backend message too large (%d bytes)" % total)
-        payload += _recvn(sock, length)
+        payload += recvn(sock, length)
     return seq, payload
 
 def _send_packet(sock, seq, payload):
@@ -295,7 +285,6 @@ def connect(host=None, port=3306, user=None, password=None, database=None, conne
     try:
         sock = socket.create_connection((host or "localhost", int(port or 3306)), timeout=connect_timeout)
         keepalive(sock)
-        sock.settimeout(None)
     except (socket.error, socket.timeout) as ex:
         raise OperationalError("could not connect to '%s:%s' (%s)" % (host, port, ex))
 
@@ -352,6 +341,7 @@ def connect(host=None, port=3306, user=None, password=None, database=None, conne
         _send_packet(sock, seq + 1, response)
 
         _finish_auth(sock, password or "", plugin or "mysql_native_password", salt)
+        handshake_done(sock)
     except (DatabaseError, InterfaceError):
         _safe_close(sock)
         raise
@@ -363,12 +353,16 @@ def connect(host=None, port=3306, user=None, password=None, database=None, conne
     # SET NAMES: reset collation_connection to the server's default (the fixed handshake collation 45 =
     # utf8mb4_general_ci otherwise clashes with MySQL 8's utf8mb4_0900_ai_ci columns -> 'illegal mix of
     # collations' 1271 in a UNION/CONCAT); results stay utf8mb4 so the utf-8 decode is unchanged. autocommit=1
-    # so DML persists even if the server default is autocommit=0. Both best-effort (one-time, at connect).
-    for setup in ("SET NAMES utf8mb4", "SET autocommit=1"):
-        try:
-            connection._query(setup)
-        except Exception:
-            pass
+    # so DML persists even if the server default is autocommit=0. Best-effort (one-time, at connect) - but the
+    # charset has to land on *something*, else rows decode as utf-8 that never was: pre-5.5.3 servers have no
+    # utf8mb4, and 'utf8' (3-byte) is the fallback every 4.1+ server does have.
+    for alternatives in (("SET NAMES utf8mb4", "SET NAMES utf8"), ("SET autocommit=1",)):
+        for setup in alternatives:
+            try:
+                connection._query(setup)
+                break
+            except Exception:
+                pass
     return connection
 
 def _safe_close(sock):

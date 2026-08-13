@@ -29,7 +29,9 @@ from extra.dbwire import InterfaceError
 from extra.dbwire import NotSupportedError
 from extra.dbwire import OperationalError
 from extra.dbwire import connection_lost
+from extra.dbwire import handshake_done
 from extra.dbwire import keepalive
+from extra.dbwire import recvn
 from extra.dbwire import ProgrammingError
 
 _PROTOCOL_VERSION = 196608  # 3.0
@@ -70,24 +72,12 @@ def _xor(a, b):
         return b"".join(chr(ord(x) ^ ord(y)) for x, y in zip(a, b))
     return bytes(x ^ y for x, y in zip(a, b))
 
-def _recvn(sock, n):
-    buf = b""
-    while len(buf) < n:
-        try:
-            chunk = sock.recv(n - len(buf))
-        except (socket.error, OSError) as ex:
-            raise connection_lost(ex)
-        if not chunk:
-            raise InterfaceError("connection closed by server")
-        buf += chunk
-    return buf
-
 def _read_message(sock):
-    mtype = _recvn(sock, 1)
-    (length,) = struct.unpack("!I", _recvn(sock, 4))
+    mtype = recvn(sock, 1)
+    (length,) = struct.unpack("!I", recvn(sock, 4))
     if length < 4 or length > _MAX_MESSAGE_LENGTH:
         raise InterfaceError("invalid backend message length (%d)" % length)
-    return mtype, _recvn(sock, length - 4)
+    return mtype, recvn(sock, length - 4)
 
 def _send(sock, mtype, payload):
     try:
@@ -313,7 +303,6 @@ def connect(host=None, port=5432, user=None, password=None, database=None, conne
     try:
         sock = socket.create_connection((host or "localhost", int(port or 5432)), timeout=connect_timeout)
         keepalive(sock)
-        sock.settimeout(None)
     except (socket.error, socket.timeout) as ex:
         raise OperationalError("could not connect to '%s:%s' (%s)" % (host, port, ex))
 
@@ -331,6 +320,7 @@ def connect(host=None, port=5432, user=None, password=None, database=None, conne
                 _raise_server_error_as_operational(payload)
             if mtype == b"Z":
                 break
+        handshake_done(sock)
     except Exception:  # any setup failure (DB-API or otherwise) must still close the socket
         try:
             sock.close()

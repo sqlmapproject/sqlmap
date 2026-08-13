@@ -6,7 +6,10 @@ See the file 'LICENSE' for copying permission
 """
 
 """
-Minimal pure-python TDS (Tabular Data Stream) client for Microsoft SQL Server / Sybase (stdlib only).
+Minimal pure-python TDS (Tabular Data Stream) client for Microsoft SQL Server (stdlib only).
+
+LOGIN7 / TDS 7.4 is the Microsoft dialect. Sybase ASE speaks TDS 5.0 - same 8-byte packet framing, but a
+LOGINREC login and its own token/type dialect - which is not implemented yet, so ASE still needs pymssql.
 
 Cleartext login only (TDS pre-login encryption negotiated to NOT_SUP); a server that forces encryption
 would need TLS-in-TDS which is out of scope for the dependency-free client. Implements PRELOGIN, LOGIN7,
@@ -23,7 +26,9 @@ from extra.dbwire import InterfaceError
 from extra.dbwire import NotSupportedError
 from extra.dbwire import OperationalError
 from extra.dbwire import connection_lost
+from extra.dbwire import handshake_done
 from extra.dbwire import keepalive
+from extra.dbwire import recvn
 from extra.dbwire import ProgrammingError
 
 _MAX_MESSAGE_LENGTH = 0x40000000
@@ -37,18 +42,6 @@ _STATUS_EOM = 0x01
 
 def _u8(data, off):
     return struct.unpack("<B", data[off:off + 1])[0]
-
-def _recvn(sock, n):
-    buf = b""
-    while len(buf) < n:
-        try:
-            chunk = sock.recv(n - len(buf))
-        except (socket.error, OSError) as ex:
-            raise connection_lost(ex)
-        if not chunk:
-            raise InterfaceError("connection closed by server")
-        buf += chunk
-    return buf
 
 def _send_message(sock, mtype, data):
     # split into <= 4096-byte packets (8-byte header + <=4088 data); only the last carries the EOM status bit
@@ -75,14 +68,14 @@ def _read_message(sock):
     # chunks in a list so reassembly stays linear rather than re-copying a growing immutable buffer.
     chunks, total = [], 0
     while True:
-        header = _recvn(sock, 8)
+        header = recvn(sock, 8)
         mtype, status, length = struct.unpack(">BBH", header[:4])
         if length < 8:
             raise InterfaceError("invalid TDS packet length (%d)" % length)
         total += length - 8
         if total > _MAX_MESSAGE_LENGTH:
             raise InterfaceError("TDS message exceeds the maximum allowed length (%d bytes)" % _MAX_MESSAGE_LENGTH)
-        chunks.append(_recvn(sock, length - 8))
+        chunks.append(recvn(sock, length - 8))
         if status & _STATUS_EOM:
             break
     return b"".join(chunks)
@@ -160,7 +153,10 @@ def _login7(sock, user, password, database, hostname="dbwire", appname="dbwire")
 
 # ---- token stream + type decoding --------------------------------------------------------------------
 
-def _read_us_varchar(data, off):
+def _read_b_varchar(data, off):
+    # B_VARCHAR: 1-byte length in UCS-2 *characters* (not bytes), then that many 16-bit units. COLMETADATA's
+    # ColName is a B_VARCHAR (MS-TDS 2.2.7.4) - identifiers cap at 128 chars and an unaliased expression
+    # column comes back with an empty name, so the one-byte count cannot overflow.
     (n,) = struct.unpack("<B", data[off:off + 1])
     return data[off + 1:off + 1 + n * 2].decode("utf-16-le", "replace"), off + 1 + n * 2
 
@@ -496,7 +492,7 @@ def _parse_tokens(sock, login=False):
                     (numparts,) = struct.unpack("<B", data[off:off + 1]); off += 1
                     for _ in range(numparts):
                         (plen,) = struct.unpack("<H", data[off:off + 2]); off += 2 + plen * 2
-                col.name, off = _read_us_varchar(data, off)
+                col.name, off = _read_b_varchar(data, off)
                 columns.append(col)
             description = [(c.name, c.type, None, None, None, None, None) for c in columns]
         elif token == 0xd1:  # ROW
@@ -611,13 +607,13 @@ def connect(host=None, port=1433, user=None, password=None, database=None, conne
     try:
         sock = socket.create_connection((host or "localhost", int(port or 1433)), timeout=connect_timeout)
         keepalive(sock)
-        sock.settimeout(None)
     except (socket.error, socket.timeout) as ex:
         raise OperationalError("could not connect to '%s:%s' (%s)" % (host, port, ex))
 
     try:
         _prelogin(sock)
         _login7(sock, user, password, database)
+        handshake_done(sock)
     except (DatabaseError, InterfaceError):
         try:
             sock.close()

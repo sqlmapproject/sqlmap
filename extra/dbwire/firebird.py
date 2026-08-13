@@ -27,7 +27,9 @@ from extra.dbwire import InterfaceError
 from extra.dbwire import NotSupportedError
 from extra.dbwire import OperationalError
 from extra.dbwire import connection_lost
+from extra.dbwire import handshake_done
 from extra.dbwire import keepalive
+from extra.dbwire import recvn
 
 # operation codes
 _op_connect = 1
@@ -296,16 +298,7 @@ class _Wire(object):
             raise connection_lost(ex)
 
     def _recv_raw(self, n):
-        buf = b""
-        while len(buf) < n:
-            try:
-                chunk = self._sock.recv(n - len(buf))
-            except (socket.error, OSError) as ex:
-                raise connection_lost(ex)
-            if not chunk:
-                raise InterfaceError("connection closed by server")
-            buf += chunk
-        return buf
+        return recvn(self._sock, n)
 
     def recv(self, n, align=False):
         # every length here comes off the wire (response buffers, status strings, per-value lengths): a
@@ -329,6 +322,38 @@ class _Wire(object):
             self._sock.close()
         except Exception:
             pass
+
+def _parse_response(wire):
+    head = wire.recv(16)
+    handle = struct.unpack("!i", head[:4])[0]
+    object_id = head[4:12]
+    buf = wire.recv(struct.unpack("!i", head[12:16])[0], align=True)
+    _check_status(wire)
+    return handle, object_id, buf
+
+def _check_status(wire):
+    gds, message = set(), ""
+    n = wire.recv_int()
+    while n != _isc_arg_end:
+        if n == _isc_arg_gds:
+            gds_code = wire.recv_int()
+            if gds_code:
+                gds.add(gds_code)
+        elif n == _isc_arg_number:
+            message += " %d" % wire.recv_int()
+        elif n in (_isc_arg_string, _isc_arg_interpreted, _isc_arg_sql_state):
+            s = wire.recv(wire.recv_int(), align=True)
+            if n != _isc_arg_sql_state:
+                message += " " + s.decode("utf-8", "replace")
+        n = wire.recv_int()
+    if gds:
+        message = ("(remote) firebird error %s%s" % (sorted(gds), message)).strip()
+        if gds & _GDS_INTEGRITY:
+            raise IntegrityError(message)
+        if gds & _GDS_DATA:
+            raise DataError(message)
+        if _GDS_WARNING not in gds:
+            raise OperationalError(message)
 
 def _pack_int(v):
     return struct.pack("!i", v)
@@ -461,39 +486,7 @@ class Connection(object):
             op = self._wire.recv_int()
         if op != _op_response:
             raise OperationalError("unexpected Firebird operation %d" % op)
-        return self._parse_response()
-
-    def _parse_response(self):
-        head = self._wire.recv(16)
-        handle = struct.unpack("!i", head[:4])[0]
-        object_id = head[4:12]
-        buf = self._wire.recv(struct.unpack("!i", head[12:16])[0], align=True)
-        self._check_status()
-        return handle, object_id, buf
-
-    def _check_status(self):
-        gds, message = set(), ""
-        n = self._wire.recv_int()
-        while n != _isc_arg_end:
-            if n == _isc_arg_gds:
-                gds_code = self._wire.recv_int()
-                if gds_code:
-                    gds.add(gds_code)
-            elif n == _isc_arg_number:
-                message += " %d" % self._wire.recv_int()
-            elif n in (_isc_arg_string, _isc_arg_interpreted, _isc_arg_sql_state):
-                s = self._wire.recv(self._wire.recv_int(), align=True)
-                if n != _isc_arg_sql_state:
-                    message += " " + s.decode("utf-8", "replace")
-            n = self._wire.recv_int()
-        if gds:
-            message = ("(remote) firebird error %s%s" % (sorted(gds), message)).strip()
-            if gds & _GDS_INTEGRITY:
-                raise IntegrityError(message)
-            if gds & _GDS_DATA:
-                raise DataError(message)
-            if _GDS_WARNING not in gds:
-                raise OperationalError(message)
+        return _parse_response(self._wire)
 
     # ---- query ----
 
@@ -632,7 +625,7 @@ class Connection(object):
                 op = self._wire.recv_int()
             if op != _op_fetch_response:
                 if op == _op_response:
-                    self._parse_response()
+                    _parse_response(self._wire)
                 raise OperationalError("unexpected Firebird operation %d during fetch" % op)
             status = self._wire.recv_int()
             count = self._wire.recv_int()
@@ -765,7 +758,6 @@ def connect(host=None, port=3050, user=None, password=None, database=None, conne
     try:
         sock = socket.create_connection((host or "localhost", int(port or 3050)), timeout=connect_timeout)
         keepalive(sock)
-        sock.settimeout(None)
     except (socket.error, socket.timeout) as ex:
         raise OperationalError("could not connect to '%s:%s' (%s)" % (host, port, ex))
 
@@ -782,6 +774,7 @@ def connect(host=None, port=3050, user=None, password=None, database=None, conne
         _authenticate(wire, user, password, public_key, private_key)
         connection = Connection(wire, filename, user, password)
         _attach(connection, wire, user)
+        handshake_done(sock)
     except (DatabaseError, InterfaceError):
         wire.close()
         raise
@@ -805,7 +798,7 @@ def _authenticate(wire, user, password, public_key, private_key):
     if op == _op_reject:
         raise OperationalError("Firebird connection rejected")
     if op == _op_response:
-        Connection(wire, b"", user, password)._parse_response()  # will raise the server error
+        _parse_response(wire)  # will raise the server error
         raise OperationalError("Firebird connection rejected")
 
     wire.recv(12)  # accept block: protocol version / architecture / type (not needed once lazy-send is off)
@@ -858,7 +851,7 @@ def _read_response(wire, user, password):
         raise OperationalError("Firebird authentication failed")
     if op != _op_response:
         raise OperationalError("unexpected Firebird operation %d during login" % op)
-    return Connection(wire, b"", user, password)._parse_response()[2]
+    return _parse_response(wire)[2]
 
 def _attach(connection, wire, user):
     dpb = bytearray([_isc_dpb_version1])

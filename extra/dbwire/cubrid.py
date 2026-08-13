@@ -24,7 +24,9 @@ from extra.dbwire import IntegrityError
 from extra.dbwire import NotSupportedError
 from extra.dbwire import OperationalError
 from extra.dbwire import connection_lost
+from extra.dbwire import handshake_done
 from extra.dbwire import keepalive
+from extra.dbwire import recvn
 from extra.dbwire import ProgrammingError
 
 _MAGIC = b"CUBRK"
@@ -261,23 +263,13 @@ class Connection(object):
         self._sock = None
 
     def _recvn(self, n):
-        buf = b""
-        while len(buf) < n:
-            try:
-                chunk = self._sock.recv(n - len(buf))
-            except (socket.error, OSError) as ex:
-                raise connection_lost(ex)
-            if not chunk:
-                raise InterfaceError("connection closed by server")
-            buf += chunk
-        return buf
+        return recvn(self._sock, n)
 
     def _open(self):
         # broker handshake (may redirect to a dedicated CAS worker port), then cleartext OPEN_DATABASE login
         try:
             sock = socket.create_connection((self._host, self._port), timeout=self._timeout)
             keepalive(sock)
-            sock.settimeout(None)
             sock.sendall(_MAGIC + struct.pack(">BB", _CLIENT_JDBC, _CAS_VERSION) + b"\x00\x00\x00")
             self._sock = sock
             (port,) = struct.unpack(">i", self._recvn(4))
@@ -287,21 +279,25 @@ class Connection(object):
                 self._safe_close()
                 sock = socket.create_connection((self._host, port), timeout=self._timeout)
                 keepalive(sock)
-                sock.settimeout(None)
                 self._sock = sock
+
+            login = self._fixed(self._database, 32) + self._fixed(self._user, 32) + self._fixed(self._password, 32)
+            login += b"\x00" * 532  # 512 extended-info + 20 reserved
+            self._sock.sendall(login)
+            reader = self._read_response()
+            reader.int()             # response_code (>=0; errors already raised in _read_response)
+            broker = reader.raw(8)
+            self._protocol_version = bytearray(broker)[4] & 0x3f
+            # enable auto-commit so each statement is independent (avoids the CAS keep-connection handshake dance)
+            self._call(_Writer(_FC_SET_DB_PARAMETER).arg_int(_PARAM_AUTO_COMMIT).arg_int(1))
         except (socket.error, socket.timeout) as ex:
             self._safe_close()
             raise OperationalError("could not connect to '%s:%s' (%s)" % (self._host, self._port, ex))
+        except Exception:   # a rejected login (or connection_lost() out of _recvn) is still ours to close
+            self._safe_close()
+            raise
 
-        login = self._fixed(self._database, 32) + self._fixed(self._user, 32) + self._fixed(self._password, 32)
-        login += b"\x00" * 532  # 512 extended-info + 20 reserved
-        self._sock.sendall(login)
-        reader = self._read_response()
-        reader.int()                 # response_code (>=0; errors already raised in _read_response)
-        broker = reader.raw(8)
-        self._protocol_version = bytearray(broker)[4] & 0x3f
-        # enable auto-commit so each statement is independent (avoids the CAS keep-connection handshake dance)
-        self._call(_Writer(_FC_SET_DB_PARAMETER).arg_int(_PARAM_AUTO_COMMIT).arg_int(1))
+        handshake_done(self._sock)
 
     @staticmethod
     def _fixed(value, length):
@@ -347,9 +343,9 @@ class Connection(object):
         text = message.lower()
         if any(k in text for k in ("unique", "duplicate", "foreign key", "constraint violat")):
             raise IntegrityError(message)
-        if any(k in text for k in ("syntax", "unknown class", "does not exist", "not found", "before ' '")):
-            raise ProgrammingError(message)
-        if any(k in text for k in ("cast", "conversion", "overflow", "truncat")):
+        if any(k in text for k in ("syntax", "unknown class", "does not exist", "not found", "before '")):
+            raise ProgrammingError(message)  # CUBRID points at the offending token as: before ' ,'y')'
+        if any(k in text for k in ("cast", "coerce", "conversion", "overflow", "truncat")):
             raise DataError(message)
         raise ProgrammingError(message)
 

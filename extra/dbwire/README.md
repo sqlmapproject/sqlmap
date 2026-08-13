@@ -22,7 +22,7 @@ A wire protocol is shared across a whole family of products, so one client serve
 |-----------------|---------------------|---------|
 | `postgres.py`   | PostgreSQL v3       | PostgreSQL, CockroachDB, CrateDB, Redshift, Greenplum, Vertica |
 | `mysql.py`      | MySQL client/server | MySQL, MariaDB, TiDB, Aurora (MySQL), Percona |
-| `tds.py`        | TDS                 | Microsoft SQL Server, Sybase |
+| `tds.py`        | TDS 7.x             | Microsoft SQL Server |
 | `firebird.py`   | Firebird wire       | Firebird 3 / 4 / 5 |
 | `cubrid.py`     | CUBRID CAS          | CUBRID |
 | `clickhouse.py` | HTTP (TabSeparated) | ClickHouse and HTTP-compatible forks |
@@ -57,7 +57,9 @@ parameter binding, prepared statements, bulk load/`COPY`, or TLS. Notable per-pr
   `caching_sha2_password` authentication over a plaintext connection requires RSA/TLS and is not
   supported; use a `mysql_native_password` account for the dependency-free path.
 - **TDS** - cleartext login only. Servers that force encryption (for example Azure SQL Database)
-  require TLS and are not supported here; the native driver or SQLAlchemy tier covers those.
+  require TLS and are not supported here; the native driver or SQLAlchemy tier covers those. LOGIN7 is the
+  Microsoft dialect (TDS 7.x); Sybase ASE speaks TDS 5.0 (LOGINREC + its own token dialect), which is not
+  implemented yet - ASE `-d` goes through the pymssql/FreeTDS tier for now.
 - **Firebird** - SRP-256 (and SRP) authentication with ChaCha20 or RC4 wire encryption, as required by
   default on Firebird 3 and later. Legacy (pre-SRP) authentication is not implemented.
 - **CUBRID** - cleartext login over the CAS broker protocol. Large objects (BLOB/CLOB) are returned as

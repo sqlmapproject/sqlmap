@@ -23,35 +23,25 @@ from extra.dbwire import InterfaceError
 from extra.dbwire import NotSupportedError
 from extra.dbwire import OperationalError
 from extra.dbwire import connection_lost
+from extra.dbwire import handshake_done
 from extra.dbwire import keepalive
+from extra.dbwire import recvn
 from extra.dbwire import ProgrammingError
 
 _MAX_BLOCK = 0xffff >> 1
 _MAX_MESSAGE_LENGTH = 0x40000000  # cap on a (re-assembled) response, to bound a hostile/corrupt stream
-
-def _recvn(sock, n):
-    buf = b""
-    while len(buf) < n:
-        try:
-            chunk = sock.recv(n - len(buf))
-        except (socket.error, OSError) as ex:
-            raise connection_lost(ex)
-        if not chunk:
-            raise InterfaceError("connection closed by server")
-        buf += chunk
-    return buf
 
 def _getblock(sock):
     # the block length is a 15-bit field, so bounding IT is pointless - a peer that never sets the last-flag
     # simply streams blocks forever. Bound the accumulated response instead (as the other wire modules do).
     chunks, total = [], 0
     while True:
-        (header,) = struct.unpack("<H", _recvn(sock, 2))
+        (header,) = struct.unpack("<H", recvn(sock, 2))
         length, last = header >> 1, header & 1
         total += length
         if total > _MAX_MESSAGE_LENGTH:
             raise InterfaceError("backend message too large (%d bytes)" % total)
-        chunks.append(_recvn(sock, length))
+        chunks.append(recvn(sock, length))
         if last:
             break
     return b"".join(chunks).decode("utf-8", "replace")
@@ -201,7 +191,6 @@ def connect(host=None, port=50000, user=None, password=None, database=None, conn
     try:
         sock = socket.create_connection((host, port), timeout=connect_timeout)
         keepalive(sock)
-        sock.settimeout(None)
     except (socket.error, socket.timeout) as ex:
         raise OperationalError("could not connect to '%s:%s' (%s)" % (host, port, ex))
 
@@ -218,7 +207,6 @@ def connect(host=None, port=50000, user=None, password=None, database=None, conn
                     host, port, database = m.group(1), int(m.group(2)), m.group(3) or database
                     sock = socket.create_connection((host, port), timeout=connect_timeout)
                     keepalive(sock)
-                    sock.settimeout(None)
                 continue  # merovingian proxy redirect: keep reading the next challenge on this socket
             if block[0] == "!":
                 raise OperationalError("(remote) %s" % block[1:].strip())
@@ -244,4 +232,9 @@ def connect(host=None, port=50000, user=None, password=None, database=None, conn
     except (socket.error, socket.timeout) as ex:
         connection.close()
         raise OperationalError("connection error: %s" % ex)
+    except Exception:   # e.g. connection_lost() out of _putblock/_getblock: the socket is still ours to close
+        connection.close()
+        raise
+
+    handshake_done(sock)
     return connection
