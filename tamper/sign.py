@@ -19,10 +19,12 @@ def tamper(payload, **kwargs):
     Replaces greater than operator ('>') with 'SIGN' counterpart (e.g. SIGN((A)-(B))=1)
 
     Tested against:
-        * MySQL 5
-        * Oracle 11g
-        * PostgreSQL 9
-        * Microsoft SQL Server 2012
+        * MySQL 8.4.9
+        * MariaDB 11.8.8
+        * PostgreSQL 16.11
+        * SQLite 3.45.1
+        * Microsoft SQL Server 2022
+        * Oracle 23ai
 
     Notes:
         * Useful to bypass filtering of comparison operators altogether (>, <,

@@ -48,15 +48,18 @@ def tamper(payload, **kwargs):
 
     Requirement:
         * MySQL
-        * SQLite (possibly)
-        * SAP MaxDB (possibly)
+        * MariaDB
 
     Tested against:
-        * MySQL 5.0 and 5.5
+        * MySQL 8.4.9
+        * MariaDB 11.8.8
 
     Notes:
         * Useful to bypass very weak and bespoke web application firewalls
           that filter the IF() functions
+        * The CASE replacement itself is standard SQL and runs anywhere, but the
+          'IF(A, B, C)' input form is MySQL/MariaDB-only (SQLite, for one, has no
+          IF() function), so there is nothing to rewrite on other engines
 
     >>> tamper('IF(1, 2, 3)')
     'CASE WHEN (1) THEN (2) ELSE (3) END'

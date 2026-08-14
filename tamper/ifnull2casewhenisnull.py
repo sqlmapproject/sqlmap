@@ -19,15 +19,17 @@ def tamper(payload, **kwargs):
 
     Requirement:
         * MySQL
-        * SQLite (possibly)
-        * SAP MaxDB (possibly)
+        * MariaDB
 
     Tested against:
-        * MySQL 5.0 and 5.5
+        * MySQL 8.4.9
+        * MariaDB 11.8.8
 
     Notes:
         * Useful to bypass very weak and bespoke web application firewalls
           that filter the IFNULL() functions
+        * NOT usable against SQLite, despite it having IFNULL(): the replacement
+          needs ISNULL(), which SQLite does not provide
 
     >>> tamper('IFNULL(1, 2)')
     'CASE WHEN ISNULL(1) THEN (2) ELSE (1) END'

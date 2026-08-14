@@ -18,16 +18,26 @@ def tamper(payload, **kwargs):
     """
     Replaces greater than operator ('>') with 'GREATEST' counterpart
 
+    Requirement:
+        * MySQL
+        * MariaDB
+        * PostgreSQL
+        * Microsoft SQL Server >= 2022
+        * Oracle
+
     Tested against:
-        * MySQL 4, 5.0 and 5.5
-        * Oracle 10g
-        * PostgreSQL 8.3, 8.4, 9.0
+        * MySQL 8.4.9
+        * MariaDB 11.8.8
+        * PostgreSQL 16.11
+        * Microsoft SQL Server 2022
+        * Oracle 23ai
 
     Notes:
         * Useful to bypass weak and bespoke web application firewalls that
           filter the greater than character
-        * The GREATEST clause is a widespread SQL command. Hence, this
-          tamper script should work against majority of databases
+        * NOT usable against SQLite, which has no GREATEST() (it overloads
+          MAX() for the multi-argument case instead). Microsoft SQL Server
+          only gained GREATEST() in 2022
 
     >>> tamper('1 AND A > B')
     '1 AND GREATEST(A,B+1)=A'
