@@ -48,4 +48,5 @@ sqlmap의 능력, 지원되는 기능과 모든 옵션과 스위치들의 목록
 * 트위터: [@sqlmap](https://x.com/sqlmap)
 * 시연 영상: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * 플레이그라운드: https://sekumart.sekuripy.hr
+* 연구: https://www.sekuripy.hr/labs/sqlmap/#research
 * 스크린샷: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

@@ -51,4 +51,5 @@ Tautan
 * X: [@sqlmap](https://x.com/sqlmap)
 * Video Demo [#1](https://www.youtube.com/user/inquisb/videos) dan [#2](https://www.youtube.com/user/stamparm/videos)
 * Arena latihan: https://sekumart.sekuripy.hr
+* Riset: https://www.sekuripy.hr/labs/sqlmap/#research
 * Tangkapan Layar: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

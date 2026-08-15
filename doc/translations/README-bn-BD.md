@@ -59,5 +59,6 @@ SQLMap-এর সম্পূর্ণ ফিচার, ক্ষমতা, এ�
 * X: [@sqlmap](https://x.com/sqlmap)
 * ডেমো ভিডিও: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * অনুশীলন সাইট: https://sekumart.sekuripy.hr
+* গবেষণা: https://www.sekuripy.hr/labs/sqlmap/#research
 * স্ক্রিনশট: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
 

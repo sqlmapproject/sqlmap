@@ -47,4 +47,5 @@ sqlmap ნებისმიერ პლატფორმაზე მუშ�
 * X: [@sqlmap](https://x.com/sqlmap)
 * დემონსტრაციები: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * სავარჯიშო სივრცე: https://sekumart.sekuripy.hr
+* კვლევა: https://www.sekuripy.hr/labs/sqlmap/#research
 * ეკრანის ანაბეჭდები: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

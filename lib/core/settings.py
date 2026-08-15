@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.8.35"
+VERSION = "1.10.8.36"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -1706,6 +1706,24 @@ PLAIN_TEXT_CONTENT_TYPE = "text/plain; charset=utf-8"
 
 # Length used while checking for existence of Suhosin-patch (like) protection mechanism
 SUHOSIN_MAX_VALUE_LENGTH = 512
+
+# Multi-bit blind inference ("row multiplexing"): one rendered row carries one bit, so a single
+# response yields whole characters instead of a single boolean. Needs '--risk=3' (it widens the
+# result set with OR) and proves every value back against the target before returning it.
+MAX_MULTIBIT_LENGTH = 8192           # hard ceiling when the value length is unknown (anti-runaway)
+MAX_MULTIBIT_PAGE = 1048576          # response bytes parsed for repeated row markup (larger pages are truncated)
+MULTIBIT_BITS_PER_CHAR = 8           # one whole byte per character, one row per bit
+MULTIBIT_PLANES = 7                  # bit planes used to map rows in bulk (i.e. a window of 2**7 identifiers)
+MULTIBIT_CANDIDATE_COLUMNS = 3       # row identifier candidates tried before giving up on a parameter
+MULTIBIT_SAMPLES = 3                 # repeats used to separate stable row markers from per-response junk
+MULTIBIT_CALIBRATION_ROUNDS = 5      # random subsets checked before superposition is trusted
+MULTIBIT_CONFIRM_CHUNK = 64          # characters proven back per confirmation request
+MULTIBIT_MAX_FAILURES = 3            # unconfirmed values in a row before the channel is abandoned
+MULTIBIT_MAX_PLANES = 12             # planes used to place the page's own (not necessarily consecutive) rows
+MULTIBIT_MIN_BITS = 2                # bits per request below which there is nothing to gain
+MULTIBIT_NARROW = "narrow"           # AND-ed onto the live value: the page's own rows, any risk level
+MULTIBIT_WIDEN = "widen"             # OR-ed against a negated one: the whole table, asked for below its risk
+MULTIBIT_WIDEN_RISK = 3              # risk the widen channel amounts to (OR payloads, boolean_blind.xml)
 
 # Minimum size of an (binary) entry before it can be considered for dumping to disk
 MIN_BINARY_DISK_DUMP_SIZE = 100

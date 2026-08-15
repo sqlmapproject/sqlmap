@@ -47,4 +47,5 @@ Links
 * X: [@sqlmap](https://x.com/sqlmap)
 * Demonstrationen: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * Spielwiese: https://sekumart.sekuripy.hr
+* Forschung: https://www.sekuripy.hr/labs/sqlmap/#research
 * Screenshots: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

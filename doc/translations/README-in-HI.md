@@ -47,5 +47,6 @@ sqlmap [Python](https://www.python.org/download/) संस्करण **2.7** 
 * ट्विटर: [@sqlmap](https://x.com/sqlmap)
 * डेमो: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * अभ्यास स्थल: https://sekumart.sekuripy.hr
+* अनुसंधान: https://www.sekuripy.hr/labs/sqlmap/#research
 * स्क्रीनशॉट: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
 * 

@@ -50,4 +50,5 @@ Liên kết
 * X: [@sqlmap](https://x.com/sqlmap)
 * Demo: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * Sân tập: https://sekumart.sekuripy.hr
+* Nghiên cứu: https://www.sekuripy.hr/labs/sqlmap/#research
 * Ảnh chụp màn hình: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

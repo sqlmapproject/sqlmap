@@ -48,4 +48,5 @@
 * X: [@sqlmap](https://x.com/sqlmap)
 * Demos: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * Χώρος δοκιμών: https://sekumart.sekuripy.hr
+* Έρευνα: https://www.sekuripy.hr/labs/sqlmap/#research
 * Εικόνες: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

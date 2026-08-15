@@ -51,4 +51,5 @@ Bağlantılar
 * X: [@sqlmap](https://x.com/sqlmap)
 * Demolar: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * Deneme alanı: https://sekumart.sekuripy.hr
+* Araştırma: https://www.sekuripy.hr/labs/sqlmap/#research
 * Ekran görüntüleri: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

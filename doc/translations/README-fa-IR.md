@@ -82,4 +82,5 @@
 * توییتر: [@sqlmap](https://x.com/sqlmap)
 * رسانه: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * زمین تمرین: https://sekumart.sekuripy.hr
+* پژوهش: https://www.sekuripy.hr/labs/sqlmap/#research
 * تصاویر: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

@@ -49,4 +49,5 @@ sqlmapの概要、機能の一覧、全てのオプションやスイッチの�
 * X: [@sqlmap](https://x.com/sqlmap)
 * デモ: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * プレイグラウンド: https://sekumart.sekuripy.hr
+* 研究: https://www.sekuripy.hr/labs/sqlmap/#research
 * スクリーンショット: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

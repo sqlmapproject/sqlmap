@@ -48,4 +48,5 @@ Odnośniki
 * X: [@sqlmap](https://x.com/sqlmap)
 * Dema: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * Piaskownica: https://sekumart.sekuripy.hr
+* Badania: https://www.sekuripy.hr/labs/sqlmap/#research
 * Zrzuty ekranu: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

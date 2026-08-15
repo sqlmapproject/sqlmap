@@ -66,4 +66,5 @@
 * تويتر: [@sqlmap](https://x.com/sqlmap)
 * العروض التوضيحية: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * ساحة التدريب: https://sekumart.sekuripy.hr
+* الأبحاث: https://www.sekuripy.hr/labs/sqlmap/#research
 * لقطات الشاشة: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots 

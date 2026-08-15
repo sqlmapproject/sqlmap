@@ -48,4 +48,5 @@ Poveznice
 * X: [@sqlmap](https://x.com/sqlmap)
 * Demo: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * Vježbalište: https://sekumart.sekuripy.hr
+* Istraživanje: https://www.sekuripy.hr/labs/sqlmap/#research
 * Slike zaslona: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
