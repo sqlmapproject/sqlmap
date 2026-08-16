@@ -20,6 +20,9 @@
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
         <hex query="HEX(%s)"/>
         <inference query="ORD(MID((%s),%d,1))>%d"/>
+        <bitmap query="((ORD(MID((%s),1+FLOOR((%s-%s)/%s),1))&gt;&gt;MOD(%s-%s,%s))&amp;1)=1"/>
+        <bitchar query="((ORD(MID((%s),%s,1))&gt;&gt;(%s))&amp;1)=1"/>
+        <bitcol query="((%s&gt;&gt;%s)&amp;1)=1"/>
         <banner query="VERSION()"/>
         <current_user query="CURRENT_USER()"/>
         <current_db query="DATABASE()"/>
@@ -101,6 +104,9 @@
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
         <hex query="ENCODE(CONVERT_TO((%s),'UTF8'),'HEX')"/>
         <inference query="ASCII(SUBSTRING((%s)::text FROM %d FOR 1))>%d"/>
+        <bitmap query="((ASCII(SUBSTRING((%s)::text FROM (1+FLOOR((%s-%s)/%s))::int FOR 1))&gt;&gt;((%s-%s)%%%s))&amp;1)=1"/>
+        <bitchar query="((ASCII(SUBSTRING((%s)::text FROM (%s)::int FOR 1))&gt;&gt;(%s))&amp;1)=1"/>
+        <bitcol query="((%s&gt;&gt;%s)&amp;1)=1"/>
         <banner query="VERSION()"/>
         <current_user query="CURRENT_USER"/>
         <current_db query="CURRENT_SCHEMA()"/>
@@ -180,6 +186,9 @@
         <case query="SELECT (CASE WHEN (%s) THEN '1' ELSE '0' END)"/>
         <hex query="master.dbo.fn_varbintohexstr(CAST(%s AS VARBINARY(8000)))"/>
         <inference query="UNICODE(SUBSTRING((%s),%d,1))>%d"/>
+        <bitmap query="((UNICODE(SUBSTRING((%s),1+((%s-%s)/%s),1))/POWER(2,((%s-%s)%%%s)))%%2)=1"/>
+        <bitchar query="((UNICODE(SUBSTRING((%s),%s,1))/POWER(2,(%s)))%%2)=1"/>
+        <bitcol query="((%s/POWER(2,%s))%%2)=1"/>
         <banner query="SELECT @@VERSION"/>
         <current_user query="SELECT SYSTEM_USER"/>
         <current_db query="SELECT DB_NAME()"/>
@@ -260,6 +269,9 @@
         NOTE: ASCIISTR (https://www.techonthenet.com/oracle/functions/asciistr.php)
         -->
         <inference query="ASCII(SUBSTRC((%s),%d,1))>%d"/>
+        <bitmap query="(BITAND(ASCII(SUBSTRC((%s),1+FLOOR((%s-%s)/%s),1)),POWER(2,MOD(%s-%s,%s)))&gt;0)"/>
+        <bitchar query="(BITAND(ASCII(SUBSTRC((%s),%s,1)),POWER(2,(%s)))&gt;0)"/>
+        <bitcol query="BITAND(%s,POWER(2,%s))&gt;0"/>
         <banner query="SELECT banner FROM v$version WHERE ROWNUM=1"/>
         <current_user query="SELECT USER FROM DUAL"/>
         <!--
@@ -360,6 +372,9 @@
         <case query="SELECT (CASE WHEN (%s) THEN 1 ELSE 0 END)"/>
         <hex query="HEX(%s)"/>
         <inference query="SUBSTR((%s),%d,1)>'%c'"/>
+        <bitmap query="((UNICODE(SUBSTR((%s),1+((%s-%s)/%s),1))&gt;&gt;((%s-%s)%%%s))&amp;1)=1"/>
+        <bitchar query="((UNICODE(SUBSTR((%s),%s,1))&gt;&gt;(%s))&amp;1)=1"/>
+        <bitcol query="((%s&gt;&gt;%s)&amp;1)=1"/>
         <banner query="SELECT SQLITE_VERSION()"/>
         <current_user/>
         <current_db/>

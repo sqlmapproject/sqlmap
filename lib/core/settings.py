@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.8.36"
+VERSION = "1.10.8.37"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -1627,7 +1627,7 @@ VALID_TIME_CHARS_RUN_THRESHOLD = 100
 CHECK_ZERO_COLUMNS_THRESHOLD = 10
 
 # Boldify all logger messages containing these "patterns"
-BOLD_PATTERNS = ("' injectable", "provided empty", "leftover chars", "might be injectable", "' is vulnerable", "is not injectable", "does not seem to be", "test failed", "test passed", "live test final result", "test shows that", "the back-end DBMS is", "created Github", "blocked by the target server", "protection is involved", "CAPTCHA", "specific response", "NULL connection is supported", "PASSED", "FAILED", "for more than", "connection to ", "will be trimmed", "counterpart to database")
+BOLD_PATTERNS = ("' injectable", "provided empty", "leftover chars", "might be injectable", "' is vulnerable", "is not injectable", "does not seem to be", "test failed", "test passed", "live test final result", "test shows that", "the back-end DBMS is", "created Github", "blocked by the target server", "protection is involved", "CAPTCHA", "specific response", "NULL connection is supported", "PASSED", "FAILED", "for more than", "connection to ", "will be trimmed", "counterpart to database", "several characters")
 
 # Regular expression used to search for bold-patterns
 BOLD_PATTERNS_REGEX = '|'.join(BOLD_PATTERNS)
@@ -1708,8 +1708,8 @@ PLAIN_TEXT_CONTENT_TYPE = "text/plain; charset=utf-8"
 SUHOSIN_MAX_VALUE_LENGTH = 512
 
 # Multi-bit blind inference ("row multiplexing"): one rendered row carries one bit, so a single
-# response yields whole characters instead of a single boolean. Needs '--risk=3' (it widens the
-# result set with OR) and proves every value back against the target before returning it.
+# response yields whole characters instead of a single boolean. Used on demand ('--multi-bit', which
+# widens the result set with OR) and proves every value back against the target before returning it.
 MAX_MULTIBIT_LENGTH = 8192           # hard ceiling when the value length is unknown (anti-runaway)
 MAX_MULTIBIT_PAGE = 1048576          # response bytes parsed for repeated row markup (larger pages are truncated)
 MULTIBIT_BITS_PER_CHAR = 8           # one whole byte per character, one row per bit

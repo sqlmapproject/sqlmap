@@ -54,6 +54,11 @@ def action():
 
     setHandler()
 
+    # multi-bit blind ('--multi-bit'): the back-end is known now, so its bit arithmetic can be checked
+    # before nudging the user towards a channel that reads several characters per request (no requests)
+    from lib.techniques.blind import multibit
+    multibit.hint()
+
     if kb.wafBypass and Backend.getDbms():      # persist the assumed DBMS so a resumed run restores it instead of re-fingerprinting (and dead-ending) behind the WAF
         hashDBWrite(HASHDB_KEYS.DBMS, Backend.getDbms())
 

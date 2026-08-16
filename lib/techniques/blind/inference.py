@@ -78,6 +78,7 @@ from lib.core.threads import getCurrentThreadData
 from lib.core.threads import runThreads
 from lib.core.unescaper import unescaper
 from lib.request.connect import Connect as Request
+from lib.techniques.blind import multibit
 from lib.utils.progress import ProgressBar
 from lib.utils.safe2bin import safecharencode
 from lib.utils.xrange import xrange
@@ -986,8 +987,17 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                         # and detects end-of-string correctly
                         return getChar(idx, asciiTbl, True, retried=retried)
 
+        # Multi-bit inference ('--multi-bit'): on a listing page a single response carries WHICH rows came
+        # back, i.e. a whole bit vector rather than one boolean, giving several characters per request. It
+        # returns None unless it proved the extracted value back against the target, so everything below
+        # is untouched whenever it is unusable (and it owns its own threading, hence before this branch).
+        multibitValue = multibit.attempt(expression, getChar, length, charsetType, firstChar or partialValue)
+
+        if multibitValue is not None:
+            finalValue = multibitValue
+
         # Go multi-threading (--threads > 1)
-        if numThreads > 1 and isinstance(length, int) and length > 1:
+        elif numThreads > 1 and isinstance(length, int) and length > 1:
             threadData.shared.value = [None] * length
             threadData.shared.index = [firstChar]    # As list for python nested function scoping
             threadData.shared.start = firstChar

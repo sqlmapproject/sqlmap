@@ -2287,7 +2287,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.lastParserStatus = None
 
     kb.locks = AttribDict()
-    for _ in ("cache", "connError", "count", "handlers", "hint", "identYwaf", "index", "io", "limit", "liveCookies", "log", "prediction", "socket", "redirect", "request", "value"):
+    for _ in ("cache", "connError", "count", "handlers", "hint", "identYwaf", "index", "io", "limit", "liveCookies", "log", "multibit", "prediction", "socket", "redirect", "request", "value"):
         kb.locks[_] = threading.Lock()
 
     kb.matchRatio = None
@@ -2296,6 +2296,8 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.mergeCookies = None
     kb.mysqlUtf8mb4 = None
     kb.multiThreadMode = False
+    kb.multibit = {}                    # per injection point: absent=untried, False=unusable, else the row channel profile
+    kb.multibitHinted = False
     kb.multipleCtrlC = False
     kb.negativeLogic = False
     kb.nchar = True

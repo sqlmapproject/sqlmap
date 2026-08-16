@@ -137,6 +137,7 @@ optDict = {
         "oobToken": "string",
         "timeSec": "integer",
         "timeless": "boolean",
+        "multiBit": "boolean",
         "uCols": "string",
         "uChar": "string",
         "uFrom": "string",

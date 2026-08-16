@@ -436,6 +436,9 @@ def cmdLineParser(argv=None):
         techniques.add_argument("--timeless", dest="timeless", action="store_true",
             help="Use HTTP/2 timeless timing (faster, no delay)")
 
+        techniques.add_argument("--multi-bit", dest="multiBit", action="store_true",
+            help="Use rendered rows to read several bits per request")
+
         techniques.add_argument("--union-cols", dest="uCols",
             help="Range of columns to test for UNION query SQL injection")
 
