@@ -39,7 +39,7 @@ assert SQLiteMap
 
 ROWS = 96
 SMALL = 15                                          # a real shop listing, far short of the 128 wide window
-_WARN = multibit.singleTimeWarnMessage              # restored after the cases that capture the nudge
+_SAID = (multibit.singleTimeWarnMessage, multibit.singleTimeLogMessage)   # hint() speaks through both
 
 def tearDownModule():
     reset_dbms()
@@ -137,6 +137,7 @@ class MultibitTest(unittest.TestCase):
         # kb.injection is restored by identity above, so its members have to be put back one by one
         kb.injection.place, kb.injection.parameter, kb.injection.data = self._savedInjection
         multibit._page = self._savedPage
+        multibit.singleTimeWarnMessage, multibit.singleTimeLogMessage = _SAID
 
     def _attempt(self, secret, length=None, **kwargs):
         target = _Target(secret, **kwargs)
@@ -354,21 +355,26 @@ class MultibitTest(unittest.TestCase):
         self.assertEqual(value, secret)
         self.assertEqual(list(kb.multibit.values())[0]["mode"], MULTIBIT_WIDEN)
 
+    def _hint(self):
+        """hint() with everything it could say captured - a nudge is INFO, an unusable back-end a WARNING."""
+
+        said = []
+        multibit.singleTimeWarnMessage = lambda message: said.append(message)
+        multibit.singleTimeLogMessage = lambda message, level=None, flag=None: said.append(message)
+        multibit.hint()
+
+        return said
+
     def test_hint_costs_nothing_and_states_the_width(self):
         # the nudge towards the switch is drawn from the page sqlmap already has, never from a probe
         conf.multiBit = False                       # the nudge is for a run that did NOT ask for it
         kb.originalPage = "".join("<div class='item'><a href='/product.php?id=%d'>p</a></div>" % _ for _ in range(1, 13))
-        warned = []
-        multibit.singleTimeWarnMessage = lambda message: warned.append(message)
 
-        try:
-            multibit.hint()
-        finally:
-            multibit.singleTimeWarnMessage = _WARN
+        said = self._hint()
 
-        self.assertEqual(len(warned), 1)
-        self.assertIn("12 rows", warned[0])
-        self.assertIn("--multi-bit", warned[0])
+        self.assertEqual(len(said), 1)
+        self.assertIn("12 rows", said[0])
+        self.assertIn("--multi-bit", said[0])
 
     def test_hint_stays_quiet_on_a_page_that_renders_no_rows(self):
         # the old trigger announced "the target lists rows" on the nav menu of a single-product DETAIL
@@ -380,39 +386,26 @@ class MultibitTest(unittest.TestCase):
                            "<a href='/category.php?cat=3'>C</a></nav>"
                            "<main><div class='product'><h2>Quantum USB Cable</h2><p class='price'>$9.99</p>"
                            "<input type='hidden' name='product_id' value='1'></div></main></body></html>")
-        multibit.singleTimeWarnMessage = lambda message: self.fail("hinted at a detail page: %s" % message)
 
-        try:
-            multibit.hint()
-        finally:
-            multibit.singleTimeWarnMessage = _WARN
+        self.assertEqual(self._hint(), [])
 
     def test_switch_on_an_unsupported_backend_says_so(self):
         # the bit arithmetic exists for five back-ends; asking for the switch on any other one has to
         # say why nothing happens instead of silently doing nothing
         set_dbms(DBMS.FIREBIRD)
-        warned = []
-        multibit.singleTimeWarnMessage = lambda message: warned.append(message)
 
-        try:
-            multibit.hint()
-        finally:
-            multibit.singleTimeWarnMessage = _WARN
+        said = self._hint()
 
-        self.assertEqual(len(warned), 1)
-        self.assertIn("not supported", warned[0])
+        self.assertEqual(len(said), 1)
+        self.assertIn("not supported", said[0])
 
     def test_hint_stays_quiet_when_an_inband_channel_is_available(self):
         # UNION or error-based beats any row channel, so nudging towards this one would be noise
         conf.multiBit = False
         kb.originalPage = "".join("<div class='item'><a href='/product.php?id=%d'>p</a></div>" % _ for _ in range(1, 13))
         kb.injection.data[PAYLOAD.TECHNIQUE.UNION] = {}
-        multibit.singleTimeWarnMessage = lambda message: self.fail("hinted over an in-band channel: %s" % message)
 
-        try:
-            multibit.hint()
-        finally:
-            multibit.singleTimeWarnMessage = _WARN
+        self.assertEqual(self._hint(), [])
 
 if __name__ == "__main__":
     unittest.main()
