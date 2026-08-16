@@ -765,6 +765,46 @@ class TestEntriesInference(_EntriesBase):
         self.assertEqual(list(dumped["id"]["values"]), ["1", "2"])
         self.assertEqual(list(dumped["name"]["values"]), ["alice", "bob"])
 
+    def test_dump_table_inference_keyset_giving_up_falls_back(self):
+        # A keyset walk that gives up mid-table hands back None (issue #6097: a key value that did
+        # not come back). The table must then be dumped by the standard OFFSET path IN FULL - a
+        # short table would otherwise be presented as the whole thing.
+        set_dbms("MySQL")
+        e = self._entries(cols=("id", "name"))
+        conf.db = "testdb"
+        conf.tbl = "users"
+        conf.col = None
+        conf.noKeyset = False
+        conf.keyset = True                          # keyset regardless of the row-count threshold
+
+        savedResolve, savedDump = emod.resolveKeysetCursor, emod.keysetDumpTable
+        attempted = []
+        emod.resolveKeysetCursor = lambda tbl, colList: ["id"]
+        emod.keysetDumpTable = lambda *a, **k: attempted.append(a) or None   # gave up, nothing kept
+
+        data = {0: {"id": "1", "name": "alice"}, 1: {"id": "2", "name": "bob"}}
+
+        def gv(query, *a, **k):
+            if k.get("expected") == EXPECTED.INT:
+                return "2"
+            import re as _re
+            idx = int(_re.search(r"LIMIT\s+(\d+)\s*,\s*1", query).group(1))
+            proj = query.split(" FROM ", 1)[0]
+            return data[idx]["name" if "name" in proj else "id"]
+
+        emod.inject.getValue = gv
+
+        try:
+            e.dumpTable()
+        finally:
+            emod.resolveKeysetCursor, emod.keysetDumpTable = savedResolve, savedDump
+
+        self.assertEqual(len(attempted), 1)         # the walk really was tried, then discarded
+        dumped = conf.dumper.tableValues[-1]
+        self.assertEqual(dumped["__infos__"]["count"], 2)
+        self.assertEqual(list(dumped["id"]["values"]), ["1", "2"])
+        self.assertEqual(list(dumped["name"]["values"]), ["alice", "bob"])
+
     def test_dump_table_inference_empty_table(self):
         # A zero row count in the inference path yields empty per-column value
         # lists and no dbTableValues emission (dumpedTable stays effectively empty).

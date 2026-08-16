@@ -68,7 +68,7 @@ class TestKeysetCompositeCursor(unittest.TestCase):
         kb.data.cachedColumns = self._s["cachedColumns"]
         inject.getValue = self._s["gv"]
 
-    def _install_oracle(self, rowValueSupported):
+    def _install_oracle(self, rowValueSupported, dropped=()):
         def oracle(query=None, **kwargs):
             # a back-end without ANSI row-value support errors on (a,b)>(x,y) -> no result
             if re.search(r"\)\s*>\s*\(", query or "") and not rowValueSupported:
@@ -76,7 +76,11 @@ class TestKeysetCompositeCursor(unittest.TestCase):
             m = re.search(r"SELECT (\w+) FROM .+? WHERE (.+) ORDER BY .+ LIMIT 1", query or "")   # advance
             if m:
                 cand = sorted(r for r in _ROWS if _condTrue(m.group(2), r))
-                return None if not cand else str(cand[0][_COL_INDEX[m.group(1)]])
+                if not cand:
+                    return None
+                if (m.group(1), cand[0]) in dropped:   # a key cell the channel did not bring back
+                    return None
+                return str(cand[0][_COL_INDEX[m.group(1)]])
             m = re.search(r"SELECT MAX\((\w+)\) FROM .+? WHERE (.+)", query or "")                 # point fetch
             if m:
                 cand = [r for r in _ROWS if _condTrue(m.group(2), r)]
@@ -85,9 +89,16 @@ class TestKeysetCompositeCursor(unittest.TestCase):
 
         inject.getValue = oracle
 
-    def _dump(self, rowValueSupported):
-        self._install_oracle(rowValueSupported)
-        entries, _ = ks.keysetDumpTable("users", ["a", "b", "d"], len(_ROWS), ["a", "b"])
+    def _walk(self, rowValueSupported, dropped=()):
+        """The raw result: (entries, lengths), or None when the walk gave up and the caller must fall back."""
+
+        self._install_oracle(rowValueSupported, dropped)
+
+        return ks.keysetDumpTable("users", ["a", "b", "d"], len(_ROWS), ["a", "b"])
+
+    def _dump(self, rowValueSupported, dropped=()):
+        entries, _ = self._walk(rowValueSupported, dropped)
+
         return list(zip(entries["a"], entries["b"], entries["d"]))
 
     def test_all_rows_when_row_value_supported(self):
@@ -99,6 +110,14 @@ class TestKeysetCompositeCursor(unittest.TestCase):
         rows = self._dump(rowValueSupported=False)
         self.assertEqual(len(rows), len(_ROWS))
         self.assertEqual([r[2] for r in rows], [r[2] for r in _ROWS])
+
+    def test_unretrieved_key_cell_is_handed_back_for_the_offset_fallback(self):
+        # one key column of a row that does not come back (an error-channel miss, a blocked payload)
+        # leaves a None in the cursor tuple. Seeking on it is impossible, so the walk must hand back
+        # NOTHING - it used to format that None into the next seek predicate (a TypeError, issue
+        # #6097) and, once the predicate became a plain '%s', to emit a row of empty cells and then
+        # silently truncate the table
+        self.assertIsNone(self._walk(rowValueSupported=True, dropped={("b", (2, 5, "gamma"))}))
 
 
 if __name__ == "__main__":

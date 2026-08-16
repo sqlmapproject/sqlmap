@@ -149,7 +149,10 @@ def _lit(value):
     (e.g. 0x.. hex) form for string keys. Both forms are self-contained (no surrounding quotes).
     """
 
-    if value is not None and re.match(r"\A-?[0-9]+\Z", value):
+    if value is None:
+        return NULL                                 # unescaper.escape() passes None through, and a bare
+                                                    # None formatted into a predicate is not even SQL
+    if re.match(r"\A-?[0-9]+\Z", value):
         return value
     return unescaper.escape(value, False)
 
@@ -161,18 +164,24 @@ def _embed(template, value, *fixed):
     template = template.replace("'%s'", "%s")
     return template % (fixed + (_lit(value),))
 
-def _dumpSingle(tbl, colList, count, cursor, tableRef, entries, lengths):
-    blind = queries[Backend.getIdentifiedDbms()].dump_table.blind
-    field = agent.preprocessField(tbl, cursor)
+def _target(count):
+    """Rows the walk is expected to produce, honouring --start/--stop."""
 
     if conf.limitStart and conf.limitStop:
-        target = max(0, conf.limitStop - conf.limitStart + 1)
+        return max(0, conf.limitStop - conf.limitStart + 1)
     elif conf.limitStop:
-        target = conf.limitStop
+        return conf.limitStop
     elif conf.limitStart:
-        target = max(0, count - conf.limitStart + 1)
-    else:
-        target = count
+        return max(0, count - conf.limitStart + 1)
+
+    return count
+
+def _dumpSingle(tbl, colList, count, cursor, tableRef, entries, lengths):
+    """False when the walk gave up mid-table (the caller then discards the partial result)."""
+
+    blind = queries[Backend.getIdentifiedDbms()].dump_table.blind
+    field = agent.preprocessField(tbl, cursor)
+    target = _target(count)
 
     pivotValue = None
 
@@ -182,7 +191,7 @@ def _dumpSingle(tbl, colList, count, cursor, tableRef, entries, lengths):
         seed = unArrayizeValue(inject.getValue(query))
 
         if isNoneValue(seed) or seed == NULL:
-            return
+            return False                            # no seed, no walk - and an empty table is not that
 
         pivotValue = safechardecode(seed)
 
@@ -205,7 +214,7 @@ def _dumpSingle(tbl, colList, count, cursor, tableRef, entries, lengths):
         # safety latch against a non-advancing cursor (e.g. encoding edge cases)
         if value == pivotValue:
             singleTimeWarnMessage("keyset cursor stopped advancing prematurely")
-            break
+            return False
 
         pivotValue = value
 
@@ -223,20 +232,17 @@ def _dumpSingle(tbl, colList, count, cursor, tableRef, entries, lengths):
 
         produced += 1
 
+    return True
+
 def _dumpComposite(tbl, colList, count, cursorCols, tableRef, entries, lengths):
+    """False when the walk gave up mid-table (the caller then discards the partial result)."""
+
     blind = queries[Backend.getIdentifiedDbms()].dump_table.blind
     fields = [agent.preprocessField(tbl, _) for _ in cursorCols]
     orderExpr = ','.join(fields)
 
     startSkip = (conf.limitStart - 1) if conf.limitStart else 0
-    if conf.limitStart and conf.limitStop:
-        target = max(0, conf.limitStop - conf.limitStart + 1)
-    elif conf.limitStop:
-        target = conf.limitStop
-    elif conf.limitStart:
-        target = max(0, count - conf.limitStart + 1)
-    else:
-        target = count
+    target = _target(count)
 
     prev = None
     produced = 0
@@ -263,11 +269,18 @@ def _dumpComposite(tbl, colList, count, cursorCols, tableRef, entries, lengths):
             tup.append(None if isNoneValue(value) else safechardecode(value))
 
         if all(isNoneValue(_) for _ in tup):
-            break
+            break                                   # nothing past the cursor: the table is walked
+
+        # A key column that did not come back (an error-channel miss, a blocked payload) cannot be
+        # seeked on, and its equality would pin the rest of the row to a NULL - so the walk stops
+        # here rather than emitting a row of empty cells and carrying the hole into the next seek
+        if any(isNoneValue(_) for _ in tup):
+            singleTimeWarnMessage("keyset cursor could not be retrieved for one of the key column(s)")
+            return False
 
         if prev is not None and tup == prev:
             singleTimeWarnMessage("keyset cursor stopped advancing prematurely")
-            break
+            return False
 
         prev = tup
         seen += 1
@@ -290,6 +303,8 @@ def _dumpComposite(tbl, colList, count, cursorCols, tableRef, entries, lengths):
 
         produced += 1
 
+    return True
+
 def keysetDumpTable(tbl, colList, count, cursor):
     """
     Dumps a table one row at a time using keyset (seek) pagination on 'cursor' (a list of
@@ -298,6 +313,10 @@ def keysetDumpTable(tbl, colList, count, cursor):
     exact equality on the cursor (index point seek), so no row is skipped via OFFSET and no
     per-row ORDER BY filesort is needed. A deep --start uses a single OFFSET "seed" jump
     (single-column cursors), after which the walk is pure keyset.
+
+    Returns None when the walk gave up mid-table (a key value that did not come back, a cursor
+    that stopped advancing): a short table is worse than a slow one, so the caller redoes it
+    with the standard OFFSET dump instead of showing whatever was reached.
     """
 
     tableRef = _tableRef(tbl)
@@ -309,9 +328,16 @@ def keysetDumpTable(tbl, colList, count, cursor):
         entries[column] = BigArray()
 
     if len(cursor) == 1:
-        _dumpSingle(tbl, colList, count, cursor[0], tableRef, entries, lengths)
+        complete = _dumpSingle(tbl, colList, count, cursor[0], tableRef, entries, lengths)
     else:
-        _dumpComposite(tbl, colList, count, cursor, tableRef, entries, lengths)
+        complete = _dumpComposite(tbl, colList, count, cursor, tableRef, entries, lengths)
+
+    if not complete:
+        warnMsg = "keyset pagination did not complete for table '%s', " % unsafeSQLIdentificatorNaming(tbl)
+        warnMsg += "falling back to the standard dump"
+        logger.warning(warnMsg)
+
+        return None
 
     debugMsg = "keyset pagination retrieved %d row(s) for table '%s'" % (len(entries[colList[0]]) if colList and colList[0] in entries else 0, unsafeSQLIdentificatorNaming(tbl))
     logger.debug(debugMsg)

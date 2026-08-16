@@ -231,12 +231,17 @@ class Entries(object):
                             logger.info(infoMsg)
 
                             try:
-                                entries, lengths = keysetDumpTable(tbl, colList, int(count), keysetCursor)
-                                for column, columnEntries in entries.items():
-                                    length = max(lengths[column], getConsoleLength(column))
-                                    kb.data.dumpedTable[column] = {"length": length, "values": columnEntries}
-                                    entriesCount = len(columnEntries)
-                                keysetDone = bool(kb.data.dumpedTable)
+                                # None when the walk gave up mid-table: nothing is kept, so the
+                                # standard dump below redoes it rather than showing a short table
+                                result = keysetDumpTable(tbl, colList, int(count), keysetCursor)
+
+                                if result is not None:
+                                    entries, lengths = result
+                                    for column, columnEntries in entries.items():
+                                        length = max(lengths[column], getConsoleLength(column))
+                                        kb.data.dumpedTable[column] = {"length": length, "values": columnEntries}
+                                        entriesCount = len(columnEntries)
+                                    keysetDone = bool(kb.data.dumpedTable)
                             except KeyboardInterrupt:
                                 kb.dumpKeyboardInterrupt = True
                                 clearConsoleLine()
@@ -379,6 +384,26 @@ class Entries(object):
                     lengths = {}
                     entries = {}
 
+                    # Attempted before the chain below so that a walk which gave up mid-table (None) can
+                    # fall through to the standard OFFSET paths - a short table is worse than a slow one.
+                    # An interrupted walk keeps the chain out of a re-dump by claiming the branch itself.
+                    keysetResult = None
+
+                    if keysetCursor:
+                        infoMsg = "using keyset (seek) pagination on column(s) '%s' " % ', '.join(keysetCursor)
+                        infoMsg += "for table '%s'" % unsafeSQLIdentificatorNaming(tbl)
+                        logger.info(infoMsg)
+
+                        try:
+                            keysetResult = keysetDumpTable(tbl, colList, count, keysetCursor)
+                        except KeyboardInterrupt:
+                            kb.dumpKeyboardInterrupt = True
+                            clearConsoleLine()
+                            warnMsg = "Ctrl+C detected in dumping phase"
+                            logger.warning(warnMsg)
+
+                            keysetResult = (entries, lengths)
+
                     if count == 0:
                         warnMsg = "table '%s' " % unsafeSQLIdentificatorNaming(tbl)
                         warnMsg += "in database '%s' " % unsafeSQLIdentificatorNaming(conf.db)
@@ -399,18 +424,8 @@ class Entries(object):
 
                         continue
 
-                    elif keysetCursor:
-                        infoMsg = "using keyset (seek) pagination on column(s) '%s' " % ', '.join(keysetCursor)
-                        infoMsg += "for table '%s'" % unsafeSQLIdentificatorNaming(tbl)
-                        logger.info(infoMsg)
-
-                        try:
-                            entries, lengths = keysetDumpTable(tbl, colList, count, keysetCursor)
-                        except KeyboardInterrupt:
-                            kb.dumpKeyboardInterrupt = True
-                            clearConsoleLine()
-                            warnMsg = "Ctrl+C detected in dumping phase"
-                            logger.warning(warnMsg)
+                    elif keysetResult is not None:
+                        entries, lengths = keysetResult
 
                     elif Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.SYBASE, DBMS.MAXDB, DBMS.MSSQL, DBMS.INFORMIX, DBMS.MCKOI, DBMS.RAIMA):
                         if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.RAIMA):
