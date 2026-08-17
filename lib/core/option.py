@@ -423,7 +423,10 @@ def _doSearch():
                 conf.googlePage += 1
 
 def _setStdinPipeTargets():
-    if conf.url:
+    # Note: an explicit target source takes precedence. Without this, any non-interactive run (CI,
+    # cron, subprocess) would reroute '-m/-l/-r/-g' targets through the STDIN container, losing both
+    # their count and their order
+    if any((conf.url, conf.direct, conf.logFile, conf.bulkFile, conf.requestFile, conf.googleDork, conf.openApiFile)):
         return
 
     if isinstance(conf.stdinPipe, _collections.Iterable):

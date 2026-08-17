@@ -7,6 +7,8 @@ See the file 'LICENSE' for copying permission
 
 import re
 
+from lib.core.common import Backend
+from lib.core.enums import DBMS
 from lib.core.enums import PRIORITY
 
 __priority__ = PRIORITY.NORMAL
@@ -43,7 +45,16 @@ def _unwrapIsnull(query):
             break
 
         inner = retVal[match.end():end]
-        separator = inner.rfind(',')
+        separator, depth = -1, 0     # the argument separator is the comma at the top level
+
+        for index, char in enumerate(inner):
+            if char == '(':
+                depth += 1
+            elif char == ')':
+                depth -= 1
+            elif char == ',' and depth == 0:
+                separator = index
+
         if separator < 1:
             break
 
@@ -75,6 +86,11 @@ def _reshape(payload, opener, tail, build):
             pos = pos + match.end()
             continue
         replacement = build(query, rest)
+
+        if replacement is None:                     # builder declined, leave this occurrence alone
+            pos = pos + match.end()
+            continue
+
         retVal = retVal[:start] + replacement + retVal[end + 1 + rest.end():]
         pos = start + len(replacement)
     return retVal
@@ -134,7 +150,12 @@ def tamper(payload, **kwargs):
     def _mysqlSet(query, rest):
         # set-membership form of the same read ('... IN (<ordinals>)', used by the Huffman retrieval).
         # ORD('') is 0, so a past-the-end position matches the ordinal 0, which is the empty string here
-        position, ordinals = rest.group(1), [int(_) for _ in rest.group(2).split(',')]
+        position = rest.group(1)
+        ordinals = [int(_) for _ in rest.group(2).split(',') if _.strip().isdigit()]
+
+        if not ordinals or any(_ > 255 for _ in ordinals):      # a byte comparison cannot represent those
+            return None
+
         query = _unwrapIsnull(query)
         members = ",".join("''" if _ == 0 else "0x%02x" % _ for _ in ordinals)
         return "BINARY RIGHT(LEFT(%s,%s),(%s<=LENGTH(CONVERT(%s USING ascii)))) IN (%s)" % (query, position, position, query, members)
@@ -150,7 +171,9 @@ def tamper(payload, **kwargs):
     comma_tail = r"\s*,\s*(\d+)\s*,\s*1\)\)\s*(>=|<=|>|<|=)\s*(\d+)"
     set_tail = r"\s*,\s*(\d+)\s*,\s*1\)\)\s+IN\s*\(([\d,\s]+)\)"
 
-    if re.search(r"(?i)IFNULL\(", payload):        # also on payloads that are not single-character reads
+    # also on payloads that are not single-character reads. Gated on MySQL, because IFNULL() is used
+    # by H2, HSQLDB, Cubrid and others too, and IF() is not a function there
+    if Backend.getIdentifiedDbms() == DBMS.MYSQL and re.search(r"(?i)IFNULL\(", payload):
         payload = _unwrapIsnull(payload)
 
     retVal = _reshape(payload, r"(?i)ORD\(MID\(", set_tail, _mysqlSet)

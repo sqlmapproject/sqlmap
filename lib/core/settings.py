@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.8.42"
+VERSION = "1.10.8.43"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -88,7 +88,7 @@ WAF_BYPASS_TAMPERS = (
 )
 
 # Maximum number of candidate tamper (chains) trialled during automatic WAF-bypass
-WAF_BYPASS_MAX_TRIALS = 8
+WAF_BYPASS_MAX_TRIALS = len(WAF_BYPASS_TAMPERS)
 
 # Browser-like request headers applied alongside the random (non-scanner) User-Agent during
 # automatic WAF bypass: sqlmap's defaults ('Accept: */*', no 'Accept-Language') are themselves a

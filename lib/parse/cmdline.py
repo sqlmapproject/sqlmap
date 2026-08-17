@@ -1215,7 +1215,10 @@ def cmdLineParser(argv=None):
         if args.dummy:
             args.url = args.url or DUMMY_URL
 
-        if hasattr(sys.stdin, "fileno") and not any((os.isatty(sys.stdin.fileno()), args.api, args.ignoreStdin, "GITHUB_ACTIONS" in os.environ)):
+        # Note: an explicit target source rules out reading targets from the standard input. Without
+        # this, any non-interactive run (CI, cron, subprocess) would turn '-d/-u/-m/-l/-r/-g' into a
+        # 'multiple targets' run reading from a pipe, which also resets per-target options in between
+        if hasattr(sys.stdin, "fileno") and not any((os.isatty(sys.stdin.fileno()), args.api, args.ignoreStdin, "GITHUB_ACTIONS" in os.environ, args.direct, args.url, args.logFile, args.bulkFile, args.requestFile, args.googleDork, args.configFile, args.openApiFile)):
             args.stdinPipe = iter(sys.stdin.readline, None)
         else:
             args.stdinPipe = None

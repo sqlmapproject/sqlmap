@@ -120,7 +120,7 @@ class Fingerprint(GenericFingerprint):
                 fork = FORK.DORIS
             elif inject.checkBooleanExpression("@@VERSION_COMMENT LIKE '%StarRocks%'"):
                 fork = FORK.STARROCKS
-            elif inject.checkBooleanExpression("GEOGRAPHY_AREA(NULL) IS NULL"):         # Note: MemSQL is the only one of the forks without SESSION_USER()
+            elif inject.checkBooleanExpression("GEOGRAPHY_AREA(NULL) IS NULL"):         # Note: GEOGRAPHY_AREA() is MemSQL specific
                 fork = FORK.MEMSQL
             elif inject.checkBooleanExpression("AURORA_VERSION() LIKE '%'"):            # Reference: https://aws.amazon.com/premiumsupport/knowledge-center/aurora-version-number/
                 fork = FORK.AURORA
