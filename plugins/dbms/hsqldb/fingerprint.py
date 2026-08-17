@@ -99,7 +99,7 @@ class Fingerprint(GenericFingerprint):
             infoMsg = "confirming %s" % DBMS.HSQLDB
             logger.info(infoMsg)
 
-            result = inject.checkBooleanExpression("LEAST(ROUNDMAGIC(PI()),3)=3")
+            result = inject.checkBooleanExpression("ROUNDMAGIC(PI())>=3")    # Note: same check without the blacklisted LEAST()
 
             if not result:
                 warnMsg = "the back-end DBMS is not %s" % DBMS.HSQLDB

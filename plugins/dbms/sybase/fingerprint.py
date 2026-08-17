@@ -106,7 +106,8 @@ class Fingerprint(GenericFingerprint):
                 Backend.setVersion(str(result))
             else:
                 for version in xrange(12, 16):
-                    result = inject.checkBooleanExpression("PATINDEX('%%/%d[./]%%',@@VERSION)>0" % version)
+                    # Note: plain LIKE matches the same two shapes, without the bracket class that WAF/IPS score (e.g. OWASP CRS rule 932130)
+                    result = inject.checkBooleanExpression("(@@VERSION LIKE '%%/%d.%%' OR @@VERSION LIKE '%%/%d/%%')" % (version, version))
 
                     if result:
                         Backend.setVersion(str(version))

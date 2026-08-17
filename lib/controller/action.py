@@ -42,17 +42,19 @@ def action():
 
     # First of all we have to identify the back-end database management
     # system to be able to go ahead with the injection
-    # automatic WAF-bypass: if a WAF/IPS is present and the back-end DBMS is already indicated by the error
-    # page or the heuristic checks, skip active fingerprinting (the WAF would just block its payloads
-    # and flood the run with 403s) and assume that DBMS, so the user gets a usable result
-    if kb.wafBypass and not conf.forceDbms:
+    setHandler()
+
+    # automatic WAF-bypass: fingerprinting probes are kept off the WAF/IPS blacklists, so it is tried
+    # first even behind a protection. Only if it comes back empty the back-end DBMS is assumed from
+    # the error page or the heuristic checks, so that the user still gets a usable result
+    if kb.wafBypass and not conf.forceDbms and not Backend.getIdentifiedDbms():
         fallback = Backend.getErrorParsedDBMSes() or ([kb.heuristicDbms] if kb.heuristicDbms else [])
         fallback = next((_ for _ in fallback if _ and _.lower() in SUPPORTED_DBMS), None)
         if fallback:
-            logger.warning("skipping active back-end DBMS fingerprinting behind the WAF/IPS and assuming '%s' from error/heuristic detection" % fallback)
+            logger.warning("active back-end DBMS fingerprinting did not get through the WAF/IPS. Assuming '%s' from error/heuristic detection" % fallback)
             conf.forceDbms = fallback
 
-    setHandler()
+            setHandler()
 
     # multi-bit blind ('--multi-bit'): the back-end is known now, so its bit arithmetic can be checked
     # before nudging the user towards a channel that reads several characters per request (no requests)
@@ -64,8 +66,9 @@ def action():
 
     # automatic WAF-bypass: with MySQL behind the WAF, make data retrieval AND table enumeration survive a
     # libinjection-class WAF (e.g. OWASP CRS), verified end-to-end through ModSecurity/CRS:
-    #   * fingerprinting was skipped, so flag has_information_schema (modern MySQL >=5.0 always has it) -
-    #     otherwise enumeration wrongly assumes 'MySQL < 5.0' and bails with "no tables";
+    #   * flag has_information_schema (modern MySQL >=5.0 always has it) in case the DBMS was assumed
+    #     rather than fingerprinted, otherwise enumeration wrongly assumes 'MySQL < 5.0' and bails
+    #     with "no tables",
     #   * 'blindbinary' reshapes the single-character read ORD(MID())->RIGHT(LEFT())>BINARY 0x.. (sheds the
     #     ORD/MID function names scored by 942151/942190);
     #   * 'infoschema2innodb' moves table enumeration off 'information_schema' (scored by 942140) onto

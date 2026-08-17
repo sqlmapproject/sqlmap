@@ -91,9 +91,9 @@ class Fingerprint(GenericFingerprint):
             for version, check in (
                 ("Azure", "@@VERSION LIKE '%Azure%'"),
                 ("2025", "CHARINDEX('17.0.',@@VERSION)>0"),
-                ("2022", "GREATEST(NULL,NULL) IS NULL"),
+                ("2022", "LEFT_SHIFT(1,1)=2"),                          # Note: same release as the blacklisted GREATEST()
                 ("2019", "CHARINDEX('15.0.',@@VERSION)>0"),
-                ("2017", "TRIM(NULL) IS NULL"),
+                ("2017", "TRANSLATE('[RANDSTR]','[RANDSTR]','[RANDSTR]')='[RANDSTR]'"),     # Note: same release as the blacklisted TRIM()
                 ("2016", "ISJSON(NULL) IS NULL"),
                 ("2014", "CHARINDEX('12.0.',@@VERSION)>0"),
                 ("2012", "CONCAT(NULL,NULL)=CONCAT(NULL,NULL)"),

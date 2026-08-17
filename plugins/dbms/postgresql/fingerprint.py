@@ -118,7 +118,8 @@ class Fingerprint(GenericFingerprint):
             infoMsg = "confirming %s" % DBMS.PGSQL
             logger.info(infoMsg)
 
-            result = inject.checkBooleanExpression("COALESCE([RANDNUM], NULL)=[RANDNUM]")
+            # Note: TO_HEX() is PostgreSQL specific as well, and not blacklisted like COALESCE()
+            result = inject.checkBooleanExpression("TO_HEX([RANDNUM]) IS NOT NULL")
 
             if not result:
                 warnMsg = "the back-end DBMS is not %s" % DBMS.PGSQL
@@ -142,7 +143,7 @@ class Fingerprint(GenericFingerprint):
                 Backend.setVersion(">= 16.0")
             elif inject.checkBooleanExpression("REGEXP_COUNT(NULL,NULL) IS NULL"):
                 Backend.setVersion(">= 15.0")
-            elif inject.checkBooleanExpression("BIT_COUNT(NULL) IS NULL"):
+            elif inject.checkBooleanExpression("TRIM_ARRAY(ARRAY[1,2],1)=ARRAY[1]"):    # Note: same release as the blacklisted BIT_COUNT()
                 Backend.setVersion(">= 14.0")
             elif inject.checkBooleanExpression("NULL::anycompatible IS NULL"):
                 Backend.setVersion(">= 13.0")
@@ -154,7 +155,7 @@ class Fingerprint(GenericFingerprint):
                 Backend.setVersionList([">= 10.0", "< 11.0"])
             elif inject.checkBooleanExpression("SIND(0)=0"):
                 Backend.setVersionList([">= 9.6.0", "< 10.0"])
-            elif inject.checkBooleanExpression("TO_JSONB(1) IS NOT NULL"):
+            elif inject.checkBooleanExpression("ARRAY_POSITION(ARRAY[1,2],2)=2"):       # Note: same release as the blacklisted TO_JSONB()
                 Backend.setVersionList([">= 9.5.0", "< 9.6.0"])
             elif inject.checkBooleanExpression("JSON_TYPEOF(NULL) IS NULL"):
                 Backend.setVersionList([">= 9.4.0", "< 9.5.0"])

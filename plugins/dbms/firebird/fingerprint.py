@@ -72,9 +72,11 @@ class Fingerprint(GenericFingerprint):
         retVal = None
         table = (
             ("1.0", ("EXISTS(SELECT CURRENT_USER FROM RDB$DATABASE)",)),
-            ("1.5", ("NULLIF(%d,%d) IS NULL", "EXISTS(SELECT CURRENT_TRANSACTION FROM RDB$DATABASE)")),
-            ("2.0", ("EXISTS(SELECT CURRENT_TIME(0) FROM RDB$DATABASE)", "BIT_LENGTH(%d)>0", "CHAR_LENGTH(%d)>0")),
-            ("2.1", ("BIN_XOR(%d,%d)=0", "PI()>0.%d", "RAND()<1.%d", "FLOOR(1.%d)>=0")),
+            # Note: NULLIF(), CURRENT_TIME(), BIT_LENGTH(), CHAR_LENGTH() and RAND() are all blacklisted
+            # by WAF/IPS (e.g. OWASP CRS rule 942151), so only markers from the same releases are kept
+            ("1.5", ("EXISTS(SELECT CURRENT_TRANSACTION FROM RDB$DATABASE)",)),
+            ("2.0", ("EXISTS(SELECT 1 FROM RDB$DATABASE ROWS 1)",)),
+            ("2.1", ("BIN_XOR(%d,%d)=0", "PI()>0.%d", "FLOOR(1.%d)>=0")),
             ("2.5", ("'%s' SIMILAR TO '%s'",)),  # Reference: https://firebirdsql.org/refdocs/langrefupd25-similar-to.html
             ("3.0", ("FALSE IS FALSE",)),  # https://www.firebirdsql.org/file/community/conference-2014/pdf/02_fb.2014.whatsnew.30.en.pdf
         )
