@@ -21,6 +21,9 @@ def tamper(payload, **kwargs):
     """
     Replaces (MsSQL) statement separator ';' with a blank character
 
+    Requirement:
+        * Microsoft SQL Server
+
     Notes:
         * Useful to bypass filters/WAFs blocking the ';' character, as
           Transact-SQL does not require any separator between statements

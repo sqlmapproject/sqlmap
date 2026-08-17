@@ -2198,7 +2198,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
 
     kb.chars = AttribDict()
     kb.chars.delimiter = randomStr(length=6, lowercase=True)
-    # NOTE: markers have to be mutually distinct (e.g. equal start/stop makes the delimited output ambiguous, while equal replacement markers make _errorReplaceChars() restore the wrong character)
+    # NOTE: markers have to be mutually distinct (e.g. equal start/stop makes the delimited output ambiguous, while equal replacement markers make _errorReplaceChars() restore the wrong character). Also, none of the inner letters may be the boundary character itself, as that makes a marker contain a shorter one (e.g. 'qzqxq' carrying 'qzq')
     _ = set()
     while len(_) < 2:
         _.add(randomStr(length=3, alphabet=KB_CHARS_LOW_FREQUENCY_ALPHABET))
@@ -2207,6 +2207,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     _ = set()
     while len(_) < 4:
         _.add(randomStr(length=1, lowercase=True))
+        _.discard(KB_CHARS_BOUNDARY_CHAR)
     kb.chars.at, kb.chars.space, kb.chars.dollar, kb.chars.hash_ = ("%s%s%s" % (KB_CHARS_BOUNDARY_CHAR, __, KB_CHARS_BOUNDARY_CHAR) for __ in _)
 
     kb.checkWafMode = False

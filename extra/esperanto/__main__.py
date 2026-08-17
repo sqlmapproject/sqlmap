@@ -105,7 +105,7 @@ def _selftest():
         esp.discover()
         got = esp.extract("(SELECT name FROM users WHERE id=1)")
         assert got == "Admin-42", "quorum extraction (seed %d) failed: %r" % (seed, got)
-    print("  quorum=6 under 20%% noisy oracle (12%% err + 8%% lies) -> 'Admin-42' across 4 seeds")
+    print("  quorum=6 under 20% noisy oracle (12% err + 8% lies) -> 'Admin-42' across 4 seeds")
 
     # -- integrity guards (peer-review round 4) --------------------------------
     # empty/NULL are falsey; a bounded prefix (incl. limit=0) is incomplete+truncated

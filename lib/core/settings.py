@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.8.44"
+VERSION = "1.10.8.45"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -612,7 +612,7 @@ MYSQL_UNION_VALUE_CAST = "CONVERT(%s USING utf8mb4) COLLATE utf8mb4_bin"
 # Row count at/above which keyset (seek) pagination is used automatically for table dumps when a usable integer-key cursor exists (smaller tables keep the plain LIMIT/OFFSET path; '--keyset' forces it regardless of size)
 KEYSET_MIN_ROWS = 1000
 
-# Number of consecutive Huffman (set-membership) character attempts allowed to decline/escape without a single validated success before the technique latches itself off (safety against trimmed/blocked long IN() payloads)
+# Number of Huffman (set-membership) character attempts made before their escape ratio is judged; at/above it, escapes reaching half of all attempts latch the technique off (safety against trimmed/blocked long IN() payloads)
 HUFFMAN_PROBE_LIMIT = 8
 
 # Cold-start (prior) weights for the order-0 Huffman model used in adaptive blind retrieval. Gently
@@ -1776,8 +1776,8 @@ BRUTE_DOC_ROOT_TARGET_MARK = "%TARGET%"
 # Character used as a boundary in kb.chars (preferably less frequent letter)
 KB_CHARS_BOUNDARY_CHAR = 'q'
 
-# Letters of lower frequency used in kb.chars
-KB_CHARS_LOW_FREQUENCY_ALPHABET = "zqxjkvbp"
+# Letters of lower frequency used in kb.chars (NOTE: without the boundary character itself, so that no marker can contain a shorter one)
+KB_CHARS_LOW_FREQUENCY_ALPHABET = "zxjkvbp"
 
 # Printable bytes
 PRINTABLE_BYTES = set(bytes(string.printable, "ascii") if six.PY3 else string.printable)

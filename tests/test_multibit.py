@@ -30,6 +30,7 @@ bootstrap()
 from lib.core.data import conf, kb, queries
 from lib.core.enums import DBMS
 from lib.core.enums import PAYLOAD
+from lib.core.settings import MULTIBIT_MAX_FAILURES
 from lib.core.settings import MULTIBIT_NARROW
 from lib.core.settings import MULTIBIT_WIDEN
 from plugins.dbms.sqlite import SQLiteMap    # registers the SQLite escaper used by the read-back
@@ -235,6 +236,21 @@ class MultibitTest(unittest.TestCase):
 
             good = target.secret("plain ascii value that must still come back")
             self.assertEqual(self._read(target, good, len(good)), good, "condemned after %r" % first)
+
+    def test_null_values_do_not_condemn_the_channel(self):
+        # a NULL column has no length, so the read-back's length probe comes back unselected no matter
+        # what the channel did - i.e. exactly the way a channel dropping rows fails it. That is the
+        # data's doing, and a handful of NULLs in one dump must not retire a working channel
+        first = "first value is perfectly readable ascii"
+        target = _Target(first)
+        self.assertEqual(self._read(target, first, len(first)), first)
+
+        for _ in range(MULTIBIT_MAX_FAILURES + 1):
+            target.secret(None)
+            self.assertIsNone(self._read(target, ""))
+
+        good = target.secret("and the channel is still fine afterwards")
+        self.assertEqual(self._read(target, good, len(good)), good)
 
     def test_unreadable_value_mid_run_keeps_the_channel(self):
         target = _Target("first value is perfectly readable ascii")

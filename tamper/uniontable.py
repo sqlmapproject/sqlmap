@@ -32,8 +32,8 @@ def tamper(payload, **kwargs):
         * Useful to bypass web application firewalls, as the resulting payload contains neither
           the SELECT nor the FROM keyword. Verified against ModSecurity v3 with the OWASP CRS
           (paranoia level 1, blocking mode), where the plain counterpart scores 20 anomaly
-          points and is blocked, while the rewritten payload scores 0 and is answered with
-          HTTP 200
+          points and is blocked, while the rewritten payload drops to 5 (rule 942360 alone,
+          see below) or to 0 when chained with tamper script 'odbcbrace'
         * The rule doing most of the work there is 942270 '(?i)union.*?select.*?from', which
           needs all three keywords in that order. TABLE <table> is a complete query block on
           its own (sql_yacc.yy query_primary has exactly three alternatives: SELECT, VALUES and

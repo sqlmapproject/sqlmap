@@ -84,8 +84,8 @@ from lib.utils.safe2bin import safecharencode
 from lib.utils.xrange import xrange
 from thirdparty import six
 
-# Sentinel returned by the opt-in Huffman retrieval (--huffman) meaning "this character is
-# outside the ASCII model (e.g. multi-byte/Unicode) - defer to the classic bisection".
+# Sentinel returned by the (default-on, '--no-huffman') Huffman retrieval meaning "this character
+# is outside the ASCII model (e.g. multi-byte/Unicode) - defer to the classic bisection".
 _HUFFMAN_FALLBACK = object()
 
 # Cache of character-level Markov priors keyed by (order, scale, dbms); built once per process

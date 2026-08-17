@@ -591,6 +591,13 @@ def _confirm(profile, expression, value, length):
     # whose low byte still looks like ASCII), and that must not count against a working channel.
     if length is None:
         if _ask(profile, "%s=%d" % (queries[dbms].length.query % ("(%s)" % expression), len(value))) is not True:
+            # a NULL value has no length, so the comparison above is NULL (i.e. not selected) no matter
+            # what was read - exactly how a channel that drops rows fails it. One extra probe tells the
+            # two apart, so a column with NULLs in it does not retire an otherwise working channel
+            if _ask(profile, "(%s) IS NULL" % expression) is True:
+                _debug("value is NULL, so its length cannot be confirmed")
+                return None
+
             _debug("length of the extracted value did not confirm")
             return False
     elif length != len(value):

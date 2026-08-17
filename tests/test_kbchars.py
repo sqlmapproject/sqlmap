@@ -58,6 +58,19 @@ class KbCharsDistinctTest(unittest.TestCase):
             self.assertEqual(len(set(drawn)), len(MARKERS),
                              msg="colliding kb.chars markers on round %d: %s" % (i, dict(zip(MARKERS, drawn))))
 
+    def test_markers_never_contain_each_other(self):
+        # whole-string distinctness is not enough: the boundary character wrapping every marker used
+        # to be drawn for the inner letters as well, so a start marker could render as 'qzqxq', which
+        # carries the perfectly legal replacement marker 'qzq' (and 'qxq') inside it
+        for i in range(ROUNDS):
+            _setKnowledgeBaseAttributes()
+            drawn = [getattr(kb.chars, _) for _ in MARKERS]
+            for one in drawn:
+                for other in drawn:
+                    if one is not other:
+                        self.assertNotIn(other, one,
+                                         msg="kb.chars marker %r contains %r on round %d" % (one, other, i))
+
     def test_markers_keep_their_shape(self):
         # the fix must not change the on-the-wire length of a payload
         for _ in range(ROUNDS // 100):

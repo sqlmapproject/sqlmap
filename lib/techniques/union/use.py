@@ -257,7 +257,8 @@ def _chunkedJsonAggUse(expression, expressionFields, expressionFieldsList, count
     caps. K is halved adaptively if a chunk response still gets truncated. Returns a BigArray of
     rows, or None to let the caller fall back to the regular per-row UNION path.
 
-    Same DBMS coverage as the single-shot JSON-agg (per-DBMS aggregate + windowing); others -> None.
+    Covers the single-shot JSON-agg back-ends that also have a windowing form here (i.e. all of them
+    except Oracle and MSSQL, whose aggregates are built differently); others -> None.
     """
     dbms = Backend.getIdentifiedDbms()
 

@@ -114,6 +114,7 @@ optDict = {
         "notString": "string",
         "regexp": "string",
         "code": "integer",
+        "lengths": "boolean",
         "smart": "boolean",
         "textOnly": "boolean",
         "titles": "boolean",
