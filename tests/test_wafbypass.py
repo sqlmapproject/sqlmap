@@ -38,9 +38,10 @@ class TestIdentYwafDecoder(unittest.TestCase):
 class TestCandidateRanking(unittest.TestCase):
     def test_structural_first(self):
         cands = candidateTampers()
-        # the empirically strongest structural substitutions lead, ahead of camouflage
-        self.assertEqual(cands[0], "equaltolike")
-        self.assertIn("between", cands[:3])
+        # the empirically strongest structural substitutions lead, ahead of camouflage. The first
+        # three are the ones measured to get through a CRS-class ruleset, so they are trialled first
+        self.assertEqual(cands[:3], ["castprefix", "mid2leftright", "odbcbrace"])
+        self.assertLess(cands.index("equaltolike"), cands.index("randomcase"))
         self.assertLess(cands.index("between"), cands.index("space2comment"))
 
     def test_no_dbms_prefiltering(self):
