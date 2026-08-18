@@ -53,6 +53,9 @@
 * Added time-based payloads for CUBRID.
 * Added out-of-band DNS channels for H2 and ClickHouse.
 * Added PostgreSQL command execution through a PL extension.
+* Added the running of non-query statements without stacked queries through a gadget. On PostgreSQL, when the `dblink` extension is present, `--sql-query`, `--file-write`, `--os-cmd`, and `--os-shell` now work from a plain (e.g. boolean-based) injection point.
+* Added file read and file write support for SQLite through the `fileio` extension functions `readfile` and `writefile`.
+* Added the data access and the security type of a routine to the output of `--procs` on MySQL and PostgreSQL, so a routine that runs as its definer or that modifies data stands out.
 * Added the tamper scripts `blindbinary`, `dollarquote`, `infoschema2innodb`, `oraclequote`, and `sign`.
 
 ## Fewer dependencies
