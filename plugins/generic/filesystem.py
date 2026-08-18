@@ -56,6 +56,9 @@ class Filesystem(object):
         elif Backend.isDbms(DBMS.PGSQL) and not fileRead:
             lengthQuery = "SELECT SUM(LENGTH(data)) FROM pg_largeobject WHERE loid=%d" % self.oid
 
+        elif Backend.isDbms(DBMS.SQLITE):
+            lengthQuery = "LENGTH(readfile('%s'))" % remoteFile
+
         elif Backend.isDbms(DBMS.MSSQL):
             self.createSupportTbl(self.fileTblName, self.tblField, "VARBINARY(MAX)")
             inject.goStacked("INSERT INTO %s(%s) SELECT %s FROM OPENROWSET(BULK '%s', SINGLE_BLOB) AS %s(%s)" % (self.fileTblName, self.tblField, self.tblField, remoteFile, self.fileTblName, self.tblField))
@@ -213,6 +216,11 @@ class Filesystem(object):
         errMsg += "into the specific DBMS plugin"
         raise SqlmapUndefinedMethod(errMsg)
 
+    def nonStackedWriteFile(self, localFile, remoteFile, fileType, forceCheck=False):
+        errMsg = "'nonStackedWriteFile' method must be defined "
+        errMsg += "into the specific DBMS plugin"
+        raise SqlmapUndefinedMethod(errMsg)
+
     def stackedWriteFile(self, localFile, remoteFile, fileType, forceCheck=False):
         errMsg = "'stackedWriteFile' method must be defined "
         errMsg += "into the specific DBMS plugin"
@@ -234,7 +242,7 @@ class Filesystem(object):
                     logger.debug(debugMsg)
 
                 fileContent = self.stackedReadFile(remoteFile)
-            elif Backend.isDbms(DBMS.MYSQL) or Backend.isDbms(DBMS.PGSQL) or Backend.isDbms(DBMS.H2):
+            elif Backend.isDbms(DBMS.MYSQL) or Backend.isDbms(DBMS.PGSQL) or Backend.isDbms(DBMS.H2) or Backend.isDbms(DBMS.SQLITE):
                 debugMsg = "going to try to read the file with non-stacked query "
                 debugMsg += "SQL injection technique"
                 logger.debug(debugMsg)
@@ -321,6 +329,12 @@ class Filesystem(object):
             logger.debug(debugMsg)
 
             written = self.linesTerminatedWriteFile(localFile, remoteFile, fileType, forceCheck)
+        elif Backend.isDbms(DBMS.SQLITE):
+            debugMsg = "going to upload the file '%s' with " % fileType
+            debugMsg += "'writefile' function"
+            logger.debug(debugMsg)
+
+            written = self.nonStackedWriteFile(localFile, remoteFile, fileType, forceCheck)
         else:
             errMsg = "none of the SQL injection techniques detected can "
             errMsg += "be used to write files to the underlying file "

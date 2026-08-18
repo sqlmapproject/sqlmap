@@ -108,5 +108,12 @@ class Fingerprint(GenericFingerprint):
 
             return False
 
+    def checkDbmsOs(self, detailed=False):
+        if Backend.getOs():
+            infoMsg = "the back-end DBMS operating system is %s" % Backend.getOs()
+            logger.info(infoMsg)
+        else:
+            self.userChooseDbmsOs()
+
     def forceDbmsEnum(self):
         conf.db = "%s%s" % (DBMS.SQLITE, METADB_SUFFIX)
