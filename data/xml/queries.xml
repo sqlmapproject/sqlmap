@@ -51,8 +51,8 @@
             <blind query="SELECT INFO FROM INFORMATION_SCHEMA.PROCESSLIST ORDER BY ID LIMIT %d,1" query2="SELECT INFO FROM INFORMATION_SCHEMA.PROCESSLIST WHERE ID=%d" query3="SELECT ID FROM INFORMATION_SCHEMA.PROCESSLIST LIMIT %d,1" count="SELECT COUNT(DISTINCT(INFO)) FROM INFORMATION_SCHEMA.PROCESSLIST"/>
         </statements>
         <procedures>
-            <inband query="SELECT CONCAT(ROUTINE_NAME,' [',ROUTINE_TYPE,'] ',IFNULL(ROUTINE_DEFINITION,'')) FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_SCHEMA NOT IN ('mysql','sys','information_schema','performance_schema')"/>
-            <blind query="SELECT CONCAT(ROUTINE_NAME,' [',ROUTINE_TYPE,'] ',IFNULL(ROUTINE_DEFINITION,'')) FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_SCHEMA NOT IN ('mysql','sys','information_schema','performance_schema') ORDER BY ROUTINE_SCHEMA,ROUTINE_NAME LIMIT %d,1" count="SELECT COUNT(*) FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_SCHEMA NOT IN ('mysql','sys','information_schema','performance_schema')"/>
+            <inband query="SELECT CONCAT(ROUTINE_NAME,' [',ROUTINE_TYPE,'/',SQL_DATA_ACCESS,'/',SECURITY_TYPE,'] ',IFNULL(ROUTINE_DEFINITION,'')) FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_SCHEMA NOT IN ('mysql','sys','information_schema','performance_schema')"/>
+            <blind query="SELECT CONCAT(ROUTINE_NAME,' [',ROUTINE_TYPE,'/',SQL_DATA_ACCESS,'/',SECURITY_TYPE,'] ',IFNULL(ROUTINE_DEFINITION,'')) FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_SCHEMA NOT IN ('mysql','sys','information_schema','performance_schema') ORDER BY ROUTINE_SCHEMA,ROUTINE_NAME LIMIT %d,1" count="SELECT COUNT(*) FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_SCHEMA NOT IN ('mysql','sys','information_schema','performance_schema')"/>
         </procedures>
         <dbs>
             <inband query="SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA" query2="SELECT db FROM mysql.db"/>
@@ -134,8 +134,8 @@
             <blind query="SELECT DISTINCT(query) FROM pg_stat_activity WHERE query != '&lt;IDLE&gt;' OFFSET %d LIMIT 1" count="SELECT COUNT(DISTINCT(query)) FROM pg_stat_activity WHERE query != '&lt;IDLE&gt;'"/>
         </statements>
         <procedures>
-            <inband query="SELECT n.nspname||'.'||p.proname||': '||p.prosrc FROM pg_proc p JOIN pg_namespace n ON p.pronamespace=n.oid WHERE n.nspname NOT IN ('pg_catalog','information_schema')"/>
-            <blind query="SELECT n.nspname||'.'||p.proname||': '||p.prosrc FROM pg_proc p JOIN pg_namespace n ON p.pronamespace=n.oid WHERE n.nspname NOT IN ('pg_catalog','information_schema') ORDER BY n.nspname,p.proname OFFSET %d LIMIT 1" count="SELECT COUNT(*) FROM pg_proc p JOIN pg_namespace n ON p.pronamespace=n.oid WHERE n.nspname NOT IN ('pg_catalog','information_schema')"/>
+            <inband query="SELECT n.nspname||'.'||p.proname||' ['||(CASE p.provolatile WHEN 'v' THEN 'VOLATILE' WHEN 's' THEN 'STABLE' ELSE 'IMMUTABLE' END)||(CASE WHEN p.prosecdef THEN '/DEFINER' ELSE '/INVOKER' END)||']: '||p.prosrc FROM pg_proc p JOIN pg_namespace n ON p.pronamespace=n.oid WHERE n.nspname NOT IN ('pg_catalog','information_schema')"/>
+            <blind query="SELECT n.nspname||'.'||p.proname||' ['||(CASE p.provolatile WHEN 'v' THEN 'VOLATILE' WHEN 's' THEN 'STABLE' ELSE 'IMMUTABLE' END)||(CASE WHEN p.prosecdef THEN '/DEFINER' ELSE '/INVOKER' END)||']: '||p.prosrc FROM pg_proc p JOIN pg_namespace n ON p.pronamespace=n.oid WHERE n.nspname NOT IN ('pg_catalog','information_schema') ORDER BY n.nspname,p.proname OFFSET %d LIMIT 1" count="SELECT COUNT(*) FROM pg_proc p JOIN pg_namespace n ON p.pronamespace=n.oid WHERE n.nspname NOT IN ('pg_catalog','information_schema')"/>
         </procedures>
         <dbs>
             <inband query="SELECT DISTINCT(schemaname) FROM pg_tables"/>
