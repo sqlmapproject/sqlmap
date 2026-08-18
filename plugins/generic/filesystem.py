@@ -317,6 +317,13 @@ class Filesystem(object):
 
             written = self.stackedWriteFile(localFile, remoteFile, fileType, forceCheck)
             self.cleanup(onlyFileTbl=True)
+        elif Backend.isDbms(DBMS.PGSQL) and inject.getGadget():
+            debugMsg = "going to upload the file '%s' with " % fileType
+            debugMsg += "large object technique through a gadget"
+            logger.debug(debugMsg)
+
+            written = self.stackedWriteFile(localFile, remoteFile, fileType, forceCheck)
+            self.cleanup(onlyFileTbl=True)
         elif isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) and Backend.isDbms(DBMS.MYSQL):
             debugMsg = "going to upload the file '%s' with " % fileType
             debugMsg += "UNION query technique"
