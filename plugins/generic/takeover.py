@@ -27,6 +27,7 @@ from lib.core.exception import SqlmapNotVulnerableException
 from lib.core.exception import SqlmapSystemException
 from lib.core.exception import SqlmapUndefinedMethod
 from lib.core.exception import SqlmapUnsupportedDBMSException
+from lib.request import inject
 from lib.takeover.abstraction import Abstraction
 from lib.takeover.icmpsh import ICMPsh
 from lib.takeover.metasploit import Metasploit
@@ -45,6 +46,8 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
 
     def osCmd(self):
         if isStackingAvailable() or conf.direct:
+            web = False
+        elif Backend.isDbms(DBMS.PGSQL) and inject.getGadget():
             web = False
         elif not isStackingAvailable() and Backend.isDbms(DBMS.MYSQL):
             infoMsg = "going to use a web backdoor for command execution"
@@ -67,6 +70,8 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
 
     def osShell(self):
         if isStackingAvailable() or conf.direct:
+            web = False
+        elif Backend.isDbms(DBMS.PGSQL) and inject.getGadget():
             web = False
         elif not isStackingAvailable() and Backend.isDbms(DBMS.MYSQL):
             infoMsg = "going to use a web backdoor for command prompt"

@@ -48,6 +48,9 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
+from lib.core.convert import encodeHex
+from lib.core.convert import getBytes
+from lib.core.convert import getUnicode
 from lib.core.decorators import lockedmethod
 from lib.core.decorators import stackedmethod
 from lib.core.dicts import FROM_DUMMY_TABLE
@@ -834,6 +837,36 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
 
     return extractExpectedValue(value, expected)
 
+def getGadget():
+    """
+    Returns a 'gadget' (a side-effecting scalar expression usable through a
+    regular - e.g. boolean/time-based - injection) that can run an arbitrary
+    statement when stacked queries are not available (e.g. dblink_exec() on
+    PostgreSQL). Detection is done once and cached inside 'kb.gadget'.
+    """
+
+    if kb.gadget is None:
+        kb.gadget = False
+
+        dbms = Backend.getIdentifiedDbms()
+
+        if dbms is not None and "gadgets" in queries[dbms]:
+            for name, gadget in queries[dbms].gadgets.__dict__.items():
+                try:
+                    available = checkBooleanExpression(gadget.check)
+                except Exception:
+                    available = False
+
+                if available:
+                    infoMsg = "using '%s' gadget to run statement(s) as " % name
+                    infoMsg += "stacked queries are not available"
+                    logger.info(infoMsg)
+
+                    kb.gadget = gadget
+                    break
+
+    return kb.gadget or None
+
 def goStacked(expression, silent=False):
     if PAYLOAD.TECHNIQUE.STACKED in kb.injection.data:
         setTechnique(PAYLOAD.TECHNIQUE.STACKED)
@@ -848,6 +881,18 @@ def goStacked(expression, silent=False):
 
     if conf.direct:
         return direct(expression)
+
+    if PAYLOAD.TECHNIQUE.STACKED not in kb.injection.data:
+        gadget = getGadget()
+
+        if gadget:
+            warnMsg = "statement execution through a gadget is best-effort "
+            warnMsg += "and its result (if any) can not be retrieved"
+            singleTimeWarnMessage(warnMsg)
+
+            payload = getUnicode(gadget.command) % getUnicode(encodeHex(getBytes(expression), binary=False))
+            checkBooleanExpression("(%s) IS NOT NULL" % payload)
+            return
 
     query = agent.prefixQuery(";%s" % expression)
     query = agent.suffixQuery(query)

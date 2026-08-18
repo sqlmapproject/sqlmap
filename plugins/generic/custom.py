@@ -71,7 +71,7 @@ class Custom(object):
                             output[i] = joinValue(output[i])
 
                 return output
-            elif not isStackingAvailable() and not conf.direct:
+            elif not isStackingAvailable() and not conf.direct and not inject.getGadget():
                 warnMsg = "execution of non-query SQL statements is only "
                 warnMsg += "available when stacked queries are supported"
                 logger.warning(warnMsg)

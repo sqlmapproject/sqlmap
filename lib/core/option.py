@@ -2255,6 +2255,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.forkNote = None
     kb.futileUnion = None
     kb.fuzzUnionTest = None
+    kb.gadget = None
     kb.heavilyDynamic = False
     kb.headersFile = None
     kb.headersFp = {}
