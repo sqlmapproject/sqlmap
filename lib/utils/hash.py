@@ -269,7 +269,7 @@ def oracle_old_passwd(password, username, uppercase=True):  # prior to version '
 
     IV, pad = b"\0" * 8, b"\0"
 
-    unistr = b"".join((b"\0" + _.encode(UNICODE_ENCODING)) if ord(_) < 256 else _.encode(UNICODE_ENCODING) for _ in (username + password).upper())
+    unistr = b"".join((b"\0" + _.encode(UNICODE_ENCODING)) if ord(_) < 256 else _.encode(UNICODE_ENCODING) for _ in (getUnicode(username) + getUnicode(password)).upper())
 
     if des.__module__ == "Crypto.Cipher.DES":
         unistr += b"\0" * ((8 - len(unistr) % 8) & 7)
