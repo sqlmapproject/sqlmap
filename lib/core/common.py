@@ -1529,6 +1529,8 @@ def cleanQuery(query):
 
     >>> cleanQuery("select id from users")
     'SELECT id FROM users'
+    >>> cleanQuery("select a from selected where b='from'")
+    "SELECT a FROM selected WHERE b='from'"
     """
 
     retVal = query
@@ -1544,10 +1546,11 @@ def cleanQuery(query):
             if not candidate or candidate.lower() not in queryLower:
                 continue
 
-            queryMatch = re.search(r"(?i)\b(%s)\b" % candidate, query)
-
-            if queryMatch and "sys_exec" not in query:
-                retVal = retVal.replace(queryMatch.group(1), candidate.upper())
+            if "sys_exec" not in query:
+                # NOTE: the leading branch consumes whole quoted parts (hence keeping keyword-alike data
+                # and case sensitive quoted identifiers intact), while the keyword itself is switched only
+                # at word boundaries (e.g. 'selected' must not turn into 'SELECTed')
+                retVal = re.sub(r"(?i)('[^']*'|\"[^\"]*\")|\b%s\b" % candidate, lambda match: match.group(1) or candidate.upper(), retVal)
 
     return retVal
 
