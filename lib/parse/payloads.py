@@ -71,7 +71,10 @@ def parseXmlNode(node):
                 for gchild in progeny:
                     if gchild.tag in test[child.tag]:
                         prevtext = test[child.tag][gchild.tag]
-                        test[child.tag][gchild.tag] = [prevtext, gchild.text]
+                        if isinstance(prevtext, list):
+                            prevtext.append(gchild.text)
+                        else:
+                            test[child.tag][gchild.tag] = [prevtext, gchild.text]
                     else:
                         test[child.tag][gchild.tag] = gchild.text
 
