@@ -212,6 +212,10 @@ def checkSqlInjection(place, parameter, value):
                 })
 
             if stype == PAYLOAD.TECHNIQUE.UNION:
+                if "char" not in test.request:
+                    logger.debug("skipping malformed UNION test '%s' because its request has no character" % title)
+                    continue
+
                 configUnion(test.request.char)
 
                 if "[CHAR]" in title:
