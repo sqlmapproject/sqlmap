@@ -89,6 +89,8 @@ def crackHMAC(token, secrets, limit=None):
     's3cr3t'
     >>> crackHMAC(token, ["admin", "letmein"]) is None
     True
+    >>> crackHMAC("eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoiYWRtaW4ifQ.x", ["secret"]) is None
+    True
     """
 
     data = parseJWT(token)
@@ -97,7 +99,13 @@ def crackHMAC(token, secrets, limit=None):
 
     fn = HMAC_ALGORITHMS[data["header"]["alg"].upper()]
     signingInput = getBytes(data["signingInput"])
-    target = decodeBase64(data["signature"], binary=True)
+
+    try:
+        target = decodeBase64(data["signature"], binary=True)
+    except Exception:
+        # a signature segment that is not valid base64url (e.g. a truncated/malformed token that still
+        # matches the JWT pattern) cannot be an HMAC we could verify, so it is simply not crackable
+        return None
 
     for index, secret in enumerate(secrets):
         if limit is not None and index >= limit:
