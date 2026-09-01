@@ -21,9 +21,22 @@
         <error regexp="MemSQL does not support this type of query" fork="MemSQL"/>
         <error regexp="is not supported by MemSQL" fork="MemSQL"/>
         <error regexp="unsupported nested scalar subselect" fork="MemSQL"/>
+        <error regexp="check the manual that (corresponds to|fits) your (Apache )?Doris server version" fork="Doris"/>
+        <error regexp="org\.apache\.doris\." fork="Doris"/>
+        <error regexp="check the manual that (corresponds to|fits) your StarRocks server version" fork="StarRocks"/>
+        <error regexp="com\.starrocks\." fork="StarRocks"/>
     </dbms>
 
     <dbms value="PostgreSQL">
+        <error regexp="CockroachDB.*?ERROR" fork="CockroachDB"/>
+        <error regexp="check the manual that (corresponds to|fits) your CockroachDB server version" fork="CockroachDB"/>
+        <error regexp="pgwire/pgerror" fork="CockroachDB"/>
+        <error regexp="crdb_internal\." fork="CockroachDB"/>
+        <error regexp="YugabyteDB.*?ERROR" fork="YugabyteDB"/>
+        <error regexp="check the manual that (corresponds to|fits) your YugabyteDB server version" fork="YugabyteDB"/>
+        <error regexp="org\.yb\." fork="YugabyteDB"/>
+        <error regexp="openGauss.*?ERROR" fork="OpenGauss"/>
+        <error regexp="org\.opengauss\.util\.PSQLException" fork="OpenGauss"/>
         <error regexp="PostgreSQL.*?ERROR"/>
         <error regexp="Warning.*?\Wpg_"/>
         <error regexp="valid PostgreSQL result"/>
@@ -118,6 +131,10 @@
     </dbms>
 
     <dbms value="SQLite">
+        <error regexp="duckdb\.duckdb\.(Parser|Binder|Catalog|Conversion)Exception" fork="DuckDB"/>
+        <error regexp="org\.duckdb\.DuckDBException" fork="DuckDB"/>
+        <error regexp="Parser Error: syntax error at or near" fork="DuckDB"/>
+        <error regexp="Binder Error: Table with name" fork="DuckDB"/>
         <error regexp="SQLite/JDBCDriver"/>
         <error regexp="SQLite\.Exception"/>
         <error regexp="(Microsoft|System)\.Data\.SQLite\.SQLiteException"/>
@@ -208,6 +225,8 @@
         <error regexp="com\.simba\.presto\.jdbc"/>
         <error regexp="UNION query has different number of fields: \d+, \d+"/>
         <error regexp="line \d+:\d+: mismatched input '[^']+'. Expecting:"/>
+        <error regexp="io\.trino\.jdbc" fork="Trino"/>
+        <error regexp="io\.trino\.spi\." fork="Trino"/>
     </dbms>
 
     <dbms value="Altibase">
