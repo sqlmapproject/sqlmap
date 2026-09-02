@@ -19,6 +19,7 @@ non-ASCII byte is unavoidable. Compatibility shims live in `lib/core/compat.py` 
 |-------|------|---------|
 | CLI | `sqlmap.py` -> `main()` | the scanner. Applies runtime patches, parses options, runs a scan. |
 | REST API | `sqlmapapi.py` | `-s` server / `-c` client wrappers around `lib/utils/api.py`. |
+| Library | `import sqlmap` -> `lib/utils/library.py` | `scan()` / `scanFromRequest()` for programmatic callers; like the API, it drives the engine as a subprocess. |
 
 `main()` (sqlmap.py) does, in order: `dirtyPatches()` (monkey-patches stdlib for
 quirks/security - see below), `setPaths()`, `init()` (option parsing + environment
@@ -58,7 +59,7 @@ Identifiers in the codebase are camelCase.
 | `lib/core/` | conf/kb model, common helpers, settings, enums, dump, session, agent, option parsing |
 | `lib/controller/` | the scan orchestrator (`controller.py`), detection checks (`checks.py`), enumeration dispatch (`action.py`), DBMS handler selection (`handler.py`) |
 | `lib/request/` | HTTP layer: `connect.py` (sending), `comparison.py` (the true/false oracle), `inject.py` (value extraction), protocol handlers, response processing |
-| `lib/techniques/` | the exploitation engines: `blind/inference.py`, `error/use.py`, `union/{test,use}.py`, `dns/` |
+| `lib/techniques/` | the exploitation engines: `blind/{inference,multibit}.py`, `error/use.py`, `union/{test,use}.py`, `dns/`, plus one directory per non-SQL family (`ssti/`, `nosql/`, `xpath/`, ...) |
 | `lib/parse/` | parsing of inputs: CLI, config, HTTP request/log files, HTML, sitemap, and the XML payload/boundary loader (`payloads.py`) |
 | `lib/utils/` | feature modules: `api.py` (REST), `hashdb.py` (session), `crawler.py`, `hash.py` (cracking), `har.py`, `brute.py`, `search.py`, ... |
 | `lib/takeover/` | OS-level takeover: shells, file access, UDF, registry, Metasploit, `xp_cmdshell` |
@@ -130,6 +131,7 @@ Once a parameter is injectable, value extraction is dispatched by
 | Technique | Engine | Mechanism |
 |-----------|--------|-----------|
 | boolean-based blind | `blind/inference.py: bisection()` | binary-search each character via true/false oracle |
+| multi-bit blind (`--multi-bit`) | `blind/multibit.py` | opt-in; reads several bits per request out of the rows a listing page renders |
 | time-based blind / stacked | `blind/inference.py` (time compare) | same bisection, oracle is a measured delay |
 | error-based | `error/use.py: errorUse()` | parse the value straight out of a provoked DB error |
 | UNION query | `union/{test,use}.py` | column-count detection then `UNION SELECT` extraction |
@@ -140,6 +142,14 @@ Once a parameter is injectable, value extraction is dispatched by
 `kb.cache.charsetAsciiTbl` and respects the `kb.disableShiftTable` runaway-guard latch
 (intentional). Multi-threaded extraction is coordinated via `kb.locks` and
 `getCurrentThreadData()` (`lib/core/threads.py`).
+
+**Non-SQL engines.** `--nosql`, `--xpath`, `--ldap`, `--ssti`, `--graphql`, `--hql`, `--sparql`,
+`--odata`, `--xslt`, `--xxe` and `--jwt` do not go through the pipeline above at all. Each one is a
+self-contained scanner in `lib/techniques/<family>/inject.py`, dispatched from `controller.py` and
+registered once in `NONSQL_TECHNIQUES` (`lib/core/settings.py`) - that tuple is what the rest of the
+code tests against, so a new family is declared there and nowhere else. The response comparison,
+reflection stripping and blind-bit classification they all need live in `lib/utils/nonsql.py`
+instead of being copied per family.
 
 ---
 
@@ -155,7 +165,10 @@ Enumeration is DBMS-agnostic at the top and specialized underneath:
   pieces and supplying dialect specifics.
 - **`data/xml/queries.xml`** - per-DBMS SQL query templates (banner, current user, table
   enumeration, casting, etc.) keyed by DBMS. The generic code asks for a query by name;
-  the dialect comes from XML.
+  the dialect comes from XML. It also carries the per-DBMS `<gadgets>` - side-effecting scalar
+  expressions (e.g. PostgreSQL `dblink_exec`) that `getGadget()` (`lib/request/inject.py`) probes
+  once and caches in `kb.gadget`, so `--sql-query` / `--file-write` / `--os-cmd` still work from an
+  injection point that has no stacked queries.
 
 `conf.dbmsHandler` (set in `handler.py`) is the live object that `action()` calls into.
 
@@ -180,12 +193,16 @@ Enumeration is DBMS-agnostic at the top and specialized underneath:
 `lib/request/connect.py` (`Connect.getPage`) is the single HTTP chokepoint. Around it:
 protocol handlers (`httpshandler`, `redirecthandler`, `chunkedhandler`, `rangehandler`,
 persistent connections via `lib/request/keepalive.py`), response processing (`basic.py`), and the
-comparison oracle (`comparison.py`).
+comparison oracle (`comparison.py`). Alternative transports hang off the same chokepoint: the
+standard-library HTTP/2 client (`http2.py`, `--http2`, which also carries the `--timeless` oracle in
+`timeless.py`) and WebSocket targets (`websocket.py`).
 
 **Tamper scripts** (`tamper/`) mutate the payload just before sending to evade WAF/IPS.
 Each file exposes a `tamper(payload, **kwargs)` and a `__priority__`; `--tamper=a,b,c`
 chains them in priority order. They are payload-string transforms only (no engine
-coupling), which is why they compose freely.
+coupling), which is why they compose freely. When a WAF/IPS is identified, `lib/utils/wafbypass.py`
+ranks the plausible candidates and `_autoWafBypass()` (`controller.py`) trials them one at a time -
+a candidate is adopted only if re-running the detection through it brings the injection back.
 
 ---
 
@@ -227,6 +244,7 @@ Two complementary layers:
 | a constant/threshold | `lib/core/settings.py` |
 | how injection is *detected* | `data/xml/boundaries.xml` + `data/xml/payloads/*.xml`, then `lib/controller/checks.py` |
 | how a value is *extracted* | `lib/request/inject.py` + the relevant `lib/techniques/` engine |
+| a non-SQL technique (SSTI, NoSQL, XPath, ...) | `lib/techniques/<family>/inject.py` (+ `NONSQL_TECHNIQUES` in `settings.py`) |
 | the true/false decision | `lib/request/comparison.py` |
 | a per-DBMS query/dialect | `data/xml/queries.xml` + `plugins/dbms/<dbms>/` |
 | enumeration behavior | `plugins/generic/*.py` |

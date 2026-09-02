@@ -15,10 +15,12 @@
 * Added the switch `--xslt`. It tests for XSLT injection. The engine names itself in the response. sqlmap then dumps the XML document that the stylesheet transforms. It also reads the files that the engine can reach. When the engine exposes an extension bridge (PHP `php:function` or the Xalan `java:` namespace), sqlmap reads any file through it, and with `--os-cmd` or `--os-shell` it runs operating system commands.
 * Added the switch `--xxe`. It tests for XML External Entity injection. It uses in-band, error-based, and out-of-band channels.
 * Added the switch `--jwt`. It examines JSON Web Tokens for weak keys and for injection in the claims.
+* sqlmap now offers to get around a WAF/IPS on its own. Once it identifies one and the ordinary payloads come back blocked, it drops the scanner fingerprint and tries the tamper scripts that suit that WAF, and it keeps the first one that brings the injection back.
 
 ## Speed
 
 * Added the switch `--timeless`. It reads each blind bit from the HTTP/2 response order. It does not use a delay. sqlmap calibrates the target first, and it uses the usual time-based technique if the target is not applicable.
+* Added the switch `--multi-bit`. On a page that renders rows, one request reads a bit from each row that comes back instead of a single bit altogether.
 * Added set-membership (Huffman) retrieval for blind dumps. It needs fewer requests for each character. Use `--no-huffman` to stop it.
 * Added keyset (seek) pagination for blind table dumps. Use `--no-keyset` to stop it.
 * Added parallel retrieval of values in blind mode. Each thread retrieves a different value.
@@ -53,10 +55,13 @@
 * Added time-based payloads for CUBRID.
 * Added out-of-band DNS channels for H2 and ClickHouse.
 * Added PostgreSQL command execution through a PL extension.
-* Added the running of non-query statements without stacked queries through a gadget. On PostgreSQL, when the `dblink` extension is present, `--sql-query`, `--file-write`, `--os-cmd`, and `--os-shell` now work from a plain (e.g. boolean-based) injection point.
+* Added the running of non-query statements without stacked queries through a gadget. On PostgreSQL, when the `dblink` extension is there and the current user can run it, `--sql-query`, `--file-write`, `--os-cmd`, and `--os-shell` now work from a plain (e.g. boolean-based) injection point.
 * Added file read and file write support for SQLite through the `fileio` extension functions `readfile` and `writefile`.
 * Added the data access and the security type of a routine to the output of `--procs` on MySQL and PostgreSQL, so a routine that runs as its definer or that modifies data stands out.
-* Added the tamper scripts `blindbinary`, `dollarquote`, `infoschema2innodb`, `oraclequote`, and `sign`.
+* Added stacked query payloads for Microsoft SQL Server and Sybase that carry no semicolon, so a filtered semicolon alone no longer hides the technique.
+* Added the error signatures that tell the MySQL and the PostgreSQL forks apart: Doris, StarRocks, CockroachDB, YugabyteDB, OpenGauss, DuckDB, and Trino. These forks keep the wording of the engine that they come from, so only a leaked driver package or an engine-internal source reference gives them away.
+* Made the fingerprinting payloads friendlier to a WAF, so the version detection survives where it used to get blocked.
+* Added the tamper scripts `blindbinary`, `castprefix`, `dollarquote`, `infoschema2innodb`, `mid2leftright`, `mssqlnosemicolon`, `odbcbrace`, `oraclequote`, `quote2ltat`, `sign`, `sleep2hex`, and `uniontable`.
 
 ## Fewer dependencies
 
@@ -93,6 +98,11 @@
 * Made the heuristic hints of the non-SQL switches exclusive. A signature no longer matches the errors of a different engine, an ordinary SQL error, or a page that only contains the name of a template engine.
 * Corrected the GraphQL validation signatures. They now match the quotes in the way that the JSON body escapes them.
 * Added the error signatures of Mako and of DynamoDB. sqlmap did not recognise the errors of these two back-ends.
+* sqlmap no longer stops with an exception on a JWT whose signature is not valid base64url. Such a signature can not be an HMAC that sqlmap could verify, so it is reported as not crackable instead.
+* Corrected the uppercasing of the keywords in the shown queries. A word that merely contains a keyword (e.g. a table named `selected`) and a keyword inside a quoted string are now left alone.
+* Corrected the cracking of the old Oracle password hashes when the user name or the password does not come in as text.
+* sqlmap now skips a UNION test whose request holds no character instead of stopping with an exception. Only a hand-edited `payloads/union_query.xml` can hold such a test.
+* The gadget check now runs the gadget itself instead of only looking for the extension. A user that can not use it no longer gets a false success.
 
 ## Quality
 
