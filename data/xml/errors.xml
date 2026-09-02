@@ -2,6 +2,9 @@
 
 <root>
     <dbms value="MySQL">
+        <error regexp="org\.apache\.doris\." fork="Doris"/>
+        <error regexp="com\.starrocks\." fork="StarRocks"/>
+        <error regexp="Getting syntax error (at|from) line \d+, column \d+" fork="StarRocks"/>
         <error regexp="SQL syntax.*?MySQL"/>
         <error regexp="Warning.*?\Wmysqli?_"/>
         <error regexp="MySQLSyntaxErrorException"/>
@@ -24,6 +27,15 @@
     </dbms>
 
     <dbms value="PostgreSQL">
+        <error regexp="crdb_internal\." fork="CockroachDB"/>
+        <error regexp="github\.com/cockroachdb/cockroach/pkg/sql" fork="CockroachDB"/>
+        <error regexp="com\.yugabyte\.(util\.PSQLException|core\.v3)" fork="YugabyteDB"/>
+        <error regexp="\(yb/\w+/\w+\.cc:\d+\)" fork="YugabyteDB"/>
+        <error regexp="org\.opengauss\.(util\.PSQLException|core\.v3)" fork="OpenGauss"/>
+        <error regexp="(duckdb\.duckdb|_duckdb)\.(Parser|Binder|Catalog|Conversion)Exception" fork="DuckDB"/>
+        <error regexp="org\.duckdb\.DuckDB" fork="DuckDB"/>
+        <error regexp="Parser Error: [^\n]{0,40}at or near" fork="DuckDB"/>
+        <error regexp="(Catalog Error: Table with name|Binder Error: Referenced column)" fork="DuckDB"/>
         <error regexp="PostgreSQL.*?ERROR"/>
         <error regexp="Warning.*?\Wpg_"/>
         <error regexp="valid PostgreSQL result"/>
@@ -203,6 +215,7 @@
     </dbms>
 
     <dbms value="Presto">
+        <error regexp="io\.trino\.(jdbc|spi)\." fork="Trino"/>
         <error regexp="com\.facebook\.presto\.jdbc"/>
         <error regexp="io\.prestosql\.jdbc"/>
         <error regexp="com\.simba\.presto\.jdbc"/>
