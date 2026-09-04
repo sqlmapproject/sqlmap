@@ -905,6 +905,13 @@ def _setTamperingFunctions():
             priority = PRIORITY.NORMAL if not hasattr(module, "__priority__") else module.__priority__
             priority = priority if priority is not None else PRIORITY.LOWEST
 
+            if not isinstance(priority, int):
+                warnMsg = "tamper module '%s' has an invalid value for '__priority__' " % filename[:-3]
+                warnMsg += "(assuming '%d')" % PRIORITY.NORMAL
+                logger.warning(warnMsg)
+
+                priority = PRIORITY.NORMAL
+
             for name, function in inspect.getmembers(module, inspect.isfunction):
                 if name == "tamper" and (hasattr(inspect, "signature") and all(_ in inspect.signature(function).parameters for _ in ("payload", "kwargs")) or inspect.getargspec(function).args and inspect.getargspec(function).keywords == "kwargs"):
                     found = True
