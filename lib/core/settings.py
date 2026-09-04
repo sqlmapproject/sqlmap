@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.9.3"
+VERSION = "1.10.9.4"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -1193,7 +1193,10 @@ XPATH_ERROR_SIGNATURES = (
     ("Python ElementTree", r"xml\.etree\.ElementTree\.(?:ParseError|Element)"),
     # NOT XSLT: a dedicated '--xslt' engine owns those errors now, and claiming them here made every
     # XSLT parser error suggest '--xpath' as well
-    ("Generic XPath", r"XPath.*?(?:error|exception|syntax)"),
+    # NOTE: the gap has to stay bounded (like in 'Handlebars' below). An unbounded '.*?' turns this
+    # into a quadratic scan of every long line that merely carries the word 'xpath' (e.g. minified
+    # JS/JSON), which took ~25s on a 400KB response - and blew up the regex engine itself (#6105)
+    ("Generic XPath", r"XPath[^\n]{0,100}?(?:error|exception|syntax)"),
     ("Generic XPath", r"Invalid XPath|XPath evaluation failed"),
 )
 
@@ -1337,7 +1340,7 @@ SSTI_ERROR_SIGNATURES = (
     ("Velocity", r"org\.apache\.velocity\.(?:runtime|exception)\.\w+|ParseErrorException|MethodInvocationException|ResourceNotFoundException"),
     ("Spring EL / Thymeleaf", r"org\.springframework\.expression\.\w+|org\.thymeleaf\.\w+|SpelEvaluationException|TemplateProcessingException|ExpressionParsingException"),
     ("Struts2 (OGNL)", r"ognl\.(?:OgnlException|NoSuchPropertyException|MethodFailedException|InappropriateExpressionException|ExpressionSyntaxException)|com\.opensymphony\.xwork2|org\.apache\.struts2|There is no Action mapped for|Struts (?:Problem Report|has detected an unhandled exception)"),
-    ("ERB", r"\(erb\):\d+|NameError.*undefined local variable"),
+    ("ERB", r"\(erb\):\d+|NameError[^\n]{0,100}?undefined local variable"),
     # NOTE: these must stay anchored to a diagnostic. The bare product names matched any page that
     # carries the word 'pug'/'jade'/'handlebars' (a surname, a colour, a <script src=> of the runtime),
     # and the bare 'ParseError' matched lxml.etree.XSLTParseError and ElementTree.ParseError
@@ -1361,7 +1364,7 @@ XXE_ERROR_SIGNATURES = (
     ("Java (Xerces/JAXP)", r"(?:org\.xml\.sax\.SAXParseException|com\.sun\.org\.apache\.xerces|javax\.xml\.stream\.XMLStreamException|The (?:entity|element type) \"[^\"]*\" was referenced|DOCTYPE is disallowed when the feature|External (?:DTD|parsed entities|Entity): failed|\"[^\"]*\" must be declared|had to be read but the maximum)"),
     (".NET System.Xml", r"(?:System\.Xml\.XmlException|For security reasons DTD is prohibited|Reference to undeclared entity|An error occurred while parsing EntityName|XmlTextReaderImpl)"),
     ("Python expat", r"(?:xml\.parsers\.expat\.ExpatError|undefined entity|not well-formed \(invalid token\)|ExpatError)"),
-    ("Ruby Nokogiri/REXML", r"(?:Nokogiri::XML::SyntaxError|REXML::ParseException|Entity .* not defined)"),
+    ("Ruby Nokogiri/REXML", r"(?:Nokogiri::XML::SyntaxError|REXML::ParseException|Entity [^\n]{0,100}? not defined)"),
     ("Go encoding/xml", r"XML syntax error on line \d+"),
     # NOTE: 'unexpected end of ...' is what every parser says, not what an XML parser says. It matched
     # the "Unexpected end of query" of BaseX, the "Unexpected <EOF>" of GraphQL and the "Unexpected end
@@ -1417,7 +1420,7 @@ HQL_ERROR_SIGNATURES = (
     ("Hibernate", r"(?:unexpected (?:token:|end of subtree|AST node)|Could not (?:resolve|interpret) (?:attribute|root entity|path|property))"),
     ("EclipseLink / JPQL", r"(?:org\.eclipse\.persistence\.exceptions\.JPQLException|Exception \[EclipseLink|Problem compiling \[|An exception occurred while creating a query)"),
     ("JPA / JPQL", r"(?:javax|jakarta)\.persistence\.(?:PersistenceException|Query(?:Syntax|Timeout)?Exception)"),
-    ("Generic HQL/JPQL", r"(?:HQL|JPQL|EJBQL)\b.*?(?:error|exception|syntax|not (?:mapped|resolve))"),
+    ("Generic HQL/JPQL", r"(?:HQL|JPQL|EJBQL)\b[^\n]{0,100}?(?:error|exception|syntax|not (?:mapped|resolve))"),
 )
 
 HQL_ERROR_REGEX = r"(?i)(?:%s)" % '|'.join(regex for _, regex in HQL_ERROR_SIGNATURES)
@@ -1484,7 +1487,7 @@ SPARQL_ERROR_SIGNATURES = (
     # too - matching on it alone mislabelled them as RDF4J, so only the package name is kept
     ("RDF4J / GraphDB", r"org\.eclipse\.rdf4j|org\.openrdf\.query"),
     ("Blazegraph", r"com\.bigdata\.rdf|\bBlazegraph\b"),
-    ("rdflib", r"rdflib\.plugins\.sparql|\bParseException\b.*?(?:SPARQL|sparql)"),
+    ("rdflib", r"rdflib\.plugins\.sparql|\bParseException\b[^\n]{0,100}?(?:SPARQL|sparql)"),
     ("Stardog", r"com\.(?:complexible\.)?stardog"),
 )
 

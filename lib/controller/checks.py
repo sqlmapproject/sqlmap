@@ -1223,6 +1223,14 @@ def heuristicCheckSqlInjection(place, parameter):
         if conf.beep:
             beep()
 
+    def _search(regex):
+        # Note: on a rare (e.g. huge) response the regex engine itself can fail, and losing one
+        # advisory heuristic beats losing the whole run (e.g. #5994 and #6105)
+        try:
+            return re.search(regex, page or "")
+        except (SystemError, RuntimeError) as ex:
+            logger.debug("skipping heuristic check because of a regex engine failure ('%s')" % getSafeExString(ex))
+
     try:
         for match in re.finditer(FI_ERROR_REGEX, page or ""):
             if randStr1.lower() in match.group(0).lower():
@@ -1234,71 +1242,71 @@ def heuristicCheckSqlInjection(place, parameter):
 
                 break
     except (SystemError, RuntimeError) as ex:
-        logger.debug("Skipping FI heuristic due to regex failure: %s", getSafeExString(ex))
+        logger.debug("skipping heuristic check because of a regex engine failure ('%s')" % getSafeExString(ex))
 
-    if not conf.nosql and re.search(NOSQL_ERROR_REGEX, page or ""):
+    if not conf.nosql and _search(NOSQL_ERROR_REGEX):
         infoMsg = "heuristic (NoSQL) test shows that %sparameter '%s' might be vulnerable to NoSQL injection attacks (rerun with switch '--nosql')" % ("%s " % paramType if paramType != parameter else "", parameter)
         logger.info(infoMsg)
 
         if conf.beep:
             beep()
 
-    if not conf.graphql and re.search(GRAPHQL_ERROR_REGEX, page or ""):
+    if not conf.graphql and _search(GRAPHQL_ERROR_REGEX):
         infoMsg = "heuristic (GraphQL) test shows that %sparameter '%s' appears to be a GraphQL endpoint (rerun with switch '--graphql')" % ("%s " % paramType if paramType != parameter else "", parameter)
         logger.info(infoMsg)
 
         if conf.beep:
             beep()
 
-    if not conf.ldap and re.search(LDAP_ERROR_REGEX, page or ""):
+    if not conf.ldap and _search(LDAP_ERROR_REGEX):
         infoMsg = "heuristic (LDAP) test shows that %sparameter '%s' might be vulnerable to LDAP injection (rerun with switch '--ldap')" % ("%s " % paramType if paramType != parameter else "", parameter)
         logger.info(infoMsg)
 
         if conf.beep:
             beep()
 
-    if not conf.xpath and re.search(XPATH_ERROR_REGEX, page or ""):
+    if not conf.xpath and _search(XPATH_ERROR_REGEX):
         infoMsg = "heuristic (XPath) test shows that %sparameter '%s' might be vulnerable to XPath injection (rerun with switch '--xpath')" % ("%s " % paramType if paramType != parameter else "", parameter)
         logger.info(infoMsg)
 
         if conf.beep:
             beep()
 
-    if not conf.ssti and re.search(SSTI_ERROR_REGEX, page or ""):
+    if not conf.ssti and _search(SSTI_ERROR_REGEX):
         infoMsg = "heuristic (SSTI) test shows that %sparameter '%s' might be vulnerable to server-side template injection (rerun with switch '--ssti')" % ("%s " % paramType if paramType != parameter else "", parameter)
         logger.info(infoMsg)
 
         if conf.beep:
             beep()
 
-    if not conf.hql and re.search(HQL_ERROR_REGEX, page or ""):
+    if not conf.hql and _search(HQL_ERROR_REGEX):
         infoMsg = "heuristic (HQL) test shows that %sparameter '%s' might be vulnerable to HQL/JPQL (Hibernate ORM) injection (rerun with switch '--hql')" % ("%s " % paramType if paramType != parameter else "", parameter)
         logger.info(infoMsg)
 
         if conf.beep:
             beep()
 
-    if not conf.xslt and re.search(XSLT_ERROR_REGEX, page or ""):
+    if not conf.xslt and _search(XSLT_ERROR_REGEX):
         infoMsg = "heuristic (XSLT) test shows that %sparameter '%s' might be vulnerable to XSLT injection (rerun with switch '--xslt')" % ("%s " % paramType if paramType != parameter else "", parameter)
         logger.info(infoMsg)
         if conf.beep:
             beep()
 
-    if not conf.sparql and re.search(SPARQL_ERROR_REGEX, page or ""):
+    if not conf.sparql and _search(SPARQL_ERROR_REGEX):
         infoMsg = "heuristic (SPARQL) test shows that %sparameter '%s' might be vulnerable to SPARQL injection (rerun with switch '--sparql')" % ("%s " % paramType if paramType != parameter else "", parameter)
         logger.info(infoMsg)
 
         if conf.beep:
             beep()
 
-    if not conf.odata and re.search(ODATA_ERROR_REGEX, page or ""):
+    if not conf.odata and _search(ODATA_ERROR_REGEX):
         infoMsg = "heuristic (OData) test shows that %sparameter '%s' might be vulnerable to OData $filter injection (rerun with switch '--odata')" % ("%s " % paramType if paramType != parameter else "", parameter)
         logger.info(infoMsg)
 
         if conf.beep:
             beep()
 
-    if not conf.xxe and kb.postHint in (POST_HINT.XML, POST_HINT.SOAP) and re.search(XXE_ERROR_REGEX, page or ""):
+    if not conf.xxe and kb.postHint in (POST_HINT.XML, POST_HINT.SOAP) and _search(XXE_ERROR_REGEX):
         infoMsg = "heuristic (XXE) test shows that the XML request body might be vulnerable to XML External Entity injection (rerun with switch '--xxe')"
         logger.info(infoMsg)
 

@@ -26,6 +26,7 @@ stdlib unittest only (no pytest / no pip); works on Python 2.7 and 3.x.
 import os
 import re
 import sys
+import time
 import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -222,6 +223,26 @@ class HeuristicSignatureTest(unittest.TestCase):
             fired = _matches(text)
             self.assertEqual(fired, (),
                              msg="%s output suggests %s: %r" % (backend, '/'.join("'--%s'" % _ for _ in fired), text))
+
+    def test_no_signature_has_an_unbounded_gap(self):
+        # an unbounded '.*' between a literal and a keyword is quadratic on a long line (minified
+        # JS/JSON, a one-line JSON error body), which is how a stray 'xpath' in a 400KB response
+        # cost ~25s per parameter - and made the regex engine itself blow up (#5994, #6105).
+        # The bounded form ('[^\n]{0,100}?') matches the same real errors in constant work
+        for name, regex in ENGINES:
+            found = re.search(r"(?<!\\)\.[*+]", regex)
+            self.assertIsNone(found, msg="'--%s' signatures carry an unbounded '%s' gap" % (name, found.group(0) if found else ""))
+
+    def test_signatures_stay_linear_on_a_long_line(self):
+        # the same invariant, measured: every engine has to survive a single-line response that
+        # carries the words its signatures start with, without any error actually being present
+        page = ("<div class=\"x\">lorem ipsum dolor sit amet consectetur adipiscing elit</div>" + ''.join("%s " % _ for _ in ("xpath", "HQL", "ParseException", "NameError", "Entity x", "handlebars", "no such file", "Twig"))) * 2000
+
+        for name, regex in ENGINES:
+            start = time.time()
+            re.search(regex, page)
+            elapsed = time.time() - start
+            self.assertLess(elapsed, 2, msg="'--%s' signatures took %.1fs on a %dKB single-line response" % (name, elapsed, len(page) // 1024))
 
     def test_every_engine_is_covered(self):
         # a new switch must arrive here with its own errors, or the matrix above proves nothing about it
