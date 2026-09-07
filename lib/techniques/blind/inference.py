@@ -67,6 +67,7 @@ from lib.core.settings import INFERENCE_MARKER
 from lib.core.settings import INFERENCE_NOT_EQUALS_CHAR
 from lib.core.settings import INFERENCE_UNKNOWN_CHAR
 from lib.core.settings import MAX_BISECTION_LENGTH
+from lib.core.settings import MAX_INT
 from lib.core.settings import MAX_REVALIDATION_STEPS
 from lib.core.settings import NULL
 from lib.core.settings import PARTIAL_HEX_VALUE_MARKER
@@ -864,7 +865,9 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                             # elements we use a xrange, which is a virtual
                             # list
                             if expand and shiftTable:
-                                charTbl = xrange(maxChar + 1, (maxChar + 1) << shiftTable.pop())
+                                # Cap the expansion so its length never exceeds what len() can report
+                                # (a run of all-true probes would otherwise overflow on 32-bit builds)
+                                charTbl = xrange(maxChar + 1, min((maxChar + 1) << shiftTable.pop(), maxChar + 1 + MAX_INT))
                                 originalTbl = xrange(charTbl[0], charTbl[-1] + 1)
                                 maxChar = maxValue = charTbl[-1]
                                 minValue = charTbl[0]
