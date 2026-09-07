@@ -1072,6 +1072,10 @@ class Connect(object):
                     errMsg += "function '%s' ('%s')" % (function.__name__, getSafeExString(ex))
                     raise SqlmapGenericException(errMsg)
 
+                # a postprocess function may replace responseHeaders with a plain dict lacking
+                # the internal '.headers' attribute expected further down (e.g. in processResponse())
+                responseHeaders = patchHeaders(responseHeaders)
+
             if isinstance(page, six.binary_type):
                 if HTTP_HEADER.CONTENT_TYPE in (responseHeaders or {}) and not re.search(TEXT_CONTENT_TYPE_REGEX, responseHeaders[HTTP_HEADER.CONTENT_TYPE]):
                     page = six.text_type(page, errors="ignore")
