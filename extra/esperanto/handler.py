@@ -31,6 +31,7 @@ def buildHandler():
     from lib.core.enums import CHARSET_TYPE
     from lib.core.enums import EXPECTED
     from lib.core.exception import SqlmapDataException
+    from lib.core.exception import SqlmapUnsupportedFeatureException
     from lib.request.inject import checkBooleanExpression
     from lib.request.inject import getValue
     from plugins.generic.enumeration import Enumeration
@@ -52,6 +53,15 @@ def buildHandler():
             self._colCache = {}         # (db, table) -> ordered column names, so a dump
                                         # reuses what --columns already enumerated
             self._scopeCache = {}       # table -> resolved schema (see _scopeFor)
+
+        def __getattr__(self, name):
+            # this handler only mixes in Enumeration/Miscellaneous (read-only, boolean-oracle
+            # extraction); any DBMS-specific capability (--os-*/--file-*/--sql-shell/--udf-*/--reg-*/
+            # --cleanup) has no generic equivalent - fail cleanly instead of an AttributeError deep
+            # in action(). Leading underscore excluded so internal/dunder lookups behave normally.
+            if name.startswith("_"):
+                raise AttributeError(name)
+            raise SqlmapUnsupportedFeatureException("Esperanto does not support '%s' (DBMS-agnostic engine covers enumeration/dump only)" % name)
 
         def _engine(self):
             if self._esp is None:
