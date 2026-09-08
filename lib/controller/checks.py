@@ -1325,7 +1325,7 @@ def checkJWT():
     headers, missing expiry), hinting at '--jwt' for active confirmation and injection.
     """
 
-    if kb.jwtChecked or conf.jwt:
+    if kb.get("jwtChecked") or conf.jwt:
         return
 
     kb.jwtChecked = True
