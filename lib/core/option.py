@@ -128,7 +128,6 @@ from lib.core.settings import PARAMETER_SPLITTING_REGEX
 from lib.core.settings import PRECONNECT_CANDIDATE_TIMEOUT
 from lib.core.settings import PROXY_ENVIRONMENT_VARIABLES
 from lib.core.settings import SOCKET_PRE_CONNECT_QUEUE_SIZE
-from lib.core.settings import NONSQL_TECHNIQUES
 from lib.core.settings import SQLMAP_ENVIRONMENT_PREFIX
 from lib.core.settings import SUPPORTED_DBMS
 from lib.core.settings import SUPPORTED_OS
@@ -423,10 +422,7 @@ def _doSearch():
                 conf.googlePage += 1
 
 def _setStdinPipeTargets():
-    # Note: an explicit target source takes precedence. Without this, any non-interactive run (CI,
-    # cron, subprocess) would reroute '-m/-l/-r/-g' targets through the STDIN container, losing both
-    # their count and their order
-    if any((conf.url, conf.direct, conf.logFile, conf.bulkFile, conf.requestFile, conf.googleDork, conf.openApiFile)):
+    if conf.url:
         return
 
     if isinstance(conf.stdinPipe, _collections.Iterable):
@@ -830,6 +826,8 @@ def _setDBMS():
 
             break
 
+    Backend.setDbms(conf.dbms)
+
 def _listTamperingFunctions():
     """
     Lists available tamper functions
@@ -905,13 +903,6 @@ def _setTamperingFunctions():
             priority = PRIORITY.NORMAL if not hasattr(module, "__priority__") else module.__priority__
             priority = priority if priority is not None else PRIORITY.LOWEST
 
-            if not isinstance(priority, int):
-                warnMsg = "tamper module '%s' has an invalid value for '__priority__' " % filename[:-3]
-                warnMsg += "(assuming '%d')" % PRIORITY.NORMAL
-                logger.warning(warnMsg)
-
-                priority = PRIORITY.NORMAL
-
             for name, function in inspect.getmembers(module, inspect.isfunction):
                 if name == "tamper" and (hasattr(inspect, "signature") and all(_ in inspect.signature(function).parameters for _ in ("payload", "kwargs")) or inspect.getargspec(function).args and inspect.getargspec(function).keywords == "kwargs"):
                     found = True
@@ -955,14 +946,11 @@ def _setTamperingFunctions():
             warnMsg += "a good idea"
             logger.warning(warnMsg)
 
-        # tamper scripts rewrite SQL injection payloads; the self-contained non-SQL engines do not run
-        # payloads through the tampering hook, so warn instead of silently ignoring the user's
-        # '--tamper'. One tuple drives both the test and the name lookup - keeping two lists in step is
-        # exactly how this raised StopIteration, and leaving an engine OUT (as '--hql' was) is how the
-        # warning silently stops covering one.
-        _nonSqlEngines = ("graphql", "nosql", "ldap", "xpath", "ssti", "xslt", "xxe", "hql", "sparql", "odata")
-        if kb.tamperFunctions and any(conf.get(_) for _ in _nonSqlEngines):
-            engine = next(_ for _ in _nonSqlEngines if conf.get(_))
+        # tamper scripts rewrite SQL injection payloads; the self-contained non-SQL engines
+        # (--graphql/--nosql/--ldap/--xpath/--ssti/--xxe) do not run payloads through the tampering hook, so
+        # warn instead of silently ignoring the user's '--tamper'
+        if kb.tamperFunctions and any((conf.graphql, conf.nosql, conf.ldap, conf.xpath, conf.ssti, conf.xxe)):
+            engine = next(_ for _ in ("graphql", "nosql", "ldap", "xpath", "ssti", "xxe") if conf.get(_))
             warnMsg = "tamper scripts are applied to SQL injection payloads only and "
             warnMsg += "will be ignored by the '--%s' engine" % engine
             logger.warning(warnMsg)
@@ -2205,17 +2193,9 @@ def _setKnowledgeBaseAttributes(flushAll=True):
 
     kb.chars = AttribDict()
     kb.chars.delimiter = randomStr(length=6, lowercase=True)
-    # NOTE: markers have to be mutually distinct (e.g. equal start/stop makes the delimited output ambiguous, while equal replacement markers make _errorReplaceChars() restore the wrong character). Also, none of the inner letters may be the boundary character itself, as that makes a marker contain a shorter one (e.g. 'qzqxq' carrying 'qzq')
-    _ = set()
-    while len(_) < 2:
-        _.add(randomStr(length=3, alphabet=KB_CHARS_LOW_FREQUENCY_ALPHABET))
-    kb.chars.start, kb.chars.stop = ("%s%s%s" % (KB_CHARS_BOUNDARY_CHAR, __, KB_CHARS_BOUNDARY_CHAR) for __ in _)
-
-    _ = set()
-    while len(_) < 4:
-        _.add(randomStr(length=1, lowercase=True))
-        _.discard(KB_CHARS_BOUNDARY_CHAR)
-    kb.chars.at, kb.chars.space, kb.chars.dollar, kb.chars.hash_ = ("%s%s%s" % (KB_CHARS_BOUNDARY_CHAR, __, KB_CHARS_BOUNDARY_CHAR) for __ in _)
+    kb.chars.start = "%s%s%s" % (KB_CHARS_BOUNDARY_CHAR, randomStr(length=3, alphabet=KB_CHARS_LOW_FREQUENCY_ALPHABET), KB_CHARS_BOUNDARY_CHAR)
+    kb.chars.stop = "%s%s%s" % (KB_CHARS_BOUNDARY_CHAR, randomStr(length=3, alphabet=KB_CHARS_LOW_FREQUENCY_ALPHABET), KB_CHARS_BOUNDARY_CHAR)
+    kb.chars.at, kb.chars.space, kb.chars.dollar, kb.chars.hash_ = ("%s%s%s" % (KB_CHARS_BOUNDARY_CHAR, _, KB_CHARS_BOUNDARY_CHAR) for _ in randomStr(length=4, lowercase=True))
 
     kb.checkWafMode = False
     kb.choices = AttribDict(keycheck=False)
@@ -2262,7 +2242,6 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.forkNote = None
     kb.futileUnion = None
     kb.fuzzUnionTest = None
-    kb.gadget = None
     kb.heavilyDynamic = False
     kb.headersFile = None
     kb.headersFp = {}
@@ -2299,7 +2278,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.lastParserStatus = None
 
     kb.locks = AttribDict()
-    for _ in ("cache", "connError", "count", "handlers", "hint", "identYwaf", "index", "io", "limit", "liveCookies", "log", "multibit", "prediction", "socket", "redirect", "request", "value"):
+    for _ in ("cache", "connError", "count", "handlers", "hint", "identYwaf", "index", "io", "limit", "liveCookies", "log", "prediction", "socket", "redirect", "request", "value"):
         kb.locks[_] = threading.Lock()
 
     kb.matchRatio = None
@@ -2308,8 +2287,6 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.mergeCookies = None
     kb.mysqlUtf8mb4 = None
     kb.multiThreadMode = False
-    kb.multibit = {}                    # per injection point: absent=untried, False=unusable, else the row channel profile
-    kb.multibitHinted = False
     kb.multipleCtrlC = False
     kb.negativeLogic = False
     kb.nchar = True
@@ -2778,7 +2755,9 @@ def _checkTor():
         logger.info(infoMsg)
 
 def _basicOptionValidation():
-    _nonSqlTechniques = ["--%s" % _ for _ in NONSQL_TECHNIQUES if conf.get(_)]
+    _nonSqlTechniques = [name for name, enabled in (
+        ("--graphql", conf.graphql), ("--nosql", conf.nosql), ("--ldap", conf.ldap),
+        ("--xpath", conf.xpath), ("--ssti", conf.ssti), ("--xxe", conf.xxe), ("--hql", conf.hql)) if enabled]
     if len(_nonSqlTechniques) > 1:
         errMsg = "only one non-SQL technique switch may be used at a time (found: %s). " % ", ".join(_nonSqlTechniques)
         errMsg += "each is a self-contained scan for a different back-end class - pick one"

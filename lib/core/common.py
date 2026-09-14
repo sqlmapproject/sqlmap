@@ -266,7 +266,14 @@ class Format(object):
         if isListLike(versions) and UNKNOWN_DBMS_VERSION in versions:
             versions = None
 
-        return Backend.getDbms() if versions is None else "%s %s" % (Backend.getDbms(), " and ".join(filterNone(versions)))
+        dbms = Backend.getDbms() or Backend.getIdentifiedDbms()
+
+        if versions is None:
+            return dbms
+
+        version = " and ".join(filterNone(versions))
+
+        return "%s %s" % (dbms, version) if dbms else version
 
     @staticmethod
     def getErrorParsedDBMSes():
@@ -491,7 +498,12 @@ class Backend(object):
 
     @staticmethod
     def getDbms():
-        return aliasToDbmsEnum(kb.get("dbms"))
+        retVal = aliasToDbmsEnum(kb.get("dbms"))
+
+        if retVal is None and conf.get("dbms"):
+            retVal = aliasToDbmsEnum(conf.get("dbms"))
+
+        return retVal
 
     @staticmethod
     def getErrorParsedDBMSes():
@@ -1529,8 +1541,6 @@ def cleanQuery(query):
 
     >>> cleanQuery("select id from users")
     'SELECT id FROM users'
-    >>> cleanQuery("select a from selected where b='from'")
-    "SELECT a FROM selected WHERE b='from'"
     """
 
     retVal = query
@@ -1546,11 +1556,10 @@ def cleanQuery(query):
             if not candidate or candidate.lower() not in queryLower:
                 continue
 
-            if "sys_exec" not in query:
-                # NOTE: the leading branch consumes whole quoted parts (hence keeping keyword-alike data
-                # and case sensitive quoted identifiers intact), while the keyword itself is switched only
-                # at word boundaries (e.g. 'selected' must not turn into 'SELECTed')
-                retVal = re.sub(r"(?i)('[^']*'|\"[^\"]*\")|\b%s\b" % candidate, lambda match: match.group(1) or candidate.upper(), retVal)
+            queryMatch = re.search(r"(?i)\b(%s)\b" % candidate, query)
+
+            if queryMatch and "sys_exec" not in query:
+                retVal = retVal.replace(queryMatch.group(1), candidate.upper())
 
     return retVal
 

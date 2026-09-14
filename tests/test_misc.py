@@ -17,7 +17,8 @@ from _testutils import bootstrap, set_dbms, reset_dbms
 bootstrap()
 
 from lib.core import common as C
-from lib.core.settings import NULL
+from lib.core.data import conf, kb
+from lib.core.settings import NULL, UNKNOWN_DBMS_VERSION
 from lib.core.enums import DBMS
 
 
@@ -93,6 +94,55 @@ class TestEnumAndDbmsHelpers(unittest.TestCase):
         C.Backend.setVersion("5.7")
         self.assertTrue(C.isDBMSVersionAtLeast("5.0"))
         self.assertFalse(C.isDBMSVersionAtLeast("8.0"))
+
+
+class TestFormatGetDbms(unittest.TestCase):
+    def _resetDbmsState(self):
+        kb.stickyDBMS = False
+        kb.forcedDbms = None
+        kb.dbms = None
+        kb.dbmsVersion = [UNKNOWN_DBMS_VERSION]
+        conf.dbms = None
+
+    def test_version_without_kb_dbms_uses_conf_dbms(self):
+        saved_dbms = kb.dbms
+        saved_version = kb.dbmsVersion
+        saved_conf_dbms = conf.dbms
+        saved_forced = kb.forcedDbms
+        saved_sticky = kb.stickyDBMS
+
+        try:
+            self._resetDbmsState()
+            kb.dbmsVersion = ["5.0.12"]
+            conf.dbms = DBMS.MYSQL
+
+            self.assertEqual(C.Format.getDbms(), "MySQL 5.0.12")
+            self.assertNotIn("None", C.Format.getDbms())
+        finally:
+            kb.dbms = saved_dbms
+            kb.dbmsVersion = saved_version
+            conf.dbms = saved_conf_dbms
+            kb.forcedDbms = saved_forced
+            kb.stickyDBMS = saved_sticky
+
+    def test_version_only_when_dbms_unknown(self):
+        saved_dbms = kb.dbms
+        saved_version = kb.dbmsVersion
+        saved_conf_dbms = conf.dbms
+        saved_forced = kb.forcedDbms
+        saved_sticky = kb.stickyDBMS
+
+        try:
+            self._resetDbmsState()
+            kb.dbmsVersion = [">= 8.0.0"]
+
+            self.assertEqual(C.Format.getDbms(), ">= 8.0.0")
+        finally:
+            kb.dbms = saved_dbms
+            kb.dbmsVersion = saved_version
+            conf.dbms = saved_conf_dbms
+            kb.forcedDbms = saved_forced
+            kb.stickyDBMS = saved_sticky
 
 
 class TestColumnPriority(unittest.TestCase):

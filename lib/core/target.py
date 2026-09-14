@@ -17,6 +17,7 @@ from lib.core.common import Backend
 from lib.core.common import getSafeExString
 from lib.core.common import hashDBRetrieve
 from lib.core.common import intersect
+from lib.core.common import isNoneValue
 from lib.core.common import isNumPosStrValue
 from lib.core.common import normalizeUnicode
 from lib.core.common import openFile
@@ -584,6 +585,13 @@ def _resumeDBMS():
             if not readInput(message, default='N', boolean=True):
                 conf.dbms = None
                 Backend.setDbms(dbms)
+                Backend.setVersionList(dbmsVersion)
+            else:
+                Backend.setDbms(conf.dbms)
+        else:
+            Backend.setDbms(dbms)
+
+            if isNoneValue(Backend.getVersionList()) or UNKNOWN_DBMS_VERSION in (Backend.getVersionList() or []):
                 Backend.setVersionList(dbmsVersion)
     else:
         infoMsg = "resuming back-end DBMS '%s' " % dbms
