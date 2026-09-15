@@ -559,12 +559,14 @@ def main():
             raise SystemExit
 
         elif (sys._jit.is_enabled() if hasattr(sys, "_jit") else os.environ.get("PYTHON_JIT") == '1'):
-            errMsg = "the experimental Python JIT compiler appears to be turned on. There are known cases of it "
-            errMsg += "producing bogus errors inside otherwise correct code (e.g. a built-in function resolving "
-            errMsg += "to an unrelated object). Please rerun with it turned off (e.g. 'PYTHON_JIT=0') and report "
-            errMsg += "the problem only if it still occurs "
-            errMsg += "(Reference: 'https://github.com/sqlmapproject/sqlmap/issues/6117')"
+            errMsg = "the experimental Python JIT compiler is turned on. CPython has an open defect where "
+            errMsg += "the tier-2 optimizer runs the wrong instruction stream against a correct frame, raising "
+            errMsg += "exceptions that the executed code cannot produce "
+            errMsg += "(Reference: 'https://github.com/python/cpython/issues/156319'). Please rerun with it "
+            errMsg += "turned off (e.g. 'PYTHON_JIT=0') and report the problem only if it still occurs"
             logger.critical(errMsg)
+            print()
+            dataToStdout(excMsg)
             raise SystemExit
 
         for match in re.finditer(r'File "(.+?)", line', excMsg):
