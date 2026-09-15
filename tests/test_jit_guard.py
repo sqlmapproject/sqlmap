@@ -20,7 +20,10 @@ import unittest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# forces a crash inside init(), i.e. the same place #6117 landed, without needing a target.
+# Forces a crash inside init(), i.e. the same place #6117 landed, without needing a target.
+# NOTE: the injected fault must raise on Python 2 as well - 'a' < 128 does NOT (Python 2 orders
+# mismatched types by type name and quietly returns a bool), which let a broken run reach the
+# network on the PyPy-2.7 job instead of the exception handler under test.
 # codeIsModified() is neutralized because its branch sits earlier in the chain and would
 # otherwise win on any working tree with uncommitted edits (or a stale txt/checksum.md5).
 DRIVER = """
@@ -30,7 +33,7 @@ sys.argv = ["sqlmap.py", "-u", "http://127.0.0.1/?id=1", "--batch"]
 import sqlmap
 import lib.core.option
 sqlmap.codeIsModified = lambda: False
-lib.core.option.loadPayloads = lambda: "a" < 128
+lib.core.option.loadPayloads = lambda: iter([])()
 sqlmap.main()
 """ % ROOT
 
@@ -50,8 +53,9 @@ def _run(jit):
 
 
 def _jitEnabled(jit):
-    """Whether the interpreter actually honours PYTHON_JIT=<jit> (build-dependent)."""
-    code = "import sys, os; print(sys._jit.is_enabled() if hasattr(sys, '_jit') else os.environ.get('PYTHON_JIT') == '1')"
+    """Whether the guard in sqlmap.py would consider the JIT enabled (mirrors its condition)."""
+    code = ("import sys, os; print(sys._jit.is_enabled() if hasattr(sys, '_jit') "
+            "else (sys.version_info >= (3, 13) and os.environ.get('PYTHON_JIT') == '1'))")
     env = dict(os.environ)
     env["PYTHON_JIT"] = jit
     return subprocess.check_output([sys.executable, "-c", code], env=env).strip() == b"True"

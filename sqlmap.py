@@ -558,7 +558,7 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
-        elif (sys._jit.is_enabled() if hasattr(sys, "_jit") else os.environ.get("PYTHON_JIT") == '1'):
+        elif (sys._jit.is_enabled() if hasattr(sys, "_jit") else (sys.version_info >= (3, 13) and os.environ.get("PYTHON_JIT") == '1')):
             errMsg = "the experimental Python JIT compiler is turned on. CPython has an open defect where "
             errMsg += "the tier-2 optimizer runs the wrong instruction stream against a correct frame, raising "
             errMsg += "exceptions that the executed code cannot produce "
