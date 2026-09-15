@@ -422,14 +422,6 @@ def main():
             logger.critical(errMsg)
             raise SystemExit
 
-        elif "object is not callable" in excMsg and (sys._jit.is_enabled() if hasattr(sys, "_jit") else os.environ.get("PYTHON_JIT") == '1'):
-            errMsg = "there is a known issue when sqlmap is run with the experimental Python JIT compiler turned on, "
-            errMsg += "where a regular callable (e.g. built-in function) bogusly resolves to an unrelated object. "
-            errMsg += "Please turn it off (e.g. 'PYTHON_JIT=0') and try again "
-            errMsg += "(Reference: 'https://github.com/sqlmapproject/sqlmap/issues/6117')"
-            logger.critical(errMsg)
-            raise SystemExit
-
         elif all(_ in excMsg for _ in ("Resource temporarily unavailable", "os.fork()", "dictionaryAttack")):
             errMsg = "there has been a problem while running the multiprocessing hash cracking. "
             errMsg += "Please rerun with option '--threads=1'"
@@ -563,6 +555,15 @@ def main():
             match = re.search(r"\s*(.+)\s+ValueError", excMsg)
             errMsg = "one of your .pyc files are corrupted%s" % (" ('%s')" % match.group(1) if match else "")
             errMsg += ". Please delete .pyc files on your system to fix the problem"
+            logger.critical(errMsg)
+            raise SystemExit
+
+        elif (sys._jit.is_enabled() if hasattr(sys, "_jit") else os.environ.get("PYTHON_JIT") == '1'):
+            errMsg = "the experimental Python JIT compiler appears to be turned on. There are known cases of it "
+            errMsg += "producing bogus errors inside otherwise correct code (e.g. a built-in function resolving "
+            errMsg += "to an unrelated object). Please rerun with it turned off (e.g. 'PYTHON_JIT=0') and report "
+            errMsg += "the problem only if it still occurs "
+            errMsg += "(Reference: 'https://github.com/sqlmapproject/sqlmap/issues/6117')"
             logger.critical(errMsg)
             raise SystemExit
 
