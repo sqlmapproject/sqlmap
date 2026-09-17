@@ -113,6 +113,7 @@ from lib.core.common import (
     safeSQLIdentificatorNaming,
     saveConfig,
     serializeObject,
+    setColor,
     setTechnique,
     splitFields,
     trimAlphaNum,
@@ -1782,6 +1783,49 @@ class TestCheckOldOptions(unittest.TestCase):
     def test_no_old_options_is_noop(self):
         # Returns None and does not raise when no deprecated options are present
         self.assertIsNone(checkOldOptions(["-u", "http://test.invalid/?id=1", "--banner"]))
+
+
+class TestSetColorHandlerMismatch(unittest.TestCase):
+    """
+    Regression test for issue #6122: setColor() decided whether to colorize purely from
+    conf.disableColoring/IS_TTY, independent of whether the installed LOGGER_HANDLER actually
+    supports colorize() (a plain logging.StreamHandler - installed for --disable-coloring, or as
+    the ansistrm-unavailable fallback - never defines it). A multiprocessing hash-cracking worker
+    hit exactly this mismatch (conf.disableColoring not carried over into the worker) and crashed
+    with an AttributeError that got misreported as "there was a problem while hashing entry".
+    """
+
+    def setUp(self):
+        import lib.core.common as common_mod
+        self._common_mod = common_mod
+        self._saved_handler = common_mod.LOGGER_HANDLER
+        self._saved_disableColoring = conf.get("disableColoring")
+
+    def tearDown(self):
+        self._common_mod.LOGGER_HANDLER = self._saved_handler
+        conf.disableColoring = self._saved_disableColoring
+
+    def test_plain_handler_without_colorize_does_not_raise(self):
+        import logging
+        self._common_mod.LOGGER_HANDLER = logging.StreamHandler()   # no .colorize(), like the --disable-coloring handler
+        conf.disableColoring = False    # the desync: coloring "should" apply, but handler can't
+        result = setColor("[INFO] current status: abcde", istty=True)   # must not raise
+        self.assertIsInstance(result, str)
+
+    def test_colorizing_handler_still_used(self):
+        # sanity check: a handler that DOES define colorize() is unaffected by the guard
+        calls = []
+
+        class _FakeColorizingHandler(object):
+            def colorize(self, message, levelno, force=False):
+                calls.append((message, levelno, force))
+                return "COLORIZED"
+
+        self._common_mod.LOGGER_HANDLER = _FakeColorizingHandler()
+        conf.disableColoring = False
+        result = setColor("[INFO] current status: abcde", istty=True)
+        self.assertEqual(result, "COLORIZED")
+        self.assertEqual(len(calls), 1)
 
 
 if __name__ == "__main__":

@@ -997,7 +997,7 @@ def setColor(message, color=None, bold=False, level=None, istty=None):
 
             if bold or color:
                 retVal = colored(message, color=color, on_color=None, attrs=("bold",) if bold else None)
-            elif level:
+            elif level and hasattr(LOGGER_HANDLER, "colorize"):
                 try:
                     level = getattr(logging, level, None)
                 except:
