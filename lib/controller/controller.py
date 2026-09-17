@@ -376,6 +376,11 @@ def start():
     for targetUrl, targetMethod, targetData, targetCookie, targetHeaders in kb.targets:
         targetCount += 1
 
+        # --report-json: give each target its own taskid in the shared collector, so a multi-target
+        # run (e.g. '-m' bulk file) doesn't have later targets overwrite earlier ones (see _reportData)
+        if conf.reportJson:
+            kb.reportTaskId = targetCount
+
         try:
             if conf.checkInternet:
                 infoMsg = "checking for Internet connection"

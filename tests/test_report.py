@@ -222,5 +222,98 @@ class TestWriteReportJson(_CollectorCase):
             os.remove(path)
 
 
+class TestMultiTargetTaskId(_CollectorCase):
+    """
+    Regression coverage for issue #6123: a '-m' bulk-file run shares ONE process (and thus one
+    report collector) across many targets. _storeData()'s COMPLETE-status branch deletes any
+    existing row for a (taskid, content_type) key before inserting the new one, so if every
+    target reused the same fixed REPORT_TASKID, a later target's TARGET/TECHNIQUES write would
+    silently delete an earlier target's row of the same content_type. The fix keys each target's
+    writes by kb.reportTaskId instead.
+    """
+
+    def setUp(self):
+        super(TestMultiTargetTaskId, self).setUp()
+        from lib.core.dump import Dump
+        self._saved_reportTaskId = kb.get("reportTaskId")
+        self._saved_dumper = conf.get("dumper")
+        self._saved_reportCollector = conf.get("reportCollector")
+        conf.dumper = Dump()
+        conf.reportCollector = self.c
+
+    def tearDown(self):
+        kb.reportTaskId = self._saved_reportTaskId
+        conf.dumper = self._saved_dumper
+        conf.reportCollector = self._saved_reportCollector
+        super(TestMultiTargetTaskId, self).tearDown()
+
+    def test_second_target_does_not_overwrite_first(self):
+        kb.reportTaskId = 1
+        conf.dumper._reportData({"url": "http://host1/?id=1"}, CONTENT_TYPE.TARGET)
+
+        kb.reportTaskId = 2
+        conf.dumper._reportData({"url": "http://host2/?id=1"}, CONTENT_TYPE.TARGET)
+
+        first = api._assembleData(self.c, 1)["data"]
+        second = api._assembleData(self.c, 2)["data"]
+        self.assertEqual(first[0]["value"]["url"], "http://host1/?id=1")    # not clobbered by target #2
+        self.assertEqual(second[0]["value"]["url"], "http://host2/?id=1")
+
+    def test_write_report_json_wraps_multiple_targets(self):
+        kb.reportTaskId = 1
+        conf.dumper._reportData({"url": "http://host1/?id=1"}, CONTENT_TYPE.TARGET)
+        kb.reportTaskId = 2
+        conf.dumper._reportData({"url": "http://host2/?id=1"}, CONTENT_TYPE.TARGET)
+
+        fd, path = tempfile.mkstemp(suffix=".json")
+        os.close(fd)
+        try:
+            api.writeReportJson(self.c, path)
+            with io.open(path, encoding="utf-8") as f:
+                loaded = json.load(f)
+            self.assertIn("targets", loaded)
+            self.assertEqual(len(loaded["targets"]), 2)
+            urls = [t["data"][0]["value"]["url"] for t in loaded["targets"]]
+            self.assertEqual(urls, ["http://host1/?id=1", "http://host2/?id=1"])
+        finally:
+            os.remove(path)
+
+    def test_single_target_report_keeps_flat_shape(self):
+        # backward compatibility: exactly one taskid -> no 'targets' wrapper, same shape as before
+        kb.reportTaskId = 1
+        conf.dumper._reportData({"url": "http://host1/?id=1"}, CONTENT_TYPE.TARGET)
+
+        fd, path = tempfile.mkstemp(suffix=".json")
+        os.close(fd)
+        try:
+            api.writeReportJson(self.c, path)
+            with io.open(path, encoding="utf-8") as f:
+                loaded = json.load(f)
+            self.assertNotIn("targets", loaded)
+            self.assertEqual(loaded["data"][0]["value"]["url"], "http://host1/?id=1")
+        finally:
+            os.remove(path)
+
+    def test_error_recorded_under_active_target(self):
+        import logging
+        from lib.core.data import logger
+
+        saved_level = logger.level
+        logger.setLevel(logging.ERROR)
+        # mute pre-existing handlers (e.g. console) but not the ReportErrorRecorder added by setUp
+        muted = [(handler, handler.level) for handler in logger.handlers if not isinstance(handler, api.ReportErrorRecorder)]
+        for handler, _ in muted:
+            handler.setLevel(logging.CRITICAL + 1)
+        try:
+            kb.reportTaskId = 2
+            logger.error("boom for target 2")
+            self.assertTrue(any("boom for target 2" in _ for _ in api._assembleData(self.c, 2)["error"]))
+            self.assertEqual(api._assembleData(self.c, 1)["error"], [])    # not attributed to target #1
+        finally:
+            logger.setLevel(saved_level)
+            for handler, level in muted:
+                handler.setLevel(level)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

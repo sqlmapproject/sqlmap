@@ -108,11 +108,15 @@ class Dump(object):
         collector is active - which is only ever the case for a CLI --report-json run, never under
         --api - so this never double-captures alongside StdDbOut. A None content_type is resolved
         via the kb.partRun fallback (e.g. the fingerprint line), mirroring the API exactly.
+
+        Keyed by kb.reportTaskId rather than the fixed REPORT_TASKID so that a multi-target run
+        (e.g. '-m' bulk file) keeps each target's results separate instead of later targets
+        overwriting earlier ones under the same content_type.
         """
 
         if conf.get("reportCollector") is not None:
             from lib.utils.api import _storeData, REPORT_TASKID
-            _storeData(conf.reportCollector, REPORT_TASKID, stdoutEncode(clearColors(data)), CONTENT_STATUS.COMPLETE, content_type)
+            _storeData(conf.reportCollector, kb.get("reportTaskId", REPORT_TASKID), stdoutEncode(clearColors(data)), CONTENT_STATUS.COMPLETE, content_type)
 
     def flush(self):
         if self._outputFP:

@@ -265,9 +265,19 @@ def writeReportJson(collector, filepath):
     """
     Writes the collected results to filepath as JSON, in the same shape as the REST API's
     /scan/<id>/data response, wrapped with a small 'meta' block for standalone consumers.
+
+    A multi-target run (e.g. '-m' bulk file) stores each target under its own taskid (see
+    kb.reportTaskId), so every taskid present in the collector is assembled here; a single-target
+    run still yields exactly one taskid and keeps the flat {success, data, error} shape.
     """
 
-    result = _assembleData(collector, REPORT_TASKID)
+    taskids = sorted(row[0] for row in collector.execute("SELECT DISTINCT taskid FROM data")) or [REPORT_TASKID]
+
+    if len(taskids) > 1:
+        result = {"success": True, "targets": [_assembleData(collector, taskid) for taskid in taskids]}
+    else:
+        result = _assembleData(collector, taskids[0])
+
     result["meta"] = {
         "api_version": int(RESTAPI_VERSION.split(".")[0]),   # MAJOR only - the part that matters for client compatibility
         "sqlmap_version": VERSION_STRING,
@@ -467,7 +477,8 @@ class ReportErrorRecorder(logging.Handler):
 
     def emit(self, record):
         try:
-            self.collector.execute("INSERT INTO errors VALUES(NULL, ?, ?)", (REPORT_TASKID, str(record.msg % record.args if record.args else record.msg)))
+            taskid = kb.get("reportTaskId", REPORT_TASKID)
+            self.collector.execute("INSERT INTO errors VALUES(NULL, ?, ?)", (taskid, str(record.msg % record.args if record.args else record.msg)))
         except Exception:
             pass
 
