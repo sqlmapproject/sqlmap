@@ -81,5 +81,38 @@ class TestJitGuard(unittest.TestCase):
         self.assertIn(PROMPT, out)
 
 
+# Tool id 3 is unused by CPython's own well-known ids (DEBUGGER=0, COVERAGE=1, PROFILER=2, OPTIMIZER=5)
+_TEST_TOOL_ID = 3
+
+_MONITORING_DRIVER = """
+import sys
+sys.path.insert(0, %r)
+sys.monitoring.use_tool_id(%d, "test-tool")
+sys.monitoring.set_events(%d, sys.monitoring.events.PY_START)
+import sqlmap
+print(sys.monitoring.get_tool(%d))
+print(sys.monitoring.get_events(%d))
+""" % (ROOT, _TEST_TOOL_ID, _TEST_TOOL_ID, _TEST_TOOL_ID, _TEST_TOOL_ID)
+
+
+class TestMonitoringGuard(unittest.TestCase):
+    """
+    The other half of the cpython#156319 mitigation: the tier-2 corruption needs BOTH the JIT and
+    an active sys.monitoring tool (debugger/profiler/coverage) at once. sqlmap has no legitimate
+    reason to run a scan with one attached, so it silences any already-registered tool's events as
+    the very first thing at import time (Reference: 'https://github.com/python/cpython/issues/156319').
+    """
+
+    def test_active_tool_is_silenced_but_not_unregistered(self):
+        if not hasattr(sys, "monitoring"):
+            self.skipTest("interpreter has no sys.monitoring (needs 3.12+)")
+
+        out = subprocess.check_output([sys.executable, "-c", _MONITORING_DRIVER], cwd=ROOT)
+        tool, events = out.decode("utf-8").strip().splitlines()
+
+        self.assertEqual(tool, "test-tool")    # still registered - its own owner can still free it
+        self.assertEqual(events, "0")          # events cleared to NO_EVENTS, so nothing fires
+
+
 if __name__ == "__main__":
     unittest.main()

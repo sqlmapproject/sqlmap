@@ -12,6 +12,19 @@ try:
 
     sys.dont_write_bytecode = True
 
+    # Reference: https://github.com/python/cpython/issues/156319 - CPython's tier-2 optimizer can
+    # corrupt frame locals (raising exceptions the executed code cannot produce) whenever an active
+    # sys.monitoring tool (an attached debugger/profiler/coverage run) coincides with enough hot
+    # code. sqlmap never needs one attached during a scan, so silence any already-registered tool
+    # up front, before any hot code runs (name stays registered so the owning tool can still free it)
+    if hasattr(sys, "monitoring"):
+        for _ in range(6):  # valid tool id range (Reference: https://docs.python.org/3/library/sys.monitoring.html)
+            try:
+                if sys.monitoring.get_tool(_) is not None:
+                    sys.monitoring.set_events(_, sys.monitoring.events.NO_EVENTS)
+            except Exception:
+                pass
+
     try:
         __import__("lib.utils.versioncheck")  # this has to be the first non-standard import
     except ImportError:
