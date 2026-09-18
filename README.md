@@ -22,6 +22,10 @@ Preferably, you can download sqlmap by cloning the [Git](https://github.com/sqlm
 
 sqlmap works out of the box with [Python](https://www.python.org/download/) version **2.7** and **3.x** on any platform.
 
+You can also use ``pip`` to install and/or upgrade the sqlmap to latest (monthly) tagged version with: ::
+
+    pip install --upgrade sqlmap
+
 Usage
 ----
 
