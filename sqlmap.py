@@ -8,16 +8,17 @@ See the file 'LICENSE' for copying permission
 from __future__ import print_function
 
 try:
+    import os
     import sys
 
     sys.dont_write_bytecode = True
 
     # Reference: https://github.com/python/cpython/issues/156319 - CPython's tier-2 optimizer can
-    # corrupt frame locals (raising exceptions the executed code cannot produce) whenever an active
-    # sys.monitoring tool (an attached debugger/profiler/coverage run) coincides with enough hot
-    # code. sqlmap never needs one attached during a scan, so silence any already-registered tool
-    # up front, before any hot code runs (name stays registered so the owning tool can still free it)
-    if hasattr(sys, "monitoring"):
+    # corrupt frame locals (raising exceptions the executed code cannot produce), but only when the
+    # experimental JIT is on AND a sys.monitoring tool (debugger/profiler/coverage run) is active at
+    # the same time - neither alone triggers it. So only silence monitoring when the JIT is also on;
+    # otherwise leave it alone (e.g. a legitimate `coverage run sqlmap.py ...` must keep working).
+    if hasattr(sys, "monitoring") and (sys._jit.is_enabled() if hasattr(sys, "_jit") else (sys.version_info >= (3, 13) and os.environ.get("PYTHON_JIT") == '1')):
         for _ in range(6):  # valid tool id range (Reference: https://docs.python.org/3/library/sys.monitoring.html)
             try:
                 if sys.monitoring.get_tool(_) is not None:

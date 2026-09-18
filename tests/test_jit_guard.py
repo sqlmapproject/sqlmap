@@ -95,23 +95,42 @@ print(sys.monitoring.get_events(%d))
 """ % (ROOT, _TEST_TOOL_ID, _TEST_TOOL_ID, _TEST_TOOL_ID, _TEST_TOOL_ID)
 
 
+def _monitoringStateAfterImport(jit):
+    env = dict(os.environ)
+    env["PYTHON_JIT"] = jit
+    out = subprocess.check_output([sys.executable, "-c", _MONITORING_DRIVER], cwd=ROOT, env=env)
+    tool, events = out.decode("utf-8").strip().splitlines()
+    return tool, int(events)
+
+
 class TestMonitoringGuard(unittest.TestCase):
     """
     The other half of the cpython#156319 mitigation: the tier-2 corruption needs BOTH the JIT and
-    an active sys.monitoring tool (debugger/profiler/coverage) at once. sqlmap has no legitimate
-    reason to run a scan with one attached, so it silences any already-registered tool's events as
-    the very first thing at import time (Reference: 'https://github.com/python/cpython/issues/156319').
+    an active sys.monitoring tool (debugger/profiler/coverage) at once - neither alone triggers it.
+    So sqlmap only silences an already-registered tool's events when the JIT is also on, and leaves
+    it alone otherwise. A plain `coverage run sqlmap.py ...` (JIT off) must keep working - which is
+    exactly what broke CI the first time this guard shipped unconditionally.
     """
 
-    def test_active_tool_is_silenced_but_not_unregistered(self):
+    def test_active_tool_is_silenced_when_jit_is_on(self):
         if not hasattr(sys, "monitoring"):
             self.skipTest("interpreter has no sys.monitoring (needs 3.12+)")
+        if not _jitEnabled('1'):
+            self.skipTest("interpreter does not report the JIT as enabled")
 
-        out = subprocess.check_output([sys.executable, "-c", _MONITORING_DRIVER], cwd=ROOT)
-        tool, events = out.decode("utf-8").strip().splitlines()
-
+        tool, events = _monitoringStateAfterImport('1')
         self.assertEqual(tool, "test-tool")    # still registered - its own owner can still free it
-        self.assertEqual(events, "0")          # events cleared to NO_EVENTS, so nothing fires
+        self.assertEqual(events, 0)            # but events cleared to NO_EVENTS
+
+    def test_active_tool_is_left_alone_without_jit(self):
+        if not hasattr(sys, "monitoring"):
+            self.skipTest("interpreter has no sys.monitoring (needs 3.12+)")
+        if _jitEnabled('0'):
+            self.skipTest("JIT stays enabled with PYTHON_JIT=0 on this build")
+
+        tool, events = _monitoringStateAfterImport('0')
+        self.assertEqual(tool, "test-tool")
+        self.assertNotEqual(events, 0)         # untouched - e.g. a real `coverage run` must keep working
 
 
 if __name__ == "__main__":
