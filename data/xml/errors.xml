@@ -145,7 +145,7 @@
     </dbms>
 
     <dbms value="SAP MaxDB">
-        <error regexp="SQL error.*?POS([0-9]+)"/>
+        <error regexp="SQL[- ]error.*?POS\(\d+\)"/>
         <error regexp="Warning.*?\Wmaxdb_"/>
         <error regexp="DriverSapDB"/>
         <error regexp="-3014.*?Invalid end of SQL statement"/>
