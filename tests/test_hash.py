@@ -87,6 +87,22 @@ class TestDbmsSpecificVectors(unittest.TestCase):
         self.assertEqual(H.oracle_old_passwd("tiger", "scott", uppercase=True), "F894844C34402B67")
 
 
+class TestCryptGenericBytesInput(unittest.TestCase):
+    """
+    The dictionary-attack workers (_bruteProcessVariantA/B in lib/utils/hash.py) always pass
+    'password' as bytes (getBytes(word)), regardless of which hash function gets dispatched. Every
+    other function here hashes via hashlib (bytes-friendly), but crypt_generic_passwd forwards
+    straight to the stdlib crypt.crypt(), which requires str - raising 'TypeError: crypt() argument
+    1 must be str, not bytes' on Linux/macOS (reported via a user's cracked-hash session).
+    """
+
+    def test_bytes_password_does_not_raise(self):
+        self.assertEqual(H.crypt_generic_passwd(password=b"rasmuslerdorf", salt="rl", uppercase=False), "rl.3StKT.4T8M")
+
+    def test_str_password_unaffected(self):
+        self.assertEqual(H.crypt_generic_passwd(password="rasmuslerdorf", salt="rl", uppercase=False), "rl.3StKT.4T8M")
+
+
 class TestMssqlUnicodePassword(unittest.TestCase):
     """MSSQL hashes the password as UCS-2/UTF-16LE. A per-char 'utf-8 + NUL' approximation is only
     correct for ASCII, so non-ASCII passwords (cafe, etc.) hashed WRONG and were uncrackable. The

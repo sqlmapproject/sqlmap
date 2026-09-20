@@ -406,6 +406,8 @@ def crypt_generic_passwd(password, salt, **kwargs):
     'rl.3StKT.4T8M'
     """
 
+    password = getUnicode(password)  # stdlib crypt.crypt() requires str, unlike the hashlib-based functions here
+
     return getText(crypt(password, salt))
 
 def unix_md5_passwd(password, salt, magic="$1$", **kwargs):
