@@ -406,7 +406,7 @@ def crypt_generic_passwd(password, salt, **kwargs):
     'rl.3StKT.4T8M'
     """
 
-    password = getUnicode(password)  # stdlib crypt.crypt() requires str, unlike the hashlib-based functions here
+    password = getText(password)  # crypt.crypt() requires native str (unicode on Py3, bytes on Py2/PyPy), unlike the hashlib-based functions here
 
     return getText(crypt(password, salt))
 
