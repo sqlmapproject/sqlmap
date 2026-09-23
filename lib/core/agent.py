@@ -113,7 +113,11 @@ class Agent(object):
         paramDict = conf.paramDict[place]
         origValue = getUnicode(paramDict[parameter])
         newValue = getUnicode(newValue) if newValue else newValue
-        base64Encoding = re.sub(r" \(.+", "", parameter) in conf.base64Parameter
+        try:
+            # Dirty patch for Python 3.14.7 re.sub() regression (e.g. https://github.com/sqlmapproject/sqlmap/issues/6128)
+            base64Encoding = re.sub(r" \(.+", "", parameter) in conf.base64Parameter
+        except TypeError:
+            base64Encoding = False
 
         if place == PLACE.URI or BOUNDED_INJECTION_MARKER in origValue:
             paramString = origValue
