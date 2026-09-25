@@ -235,6 +235,7 @@ class TestMultiTargetTaskId(_CollectorCase):
     def setUp(self):
         super(TestMultiTargetTaskId, self).setUp()
         from lib.core.dump import Dump
+        self._had_reportTaskId = "reportTaskId" in kb
         self._saved_reportTaskId = kb.get("reportTaskId")
         self._saved_dumper = conf.get("dumper")
         self._saved_reportCollector = conf.get("reportCollector")
@@ -242,7 +243,17 @@ class TestMultiTargetTaskId(_CollectorCase):
         conf.reportCollector = self.c
 
     def tearDown(self):
-        kb.reportTaskId = self._saved_reportTaskId
+        # restore to the PRIOR STATE exactly - if the key was absent before (the common case, since
+        # kb.reportTaskId is normally set lazily by a multi-target run), setting it to the saved None
+        # would instead leave it explicitly present with value None, which breaks the
+        # kb.get("reportTaskId", REPORT_TASKID) fallback used elsewhere (e.g. ReportErrorRecorder.emit())
+        # for the rest of the test process - order-dependent flakiness, since Python 2's unittest
+        # discover() does not sort tests/ (unlike Python 3's), so this class can run before
+        # TestReportErrorCapture depending on the checkout's raw directory order
+        if self._had_reportTaskId:
+            kb.reportTaskId = self._saved_reportTaskId
+        else:
+            del kb.reportTaskId
         conf.dumper = self._saved_dumper
         conf.reportCollector = self._saved_reportCollector
         super(TestMultiTargetTaskId, self).tearDown()
