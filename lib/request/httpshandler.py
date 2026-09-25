@@ -91,7 +91,7 @@ class HTTPSConnection(_http_client.HTTPSConnection):
                     else:
                         for header, value in conf.httpHeaders:
                             if header.lower() == "host":
-                                hostname = value
+                                hostname = value.split(":")[0]
                                 break
                     hostname = hostname if re.search(r"\A[\d.]+\Z", hostname or "") is None else None
                     result = _contexts[protocol].wrap_socket(sock, do_handshake_on_connect=True, server_hostname=hostname)
