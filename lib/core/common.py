@@ -27,6 +27,7 @@ import platform
 import posixpath
 import random
 import re
+import signal
 import socket
 import string
 import subprocess
@@ -2476,22 +2477,58 @@ def getConsoleWidth(default=80):
 
     return width or default
 
-def shellExec(cmd):
+def shellExec(cmd, timeout=None):
     """
-    Executes arbitrary shell command
+    Executes arbitrary shell command, optionally bounded by 'timeout' seconds - killing (and
+    flagging) a hung child instead of blocking forever, as callers otherwise have no other
+    watchdog around this call (e.g. --vuln-test runs one such call per entry, unattended)
 
     >>> shellExec('echo 1').strip() == '1'
     True
     """
 
     retVal = ""
+    timedOut = []
 
     try:
-        retVal = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT).communicate()[0] or ""
+        popenKwargs = {"shell": True, "stdout": subprocess.PIPE, "stderr": subprocess.STDOUT}
+        if timeout:
+            # shell=True's Popen.pid is the shell, not the (possibly grandchild) command it runs -
+            # killing just that pid leaves the real child holding the stdout pipe open, so
+            # communicate() keeps blocking past the deadline; run it in its own group/session instead
+            # so the whole tree can be killed at once
+            if IS_WIN:
+                popenKwargs["creationflags"] = subprocess.CREATE_NEW_PROCESS_GROUP
+            else:
+                popenKwargs["preexec_fn"] = os.setsid
+
+        process = subprocess.Popen(cmd, **popenKwargs)
+
+        def _kill():
+            timedOut.append(True)
+            try:
+                if IS_WIN:
+                    subprocess.call(["taskkill", "/F", "/T", "/PID", str(process.pid)])
+                else:
+                    os.killpg(os.getpgid(process.pid), signal.SIGKILL)
+            except Exception:
+                pass
+
+        timer = threading.Timer(timeout, _kill) if timeout else None
+        if timer:
+            timer.daemon = True
+            timer.start()
+
+        retVal = process.communicate()[0] or ""
+
+        if timer:
+            timer.cancel()
     except Exception as ex:
         retVal = getSafeExString(ex)
     finally:
         retVal = getText(retVal)
+        if timedOut:
+            retVal += "\n[shellExec] child process tree killed after exceeding %d-second timeout" % timeout
 
     return retVal
 
