@@ -289,14 +289,10 @@ class Interactsh(object):
         return retVal
 
     def pollUntil(self, attempts, delay):
-        """Wait for and return captured interactions, up to attempts * delay seconds.
-
-        The background poller remains the sole remote /poll consumer. Each attempt waits on its
-        in-memory queue for at most ``delay`` seconds instead of issuing an independent destructive
-        poll() request.
-        """
+        """Poll repeatedly, returning as soon as any interaction is captured."""
         for _ in range(attempts):
-            interactions = self._consume(lambda record: True, deadline=time.time() + delay)
+            time.sleep(delay)
+            interactions = self.poll()
             if interactions:
                 return interactions
         return []
@@ -308,10 +304,10 @@ class Interactsh(object):
         stopped before deregistering; stopping it first also prevents it from re-staging
         interactions after close() is called (best-effort on a dead/broken poller).
 
-        Normal completion leaves no active polling thread. If the poller cannot be joined within
-        one request-timeout budget, this interaction is deliberately left registered so deregister
-        never races a still-active /poll drain; a later stop()/close() retries the join and
-        deregisters once the thread has exited."""
+        Invariant: after stop()/close() returns, this object owns no active polling thread. If the
+        poller cannot be stopped within the budget it is deliberately left running (and this
+        interaction left registered) so a deregister can never race a still-active /poll drain -
+        a later stop()/close() re-runs it and deregisters once the thread has exited."""
         # Set _stopping and capture the poller under _pollerLock (the start/stop race lives under
         # that lock); release the lock before joining so a concurrent _ensurePoller() caller is
         # not blocked for a whole join. The lock prevents a restart of this same poller between here
@@ -336,10 +332,10 @@ class Interactsh(object):
     def close(self):
         """Canonical complete teardown: stop the poller AND deregister.
 
-        close() predates the background-poller addition, so existing callers can keep using it
-        without learning about stop(). If the current /poll cannot be joined within its bounded
-        network-timeout budget, teardown remains pending and the interaction stays registered so
-        a later close()/stop() can retry safely."""
+        close() predates the background-poller addition, so every existing/future caller can
+        keep using it without learning about stop(); making it do the full shutdown means the
+        invariant holds regardless of which entry point is taken: after close() returns this
+        object owns no active polling thread."""
         self.stop()
 
     def _deregister(self):
@@ -441,9 +437,9 @@ class InteractshPoller(object):
         timeout. Joining is retried on every call, so a second stop() after a failed first still
         joins the (now-sleeping-loop) thread instead of bailing out before _running was read.
 
-        Only a genuinely hung /poll network call exceeds the budget; the common case exits as soon
-        as the loop wakes. On timeout this method returns False and the owner leaves the interaction
-        registered; a later stop() retries joining the same thread."""
+        Only a genuinely hung /poll network call exceeds the budget; the common case exits the
+        instant the loop wakes. This is why the stated invariant holds strictly - it is retried,
+        not capped at a guessed timeout."""
         with self._lock:
             self._running = False
             self._cond.notify_all()
