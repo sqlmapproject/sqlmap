@@ -49,9 +49,15 @@ CORPUS = [
     u"\U00010348", u"Aé€\U00010348Z",
 ]
 
+# every connection _oracle()/_disguisedOracle() open outlives the helper call (the returned
+# closure keeps using it), so callers can't close it themselves - tracked here and closed once
+# in tearDownModule() instead of leaking to GC (ResourceWarning: unclosed database)
+_OPEN_CONNECTIONS = []
+
 
 def _oracle(value=None, is_null=False):
     con = sqlite3.connect(":memory:")
+    _OPEN_CONNECTIONS.append(con)
     con.execute("CREATE TABLE t (v TEXT)")
     con.execute("INSERT INTO t VALUES (?)", (None if is_null else value,))
     con.commit()
@@ -84,6 +90,7 @@ def _disguisedOracle(blocked=None, rewrites=(), funcs=()):
     `funcs` registers extra SQL functions (e.g. a variadic CONCAT SQLite lacks). The
     engine never sees SQLite - it must adapt to whatever back-end the scenario emulates."""
     con = sqlite3.connect(":memory:")
+    _OPEN_CONNECTIONS.append(con)
     for name, narg, fn in funcs:
         con.create_function(name, narg, fn)
     for stmt in _SEED:
@@ -221,6 +228,7 @@ class TestEsperanto(unittest.TestCase):
         # hostExtract must mirror the native EXACT/AMBIGUOUS verdict: in a mode with no byte-exact
         # witness (ordinal), both must be WHOLE_BUT_AMBIGUOUS, not native-ambiguous/host-exact.
         con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
         con.execute("CREATE TABLE t (v TEXT)")
         con.execute("INSERT INTO t VALUES ('Admin-42')")
         con.commit()
@@ -249,6 +257,7 @@ class TestEsperanto(unittest.TestCase):
         # must reject the shortened token -> fall back to cell-by-cell (which reads the true
         # length via substring), so a 400-char value is recovered whole, not silently as 300.
         con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
         con.execute("CREATE TABLE t (id INTEGER PRIMARY KEY, v TEXT)")
         big = "A" * 400
         con.execute("INSERT INTO t VALUES (1, ?)", (big,))
@@ -273,6 +282,7 @@ class TestEsperanto(unittest.TestCase):
         # operands -> bisection converges off-by-one. The final `expr = recovered` check must
         # reject it (fail closed) rather than return a silently-wrong integer.
         con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
 
         def ask(cond):
             c = cond
@@ -302,6 +312,7 @@ class TestEsperanto(unittest.TestCase):
         # (LENGTH(..)>n, UNICODE(..)>n) converges off-by-one; the '=' confirmation must fail closed
         # rather than hand back silently-wrong code-point text as exact.
         con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
         con.execute("CREATE TABLE t (v TEXT)")
         con.execute("INSERT INTO t VALUES ('Admin-42')")
         con.commit()
@@ -329,6 +340,7 @@ class TestEsperanto(unittest.TestCase):
         # (e.g. utf-8 bytes with an embedded NUL heuristically read as UTF-16). Bytes are faithful;
         # only a PROVEN codec makes the decoded text exact.
         con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
         con.execute("CREATE TABLE t (v TEXT)")
         con.execute("INSERT INTO t VALUES (?)", (u"é",))            # utf-8 C3 A9 -> non-ASCII bytes
         con.execute("CREATE TABLE a (v TEXT)")
@@ -356,6 +368,7 @@ class TestEsperanto(unittest.TestCase):
         # Round 8 #5: once a byte-length witness is selected, an UNDECIDED reading must reject the
         # bytes (fail closed), never treat "couldn't verify" as "matched".
         con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
         con.execute("CREATE TABLE t (v TEXT)")
         con.execute("INSERT INTO t VALUES ('abc')")
         con.commit()
@@ -389,6 +402,7 @@ class TestEsperanto(unittest.TestCase):
         # never ran on the very failure it defends against. The canary must run whenever a textcast
         # was applied, and an unproven cast must not certify source identity.
         con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
         con.execute("CREATE TABLE t (id INTEGER PRIMARY KEY, v TEXT)")
         con.execute(u"INSERT INTO t VALUES (1, 'café')")
         con.commit()
@@ -415,6 +429,7 @@ class TestEsperanto(unittest.TestCase):
         # the engine must escalate to the cast+hex path (which the framed dump proves works) and
         # recover the value exactly. Without hex, it stays honestly incomplete (no false-complete).
         con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
         con.execute("CREATE TABLE t (v TEXT)")
         con.execute(u"INSERT INTO t VALUES ('café-€')")
         con.commit()
@@ -466,6 +481,7 @@ class TestEsperanto(unittest.TestCase):
         # False). the full truth table must reject 'gt' (and fall to BETWEEN) so counts/lengths
         # aren't read off-by-one. reproduced: extractInteger('5',max=10) used to return 6.
         con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
 
         def ask(cond):
             try:
@@ -481,6 +497,7 @@ class TestEsperanto(unittest.TestCase):
         # without a proven hex/binary witness (or code-codepoint), a value is WHOLE_BUT_AMBIGUOUS,
         # never EXACT - plain '=' is collation-dependent and can't certify byte-exactness.
         con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
         con.execute("CREATE TABLE t (v TEXT)")
         con.execute("INSERT INTO t VALUES ('Zz')")
         con.commit()
@@ -510,6 +527,7 @@ class TestEsperanto(unittest.TestCase):
 
     def test_host_maxlen_zero(self):
         con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
         con.execute("CREATE TABLE t (v TEXT)")
         con.execute("INSERT INTO t VALUES ('abcdef')")
         con.commit()
@@ -541,6 +559,7 @@ class TestEsperanto(unittest.TestCase):
         # `complete` (walk finished) must be distinct from `exact` (bytes proven identical).
         # a case-insensitive collation recovers a WHOLE value that is NOT exact.
         con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
         con.execute("CREATE TABLE t (v TEXT)")
         con.execute("INSERT INTO t VALUES ('A')")
         con.commit()
@@ -568,6 +587,7 @@ class TestEsperanto(unittest.TestCase):
         # hostExtract returns an ExtractResult: a bounded read is TRUNCATED (not a bare string),
         # and an undecided (None) host observation degrades to a FAILED result, never a fake bit.
         con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
         con.execute("CREATE TABLE t (v TEXT)")
         con.execute("INSERT INTO t VALUES ('abcdef')")
         con.commit()
@@ -602,6 +622,7 @@ class TestEsperanto(unittest.TestCase):
         # key's first column repeats -> `> prev` paging silently drops rows sharing it, so it
         # must be REJECTED (COUNT(*) != COUNT(DISTINCT col)); only a unique column is accepted.
         con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
         con.execute("CREATE TABLE k (a INT, b INT, u INT, nul INT)")
         con.executemany("INSERT INTO k VALUES (?,?,?,?)", [(1, 1, 10, 1), (1, 2, 20, None), (2, 1, 30, 3)])
         con.commit()
@@ -651,6 +672,7 @@ class TestEsperanto(unittest.TestCase):
 
     def test_enumerate(self):
         con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
         con.execute("CREATE TABLE alpha (x)")
         con.execute("CREATE TABLE beta (y)")
         con.commit()
@@ -668,6 +690,7 @@ class TestEsperanto(unittest.TestCase):
     def test_dump(self):
         # row DATA byte-exact, including commas / quotes / unicode (hex framing keeps intact)
         con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
         con.execute("CREATE TABLE users (id, uname, note)")
         truth = [(1, u"admin", u"all,good"), (2, u"o'brien", u"café,€"), (3, u"x", u"")]
         for row in truth:
@@ -692,6 +715,7 @@ class TestEsperanto(unittest.TestCase):
         # extraction. Quotes/commas/NULLs in the data must survive (a single value has
         # no framing ambiguity). This is the scavenger's whole reason to exist.
         con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
         con.execute("CREATE TABLE users (id INTEGER, name TEXT, email TEXT)")
         for row in ((1, "luther", "a@b.c"), (2, "o'brien", "x,y@z"), (3, "wu", None)):
             con.execute("INSERT INTO users VALUES (?,?,?)", row)
@@ -723,6 +747,7 @@ class TestEsperanto(unittest.TestCase):
         # catalog detection, brute-force existence probing, and identifier quoting are
         # all COUNT-free (scalar-subquery existence), so tables/columns/dump still work.
         con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
         con.execute("CREATE TABLE users (id INTEGER, name TEXT)")
         con.execute("INSERT INTO users VALUES (1, 'admin'), (2, 'root')")
         con.commit()
@@ -747,6 +772,7 @@ class TestEsperanto(unittest.TestCase):
     def test_quoting(self):
         # reserved-word / spaced column names must be quoted, not interpolated raw
         con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
         con.execute('CREATE TABLE q (id INTEGER, "order" TEXT, "group by" TEXT)')
         con.execute('INSERT INTO q VALUES (1, ?, ?)', ("a'b", "x,y"))
         con.commit()
@@ -767,6 +793,7 @@ class TestEsperanto(unittest.TestCase):
     def test_strategy_handoff(self):
         # the frozen InferenceStrategy is a *sufficient* host interface, and immutable
         con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
         con.execute("CREATE TABLE k (v TEXT)")
         con.execute("INSERT INTO k VALUES ('Str4t3gy!')")
         con.commit()
@@ -788,6 +815,7 @@ class TestEsperanto(unittest.TestCase):
     def test_pattern_match_fallback(self):
         # SUBSTR + LENGTH + hex + code fns ALL blacklisted -> pure GLOB/LIKE floor
         con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
         con.execute("CREATE TABLE flag (id INTEGER, v TEXT)")
         con.execute("INSERT INTO flag VALUES (1, 'FLAG{no_SUBSTR_%_needed}')")
         con.commit()
@@ -812,6 +840,7 @@ class TestEsperanto(unittest.TestCase):
         # like 'all_products' must escape them (\_ ESCAPE '\'), not treat them as
         # match-anything. GLOB is blocked here to force LIKE (where '_'/'%' are magic).
         con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
         con.execute("CREATE TABLE v (val TEXT)")
         con.execute("INSERT INTO v VALUES ('all_products')")
         for t in ("all_products", "wp_users", "sales%2024"):     # '_'/'%' in identifiers
@@ -838,6 +867,7 @@ class TestEsperanto(unittest.TestCase):
     def test_length_from_substring(self):
         # every length fn blacklisted but SUBSTR present -> length derived from the end
         con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
         con.execute("CREATE TABLE t6 (v TEXT)")
         con.execute(u"INSERT INTO t6 VALUES ('Admin-42€')")
         con.commit()
@@ -859,6 +889,7 @@ class TestEsperanto(unittest.TestCase):
         # a permission/charset wall mid-walk (oracle can't decide the keyset bound)
         # must STOP with partial results, never crash with OracleUndecided
         con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
         for t in ("alpha", "beta", "gamma"):
             con.execute("CREATE TABLE %s (x)" % t)
         con.commit()
@@ -884,6 +915,7 @@ class TestEsperanto(unittest.TestCase):
         # RIGHT( onto them (the same rewrite the disguised-dialect oracles use). Keeps the
         # test portable across SQLite builds while still exercising the real left_right rung.
         con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
         con.execute("CREATE TABLE t7 (v TEXT)")
         con.execute("INSERT INTO t7 VALUES ('Zagreb-42')")
         con.commit()
@@ -1029,6 +1061,7 @@ class TestEsperanto(unittest.TestCase):
         seed = ('CREATE TABLE q (id INTEGER, "order" TEXT, "group" TEXT)',
                 "INSERT INTO q VALUES (1, ?, ?)")
         con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
         con.execute(seed[0]); con.execute(seed[1], ("a,b", "x'y")); con.commit()
         blk = re.compile(r'"|`')
 
@@ -1050,6 +1083,7 @@ class TestEsperanto(unittest.TestCase):
         # a first-byte charcode fn (MySQL-style ASCII) is lossy for non-ASCII; the
         # engine must detect that and escalate to hex, recovering the bytes exactly
         con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
         con.execute("CREATE TABLE t (v TEXT)")
         con.execute(u"INSERT INTO t VALUES ('café-€')")   # cafe-EUR
         con.commit()
@@ -1071,6 +1105,7 @@ class TestEsperanto(unittest.TestCase):
         # non-ASCII data recovered byte-exact even while the dialect is disguised
         # (SUBSTR/MID/CHAR_LENGTH/LENGTH blocked -> SUBSTRING/LEN mapped to SQLite)
         con = sqlite3.connect(":memory:")
+        self.addCleanup(con.close)
         con.execute("CREATE TABLE s (v TEXT)")
         con.execute(u"INSERT INTO s VALUES ('Zagreb-župa-€42')")   # Zagreb-zupa-EUR42
         con.commit()
@@ -1089,6 +1124,14 @@ class TestEsperanto(unittest.TestCase):
                 return False
         esp = Esperanto(ask); esp.discover()
         self.assertEqual(esp.extractText("(SELECT v FROM s)"), u"Zagreb-župa-€42")
+
+
+def tearDownModule():
+    while _OPEN_CONNECTIONS:
+        try:
+            _OPEN_CONNECTIONS.pop().close()
+        except Exception:
+            pass
 
 
 if __name__ == "__main__":

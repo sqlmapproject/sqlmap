@@ -847,6 +847,24 @@ def _listTamperingFunctions():
                 comment = match.group(1).strip()
                 dataToStdout("* %s - %s\n" % (setColor(os.path.basename(script), "yellow"), re.sub(r" *\n *", " ", comment.split("\n\n")[0].strip())))
 
+def _argSpec(function):
+    """
+    Cross Py2/Py3 argument-name introspection - inspect.getargspec() is deprecated since
+    Python 3.0 and removed entirely since 3.11, while inspect.getfullargspec() (used here
+    whenever available) covers the same 'args'/'keywords' need without the warning/removal
+    """
+
+    return inspect.getfullargspec(function) if hasattr(inspect, "getfullargspec") else inspect.getargspec(function)
+
+def _kwargsName(function):
+    """
+    Name of 'function's **kwargs-style catch-all parameter, or None - the field holding it is
+    called 'varkw' on a getfullargspec() result and 'keywords' on a (Python 2) getargspec() one
+    """
+
+    spec = _argSpec(function)
+    return getattr(spec, "varkw", None) or getattr(spec, "keywords", None)
+
 def _setTamperingFunctions():
     """
     Loads tampering functions from given script(s)
@@ -913,7 +931,7 @@ def _setTamperingFunctions():
                 priority = PRIORITY.NORMAL
 
             for name, function in inspect.getmembers(module, inspect.isfunction):
-                if name == "tamper" and (hasattr(inspect, "signature") and all(_ in inspect.signature(function).parameters for _ in ("payload", "kwargs")) or inspect.getargspec(function).args and inspect.getargspec(function).keywords == "kwargs"):
+                if name == "tamper" and (hasattr(inspect, "signature") and all(_ in inspect.signature(function).parameters for _ in ("payload", "kwargs")) or _argSpec(function).args and _kwargsName(function) == "kwargs"):
                     found = True
                     kb.tamperFunctions.append(function)
                     function.__name__ = module.__name__
@@ -1023,7 +1041,7 @@ def _setPreprocessFunctions():
 
             for name, function in inspect.getmembers(module, inspect.isfunction):
                 try:
-                    if name == "preprocess" and inspect.getargspec(function).args and all(_ in inspect.getargspec(function).args for _ in ("req",)):
+                    if name == "preprocess" and _argSpec(function).args and all(_ in _argSpec(function).args for _ in ("req",)):
                         found = True
 
                         kb.preprocessFunctions.append(function)
@@ -1106,7 +1124,7 @@ def _setPostprocessFunctions():
                 raise SqlmapSyntaxException("cannot import postprocess module '%s' (%s)" % (getUnicode(filename[:-3]), getSafeExString(ex)))
 
             for name, function in inspect.getmembers(module, inspect.isfunction):
-                if name == "postprocess" and inspect.getargspec(function).args and all(_ in inspect.getargspec(function).args for _ in ("page", "headers", "code")):
+                if name == "postprocess" and _argSpec(function).args and all(_ in _argSpec(function).args for _ in ("page", "headers", "code")):
                     found = True
 
                     kb.postprocessFunctions.append(function)
