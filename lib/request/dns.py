@@ -235,8 +235,9 @@ class InteractshDNSServer(object):
     is a drop-in for conf.dnsServer.
     """
 
-    _POLL_TRIES = 6      # a triggered lookup surfaces at interactsh within a couple of seconds;
-    _POLL_DELAY = 1.0    # poll up to ~6s per retrieval before treating the channel as silent
+    # Default time budget (seconds) pop() spends waiting on the poller queue for a
+    # not-yet-arriving captured lookup. Overridable per instance for fast tests.
+    _POP_DEADLINE = 6
 
     def __init__(self, server=None):
         from lib.request.interactsh import Interactsh, hasCrypto
@@ -249,42 +250,74 @@ class InteractshDNSServer(object):
         if not self._client.registered:
             raise socket.error("could not register with an interactsh interaction server")
 
+        # One background poller drains the remote session; pop() consumes from its in-memory
+        # queue with zero network calls.
+        self._client._ensurePoller()
         self.domain = self._client.dnsDomain()
         self._seen = set()
         self._running = True
         self._initialized = True
 
+    def stop(self):
+        """Best-effort shutdown: stop the single background poller (join it) then deregister.
+
+        stop() also deregisters, and the poller is the only code that drains the remote
+        session, so it must be stopped before deregistering."""
+        self._running = False
+        client = getattr(self, "_client", None)
+        if client is not None:
+            client.stop()
+
     def run(self):
         """No background listener is needed - interactsh does the receiving."""
         pass
 
-    def pop(self, prefix=None, suffix=None):
+    def _matchesDns(self, record, prefix, suffix):
+        # Protocol gate: the shared poller queues dns/http/https together, so a record can land in
+        # the queue for another consumer. Never hand an HTTP record to the DNS channel - doing so
+        # would make pop() return a request line as though it were a DNS lookup, and the HTTP
+        # consumer would then lose that interaction (the exact cross-consumer loss the shared queue
+        # was introduced to prevent).
+        if record.get("protocol") != "dns":
+            return False
+        name = record.get("full-id")
+        if not name:
+            return False
+        if name in self._seen:       # already handed out once, never return it again
+            return False
+        if prefix is None and suffix is None:
+            return True
+        if prefix and suffix and re.search(
+                r"%s\..+\.%s" % (re.escape(prefix), re.escape(suffix)), name, re.I):
+            return True
+        return False
+
+    def pop(self, prefix=None, suffix=None, deadline=None, sync=False):
         """
         Returns a captured DNS lookup name matching the given prefix/suffix
         (prefix.<query result>.suffix.<correlation domain>), mirroring DNSServer.pop().
 
         Unlike the synchronous local DNSServer (which reads a query captured during the
         very request), interactsh is remote and eventually-consistent: a just-triggered
-        lookup takes a moment to reach the collector and surface via its poll API. So we
-        poll a few times before giving up, instead of reading once.
+        lookup takes a moment to reach the collector and surface via its poll API. The
+        background poller stages matching names in a queue, so pop() waits on that queue
+        (no network call) until the ~6s deadline, then returns None.
+
+        ``deadline`` is the number of seconds to wait for a not-yet-arriving lookup
+        (``deadline=0`` is a snapshot of the current queue with no wait); ``None`` selects the
+        class default (``_POP_DEADLINE``). This None semantics differs from ``_consume``, where
+        ``None`` means "don't wait" - here it means "wait the default". It is resolved here to
+        an absolute timestamp for the poller's Condition. ``sync`` forces the direct-poll
+        fallback path.
         """
-
-        for attempt in range(self._POLL_TRIES):
-            for name in self._client.dnsNames():
-                if name in self._seen:
-                    continue
-
-                if prefix is None and suffix is None:
-                    self._seen.add(name)
-                    return name
-
-                if prefix and suffix and re.search(r"%s\..+\.%s" % (re.escape(prefix), re.escape(suffix)), name, re.I):
-                    self._seen.add(name)
-                    return name
-
-            if attempt < self._POLL_TRIES - 1:
-                time.sleep(self._POLL_DELAY)
-
+        selector = lambda record: self._matchesDns(record, prefix, suffix)
+        # deadline=None -> use the class default budget; a number -> that many seconds.
+        budget = self._POP_DEADLINE if deadline is None else deadline
+        matched = self._client._consume(selector, deadline=time.time() + budget, sync=sync)
+        if matched:
+            matched_id = matched[0].get("full-id")
+            self._seen.add(matched_id)
+            return matched_id
         return None
 
 if __name__ == "__main__":
