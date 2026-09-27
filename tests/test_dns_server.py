@@ -381,7 +381,7 @@ class TestInteractshDNSServer(unittest.TestCase):
             # draining its pending storage in a single /poll response
             if names_batch:
                 batch = [{"protocol": "dns", "full-id": n, "unique-id": n} for n in names_batch]
-                names_batch.clear()
+                del names_batch[:]
                 return batch
             return []
         client.poll = poll
@@ -449,7 +449,7 @@ class TestInteractshDNSServer(unittest.TestCase):
             # draining its pending storage in a single /poll response
             if rec_batch:
                 batch = rec_batch[:]
-                rec_batch.clear()
+                del rec_batch[:]
                 return batch
             return []
         client.poll = poll
@@ -753,7 +753,7 @@ class TestInteractshHTTPRequests(unittest.TestCase):
             # draining its pending storage in a single /poll response
             if rec_batch:
                 batch = rec_batch[:]
-                rec_batch.clear()
+                del rec_batch[:]
                 return batch
             return []
         client.poll = poll
