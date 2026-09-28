@@ -442,8 +442,8 @@ def processResponse(page, responseHeaders, code=None, status=None):
         rawResponse = "%s %s %s\n%s\n%s" % (_http_client.HTTPConnection._http_vsn_str, code or "", status or "", "".join(getUnicode(responseHeaders.headers if responseHeaders else [])), page[:IDENTYWAF_PARSE_PAGE_LIMIT] if not kb.checkWafMode else page[:HEURISTIC_PAGE_SIZE_THRESHOLD])
 
         with kb.locks.identYwaf:
-            identYwaf.non_blind.clear()
             try:
+                identYwaf.non_blind.clear()
                 if identYwaf.non_blind_check(rawResponse, silent=True):
                     for waf in set(identYwaf.non_blind):
                         if waf not in kb.identifiedWafs:
