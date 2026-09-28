@@ -103,9 +103,19 @@ def action():
             errMsg += ". You can try to rerun without using optimization "
             errMsg += "switch '%s'" % ("-o" if conf.optimize else "--null-connection")
 
-        raise SqlmapUnsupportedDBMSException(errMsg)
+        if kb.injection and kb.injection.place is not None:
+            # An injection point WAS already found during detection (kb.injection.place is set,
+            # e.g. via a generic, DBMS-agnostic boolean-based/UNION test), but the LATER, separate
+            # fingerprint-confirmation phase (conf.dbmsHandler / checkDbms()) failed to pin down
+            # which DBMS it actually is - e.g. a flaky target where a DBMS-specific
+            # self-comparison probe intermittently comes back false. Warn instead of aborting, so
+            # the scan continues; Backend.getDbms() stays None, so any later "back-end DBMS: %s"
+            # report legitimately prints 'None' despite an injection having been detected earlier.
+            logger.warning(errMsg)
+        else:
+            raise SqlmapUnsupportedDBMSException(errMsg)
 
-    conf.dumper.singleString(conf.dbmsHandler.getFingerprint())
+    conf.dumper.singleString(conf.dbmsHandler.getFingerprint() if conf.dbmsHandler else "back-end DBMS: %s" % Backend.getDbms())
 
     kb.fingerprinted = True
 

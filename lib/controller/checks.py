@@ -183,7 +183,7 @@ def checkSqlInjection(place, parameter, value):
                 if kb.reduceTests is None and not conf.testFilter and (intersect(Backend.getErrorParsedDBMSes(), SUPPORTED_DBMS, True) or kb.heuristicDbms or injection.dbms):
                     msg = "it looks like the back-end DBMS is '%s'. " % (Format.getErrorParsedDBMSes() or kb.heuristicDbms or joinValue(injection.dbms, '/'))
                     msg += "Do you want to skip test payloads specific for other DBMSes? [Y/n]"
-                    kb.reduceTests = (Backend.getErrorParsedDBMSes() or [kb.heuristicDbms]) if readInput(msg, default='Y', boolean=True) else []
+                    kb.reduceTests = (Backend.getErrorParsedDBMSes() or [kb.heuristicDbms] if kb.heuristicDbms else injection.dbms if isinstance(injection.dbms, list) else [injection.dbms]) if readInput(msg, default='Y', boolean=True) else []
 
             # If the DBMS has been fingerprinted (via DBMS-specific error
             # message, via simple heuristic check or via DBMS-specific
@@ -925,7 +925,7 @@ def heuristicCheckDbms(injection):
     may be
     """
 
-    retVal = False
+    retVal = None
 
     if conf.skipHeuristics:
         return retVal
