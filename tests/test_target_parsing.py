@@ -483,6 +483,18 @@ class TestCreateDirs(_TargetTestBase):
         self.assertTrue(os.path.isdir(conf.filePath))
         self.assertIn("example.com", conf.filePath)
 
+    def test_files_dir_survives_percent_in_output_dir(self):
+        # --output-dir carries a literal '%' straight into SQLMAP_FILES_PATH (e.g. an unexpanded
+        # '$(date +%Y%m%d)' on a shell without command substitution, as in #6133) - the '%' operator
+        # would try to parse '%Y' as a format directive and crash; safeStringFormat() must not
+        self._outdir("f_out_%Y%m%d_%H%M%S")
+        conf.hostname = "example.com"
+        conf.fileRead = "/etc/passwd"
+        conf.commonFiles = None
+        _createFilesDir()
+        self.assertTrue(os.path.isdir(conf.filePath))
+        self.assertIn("example.com", conf.filePath)
+
     def test_target_dir_and_target_txt(self):
         self._outdir("t_out")
         conf.hostname = "example.com"

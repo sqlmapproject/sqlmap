@@ -666,8 +666,12 @@ def _createFilesDir():
     if not any((conf.fileRead, conf.commonFiles, conf.xxe)):
         return
 
-    # Note: normalize the hostname consistently with conf.outputPath / conf.dumpPath (see _createDumpDir)
-    conf.filePath = paths.SQLMAP_FILES_PATH % normalizeUnicode(getUnicode(conf.hostname))
+    # Note: normalize the hostname consistently with conf.outputPath / conf.dumpPath (see _createDumpDir).
+    # safeStringFormat() (not raw '%') because SQLMAP_FILES_PATH embeds SQLMAP_OUTPUT_PATH, which comes
+    # straight from --output-dir - a literal '%' anywhere in that user-supplied path (e.g. an unexpanded
+    # '$(date +%Y%m%d)' on a shell that doesn't support command substitution) would otherwise make the
+    # '%' operator try to parse it as a format directive and crash
+    conf.filePath = safeStringFormat(paths.SQLMAP_FILES_PATH, normalizeUnicode(getUnicode(conf.hostname)))
 
     if not os.path.isdir(conf.filePath):
         try:
