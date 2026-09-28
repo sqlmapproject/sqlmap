@@ -15,6 +15,7 @@ import time
 from extra.beep.beep import beep
 from lib.core.agent import agent
 from lib.core.common import Backend
+from lib.core.common import arrayizeValue
 from lib.core.common import extractRegexResult
 from lib.core.common import extractStructuralTokens
 from lib.core.common import extractTextTagContent
@@ -183,7 +184,11 @@ def checkSqlInjection(place, parameter, value):
                 if kb.reduceTests is None and not conf.testFilter and (intersect(Backend.getErrorParsedDBMSes(), SUPPORTED_DBMS, True) or kb.heuristicDbms or injection.dbms):
                     msg = "it looks like the back-end DBMS is '%s'. " % (Format.getErrorParsedDBMSes() or kb.heuristicDbms or joinValue(injection.dbms, '/'))
                     msg += "Do you want to skip test payloads specific for other DBMSes? [Y/n]"
-                    kb.reduceTests = (Backend.getErrorParsedDBMSes() or [kb.heuristicDbms]) if readInput(msg, default='Y', boolean=True) else []
+                    # mirror msg's fallback chain (error-parsed -> heuristic -> injection.dbms) - falling
+                    # back only through the first two (as before) left kb.reduceTests as [None] whenever
+                    # injection.dbms alone satisfied the 'if' above, silently skipping every DBMS-specific
+                    # test payload for the rest of the scan
+                    kb.reduceTests = (Backend.getErrorParsedDBMSes() or ([kb.heuristicDbms] if kb.heuristicDbms else arrayizeValue(injection.dbms))) if readInput(msg, default='Y', boolean=True) else []
 
             # If the DBMS has been fingerprinted (via DBMS-specific error
             # message, via simple heuristic check or via DBMS-specific
@@ -925,7 +930,9 @@ def heuristicCheckDbms(injection):
     may be
     """
 
-    retVal = False
+    # None (not False) on failure - every caller gates re-running this on 'kb.heuristicDbms is
+    # None', and a stale False from an earlier parameter's failed check would wrongly block that
+    retVal = None
 
     if conf.skipHeuristics:
         return retVal
