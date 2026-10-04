@@ -827,3 +827,7 @@ class TestStruts2Header(unittest.TestCase):
         # so no start/end marker is found -> no fabricated 'output'
         ssti._s2045Send = lambda url, action: "reflected: %s" % action
         self.assertIsNone(ssti._executeStruts2Header("http://target", "id"))
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)
