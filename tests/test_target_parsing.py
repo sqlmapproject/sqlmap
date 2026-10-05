@@ -51,6 +51,7 @@ from lib.core.settings import RESTORE_MERGED_OPTIONS
 from lib.core.settings import UNENCODED_ORIGINAL_VALUE
 from lib.core.threads import getCurrentThreadData
 from lib.utils.hashdb import HashDB
+import lib.core.target as target
 from lib.core.target import _createDumpDir
 from lib.core.target import _createFilesDir
 from lib.core.target import _createTargetDirs
@@ -353,6 +354,31 @@ class TestResumeDBMS(_TargetTestBase):
         conf.offline = True
         with self.assertRaises(SqlmapNoneDataException):
             _resumeDBMS()
+
+    def test_survives_broken_re_module(self):
+        # a Python 3.13/3.14 're' module regression can make re.search() raise TypeError on an
+        # otherwise-valid pattern (#6128, #6137) - must fall back to "no match" (the stored value
+        # used as-is) instead of crashing the whole resume
+        self._new_hashdb()
+        conf.dbms = None
+        conf.offline = False
+        hashDBWrite(HASHDB_KEYS.DBMS, "MySQL 5.0")
+
+        originalRe = target.re
+
+        class _BrokenRe(object):
+            I = originalRe.I
+
+            def search(self, *args, **kwargs):
+                raise TypeError("list.append() takes exactly one argument (2 given)")
+
+        target.re = _BrokenRe()
+        try:
+            _resumeDBMS()
+        finally:
+            target.re = originalRe
+
+        self.assertIsNone(Backend.getIdentifiedDbms())
 
 
 class TestResumeOS(_TargetTestBase):

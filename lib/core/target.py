@@ -561,7 +561,11 @@ def _resumeDBMS():
     dbms = value.lower()
     dbmsVersion = [UNKNOWN_DBMS_VERSION]
     _ = "(%s)" % ('|'.join(SUPPORTED_DBMS))
-    _ = re.search(r"\A%s (.*)" % _, dbms, re.I)
+    try:
+        # Dirty patch for a Python 3.13/3.14 re module regression (e.g. https://github.com/sqlmapproject/sqlmap/issues/6128, https://github.com/sqlmapproject/sqlmap/issues/6137)
+        _ = re.search(r"\A%s (.*)" % _, dbms, re.I)
+    except TypeError:
+        _ = None
 
     if _:
         dbms = _.group(1).lower()
