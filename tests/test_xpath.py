@@ -557,3 +557,7 @@ class TestRealXPathSyntax(unittest.TestCase):
                 self.fail("Boundary '%s' in '%s' with orig='%s' invalid: %s\n  payload: %s" % (bk, tkey, original, e, payload))
             self.assertIsInstance(count, int,
                 "Boundary '%s' in '%s' produced no count" % (bk, tkey))
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)
