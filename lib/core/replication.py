@@ -16,6 +16,9 @@ from lib.core.exception import SqlmapValueException
 from lib.core.settings import UNICODE_ENCODING
 from lib.utils.safe2bin import safechardecode
 
+def _quoteIdentifier(name):
+    return '"%s"' % name.replace('"', '""')
+
 class Replication(object):
     """
     This class holds all methods/classes used for database
@@ -62,11 +65,11 @@ class Replication(object):
             self.columns = columns
             if create:
                 try:
-                    self.execute('DROP TABLE IF EXISTS "%s"' % self.name)
+                    self.execute('DROP TABLE IF EXISTS %s' % _quoteIdentifier(self.name))
                     if not typeless:
-                        self.execute('CREATE TABLE "%s" (%s)' % (self.name, ','.join('"%s" %s' % (unsafeSQLIdentificatorNaming(colname), coltype) for colname, coltype in self.columns)))
+                        self.execute('CREATE TABLE %s (%s)' % (_quoteIdentifier(self.name), ','.join('%s %s' % (_quoteIdentifier(unsafeSQLIdentificatorNaming(colname)), coltype) for colname, coltype in self.columns)))
                     else:
-                        self.execute('CREATE TABLE "%s" (%s)' % (self.name, ','.join('"%s"' % unsafeSQLIdentificatorNaming(colname) for colname in self.columns)))
+                        self.execute('CREATE TABLE %s (%s)' % (_quoteIdentifier(self.name), ','.join(_quoteIdentifier(unsafeSQLIdentificatorNaming(colname)) for colname in self.columns)))
                 except Exception as ex:
                     errMsg = "problem occurred ('%s') while initializing the sqlite database " % getSafeExString(ex, UNICODE_ENCODING)
                     errMsg += "located at '%s'" % self.parent.dbpath
@@ -78,7 +81,7 @@ class Replication(object):
             """
 
             if len(values) == len(self.columns):
-                self.execute('INSERT INTO "%s" VALUES (%s)' % (self.name, ','.join(['?'] * len(values))), safechardecode(values))
+                self.execute('INSERT INTO %s VALUES (%s)' % (_quoteIdentifier(self.name), ','.join(['?'] * len(values))), safechardecode(values))
             else:
                 errMsg = "wrong number of columns used in replicating insert"
                 raise SqlmapValueException(errMsg)
@@ -109,7 +112,7 @@ class Replication(object):
             """
             This function is used for selecting row(s) from current table.
             """
-            query = 'SELECT * FROM "%s"' % self.name
+            query = 'SELECT * FROM %s' % _quoteIdentifier(self.name)
             if condition:
                 query += ' WHERE %s' % condition
 

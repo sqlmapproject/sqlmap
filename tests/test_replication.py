@@ -22,6 +22,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _testutils import bootstrap
 bootstrap()
 
+from lib.core.common import Backend
+from lib.core.data import conf, kb
 from lib.core.replication import Replication
 from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapValueException
@@ -94,6 +96,58 @@ class TestInsertColumnMismatch(_ReplCase):
         # the matching count still works
         t.insert([1, "x"])
         self.assertEqual(t.select(), [(1, "x")])
+
+
+class TestQuotedIdentifiers(_ReplCase):
+    def setUp(self):
+        super(TestQuotedIdentifiers, self).setUp()
+        self._savedConf = dict((k, conf.get(k)) for k in ("forceDbms", "dbms"))
+        self._savedKb = dict((k, kb.get(k)) for k in ("forcedDbms", "dbms"))
+        conf.forceDbms = conf.dbms = None
+        kb.dbms = None
+        Backend.forceDbms("MySQL")
+
+    def tearDown(self):
+        for k, v in self._savedConf.items():
+            conf[k] = v
+        for k, v in self._savedKb.items():
+            kb[k] = v
+        super(TestQuotedIdentifiers, self).tearDown()
+
+    def test_table_name_with_double_quote(self):
+        t = self.rep.createTable('sales"archive', [("id", self.rep.INTEGER)])
+        self.assertEqual(t.name, 'sales"archive')
+        t.insert([1])
+        self.assertEqual(t.select(), [(1,)])
+        self.assertEqual(self._readback('SELECT id FROM "sales""archive"'), [(1,)])
+        replacement = self.rep.createTable('sales"archive', [("id", self.rep.INTEGER)])
+        self.assertEqual(replacement.select(), [])
+
+    def test_typed_column_name_with_double_quote(self):
+        t = self.rep.createTable("t", [('unit"price', self.rep.REAL)])
+        t.insert([3.5])
+        self.assertEqual(t.select(), [(3.5,)])
+        columns = self._readback("PRAGMA table_info(t)")
+        self.assertEqual(columns[0][1:3], ('unit"price', "REAL"))
+
+    def test_typeless_column_name_with_double_quote(self):
+        t = self.rep.createTable("t", ['unit"price'], typeless=True)
+        t.insert(["3.50"])
+        self.assertEqual(t.select(), [("3.50",)])
+        columns = self._readback("PRAGMA table_info(t)")
+        self.assertEqual(columns[0][1:3], ('unit"price', ""))
+
+    def test_insert_into_existing_table_with_double_quote(self):
+        self.rep.connection.execute('CREATE TABLE "sales""archive" (id INTEGER)')
+        t = Replication.Table(self.rep, 'sales"archive', [("id", self.rep.INTEGER)], create=False)
+        t.insert([7])
+        self.assertEqual(self._readback('SELECT id FROM "sales""archive"'), [(7,)])
+
+    def test_select_from_existing_table_with_double_quote(self):
+        self.rep.connection.execute('CREATE TABLE "sales""archive" (id INTEGER)')
+        self.rep.connection.execute('INSERT INTO "sales""archive" VALUES (7)')
+        t = Replication.Table(self.rep, 'sales"archive', [("id", self.rep.INTEGER)], create=False)
+        self.assertEqual(t.select("id = 7"), [(7,)])
 
 
 class TestInitFailure(unittest.TestCase):

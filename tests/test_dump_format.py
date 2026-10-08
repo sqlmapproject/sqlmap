@@ -328,6 +328,24 @@ class TestHtmlDump(_FileDumpCase):
 
 
 class TestSqliteDump(_FileDumpCase):
+    def test_double_quotes_in_table_and_column_names(self):
+        tv = _PlainOrderedDict([
+            ("__infos__", {"count": 1, "db": "testdb", "table": '`sales"archive`'}),
+            ('`unit"price`', {"length": 4, "values": ["3.50"]}),
+        ])
+        conf.dumpFormat = DUMP_FORMAT.SQLITE
+        self.d.dbTableValues(tv)
+
+        import sqlite3
+        conn = sqlite3.connect(os.path.join(self.tmp, "testdb.sqlite3"))
+        try:
+            rows = conn.execute('SELECT "unit""price" FROM "sales""archive"').fetchall()
+            self.assertEqual(rows, [("3.50",)])
+            columns = conn.execute('PRAGMA table_info("sales""archive")').fetchall()
+            self.assertEqual(columns[0][1], 'unit"price')
+        finally:
+            conn.close()
+
     def test_rows_and_inferred_types(self):
         tv = _PlainOrderedDict([
             ("__infos__", {"count": 2, "db": "testdb", "table": "people"}),
