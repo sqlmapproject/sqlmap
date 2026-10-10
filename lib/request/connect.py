@@ -1638,7 +1638,7 @@ class Connect(object):
                                     match = re.search(r"['\"]", post)
                                     if match:
                                         quote = match.group(0)
-                                        post = re.sub(r"\}\Z", "%s%s}" % (',' if re.search(r"\w", post) else "", "%s%s%s:%s" % (quote, name, quote, entry if entry.isdigit() else "%s%s%s" % (quote, entry, quote))), post)
+                                        post = re.sub(r"\}\Z", "%s%s}" % (',' if re.search(r"\w", post) else "", "%s%s%s:%s" % (quote, name, quote, entry if entry.isdigit() else "%s%s%s" % (quote, entry.replace('\\', r'\\'), quote))), post)
                                 else:
                                     post += "%s%s=%s" % (delimiter, name, entry)
                             elif get is not None:
