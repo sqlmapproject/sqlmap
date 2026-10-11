@@ -79,6 +79,7 @@ from lib.core.enums import HASH
 from lib.core.enums import MKSTEMP_PREFIX
 from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapUserQuitException
+from lib.core.patch import dirtyPatches
 from lib.core.settings import COMMON_PASSWORD_SUFFIXES
 from lib.core.settings import COMMON_PASSWORDS
 from lib.core.settings import COMMON_USER_COLUMNS
@@ -100,6 +101,16 @@ from lib.utils.bcrypt import bcryptHash
 from thirdparty import six
 from thirdparty.colorama.initialise import init as coloramainit
 from thirdparty.six.moves import queue as _queue
+
+# On Windows, multiprocessing's 'spawn' start method boots a fresh interpreter per cracking
+# worker (_bruteProcessVariantA/B/Salted below) to unpickle its target function, which re-imports
+# this module from scratch without ever running the main process's startup dirtyPatches() - so
+# process-wide monkeypatches it installs (e.g. the 'reversible' codec error handler used by
+# getUnicode()/openFile()) are missing in the worker, raising LookupError on every hashed entry
+# (#6143). Placing the (idempotent) call here means that very re-import applies it. POSIX fork()
+# workers inherit the parent's patches already, so this only needs to run on Windows.
+if IS_WIN:
+    dirtyPatches()
 
 def mysql_passwd(password, uppercase=True):
     """
