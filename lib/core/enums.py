@@ -352,18 +352,17 @@ class PAYLOAD(object):
         3: "High risk",
     }
 
-    CLAUSE = {
-        0: "Always",
-        1: "WHERE",
-        2: "GROUP BY",
-        3: "ORDER BY",
-        4: "LIMIT",
-        5: "OFFSET",
-        6: "TOP",
-        7: "Table name",
-        8: "Column name",
-        9: "Pre-WHERE (non-query)",
-    }
+    class CLAUSE(object):
+        ALWAYS = 0
+        WHERE = 1
+        GROUP_BY = 2
+        ORDER_BY = 3
+        LIMIT = 4
+        OFFSET = 5
+        TOP = 6
+        TABLE_NAME = 7
+        COLUMN_NAME = 8
+        PRE_WHERE = 9
 
     class METHOD(object):
         COMPARISON = "comparison"

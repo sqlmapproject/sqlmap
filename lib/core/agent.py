@@ -61,6 +61,31 @@ from lib.core.settings import UNICODE_ENCODING
 from lib.core.unescaper import unescaper
 from thirdparty import six
 
+def _isGroupOrderByClause(clause):
+    """
+    Returns True if (test's/injection's) clause is exclusively GROUP BY and/or ORDER BY
+
+    >>> _isGroupOrderByClause([PAYLOAD.CLAUSE.GROUP_BY, PAYLOAD.CLAUSE.ORDER_BY])
+    True
+    >>> _isGroupOrderByClause([PAYLOAD.CLAUSE.WHERE, PAYLOAD.CLAUSE.ORDER_BY])
+    False
+    """
+
+    return bool(clause) and set(clause) <= set((PAYLOAD.CLAUSE.GROUP_BY, PAYLOAD.CLAUSE.ORDER_BY))
+
+def _markerSafeRandom(generator):
+    """
+    Returns a random value (e.g. for [RANDNUM]) not containing the --string/--not-string page marker,
+    as a reflected one (e.g. echoed in a DBMS error message) would otherwise fake the comparison
+    """
+
+    markers = filterNone((conf.get("string"), conf.get("notString")))
+
+    while True:
+        retVal = getUnicode(generator())
+        if not any(_ in retVal for _ in markers):
+            return retVal
+
 class Agent(object):
     """
     This class defines the SQL agent methods.
@@ -184,7 +209,7 @@ class Agent(object):
 
             newValue = "%s%s" % (value, newValue)
 
-        newValue = self.cleanupPayload(newValue, origValue) or ""
+        newValue = self.cleanupPayload(newValue, origValue, clause=kb.injection.clause if kb.get("injection") else None) or ""
 
         if base64Encoding:
             _newValue = newValue
@@ -296,9 +321,9 @@ class Agent(object):
         # after the prefix or it is in GROUP BY / ORDER BY (<clause>)
         elif getTechnique() == PAYLOAD.TECHNIQUE.STACKED:
             query = kb.injection.prefix
-        elif kb.injection.clause == [2, 3] or kb.injection.clause == [2] or kb.injection.clause == [3]:
+        elif _isGroupOrderByClause(kb.injection.clause):
             query = kb.injection.prefix
-        elif clause == [2, 3] or clause == [2] or clause == [3]:
+        elif _isGroupOrderByClause(clause):
             query = prefix
 
         # In any other case prepend with the full prefix
@@ -356,7 +381,7 @@ class Agent(object):
 
         return re.sub(r";\W*;", ";", expression) if trimEmpty else expression
 
-    def cleanupPayload(self, payload, origValue=None):
+    def cleanupPayload(self, payload, origValue=None, clause=None):
         if not isinstance(payload, six.string_types):
             return
 
@@ -375,16 +400,18 @@ class Agent(object):
                 payload = payload.replace(value, replacements[value])
 
         for _ in set(re.findall(r"(?i)\[RANDNUM(?:\d+)?\]", payload)):
-            payload = payload.replace(_, str(randomInt()))
+            payload = payload.replace(_, _markerSafeRandom(randomInt))
 
         for _ in set(re.findall(r"(?i)\[RANDSTR(?:\d+)?\]", payload)):
-            payload = payload.replace(_, randomStr())
+            payload = payload.replace(_, _markerSafeRandom(randomStr))
 
         if origValue is not None:
             origValue = getUnicode(origValue)
 
             if "[ORIGVALUE]" in payload:
-                payload = getUnicode(payload).replace("[ORIGVALUE]", origValue if origValue.isdigit() else unescaper.escape("'%s'" % origValue))
+                # Note: in a GROUP BY/ORDER BY payload a (plain identifier) original value is the column itself - quoting it would turn it into a constant
+                raw = origValue.isdigit() or (_isGroupOrderByClause(clause) and re.search(r"\A[\w.]+\Z", origValue) is not None)
+                payload = getUnicode(payload).replace("[ORIGVALUE]", origValue if raw else unescaper.escape("'%s'" % origValue))
             if "[ORIGINAL]" in payload:
                 payload = getUnicode(payload).replace("[ORIGINAL]", origValue)
 
@@ -426,10 +453,10 @@ class Agent(object):
             payload = payload.replace(SINGLE_QUOTE_MARKER, "'")
 
             for _ in set(re.findall(r"\[RANDNUM(?:\d+)?\]", payload, re.I)):
-                payload = payload.replace(_, str(randomInt()))
+                payload = payload.replace(_, _markerSafeRandom(randomInt))
 
             for _ in set(re.findall(r"\[RANDSTR(?:\d+)?\]", payload, re.I)):
-                payload = payload.replace(_, randomStr())
+                payload = payload.replace(_, _markerSafeRandom(randomStr))
 
             if hashDBRetrieve(HASHDB_KEYS.DBMS_FORK) in (FORK.MEMSQL, FORK.TIDB, FORK.DRIZZLE):
                 payload = re.sub(r"(?i)\bORD\(", "ASCII(", payload)

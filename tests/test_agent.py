@@ -556,6 +556,21 @@ class TestCleanupPayloadOrigValue(DbmsStateMixin, unittest.TestCase):
         out = agent.cleanupPayload("p=[ORIGINAL]", origValue="raw")
         self.assertEqual(out, "p=raw")
 
+    def test_origvalue_identifier_raw_for_group_order_by(self):
+        self.assertEqual(agent.cleanupPayload("[ORIGVALUE]", origValue="p.name", clause=[2, 3]), "p.name")
+        self.assertIn("'p.name'", agent.cleanupPayload("[ORIGVALUE]", origValue="p.name", clause=[1, 2, 3]))
+
+    def test_random_values_avoid_string_marker(self):
+        # a reflected [RANDNUM] (e.g. quoted back in a DBMS error message) containing the --string
+        # marker would fake a True response (e.g. --string=98 vs. 8988)
+        saved = conf.string
+        conf.string = "9"
+        try:
+            for _ in range(200):
+                self.assertNotIn("9", agent.cleanupPayload("[RANDNUM] [RANDNUM1]"))
+        finally:
+            conf.string = saved
+
     def test_space_replace_marker(self):
         out = agent.cleanupPayload("a[SPACE_REPLACE]b")
         self.assertEqual(out, "a%sb" % kb.chars.space)

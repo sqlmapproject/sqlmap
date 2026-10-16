@@ -403,7 +403,7 @@ def checkSqlInjection(place, parameter, value):
 
             # Parse test's <request>
             comment = agent.getComment(test.request) if len(conf.boundaries) > 1 else None
-            fstPayload = agent.cleanupPayload(test.request.payload, origValue=value if place not in (PLACE.URI, PLACE.CUSTOM_POST, PLACE.CUSTOM_HEADER) and BOUNDED_INJECTION_MARKER not in (value or "") else None)
+            fstPayload = agent.cleanupPayload(test.request.payload, origValue=value if place not in (PLACE.URI, PLACE.CUSTOM_POST, PLACE.CUSTOM_HEADER) and BOUNDED_INJECTION_MARKER not in (value or "") else None, clause=clause)
 
             for boundary in boundaries:
                 injectable = False
@@ -517,13 +517,13 @@ def checkSqlInjection(place, parameter, value):
                     # payload was successful
                     # Parse test's <response>
                     for method, check in test.response.items():
-                        check = agent.cleanupPayload(check, origValue=value if place not in (PLACE.URI, PLACE.CUSTOM_POST, PLACE.CUSTOM_HEADER) and BOUNDED_INJECTION_MARKER not in (value or "") else None)
+                        check = agent.cleanupPayload(check, origValue=value if place not in (PLACE.URI, PLACE.CUSTOM_POST, PLACE.CUSTOM_HEADER) and BOUNDED_INJECTION_MARKER not in (value or "") else None, clause=clause)
 
                         # In case of boolean-based blind SQL injection
                         if method == PAYLOAD.METHOD.COMPARISON:
                             # Generate payload used for comparison
                             def genCmpPayload():
-                                sndPayload = agent.cleanupPayload(test.response.comparison, origValue=value if place not in (PLACE.URI, PLACE.CUSTOM_POST, PLACE.CUSTOM_HEADER) and BOUNDED_INJECTION_MARKER not in (value or "") else None)
+                                sndPayload = agent.cleanupPayload(test.response.comparison, origValue=value if place not in (PLACE.URI, PLACE.CUSTOM_POST, PLACE.CUSTOM_HEADER) and BOUNDED_INJECTION_MARKER not in (value or "") else None, clause=clause)
 
                                 # Forge response payload by prepending with
                                 # boundary's prefix and appending the boundary's
