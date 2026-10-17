@@ -353,7 +353,8 @@ class TestStdDbOutMultiTarget(unittest.TestCase):
         rows = self.db.execute("SELECT taskid FROM data ORDER BY id")
         self.assertEqual([row[0] for row in rows], ["t1-1", "t1-2"])    # neither target's row was deleted
 
-    def test_single_target_without_report_task_id_keeps_plain_taskid(self):
+    def test_without_report_task_id_keeps_plain_taskid(self):
+        # e.g. output written before controller.start() reaches its target loop
         if "reportTaskId" in kb:
             del kb.reportTaskId
         std = api.StdDbOut("t1", messagetype="stdout")
