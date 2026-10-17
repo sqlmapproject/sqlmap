@@ -376,9 +376,10 @@ def start():
     for targetUrl, targetMethod, targetData, targetCookie, targetHeaders in kb.targets:
         targetCount += 1
 
-        # --report-json: give each target its own taskid in the shared collector, so a multi-target
-        # run (e.g. '-m' bulk file) doesn't have later targets overwrite earlier ones (see _reportData)
-        if conf.reportJson:
+        # --report-json / REST API: give each target its own taskid in the shared collector, so a
+        # multi-target run (e.g. '-m' bulk file) doesn't have later targets overwrite earlier ones
+        # (see _reportData for the report collector and StdDbOut.write for the REST API IPC database)
+        if conf.reportJson or conf.api:
             kb.reportTaskId = targetCount
 
         try:
