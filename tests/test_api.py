@@ -30,6 +30,7 @@ bootstrap()
 
 import lib.utils.api as api
 from lib.core.data import conf
+from lib.core.data import kb
 from lib.core.convert import encodeBase64
 from lib.core.enums import CONTENT_STATUS, CONTENT_TYPE
 from thirdparty.bottle.bottle import default_app
@@ -308,6 +309,62 @@ class TestStdDbOutAndLogRecorder(unittest.TestCase):
         self.assertEqual(rows[0][2], "hello world")
 
 
+class TestStdDbOutMultiTarget(unittest.TestCase):
+    """
+    Regression coverage for issue #2503: a multi-target scan (crawl or '-m' bulk
+    file) inside a single REST API task runs every target through one StdDbOut
+    instance. StdDbOut.write() keys each target's data rows by kb.reportTaskId
+    ('<taskid>-<n>'), so a later target's COMPLETE row cannot delete an earlier
+    target's rows of the same content_type in _storeData() - mirroring the
+    --report-json fix for #6123 (see test_report.py's TestMultiTargetTaskId).
+    """
+
+    def setUp(self):
+        self.db = api.Database(":memory:")
+        self.db.connect("client")
+        self.db.init()
+        self._saved_stdout = sys.stdout
+        self._saved_cursor = conf.get("databaseCursor")
+        self._saved_partRun = kb.get("partRun")
+        self._had_reportTaskId = "reportTaskId" in kb
+        self._saved_reportTaskId = kb.get("reportTaskId")
+        conf.databaseCursor = self.db
+        kb.partRun = None
+
+    def tearDown(self):
+        sys.stdout = self._saved_stdout
+        conf.databaseCursor = self._saved_cursor
+        kb.partRun = self._saved_partRun
+        if self._had_reportTaskId:
+            kb.reportTaskId = self._saved_reportTaskId
+        elif "reportTaskId" in kb:
+            del kb.reportTaskId
+        self.db.disconnect()
+
+    def test_second_target_does_not_overwrite_first(self):
+        std = api.StdDbOut("t1", messagetype="stdout")
+        sys.stdout = self._saved_stdout    # StdDbOut hijacked it; call write() directly
+
+        kb.reportTaskId = 1
+        std.write({"url": "http://host1/?id=1"}, status=CONTENT_STATUS.COMPLETE, content_type=CONTENT_TYPE.TARGET)
+        kb.reportTaskId = 2
+        std.write({"url": "http://host2/?id=1"}, status=CONTENT_STATUS.COMPLETE, content_type=CONTENT_TYPE.TARGET)
+
+        rows = self.db.execute("SELECT taskid FROM data ORDER BY id")
+        self.assertEqual([row[0] for row in rows], ["t1-1", "t1-2"])    # neither target's row was deleted
+
+    def test_single_target_without_report_task_id_keeps_plain_taskid(self):
+        if "reportTaskId" in kb:
+            del kb.reportTaskId
+        std = api.StdDbOut("t1", messagetype="stdout")
+        sys.stdout = self._saved_stdout
+
+        std.write({"url": "http://host1/?id=1"}, status=CONTENT_STATUS.COMPLETE, content_type=CONTENT_TYPE.TARGET)
+
+        rows = self.db.execute("SELECT taskid FROM data")
+        self.assertEqual([row[0] for row in rows], ["t1"])
+
+
 # ---------------------------------------------------------------------------
 # HTTP routes (WSGI test client)
 # ---------------------------------------------------------------------------
@@ -483,6 +540,26 @@ class TestScanQueryRoutes(_ApiServerCase):
         taskid = self._new_task()
         code, parsed, _ = _wsgi_call("GET", "/scan/%s/kill" % taskid)
         self.assertFalse(parsed["success"])
+
+
+class TestScanDataMultiTarget(_ApiServerCase):
+    """scan_data() folds the per-target '<taskid>-<n>' rows (see StdDbOut.write) back into the task's flat result, in target order."""
+
+    def test_data_merges_per_target_rows(self):
+        taskid = self._new_task()
+        api._storeData(self.db, "%s-2" % taskid, {"url": "http://host2/?id=1"}, CONTENT_STATUS.COMPLETE, CONTENT_TYPE.TARGET)
+        api._storeData(self.db, "%s-1" % taskid, {"url": "http://host1/?id=1"}, CONTENT_STATUS.COMPLETE, CONTENT_TYPE.TARGET)
+        code, parsed, _ = _wsgi_call("GET", "/scan/%s/data" % taskid)
+        self.assertEqual(code, 200)
+        self.assertTrue(parsed["success"])
+        self.assertEqual([d["value"]["url"] for d in parsed["data"]], ["http://host1/?id=1", "http://host2/?id=1"])
+
+    def test_data_ignores_other_tasks_rows(self):
+        taskid = self._new_task()
+        api._storeData(self.db, "othertask-1", {"url": "http://other/?id=1"}, CONTENT_STATUS.COMPLETE, CONTENT_TYPE.TARGET)
+        code, parsed, _ = _wsgi_call("GET", "/scan/%s/data" % taskid)
+        self.assertTrue(parsed["success"])
+        self.assertEqual(parsed["data"], [])
 
 
 class TestScanStart(_ApiServerCase):

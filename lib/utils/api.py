@@ -444,7 +444,17 @@ class StdDbOut(object):
 
     def write(self, value, status=CONTENT_STATUS.IN_PROGRESS, content_type=None):
         if self.messagetype == "stdout":
-            _storeData(conf.databaseCursor, self.taskid, value, status, content_type)
+            # A multi-target scan (e.g. crawling or a '-m' bulk file inside a single API task) runs
+            # every target through this one StdDbOut instance. Key each target's data rows by
+            # kb.reportTaskId (set per target in controller.start()) so that a later target's
+            # COMPLETE row cannot delete an earlier target's rows of the same content_type in
+            # _storeData() - the REST API counterpart of the --report-json fix for #6123, and the
+            # reason a crawl via sqlmapapi used to return only the last target's results (#2503).
+            # scan_data() folds the per-target rows back into the task's flat result.
+            taskid = self.taskid
+            if kb.get("reportTaskId"):
+                taskid = "%s-%s" % (self.taskid, kb.reportTaskId)
+            _storeData(conf.databaseCursor, taskid, value, status, content_type)
         else:
             conf.databaseCursor.execute("INSERT INTO errors VALUES(NULL, ?, ?)", (self.taskid, str(value) if value else ""))
 
@@ -817,6 +827,18 @@ def scan_data(taskid):
 
     # Read all data and error messages from the IPC database (shared assembler - same output as --report-json)
     result = _assembleData(DataStore.current_db, taskid)
+
+    # Multi-target scans store each target's data rows under a '<taskid>-<n>' key (see
+    # StdDbOut.write); fold them into this task's flat result, in target order. Real taskids
+    # are dash-less hex strings, so a '<taskid>-' prefix can only match this task's own rows.
+    prefix = "%s-" % taskid
+    subtaskids = []
+    for row in DataStore.current_db.execute("SELECT DISTINCT taskid FROM data"):
+        stored = str(row[0])
+        if stored.startswith(prefix) and stored[len(prefix):].isdigit():
+            subtaskids.append(stored)
+    for subtaskid in sorted(subtaskids, key=lambda _: int(_.rsplit("-", 1)[1])):
+        result["data"].extend(_assembleData(DataStore.current_db, subtaskid)["data"])
 
     logger.debug("(%s) Retrieved scan data and error messages" % taskid)
     return jsonize(result)
