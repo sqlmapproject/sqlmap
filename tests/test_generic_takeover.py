@@ -257,7 +257,7 @@ class TestCustomSqlFile(_GenericBase):
         handle, filename = tempfile.mkstemp(suffix=suffix)
         os.close(handle)
         self.addCleanup(os.unlink, filename)
-        with io.open(filename, "w", encoding="utf-8") as f:
+        with io.open(filename, "w", encoding="utf-8", newline="") as f:
             f.write(content)
 
         set_dbms("MySQL")
@@ -289,6 +289,10 @@ class TestCustomSqlFile(_GenericBase):
     def test_sqlfile_preserves_multiline_literal(self):
         query = u"SELECT 'a;\n  b'"
         self.assertEqual(self._runSqlFile(query), [query])
+
+    def test_sqlfile_preserves_crlf_literal(self):
+        query = u"SELECT 'a;\r\n  b'"
+        self.assertEqual(self._runSqlFile(query + u";\r\nSELECT 2;"), [query, "SELECT 2"])
 
     def test_sqlfile_newline_separated_selects(self):
         self.assertEqual(self._runSqlFile(u"SELECT 'a;b'\nSELECT 2\n"), ["SELECT 'a;b'", "SELECT 2"])
