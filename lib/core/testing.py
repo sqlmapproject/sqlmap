@@ -268,9 +268,10 @@ def vulnTest(tests=None, label="vuln"):
 
         os.environ["SQLMAP_UNSAFE_EVAL"] = '1'
 
-        # bounded well above the slowest known entry (GraphQL, ~96s) - a hung entry fails fast and
-        # visibly instead of silently burning the whole CI job's timeout (see #6129 CI investigation)
-        output = shellExec(cmd, timeout=180)
+        # GraphQL blind-dumps every table, including the wide LDAP directory fixture. It takes
+        # ~124s locally on PyPy and can exceed 180s on CI; give that entry more room without
+        # weakening its checks or changing the watchdog for the remaining entries (see #6129).
+        output = shellExec(cmd, timeout=300 if "--graphql" in options else 180)
 
         if not all((check in output if not check.startswith('~') else check[1:] not in output) for check in checks) or "unhandled exception" in output:
             dataToStdout("---\n\n$ %s\n" % cmd)
