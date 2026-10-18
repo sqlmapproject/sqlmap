@@ -658,7 +658,7 @@ class Agent(object):
         fieldsSelectCase = re.search(r"\ASELECT%s\s+(\(CASE WHEN\s+.+\s+END\))" % prefixRegex, query, re.I)
         fieldsSelectFrom = re.search(r"\ASELECT%s\s+(.+?)\s+FROM " % prefixRegex, query, re.I)
         fieldsExists = re.search(r"EXISTS\(([^)]*)\)\Z", query, re.I)
-        fieldsSelect = re.search(r"\ASELECT%s\s+(.*)" % prefixRegex, query, re.I)
+        fieldsSelect = re.search(r"\ASELECT%s\s+(.*)" % prefixRegex, query, re.I | re.S)
         fieldsSubstr = re.search(r"\A(SUBSTR|MID\()", query, re.I)
         fieldsMinMaxstr = re.search(r"(?:MIN|MAX)\(([^\(\)]+)\)", query, re.I)
         fieldsNoSelect = query

@@ -12,10 +12,12 @@ import sys
 
 from lib.core.common import Backend
 from lib.core.common import dataToStdout
-from lib.core.common import getSQLSnippet
 from lib.core.common import isListLike
 from lib.core.common import isStackingAvailable
 from lib.core.common import joinValue
+from lib.core.common import readCachedFileContent
+from lib.core.common import splitFields
+from lib.core.common import zeroDepthSearch
 from lib.core.compat import xrange
 from lib.core.convert import getUnicode
 from lib.core.data import conf
@@ -148,12 +150,12 @@ class Custom(object):
             if not filename:
                 continue
 
-            snippet = getSQLSnippet(Backend.getDbms(), filename)
+            # User SQL is not a bundled procedure template: preserve literals and percent tokens.
+            snippet = readCachedFileContent(filename)
+            queries = [_.strip() for _ in splitFields(snippet, delimiter=';' if zeroDepthSearch(snippet, ';') else '\n') if _.strip()]
 
-            if snippet and all(query.strip().upper().startswith("SELECT") for query in (_ for _ in snippet.split(';' if ';' in snippet else '\n') if _)):
-                for query in (_ for _ in snippet.split(';' if ';' in snippet else '\n') if _):
-                    query = query.strip()
-                    if query:
-                        conf.dumper.sqlQuery(query, self.sqlQuery(query))
-            else:
+            if queries and all(query.upper().startswith("SELECT") for query in queries):
+                for query in queries:
+                    conf.dumper.sqlQuery(query, self.sqlQuery(query))
+            elif queries:
                 conf.dumper.sqlQuery(snippet, self.sqlQuery(snippet))

@@ -186,6 +186,12 @@ class TestPrefixSuffix(unittest.TestCase):
 
 
 class TestGetFields(unittest.TestCase):
+    def test_multiline_scalar_literal(self):
+        field = "HEX('a;\n  b')"
+        result = agent.getFields("SELECT %s" % field)
+        self.assertEqual(result[5], [field])
+        self.assertEqual(result[6], field)
+
     def test_extracts_select_list(self):
         # getFields(query) returns an 8-tuple; the fields-bearing slots are:
         #   [0],[1] = regex match objects for the SELECT/expression (must be found, not None)

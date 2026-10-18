@@ -21,8 +21,10 @@ prompts non-interactive, and conf.dumper is a recording stub. Every test restore
 all touched conf.* / kb.* / patched module attributes in tearDown so nothing leaks.
 """
 
+import io
 import os
 import sys
+import tempfile
 import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -39,6 +41,7 @@ import plugins.generic.entries as emod
 import plugins.generic.custom as cmod
 import plugins.generic.misc as mmod
 import plugins.generic.takeover as tmod
+import lib.core.common as common
 from plugins.generic.custom import Custom
 from plugins.generic.misc import Miscellaneous
 
@@ -250,38 +253,65 @@ class TestCustomSqlQuery(_GenericBase):
 
 
 class TestCustomSqlFile(_GenericBase):
-    def test_sqlfile_select_snippets(self):
-        set_dbms("MySQL")
-        c = Custom()
-        cmod.inject.getValue = lambda query, **k: "r"
+    def _runSqlFile(self, content, suffix=".sql"):
+        handle, filename = tempfile.mkstemp(suffix=suffix)
+        os.close(handle)
+        self.addCleanup(os.unlink, filename)
+        with io.open(filename, "w", encoding="utf-8") as f:
+            f.write(content)
 
-        # getSQLSnippet reads from disk; patch it to return inline SQL.
-        saved = cmod.getSQLSnippet
-        try:
-            cmod.getSQLSnippet = lambda dbms, filename, **kw: "SELECT 1;SELECT 2"
-            conf.sqlFile = "dummy.sql"
-            c.sqlFile()
-            # two SELECT statements => two recorded dumper.sqlQuery calls
-            self.assertEqual(len(conf.dumper.sqlQueries), 2)
-        finally:
-            cmod.getSQLSnippet = saved
+        set_dbms("MySQL")
+        cmod.inject.getValue = lambda query, **k: "r"
+        conf.sqlFile = filename
+        Custom().sqlFile()
+        return [query for query, output in conf.dumper.sqlQueries]
+
+    def test_sqlfile_select_snippets(self):
+        self.assertEqual(self._runSqlFile(u"SELECT 1; SELECT 2;\n"), ["SELECT 1", "SELECT 2"])
 
     def test_sqlfile_nonselect_snippet(self):
-        set_dbms("MySQL")
-        conf.direct = True
-        c = Custom()
         cmod.inject.goStacked = lambda *a, **k: None
+        self.assertEqual(self._runSqlFile(u"DROP TABLE x"), ["DROP TABLE x"])
 
-        saved = cmod.getSQLSnippet
+    def test_sqlfile_preserves_percent_tokens_without_prompting(self):
+        saved = common.readInput
         try:
-            cmod.getSQLSnippet = lambda dbms, filename, **kw: "DROP TABLE x"
-            conf.sqlFile = "dummy.sql"
-            c.sqlFile()
-            # non-SELECT => single recorded call with the whole snippet
-            self.assertEqual(len(conf.dumper.sqlQueries), 1)
-            self.assertEqual(conf.dumper.sqlQueries[0][0], "DROP TABLE x")
+            common.readInput = lambda *a, **k: self.fail("user SQL must not request template substitutions")
+            query = u"SELECT DATE_FORMAT(NOW(), '%m%m'), '%RANDSTR1%', '%RANDINT1%'"
+            self.assertEqual(self._runSqlFile(query), [query])
         finally:
-            cmod.getSQLSnippet = saved
+            common.readInput = saved
+
+    def test_sqlfile_preserves_hash_and_quoted_delimiters(self):
+        first = u"SELECT '#keep;  value', 'it''s;  quoted', \"semi;  colon\""
+        self.assertEqual(self._runSqlFile(first + u"; SELECT 2;"), [first, "SELECT 2"])
+
+    def test_sqlfile_preserves_multiline_literal(self):
+        query = u"SELECT 'a;\n  b'"
+        self.assertEqual(self._runSqlFile(query), [query])
+
+    def test_sqlfile_newline_separated_selects(self):
+        self.assertEqual(self._runSqlFile(u"SELECT 'a;b'\nSELECT 2\n"), ["SELECT 'a;b'", "SELECT 2"])
+
+    def test_sqlfile_multiline_select(self):
+        query = u"SELECT name\nFROM users"
+        self.assertEqual(self._runSqlFile(query), [query])
+
+    def test_sqlfile_preserves_mixed_batch(self):
+        batch = u"UPDATE users SET name='#keep;  value';\nSELECT name FROM users;"
+        executed = []
+        cmod.inject.goStacked = lambda query, **k: executed.append(query)
+        self.assertEqual(self._runSqlFile(batch), [batch])
+        self.assertEqual(executed, [batch.rstrip(';')])
+
+    def test_sqlfile_arbitrary_extension(self):
+        self.assertEqual(self._runSqlFile(u"SELECT 1", suffix=".txt"), ["SELECT 1"])
+
+    def test_sqlfile_without_extension(self):
+        self.assertEqual(self._runSqlFile(u"SELECT 1", suffix=""), ["SELECT 1"])
+
+    def test_sqlfile_empty(self):
+        self.assertEqual(self._runSqlFile(u" \n;\n "), [])
 
 
 # --------------------------------------------------------------------------- #
