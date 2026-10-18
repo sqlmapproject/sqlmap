@@ -29,6 +29,8 @@
     <dbms value="PostgreSQL">
         <error regexp="crdb_internal\." fork="CockroachDB"/>
         <error regexp="github\.com/cockroachdb/cockroach/pkg/sql" fork="CockroachDB"/>
+        <error regexp="at or near &quot;[^&quot;]*&quot;: syntax error" fork="CockroachDB"/>
+        <error regexp="See: https?://(go\.crdb\.dev|github\.com/cockroachdb)" fork="CockroachDB"/>
         <error regexp="com\.yugabyte\.(util\.PSQLException|core\.v3)" fork="YugabyteDB"/>
         <error regexp="\(yb/\w+/\w+\.cc:\d+\)" fork="YugabyteDB"/>
         <error regexp="org\.opengauss\.(util\.PSQLException|core\.v3)" fork="OpenGauss"/>
