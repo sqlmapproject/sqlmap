@@ -43,9 +43,13 @@ bootstrap()
 
 from lib.core.agent import agent
 from lib.core.common import Backend
-from lib.core.data import conf, kb
+from lib.core.data import conf, kb, queries
+from lib.core.datatype import AttribDict
+from lib.core.datatype import InjectionDict
 from lib.core.threads import getCurrentThreadData
 from lib.core.enums import DBMS
+from lib.core.enums import PAYLOAD
+from lib.core.enums import PLACE
 from lib.core.exception import SqlmapNotVulnerableException
 from lib.core.settings import DNS_BOUNDARIES_ALPHABET
 from lib.core.settings import MAX_DNS_LABEL
@@ -80,7 +84,8 @@ class _HighPortDNSServer(DNSServer):
         except socket.error:
             pass
 
-_CONF = {"dnsDomain": "exfil.test", "hexConvert": False, "api": False, "verbose": 0, "forceDns": False}
+_CONF = {"dnsDomain": "exfil.test", "hexConvert": False, "api": False, "verbose": 0, "forceDns": False,
+         "suffix": None, "direct": False}
 _KB = {"dnsTest": True, "dnsMode": False, "bruteMode": False, "safeCharEncode": False}
 
 
@@ -250,6 +255,73 @@ class TestDnsExfilEngineMssql(TestDnsExfilEngine):
     # MSSQL: stacked-query branch, xp_dirtree dns_request snippet, and crucially a SMALLER
     # chunk_length (MAX_DNS_LABEL//4 - 2) - exercises the alternate chunking arithmetic.
     DBMS_NAME = "Microsoft SQL Server"
+
+
+class TestDnsStackedSuffix(_DnsCase):
+    def setUp(self):
+        _DnsCase.setUp(self)
+        restore_attrs(self._s_agent)
+        self._saved_target = {k: conf.get(k) for k in ("parameters", "paramDict", "prefix")}
+        self._saved_injection = {k: kb.get(k) for k in ("injection", "technique", "forceWhere")}
+        conf.parameters = {PLACE.GET: "id=1"}
+        conf.paramDict = {PLACE.GET: {"id": "1"}}
+        conf.prefix = " /* custom prefix */"
+        kb.technique = PAYLOAD.TECHNIQUE.BOOLEAN
+        kb.forceWhere = None
+        kb.injection = InjectionDict()
+        kb.injection.place = PLACE.GET
+        kb.injection.parameter = "id"
+        kb.injection.prefix = conf.prefix
+        kb.injection.suffix = "; SELECT 999-- inferred suffix"
+        kb.injection.clause = [1]
+        kb.injection.data[PAYLOAD.TECHNIQUE.BOOLEAN] = AttribDict({"where": PAYLOAD.WHERE.ORIGINAL, "comment": "-- inferred comment"})
+
+    def tearDown(self):
+        for k, v in self._saved_target.items():
+            conf[k] = v
+        for k, v in self._saved_injection.items():
+            kb[k] = v
+        _DnsCase.tearDown(self)
+
+    def _extract_with_suffix(self, suffix):
+        secret = "The quick brown fox jumps over the lazy dog 0123456789"
+        conf.suffix = suffix
+
+        for dbms in (DBMS.MSSQL, DBMS.PGSQL):
+            set_dbms(dbms)
+            self._install_oracle(secret)
+            oracle = Connect.queryPage
+            payloads = []
+
+            def require_suffix(payload, **kwargs):
+                sql = agent.removePayloadDelimiters(payload)
+                payloads.append(sql)
+                # Model an endpoint that accepts the DNS payload only with its required ending.
+                if suffix and not sql.endswith(suffix):
+                    return None
+                return oracle(payload, **kwargs)
+
+            Connect.queryPage = staticmethod(require_suffix)
+            self.assertEqual(dnsmod.dnsUse("unused", "SELECT secret"), secret, dbms)
+            self.assertGreater(len(payloads), 1, dbms)
+            for payload in payloads:
+                self.assertTrue(payload.startswith("id=1%s; " % conf.prefix), dbms)
+                self.assertNotIn("-- inferred", payload)
+                if suffix is None:
+                    self.assertTrue(payload.endswith(queries[dbms].comment.query), dbms)
+                elif suffix:
+                    self.assertTrue(payload.endswith(suffix), dbms)
+                else:
+                    self.assertFalse(payload.endswith(queries[dbms].comment.query), dbms)
+
+    def test_explicit_suffix_survives_every_chunk(self):
+        self._extract_with_suffix("; SELECT 4973-- required suffix")
+
+    def test_default_comment_without_explicit_suffix(self):
+        self._extract_with_suffix(None)
+
+    def test_explicit_empty_suffix_does_not_add_comment(self):
+        self._extract_with_suffix("")
 
 
 class TestDnsLabelInvariant(_DnsCase):
