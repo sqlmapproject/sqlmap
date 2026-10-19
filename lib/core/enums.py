@@ -463,6 +463,7 @@ class MKSTEMP_PREFIX(object):
     BIG_ARRAY = "sqlmapbigarray-"
     SPECIFIC_RESPONSE = "sqlmapresponse-"
     PREPROCESS = "sqlmappreprocess-"
+    AUTH_REFRESH = "sqlmapauthrefresh-"
 
 class TIMEOUT_STATE(object):
     NORMAL = 0

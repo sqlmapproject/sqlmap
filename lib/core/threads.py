@@ -60,6 +60,7 @@ class _ThreadData(threading.local):
         self.lastHTTPError = None
         self.lastRedirectMsg = None
         self.lastQueryDuration = 0
+        self.authRefreshTime = 0
         self.lastPage = None
         self.lastRequestMsg = None
         self.lastRequestUID = 0

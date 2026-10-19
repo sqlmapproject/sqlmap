@@ -142,6 +142,7 @@ from lib.parse.configfile import configFileParser
 from lib.parse.payloads import loadBoundaries
 from lib.parse.payloads import loadPayloads
 from lib.request.basic import checkCharEncoding
+from lib.request import authrefresh
 from lib.request.basicauthhandler import SmartHTTPBasicAuthHandler
 from lib.request.chunkedhandler import ChunkedHandler
 from lib.request.connect import Connect as Request
@@ -1151,6 +1152,42 @@ def _setPostprocessFunctions():
                     errMsg += "should return a tuple '(page, headers, code)' "
                     errMsg += "(Note: find template script at '%s')" % filename
                     raise SqlmapGenericException(errMsg)
+
+def _setAuthRefreshFunction():
+    """
+    Load the authentication refresh hook without performing a login during initialization.
+    """
+
+    if conf.authRefresh:
+        try:
+            script = safeFilepathEncode(conf.authRefresh.strip())
+
+            if not os.path.isfile(script):
+                raise SqlmapFilePathException("auth refresh script '%s' does not exist" % script)
+            if not script.endswith(".py"):
+                raise SqlmapSyntaxException("auth refresh script should have an extension '.py'")
+
+            dirname, filename = os.path.split(os.path.abspath(script))
+            if dirname not in sys.path:
+                sys.path.insert(0, dirname)
+
+            logger.info("loading auth refresh module '%s'" % filename[:-3])
+            try:
+                getattr(importlib, "invalidate_caches", lambda: None)()
+                module = __import__(safeFilepathEncode(filename[:-3]))
+                function = getattr(module, "refresh", None)
+                if not inspect.isfunction(function):
+                    raise ValueError("missing function 'refresh()'")
+                spec = _argSpec(function)
+                if len(spec.args) > len(spec.defaults or ()) or any(_ not in (getattr(spec, "kwonlydefaults", None) or {}) for _ in getattr(spec, "kwonlyargs", ())):
+                    raise ValueError("function 'refresh()' must be callable without arguments")
+            except Exception:
+                raise SqlmapSyntaxException("unable to load 'refresh()' from auth refresh script '%s'" % script)
+        except (SqlmapFilePathException, SqlmapSyntaxException) as ex:
+            errMsg = "%s. You can find a template script at '%s'" % (getSafeExString(ex), authrefresh.createTemplate())
+            raise type(ex)(errMsg)
+
+        kb.authRefreshFunction = function
 
 def _setThreads():
     if not isinstance(conf.threads, int) or conf.threads <= 0:
@@ -2317,8 +2354,12 @@ def _setKnowledgeBaseAttributes(flushAll=True):
     kb.lastParserStatus = None
 
     kb.locks = AttribDict()
-    for _ in ("cache", "connError", "count", "handlers", "hint", "identYwaf", "index", "io", "limit", "liveCookies", "log", "multibit", "prediction", "socket", "redirect", "request", "value"):
+    for _ in ("authRefresh", "cache", "connError", "count", "handlers", "hint", "identYwaf", "index", "io", "limit", "liveCookies", "log", "multibit", "prediction", "socket", "redirect", "request", "value"):
         kb.locks[_] = threading.Lock()
+
+    kb.authRefreshHeaders = {}
+    kb.authRefreshVersion = 0
+    kb.authRefreshFailed = False
 
     kb.matchRatio = None
     kb.maxConnectionsFlag = False
@@ -2427,6 +2468,7 @@ def _setKnowledgeBaseAttributes(flushAll=True):
         kb.passwordMgr = None
         kb.postprocessFunctions = []
         kb.preprocessFunctions = []
+        kb.authRefreshFunction = None
         kb.skipVulnHost = None
         kb.storeCrawlingChoice = None
         kb.tamperFunctions = []
@@ -3171,6 +3213,7 @@ def init():
     _setTamperingFunctions()
     _setPreprocessFunctions()
     _setPostprocessFunctions()
+    _setAuthRefreshFunction()
     _setTrafficOutputFP()
     _setupHTTPCollector()
     _setHttpOptions()

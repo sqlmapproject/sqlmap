@@ -699,6 +699,17 @@ class TestRedirectHandling(unittest.TestCase):
         self.assertEqual(calls[0][1], 8443)
         self.assertEqual(calls[0][4], "xn--tst-qla.example:8443")
 
+    def test_cross_origin_redirect_strips_custom_auth_headers(self):
+        responses = [(307, [(b"location", b"https://other.test/final")], b""), (200, [], b"ok")]
+        _, calls = self._run_with_fake_exchange(
+            responses, url="https://example.test/start",
+            headers={"X-Auth-Token": "secret", "X-Keep": "yes"},
+            sensitive_headers=("X-Auth-Token",),
+        )
+        names = [key.lower() for key, _ in calls[1][5]]
+        self.assertNotIn("x-auth-token", names)
+        self.assertIn("x-keep", names)
+
 
 class TestPoolRetries(unittest.TestCase):
     class _Connection(object):

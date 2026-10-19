@@ -748,6 +748,9 @@ def cmdLineParser(argv=None):
         general.add_argument("--parse-errors", dest="parseErrors", action="store_true",
             help="Parse and display DBMS error messages from responses")
 
+        general.add_argument("--auth-refresh", dest="authRefresh",
+            help="Run script to refresh auth on HTTP 401")
+
         general.add_argument("--preprocess", dest="preprocess",
             help="Use given script(s) for preprocessing (request)")
 

@@ -1576,7 +1576,7 @@ def proxy_tuple(proxy, cred=None):
 
 
 def open_url(url, method="GET", headers=None, body=None, timeout=30, follow_redirects=True,
-             max_redirects=10, proxy=None, verify=False, ssl_context=None):
+             max_redirects=10, proxy=None, verify=False, ssl_context=None, sensitive_headers=()):
     req_headers = headers or {}
     current_method = method
     current_body = body
@@ -1614,7 +1614,7 @@ def open_url(url, method="GET", headers=None, body=None, timeout=30, follow_redi
         old_parts = parts
         new_parts = urlsplit(new_url)
         if _origin_tuple(old_parts) != _origin_tuple(new_parts):
-            req_headers = _headers_without(req_headers, _SENSITIVE_REDIRECT_FIELDS)
+            req_headers = _headers_without(req_headers, _SENSITIVE_REDIRECT_FIELDS.union(_as_bytes(_).lower() for _ in sensitive_headers))
 
         method_bytes = _as_bytes(current_method)
         change_to_get = status == 303 and method_bytes != b"HEAD"

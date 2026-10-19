@@ -22,6 +22,7 @@ import time
 import traceback
 
 from lib.request import websocket
+from lib.request import authrefresh
 from lib.request.websocket import WebSocketException
 
 from lib.core.agent import agent
@@ -469,6 +470,8 @@ class Connect(object):
         responseHeaders = None
         logHeaders = u""
         skipLogTraffic = False
+        authRetry = False
+        authVersion = None
 
         raise404 = raise404 and not kb.ignoreNotFound
 
@@ -683,6 +686,9 @@ class Connect(object):
                     else:
                         post, headers = req.data, req.headers
 
+                authVersion = authrefresh.apply(req)
+                headers = req.headers
+
                 requestHeaders += "\r\n".join(["%s: %s" % (u"-".join(_.capitalize() for _ in getUnicode(key).split(u'-')) if hasattr(key, "capitalize") else getUnicode(key), getUnicode(value)) for (key, value) in req.header_items()])
 
                 if not getRequestHeader(req, HTTP_HEADER.COOKIE) and conf.cj:
@@ -730,12 +736,12 @@ class Connect(object):
                         raise SqlmapMissingDependence("native HTTP/2 client does not support SOCKS proxies (omit '--http2' or use an HTTP proxy)")
 
                     try:
-                        conn = http2OpenUrl(url, method or (HTTPMETHOD.POST if post is not None else HTTPMETHOD.GET), headers, post, timeout, follow_redirects=kb.choices.redirect != REDIRECTION.NO, proxy=h2proxy)
+                        conn = http2OpenUrl(url, method or (HTTPMETHOD.POST if post is not None else HTTPMETHOD.GET), headers, post, timeout, follow_redirects=kb.choices.redirect != REDIRECTION.NO, proxy=h2proxy, sensitive_headers=tuple(kb.authRefreshHeaders) if conf.authRefresh else ())
                     except IOError as ex:
                         raise _http_client.HTTPException(getSafeExString(ex))
                     else:
                         if conn.code >= 400:
-                            raise _urllib.error.HTTPError(url, conn.code, conn.msg, conn.info(), io.BytesIO(conn.read()))
+                            raise _urllib.error.HTTPError(conn.geturl(), conn.code, conn.msg, conn.info(), io.BytesIO(conn.read()))
 
                         requestMsg = re.sub(r" HTTP/[0-9.]+\r\n", " %s\r\n" % conn.http_version, requestMsg, count=1)
 
@@ -863,7 +869,7 @@ class Connect(object):
             page = None
             responseHeaders = None
 
-            if checking:
+            if checking and not (ex.code == _http_client.UNAUTHORIZED and authVersion is not None):
                 return None, None, None
 
             try:
@@ -887,7 +893,8 @@ class Connect(object):
             code = ex.code
             status = getUnicode(getattr(ex, "reason", None) or getSafeExString(ex).split(": ", 1)[-1])
 
-            kb.originalCode = kb.originalCode or code
+            if not (code == _http_client.UNAUTHORIZED and authVersion is not None):
+                kb.originalCode = kb.originalCode or code
             threadData.lastHTTPError = (threadData.lastRequestUID, code, status)
             kb.httpErrorCodes[code] = kb.httpErrorCodes.get(code, 0) + 1
 
@@ -913,7 +920,15 @@ class Connect(object):
                 singleTimeLogMessage(errMsg, logging.CRITICAL)
                 raise SystemExit
 
-            if ex.code not in (conf.ignoreCode or []):
+            if ex.code == _http_client.UNAUTHORIZED and authVersion is not None and authrefresh.sameOrigin(ex.geturl(), url):
+                if kwargs.get("authRetried"):
+                    with kb.locks.authRefresh:
+                        if authVersion == kb.authRefreshVersion:
+                            kb.authRefreshFailed = True
+                    raise SqlmapConnectionException("authentication refresh did not authorize the retried request (401)")
+                authrefresh.refresh(authVersion)
+                authRetry = True
+            elif ex.code not in (conf.ignoreCode or []):
                 if ex.code == TOO_MANY_REQUESTS_HTTP_CODE or (ex.code == _http_client.SERVICE_UNAVAILABLE and Connect._parseRetryAfter(responseHeaders) is not None):
                     retried = Connect._rateLimitRetry(responseHeaders, ex.code, **kwargs)
                     if retried is not None:
@@ -1098,6 +1113,12 @@ class Connect(object):
             threadData.lastCode = code
 
             socket.setdefaulttimeout(conf.timeout)
+
+        if authRetry:
+            # Authentication latency is not evidence of a time-based SQL injection.
+            threadData.authRefreshTime += calculateDeltaSeconds(start)
+            kwargs["authRetried"] = True
+            return Connect.getPage(**kwargs)
 
         # Dirty patch for Python3.11.0a7 (e.g. https://github.com/sqlmapproject/sqlmap/issues/5091)
         if not sys.version.startswith("3.11."):
@@ -1751,6 +1772,8 @@ class Connect(object):
 
         start = time.time()
 
+        authRefreshTime = threadData.authRefreshTime
+
         if kb.nullConnection and not content and not response and not timeBasedCompare:
             noteResponseTime = False
 
@@ -1806,7 +1829,7 @@ class Connect(object):
                     return value
                 page, headers, code = Connect.getPage(url=_(kb.secondReq[0]), post=_(kb.secondReq[2]), method=kb.secondReq[1], cookie=kb.secondReq[3], silent=silent, auxHeaders=dict(auxHeaders, **dict(kb.secondReq[4])), response=response, raise404=False, ignoreTimeout=timeBasedCompare, refreshing=True)
 
-        threadData.lastQueryDuration = calculateDeltaSeconds(start)
+        threadData.lastQueryDuration = max(0, calculateDeltaSeconds(start) - (threadData.authRefreshTime - authRefreshTime))
 
         kb.originalCode = code if kb.originalCode is None else kb.originalCode
         kb.originalPage = page if kb.originalPage is None else kb.originalPage

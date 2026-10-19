@@ -32,6 +32,7 @@ from lib.core.settings import MAX_TOTAL_REDIRECTIONS
 from lib.core.threads import getCurrentThreadData
 from lib.request.basic import decodePage
 from lib.request.basic import parseResponse
+from lib.request import authrefresh
 from thirdparty import six
 from thirdparty.six.moves import http_client as _http_client
 from thirdparty.six.moves import urllib as _urllib
@@ -176,6 +177,9 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
                 req.headers[HTTP_HEADER.COOKIE] = delimiter.join("%s=%s" % (key, cookies[key]) for key in cookies)
 
             try:
+                if conf.authRefresh and not authrefresh.sameOrigin(req.get_full_url(), redurl):
+                    req.headers = authrefresh.stripHeaders(req.headers)
+                    req.unredirected_hdrs = authrefresh.stripHeaders(req.unredirected_hdrs)
                 result = _urllib.request.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)
             except _urllib.error.HTTPError as ex:
                 result = error = ex
