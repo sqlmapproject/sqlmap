@@ -113,14 +113,17 @@ class TestConfigFileRoundTrip(unittest.TestCase):
         try:
             conf.url = "http://127.0.0.1:1/?id=1"
             conf.commonTables = True
+            conf.getLinks = True
             conf.tablePrefix = "zzz"
             saveConfig(conf, path)
 
             conf.url, conf.commonTables, conf.tablePrefix = None, False, "overwritten"
+            conf.getLinks = False
             configFileParser(path)
 
             self.assertEqual(conf.url, "http://127.0.0.1:1/?id=1")
             self.assertTrue(conf.commonTables)
+            self.assertTrue(conf.getLinks)
             self.assertEqual(conf.tablePrefix, "zzz")
         finally:
             conf.clear()

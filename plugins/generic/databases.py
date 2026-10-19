@@ -72,6 +72,7 @@ class Databases(object):
         kb.data.dumpedTable = {}
         kb.data.cachedStatements = []
         kb.data.cachedProcedures = []
+        kb.data.cachedLinks = []
 
     def getCurrentDb(self):
         infoMsg = "fetching current database"
@@ -1180,6 +1181,41 @@ class Databases(object):
             kb.data.cachedStatements = [_.replace(REFLECTED_VALUE_MARKER, "<payload>") for _ in kb.data.cachedStatements]
 
         return kb.data.cachedStatements
+
+    def getLinks(self):
+        dbms = Backend.getIdentifiedDbms()
+        if dbms not in queries or "links" not in queries[dbms]:
+            logger.warning("enumeration of database links is not supported on %s" % dbms)
+            return []
+
+        if kb.data.cachedLinks:
+            return kb.data.cachedLinks
+
+        logger.info("fetching database links visible to the current user")
+        rootQuery = queries[dbms].links
+
+        if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
+            values = inject.getValue(rootQuery.inband.query, blind=False, time=False)
+            if not isNoneValue(values):
+                for value in arrayizeValue(values):
+                    value = unArrayizeValue(value)
+                    if not isNoneValue(value):
+                        kb.data.cachedLinks.append(value.strip())
+
+        if not kb.data.cachedLinks and isInferenceAvailable() and not conf.direct:
+            count = inject.getValue(rootQuery.blind.count, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
+            if count in (0, "0"):
+                return []
+            elif not isNumPosStrValue(count):
+                logger.warning("unable to retrieve the number of database links")
+                return []
+
+            for index in getLimitRange(count):
+                value = unArrayizeValue(inject.getValue(rootQuery.blind.query % index, union=False, error=False))
+                if not isNoneValue(value):
+                    kb.data.cachedLinks.append(value.strip())
+
+        return kb.data.cachedLinks
 
     def getProcedures(self):
         infoMsg = "fetching stored procedures"

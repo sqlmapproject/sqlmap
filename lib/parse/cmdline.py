@@ -499,6 +499,9 @@ def cmdLineParser(argv=None):
         enumeration.add_argument("--roles", dest="getRoles", action="store_true",
             help="Enumerate DBMS users roles")
 
+        enumeration.add_argument("--links", dest="getLinks", action="store_true",
+            help="Enumerate DBMS links")
+
         enumeration.add_argument("--dbs", dest="getDbs", action="store_true",
             help="Enumerate DBMS databases")
 

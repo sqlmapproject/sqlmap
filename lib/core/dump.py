@@ -224,6 +224,9 @@ class Dump(object):
     def procedures(self, procedures):
         self.lister("stored procedures", procedures, content_type=CONTENT_TYPE.PROCEDURES)
 
+    def links(self, links):
+        self.lister("database links", links, content_type=CONTENT_TYPE.LINKS)
+
     def userSettings(self, header, userSettings, subHeader, content_type=None):
         self._areAdmins = set()
 

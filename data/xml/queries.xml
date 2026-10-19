@@ -173,6 +173,10 @@
     </dbms>
 
     <dbms value="Microsoft SQL Server">
+        <links>
+            <inband query="SELECT CAST(name AS NVARCHAR(MAX)) COLLATE DATABASE_DEFAULT+N' -> '+ISNULL(data_source COLLATE DATABASE_DEFAULT,N'&lt;unknown&gt;') FROM master.sys.servers WHERE is_linked=1 ORDER BY server_id"/>
+            <blind query="SELECT link_name FROM (SELECT CAST(name AS NVARCHAR(MAX)) COLLATE DATABASE_DEFAULT+N' -> '+ISNULL(data_source COLLATE DATABASE_DEFAULT,N'&lt;unknown&gt;') AS link_name,ROW_NUMBER() OVER (ORDER BY server_id) AS rn FROM master.sys.servers WHERE is_linked=1) AS links WHERE rn=%d+1" count="SELECT COUNT(*) FROM master.sys.servers WHERE is_linked=1"/>
+        </links>
         <cast query="CAST(%s AS NVARCHAR(MAX))"/>
         <length query="LTRIM(STR(LEN(%s+'.')-1))"/>
         <isnull query="ISNULL(%s,' ')"/>
@@ -253,6 +257,10 @@
     </dbms>
 
     <dbms value="Oracle">
+        <links>
+            <inband query="SELECT OWNER||'.'||DB_LINK||' -> '||NVL(HOST,'&lt;unknown&gt;') FROM ALL_DB_LINKS ORDER BY OWNER,DB_LINK"/>
+            <blind query="SELECT link_name FROM (SELECT OWNER||'.'||DB_LINK||' -> '||NVL(HOST,'&lt;unknown&gt;') AS link_name,ROW_NUMBER() OVER (ORDER BY OWNER,DB_LINK) AS rn FROM ALL_DB_LINKS) WHERE rn=%d+1" count="SELECT COUNT(*) FROM ALL_DB_LINKS"/>
+        </links>
         <cast query="CAST(%s AS VARCHAR(4000))"/>
         <length query="LENGTH(%s)"/>
         <isnull query="NVL(%s,' ')"/>

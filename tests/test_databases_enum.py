@@ -17,6 +17,8 @@ the suite.
 """
 
 import os
+import sqlite3
+import subprocess
 import sys
 import unittest
 
@@ -25,7 +27,7 @@ from _testutils import bootstrap, set_dbms, reset_dbms
 
 bootstrap()
 
-from lib.core.data import conf, kb
+from lib.core.data import conf, kb, queries
 from lib.core.enums import EXPECTED, PAYLOAD
 import plugins.generic.databases as dbmod
 from plugins.generic.databases import Databases
@@ -498,6 +500,110 @@ class TestGetSchema(_BaseEnumTest):
         self.assertIn("testdb", result)
         self.assertIn("users", result["testdb"])
         self.assertEqual(result["testdb"]["users"].get("id"), "int")
+
+
+class TestGetLinks(_BaseEnumTest):
+    def setUp(self):
+        _BaseEnumTest.setUp(self)
+        self._saved_links = kb.data.get("cachedLinks")
+
+    def tearDown(self):
+        kb.data.cachedLinks = self._saved_links
+        _BaseEnumTest.tearDown(self)
+
+    def test_unsupported_dbms_does_not_query(self):
+        d = self._fresh()
+        dbmod.inject.getValue = lambda *a, **k: self.fail("unsupported DBMS must not query links")
+        saved = dbmod.logger.warning
+        warnings = []
+        try:
+            dbmod.logger.warning = warnings.append
+            for dbms in queries:
+                if "links" not in queries[dbms]:
+                    set_dbms(dbms)
+                    self.assertEqual(d.getLinks(), [])
+                    self.assertIn(dbms, warnings[-1])
+        finally:
+            dbmod.logger.warning = saved
+
+    def test_direct_links_and_cache(self):
+        conf.direct = True
+        for dbms in ("Microsoft SQL Server", "Oracle"):
+            set_dbms(dbms)
+            d = self._fresh()
+            calls = []
+
+            def gv(query, **kwargs):
+                calls.append(query)
+                return [["remote -> db.example"], ["other -> <unknown>"]]
+
+            dbmod.inject.getValue = gv
+            expected = ["remote -> db.example", "other -> <unknown>"]
+            self.assertEqual(d.getLinks(), expected)
+            self.assertEqual(d.getLinks(), expected)
+            self.assertEqual(calls, [queries[dbms].links.inband.query])
+
+    def test_blind_links_use_zero_based_paging(self):
+        self._enable_inference()
+        for dbms in ("Microsoft SQL Server", "Oracle"):
+            set_dbms(dbms)
+            d = self._fresh()
+            calls = []
+            values = iter(["2", ["first -> host1"], ["second -> host2"]])
+
+            def gv(query, **kwargs):
+                calls.append(query)
+                return next(values)
+
+            dbmod.inject.getValue = gv
+            self.assertEqual(d.getLinks(), ["first -> host1", "second -> host2"])
+            root = queries[dbms].links
+            self.assertEqual(calls, [root.blind.count, root.blind.query % 0, root.blind.query % 1])
+
+    def test_empty_direct_results(self):
+        set_dbms("Microsoft SQL Server")
+        conf.direct = True
+        d = self._fresh()
+        dbmod.inject.getValue = lambda *a, **k: None
+        self.assertEqual(d.getLinks(), [])
+
+    def test_oracle_query_paging_and_null_destination(self):
+        # Evaluate the catalog/paging SQL with compatible SQLite expressions; live Oracle is
+        # not required for this check of owner-qualified names, NULL handling and row offsets.
+        conn = sqlite3.connect(":memory:")
+        try:
+            conn.create_function("NVL", 2, lambda value, default: default if value is None else value)
+            conn.execute("CREATE TABLE ALL_DB_LINKS (OWNER TEXT, DB_LINK TEXT, HOST TEXT)")
+            conn.executemany("INSERT INTO ALL_DB_LINKS VALUES (?,?,?)", [("PUBLIC", "REMOTE", "db.example"), ("APP", "REMOTE", None)])
+            root = queries["Oracle"].links
+            expected = ["APP.REMOTE -> <unknown>", "PUBLIC.REMOTE -> db.example"]
+            self.assertEqual([row[0] for row in conn.execute(root.inband.query)], expected)
+            self.assertEqual(conn.execute(root.blind.count).fetchone()[0], 2)
+            self.assertEqual([conn.execute(root.blind.query % i).fetchone()[0] for i in range(2)], expected)
+            self.assertIsNone(conn.execute(root.blind.query % 2).fetchone())
+        finally:
+            conn.close()
+
+    def test_empty_or_unavailable_blind_count_does_not_fetch_rows(self):
+        set_dbms("Oracle")
+        self._enable_inference()
+        for count in (0, "0", None, "unavailable"):
+            d = self._fresh()
+
+            def gv(query, **kwargs):
+                self.assertEqual(kwargs.get("expected"), EXPECTED.INT)
+                return count
+
+            dbmod.inject.getValue = gv
+            self.assertEqual(d.getLinks(), [])
+
+    def test_help_is_one_line(self):
+        output = subprocess.check_output([sys.executable, os.path.join(os.path.dirname(__file__), "..", "sqlmap.py"), "-hh"])
+        lines = output.decode("utf-8").splitlines()
+        helpLines = [line for line in lines if "--links" in line]
+        self.assertEqual(len(helpLines), 1)
+        self.assertIn("Enumerate DBMS links", helpLines[0])
+        self.assertLessEqual(len(helpLines[0]), 78)
 
 
 class TestGetProcedures(_BaseEnumTest):

@@ -76,6 +76,11 @@ class _CaptureCase(unittest.TestCase):
 
 
 class TestStringAndLister(_CaptureCase):
+    def test_links_output(self):
+        self.d.links(["remote -> db.example"])
+        self.assertIn("database links [1]", self.text())
+        self.assertIn("remote -> db.example", self.text())
+
     def test_string_scalar_quoted(self):
         # a plain string fact is rendered as "header: 'value'"
         self.d.string("current user", "root@localhost")

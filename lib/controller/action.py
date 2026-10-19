@@ -134,6 +134,12 @@ def action():
     if conf.getProcs:
         conf.dumper.procedures(conf.dbmsHandler.getProcedures())
 
+    if conf.getLinks:
+        try:
+            conf.dumper.links(conf.dbmsHandler.getLinks())
+        except SqlmapNoneDataException as ex:
+            logger.critical(ex)
+
     if conf.getPasswordHashes:
         try:
             conf.dumper.userSettings("database management system users password hashes", conf.dbmsHandler.getPasswordHashes(), "password hash", CONTENT_TYPE.PASSWORDS)

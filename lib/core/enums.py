@@ -429,6 +429,7 @@ class CONTENT_TYPE(object):
     REG_READ = 25
     STATEMENTS = 26
     PROCEDURES = 27
+    LINKS = 28
 
 class CONTENT_STATUS(object):
     IN_PROGRESS = 0
