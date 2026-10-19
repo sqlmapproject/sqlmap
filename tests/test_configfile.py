@@ -114,18 +114,21 @@ class TestConfigFileRoundTrip(unittest.TestCase):
             conf.url = "http://127.0.0.1:1/?id=1"
             conf.commonTables = True
             conf.getLinks = True
+            conf.getAudit = True
             conf.authRefresh = "refresh_auth.py"
             conf.tablePrefix = "zzz"
             saveConfig(conf, path)
 
             conf.url, conf.commonTables, conf.tablePrefix = None, False, "overwritten"
             conf.getLinks = False
+            conf.getAudit = False
             conf.authRefresh = None
             configFileParser(path)
 
             self.assertEqual(conf.url, "http://127.0.0.1:1/?id=1")
             self.assertTrue(conf.commonTables)
             self.assertTrue(conf.getLinks)
+            self.assertTrue(conf.getAudit)
             self.assertEqual(conf.authRefresh, "refresh_auth.py")
             self.assertEqual(conf.tablePrefix, "zzz")
         finally:

@@ -484,6 +484,9 @@ def cmdLineParser(argv=None):
         enumeration.add_argument("--hostname", dest="getHostname", action="store_true",
             help="Retrieve DBMS server hostname")
 
+        enumeration.add_argument("--audit", dest="getAudit", action="store_true",
+            help="Audit DBMS security configuration and capabilities")
+
         enumeration.add_argument("--is-dba", dest="isDba", action="store_true",
             help="Detect if the DBMS current user is DBA")
 

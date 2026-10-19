@@ -112,6 +112,34 @@ class TestOrderByColumnCount(unittest.TestCase):
         self.assertEqual(self._detect(25), 25)
 
 
+class TestNestedOrderBy(unittest.TestCase):
+    def test_union_preserves_ordering_inside_limited_subquery_and_literals(self):
+        original_init = uu.initTechnique
+        original_use = uu._oneShotUnionUse
+        saved_json = kb.get('jsonAggMode')
+        saved_run = kb.get('partRun')
+        set_dbms('Oracle')
+        captured = []
+        def capture(query, *args, **kwargs):
+            captured.append(query)
+            raise RuntimeError('stop after query construction')
+        uu.initTechnique = lambda *args: None
+        uu._oneShotUnionUse = capture
+        try:
+            for inner, outer in (('ORDER BY', 'ORDER BY'), ('Order By', 'order by')):
+                query = "SELECT a,b FROM (SELECT a,'ORDER BY literal' AS b FROM t %s a,b) x WHERE ROWNUM<=20 %s a" % (inner, outer)
+                with self.assertRaises(RuntimeError):
+                    uu.unionUse(query)
+                self.assertIn('FROM t %s a,b)' % inner, captured[-1])
+                self.assertIn("'ORDER BY literal'", captured[-1])
+                self.assertFalse(captured[-1].rstrip().endswith('%s a' % outer))
+        finally:
+            uu.initTechnique = original_init
+            uu._oneShotUnionUse = original_use
+            kb.jsonAggMode = saved_json
+            kb.partRun = saved_run
+
+
 class TestMssqlJsonAggFalsyValues(unittest.TestCase):
     """Regression: MSSQL UNION dumps use FOR JSON (jsonAggMode), whose output carries native JSON
     types. A real 0 / '' / false is a value; only JSON null is SQL NULL. The old `row.get(field) or

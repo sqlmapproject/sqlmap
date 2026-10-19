@@ -227,6 +227,9 @@ class Dump(object):
     def links(self, links):
         self.lister("database links", links, content_type=CONTENT_TYPE.LINKS)
 
+    def audit(self, audit):
+        self.lister("database security audit", audit, content_type=CONTENT_TYPE.AUDIT)
+
     def userSettings(self, header, userSettings, subHeader, content_type=None):
         self._areAdmins = set()
 

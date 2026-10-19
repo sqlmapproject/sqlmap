@@ -1,0 +1,82 @@
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: AuditOnly!2026
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_DATABASE: auditlab
+    command: ['--secure-file-priv=/var/lib/mysql-files', '--local-infile=OFF']
+    mem_limit: 1g
+  mariadb:
+    image: mariadb:10.11
+    environment:
+      MARIADB_ROOT_PASSWORD: AuditOnly!2026
+      MARIADB_ROOT_HOST: '%'
+      MARIADB_DATABASE: auditlab
+    command: ['--secure-file-priv=', '--local-infile=ON']
+    mem_limit: 1g
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: AuditOnly!2026
+      POSTGRES_DB: auditlab
+    mem_limit: 1g
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: Y
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: AuditOnly!2026
+    mem_limit: 2g
+  oracle:
+    image: gvenzl/oracle-free:23.26.0-slim-faststart
+    environment:
+      ORACLE_PASSWORD: AuditOnly!2026
+      APP_USER: audit_owner
+      APP_USER_PASSWORD: AuditOnly!2026
+    mem_limit: 4g
+  web-mysql:
+    build: .
+    image: sqlmap-audit-fixture:local
+    environment: {ENGINE: mysql}
+    ports: ['127.0.0.1::8080']
+  web-mariadb:
+    image: sqlmap-audit-fixture:local
+    environment: {ENGINE: mariadb}
+    ports: ['127.0.0.1::8080']
+  web-postgres:
+    image: sqlmap-audit-fixture:local
+    environment: {ENGINE: postgres}
+    ports: ['127.0.0.1::8080']
+  web-mssql:
+    image: sqlmap-audit-fixture:local
+    environment: {ENGINE: mssql}
+    ports: ['127.0.0.1::8080']
+  web-oracle:
+    image: sqlmap-audit-fixture:local
+    environment: {ENGINE: oracle}
+    ports: ['127.0.0.1::8080']
+  mysql-open:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: AuditOnly!2026
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_DATABASE: auditlab
+    command: ['--secure-file-priv=', '--local-infile=ON']
+    mem_limit: 1g
+  mysql-disabled:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: AuditOnly!2026
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_DATABASE: auditlab
+    command: ['--secure-file-priv=NULL', '--local-infile=OFF']
+    mem_limit: 1g
+  web-mysql-open:
+    image: sqlmap-audit-fixture:local
+    environment: {ENGINE: mysql, DB_HOST: mysql-open}
+    ports: ['127.0.0.1::8080']
+  web-mysql-disabled:
+    image: sqlmap-audit-fixture:local
+    environment: {ENGINE: mysql, DB_HOST: mysql-disabled}
+    ports: ['127.0.0.1::8080']

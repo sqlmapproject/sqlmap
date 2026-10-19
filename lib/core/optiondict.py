@@ -164,6 +164,7 @@ optDict = {
         "getPrivileges": ("boolean", "Privileges"),
         "getRoles": ("boolean", "Roles"),
         "getLinks": "boolean",
+        "getAudit": "boolean",
         "getDbs": ("boolean", "Databases"),
         "getTables": ("boolean", "Tables"),
         "getColumns": ("boolean", "Columns"),

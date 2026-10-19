@@ -76,6 +76,12 @@ class _CaptureCase(unittest.TestCase):
 
 
 class TestStringAndLister(_CaptureCase):
+    def test_audit_output(self):
+        self.d.audit(["xp_cmdshell: disabled", "CLR integration: unavailable"])
+        self.assertIn("database security audit [2]", self.text())
+        self.assertIn("xp_cmdshell: disabled", self.text())
+        self.assertIn("CLR integration: unavailable", self.text())
+
     def test_links_output(self):
         self.d.links(["remote -> db.example"])
         self.assertIn("database links [1]", self.text())

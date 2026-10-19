@@ -140,6 +140,12 @@ def action():
         except SqlmapNoneDataException as ex:
             logger.critical(ex)
 
+    if conf.getAudit:
+        try:
+            conf.dumper.audit(conf.dbmsHandler.getAudit())
+        except SqlmapNoneDataException as ex:
+            logger.critical(ex)
+
     if conf.getPasswordHashes:
         try:
             conf.dumper.userSettings("database management system users password hashes", conf.dbmsHandler.getPasswordHashes(), "password hash", CONTENT_TYPE.PASSWORDS)

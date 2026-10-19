@@ -430,6 +430,7 @@ class CONTENT_TYPE(object):
     STATEMENTS = 26
     PROCEDURES = 27
     LINKS = 28
+    AUDIT = 29
 
 class CONTENT_STATUS(object):
     IN_PROGRESS = 0

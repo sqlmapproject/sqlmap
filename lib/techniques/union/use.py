@@ -37,6 +37,7 @@ from lib.core.common import singleTimeDebugMessage
 from lib.core.common import singleTimeWarnMessage
 from lib.core.common import unArrayizeValue
 from lib.core.common import wasLastResponseDBMSError
+from lib.core.common import zeroDepthSearch
 from lib.core.compat import xrange
 from lib.core.convert import decodeBase64
 from lib.core.convert import getUnicode
@@ -344,8 +345,10 @@ def unionUse(expression, unpack=True, dump=False):
     kb.partRun = getPartRun(alias=False) if (conf.api or conf.reportJson) else None
 
     if expressionFieldsList and len(expressionFieldsList) > 1 and "ORDER BY" in expression.upper():
-        # Removed ORDER BY clause because UNION does not play well with it
-        expression = re.sub(r"(?i)\s*ORDER BY\s+[\w,]+", "", expression)
+        # Only remove outer ordering. Nested ORDER BY clauses can select which
+        # rows survive a ROWNUM/TOP limit and must remain intact.
+        positions = set(index for keyword in set(re.findall(r"(?i)ORDER BY", expression)) for index in zeroDepthSearch(expression, keyword))
+        expression = re.sub(r"(?i)ORDER BY\s+[\w,]+", lambda match: "" if match.start() in positions else match.group(0), expression)
         debugMsg = "stripping ORDER BY clause from statement because "
         debugMsg += "it does not play well with UNION query SQL injection"
         singleTimeDebugMessage(debugMsg)

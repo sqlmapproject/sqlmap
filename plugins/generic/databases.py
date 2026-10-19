@@ -73,6 +73,7 @@ class Databases(object):
         kb.data.cachedStatements = []
         kb.data.cachedProcedures = []
         kb.data.cachedLinks = []
+        kb.data.cachedAudit = []
 
     def getCurrentDb(self):
         infoMsg = "fetching current database"
@@ -1216,6 +1217,18 @@ class Databases(object):
                     kb.data.cachedLinks.append(value.strip())
 
         return kb.data.cachedLinks
+
+    def getAudit(self):
+        from importlib import import_module
+        from lib.core.settings import DBMS_DIRECTORY_DICT
+
+        dbms = Backend.getIdentifiedDbms()
+        if dbms not in (DBMS.MYSQL, DBMS.PGSQL, DBMS.MSSQL, DBMS.ORACLE) or Backend.isFork(FORK.DUCKDB):
+            logger.warning("security configuration audit is not supported on %s" % dbms)
+            return []
+
+        module = import_module("plugins.dbms.%s.audit" % DBMS_DIRECTORY_DICT[dbms])
+        return module.Audit().getAudit()
 
     def getProcedures(self):
         infoMsg = "fetching stored procedures"
