@@ -4,6 +4,8 @@
 This fixture provisioner deliberately changes settings, grants and synthetic files inside
 its own disposable containers, then verifies the audit over native SQL and real SQLi.
 """
+from __future__ import print_function
+
 import argparse
 import concurrent.futures
 import json
