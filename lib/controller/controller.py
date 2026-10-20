@@ -223,6 +223,9 @@ def _autoWafBypass(place, parameter, value):
 
     return retVal
 
+def _targetInfo():
+    return {"url": conf.url, "query": conf.parameters.get(PLACE.GET), "data": conf.parameters.get(PLACE.POST)}
+
 def _showInjections():
     if conf.wizard and kb.wizardMode:
         kb.wizardMode = False
@@ -234,13 +237,12 @@ def _showInjections():
         header = "sqlmap resumed the following injection point(s) from stored session"
 
     if conf.api:
-        conf.dumper.string("", {"url": conf.url, "query": conf.parameters.get(PLACE.GET), "data": conf.parameters.get(PLACE.POST)}, content_type=CONTENT_TYPE.TARGET)
+        conf.dumper.string("", _targetInfo(), content_type=CONTENT_TYPE.TARGET)
         conf.dumper.string("", kb.injections, content_type=CONTENT_TYPE.TECHNIQUES)
     else:
-        # --report-json: capture the same TARGET/TECHNIQUES structures the API emits, without
-        # printing them (the human-readable injection points are rendered just below)
+        # --report-json: capture the same TECHNIQUES structure the API emits, without printing it (the
+        # human-readable injection points are rendered just below); TARGET is reported per target in start()
         if conf.reportJson:
-            conf.dumper._reportData({"url": conf.url, "query": conf.parameters.get(PLACE.GET), "data": conf.parameters.get(PLACE.POST)}, CONTENT_TYPE.TARGET)
             conf.dumper._reportData(kb.injections, CONTENT_TYPE.TECHNIQUES)
 
         data = "".join(set(_formatInjection(_) for _ in kb.injections)).rstrip("\n")
@@ -521,6 +523,11 @@ def start():
                 conf.parameters[PLACE.GET] = "x"
 
             setupTargetEnv()
+
+            # --report-json: every tested target gets its own group with its identity, also when nothing is found
+            # (otherwise its errors, e.g. connection failures, would have no group to land in)
+            if conf.reportJson:
+                conf.dumper._reportData(_targetInfo(), CONTENT_TYPE.TARGET)
 
             if not any((conf.graphql,)) and not checkConnection(suppressOutput=conf.forms):
                 continue
