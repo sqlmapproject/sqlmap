@@ -267,11 +267,11 @@ def writeReportJson(collector, filepath):
     /scan/<id>/data response, wrapped with a small 'meta' block for standalone consumers.
 
     A multi-target run (e.g. '-m' bulk file) stores each target under its own taskid (see
-    kb.reportTaskId), so every taskid present in the collector is assembled here; a single-target
-    run still yields exactly one taskid and keeps the flat {success, data, error} shape.
+    kb.reportTaskId), so every taskid present in data or errors is assembled here. Exactly one
+    stored taskid keeps the flat {success, data, error} shape; multiple taskids use targets.
     """
 
-    taskids = sorted(row[0] for row in collector.execute("SELECT DISTINCT taskid FROM data")) or [REPORT_TASKID]
+    taskids = sorted(row[0] for row in collector.execute("SELECT taskid FROM data UNION SELECT taskid FROM errors")) or [REPORT_TASKID]
 
     if len(taskids) > 1:
         result = {"success": True, "targets": [_assembleData(collector, taskid) for taskid in taskids]}
