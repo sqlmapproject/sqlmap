@@ -214,7 +214,7 @@ GOOGLE_CONSENT_COOKIE = "CONSENT=YES+shp.gws-%s-0-RC1.%s+FX+740" % (time.strftim
 DUCKDUCKGO_REGEX = r'<a class="result__url" href="(htt[^"]+)'
 
 # Regular expression used for extracting results from Bing search
-BING_REGEX = r'<h2><a href="([^"]+)" h='
+BING_REGEX = r'<h2[^>]*><a [^>]*href="(?:https?://www\.bing\.com/ck/a\?[^"]*?[?;]u=a1([^&"]+)[^"]*|([^"]+))"'
 
 # Dummy user agent for search (if default one returns different results)
 DUMMY_SEARCH_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:141.0) Gecko/20100101 Firefox/141.0"
