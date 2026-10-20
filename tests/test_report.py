@@ -326,5 +326,132 @@ class TestMultiTargetTaskId(_CollectorCase):
                 handler.setLevel(level)
 
 
+class TestWriteReportJsonTaskIds(unittest.TestCase):
+    """Discover report groups from both result rows and error rows, without a scan."""
+
+    def setUp(self):
+        self.c = api.Database(":memory:")
+        self.c.connect("report-test")
+        self.c.init()
+
+    def tearDown(self):
+        self.c.disconnect()
+
+    def _target(self, taskid, ordinal=1):
+        value = {"url": "http://target%d.invalid/record%d" % (taskid, ordinal)}
+        self.c.execute("INSERT INTO data VALUES(NULL, ?, ?, ?, ?)",
+                       (taskid, CONTENT_STATUS.COMPLETE, CONTENT_TYPE.TARGET, json.dumps(value)))
+        return value
+
+    def _error(self, taskid, message):
+        self.c.execute("INSERT INTO errors VALUES(NULL, ?, ?)", (taskid, message))
+
+    def _report(self):
+        fd, path = tempfile.mkstemp(suffix=".json")
+        os.close(fd)
+        try:
+            api.writeReportJson(self.c, path)
+            with io.open(path, encoding="utf-8") as f:
+                return json.load(f)
+        finally:
+            os.remove(path)
+
+    def test_error_only_active_target_keeps_flat_shape(self):
+        had_taskid = "reportTaskId" in kb
+        saved_taskid = kb.get("reportTaskId")
+        try:
+            kb.reportTaskId = 1
+            record = api.logging.LogRecord("report-test", api.logging.ERROR, "", 0,
+                                           "target %d failed", (1,), None)
+            api.ReportErrorRecorder(self.c).emit(record)
+        finally:
+            if had_taskid:
+                kb.reportTaskId = saved_taskid
+            else:
+                del kb.reportTaskId
+        loaded = self._report()
+        self.assertEqual(sorted(loaded), ["data", "error", "meta", "success"])
+        self.assertEqual(loaded["data"], [])
+        self.assertEqual(loaded["error"], ["target 1 failed"])
+
+    def test_error_only_target_is_not_lost_after_populated_target(self):
+        value = self._target(1)
+        self._error(2, "target 2 failed")
+        loaded = self._report()
+        self.assertEqual(sorted(loaded), ["meta", "success", "targets"])
+        self.assertEqual(len(loaded["targets"]), 2)
+        self.assertEqual(loaded["targets"][0]["data"][0]["value"], value)
+        self.assertEqual(loaded["targets"][0]["error"], [])
+        self.assertEqual(loaded["targets"][1], {"success": True, "data": [], "error": ["target 2 failed"]})
+
+    def test_multiple_error_only_targets_use_numeric_order(self):
+        self._error(10, "target 10 failed")
+        self._error(2, "target 2 failed")
+        loaded = self._report()
+        self.assertIn("targets", loaded)
+        targets = loaded["targets"]
+        self.assertEqual(targets, [
+            {"success": True, "data": [], "error": ["target 2 failed"]},
+            {"success": True, "data": [], "error": ["target 10 failed"]},
+        ])
+
+    def test_empty_collector_keeps_flat_shape(self):
+        loaded = self._report()
+        self.assertEqual(sorted(loaded), ["data", "error", "meta", "success"])
+        self.assertEqual(loaded["data"], [])
+        self.assertEqual(loaded["error"], [])
+        self.assertIs(loaded["success"], True)
+
+    def test_single_populated_target_keeps_flat_shape(self):
+        value = self._target(1)
+        loaded = self._report()
+        self.assertEqual(sorted(loaded), ["data", "error", "meta", "success"])
+        self.assertEqual(loaded["data"][0]["value"], value)
+        self.assertEqual(loaded["error"], [])
+
+    def test_populated_targets_keep_numeric_order(self):
+        later = self._target(10)
+        earlier = self._target(2)
+        targets = self._report()["targets"]
+        self.assertEqual([target["data"][0]["value"] for target in targets], [earlier, later])
+
+    def test_shared_taskid_deduplicated_and_rows_keep_order(self):
+        first = self._target(1, 2)
+        second = self._target(1, 1)
+        self._error(1, "first error")
+        self._error(1, "second error")
+        loaded = self._report()
+        self.assertNotIn("targets", loaded)
+        self.assertEqual([entry["value"] for entry in loaded["data"]], [first, second])
+        self.assertEqual(loaded["error"], ["first error", "second error"])
+
+    def test_default_taskid_error_keeps_flat_shape(self):
+        self._error(api.REPORT_TASKID, "global error")
+        loaded = self._report()
+        self.assertEqual(sorted(loaded), ["data", "error", "meta", "success"])
+        self.assertEqual(loaded["data"], [])
+        self.assertEqual(loaded["error"], ["global error"])
+
+    def test_default_taskid_data_and_error_remain_together(self):
+        value = self._target(api.REPORT_TASKID)
+        self._error(api.REPORT_TASKID, "global error")
+        loaded = self._report()
+        self.assertNotIn("targets", loaded)
+        self.assertEqual(loaded["data"][0]["value"], value)
+        self.assertEqual(loaded["error"], ["global error"])
+
+    def test_default_taskid_error_is_not_reassigned_to_active_target(self):
+        value = self._target(1)
+        self._error(api.REPORT_TASKID, "global error")
+        loaded = self._report()
+        self.assertIn("targets", loaded)
+        targets = loaded["targets"]
+        self.assertEqual(len(targets), 2)
+        self.assertEqual(targets[0], {"success": True, "data": [], "error": ["global error"]})
+        self.assertEqual(targets[1]["data"][0]["value"], value)
+        self.assertEqual(targets[1]["error"], [])
+
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
