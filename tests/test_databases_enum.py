@@ -286,6 +286,28 @@ class TestGetTables(_BaseEnumTest):
         self.assertIn("testdb", result)
         self.assertEqual(sorted(result["testdb"]), sorted(tables))
 
+    def test_get_tables_inference_spanner(self):
+        # Spanner's blind template must page per row (it used to crash with "not all arguments converted", #6151)
+        set_dbms("Spanner")
+        self._enable_inference()
+        d = self._fresh()
+        conf.db = "testdb"
+        conf.tbl = None
+
+        tables = ["t_a", "t_b"]
+        queries_ = []
+
+        def gv(query, *a, **k):
+            if k.get("expected") == EXPECTED.INT:
+                return str(len(tables))
+            queries_.append(query)
+            return [tables[len(queries_) - 1]]
+
+        dbmod.inject.getValue = gv
+        result = d.getTables()
+        self.assertEqual(sorted(result["testdb"]), sorted(tables))
+        self.assertEqual([_.endswith("OFFSET %d" % i) for i, _ in enumerate(queries_)], [True, True])
+
 
 class TestGetColumns(_BaseEnumTest):
     def _run_direct(self, dbms, db, tbl, rows):

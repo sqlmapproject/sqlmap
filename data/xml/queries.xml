@@ -1939,7 +1939,7 @@
         </dbs>
         <tables>
             <inband query="SELECT CASE table_schema WHEN '' THEN 'default' ELSE table_schema END,table_name FROM INFORMATION_SCHEMA.TABLES" condition="table_schema"/>
-            <blind query="SELECT table_name FROM INFORMATION_SCHEMA.TABLES WHERE table_schema=CASE '%s' WHEN 'default' THEN '' ELSE '%s' END ORDER BY table_name" count="SELECT COUNT(table_name) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema=CASE '%s' WHEN 'default' THEN '' ELSE '%s' END"/>
+            <blind query="SELECT table_name FROM INFORMATION_SCHEMA.TABLES WHERE table_schema=CASE '%s' WHEN 'default' THEN '' ELSE '%s' END ORDER BY table_name LIMIT 1 OFFSET %d" count="SELECT COUNT(table_name) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema=CASE '%s' WHEN 'default' THEN '' ELSE '%s' END"/>
         </tables>
         <columns>
             <inband query="SELECT column_name,spanner_type FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name='%s' AND table_schema=CASE '%s' WHEN 'default' THEN '' ELSE '%s' END" condition="column_name"/>
