@@ -138,8 +138,8 @@ def cmdLineParser(argv=None):
         target.add_argument("-r", dest="requestFile",
             help="Load HTTP request from a file")
 
-        target.add_argument("-g", dest="googleDork",
-            help="Process Google dork results as target URLs")
+        target.add_argument("-g", "--dork", dest="googleDork", metavar="DORK",
+            help="Process search engine dork results as target URLs")
 
         target.add_argument("-c", dest="configFile",
             help="Load options from a configuration INI file")
@@ -736,8 +736,8 @@ def cmdLineParser(argv=None):
         general.add_argument("--fresh-queries", dest="freshQueries", action="store_true",
             help="Ignore query results stored in session file")
 
-        general.add_argument("--gpage", dest="googlePage", type=int,
-            help="Use Google dork results from specified page number")
+        general.add_argument("--gpage", dest="googlePage", type=int, metavar="PAGE",
+            help="Use dork results from specified page number")
 
         general.add_argument("--har", dest="harFile",
             help="Log all HTTP traffic into a HAR file")

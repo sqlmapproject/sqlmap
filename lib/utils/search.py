@@ -26,8 +26,6 @@ from lib.core.exception import SqlmapBaseException
 from lib.core.settings import BING_REGEX
 from lib.core.settings import DUCKDUCKGO_REGEX
 from lib.core.settings import DUMMY_SEARCH_USER_AGENT
-from lib.core.settings import GOOGLE_CONSENT_COOKIE
-from lib.core.settings import GOOGLE_REGEX
 from lib.core.settings import HTTP_ACCEPT_ENCODING_HEADER_VALUE
 from lib.core.settings import SEARCH_ABUSE_MARKERS
 from lib.core.settings import UNICODE_ENCODING
@@ -91,7 +89,6 @@ def _search(dork):
     requestHeaders = {
         HTTP_HEADER.USER_AGENT: dict(conf.httpHeaders).get(HTTP_HEADER.USER_AGENT, DUMMY_SEARCH_USER_AGENT),
         HTTP_HEADER.ACCEPT_ENCODING: HTTP_ACCEPT_ENCODING_HEADER_VALUE,
-        HTTP_HEADER.COOKIE: GOOGLE_CONSENT_COOKIE,
     }
 
     gpage = conf.googlePage if conf.googlePage > 1 else 1
@@ -99,11 +96,13 @@ def _search(dork):
 
     encoded = urlencode(dork, convall=True)
 
-    # Note: (name, url, POST data, regex, regex flags, match->link). Ordered by current scraping reliability; tried in turn until one yields results (DuckDuckGo currently being the only consistently scrapeable one)
+    # Note: DuckDuckGo's first result page holds 10 entries, while each subsequent one holds 15 (hence the non-linear offset)
+    ddgOffset = 0 if gpage == 1 else 10 + (gpage - 2) * 15
+
+    # Note: (name, url, POST data, regex, regex flags, match->link). Ordered by current scraping reliability; tried in turn until one yields results (Google is not in here as it serves results only to JavaScript capable clients)
     engines = (
-        ("DuckDuckGo", "https://html.duckduckgo.com/html/", "q=%s&s=%d" % (encoded, (gpage - 1) * 30), DUCKDUCKGO_REGEX, re.I | re.S, lambda match: match.group(1).replace("&amp;", "&")),
+        ("DuckDuckGo", "https://html.duckduckgo.com/html/", "q=%s&s=%d" % (encoded, ddgOffset), DUCKDUCKGO_REGEX, re.I | re.S, lambda match: match.group(1).replace("&amp;", "&")),
         ("Bing", "https://www.bing.com/search?q=%s&first=%d" % (encoded, (gpage - 1) * 10 + 1), None, BING_REGEX, re.I | re.S, lambda match: decodeBase64(match.group(1), binary=False) if match.group(1) else match.group(2).replace("&amp;", "&")),
-        ("Google", "https://www.google.com/search?q=%s&num=100&hl=en&complete=0&safe=off&filter=0&btnG=Search&start=%d" % (encoded, (gpage - 1) * 100), None, GOOGLE_REGEX, re.I, lambda match: match.group(1) or match.group(2)),
     )
 
     for name, url, data, regex, flags, extract in engines:

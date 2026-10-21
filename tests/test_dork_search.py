@@ -42,7 +42,13 @@ class TestDorkSearch(unittest.TestCase):
         """Patches _fetch to serve `pages` in engine order (None meaning no reply)"""
 
         served = list(pages)
-        smod._fetch = lambda *args, **kwargs: served.pop(0) if served else None
+        self.requested = []
+
+        def fetch(url, headers, data=None):
+            self.requested.append((url, data))
+            return served.pop(0) if served else None
+
+        smod._fetch = fetch
 
     def test_duckduckgo_results(self):
         self._pages(DUCKDUCKGO_PAGE)
@@ -51,6 +57,14 @@ class TestDorkSearch(unittest.TestCase):
     def test_bing_fallback_decodes_redirect(self):
         self._pages(None, BING_PAGE)
         self.assertEqual(smod._search("dork"), ["https://www.example.com/a.php?id=1"])
+
+    def test_duckduckgo_paging_offset(self):
+        # Note: first result page holds 10 entries, each subsequent one 15 (and not the uniform 30 as previously used)
+        for gpage, offset in ((1, 0), (2, 10), (3, 25), (4, 40)):
+            conf.googlePage = gpage
+            self._pages(DUCKDUCKGO_PAGE)
+            smod._search("dork")
+            self.assertEqual(self.requested[0][1], "q=dork&s=%d" % offset)
 
     def test_abuse_page_switches_proxy(self):
         # Note: without '--proxy-list' there is nothing to switch to, hence no exception
