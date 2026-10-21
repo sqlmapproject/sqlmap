@@ -29,6 +29,7 @@ from lib.core.settings import DUMMY_SEARCH_USER_AGENT
 from lib.core.settings import GOOGLE_CONSENT_COOKIE
 from lib.core.settings import GOOGLE_REGEX
 from lib.core.settings import HTTP_ACCEPT_ENCODING_HEADER_VALUE
+from lib.core.settings import SEARCH_ABUSE_MARKERS
 from lib.core.settings import UNICODE_ENCODING
 from lib.request.basic import decodePage
 from thirdparty.six.moves import http_client as _http_client
@@ -124,7 +125,7 @@ def _search(dork):
             break  # Note: stop at the first engine that actually returns results (others are only fallbacks)
 
         # Note: switch proxy (if available) when an abuse/captcha page was served (instead of pointlessly falling through to the next engine from the same blocked IP)
-        if conf.proxyList and (("detected unusual traffic" in page) or ("issue with the Tor Exit Node you are currently using" in page)):
+        if conf.proxyList and any(marker in page for marker in SEARCH_ABUSE_MARKERS):
             warnMsg = "%s has detected 'unusual' traffic from the used IP address" % name
             raise SqlmapBaseException(warnMsg)
 

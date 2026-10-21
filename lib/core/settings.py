@@ -20,7 +20,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.10.15"
+VERSION = "1.10.10.16"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -215,6 +215,9 @@ DUCKDUCKGO_REGEX = r'<a class="result__url" href="(htt[^"]+)'
 
 # Regular expression used for extracting results from Bing search
 BING_REGEX = r'<h2[^>]*><a [^>]*href="(?:https?://www\.bing\.com/ck/a\?[^"]*?[?;]u=a1([^&"]+)[^"]*|([^"]+))"'
+
+# Markers of search engine abuse/captcha pages (i.e. used IP address got blocked)
+SEARCH_ABUSE_MARKERS = ("detected unusual traffic", "issue with the Tor Exit Node you are currently using", "anomaly.js", "Verifying your browser", "automated queries")
 
 # Dummy user agent for search (if default one returns different results)
 DUMMY_SEARCH_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:141.0) Gecko/20100101 Firefox/141.0"
