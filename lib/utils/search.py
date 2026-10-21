@@ -12,6 +12,7 @@ from lib.core.common import getSafeExString
 from lib.core.common import popValue
 from lib.core.common import pushValue
 from lib.core.common import urlencode
+from lib.core.convert import decodeBase64
 from lib.core.convert import getBytes
 from lib.core.convert import getUnicode
 from lib.core.data import conf
@@ -100,7 +101,7 @@ def _search(dork):
     # Note: (name, url, POST data, regex, regex flags, match->link). Ordered by current scraping reliability; tried in turn until one yields results (DuckDuckGo currently being the only consistently scrapeable one)
     engines = (
         ("DuckDuckGo", "https://html.duckduckgo.com/html/", "q=%s&s=%d" % (encoded, (gpage - 1) * 30), DUCKDUCKGO_REGEX, re.I | re.S, lambda match: match.group(1).replace("&amp;", "&")),
-        ("Bing", "https://www.bing.com/search?q=%s&first=%d" % (encoded, (gpage - 1) * 10 + 1), None, BING_REGEX, re.I | re.S, lambda match: match.group(1)),
+        ("Bing", "https://www.bing.com/search?q=%s&first=%d" % (encoded, (gpage - 1) * 10 + 1), None, BING_REGEX, re.I | re.S, lambda match: decodeBase64(match.group(1), binary=False) if match.group(1) else match.group(2).replace("&amp;", "&")),
         ("Google", "https://www.google.com/search?q=%s&num=100&hl=en&complete=0&safe=off&filter=0&btnG=Search&start=%d" % (encoded, (gpage - 1) * 100), None, GOOGLE_REGEX, re.I, lambda match: match.group(1) or match.group(2)),
     )
 
