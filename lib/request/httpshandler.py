@@ -28,6 +28,8 @@ except ImportError:
     pass
 
 _protocols = filterNone(getattr(ssl, _, None) for _ in ("PROTOCOL_TLS_CLIENT", "PROTOCOL_TLSv1_2", "PROTOCOL_TLSv1_1", "PROTOCOL_TLSv1", "PROTOCOL_SSLv3", "PROTOCOL_SSLv23", "PROTOCOL_SSLv2"))
+# Note: SNI (i.e. server_hostname) is a TLS extension, hence only those are used in here (Note: PROTOCOL_TLSv1 is not compiled in on OpenSSL builds without TLS 1.0 support)
+_tlsProtocols = filterNone(getattr(ssl, _, None) for _ in ("PROTOCOL_TLS_CLIENT", "PROTOCOL_TLSv1_2", "PROTOCOL_TLSv1_1", "PROTOCOL_TLSv1"))
 _lut = dict((getattr(ssl, _), _) for _ in dir(ssl) if _.startswith("PROTOCOL_"))
 _contexts = {}
 
@@ -64,7 +66,7 @@ class HTTPSConnection(_http_client.HTTPSConnection):
         # Reference(s): https://docs.python.org/2/library/ssl.html#ssl.SSLContext
         #               https://www.mnot.net/blog/2014/12/27/python_2_and_tls_sni
         if hasattr(ssl, "SSLContext"):
-            for protocol in (_ for _ in _protocols if _ >= ssl.PROTOCOL_TLSv1):
+            for protocol in (_ for _ in _protocols if _ in _tlsProtocols):
                 sock = None
                 try:
                     sock = create_sock()
