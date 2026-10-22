@@ -4116,6 +4116,10 @@ def unhandledExceptionMessage():
     True
     """
 
+    from lib.core.revision import getRevisionNumber      # Note: not in the header because of the circular import
+
+    revision = getRevisionNumber()
+
     errMsg = "unhandled exception occurred in %s. It is recommended to retry your " % VERSION_STRING
     errMsg += "run with the latest development version from official GitHub "
     errMsg += "repository at '%s'. If the exception persists, please open a new issue " % GIT_PAGE
@@ -4123,7 +4127,7 @@ def unhandledExceptionMessage():
     errMsg += "with the following text and any other information required to "
     errMsg += "reproduce the bug. Developers will try to reproduce the bug, fix it accordingly "
     errMsg += "and get back to you\n"
-    errMsg += "Running version: %s\n" % VERSION_STRING[VERSION_STRING.find('/') + 1:]
+    errMsg += "Running version: %s%s\n" % (VERSION_STRING[VERSION_STRING.find('/') + 1:], (" (%s)" % revision) if revision else "")
     errMsg += "Python version: %s\n" % PYVERSION
     errMsg += "Operating system: %s\n" % platform.platform()
     errMsg += "Command line: %s\n" % re.sub(r".+?\bsqlmap\.py\b", "sqlmap.py", getUnicode(" ".join(sys.argv), encoding=getattr(sys.stdin, "encoding", None)))
