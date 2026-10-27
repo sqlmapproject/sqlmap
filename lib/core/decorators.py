@@ -61,10 +61,11 @@ def cachedmethod(f):
                 key = args
 
             with lock:
-                try:
-                    return cache[key]
-                except KeyError:        # Note: single lookup, as an entry can get evicted in between (unlocked on Python 3)
-                    pass
+                if key in cache:
+                    try:
+                        return cache[key]
+                    except KeyError:    # Note: evicted in between (unlocked on Python 3)
+                        pass
 
         except TypeError:
             # Note: fallback (slow-path) for unhashable arguments
@@ -75,10 +76,11 @@ def cachedmethod(f):
                     key = (_FROZEN_KEY_MARKER, _freeze(args))
 
                 with lock:
-                    try:
-                        return cache[key]
-                    except KeyError:
-                        pass
+                    if key in cache:
+                        try:
+                            return cache[key]
+                        except KeyError:
+                            pass
             except TypeError:
                 # Note: genuinely uncacheable arguments; skip caching altogether
                 return f(*args, **kwargs)
