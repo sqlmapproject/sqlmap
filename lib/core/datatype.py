@@ -9,7 +9,39 @@ import copy
 import threading
 
 from collections import OrderedDict
+from thirdparty import six
 from thirdparty.six.moves import collections_abc as _collections
+
+class NoLock(object):
+    """
+    No-op stand-in for a lock, used where the guarded operations are already atomic on their own
+
+    >>> with NoLock():
+    ...     True
+    True
+    """
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        return False
+
+def cacheLock(reentrant=False):
+    """
+    Returns a lock for guarding the (OrderedDict based) caches. Only Python 2 needs a real one, as its
+    OrderedDict is implemented in Python (#5619), while on Python 3 each operation is atomic. Moreover,
+    since Python 3.14 a Ctrl-C landing right after a lock got acquired by the 'with' statement leaves it
+    acquired forever (i.e. '__exit__' never gets called), hanging every thread that touches the cache
+
+    >>> isinstance(cacheLock(), NoLock) == six.PY3
+    True
+    """
+
+    if six.PY2:
+        return threading.RLock() if reentrant else threading.Lock()
+    else:
+        return NoLock()
 
 class AttribDict(dict):
     """
@@ -133,7 +165,7 @@ class LRUDict(object):
     def __init__(self, capacity):
         self.capacity = capacity
         self.cache = OrderedDict()
-        self.__lock = threading.Lock()
+        self.__lock = cacheLock()
 
     def __len__(self):
         return len(self.cache)
@@ -159,7 +191,10 @@ class LRUDict(object):
                 self.cache.pop(key)
             except KeyError:
                 if len(self.cache) >= self.capacity:
-                    self.cache.popitem(last=False)
+                    try:
+                        self.cache.popitem(last=False)
+                    except KeyError:    # Note: concurrently emptied by another thread (unlocked on Python 3)
+                        pass
             self.cache[key] = value
 
     def set(self, key, value):
