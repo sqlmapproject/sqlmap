@@ -4108,18 +4108,30 @@ def getDaysFromLastUpdate():
 
     return int(time.time() - os.path.getmtime(paths.SQLMAP_SETTINGS_PATH)) // (3600 * 24)
 
-def jitEnabled():
+def pythonBuildInfo():
     """
-    Returns True if the experimental JIT compiler is active (Python >= 3.13)
+    Returns markers of non-default interpreter builds/modes (e.g. free-threading, JIT)
 
-    >>> jitEnabled() in (True, False)
+    >>> isinstance(pythonBuildInfo(), str)
     True
     """
 
+    retVal = []
+
     try:
-        return bool(sys._jit.is_enabled())
+        if not sys._is_gil_enabled():       # Note: free-threading has been behind reports where a still running function gets collected (e.g. https://github.com/python/cpython/issues/160682)
+            retVal.append("free-threading")
     except:
-        return os.getenv("PYTHON_JIT") == '1'
+        pass
+
+    try:
+        if sys._jit.is_enabled():
+            retVal.append("JIT")
+    except:
+        if os.getenv("PYTHON_JIT") == '1':
+            retVal.append("JIT")
+
+    return ", ".join(retVal)
 
 def unhandledExceptionMessage():
     """
@@ -4132,6 +4144,7 @@ def unhandledExceptionMessage():
     from lib.core.revision import getRevisionNumber      # Note: not in the header because of the circular import
 
     revision = getRevisionNumber()
+    buildInfo = pythonBuildInfo()
 
     errMsg = "unhandled exception occurred in %s. It is recommended to retry your " % VERSION_STRING
     errMsg += "run with the latest development version from official GitHub "
@@ -4141,8 +4154,7 @@ def unhandledExceptionMessage():
     errMsg += "reproduce the bug. Developers will try to reproduce the bug, fix it accordingly "
     errMsg += "and get back to you\n"
     errMsg += "Running version: %s%s\n" % (VERSION_STRING[VERSION_STRING.find('/') + 1:], (" (%s)" % revision) if revision else "")
-    # Note: experimental JIT (Python >= 3.13) has been behind a whole class of reports where an unrelated object ends up bound to a name
-    errMsg += "Python version: %s%s\n" % (PYVERSION, " (JIT)" if jitEnabled() else "")
+    errMsg += "Python version: %s%s\n" % (PYVERSION, (" (%s)" % buildInfo) if buildInfo else "")
     errMsg += "Operating system: %s\n" % platform.platform()
     errMsg += "Command line: %s\n" % re.sub(r".+?\bsqlmap\.py\b", "sqlmap.py", getUnicode(" ".join(sys.argv), encoding=getattr(sys.stdin, "encoding", None)))
     errMsg += "Technique: %s\n" % (enumValueToNameLookup(PAYLOAD.TECHNIQUE, getTechnique()) if getTechnique() is not None else ("DIRECT" if conf.get("direct") else None))
