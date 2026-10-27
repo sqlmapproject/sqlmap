@@ -4218,15 +4218,6 @@ def createGithubIssue(errMsg, excMsg):
     Automatically create a Github issue with unhandled exception information
     """
 
-    # Note: free-threading builds collect still running functions (https://github.com/python/cpython/issues/160682), where the reused memory shows up as an
-    # unrelated object bound to a known name (e.g. "'str' object is not callable"). Those are interpreter bugs, hence not worth a report of their own
-    if "free-threading" in pythonBuildInfo():
-        warnMsg = "the used interpreter is a free-threading build, known for collecting still running "
-        warnMsg += "functions and producing unrelated exceptions like this one. Please rerun with a "
-        warnMsg += "regular (non free-threading) build, as skipping the automatic issue creation in here"
-        logger.warning(warnMsg)
-        return
-
     try:
         issues = getFileItems(paths.GITHUB_HISTORY, unique=True)
     except:
