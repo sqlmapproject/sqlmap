@@ -1375,6 +1375,8 @@ def _setHTTPHandlers():
                 if conf.proxyCred:
                     # Reference: http://stackoverflow.com/questions/34079/how-to-specify-an-authenticated-proxy-for-a-python-http-connection
                     proxyString = "%s@" % conf.proxyCred
+                elif username is not None:
+                    proxyString = "%s:%s@" % (username, password)
                 else:
                     proxyString = ""
 
