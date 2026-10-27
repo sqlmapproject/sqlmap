@@ -4116,11 +4116,15 @@ def pythonBuildInfo():
     True
     """
 
+    import sysconfig
+
     retVal = []
 
+    # Note: free-threading builds compile in their own GC and deferred reference counting (e.g. https://github.com/python/cpython/issues/160682, where a still
+    # running function gets collected), both of which stay in play even when the GIL itself got re-enabled in runtime, hence checking the build and not only the state
     try:
-        if not sys._is_gil_enabled():       # Note: free-threading has been behind reports where a still running function gets collected (e.g. https://github.com/python/cpython/issues/160682)
-            retVal.append("free-threading")
+        if sysconfig.get_config_var("Py_GIL_DISABLED"):
+            retVal.append("free-threading" if not sys._is_gil_enabled() else "free-threading with GIL")
     except:
         pass
 
@@ -4213,6 +4217,15 @@ def createGithubIssue(errMsg, excMsg):
     """
     Automatically create a Github issue with unhandled exception information
     """
+
+    # Note: free-threading builds collect still running functions (https://github.com/python/cpython/issues/160682), where the reused memory shows up as an
+    # unrelated object bound to a known name (e.g. "'str' object is not callable"). Those are interpreter bugs, hence not worth a report of their own
+    if "free-threading" in pythonBuildInfo():
+        warnMsg = "the used interpreter is a free-threading build, known for collecting still running "
+        warnMsg += "functions and producing unrelated exceptions like this one. Please rerun with a "
+        warnMsg += "regular (non free-threading) build, as skipping the automatic issue creation in here"
+        logger.warning(warnMsg)
+        return
 
     try:
         issues = getFileItems(paths.GITHUB_HISTORY, unique=True)
