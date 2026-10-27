@@ -1646,5 +1646,50 @@ class TestNonSqlTechniqueRegistry(unittest.TestCase):
             self.assertEqual(optDict["Techniques"].get(name), "boolean", name)
 
 
+class TestSetHTTPHandlersProxyCredentials(unittest.TestCase):
+    """_setHTTPHandlers(): credentials embedded in the proxy URL (dropped for HTTP(S) and left
+    URL-encoded for SOCKS ever since the fix for #5875). Global state (shared proxy handler,
+    installed opener, SOCKS hooks) is pinned, so nothing leaks into other modules."""
+
+    _KEYS = ("proxy", "proxyCred", "proxyList", "hostname", "ignoreProxy", "cj", "keepAlive")
+
+    def setUp(self):
+        from _testutils import save_attrs
+
+        self._socks = []
+        self._saved = save_attrs(option.socks, "setdefaultproxy", "wrapmodule", "unwrapmodule")
+        self._saved += save_attrs(option.proxyHandler, "proxies", "http_open", "https_open")
+        self._saved += save_attrs(option._urllib.request, "install_opener")
+
+        option.socks.setdefaultproxy = lambda *args, **kwargs: self._socks.append((kwargs.get("username"), kwargs.get("password")))
+        option.socks.wrapmodule = option.socks.unwrapmodule = lambda *args: None
+        option._urllib.request.install_opener = lambda *args: None
+
+    def tearDown(self):
+        from _testutils import restore_attrs
+
+        restore_attrs(self._saved)
+
+    def _run(self, proxy, proxyCred=None):
+        with _preserve(conf, *self._KEYS), _preserve(kb, "proxies"):
+            conf.proxy, conf.proxyCred, conf.proxyList = proxy, proxyCred, None
+            option._setHTTPHandlers()
+            return (kb.proxies or {}).get("http")
+
+    def test_http_url_credentials(self):
+        # Note: kept URL-encoded, as urllib decodes them itself when building 'Proxy-Authorization'
+        self.assertEqual(self._run("http://user:p%40ss@127.0.0.1:8080"), "user:p%40ss@127.0.0.1:8080")
+
+    def test_proxy_cred_takes_precedence(self):
+        self.assertEqual(self._run("http://user:p%40ss@127.0.0.1:8080", "other:pw"), "other:pw@127.0.0.1:8080")
+
+    def test_http_without_credentials(self):
+        self.assertEqual(self._run("http://127.0.0.1:8080"), "127.0.0.1:8080")
+
+    def test_socks_url_credentials_decoded(self):
+        self._run("socks5://user:p%40ss@127.0.0.1:1080")
+        self.assertEqual(self._socks, [("user", "p@ss")])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

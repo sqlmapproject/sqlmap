@@ -1330,7 +1330,7 @@ def _setHTTPHandlers():
 
             match = re.search(r"\A([^:]*):([^:]*)@([^@]+)\Z", _.netloc)
             if match:
-                username, password = match.group(1), match.group(2)
+                username, password = _urllib.parse.unquote(match.group(1)), _urllib.parse.unquote(match.group(2))
             else:
                 username, password = None, None
 
@@ -1375,6 +1375,9 @@ def _setHTTPHandlers():
                 if conf.proxyCred:
                     # Reference: http://stackoverflow.com/questions/34079/how-to-specify-an-authenticated-proxy-for-a-python-http-connection
                     proxyString = "%s@" % conf.proxyCred
+                elif match:
+                    # Note: credentials from the proxy URL itself (kept URL-encoded, as urllib decodes them on its own)
+                    proxyString = "%s:%s@" % (match.group(1), match.group(2))
                 else:
                     proxyString = ""
 
