@@ -5694,6 +5694,8 @@ def parseRequestFile(reqFile, checkParams=True):
                 reqResList = []
                 for match in re.finditer(BURP_XML_HISTORY_REGEX, content, re.I | re.S):
                     port, request = match.groups()
+                    protocol = extractRegexResult(r"<protocol>\s*(?P<result>https?)\s*</protocol>",
+                                                  match.group(0), re.I)
                     try:
                         request = decodeBase64(request, binary=False)
                     except (binascii.Error, TypeError):
@@ -5703,14 +5705,20 @@ def parseRequestFile(reqFile, checkParams=True):
                         host = _.group(0).strip()
                         if not re.search(r":\d+\Z", host) and int(port) != 80:
                             request = request.replace(host, "%s:%d" % (host, int(port)))
-                    reqResList.append(request)
+                    reqResList.append((request, protocol.lower() if protocol else None, port))
             else:
                 reqResList = [content]
         else:
             reqResList = re.finditer(BURP_REQUEST_REGEX, content, re.I | re.S)
 
         for match in reqResList:
-            request = match if isinstance(match, six.string_types) else match.group(1)
+            xmlScheme, xmlPort = None, None
+
+            if isinstance(match, tuple):
+                request, xmlScheme, xmlPort = match
+            else:
+                request = match if isinstance(match, six.string_types) else match.group(1)
+
             request = re.sub(r"\A[^\w]+", "", request)
             schemePort = re.search(r"(http[\w]*)\:\/\/.*?\:([\d]+).+?={10,}", request, re.I | re.S)
 
@@ -5813,6 +5821,10 @@ def parseRequestFile(reqFile, checkParams=True):
                         params = True
 
             data = data.rstrip("\r\n") if data else data
+
+            if xmlScheme:
+                scheme = scheme or xmlScheme
+                port = port or xmlPort
 
             if getPostReq and (params or cookie or not checkParams):
                 if not port and hasattr(scheme, "lower") and scheme.lower() == "https":

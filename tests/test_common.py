@@ -561,6 +561,187 @@ class TestParseRequestFileBurp(unittest.TestCase):
         self.assertEqual(targets, [])
 
 
+class TestParseRequestFileBurpXmlProtocol(unittest.TestCase):
+    """Burp XML <protocol> is kept per item; metadata only fills missing fields."""
+
+    def setUp(self):
+        self._scope = conf.scope
+        self._method = conf.method
+        self._headers = conf.headers
+        self._force_ssl = conf.forceSSL
+        conf.scope = None
+        conf.method = None
+        conf.headers = None
+        conf.forceSSL = False
+
+    def tearDown(self):
+        conf.scope = self._scope
+        conf.method = self._method
+        conf.headers = self._headers
+        conf.forceSSL = self._force_ssl
+
+    @staticmethod
+    def _request(method, target, host="example.test", headers=(), body=None):
+        lines = ["%s %s HTTP/1.1" % (method, target), "Host: %s" % host]
+        lines.extend(headers)
+        if body is not None:
+            lines.append("Content-Length: %d" % len(body))
+        lines.extend(("", body or ""))
+        return "\r\n".join(lines)
+
+    @staticmethod
+    def _item(port, protocol, request):
+        tag = "" if protocol is None else "<protocol>%s</protocol>" % protocol
+        encoded = base64.b64encode(request.encode("utf-8")).decode("ascii")
+        return ('<item><port>%s</port>%s<request base64="true">'
+                '<![CDATA[%s]]></request></item>' % (port, tag, encoded))
+
+    def _parse(self, items):
+        xml = "<items>%s</items>" % "".join(items)
+        path = _write_temp(xml, ".xml")
+        try:
+            return list(parseRequestFile(path))
+        finally:
+            os.unlink(path)
+
+    def _url(self, port, protocol, request):
+        targets = self._parse([self._item(port, protocol, request)])
+        self.assertEqual(len(targets), 1)
+        return targets[0][0]
+
+    def test_https_on_nondefault_port(self):
+        url = self._url(8443, "https", self._request("GET", "/api?id=1"))
+        self.assertEqual(url, "https://example.test:8443/api?id=1")
+
+    def test_https_on_port_80(self):
+        url = self._url(80, "https", self._request("GET", "/api?id=1"))
+        self.assertEqual(url, "https://example.test:80/api?id=1")
+
+    def test_http_on_port_443(self):
+        url = self._url(443, "http", self._request("GET", "/api?id=1"))
+        self.assertEqual(url, "http://example.test:443/api?id=1")
+
+    def test_standard_protocol_controls(self):
+        cases = ((80, "http", "http://example.test:80/api?id=1"),
+                 (443, "https", "https://example.test:443/api?id=1"),
+                 (8080, "http", "http://example.test:8080/api?id=1"))
+        for port, protocol, expected in cases:
+            self.assertEqual(self._url(port, protocol, self._request("GET", "/api?id=1")), expected)
+
+    def test_multiple_items_reset_protocol_context(self):
+        items = [
+            self._item(8443, "https", self._request("GET", "/one?id=1")),
+            self._item(8080, None, self._request("GET", "/two?id=1")),
+            self._item(443, "http", self._request("GET", "/three?id=1")),
+            self._item(443, "https", self._request("GET", "/four?id=1")),
+        ]
+        urls = [target[0] for target in self._parse(items)]
+        self.assertEqual(urls, ["https://example.test:8443/one?id=1",
+                                "http://example.test:8080/two?id=1",
+                                "http://example.test:443/three?id=1",
+                                "https://example.test:443/four?id=1"])
+
+    def test_missing_or_unknown_protocol_keeps_legacy(self):
+        items = [
+            self._item(8443, None, self._request("GET", "/missing?id=1")),
+            self._item(8443, "ftp", self._request("GET", "/unknown?id=1")),
+        ]
+        urls = [target[0] for target in self._parse(items)]
+        self.assertEqual(urls, ["http://example.test:8443/missing?id=1",
+                                "http://example.test:8443/unknown?id=1"])
+
+    def test_missing_protocol_does_not_fill_xml_port(self):
+        # Legacy: a Host-provided scheme implies 443; XML port 80 must not override it.
+        request = self._request("GET", "/index?id=1", host="https://example.test")
+        self.assertEqual(self._url(80, None, request), "https://example.test:443/index?id=1")
+
+    def test_host_explicit_port_wins_over_xml_port(self):
+        request = self._request("GET", "/index?id=1", host="example.test:9443")
+        self.assertEqual(self._url(8443, "https", request), "https://example.test:9443/index?id=1")
+
+    def test_metadata_case_and_whitespace(self):
+        self.assertEqual(self._url(8443, "  HTTPS  ", self._request("GET", "/index?id=1")),
+                         "https://example.test:8443/index?id=1")
+
+    def test_force_ssl_remains_final_override(self):
+        conf.forceSSL = True
+        self.assertEqual(self._url(8080, "http", self._request("GET", "/index?id=1")),
+                         "https://example.test:8080/index?id=1")
+
+    def test_absolute_request_target_takes_precedence(self):
+        request = self._request("GET", "http://absolute.example.test:8080/abs?id=1")
+        self.assertEqual(self._url(8443, "https", request),
+                         "http://absolute.example.test:8080/abs?id=1")
+
+    def test_host_scheme_takes_precedence(self):
+        request = self._request("GET", "/index?id=1", host="http://example.test")
+        self.assertEqual(self._url(8443, "https", request), "http://example.test:8443/index?id=1")
+
+    def test_method_body_cookie_and_headers_retained(self):
+        request = self._request("POST", "/login",
+                                headers=("Cookie: SID=abc", "X-Test: keep"),
+                                body="user=admin&pw=1")
+        targets = self._parse([self._item(8443, "https", request)])
+        self.assertEqual(len(targets), 1)
+        url, method, data, cookie, headers = targets[0]
+        self.assertEqual(url, "https://example.test:8443/login")
+        self.assertEqual(method, HTTPMETHOD.POST)
+        self.assertEqual(data, "user=admin&pw=1")
+        self.assertEqual(cookie, "SID=abc")
+        self.assertIn(("X-Test", "keep"), headers)
+
+    def test_scope_uses_final_protocol_url(self):
+        item = self._item(8443, "https", self._request("GET", "/index?id=1"))
+        path = _write_temp("<items>%s</items>" % item, ".xml")
+        try:
+            conf.scope = r"^http://example\.test:8443/"
+            self.assertEqual(list(parseRequestFile(path)), [])
+            conf.scope = r"^https://example\.test:8443/"
+            self.assertEqual(len(list(parseRequestFile(path))), 1)
+        finally:
+            os.unlink(path)
+
+    def test_plain_raw_request_without_hint_unchanged(self):
+        for host, expected in (("example.test", "http://example.test:80/index?id=1"),
+                               ("example.test:443", "https://example.test:443/index?id=1")):
+            content = "GET /index?id=1 HTTP/1.1\r\nHost: %s\r\n\r\n" % host
+            path = _write_temp(content, ".log")
+            try:
+                targets = list(parseRequestFile(path))
+            finally:
+                os.unlink(path)
+            self.assertEqual(len(targets), 1)
+            self.assertEqual(targets[0][0], expected)
+
+    def test_set_multiple_targets_mixed_xml(self):
+        from lib.core.option import _setMultipleTargets
+
+        items = [
+            self._item(8080, "http", self._request("GET", "/plain?id=1")),
+            self._item(8443, "https", self._request("GET", "/secure?id=1")),
+            self._item(443, "https", self._request("GET", "/standard?id=1")),
+        ]
+        path = _write_temp("<items>%s</items>" % "".join(items), ".xml")
+        saved_targets = kb.targets
+        saved_log_file = conf.logFile
+        saved_param_del = conf.paramDel
+        try:
+            kb.targets = type(saved_targets)()
+            conf.logFile = path
+            conf.paramDel = None
+            _setMultipleTargets()
+            urls = sorted(target[0] for target in kb.targets)
+            self.assertEqual(len(kb.targets), 3)
+            self.assertEqual(urls, ["http://example.test:8080/plain?id=1",
+                                    "https://example.test:443/standard?id=1",
+                                    "https://example.test:8443/secure?id=1"])
+        finally:
+            kb.targets = saved_targets
+            conf.logFile = saved_log_file
+            conf.paramDel = saved_param_del
+            os.unlink(path)
+
+
 class TestParseRequestFileWebScarab(unittest.TestCase):
     """_parseWebScarabLog via parseRequestFile."""
 
