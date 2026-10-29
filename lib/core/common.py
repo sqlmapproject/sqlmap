@@ -5693,16 +5693,20 @@ def parseRequestFile(reqFile, checkParams=True):
             if re.search(BURP_XML_HISTORY_REGEX, content, re.I | re.S):
                 reqResList = []
                 for match in re.finditer(BURP_XML_HISTORY_REGEX, content, re.I | re.S):
-                    port, request = match.groups()
+                    port, protocol, request = match.groups()
+                    protocol = (protocol or "").lower()
                     try:
                         request = decodeBase64(request, binary=False)
                     except (binascii.Error, TypeError):
                         continue
                     _ = re.search(r"%s:.+" % re.escape(HTTP_HEADER.HOST), request)
                     if _:
-                        host = _.group(0).strip()
-                        if not re.search(r":\d+\Z", host) and int(port) != 80:
-                            request = request.replace(host, "%s:%d" % (host, int(port)))
+                        host = value = _.group(0).strip()
+                        if not re.search(r":\d+\Z", host) and int(port) != (443 if protocol == "https" else 80):
+                            value = "%s:%d" % (value, int(port))
+                        if protocol and "://" not in value:  # Note: item's <protocol> (as the port alone can't tell e.g. HTTPS on 8443)
+                            value = re.sub(r"\A([^:]+:\s*)", r"\g<1>%s://" % protocol, value)
+                        request = request.replace(host, value)
                     reqResList.append(request)
             else:
                 reqResList = [content]

@@ -524,6 +524,19 @@ class TestParseRequestFileBurp(unittest.TestCase):
         self.assertEqual(method, HTTPMETHOD.GET)
         self.assertEqual(cookie, "SID=xyz")
 
+    def test_burp_xml_history_protocol(self):
+        # Note: item's <protocol> decides the scheme (the port alone can't tell e.g. HTTPS on 8443 or HTTP on 443)
+        req = base64.b64encode(b"GET /vuln.php?id=1 HTTP/1.1\r\nHost: www.target.com\r\n\r\n").decode()
+        items = "".join('<item><port>%s</port>\n<protocol>%s</protocol><request base64="true"><![CDATA[%s]]></request></item>' % (port, protocol, req) for port, protocol in ((8443, "https"), (443, "http"), (443, "https"), (8080, "")))
+        path = _write_temp("<items>%s</items>" % items, ".xml")
+        try:
+            targets = list(parseRequestFile(path))
+        finally:
+            os.unlink(path)
+
+        self.assertEqual([_[0] for _ in targets], ["https://www.target.com:8443/vuln.php?id=1", "http://www.target.com:443/vuln.php?id=1", "https://www.target.com:443/vuln.php?id=1", "http://www.target.com:8080/vuln.php?id=1"])
+        self.assertTrue(all("://" not in value for _ in targets for key, value in _[4] if key == "Host"))
+
     def test_post_body_captured(self):
         content = (
             "======================================================\n"

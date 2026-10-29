@@ -19,7 +19,7 @@ from lib.core.enums import OS
 from thirdparty import six
 
 # sqlmap version (<major>.<minor>.<month>.<monthly commit>)
-VERSION = "1.10.10.28"
+VERSION = "1.10.10.29"
 TYPE = "dev" if VERSION.count('.') > 2 and VERSION.split('.')[-1] != '0' else "stable"
 TYPE_COLORS = {"dev": 33, "stable": 90, "pip": 34}
 VERSION_STRING = "sqlmap/%s#%s" % ('.'.join(VERSION.split('.')[:-1]) if VERSION.count('.') > 2 and VERSION.split('.')[-1] == '0' else VERSION, TYPE)
@@ -582,7 +582,7 @@ WEBSCARAB_SPLITTER = "### Conversation"
 BURP_REQUEST_REGEX = r"={10,}\s+([A-Z]{3,} .+?)\s+(={10,}|\Z)"
 
 # Regex used for parsing XML Burp saved history items
-BURP_XML_HISTORY_REGEX = r'<port>(\d+)</port>.*?<request base64="true"><!\[CDATA\[([^]]+)'
+BURP_XML_HISTORY_REGEX = r'<port>(\d+)</port>\s*(?:<protocol>\s*(https?)\s*</protocol>)?.*?<request base64="true"><!\[CDATA\[([^]]+)'
 
 # Encoding used for Unicode data
 UNICODE_ENCODING = "utf8"
