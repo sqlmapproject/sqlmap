@@ -18,7 +18,7 @@ declare -x SCRIPTPATH="${0}"
 PROJECT_FULLPATH=${SCRIPTPATH%/*}/$PROJECT
 SETTINGS_FULLPATH=${SCRIPTPATH%/*}/$SETTINGS
 
-git diff $SETTINGS_FULLPATH | grep "VERSION =" > /dev/null && exit 0
+git diff HEAD -- $SETTINGS_FULLPATH | grep "^+VERSION =" > /dev/null && exit 0  # Note: manually set VERSION (staged or not, e.g. "git commit -a") is kept as is
 
 if [ -f $SETTINGS_FULLPATH ]
 then
