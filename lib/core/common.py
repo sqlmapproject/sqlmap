@@ -3236,7 +3236,7 @@ def logHTTPTraffic(requestLogMsg, responseLogMsg, startTime=None, endTime=None):
     """
 
     if conf.harFile:
-        conf.httpCollector.collectRequest(requestLogMsg, responseLogMsg, startTime, endTime)
+        conf.httpCollector.collectRequest(requestLogMsg, responseLogMsg, startTime, endTime, scheme=conf.scheme)
 
     if conf.trafficFile:
         with kb.locks.log:

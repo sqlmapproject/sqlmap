@@ -36,10 +36,10 @@ class HTTPCollector(object):
     def setExtendedArguments(self, arguments):
         self.extendedArguments = arguments
 
-    def collectRequest(self, requestMessage, responseMessage, startTime=None, endTime=None):
+    def collectRequest(self, requestMessage, responseMessage, startTime=None, endTime=None, scheme=None):
         self.messages.append(RawPair(requestMessage, responseMessage,
                                      startTime=startTime, endTime=endTime,
-                                     extendedArguments=self.extendedArguments))
+                                     extendedArguments=self.extendedArguments, scheme=scheme))
 
     def obtain(self):
         return {"log": {
@@ -49,15 +49,16 @@ class HTTPCollector(object):
         }}
 
 class RawPair(object):
-    def __init__(self, request, response, startTime=None, endTime=None, extendedArguments=None):
+    def __init__(self, request, response, startTime=None, endTime=None, extendedArguments=None, scheme=None):
         self.request = getBytes(request)
         self.response = getBytes(response)
         self.startTime = startTime
         self.endTime = endTime
         self.extendedArguments = extendedArguments or {}
+        self.scheme = scheme    # Note: of the target at the time of the request (as origin-form request lines don't carry one)
 
     def toEntry(self):
-        return Entry(request=Request.parse(self.request), response=Response.parse(self.response),
+        return Entry(request=Request.parse(self.request, self.scheme), response=Response.parse(self.response),
                      startTime=self.startTime, endTime=self.endTime,
                      extendedArguments=self.extendedArguments)
 
@@ -86,7 +87,7 @@ class Entry(object):
         return out
 
 class Request(object):
-    def __init__(self, method, path, httpVersion, headers, postBody=None, raw=None, comment=None):
+    def __init__(self, method, path, httpVersion, headers, postBody=None, raw=None, comment=None, scheme=None):
         self.method = method
         self.path = path
         self.httpVersion = httpVersion
@@ -94,9 +95,10 @@ class Request(object):
         self.postBody = postBody
         self.comment = comment.strip() if comment else comment
         self.raw = raw
+        self.scheme = scheme
 
     @classmethod
-    def parse(cls, raw):
+    def parse(cls, raw, scheme=None):
         request = HTTPRequest(raw)
         return cls(method=request.command,
                    path=request.path,
@@ -104,12 +106,16 @@ class Request(object):
                    headers=request.headers,
                    postBody=request.rfile.read(),
                    comment=request.comment,
-                   raw=raw)
+                   raw=raw,
+                   scheme=scheme)
 
     @property
     def url(self):
+        if re.search(r"(?i)\Ahttps?://", self.path or ""):    # Note: absolute-form request target (e.g. refreshing/crawling/checking requests)
+            return self.path
+
         host = self.headers.get("Host", "unknown")
-        return "http://%s%s" % (host, self.path)
+        return "%s://%s%s" % (self.scheme or "http", host, self.path)
 
     def toDict(self):
         out = {

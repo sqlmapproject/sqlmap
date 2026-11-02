@@ -52,6 +52,14 @@ class TestHTTPCollector(unittest.TestCase):
         self.assertEqual(entries[0]["request"]["method"], "GET")
         self.assertEqual(entries[0]["response"]["status"], 200)
 
+    def test_request_url_scheme(self):
+        # Note: origin-form request lines carry no scheme (HTTPS targets used to be logged as 'http://'), while
+        # absolute-form ones (refreshing/crawling/checking requests) used to get the Host prepended to them
+        c = H.HTTPCollector()
+        for line, scheme in (("GET /?id=1", "https"), ("GET /?id=1", None), ("GET https://other.com:8443/x?id=1", "http")):
+            c.collectRequest(("%s HTTP/1.1\r\nHost: example.com\r\n\r\n" % line).encode(), b"HTTP/1.1 200 OK\r\n\r\n", startTime=1000, endTime=2000, scheme=scheme)
+        self.assertEqual([_["request"]["url"] for _ in c.obtain()["log"]["entries"]], ["https://example.com/?id=1", "http://example.com/?id=1", "https://other.com:8443/x?id=1"])
+
 
 class TestHTTPCollectorFactory(unittest.TestCase):
     def test_create_returns_collector(self):
