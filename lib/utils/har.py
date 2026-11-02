@@ -108,6 +108,10 @@ class Request(object):
 
     @property
     def url(self):
+        # Absolute-form targets already carry their own scheme and authority.
+        if self.path and re.match(r"(?i)https?://", self.path):
+            return self.path
+
         host = self.headers.get("Host", "unknown")
         return "http://%s%s" % (host, self.path)
 

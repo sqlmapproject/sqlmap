@@ -197,5 +197,98 @@ class TestResponse(unittest.TestCase):
         self.assertEqual(d["content"]["text"], "plain text")
 
 
+class TestRequestAbsoluteTarget(unittest.TestCase):
+    """Absolute-form request targets already carry scheme and authority.
+
+    A captured request line such as "GET https://host/path HTTP/1.1" has its own scheme and
+    authority; the Host header is redundant for address resolution. Request.url must therefore
+    return such a target verbatim instead of prefixing "http://" + Host, which used to produce
+    "http://hosthttps://host/path" (wrong scheme, authority and path) in the exported HAR entry.
+    """
+
+    def _raw(self, method, target, headers, body=b""):
+        lines = [method + " " + target + " HTTP/1.1"]
+        for name, value in headers:
+            lines.append(name + ": " + value)
+        return ("\r\n".join(lines) + "\r\n\r\n").encode("ascii") + body
+
+    def _url(self, method, target, headers, body=b""):
+        return H.Request.parse(self._raw(method, target, headers, body)).url
+
+    def test_url_absolute_https_with_query_and_port(self):
+        target = "https://app.example.invalid:8443/items?q=one"
+        self.assertEqual(self._url("GET", target, [("Host", "app.example.invalid")]), target)
+
+    def test_url_absolute_http_with_query_and_port(self):
+        target = "http://app.example.invalid:8080/items?q=one"
+        self.assertEqual(self._url("GET", target, [("Host", "app.example.invalid")]), target)
+
+    def test_url_absolute_mixed_case_scheme_preserved(self):
+        target = "HtTpS://app.example.invalid/items?q=one"
+        self.assertEqual(self._url("GET", target, [("Host", "app.example.invalid")]), target)
+
+    def test_url_absolute_wins_over_differing_host(self):
+        # an absolute target takes precedence over an inconsistent Host header
+        target = "https://app.example.invalid/items?q=one"
+        self.assertEqual(self._url("GET", target, [("Host", "proxy.example.invalid:3128")]), target)
+
+    def test_url_absolute_without_host_header(self):
+        target = "https://app.example.invalid/items?q=one"
+        url = self._url("GET", target, [])
+        self.assertEqual(url, target)
+        self.assertNotIn("unknown", url)
+
+    def test_url_origin_form_query_containing_url_is_not_absolute(self):
+        # origin-form: "https://" appears inside the query only, so the Host fallback still applies
+        path = "/login?next=https://app.example.invalid/home"
+        self.assertEqual(self._url("GET", path, [("Host", "app.example.invalid")]),
+                         "http://app.example.invalid" + path)
+
+    def test_url_unknown_host_fallback_unchanged(self):
+        req = H.Request("GET", "/", "HTTP/1.0", {})
+        self.assertEqual(req.url, "http://unknown/")
+
+    def test_collector_absolute_get_entry(self):
+        import json as _json
+        target = "https://app.example.invalid:8443/items?q=one"
+        response = (b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n"
+                    b"Content-Length: 17\r\n\r\n" + b'{"note":"sample"}')
+        c = H.HTTPCollector()
+        c.collectRequest(self._raw("GET", target, [("Host", "app.example.invalid")]),
+                         response, startTime=1000, endTime=2000)
+        entry = c.obtain()["log"]["entries"][0]
+        self.assertEqual(entry["request"]["url"], target)
+        self.assertEqual(entry["request"]["method"], "GET")
+        self.assertIn({"name": "Host", "value": "app.example.invalid"},
+                      entry["request"]["headers"])
+        self.assertEqual(entry["response"]["status"], 200)
+        self.assertEqual(entry["response"]["content"]["text"], '{"note":"sample"}')
+        self.assertEqual(_json.loads(_json.dumps(entry))["request"]["url"], target)
+
+    def test_collector_absolute_post_entry(self):
+        target = "https://app.example.invalid/items?q=one"
+        body = b'{"note":"sample"}'   # deliberately no terminal newline
+        response = (b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n"
+                    b"Content-Length: 17\r\n\r\n" + body)
+        headers = [("Host", "app.example.invalid"), ("Content-Type", "application/json"),
+                   ("Content-Length", "17")]
+        c = H.HTTPCollector()
+        c.collectRequest(self._raw("POST", target, headers, body), response,
+                         startTime=1000, endTime=2000)
+        request = c.obtain()["log"]["entries"][0]["request"]
+        self.assertEqual(request["url"], target)
+        self.assertEqual(request["method"], "POST")
+        self.assertEqual(request["postData"]["mimeType"], "application/json")
+        self.assertEqual(request["postData"]["text"], '{"note":"sample"}')
+
+    def test_collector_origin_form_entry_unchanged(self):
+        c = H.HTTPCollector()
+        c.collectRequest(self._raw("GET", "/items?q=one", [("Host", "app.example.invalid")]),
+                         b"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nok",
+                         startTime=1000, endTime=2000)
+        self.assertEqual(c.obtain()["log"]["entries"][0]["request"]["url"],
+                         "http://app.example.invalid/items?q=one")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
