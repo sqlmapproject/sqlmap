@@ -73,7 +73,7 @@ class WebSocket(object):
         self.sock.settimeout(self._timeout)
 
         hostport = "[%s]" % host if ":" in host else host       # bracket IPv6 literals
-        if port not in (80, 443):
+        if port != (443 if secure else 80):    # Note: only the scheme's own default port gets omitted
             hostport = "%s:%d" % (hostport, port)
 
         key = getText(base64.b64encode(os.urandom(16)))

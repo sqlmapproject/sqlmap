@@ -133,6 +133,35 @@ class TestWebSocket(unittest.TestCase):
         ws = _client(); ws.sock = _RaisingSock(_ssl.SSLError("decryption failed"))
         self.assertRaises(_ssl.SSLError, ws.recv)
 
+    def test_handshake_host_port(self):
+        # Note: only the scheme's own default port is omitted (port 443 used to be dropped for 'ws://' too)
+        import lib.request.websocket as W
+
+        class _Sent(Exception):
+            pass
+
+        class _Capture(_FakeSock):
+            def settimeout(self, value):
+                pass
+
+            def sendall(self, data):
+                raise _Sent(data)
+
+        original = W.socket.create_connection
+        try:
+            W.socket.create_connection = lambda *args, **kwargs: _Capture()
+            for url, host in (("ws://example.com:443/x", "example.com:443"), ("ws://example.com:80/x", "example.com"), ("ws://example.com:8080/x", "example.com:8080")):
+                ws = WebSocket.__new__(WebSocket)
+                ws._timeout = None
+                try:
+                    ws.connect(url)
+                except _Sent as ex:
+                    self.assertIn(("Host: %s\r\n" % host).encode(), ex.args[0])
+                else:
+                    self.fail("handshake was not sent")
+        finally:
+            W.socket.create_connection = original
+
 
 if __name__ == "__main__":
     unittest.main()

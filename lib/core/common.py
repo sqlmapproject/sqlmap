@@ -5140,7 +5140,7 @@ def getHostHeader(url):
     if url:
         parsed = _urllib.parse.urlparse(url)
         retVal = parsed.netloc
-        defaultPort = {"http": 80, "https": 443}.get(parsed.scheme.lower())
+        defaultPort = {"http": 80, "https": 443, "ws": 80, "wss": 443}.get(parsed.scheme.lower())
 
         # Keep non-default ports, including 80 on HTTPS and 443 on HTTP.
         if defaultPort is not None and retVal.endswith(':%d' % defaultPort):
