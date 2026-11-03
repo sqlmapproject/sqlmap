@@ -70,6 +70,21 @@ class TestGetHostHeader(unittest.TestCase):
     def test_without_port(self):
         self.assertEqual(getHostHeader("http://example.com/path"), "example.com")
 
+    def test_default_ports_depend_on_scheme(self):
+        cases = (
+            ("http://example.com:80/path", "example.com"),
+            ("https://example.com:443/path", "example.com"),
+            ("http://example.com:443/path", "example.com:443"),
+            ("https://example.com:80/path", "example.com:80"),
+            ("HTTP://example.com:443/path", "example.com:443"),
+            ("http://[::1]:80/path", "[::1]"),
+            ("https://[::1]:443/path", "[::1]"),
+            ("http://[::1]:443/path", "[::1]:443"),
+            ("https://[::1]:80/path", "[::1]:80"),
+        )
+        for url, expected in cases:
+            self.assertEqual(getHostHeader(url), expected, msg=url)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
