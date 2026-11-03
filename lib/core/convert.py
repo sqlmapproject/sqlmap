@@ -61,6 +61,83 @@ _SERIALIZE_CLASSES = frozenset((
     "lib.utils.har.RawPair",
 ))
 
+class _SessionTimezone(datetime.tzinfo):
+    """Fixed timezone information captured from a stored date or time value."""
+
+    def __init__(self, offset, daylight, name):
+        self._offset = offset
+        self._daylight = daylight
+        self._name = name
+
+    def utcoffset(self, dt):
+        return self._offset
+
+    def dst(self, dt):
+        return self._daylight
+
+    def tzname(self, dt):
+        return self._name
+
+    def __reduce__(self):
+        return self.__class__, (self._offset, self._daylight, self._name)
+
+    def fromutc(self, dt):
+        if not isinstance(dt, datetime.datetime):
+            raise TypeError("fromutc() requires a datetime argument")
+        if dt.tzinfo is not self:
+            raise ValueError("fromutc: dt.tzinfo is not self")
+        if self._offset is None:
+            raise ValueError("fromutc: non-None utcoffset() result required")
+        return dt + self._offset
+
+def _serializeTimeDelta(value):
+    return [value.days, value.seconds, value.microseconds] if value is not None else None
+
+def _serializeDateTime(value, retVal):
+    if value.tzinfo is not None:
+        name = value.tzname()
+        if isinstance(name, six.binary_type):
+            name = {"b": encodeBase64(name, binary=False)}
+        retVal["z"] = [_serializeTimeDelta(value.utcoffset()), _serializeTimeDelta(value.dst()), name]
+    if getattr(value, "fold", 0):
+        retVal["f"] = value.fold
+    return retVal
+
+def _deserializeTimeDelta(value):
+    if value is None:
+        return None
+    if not isinstance(value, list) or len(value) != 3 or not all(isinstance(_, six.integer_types) for _ in value):
+        raise ValueError("invalid serialized timezone offset")
+    retVal = datetime.timedelta(*value)
+    if not -datetime.timedelta(days=1) < retVal < datetime.timedelta(days=1):
+        raise ValueError("serialized timezone offset must be less than one day")
+    return retVal
+
+def _deserializeDateTime(value, struct):
+    kwargs = {}
+    if "z" in struct:
+        zone = struct["z"]
+        if not isinstance(zone, list) or len(zone) != 3:
+            raise ValueError("invalid serialized timezone")
+        name = zone[2]
+        if isinstance(name, dict):
+            if set(name) != set(("b",)) or not isinstance(name["b"], six.string_types):
+                raise ValueError("invalid serialized timezone name")
+            name = decodeBase64(name["b"], binary=True)
+            if six.PY3:
+                try:
+                    name = name.decode("utf-8")
+                except UnicodeDecodeError:
+                    name = name.decode("latin-1")
+        elif name is not None and not isinstance(name, six.string_types):
+            raise ValueError("invalid serialized timezone name")
+        elif six.PY2 and isinstance(name, six.text_type):
+            name = name.encode("utf-8")
+        kwargs["tzinfo"] = _SessionTimezone(_deserializeTimeDelta(zone[0]), _deserializeTimeDelta(zone[1]), name)
+    if getattr(value, "fold", None) is not None and "f" in struct:
+        kwargs["fold"] = struct["f"]
+    return value.replace(**kwargs) if kwargs else value
+
 def _serializeEncode(value):
     """
     Turns a Python value into a JSON-serializable (tagged) structure
@@ -126,13 +203,13 @@ def _serializeEncode(value):
         return {_SERIALIZE_TAG: "dec", "v": getUnicode(value)}
 
     if isinstance(value, datetime.datetime):
-        return {_SERIALIZE_TAG: "dt", "v": [value.year, value.month, value.day, value.hour, value.minute, value.second, value.microsecond]}
+        return _serializeDateTime(value, {_SERIALIZE_TAG: "dt", "v": [value.year, value.month, value.day, value.hour, value.minute, value.second, value.microsecond]})
 
     if isinstance(value, datetime.date):
         return {_SERIALIZE_TAG: "date", "v": [value.year, value.month, value.day]}
 
     if isinstance(value, datetime.time):
-        return {_SERIALIZE_TAG: "time", "v": [value.hour, value.minute, value.second, value.microsecond]}
+        return _serializeDateTime(value, {_SERIALIZE_TAG: "time", "v": [value.hour, value.minute, value.second, value.microsecond]})
 
     if isinstance(value, datetime.timedelta):
         return {_SERIALIZE_TAG: "td", "v": [value.days, value.seconds, value.microseconds]}
@@ -206,11 +283,11 @@ def _serializeDecode(struct):
         elif tag == "dec":
             return decimal.Decimal(struct["v"])
         elif tag == "dt":
-            return datetime.datetime(*struct["v"])
+            return _deserializeDateTime(datetime.datetime(*struct["v"]), struct)
         elif tag == "date":
             return datetime.date(*struct["v"])
         elif tag == "time":
-            return datetime.time(*struct["v"])
+            return _deserializeDateTime(datetime.time(*struct["v"]), struct)
         elif tag == "td":
             return datetime.timedelta(struct["v"][0], struct["v"][1], struct["v"][2])
         elif tag == "o":

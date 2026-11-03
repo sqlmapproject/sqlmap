@@ -25,6 +25,7 @@ Two properties must hold forever, on BOTH Python 2.7 and 3.x:
 Kept deliberately verbose - each case maps to a real session/BigArray value or a real report.
 """
 
+import copy
 import datetime
 import decimal
 import json
@@ -51,6 +52,22 @@ _unichr = six.unichr
 def rt(value):
     """Full session round-trip: value -> JSON text -> value."""
     return deserializeValue(serializeValue(value))
+
+
+class _TestTimezone(datetime.tzinfo):
+    def __init__(self, offset, dst, name):
+        self.offset = offset
+        self.daylight = dst
+        self.name = name
+
+    def utcoffset(self, dt):
+        return self.offset
+
+    def dst(self, dt):
+        return self.daylight
+
+    def tzname(self, dt):
+        return self.name
 
 
 def _import_all_modules():
@@ -259,6 +276,102 @@ class TestDbmsScalars(unittest.TestCase):
             self.assertEqual(restored, value)
             self.assertIs(type(restored), type(value))
 
+    def test_timezone_aware_datetime_and_time(self):
+        zones = [
+            _TestTimezone(datetime.timedelta(0), None, "UTC"),
+            _TestTimezone(datetime.timedelta(hours=5, minutes=30), datetime.timedelta(0), "IST"),
+            _TestTimezone(datetime.timedelta(hours=-7), datetime.timedelta(hours=1), "PDT"),
+            _TestTimezone(None, None, None),
+        ]
+        for zone in zones:
+            for value in (datetime.datetime(2024, 1, 2, 3, 4, 5, 6, tzinfo=zone),
+                          datetime.time(3, 4, 5, 6, tzinfo=zone)):
+                restored = rt(value)
+                self.assertEqual(restored, value)
+                self.assertIs(type(restored), type(value))
+                self.assertIsNotNone(restored.tzinfo)
+                self.assertEqual(restored.utcoffset(), value.utcoffset())
+                self.assertEqual(restored.dst(), value.dst())
+                self.assertEqual(restored.tzname(), value.tzname())
+                self.assertEqual(restored.isoformat(), value.isoformat())
+
+    @unittest.skipUnless(hasattr(datetime.datetime.now(), "fold"), "requires datetime.fold")
+    def test_datetime_fold_roundtrip(self):
+        zone = _TestTimezone(datetime.timedelta(hours=-5), datetime.timedelta(0), "EST")
+        for value in (datetime.datetime(2024, 11, 3, 1, 30, tzinfo=zone).replace(fold=1),
+                      datetime.time(1, 30, tzinfo=zone).replace(fold=1),
+                      datetime.datetime(2024, 11, 3, 1, 30).replace(fold=1)):
+            restored = rt(value)
+            self.assertEqual(restored.fold, 1)
+            self.assertEqual(restored.isoformat(), value.isoformat())
+
+    def test_legacy_datetime_serialization(self):
+        self.assertEqual(deserializeValue('{"$T":"dt","v":[2024,1,2,3,4,5,6]}'),
+                         datetime.datetime(2024, 1, 2, 3, 4, 5, 6))
+        self.assertEqual(deserializeValue('{"$T":"time","v":[3,4,5,6]}'), datetime.time(3, 4, 5, 6))
+
+    def test_restored_timezone_converts_from_utc(self):
+        zone = _TestTimezone(datetime.timedelta(hours=5, minutes=30), None, "IST")
+        value = datetime.datetime(2024, 1, 2, 3, 4, tzinfo=zone)
+        restored = rt(value)
+        utc = _TestTimezone(datetime.timedelta(0), datetime.timedelta(0), "UTC")
+        instant = datetime.datetime(2024, 1, 1, 21, 34, tzinfo=utc)
+        self.assertEqual(instant.astimezone(restored.tzinfo), value)
+        self.assertEqual(copy.deepcopy(restored), restored)
+
+    def test_timezone_name_with_non_ascii_characters(self):
+        name = u"Caf\u00e9"
+        if six.PY2:
+            name = name.encode("utf-8")
+        zone = _TestTimezone(datetime.timedelta(0), None, name)
+        value = datetime.datetime(2024, 1, 2, tzinfo=zone)
+        self.assertEqual(rt(value).tzname(), name)
+
+    @unittest.skipUnless(six.PY2, "Python 2 permits non-UTF-8 byte timezone names")
+    def test_timezone_name_with_non_utf8_bytes(self):
+        name = b"Zone\xff"
+        zone = _TestTimezone(datetime.timedelta(0), None, name)
+        value = datetime.datetime(2024, 1, 2, tzinfo=zone)
+        self.assertEqual(rt(value).tzname(), name)
+
+    def test_timezone_name_from_python2_session(self):
+        payload = '{"$T":"dt","v":[2024,1,2,3,4,5,6],"z":[[0,0,0],null,{"b":"Wm9uZf8="}]}'
+        expected = b"Zone\xff" if six.PY2 else u"Zone\u00ff"
+        self.assertEqual(deserializeValue(payload).tzname(), expected)
+
+    @unittest.skipUnless(sys.version_info >= (3, 7), "requires sub-minute timezone offsets")
+    def test_timezone_with_subminute_offset(self):
+        zone = _TestTimezone(datetime.timedelta(hours=5, seconds=42, microseconds=123), None, "TST")
+        value = datetime.datetime(2024, 1, 2, tzinfo=zone)
+        restored = rt(value)
+        self.assertEqual(restored.utcoffset(), value.utcoffset())
+        self.assertEqual(restored.isoformat(), value.isoformat())
+
+    @unittest.skipUnless(hasattr(datetime.datetime.now(), "fold"), "requires datetime.fold")
+    def test_ambiguous_datetime_keeps_its_instant(self):
+        class FoldTimezone(datetime.tzinfo):
+            def utcoffset(self, dt):
+                return datetime.timedelta(hours=-5 if dt.fold else -4)
+
+            def dst(self, dt):
+                return datetime.timedelta(0) if dt.fold else datetime.timedelta(hours=1)
+
+            def tzname(self, dt):
+                return "EST" if dt.fold else "EDT"
+
+        value = datetime.datetime(2024, 11, 3, 1, 30, tzinfo=FoldTimezone()).replace(fold=1)
+        restored = rt(value)
+        self.assertEqual(restored.fold, value.fold)
+        self.assertEqual(restored.isoformat(), value.isoformat())
+        self.assertEqual(restored.timestamp(), value.timestamp())
+
+    def test_invalid_serialized_timezone_is_rejected(self):
+        for zone in ("invalid", [[], None, "UTC"], [[1, 0, 0], None, "UTC"], [None, None, 42],
+                     [None, None, {"unknown": "value"}]):
+            payload = json.dumps({"$T": "dt", "v": [2024, 1, 2, 3, 4, 5, 6], "z": zone})
+            with self.assertRaises(ValueError):
+                deserializeValue(payload)
+
 
 class TestRealSessionObjects(unittest.TestCase):
     # the exact shapes written with serialize=True across the codebase
@@ -422,6 +535,29 @@ class TestAllowlistGuard(unittest.TestCase):
 
 
 class TestHashDBIntegration(unittest.TestCase):
+    def test_timezone_survives_session_reload(self):
+        from lib.utils.hashdb import HashDB
+
+        handle, path = tempfile.mkstemp(suffix=".sqlite")
+        os.close(handle)
+        os.remove(path)
+        try:
+            value = datetime.datetime(2024, 1, 2, 3, 4, tzinfo=_TestTimezone(
+                datetime.timedelta(hours=5, minutes=30), datetime.timedelta(0), "IST"))
+            db = HashDB(path)
+            db.write("query", [(value,)], serialize=True)
+            db.flush()
+            db._write_cache.clear()
+            db._read_cache.cache.clear()
+            restored = db.retrieve("query", unserialize=True)
+            db.closeAll()
+
+            self.assertEqual(getUnicode(restored), getUnicode([(value,)]))
+            self.assertEqual(restored[0][0].utcoffset(), value.utcoffset())
+        finally:
+            if os.path.exists(path):
+                os.remove(path)
+
     def test_write_retrieve_roundtrip(self):
         from lib.utils.hashdb import HashDB
 
