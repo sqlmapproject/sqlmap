@@ -5138,12 +5138,12 @@ def getHostHeader(url):
     retVal = url
 
     if url:
-        retVal = _urllib.parse.urlparse(url).netloc
+        parsed = _urllib.parse.urlparse(url)
+        retVal = parsed.netloc
+        defaultPort = {"http": 80, "https": 443}.get(parsed.scheme.lower())
 
-        # Note: netloc keeps the IPv6 brackets (and any port), so only the default ports are
-        # stripped here - mirroring the hostname/IPv4 branch and preserving non-default ports
-        # (e.g. '[::1]:8080') as required by RFC 7230
-        if any(retVal.endswith(':%d' % _) for _ in (80, 443)):
+        # Keep non-default ports, including 80 on HTTPS and 443 on HTTP.
+        if defaultPort is not None and retVal.endswith(':%d' % defaultPort):
             retVal = retVal[:retVal.rfind(':')]
 
     if retVal and retVal.count(':') > 1 and not any(_ in retVal for _ in ('[', ']')):
