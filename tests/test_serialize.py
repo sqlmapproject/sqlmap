@@ -259,6 +259,19 @@ class TestDbmsScalars(unittest.TestCase):
             self.assertEqual(restored, value)
             self.assertIs(type(restored), type(value))
 
+    def test_timezone_aware_kept_as_displayed(self):
+        # Note: a resumed '-d' session used to drop the offset (e.g. '+05:30'), as only naive fields got stored
+        class _Offset(datetime.tzinfo):
+            def utcoffset(self, dt):
+                return datetime.timedelta(hours=5, minutes=30)
+
+            def dst(self, dt):
+                return datetime.timedelta(0)
+
+        for value in (datetime.datetime(2024, 1, 2, 3, 4, 0, tzinfo=_Offset()), datetime.time(3, 4, 0, tzinfo=_Offset())):
+            self.assertEqual(rt(value), getUnicode(value))
+            self.assertTrue(rt(value).endswith("+05:30"))
+
 
 class TestRealSessionObjects(unittest.TestCase):
     # the exact shapes written with serialize=True across the codebase

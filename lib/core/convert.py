@@ -125,6 +125,9 @@ def _serializeEncode(value):
     if isinstance(value, decimal.Decimal):
         return {_SERIALIZE_TAG: "dec", "v": getUnicode(value)}
 
+    if isinstance(value, (datetime.datetime, datetime.time)) and value.tzinfo is not None:
+        return getUnicode(value)    # Note: time zone aware value (e.g. from '-d' connector) kept as displayed, as an arbitrary tzinfo can't be rebuilt
+
     if isinstance(value, datetime.datetime):
         return {_SERIALIZE_TAG: "dt", "v": [value.year, value.month, value.day, value.hour, value.minute, value.second, value.microsecond]}
 
