@@ -619,17 +619,17 @@ class Connect(object):
                                     warnMsg = "too large websocket response detected. Automatically trimming it"
                                     singleTimeWarnMessage(warnMsg)
                                     break
-                            except websocket.WebSocketTimeoutException:
+                            except (websocket.WebSocketTimeoutException, websocket.WebSocketNormalClosureException):
                                 kb.webSocketRecvCount = len(_page)
                                 break
                     else:
                         for i in xrange(max(1, kb.webSocketRecvCount)):
                             # Note: a later response may carry fewer frames than the calibration one
-                            # (e.g. a FALSE boolean-blind reply); stop on timeout instead of letting it
-                            # bubble up as a failed request, mirroring the initial recv loop above
+                            # (e.g. a FALSE boolean-blind reply); stop on timeout or normal closure,
+                            # mirroring the initial recv loop above
                             try:
                                 _page.append(ws.recv())
-                            except websocket.WebSocketTimeoutException:
+                            except (websocket.WebSocketTimeoutException, websocket.WebSocketNormalClosureException):
                                 break
 
                     page = "\n".join(_page)
