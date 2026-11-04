@@ -33,6 +33,9 @@ from lib.request.websocket import (
     OPCODE_PING,
     OPCODE_CLOSE,
 )
+from lib.request.connect import Connect
+
+_GET_PAGE = Connect.__dict__["getPage"]
 
 
 class _FakeSock(object):
@@ -161,6 +164,88 @@ class TestWebSocket(unittest.TestCase):
                     self.fail("handshake was not sent")
         finally:
             W.socket.create_connection = original
+
+    def test_getpage_preserves_host_header(self):
+        import socket
+        import tempfile
+        import lib.request.websocket as W
+        from lib.core.data import conf, kb
+        from lib.core.option import _setKnowledgeBaseAttributes
+        from lib.core.threads import getCurrentThreadData
+
+        class _HandshakeSock(_FakeSock):
+            def __init__(self):
+                _FakeSock.__init__(self)
+                self.handshake = None
+                self.response = b""
+
+            def settimeout(self, value):
+                pass
+
+            def sendall(self, data):
+                if self.handshake is None:
+                    self.handshake = data
+                    key = next(line.split(b":", 1)[1].strip() for line in data.split(b"\r\n") if line.lower().startswith(b"sec-websocket-key:"))
+                    accept = base64.b64encode(hashlib.sha1(key + _GUID.encode("ascii")).digest())
+                    self.response = b"HTTP/1.1 101 Switching Protocols\r\nSec-WebSocket-Accept: " + accept + b"\r\n\r\n" + _serverFrame("ok")
+
+            def recv(self, size):
+                result, self.response = self.response[:size], self.response[size:]
+                return result
+
+        sockets = []
+        def create_socket(*args, **kwargs):
+            sock = _HandshakeSock()
+            sockets.append(sock)
+            return sock
+
+        oldConf, oldKb = dict(conf), dict(kb)
+        threadData = getCurrentThreadData()
+        oldThreadData = dict(threadData.__dict__)
+        oldTimeout = socket.getdefaulttimeout()
+        original = W.socket.create_connection
+        oldGetPage = Connect.__dict__["getPage"]
+        fd, headersFile = tempfile.mkstemp(prefix="sqlmap-ws-headers-")
+        try:
+            with os.fdopen(fd, "w") as f:
+                f.write("hOsT: file.example\n")
+            threadData.__dict__.clear()
+            threadData.reset()
+            _setKnowledgeBaseAttributes(False)
+            kb.wizardMode, kb.webSocketRecvCount = True, 1
+            conf.url = "ws://example.test:8080/test"
+            conf.hostname, conf.scheme, conf.port, conf.path = "example.test", "ws", 8080, "/test"
+            conf.parameters, conf.data = {}, None
+            conf.abortCode, conf.ignoreCode = [], []
+            conf.timeout, conf.batch, conf.keepAlive = 3, True, False
+            conf.retryOn, conf.ignoreRedirects, conf.scope = None, False, None
+            W.socket.create_connection = create_socket
+            Connect.getPage = _GET_PAGE
+            cases = (
+                ("ws://example.test:8080/test", [], None, None, None, False, "example.test:8080"),
+                ("ws://user:pass@example.test:8080/test", [], None, None, None, False, "example.test:8080"),
+                ("ws://example.test:8080/test", [('hOsT', 'configured.example')], None, None, None, False, "configured.example"),
+                ("ws://example.test:8080/test", [('Host', 'configured.example')], "override.example:8443", None, None, False, "override.example:8443"),
+                ("ws://example.test:8080/test", [], None, {'Host': 'aux.example'}, None, False, "aux.example"),
+                ("ws://example.test:8080/test", [], None, None, headersFile, False, "file.example"),
+                ("ws://example.test:8080/test", [], None, None, None, True, "localhost"),
+            )
+            for url, headers, host, aux, path, localhost, expected in cases:
+                conf.url = url
+                conf.httpHeaders = headers
+                conf.localhost, kb.headersFile = localhost, path
+                self.assertEqual(Connect.getPage(url=url, host=host, auxHeaders=aux)[0], "ok")
+                hostLines = [line for line in sockets[-1].handshake.split(b"\r\n") if line.lower().startswith(b"host:")]
+                self.assertEqual(len(hostLines), 1)
+                self.assertEqual(hostLines[0].split(b":", 1)[1].strip(), expected.encode("ascii"))
+        finally:
+            Connect.getPage = oldGetPage
+            W.socket.create_connection = original
+            socket.setdefaulttimeout(oldTimeout)
+            conf.clear(); conf.update(oldConf)
+            kb.clear(); kb.update(oldKb)
+            threadData.__dict__.clear(); threadData.__dict__.update(oldThreadData)
+            os.unlink(headersFile)
 
 
 if __name__ == "__main__":

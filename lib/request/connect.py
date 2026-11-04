@@ -521,6 +521,8 @@ class Connect(object):
 
             # Prepare HTTP headers
             headers = forgeHeaders({HTTP_HEADER.COOKIE: cookie, HTTP_HEADER.USER_AGENT: ua, HTTP_HEADER.REFERER: referer, HTTP_HEADER.HOST: host or getHeader(dict(conf.httpHeaders), HTTP_HEADER.HOST) or getHostHeader(url)}, base=None if target else {})
+            # WebSocket builds its own default Host, but must preserve explicit overrides.
+            customWsHost = webSocket and bool(host or getHeader(dict(conf.httpHeaders), HTTP_HEADER.HOST) or getHeader(auxHeaders, HTTP_HEADER.HOST) is not None)
 
             if HTTP_HEADER.COOKIE in headers:
                 cookie = headers[HTTP_HEADER.COOKIE]
@@ -573,9 +575,13 @@ class Connect(object):
                     if ':' in line:
                         header, value = line.split(':', 1)
                         headers[header] = value
+                        if webSocket and header.upper() == HTTP_HEADER.HOST.upper():
+                            headers[HTTP_HEADER.HOST] = value
+                            customWsHost = True
 
             if conf.localhost:
                 headers[HTTP_HEADER.HOST] = "localhost"
+                customWsHost = True
 
             for key, value in list(headers.items()):
                 if key.upper() == HTTP_HEADER.ACCEPT_ENCODING.upper():
@@ -600,7 +606,7 @@ class Connect(object):
                 try:
                     ws.settimeout(WEBSOCKET_INITIAL_TIMEOUT if kb.webSocketRecvCount is None else timeout)
                     wsHeaders = tuple("%s: %s" % (getUnicode(key), getUnicode(value)) for key, value in headers.items() if getUnicode(key).upper() != HTTP_HEADER.HOST.upper())
-                    ws.connect(url, header=wsHeaders, cookie=cookie)  # WebSocket will add Host field of headers automatically
+                    ws.connect(url, header=wsHeaders, cookie=cookie, host_header=getHeader(headers, HTTP_HEADER.HOST) if customWsHost else None)
                     ws.send(urldecode(post or ""))
 
                     _page = []
