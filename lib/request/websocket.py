@@ -39,6 +39,9 @@ class WebSocketTimeoutException(WebSocketException):
 class WebSocketConnectionClosedException(WebSocketException):
     pass
 
+class WebSocketNormalClosureException(WebSocketConnectionClosedException):
+    pass
+
 class WebSocket(object):
     """
     Minimal RFC 6455 client exposing the websocket-client subset used by sqlmap: settimeout(), connect(),
@@ -157,10 +160,14 @@ class WebSocket(object):
 
     def recv(self):
         data = bytearray()
+        receivedFragment = False
         while True:
             fin, opcode, payload = self._recvFrame()
             if opcode == OPCODE_CLOSE:
                 self._closed = True
+                normal = not payload or (len(payload) >= 2 and struct.unpack("!H", bytes(payload[:2]))[0] in (1000, 1001))
+                if normal and not receivedFragment:
+                    raise WebSocketNormalClosureException("WebSocket connection closed")
                 raise WebSocketConnectionClosedException("WebSocket connection closed")
             elif opcode == OPCODE_PING:
                 self._sendFrame(bytes(payload), OPCODE_PONG)
@@ -169,6 +176,7 @@ class WebSocket(object):
                 continue
 
             data += payload
+            receivedFragment = True
             if fin:
                 break
 
