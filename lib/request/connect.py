@@ -606,7 +606,7 @@ class Connect(object):
                 try:
                     ws.settimeout(WEBSOCKET_INITIAL_TIMEOUT if kb.webSocketRecvCount is None else timeout)
                     wsHeaders = tuple("%s: %s" % (getUnicode(key), getUnicode(value)) for key, value in headers.items() if getUnicode(key).upper() != HTTP_HEADER.HOST.upper())
-                    ws.connect(url, header=wsHeaders, cookie=cookie, host_header=getHeader(headers, HTTP_HEADER.HOST) if customWsHost else None)
+                    ws.connect(url, header=wsHeaders, cookie=cookie, hostHeader=getHeader(headers, HTTP_HEADER.HOST) if customWsHost else None)
                     ws.send(urldecode(post or ""))
 
                     _page = []

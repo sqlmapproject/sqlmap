@@ -61,7 +61,7 @@ class WebSocket(object):
         if self.sock is not None:
             self.sock.settimeout(timeout)
 
-    def connect(self, url, header=None, cookie=None, host_header=None):
+    def connect(self, url, header=None, cookie=None, hostHeader=None):
         parts = _urllib.parse.urlsplit(url)
         secure = parts.scheme == "wss"
         host = parts.hostname
@@ -78,8 +78,8 @@ class WebSocket(object):
         hostport = "[%s]" % host if ":" in host else host       # bracket IPv6 literals
         if port != (443 if secure else 80):    # Note: only the scheme's own default port gets omitted
             hostport = "%s:%d" % (hostport, port)
-        if host_header is not None:
-            hostport = getText(host_header)
+        if hostHeader is not None:
+            hostport = getText(hostHeader)
 
         key = getText(base64.b64encode(os.urandom(16)))
         lines = ["GET %s HTTP/1.1" % resource,
