@@ -130,7 +130,7 @@ def cmdLineParser(argv=None):
             help="Connection string for direct database connection")
 
         target.add_argument("-l", dest="logFile",
-            help="Parse target(s) from Burp or WebScarab proxy log file")
+            help="Parse target(s) from Burp, WebScarab or HAR log file")
 
         target.add_argument("-m", dest="bulkFile",
             help="Scan multiple targets given in a textual file")

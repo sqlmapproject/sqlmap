@@ -5645,7 +5645,7 @@ def pollProcess(process, suppress_errors=False):
 
 def parseRequestFile(reqFile, checkParams=True):
     """
-    Parses WebScarab and Burp logs and adds results to the target URL list
+    Parses WebScarab, Burp and HAR logs and adds results to the target URL list
 
     >>> handle, reqFile = tempfile.mkstemp(suffix=".req")
     >>> content = b"POST / HTTP/1.0\\nUser-agent: foobar\\nHost: www.example.com\\n\\nid=1\\n"
@@ -5689,7 +5689,23 @@ def parseRequestFile(reqFile, checkParams=True):
         Parses Burp logs
         """
 
-        if not re.search(BURP_REQUEST_REGEX, content, re.I | re.S):
+        if re.search(r"\A\s*\{.*\"entries\"", content[:1000], re.S):
+            reqResList = []
+            try:
+                entries = json.loads(content)["log"]["entries"]
+            except (ValueError, KeyError, TypeError):
+                entries = []
+            for entry in entries:  # Note: HAR (HTTP Archive) logs (e.g. ZAP, browsers) - re-serialized into raw requests
+                try:
+                    request = entry["request"]
+                    url = request["url"]
+                    headers = [(_["name"], _["value"]) for _ in request.get("headers", []) if not _["name"].startswith(':')]
+                    if not any(_[0].upper() == HTTP_HEADER.HOST.upper() for _ in headers):
+                        headers.insert(0, (HTTP_HEADER.HOST, _urllib.parse.urlsplit(url).netloc))
+                    reqResList.append("%s %s HTTP/1.1\n%s\n\n%s" % (request["method"], url, "\n".join("%s: %s" % _ for _ in headers), (request.get("postData") or {}).get("text") or ""))
+                except (KeyError, TypeError, AttributeError):
+                    continue
+        elif not re.search(BURP_REQUEST_REGEX, content, re.I | re.S):
             if re.search(BURP_XML_HISTORY_REGEX, content, re.I | re.S):
                 reqResList = []
                 for match in re.finditer(BURP_XML_HISTORY_REGEX, content, re.I | re.S):

@@ -21,6 +21,7 @@ stdlib unittest only (no pytest / no pip); works on Python 2.7 and 3.x.
 
 import atexit
 import base64
+import json
 import os
 import shutil
 import sys
@@ -536,6 +537,22 @@ class TestParseRequestFileBurp(unittest.TestCase):
 
         self.assertEqual([_[0] for _ in targets], ["https://www.target.com:8443/vuln.php?id=1", "http://www.target.com:443/vuln.php?id=1", "https://www.target.com:443/vuln.php?id=1", "http://www.target.com:8080/vuln.php?id=1"])
         self.assertTrue(all("://" not in value for _ in targets for key, value in _[4] if key == "Host"))
+
+    def test_har_log(self):
+        # Note: HAR (HTTP Archive) logs (e.g. ZAP, browsers), including HTTP/2 entries (pseudo-headers, no Host)
+        entries = [
+            {"request": {"method": "GET", "url": "https://www.target.com:8443/vuln.php?id=1", "headers": [{"name": "Host", "value": "www.target.com:8443"}, {"name": "Cookie", "value": "SID=xyz"}]}},
+            {"request": {"method": "POST", "url": "https://www.target.com/api", "headers": [{"name": ":authority", "value": "www.target.com"}, {"name": "content-type", "value": "application/json"}], "postData": {"text": '{"id": 1}'}}},
+            {"request": {"method": "GET", "url": "https://www.target.com/logo.png", "headers": []}},
+        ]
+        path = _write_temp(json.dumps({"log": {"version": "1.2", "entries": entries}}), ".har")
+        try:
+            targets = list(parseRequestFile(path))
+        finally:
+            os.unlink(path)
+
+        self.assertEqual([_[:4] for _ in targets], [("https://www.target.com:8443/vuln.php?id=1", HTTPMETHOD.GET, None, "SID=xyz"), ("https://www.target.com/api", HTTPMETHOD.POST, '{"id": 1}', None)])
+        self.assertEqual(targets[1][4], (("Host", "www.target.com"), ("content-type", "application/json")))
 
     def test_post_body_captured(self):
         content = (
