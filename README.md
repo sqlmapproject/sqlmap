@@ -49,6 +49,7 @@ Links
 * Demos: [https://www.youtube.com/user/inquisb/videos](https://www.youtube.com/user/inquisb/videos)
 * Playground: https://sekumart.sekuripy.hr
 * Research: https://www.sekuripy.hr/labs/sqlmap/#research
+* Community tutorial: [SQLmap: SQL Injection Guide, Commands, and Tutorials](https://en.hackita.it/articoli/sqlmap/)
 * Screenshots: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
 
 Translations
