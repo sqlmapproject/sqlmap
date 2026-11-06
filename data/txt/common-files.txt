@@ -1818,6 +1818,8 @@
 /run/secrets/kubernetes.io/serviceaccount/namespace
 /var/run/secrets/kubernetes.io/serviceaccount/namespace
 /run/secrets/kubernetes.io/serviceaccount/ca.crt
+/etc/kubernetes/admin.conf
+/etc/kubernetes/kubelet.conf
 
 # Cloud provider credentials
 
@@ -1825,7 +1827,9 @@
 /root/.aws/config
 /root/.config/gcloud/application_default_credentials.json
 /root/.config/gcloud/credentials.db
+/root/.config/gcloud/access_tokens.db
 /root/.azure/accessTokens.json
+/root/.azure/credentials
 /root/.kube/config
 
 # SSH keys and DB/tool history
@@ -1834,6 +1838,10 @@
 /root/.ssh/id_ed25519
 /root/.ssh/id_ecdsa
 /root/.ssh/id_dsa
+/root/.ssh/config
+/etc/ssh/ssh_host_rsa_key
+/etc/ssh/ssh_host_ed25519_key
+/etc/ssh/ssh_host_ecdsa_key
 /root/.mysql_history
 /root/.psql_history
 /root/.rediscli_history
@@ -1852,3 +1860,60 @@
 /app/application.properties
 /app/application.yml
 /app/docker-compose.yml
+
+# Developer, package manager and DBMS credential files
+
+/root/.env
+/root/.netrc
+/root/.git-credentials
+/root/.npmrc
+/root/.pypirc
+/root/.docker/config.json
+/root/.config/gh/hosts.yml
+/root/.config/op/config
+/root/.my.cnf
+/etc/mysql/debian.cnf
+
+# Hosting control panels
+
+/etc/psa/.psa.shadow
+/etc/psa/private/secret_key
+
+# AI agent credentials
+
+/root/.claude/.credentials.json
+/root/.claude.json
+/root/.codex/auth.json
+/root/.config/anthropic/config.json
+
+# Secrets in the default user's home on common cloud images
+
+/home/ubuntu/.ssh/id_rsa
+/home/ubuntu/.aws/credentials
+/home/ubuntu/.kube/config
+/home/ubuntu/.git-credentials
+/home/ubuntu/.claude/.credentials.json
+/home/debian/.ssh/id_rsa
+/home/debian/.aws/credentials
+/home/debian/.kube/config
+/home/debian/.git-credentials
+/home/admin/.ssh/id_rsa
+/home/admin/.aws/credentials
+/home/admin/.kube/config
+/home/admin/.git-credentials
+/home/ec2-user/.ssh/id_rsa
+/home/ec2-user/.aws/credentials
+/home/ec2-user/.kube/config
+/home/ec2-user/.git-credentials
+/home/centos/.ssh/id_rsa
+/home/centos/.aws/credentials
+/home/centos/.kube/config
+/home/opc/.ssh/id_rsa
+/home/opc/.aws/credentials
+/home/opc/.kube/config
+
+# Appliance and LFI-to-RCE gadget targets
+
+/dev/cmdb/sslvpn_websession
+/usr/share/php/pearcmd.php
+/usr/local/lib/php/pearcmd.php
