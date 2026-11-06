@@ -4066,7 +4066,7 @@ def decodeIntToUnicode(value):
     """
     retVal = value
 
-    if isinstance(value, int):
+    if isinstance(value, six.integer_types):
         try:
             if value > 255:
                 _ = "%x" % value
