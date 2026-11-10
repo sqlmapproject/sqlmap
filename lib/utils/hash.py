@@ -1380,7 +1380,8 @@ def dictionaryAttack(attack_dict):
         else:
             try:
                 if multiprocessing.cpu_count() > 1:
-                    _multiprocessing = multiprocessing
+                    # Note: 'forkserver' (POSIX default since Python 3.14) re-imports the main script, which breaks for pip installs (#6180)
+                    _multiprocessing = multiprocessing.get_context("fork") if "fork" in getattr(multiprocessing, "get_all_start_methods", lambda: ())() else multiprocessing
             except NotImplementedError:
                 pass
 
