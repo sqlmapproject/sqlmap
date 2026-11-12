@@ -3673,7 +3673,7 @@ def parseSqliteTableSchema(value):
                 continue
             retVal = True
 
-            columns[column] = match.group(3) or "TEXT"
+            columns[safeSQLIdentificatorNaming(column)] = match.group(3) or "TEXT"  # Note: stored escaped, as by all other column enumeration paths (e.g. 'my col' -> '`my col`')
 
         table[safeSQLIdentificatorNaming(conf.tbl, True)] = columns
         if conf.db in kb.data.cachedColumns:
