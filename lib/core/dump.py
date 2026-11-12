@@ -75,6 +75,7 @@ class Dump(object):
         self._outputFile = None
         self._outputFP = None
         self._lock = threading.Lock()
+        self._dumpFiles = {}    # Note: dump file -> table (written during this run)
 
     def _write(self, data, newline=True, console=True, content_type=None):
         text = "%s%s" % (data, "\n" if newline else " ")
@@ -513,7 +514,8 @@ class Dump(object):
                     else:
                         dumpFileName = os.path.join(dumpDbPath, "%s.%s" % (safeTable, conf.dumpFormat.lower()))
             else:
-                appendToFile = any((conf.limitStart, conf.limitStop))
+                # Note: appending (e.g. of --start/--stop ranges) only to the same table's file (i.e. not to a --dump-file shared among multiple tables)
+                appendToFile = any((conf.limitStart, conf.limitStop)) and self._dumpFiles.get(dumpFileName, table) == table
 
                 if not appendToFile:
                     count = 1
@@ -528,6 +530,7 @@ class Dump(object):
                         else:
                             count += 1
 
+            self._dumpFiles[dumpFileName] = table
             dumpFP = openFile(dumpFileName, 'w' if not appendToFile else 'a', buffering=DUMP_FILE_BUFFER_SIZE)
 
         count = int(tableValues["__infos__"]["count"])
