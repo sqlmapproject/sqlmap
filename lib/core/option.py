@@ -1374,7 +1374,8 @@ def _setHTTPHandlers():
 
                 if conf.proxyCred:
                     # Reference: http://stackoverflow.com/questions/34079/how-to-specify-an-authenticated-proxy-for-a-python-http-connection
-                    proxyString = "%s@" % conf.proxyCred
+                    # Note: (raw) credentials have to be URL-encoded, as urllib decodes them (e.g. '%41' would become 'A')
+                    proxyString = "%s@" % ':'.join(_urllib.parse.quote(_, safe="") for _ in conf.proxyCred.split(':', 1))
                 elif match:
                     # Note: credentials from the proxy URL itself (kept URL-encoded, as urllib decodes them on its own)
                     proxyString = "%s:%s@" % (match.group(1), match.group(2))
