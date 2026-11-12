@@ -5078,6 +5078,9 @@ def findPageForms(content, url, raiseException=False, addToTargets=False):
         data = data.strip("['\"]")
         retVal.add((url, HTTPMETHOD.POST, data, conf.cookie, None))
 
+    # Note: same filtering for forms found inside scripts (e.g. jQuery's $.post(...)) as for regular ones
+    retVal = set(_ for _ in retVal if not (conf.crawlExclude and re.search(conf.crawlExclude, _[0]) or conf.scope and not re.search(conf.scope, _[0], re.I) or not checkSameHost(response.geturl(), _[0])))
+
     if not retVal and not conf.crawlDepth:
         errMsg = "there were no forms found at the given target URL"
         if raiseException:
