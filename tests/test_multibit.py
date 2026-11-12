@@ -140,8 +140,14 @@ class MultibitTest(unittest.TestCase):
         multibit._page = self._savedPage
         multibit.singleTimeWarnMessage, multibit.singleTimeLogMessage = _SAID
 
-    def _attempt(self, secret, length=None, **kwargs):
+    def _target(self, secret, **kwargs):
         target = _Target(secret, **kwargs)
+        self.addCleanup(target.db.close)
+
+        return target
+
+    def _attempt(self, secret, length=None, **kwargs):
+        target = self._target(secret, **kwargs)
         multibit._page = target.page
 
         return self._read(target, secret, length), target
@@ -231,7 +237,7 @@ class MultibitTest(unittest.TestCase):
         # non-ASCII one, and one whose codepoint has an ASCII low byte (U+0141 -> 0x41 'A') all settle
         # nothing, and none of them may condemn a channel that calibrated cleanly
         for first in ("", u"\u017eaba pod vodom", u"\u0141ukasz Nowak here"):
-            target = _Target(first)
+            target = self._target(first)
             self.assertIsNone(self._read(target, first, len(first) or None))
 
             good = target.secret("plain ascii value that must still come back")
@@ -242,7 +248,7 @@ class MultibitTest(unittest.TestCase):
         # what the channel did - i.e. exactly the way a channel dropping rows fails it. That is the
         # data's doing, and a handful of NULLs in one dump must not retire a working channel
         first = "first value is perfectly readable ascii"
-        target = _Target(first)
+        target = self._target(first)
         self.assertEqual(self._read(target, first, len(first)), first)
 
         for _ in range(MULTIBIT_MAX_FAILURES + 1):
@@ -253,7 +259,7 @@ class MultibitTest(unittest.TestCase):
         self.assertEqual(self._read(target, good, len(good)), good)
 
     def test_unreadable_value_mid_run_keeps_the_channel(self):
-        target = _Target("first value is perfectly readable ascii")
+        target = self._target("first value is perfectly readable ascii")
         self.assertEqual(self._read(target, "first value is perfectly readable ascii", 39), "first value is perfectly readable ascii")
 
         bad = target.secret(u"\u0141ukasz")          # reads back as "Aukasz" - right length, wrong char
@@ -295,7 +301,7 @@ class MultibitTest(unittest.TestCase):
     def test_resumed_partial_value_is_left_to_bisection(self):
         # a resumed value starts mid-string, and multi-bit reads from the first character: it would
         # re-read what is already cached and then fail its own length read-back
-        target = _Target("resuming this one is bisection's job")
+        target = self._target("resuming this one is bisection's job")
         multibit._page = target.page
 
         self.assertIsNone(multibit.attempt("SELECT s FROM v", lambda idx: 'x', 35, None, True))
