@@ -49,6 +49,11 @@ class Interactsh(object):
     def __init__(self, server=None, token=None):
         self.server = None
         self.token = token or conf.get("oobToken")
+
+        # Note: (private) token belongs only to an explicitly provided server (i.e. never to be sent to a public one)
+        if self.token and not server:
+            logger.warning("OOB token is used only with an explicitly provided OOB server (option '--oob-server')")
+            self.token = None
         self.correlationId = randomStr(OOB_CORRELATION_ID_LENGTH, lowercase=True)
         self.secret = randomStr(32, lowercase=True)
         self.registered = False
