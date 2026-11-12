@@ -37,6 +37,9 @@ class HTTPSPKIAuthHandler(_urllib.request.HTTPSHandler):
         try:
             if ssl and hasattr(ssl, "SSLContext") and hasattr(ssl, "create_default_context"):
                 ctx = ssl.create_default_context()
+                # Note: no server certificate validation (e.g. self-signed/internal CA), as everywhere else (e.g. httpshandler.py)
+                ctx.check_hostname = False
+                ctx.verify_mode = ssl.CERT_NONE
                 ctx.load_cert_chain(certfile=self.auth_file, keyfile=self.auth_file)
                 try:
                     return _http_client.HTTPSConnection(host, timeout=timeout, context=ctx)
