@@ -293,7 +293,7 @@ class Dump(object):
             lines = "-" * (int(maxlength) + 2)
 
             for db, tables in dbTables.items():
-                tables = sorted(filter(None, tables))
+                tables = sorted(filter(None, tables), key=lambda _: unsafeSQLIdentificatorNaming(getUnicode(_)))     # Note: sorted by (displayed) unescaped names
 
                 self._write("Database: %s" % unsafeSQLIdentificatorNaming(db) if db and METADB_SUFFIX not in db else "<current>")
 
@@ -408,7 +408,7 @@ class Dump(object):
             for ctables in dbTables.values():
                 for tables in ctables.values():
                     for table in tables:
-                        maxlength1 = max(maxlength1, getConsoleLength(getUnicode(table)))
+                        maxlength1 = max(maxlength1, getConsoleLength(unsafeSQLIdentificatorNaming(getUnicode(table))))
 
             for db, counts in dbTables.items():
                 self._write("Database: %s" % unsafeSQLIdentificatorNaming(db) if db and METADB_SUFFIX not in db else "<current>")
@@ -431,10 +431,10 @@ class Dump(object):
                     if count is None:
                         count = "Unknown"
 
-                    tables.sort(key=lambda _: _.lower() if hasattr(_, "lower") else _)
+                    tables = sorted((unsafeSQLIdentificatorNaming(getUnicode(_)) for _ in tables), key=lambda _: _.lower())
 
                     for table in tables:
-                        blank1 = " " * (maxlength1 - getConsoleLength(getUnicode(table)))
+                        blank1 = " " * (maxlength1 - getConsoleLength(table))
                         blank2 = " " * (maxlength2 - len(str(count)))
                         self._write("| %s%s | %d%s |" % (table, blank1, count, blank2))
 
