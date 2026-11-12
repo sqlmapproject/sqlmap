@@ -37,6 +37,7 @@ from lib.core.settings import HQL_MAX_RECORDS
 from lib.core.settings import UPPER_RATIO_BOUND
 from lib.request.connect import Connect as Request
 from lib.utils.xrange import xrange
+from thirdparty.six.moves.urllib.parse import quote as _quote
 
 
 SENTINEL = randomStr(length=10, lowercase=True)
@@ -126,7 +127,8 @@ def _send(place, parameter, value):
         time.sleep(conf.delay)
 
     old_params = conf.parameters.get(place, "")
-    conf.parameters[place] = _replaceSegment(place, parameter, value)
+    # Note: URL encoded value (raw '+', '&', '%', '#', '?' would be misinterpreted), as with other non-SQL engines (e.g. OData)
+    conf.parameters[place] = _replaceSegment(place, parameter, _quote(value, safe=""))
 
     try:
         if conf.verbose >= 3:
@@ -406,11 +408,9 @@ for _ in xrange(HQL_CHAR_MIN, HQL_CHAR_MAX + 1):
 # Charset as an HQL string literal for LOCATE()-based binary search: each character's
 # 1-based index inside this literal is recovered by bisection (~log2(n) requests vs a
 # linear equality scan), and LOCATE is an index lookup so no lexicographic ordering /
-# collation assumption is introduced. URL-structural bytes (%, &, +, #, ?) are excluded
-# because they cannot survive a raw GET/POST value; such a byte is surfaced as '?' (as
-# it was under the previous linear scan). ', ", \ are already excluded above.
-_URL_HOSTILE = set(ord(_) for _ in "%&+#?")
-_CS_LITERAL = "".join(chr(_) for _ in _CHARSET if _ not in _URL_HOSTILE)
+# collation assumption is introduced. URL-structural bytes (%, &, +, #, ?) are fine, as
+# values are URL encoded by _send(). ', ", \ are already excluded above.
+_CS_LITERAL = "".join(chr(_) for _ in _CHARSET)
 
 
 def _scalar(entity, attrExpr, pin, after=None):
