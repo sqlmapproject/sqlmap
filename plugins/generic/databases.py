@@ -704,9 +704,9 @@ class Databases(object):
                     if dumpMode and colList:
                         if conf.db not in kb.data.cachedColumns:
                             kb.data.cachedColumns[conf.db] = {}
-                        kb.data.cachedColumns[conf.db][safeSQLIdentificatorNaming(conf.tbl, True)] = dict((_, None) for _ in colList)
+                        kb.data.cachedColumns[conf.db][safeSQLIdentificatorNaming(tbl, True)] = dict((_, None) for _ in colList)
                     else:
-                        parseSqliteTableSchema(unArrayizeValue(values))
+                        parseSqliteTableSchema(unArrayizeValue(values), tbl)
 
                 elif not isNoneValue(values):
                     table = {}
@@ -813,13 +813,13 @@ class Databases(object):
                     if dumpMode and colList:
                         if conf.db not in kb.data.cachedColumns:
                             kb.data.cachedColumns[conf.db] = {}
-                        kb.data.cachedColumns[conf.db][safeSQLIdentificatorNaming(conf.tbl, True)] = dict((_, None) for _ in colList)
+                        kb.data.cachedColumns[conf.db][safeSQLIdentificatorNaming(tbl, True)] = dict((_, None) for _ in colList)
                     else:
                         query = rootQuery.blind.query % unsafeSQLIdentificatorNaming(tbl)
                         value = unArrayizeValue(inject.getValue(query, union=False, error=False))
-                        parseSqliteTableSchema(unArrayizeValue(value))
+                        parseSqliteTableSchema(unArrayizeValue(value), tbl)
 
-                    return kb.data.cachedColumns
+                    continue
 
                 table = {}
                 columns = {}

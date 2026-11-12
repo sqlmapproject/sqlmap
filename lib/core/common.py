@@ -3634,7 +3634,7 @@ def isDBMSVersionAtLeast(minimum):
 
     return retVal
 
-def parseSqliteTableSchema(value):
+def parseSqliteTableSchema(value, tbl=None):
     """
     Parses table column names and types from specified SQLite table schema
 
@@ -3675,7 +3675,7 @@ def parseSqliteTableSchema(value):
 
             columns[safeSQLIdentificatorNaming(column)] = match.group(3) or "TEXT"  # Note: stored escaped, as by all other column enumeration paths (e.g. 'my col' -> '`my col`')
 
-        table[safeSQLIdentificatorNaming(conf.tbl, True)] = columns
+        table[safeSQLIdentificatorNaming(tbl or conf.tbl, True)] = columns
         if conf.db in kb.data.cachedColumns:
             kb.data.cachedColumns[conf.db].update(table)
         else:
