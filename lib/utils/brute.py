@@ -55,7 +55,8 @@ def _addPageTextWords():
     for word in pageWords:
         word = word.lower()
 
-        if len(word) > 2 and not word[0].isdigit() and word not in wordsList:
+        # Note: words of the (boolean) oracle string would be "found" (e.g. reflected inside an error message)
+        if len(word) > 2 and not word[0].isdigit() and word not in wordsList and not (conf.string and word in conf.string.lower()):
             wordsList.append(word)
 
     return wordsList
