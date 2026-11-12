@@ -3058,6 +3058,10 @@ def _basicOptionValidation():
         errMsg = "option '--crawl-exclude' requires usage of switch '--crawl'"
         raise SqlmapSyntaxException(errMsg)
 
+    if conf.privEsc and not any((conf.osPwn, conf.osSmb, conf.osBof)):
+        errMsg = "switch '--priv-esc' requires usage of switch '--os-pwn', '--os-smbrelay' or '--os-bof'"
+        raise SqlmapSyntaxException(errMsg)
+
     if conf.safePost and not conf.safeUrl:
         errMsg = "option '--safe-post' requires usage of option '--safe-url'"
         raise SqlmapSyntaxException(errMsg)
