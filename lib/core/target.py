@@ -587,6 +587,7 @@ def _resumeDBMS():
 
             if not readInput(message, default='N', boolean=True):
                 conf.dbms = None
+                kb.dbmsFilter = []
                 Backend.setDbms(dbms)
                 Backend.setVersionList(dbmsVersion)
     else:
