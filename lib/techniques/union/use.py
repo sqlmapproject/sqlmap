@@ -353,8 +353,11 @@ def unionUse(expression, unpack=True, dump=False):
         debugMsg += "it does not play well with UNION query SQL injection"
         singleTimeDebugMessage(debugMsg)
 
+    # Note: (outer) LIMIT/OFFSET/FETCH would apply to the single aggregated row (i.e. being ignored), while Microsoft SQL Server's FOR JSON wraps the whole statement
+    limited = not Backend.isDbms(DBMS.MSSQL) and any(zeroDepthSearch(expression.upper(), _) for _ in (" LIMIT ", " OFFSET ", " FETCH "))
+
     # Note: Oracle, PostgreSQL, Microsoft SQL Server and SQLite aggregate the raw (not hex-converted) fields, while parseUnionPage() decodes them all in case of '--hex'
-    if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ORACLE, DBMS.PGSQL, DBMS.MSSQL, DBMS.SQLITE, DBMS.H2, DBMS.HSQLDB, DBMS.FIREBIRD) and expressionFields and not any((conf.binaryFields, conf.limitStart, conf.limitStop, conf.disableJson)) and not (conf.hexConvert and Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.PGSQL, DBMS.MSSQL, DBMS.SQLITE)):
+    if not limited and Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ORACLE, DBMS.PGSQL, DBMS.MSSQL, DBMS.SQLITE, DBMS.H2, DBMS.HSQLDB, DBMS.FIREBIRD) and expressionFields and not any((conf.binaryFields, conf.limitStart, conf.limitStop, conf.disableJson)) and not (conf.hexConvert and Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.PGSQL, DBMS.MSSQL, DBMS.SQLITE)):
         match = re.search(r"SELECT\s*(.+?)\bFROM", expression, re.I)
         if match and not (Backend.isDbms(DBMS.ORACLE) and FROM_DUMMY_TABLE[DBMS.ORACLE] in expression) and not re.search(r"\b(MIN|MAX|COUNT|EXISTS)\(", expression):
             kb.jsonAggMode = True
