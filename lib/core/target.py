@@ -486,6 +486,10 @@ def _setHashDB():
     if not conf.hashDBFile:
         conf.hashDBFile = conf.sessionFile or os.path.join(conf.outputPath, SESSION_SQLITE_FILE)
 
+    if conf.sessionFile and not os.path.isdir(os.path.dirname(os.path.abspath(conf.hashDBFile))):
+        errMsg = "directory of the provided session file '%s' does not exist" % conf.sessionFile
+        raise SqlmapFilePathException(errMsg)
+
     if conf.flushSession:
         if os.path.exists(conf.hashDBFile):
             if conf.hashDB:
