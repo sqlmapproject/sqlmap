@@ -1651,6 +1651,10 @@ def _enumerate(oracle):
     conf.dumper.singleString("GraphQL database tables [%d]:\n%s" % (
         len(tables), _grid(["table"], [[_] for _ in tables])))
 
+    # Note: honoring -T (as in case of regular SQL enumeration)
+    if conf.tbl:
+        tables = [_ for _ in tables if _.lower() in set(__.lower() for __ in conf.tbl.split(','))]
+
     for table in tables:
         parsed = _dumpTable(infer, dialect, table)
         if not parsed:
