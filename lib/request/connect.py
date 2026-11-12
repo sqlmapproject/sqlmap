@@ -1305,7 +1305,7 @@ class Connect(object):
 
                     if not skip:
                         if place in (PLACE.POST, PLACE.CUSTOM_POST):  # potential problems in other cases (e.g. URL encoding of whole URI - including path)
-                            value = urlencode(value, spaceplus=kb.postSpaceToPlus)
+                            value = urlencode(value, safe="%%&=-_%s" % (conf.paramDel or ""), spaceplus=kb.postSpaceToPlus)
                         payload = urlencode(payload, safe='%', spaceplus=kb.postSpaceToPlus)
                         value = agent.replacePayload(value, payload)
                         postUrlEncode = False
