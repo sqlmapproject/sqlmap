@@ -329,6 +329,10 @@ def _setRequestParams():
                     if kb.processUserMarks:
                         kb.testOnlyCustom = True
 
+                        if conf.testParameter:
+                            warnMsg = "option '-p' is ignored as only the custom injection marker(s) ('%s') will be tested" % kb.customInjectionMark
+                            logger.warning(warnMsg)
+
                         if "=%s" % kb.customInjectionMark in _:
                             warnMsg = "it seems that you've provided empty parameter value(s) "
                             warnMsg += "for testing. Please, always use only valid parameter values "
