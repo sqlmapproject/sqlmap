@@ -425,8 +425,18 @@ class Connect(object):
                         raise SqlmapValueException(errMsg)
 
                 with openFile(conf.liveCookies) as f:
-                    cookie = f.read().strip()
-                cookie = re.sub(r"(?i)\ACookie:\s*", "", cookie)
+                    live = re.sub(r"(?i)\ACookie:\s*", "", f.read().strip())
+
+                # Note: (live) values are taken, except for the cookie(s) currently carrying the payload (i.e. differing from the original value)
+                delimiter = conf.cookieDel or DEFAULT_COOKIE_DELIMITER
+                original = conf.paramDict.get(PLACE.COOKIE) or {}
+                for part in (cookie or "").split(delimiter):
+                    name, _, value = part.strip().partition('=')
+                    if name in original and value != original[name]:
+                        regex = r"(\A|(?<=[%s\s]))%s=[^%s]*" % (re.escape(delimiter), re.escape(name), re.escape(delimiter))
+                        live = re.sub(regex, lambda match: "%s=%s" % (name, value), live) if re.search(regex, live) else "%s%s %s=%s" % (live, delimiter, name, value)
+
+                cookie = live
 
         if multipart:
             post = multipart
