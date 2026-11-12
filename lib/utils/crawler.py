@@ -501,7 +501,7 @@ def normalizeCrawlingResults(targets):
         # action name and parameters (e.g. /users/edit?id= vs /products/edit?id=) are not collapsed
         match = re.search(r"\A[^?]+\?.+\Z", value)
         if match:
-            key = re.sub(r"=[^=&]*", "=", match.group(0)).strip("&?")
+            key = "%s %s" % (target[1] or "GET", re.sub(r"=[^=&]*", "=", match.group(0)).strip("&?"))  # Note: e.g. GET link and POST form with same parameter(s) are distinct targets
             if '=' in key and key not in seen:
                 results.add(target)
                 seen.add(key)
