@@ -2652,7 +2652,7 @@ def _mergeOptions(inputOptions, overrideOptions):
         inputOptionsItems = inputOptions.__dict__.items()
 
     for key, value in inputOptionsItems:
-        if key not in conf or value not in (None, False) or overrideOptions:
+        if key not in conf or (value is not None and value is not False) or overrideOptions:  # Note: explicit zero (e.g. '--delay 0') has to win over the configuration file
             conf[key] = value
 
     if not conf.api:
