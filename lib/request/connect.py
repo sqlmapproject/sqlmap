@@ -742,7 +742,7 @@ class Connect(object):
                         raise SqlmapMissingDependence("native HTTP/2 client does not support SOCKS proxies (omit '--http2' or use an HTTP proxy)")
 
                     try:
-                        conn = http2OpenUrl(url, method or (HTTPMETHOD.POST if post is not None else HTTPMETHOD.GET), headers, post, timeout, follow_redirects=kb.choices.redirect != REDIRECTION.NO, proxy=h2proxy, sensitive_headers=tuple(kb.authRefreshHeaders) if conf.authRefresh else ())
+                        conn = http2OpenUrl(url, method or (HTTPMETHOD.POST if post is not None else HTTPMETHOD.GET), headers, post, timeout, follow_redirects=kb.choices.redirect != REDIRECTION.NO and not conf.ignoreRedirects, proxy=h2proxy, sensitive_headers=tuple(kb.authRefreshHeaders) if conf.authRefresh else ())
                     except IOError as ex:
                         raise _http_client.HTTPException(getSafeExString(ex))
                     else:
