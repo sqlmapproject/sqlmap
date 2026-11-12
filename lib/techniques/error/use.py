@@ -213,6 +213,10 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
         if isinstance(retVal, six.string_types):
             retVal = htmlUnescape(retVal).replace("<br>", "\n")
 
+            # Note: SQLite's error message of JSON_EXTRACT (e.g. "bad JSON path: '...'") quotes the (path) value by doubling its single quotes
+            if Backend.isDbms(DBMS.SQLITE) and not conf.hexConvert and "JSON_EXTRACT" in (getTechniqueData().vector or ""):
+                retVal = retVal.replace("''", "'")
+
         retVal = _errorReplaceChars(retVal)
 
         if retVal is not None:
