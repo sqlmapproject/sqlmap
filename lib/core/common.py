@@ -1681,10 +1681,14 @@ def parseTargetDirect():
     for dbms in SUPPORTED_DBMS:
         details = re.search(r"^(?P<dbms>%s)://(?P<credentials>(?P<user>.*?)\:(?P<pass>.*)\@)?(?P<remote>(?P<hostname>[\w.-]+?)\:(?P<port>[\d]+)\/)?(?P<db>[\w\d\ \:\.\_~\-\/\\]*)$" % dbms, conf.direct, re.I)
 
+        # Note: database file path of a file-based DBMS (e.g. SQLite) can contain (almost) any character (e.g. '/tmp/my dir (old)/t.db')
+        if not details and dbms in DBMS_DICT[DBMS.SQLITE][0] + DBMS_DICT[DBMS.ACCESS][0]:
+            details = re.search(r"^(?P<dbms>%s)://(?P<db>.+)$" % re.escape(dbms), conf.direct, re.I)
+
         if details:
             conf.dbms = details.group("dbms")
 
-            if details.group("credentials"):
+            if details.groupdict().get("credentials"):
                 conf.dbmsUser = details.group("user").strip("'\"")
                 conf.dbmsPass = details.group("pass").strip("'\"")
             else:
@@ -1697,7 +1701,7 @@ def parseTargetDirect():
             if not conf.dbmsPass:
                 conf.dbmsPass = None
 
-            if details.group("remote"):
+            if details.groupdict().get("remote"):
                 remote = True
                 conf.hostname = details.group("hostname").strip()
                 conf.port = int(details.group("port"))
