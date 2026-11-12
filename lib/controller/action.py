@@ -48,7 +48,7 @@ def action():
     # automatic WAF-bypass: fingerprinting probes are kept off the WAF/IPS blacklists, so it is tried
     # first even behind a protection. Only if it comes back empty the back-end DBMS is assumed from
     # the error page or the heuristic checks, so that the user still gets a usable result
-    if kb.wafBypass and not conf.forceDbms and not Backend.getIdentifiedDbms():
+    if kb.wafBypass and not conf.forceDbms and not conf.esperanto and not Backend.getIdentifiedDbms():  # Note: --esperanto does its own (generic) back-end identification
         fallback = Backend.getErrorParsedDBMSes() or ([kb.heuristicDbms] if kb.heuristicDbms else [])
         fallback = next((_ for _ in fallback if _ and _.lower() in SUPPORTED_DBMS), None)
         if fallback:
