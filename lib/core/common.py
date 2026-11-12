@@ -5793,6 +5793,10 @@ def parseRequestFile(reqFile, checkParams=True):
                 elif "?" in line and "=" in line and ": " not in line:
                     params = True
 
+                # HTTP/2 pseudo-headers (e.g. ':authority')
+                elif line.startswith(':'):
+                    continue
+
                 # Headers
                 elif re.search(r"\A\S+:", line):
                     key, value = line.split(":", 1)
@@ -5807,7 +5811,7 @@ def parseRequestFile(reqFile, checkParams=True):
 
                     # Cookie and Host headers
                     if key.upper() == HTTP_HEADER.COOKIE.upper():
-                        cookie = value
+                        cookie = "%s; %s" % (cookie, value) if cookie else value  # Note: (e.g. HTTP/2) cookies can be split into multiple headers
                     elif key.upper() == HTTP_HEADER.HOST.upper():
                         if '://' in value:
                             scheme, value = value.split('://')[:2]
