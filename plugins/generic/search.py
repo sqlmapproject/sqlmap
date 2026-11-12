@@ -279,7 +279,7 @@ class Search(object):
                                 foundTbls[db] = []
                 else:
                     dbName = "SQLite" if Backend.isDbms(DBMS.SQLITE) else "Firebird"
-                    foundTbls["%s%s" % (dbName, METADB_SUFFIX)] = []
+                    foundTbls.setdefault("%s%s" % (dbName, METADB_SUFFIX), [])  # Note: keeping matches of previous tables (e.g. -T users,nonexist)
 
                 for db in foundTbls:
                     db = safeSQLIdentificatorNaming(db)
