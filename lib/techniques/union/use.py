@@ -353,7 +353,8 @@ def unionUse(expression, unpack=True, dump=False):
         debugMsg += "it does not play well with UNION query SQL injection"
         singleTimeDebugMessage(debugMsg)
 
-    if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ORACLE, DBMS.PGSQL, DBMS.MSSQL, DBMS.SQLITE, DBMS.H2, DBMS.HSQLDB, DBMS.FIREBIRD) and expressionFields and not any((conf.binaryFields, conf.limitStart, conf.limitStop, conf.disableJson)):
+    # Note: Oracle, PostgreSQL, Microsoft SQL Server and SQLite aggregate the raw (not hex-converted) fields, while parseUnionPage() decodes them all in case of '--hex'
+    if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ORACLE, DBMS.PGSQL, DBMS.MSSQL, DBMS.SQLITE, DBMS.H2, DBMS.HSQLDB, DBMS.FIREBIRD) and expressionFields and not any((conf.binaryFields, conf.limitStart, conf.limitStop, conf.disableJson)) and not (conf.hexConvert and Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.PGSQL, DBMS.MSSQL, DBMS.SQLITE)):
         match = re.search(r"SELECT\s*(.+?)\bFROM", expression, re.I)
         if match and not (Backend.isDbms(DBMS.ORACLE) and FROM_DUMMY_TABLE[DBMS.ORACLE] in expression) and not re.search(r"\b(MIN|MAX|COUNT|EXISTS)\(", expression):
             kb.jsonAggMode = True
