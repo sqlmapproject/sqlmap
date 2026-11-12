@@ -530,6 +530,17 @@ class Dump(object):
                         else:
                             count += 1
 
+            # Note: appending to HTML means adding rows to the existing table (i.e. not appending a whole new document)
+            if appendToFile and conf.dumpFormat == DUMP_FORMAT.HTML:
+                with openFile(dumpFileName, "r") as f:
+                    content = f.read()
+
+                if "</tbody>" in content:
+                    with openFile(dumpFileName, "w+") as f:
+                        f.write(content[:content.rindex("</tbody>")])
+                else:
+                    appendToFile = False
+
             self._dumpFiles[dumpFileName] = table
             dumpFP = openFile(dumpFileName, 'w' if not appendToFile else 'a', buffering=DUMP_FILE_BUFFER_SIZE)
 
@@ -603,7 +614,7 @@ class Dump(object):
                     cols.append((unsafeSQLIdentificatorNaming(column), colType if colType else Replication.TEXT))
 
             rtable = replication.createTable(table, cols)
-        elif conf.dumpFormat == DUMP_FORMAT.HTML:
+        elif conf.dumpFormat == DUMP_FORMAT.HTML and not appendToFile:
             dataToDumpFile(dumpFP, "<!DOCTYPE html>\n<html>\n<head>\n")
             dataToDumpFile(dumpFP, "<meta http-equiv=\"Content-type\" content=\"text/html;charset=%s\">\n" % UNICODE_ENCODING)
             dataToDumpFile(dumpFP, "<meta name=\"generator\" content=\"%s\" />\n" % VERSION_STRING)
@@ -639,7 +650,7 @@ class Dump(object):
 
                 field += 1
 
-        if conf.dumpFormat == DUMP_FORMAT.HTML:
+        if conf.dumpFormat == DUMP_FORMAT.HTML and not appendToFile:
             dataToDumpFile(dumpFP, "\n</tr>\n</thead>\n<tbody>\n")
 
         self._write("|\n%s" % separator)
