@@ -795,7 +795,7 @@ class Dump(object):
                 self.dbTableColumns(found)
 
     def sqlQuery(self, query, queryRes):
-        self.string(query, queryRes, content_type=CONTENT_TYPE.SQL_QUERY)
+        self.string(query, queryRes, content_type=CONTENT_TYPE.SQL_QUERY, sort=False)  # Note: query's own row order and duplicates have to be preserved
 
     def rFile(self, fileData):
         self.lister("files saved to", fileData, sort=False, content_type=CONTENT_TYPE.FILE_READ)
