@@ -1234,7 +1234,8 @@ class Databases(object):
         infoMsg = "fetching stored procedures"
         logger.info(infoMsg)
 
-        rootQuery = queries[Backend.getIdentifiedDbms()].procedures
+        dbms = Backend.getIdentifiedDbms()
+        rootQuery = queries[dbms].procedures if dbms in queries and "procedures" in queries[dbms] else {}
 
         # Generic-first by design: a DBMS is supported iff it declares a <procedures> query block in
         # queries.xml (INFORMATION_SCHEMA.ROUTINES / pg_proc / sys.sql_modules / ALL_SOURCE / RDB$PROCEDURES).
