@@ -58,15 +58,15 @@ class Replication(object):
 
         def __init__(self, parent, name, columns=None, create=True, typeless=False):
             self.parent = parent
-            self.name = unsafeSQLIdentificatorNaming(name)
+            self.name = unsafeSQLIdentificatorNaming(name).replace('"', '""')  # Note: escaped for its (double quoted) usage in statements below
             self.columns = columns
             if create:
                 try:
                     self.execute('DROP TABLE IF EXISTS "%s"' % self.name)
                     if not typeless:
-                        self.execute('CREATE TABLE "%s" (%s)' % (self.name, ','.join('"%s" %s' % (unsafeSQLIdentificatorNaming(colname), coltype) for colname, coltype in self.columns)))
+                        self.execute('CREATE TABLE "%s" (%s)' % (self.name, ','.join('"%s" %s' % (unsafeSQLIdentificatorNaming(colname).replace('"', '""'), coltype) for colname, coltype in self.columns)))
                     else:
-                        self.execute('CREATE TABLE "%s" (%s)' % (self.name, ','.join('"%s"' % unsafeSQLIdentificatorNaming(colname) for colname in self.columns)))
+                        self.execute('CREATE TABLE "%s" (%s)' % (self.name, ','.join('"%s"' % unsafeSQLIdentificatorNaming(colname).replace('"', '""') for colname in self.columns)))
                 except Exception as ex:
                     errMsg = "problem occurred ('%s') while initializing the sqlite database " % getSafeExString(ex, UNICODE_ENCODING)
                     errMsg += "located at '%s'" % self.parent.dbpath
