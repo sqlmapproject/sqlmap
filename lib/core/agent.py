@@ -5,6 +5,7 @@ Copyright (c) 2006-2026 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
+import json
 import re
 
 from lib.core.common import Backend
@@ -29,6 +30,7 @@ from lib.core.common import zeroDepthSearch
 from lib.core.compat import xrange
 from lib.core.convert import encodeBase64
 from lib.core.convert import getUnicode
+from lib.core.convert import htmlUnescape
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import queries
@@ -137,6 +139,7 @@ class Agent(object):
         paramString = conf.parameters[place]
         paramDict = conf.paramDict[place]
         origValue = getUnicode(paramDict[parameter])
+        lookupValue = None
         newValue = getUnicode(newValue) if newValue else newValue
         try:
             # Dirty patch for Python 3.14.7 re.sub() regression (e.g. https://github.com/sqlmapproject/sqlmap/issues/6128)
@@ -160,12 +163,21 @@ class Agent(object):
         elif place == PLACE.CUSTOM_POST:
             paramString = origValue
             origValue = origValue.split(kb.customInjectionMark)[0]
+            # Note: original value is taken in its raw (decoded) form, as the whole payload (including it) gets (re)encoded later on (connect.py)
             if kb.postHint in (POST_HINT.SOAP, POST_HINT.XML):
                 origValue = re.split(r"['\">]", origValue)[-1]
+                lookupValue = origValue
+                origValue = htmlUnescape(origValue) if '&' in origValue else origValue
             elif kb.postHint in (POST_HINT.JSON, POST_HINT.JSON_LIKE, POST_HINT.GRPC_WEB):
                 match = re.search(r"['\"]", origValue)
                 quote = match.group(0) if match else '"'
                 origValue = extractRegexResult(r"%s\s*:\s*(?P<result>\d+)\Z" % quote, origValue) or extractRegexResult(r"(?P<result>[^%s]*)\Z" % quote, origValue)
+                lookupValue = origValue
+                if quote == '"' and kb.postHint != POST_HINT.JSON_LIKE and '\\' in (origValue or ""):
+                    try:
+                        origValue = json.loads('"%s"' % origValue)
+                    except ValueError:
+                        pass
             else:
                 _ = extractRegexResult(r"(?s)(?P<result>[^\s<>{}();'\"&]+\Z)", origValue) or ""
                 origValue = _.split('=', 1)[1] if '=' in _ else _
@@ -233,7 +245,7 @@ class Agent(object):
                 origValue = encodeBase64(origValue, binary=False, encoding=conf.encoding or UNICODE_ENCODING)
 
         if place in (PLACE.URI, PLACE.CUSTOM_POST, PLACE.CUSTOM_HEADER):
-            _ = "%s%s" % (_origValue if base64Encoding else origValue, kb.customInjectionMark)
+            _ = "%s%s" % (_origValue if base64Encoding else (origValue if lookupValue is None else lookupValue), kb.customInjectionMark)  # Note: raw value (as found in the request) for the lookup
 
             if kb.postHint in (POST_HINT.JSON, POST_HINT.GRPC_WEB) and isNumber(origValue) and not isNumber(newValue) and '"%s"' % _ not in paramString:
                 newValue = '"%s"' % self.addPayloadDelimiters(newValue)
