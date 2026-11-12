@@ -85,6 +85,10 @@ def _send(token):
     skipUrlEncode = conf.skipUrlEncode
     conf.skipUrlEncode = True
 
+    # Note: a rejected token is commonly answered with HTTP 401/403 - that is an oracle answer here, not a connection problem
+    ignoreCode = conf.ignoreCode
+    conf.ignoreCode = list(set((ignoreCode or []) + [401, 403]))
+
     if conf.delay:
         time.sleep(conf.delay)
 
@@ -110,6 +114,7 @@ def _send(token):
         return None
     finally:
         conf.skipUrlEncode = skipUrlEncode
+        conf.ignoreCode = ignoreCode
 
     return page
 
