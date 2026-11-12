@@ -745,11 +745,26 @@ class Connect(object):
                     except ValueError:
                         raise SqlmapMissingDependence("native HTTP/2 client does not support SOCKS proxies (omit '--http2' or use an HTTP proxy)")
 
+                    # Note: cookie jar handling (i.e. Set-Cookie), as urllib's HTTPCookieProcessor is bypassed
+                    if conf.cj is not None and HTTP_HEADER.COOKIE not in headers:
+                        try:
+                            conf.cj.add_cookie_header(req)
+                            if req.get_header(HTTP_HEADER.COOKIE):
+                                headers[HTTP_HEADER.COOKIE] = req.get_header(HTTP_HEADER.COOKIE)
+                        except Exception as ex:
+                            logger.debug("problem occurred while adding HTTP/2 cookies ('%s')" % getSafeExString(ex))
+
                     try:
                         conn = http2OpenUrl(url, method or (HTTPMETHOD.POST if post is not None else HTTPMETHOD.GET), headers, post, timeout, follow_redirects=kb.choices.redirect != REDIRECTION.NO and not conf.ignoreRedirects, proxy=h2proxy, sensitive_headers=tuple(kb.authRefreshHeaders) if conf.authRefresh else ())
                     except IOError as ex:
                         raise _http_client.HTTPException(getSafeExString(ex))
                     else:
+                        if conf.cj is not None:
+                            try:
+                                conf.cj.extract_cookies(conn, req)
+                            except Exception as ex:
+                                logger.debug("problem occurred while storing HTTP/2 cookies ('%s')" % getSafeExString(ex))
+
                         if conn.code >= 400:
                             raise _urllib.error.HTTPError(conn.geturl(), conn.code, conn.msg, conn.info(), io.BytesIO(conn.read()))
 

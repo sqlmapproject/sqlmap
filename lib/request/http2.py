@@ -1496,6 +1496,7 @@ class H2Response(object):
             if not name.startswith(":"):
                 self._info[name] = value
         self._info.headers = ["%s: %s\r\n" % item for item in self._info.items()]
+        self._info.getheaders = lambda name: self._info.get_all(name) or []    # Note: Python 2 cookielib's interface (e.g. for Set-Cookie)
 
     def info(self):
         return self._info
