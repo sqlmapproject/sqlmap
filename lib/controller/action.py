@@ -9,6 +9,7 @@ from lib.controller.handler import setHandler
 from lib.core.common import Backend
 from lib.core.common import Format
 from lib.core.common import hashDBWrite
+from lib.core.common import splitFields
 from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
@@ -251,7 +252,7 @@ def action():
             raise
 
     if conf.sqlQuery:
-        for query in conf.sqlQuery.strip(';').split(';'):
+        for query in splitFields(conf.sqlQuery.strip(';'), delimiter=';'):  # Note: e.g. "SELECT 'a;b'" is a single statement
             query = query.strip()
             if query:
                 conf.dumper.sqlQuery(query, conf.dbmsHandler.sqlQuery(query))
