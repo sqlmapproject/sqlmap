@@ -1695,10 +1695,11 @@ class Connect(object):
         if (conf.safeFreq or 0) > 0 and not buildOnly:
             kb.queryCounter += 1
             if kb.queryCounter % conf.safeFreq == 0:
+                # Note: "safe" visit must not carry the payload (e.g. in case of Cookie injection)
                 if conf.safeUrl:
-                    Connect.getPage(url=conf.safeUrl, post=conf.safePost, cookie=cookie, direct=True, silent=True, ua=ua, referer=referer, host=host)
+                    Connect.getPage(url=conf.safeUrl, post=conf.safePost, cookie=conf.parameters.get(PLACE.COOKIE) if place == PLACE.COOKIE else cookie, direct=True, silent=True, ua=ua, referer=referer, host=host)
                 elif kb.safeReq:
-                    Connect.getPage(url=kb.safeReq.url, post=kb.safeReq.post, method=kb.safeReq.method, auxHeaders=kb.safeReq.headers)
+                    Connect.getPage(url=kb.safeReq.url, post=kb.safeReq.post, method=kb.safeReq.method, auxHeaders=kb.safeReq.headers, direct=True)
 
         # When the timeless oracle is engaged (by action() at the start of extraction, so the heavy vector
         # is in place before any payload is built), a boolean comparison is answered by relative HTTP/2
