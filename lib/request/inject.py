@@ -677,6 +677,8 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
             count = 0
 
             if query and not re.search(r"COUNT.*FROM.*\(.*DISTINCT", query, re.I):
+                if fromUser and re.search(r"(?i)\bDISTINCT\b", query):
+                    singleTimeWarnMessage("DISTINCT is not supported in provided SQL queries (results can contain duplicates)")
                 query = query.replace("DISTINCT ", "")
 
             if not conf.forceDns:
