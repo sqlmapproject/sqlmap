@@ -5389,7 +5389,7 @@ def hashDBWrite(key, value, serialize=False):
     """
 
     if conf.hashDB:
-        _ = '|'.join((str(_) if not isinstance(_, six.string_types) else _) for _ in (conf.hostname, conf.path.strip('/') if conf.path is not None else conf.port, key, HASHDB_MILESTONE_VALUE))
+        _ = '|'.join((str(_) if not isinstance(_, six.string_types) else _) for _ in (conf.hostname, conf.path.strip('/') if conf.path is not None else ("%s:%s" % (conf.port, conf.dbmsDb) if conf.direct else conf.port), key, HASHDB_MILESTONE_VALUE))  # Note: in case of direct connection, database (e.g. SQLite file) is part of the key
         conf.hashDB.write(_, value, serialize)
 
 def hashDBRetrieve(key, unserialize=False, checkConf=False):
@@ -5400,7 +5400,7 @@ def hashDBRetrieve(key, unserialize=False, checkConf=False):
     retVal = None
 
     if conf.hashDB:
-        _ = '|'.join((str(_) if not isinstance(_, six.string_types) else _) for _ in (conf.hostname, conf.path.strip('/') if conf.path is not None else conf.port, key, HASHDB_MILESTONE_VALUE))
+        _ = '|'.join((str(_) if not isinstance(_, six.string_types) else _) for _ in (conf.hostname, conf.path.strip('/') if conf.path is not None else ("%s:%s" % (conf.port, conf.dbmsDb) if conf.direct else conf.port), key, HASHDB_MILESTONE_VALUE))  # Note: in case of direct connection, database (e.g. SQLite file) is part of the key
         retVal = conf.hashDB.retrieve(_, unserialize) if kb.resumeValues and not (checkConf and any((conf.flushSession, conf.freshQueries))) else None
 
         if not kb.inferenceMode and not kb.fileReadMode and isinstance(retVal, six.string_types) and any(_ in retVal for _ in (PARTIAL_VALUE_MARKER, PARTIAL_HEX_VALUE_MARKER)):
