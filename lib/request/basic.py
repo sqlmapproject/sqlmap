@@ -121,7 +121,10 @@ def forgeHeaders(items=None, base=None):
                 if cookie is None or cookie.domain_specified and not ((conf.hostname or "").endswith(cookie.domain) or (conf.hostname or "") == cookie.domain.lstrip('.')):
                     continue
 
-                if ("%s=" % getUnicode(cookie.name)) in getUnicode(headers[HTTP_HEADER.COOKIE]):
+                # Note: cookie name has to start right after a delimiter (e.g. server's 'id' must not match inside user's 'x-id=2')
+                boundary = r"(?:\A|(?<=[%s\s]))" % re.escape(conf.cookieDel or DEFAULT_COOKIE_DELIMITER)
+
+                if re.search(r"%s%s=" % (boundary, re.escape(getUnicode(cookie.name))), getUnicode(headers[HTTP_HEADER.COOKIE])):
                     if conf.loadCookies:
                         conf.httpHeaders = filterNone((item if item[0] != HTTP_HEADER.COOKIE else None) for item in conf.httpHeaders)
                     elif kb.mergeCookies is None:
@@ -134,7 +137,7 @@ def forgeHeaders(items=None, base=None):
 
                     if kb.mergeCookies and kb.injection.place != PLACE.COOKIE:
                         def _(value):
-                            return re.sub(r"(?i)\b%s=[^%s]+" % (re.escape(getUnicode(cookie.name)), conf.cookieDel or DEFAULT_COOKIE_DELIMITER), ("%s=%s" % (getUnicode(cookie.name), getUnicode(cookie.value))).replace('\\', r'\\'), value)
+                            return re.sub(r"(?i)%s%s=[^%s]+" % (boundary, re.escape(getUnicode(cookie.name)), conf.cookieDel or DEFAULT_COOKIE_DELIMITER), ("%s=%s" % (getUnicode(cookie.name), getUnicode(cookie.value))).replace('\\', r'\\'), value)
 
                         headers[HTTP_HEADER.COOKIE] = _(headers[HTTP_HEADER.COOKIE])
 
