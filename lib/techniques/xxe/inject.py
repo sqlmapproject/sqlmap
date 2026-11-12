@@ -821,6 +821,13 @@ def _tryOobExfil(xml, rootName):
     if not fileName:
         return None
 
+    # Note: provided (own) OOB server is not a consent for contacting a public service (needed for hosting of the external DTD)
+    if conf.get("oobServer"):
+        message = "file exfiltration requires hosting of an external DTD, which provided OOB server can't do. "
+        message += "Do you want to use public service (webhook.site) for that? [y/N] "
+        if not readInput(message, default='N', boolean=True):
+            return None
+
     wh = WebhookSite()
     exfilToken = wh.newToken()
     if not exfilToken:
