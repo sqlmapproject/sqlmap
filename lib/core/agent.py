@@ -1267,6 +1267,11 @@ class Agent(object):
                 orderBy = limitedQuery[limitedQuery.index(" ORDER BY "):]
                 limitedQuery = limitedQuery[:limitedQuery.index(" ORDER BY ")]
 
+            # Note: Microsoft SQL Server 2012+ (and Azure) supports OFFSET/FETCH (row position based), while the (old) NOT IN forging is value based (i.e. collapses duplicate values)
+            if Backend.isDbms(DBMS.MSSQL) and (Backend.isVersionGreaterOrEqualThan("2012") or Backend.isVersionWithin(("Azure",))) and not re.search(r"(?i)\A(SELECT\s+)?(TOP|DISTINCT)\b", limitedQuery):
+                limitedQuery = "%s%s OFFSET %d ROWS FETCH NEXT 1 ROWS ONLY" % (limitedQuery, orderBy or " ORDER BY %s" % (uniqueField or '1'), num)
+                return limitedQuery
+
             notDistincts = re.findall(r"DISTINCT[\(\s+](.+?)\)*\s+", limitedQuery, re.I)
 
             for notDistinct in notDistincts:
