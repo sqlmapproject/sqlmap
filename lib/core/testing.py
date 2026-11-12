@@ -5,6 +5,7 @@ Copyright (c) 2006-2026 sqlmap developers (https://sqlmap.org)
 See the file 'LICENSE' for copying permission
 """
 
+import contextlib
 import doctest
 import json
 import logging
@@ -206,9 +207,11 @@ def vulnTest(tests=None, label="vuln"):
     os.close(handle)
     cleanups.append(database)
 
-    with sqlite3.connect(database) as conn:
+    # Note: sqlite3's own context manager only commits (it does not close the connection)
+    with contextlib.closing(sqlite3.connect(database)) as conn:
         c = conn.cursor()
         c.executescript(vulnserver.SCHEMA)
+        conn.commit()
 
     handle, request = tempfile.mkstemp(suffix=".req")
     os.close(handle)

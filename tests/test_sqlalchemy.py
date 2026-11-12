@@ -58,6 +58,7 @@ class TestSQLAlchemySqlitePath(unittest.TestCase):
 
         sa = SQLAlchemy(dialect="sqlite")
         sa.connect()
+        self.addCleanup(sa.close)
 
         # the reformatted URL must resolve to the exact absolute file (not '//...path')
         self.assertEqual(_sa.engine.url.make_url(sa.address).database, os.path.abspath(dbfile))

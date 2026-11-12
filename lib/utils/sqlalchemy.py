@@ -50,6 +50,7 @@ class SQLAlchemy(GenericConnector):
 
         self.dialect = dialect
         self.address = conf.direct
+        self.engine = None
 
         if conf.dbmsUser:
             self.address = self.address.replace("'%s':" % conf.dbmsUser, "%s:" % _urllib.parse.quote(conf.dbmsUser))
@@ -84,6 +85,7 @@ class SQLAlchemy(GenericConnector):
                 else:
                     engine = _sqlalchemy.create_engine(self.address, connect_args={})
 
+                self.engine = engine
                 self.connector = engine.connect()
             except (TypeError, ValueError) as ex:
                 if "_get_server_version_info" in traceback.format_exc():
@@ -109,6 +111,19 @@ class SQLAlchemy(GenericConnector):
             self.printConnected()
         else:
             raise SqlmapMissingDependence("SQLAlchemy not available (e.g. 'pip%s install SQLAlchemy')" % ('3' if six.PY3 else ""))
+
+    def close(self):
+        try:
+            GenericConnector.close(self)
+        finally:
+            # Note: closing the connection only returns it to the engine's pool (the underlying DBAPI
+            # connection, e.g. sqlite3, stays open) - disposing the engine is what actually releases it
+            if self.engine is not None:
+                try:
+                    self.engine.dispose()
+                except Exception as ex:
+                    logger.debug(getSafeExString(ex))
+                self.engine = None
 
     def fetchall(self):
         try:
