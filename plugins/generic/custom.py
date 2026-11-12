@@ -152,6 +152,7 @@ class Custom(object):
 
             # User SQL is not a bundled procedure template: preserve literals and percent tokens.
             snippet = readCachedFileContent(filename)
+            snippet = "\n".join(_ for _ in snippet.split("\n") if not re.match(r"\s*(--|#)", _))  # Note: only whole comment lines (literals stay intact)
             queries = [_.strip() for _ in splitFields(snippet, delimiter=';' if zeroDepthSearch(snippet, ';') else '\n') if _.strip()]
 
             if queries and all(query.upper().startswith("SELECT") for query in queries):
