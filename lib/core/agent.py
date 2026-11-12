@@ -279,7 +279,7 @@ class Agent(object):
                 return retVal
 
             # Note: parameter name has to start right after a delimiter (e.g. '-p id' must not match inside 'x-id=1')
-            boundary = r"(\A|(?<=[%s\s]))" % re.escape("%s%s%s" % (DEFAULT_GET_POST_DELIMITER, DEFAULT_COOKIE_DELIMITER, conf.paramDel or ""))
+            boundary = r"(\A|(?<=[%s\s]))" % re.escape("%s%s%s%s" % (DEFAULT_GET_POST_DELIMITER, DEFAULT_COOKIE_DELIMITER, conf.paramDel or "", conf.cookieDel or ""))
 
             if origValue:
                 regex = r"%s%s=%s%s" % (boundary, re.escape(parameter), re.escape(origValue), r"(\Z|\b)" if origValue[-1].isalnum() else "")
