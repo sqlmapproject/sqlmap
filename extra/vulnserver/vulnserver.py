@@ -1227,7 +1227,8 @@ class ReqHandler(BaseHTTPRequestHandler):
                 params.update(dict((_[0], _[1].replace("&apos;", "'").replace("&quot;", '"').replace("&lt;", '<').replace("&gt;", '>').replace("&amp;", '&')) for _ in re.findall(r'name="([^"]+)" value="([^"]*)"', self.data)))
             else:
                 self.data = self.data.replace(';', '&')     # Note: seems that Python3 started ignoring parameter splitting with ';'
-                params.update(parse_qs(self.data))
+                # Note: parsing the raw (i.e. not yet URL decoded) body, otherwise encoded '&'/'=' inside values would split them
+                params.update(parse_qs((getattr(self, "rawData", None) or self.data).replace(';', '&')))
 
         for name in self.headers:
             params[name.lower()] = self.headers[name]
@@ -1748,7 +1749,8 @@ class ReqHandler(BaseHTTPRequestHandler):
         length = int(self.headers.get("Content-length", 0))
         if length:
             data = self.rfile.read(length)
-            data = unquote_plus(data.decode(UNICODE_ENCODING, "ignore"))
+            self.rawData = data.decode(UNICODE_ENCODING, "ignore")
+            data = unquote_plus(self.rawData)
             self.data = data
         elif self.headers.get("Transfer-encoding") == "chunked":
             data, line = b"", b""
