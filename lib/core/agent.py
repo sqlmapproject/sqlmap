@@ -673,6 +673,10 @@ class Agent(object):
         if re.search(r"\bWHERE\b.+(MIN|MAX)", query, re.I):
             fieldsMinMaxstr = None
 
+        # Note: shortcut is meant only for a single MIN()/MAX() field (e.g. 'SELECT MAX(id),MIN(id) FROM users' has two)
+        if fieldsMinMaxstr and fieldsSelectFrom and len(splitFields(fieldsSelectFrom.group(1))) > 1:
+            fieldsMinMaxstr = None
+
         fieldsToCastStr = fieldsNoSelect
 
         if fieldsSubstr:
@@ -701,8 +705,8 @@ class Agent(object):
 
         fieldsToCastStr = fieldsToCastStr or ""
 
-        # Function
-        if re.search(r"\A\w+\(.*\)", fieldsToCastStr, re.I) or (fieldsSelectCase and "WHEN use" not in query) or fieldsSubstr:
+        # Function (Note: a single one - e.g. 'MAX(id),MIN(id)' are two fields)
+        if (re.search(r"\A\w+\(.*\)", fieldsToCastStr, re.I) and len(splitFields(fieldsToCastStr)) == 1) or (fieldsSelectCase and "WHEN use" not in query) or fieldsSubstr:
             fieldsToCastList = [fieldsToCastStr]
         else:
             fieldsToCastList = splitFields(fieldsToCastStr)
@@ -1065,11 +1069,11 @@ class Agent(object):
         startLimit = 0
         stopLimit = None
         limitCond = True
+        limitClause = None
 
         topLimit = re.search(r"TOP\s+([\d]+)\s+", expression, re.I)
 
         limitRegExp = re.search(queries[Backend.getIdentifiedDbms()].limitregexp.query, expression, re.I)
-        limitClause = None
 
         if hasattr(queries[Backend.getIdentifiedDbms()].limitregexp, "query2"):
             limitRegExp2 = re.search(queries[Backend.getIdentifiedDbms()].limitregexp.query2, expression, re.I)
@@ -1096,16 +1100,16 @@ class Agent(object):
                         # Note: query2 (LIMIT without OFFSET) always has exactly one group (the
                         # count); using limitGroupStart here would IndexError for H2 (groupstart=2)
                         stopLimit = limitRegExp2.group(1)
-                limitCond = int(stopLimit) > 1
-
-            elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
-                if limitRegExp:
 
                 # Note: standard 'LIMIT n OFFSET m' (or 'OFFSET m LIMIT n') isn't (fully) covered by limitregexp (e.g. OFFSET was silently ignored on MySQL)
                 limitClause = re.search(r"(?i)\s+LIMIT\s+(?P<stop>\d+)\s+OFFSET\s+(?P<start>\d+)", expression) or re.search(r"(?i)\s+OFFSET\s+(?P<start>\d+)\s+LIMIT\s+(?P<stop>\d+)", expression)
                 if limitClause:
                     startLimit, stopLimit = int(limitClause.group("start")), limitClause.group("stop")
 
+                limitCond = int(stopLimit) > 1
+
+            elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
+                if limitRegExp:
                     limitGroupStart = queries[Backend.getIdentifiedDbms()].limitgroupstart.query
                     limitGroupStop = queries[Backend.getIdentifiedDbms()].limitgroupstop.query
 
