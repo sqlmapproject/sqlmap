@@ -348,7 +348,7 @@ def unionUse(expression, unpack=True, dump=False):
         # Only remove outer ordering. Nested ORDER BY clauses can select which
         # rows survive a ROWNUM/TOP limit and must remain intact.
         positions = set(index for keyword in set(re.findall(r"(?i)ORDER BY", expression)) for index in zeroDepthSearch(expression, keyword))
-        expression = re.sub(r"(?i)ORDER BY\s+[\w,]+", lambda match: "" if match.start() in positions else match.group(0), expression)
+        expression = re.sub(r"(?i)ORDER BY\s+[\w.]+(?:\s+(?:ASC|DESC)\b)?(?:\s*,\s*[\w.]+(?:\s+(?:ASC|DESC)\b)?)*", lambda match: "" if match.start() in positions else match.group(0), expression)
         debugMsg = "stripping ORDER BY clause from statement because "
         debugMsg += "it does not play well with UNION query SQL injection"
         singleTimeDebugMessage(debugMsg)
