@@ -1412,7 +1412,7 @@ class Connect(object):
                     logger.warning(warnMsg)
 
                 page, headers, code = Connect.getPage(url=conf.csrfUrl or conf.url, post=conf.csrfData or (conf.data if conf.csrfUrl == conf.url and (conf.csrfMethod or "").upper() == HTTPMETHOD.POST else None), method=conf.csrfMethod or (conf.method if conf.csrfUrl == conf.url else None), cookie=conf.parameters.get(PLACE.COOKIE), direct=True, silent=True, ua=conf.parameters.get(PLACE.USER_AGENT), referer=conf.parameters.get(PLACE.REFERER), host=conf.parameters.get(PLACE.HOST))
-                page = urldecode(page)  # for anti-CSRF tokens with special characters in their name (e.g. 'foo:bar=...')
+                page = urldecode(page, spaceplus=False)  # for anti-CSRF tokens with special characters in their name (e.g. 'foo:bar=...') - Note: '+' is a legitimate (e.g. Base64) token value character
 
                 match = re.search(r"(?i)<input[^>]+\bname=[\"']?(?P<name>%s)\b[^>]*\bvalue=[\"']?(?P<value>[^>'\"]*)" % conf.csrfToken, page or "", re.I)
 
@@ -1467,14 +1467,17 @@ class Connect(object):
             if token:
                 token.value = token.value.strip("'\"")
 
+                # Note: (decoded) token value has to be URL encoded for (URL encoded) places (e.g. Base64 token 'ab+cd/ef==' -> 'ab%2Bcd%2Fef%3D%3D')
+                encoded = urlencode(token.value, convall=True)
+
                 for candidate in (PLACE.GET, PLACE.POST, PLACE.CUSTOM_POST, PLACE.URI):
                     if candidate in conf.parameters:
                         if candidate == PLACE.URI and uri:
-                            uri = _adjustParameter(uri, token.name, token.value)
+                            uri = _adjustParameter(uri, token.name, encoded)
                         elif candidate == PLACE.GET and get:
-                            get = _adjustParameter(get, token.name, token.value)
+                            get = _adjustParameter(get, token.name, encoded)
                         elif candidate in (PLACE.POST, PLACE.CUSTOM_POST) and post:
-                            post = _adjustParameter(post, token.name, token.value)
+                            post = _adjustParameter(post, token.name, encoded if candidate == PLACE.POST else token.value)
 
                 for i in xrange(len(conf.httpHeaders)):
                     if conf.httpHeaders[i][0].lower() == token.name.lower():
