@@ -2894,6 +2894,11 @@ def _basicOptionValidation():
         errMsg = "HTTP/2 support is currently incompatible with SOCKS/Tor proxies"
         raise SqlmapSyntaxException(errMsg)
 
+    # Note: native HTTP/2 client bypasses urllib's (challenge-response) authentication handlers (only Basic is sent preemptively)
+    if conf.http2 and ((conf.authType or "").lower() not in ("", AUTH_TYPE.BASIC, AUTH_TYPE.BEARER) or conf.authFile):
+        errMsg = "HTTP/2 support is currently incompatible with HTTP authentication type '%s'" % (conf.authType or AUTH_TYPE.PKI)
+        raise SqlmapSyntaxException(errMsg)
+
     if conf.uValues and conf.uChar:
         errMsg = "option '--union-values' is incompatible with option '--union-char'"
         raise SqlmapSyntaxException(errMsg)

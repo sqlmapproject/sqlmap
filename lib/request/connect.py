@@ -736,6 +736,10 @@ class Connect(object):
                     from lib.request.http2 import open_url as http2OpenUrl
                     from lib.request.http2 import proxy_tuple
 
+                    # Note: (preemptive) Basic authentication, as urllib's handlers are bypassed
+                    if (conf.authType or "").lower() == AUTH_TYPE.BASIC and conf.authUsername is not None and HTTP_HEADER.AUTHORIZATION not in headers:
+                        headers[HTTP_HEADER.AUTHORIZATION] = "Basic %s" % encodeBase64("%s:%s" % (conf.authUsername, conf.authPassword or ""), binary=False)
+
                     try:
                         h2proxy = proxy_tuple(conf.proxy, conf.proxyCred)
                     except ValueError:
