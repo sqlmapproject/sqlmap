@@ -1058,7 +1058,7 @@ class Databases(object):
         query = agent.whereQuery(query)
         count = inject.getValue(query, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
-        if isNumPosStrValue(count):
+        if isNumPosStrValue(count) or count in (0, "0"):     # Note: including empty tables (i.e. 0 entries)
             if safeSQLIdentificatorNaming(db) not in kb.data.cachedCounts:
                 kb.data.cachedCounts[safeSQLIdentificatorNaming(db)] = {}
 
