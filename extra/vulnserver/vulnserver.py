@@ -1492,6 +1492,22 @@ class ReqHandler(BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps({"error": {"message": str(ex)}}).encode(UNICODE_ENCODING))
             return
 
+        if self.url == "/list":
+            # VULNERABLE: listing page whose (number of) rows depends on the injected 'min' value (e.g. for --multi-bit)
+            try:
+                with _lock:
+                    _cursor.execute("SELECT id,name FROM users WHERE id>%s ORDER BY id" % self.params.get("min", "0"))
+                    rows = _cursor.fetchall()
+                output = "<html><body><ul>%s</ul></body></html>" % "".join("<li><a href=\"/?id=%s\">%s</a></li>" % (row[0], row[1]) for row in rows)
+            except Exception:
+                output = "<html><body>error</body></html>"
+            self.send_response(OK)
+            self.send_header("Content-type", "text/html; charset=%s" % UNICODE_ENCODING)
+            self.send_header("Connection", "close")
+            self.end_headers()
+            self.wfile.write(output.encode(UNICODE_ENCODING))
+            return
+
         if self.url == "/echo":
             # A pure reflector: no engine of any kind behind it, it only shows the parameter back. Every
             # non-SQL switch must stay silent here. A differential built on "the page changed" is
@@ -1775,6 +1791,114 @@ class ReqHandler(BaseHTTPRequestHandler):
 
     def log_message(self, format, *args):
         return
+
+def run_h2(address=LISTEN_ADDRESS, port=LISTEN_PORT + 1):
+    """
+    Optional HTTP/2 (TLS) endpoint '/?id=1' (e.g. for --http2/--timeless), requiring 'h2' and 'cryptography'
+    Note: each stream is answered on its own thread with its own database connection (i.e. in order of completion)
+    """
+
+    import datetime
+    import socket
+    import ssl
+
+    import h2.config
+    import h2.connection
+    import h2.events
+
+    from cryptography import x509
+    from cryptography.hazmat.primitives import hashes
+    from cryptography.hazmat.primitives import serialization
+    from cryptography.hazmat.primitives.asymmetric import ec
+    from cryptography.x509.oid import NameOID
+
+    key = ec.generate_private_key(ec.SECP256R1())
+    name = x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, u"localhost")])
+    now = datetime.datetime.utcnow()
+    cert = x509.CertificateBuilder().subject_name(name).issuer_name(name).public_key(key.public_key()).serial_number(x509.random_serial_number()).not_valid_before(now - datetime.timedelta(days=1)).not_valid_after(now + datetime.timedelta(days=1)).sign(key, hashes.SHA256())
+
+    handle, certFile = tempfile.mkstemp(suffix=".pem")
+    os.close(handle)
+    with open(certFile, "wb") as f:
+        f.write(cert.public_bytes(serialization.Encoding.PEM))
+        f.write(key.private_bytes(serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8, serialization.NoEncryption()))
+
+    context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    context.load_cert_chain(certFile)
+    context.set_alpn_protocols(["h2"])
+    local = threading.local()
+
+    def _respond(conn, lock, sock, streamId, path):
+        if not hasattr(local, "db"):
+            local.db = sqlite3.connect(":memory:")
+            local.db.executescript(SCHEMA)
+
+        try:
+            value = parse_qs(path.split('?', 1)[-1] if '?' in path else "").get("id", ["1"])[-1]
+            rows = local.db.execute("SELECT * FROM users WHERE id=%s LIMIT 0, 1" % value).fetchall()
+            status, body = "200", "<html><body>%s</body></html>" % "".join("<td>%s</td>" % _ for row in rows for _ in row)
+        except Exception as ex:
+            status, body = "500", "<html><body>error: %s</body></html>" % ex
+
+        body = body.encode(UNICODE_ENCODING)
+
+        with lock:
+            conn.send_headers(streamId, [(":status", status), ("content-length", str(len(body))), ("content-type", "text/html")])
+            conn.send_data(streamId, body, end_stream=True)
+            sock.sendall(conn.data_to_send())
+
+    def _serve(sock):
+        conn = h2.connection.H2Connection(config=h2.config.H2Configuration(client_side=False))
+        lock = threading.Lock()
+        paths = {}
+
+        conn.initiate_connection()
+        sock.sendall(conn.data_to_send())
+
+        try:
+            while True:
+                data = sock.recv(65535)
+                if not data:
+                    break
+
+                with lock:
+                    events = conn.receive_data(data)
+                    sock.sendall(conn.data_to_send())
+
+                for event in events:
+                    if isinstance(event, h2.events.RequestReceived):
+                        paths[event.stream_id] = dict((_[0].decode() if isinstance(_[0], bytes) else _[0], _[1].decode() if isinstance(_[1], bytes) else _[1]) for _ in event.headers).get(":path", "/")
+                    elif isinstance(event, h2.events.StreamEnded):
+                        thread = threading.Thread(target=_respond, args=(conn, lock, sock, event.stream_id, paths.pop(event.stream_id, "/")))
+                        thread.daemon = True
+                        thread.start()
+        except Exception:
+            pass
+        finally:
+            sock.close()
+
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.settimeout(None)     # Note: independent of (e.g. sqlmap's) default socket timeout, which would end the accept loop once idle
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    server.bind((address, port))
+    server.listen(50)
+
+    while True:
+        try:
+            client, _ = server.accept()
+        except socket.error:
+            continue
+
+        try:
+            client.settimeout(None)
+            client = context.wrap_socket(client, server_side=True)
+        except Exception:
+            client.close()
+            continue
+
+        thread = threading.Thread(target=_serve, args=(client,))
+        thread.daemon = True
+        thread.start()
 
 def run(address=LISTEN_ADDRESS, port=LISTEN_PORT):
     global _alive

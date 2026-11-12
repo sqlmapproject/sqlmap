@@ -97,13 +97,14 @@ jobs:
       - name: Basic import test
         run: python -c "import sqlmap; import sqlmapapi"
 
-      - name: Install optional test deps (lxml, jinja2)
+      - name: Install optional test deps (lxml, jinja2, h2, cryptography)
         # lxml has no PyPy-2.7 wheel and 5.x is Py3-only, so it cannot be pip-installed there. The
         # tests that use it (test_xpath's real-XPath checks, and the --xpath/--ssti vuln-test
         # endpoints) skip themselves when the engine is unavailable, so these deps are only needed
-        # on the Py3 jobs.
+        # on the Py3 jobs. Same for h2/cryptography (vulnserver's HTTP/2 endpoint for --timeless and
+        # the reference-peer checks in test_http2).
         if: matrix.python-version != 'pypy-2.7'
-        run: python -m pip install -q lxml jinja2
+        run: python -m pip install -q lxml jinja2 h2 cryptography
 
       - name: Unit tests
         # -B: do not write .pyc files. On Python 2 / PyPy a cached .pyc makes a module's __file__

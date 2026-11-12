@@ -96,6 +96,8 @@ def vulnTest(tests=None, label="vuln"):
         ("-u \"<url>&echo=foobar*\" --flush-session", ("might be vulnerable to cross-site scripting",)),
         ("-u \"<base>nosql?name=luther&password=x\" -p password --nosql --flush-session", ("is vulnerable to NoSQL injection", "back-end: 'MongoDB'", "NoSQL: GET parameter 'password'", "s3cr3t")),   # NoSQL (MongoDB) operator-injection detection + blind regexp extraction
         ("-u \"<base>graphql\" --graphql -T creds --flush-session --disable-hashing", ("found GraphQL endpoint", "introspection returned", "enumerated 6 injectable argument slot(s): 4 query, 2 mutation", "SQL injection via GraphQL (boolean-based)", "in-band data exposure", "back-end DBMS: 'SQLite'", "banner: '3.", "GraphQL database tables", "fetched 30 entries from table 'creds'", "db3a16990a0008a3b04707fdef6584a0", "GraphQL scan complete")),   # GraphQL: endpoint detection + introspection + query-slots-first (mutations only as fallback) + boolean-blind/in-band + back-end fingerprint + batched blind dump of an injection-only table (SQLite-backed)
+        ("-u \"<base>list?min=0\" --multi-bit --technique=B -T users --dump --flush-session", ("carries a multi-bit channel", "30 entries", "luther")),   # --multi-bit: a listing page whose rows depend on the injected value carries several bits per request
+        ("-u \"<h2base>?id=1\" --http2 --technique=T --timeless --dbms=sqlite --level=3 --risk=2 --banner --time-sec=5 --flush-session", ("turning on HTTP/2 timeless timing", "banner: '3.")),   # --timeless: (SQLite heavy-query) time-based blind read by HTTP/2 response order (Note: --time-sec=5 as heavy queries scale with it)
         ("-u \"<base>ldap/search?q=x\" --ldap --flush-session --disable-hashing", ("is vulnerable to LDAP injection", "Title: LDAP in-band data exposure", "LDAP: GET parameter 'q' in-band entries", "in-band data exposure", "LDAP scan complete")),   # LDAP: error-based detection (unbalanced paren) + boolean oracle + directory attribute extraction via blind substring probing
         ("-u \"<base>echo?q=x\" --xslt --flush-session --disable-hashing", ("no parameter appears to be injectable", "~is vulnerable to")),   # reflection is not evaluation: a pure echo endpoint must not satisfy any non-SQL engine's oracle
         ("-u \"<base>echo?q=x\" --xpath --flush-session --disable-hashing", ("no parameter appears to be injectable", "~is vulnerable to")),   # same gate for --xpath (it used to confirm XPath injection from reflected text alone)
@@ -133,6 +135,12 @@ def vulnTest(tests=None, label="vuln"):
     except ImportError:
         TESTS = tuple(_ for _ in TESTS if "--ssti" not in _[0])
         logger.warning("skipping the SSTI vuln-test entry ('jinja2' not available)")
+    try:
+        __import__("h2")
+        __import__("cryptography")
+    except ImportError:
+        TESTS = tuple(_ for _ in TESTS if "<h2base>" not in _[0])
+        logger.warning("skipping the HTTP/2 vuln-test entry ('h2' or 'cryptography' not available)")
 
     # --test-filter / --test-skip narrow a (slow) full run to just the entries touching a change:
     # the needle is matched case-insensitively against each entry's command line and its expected
@@ -236,6 +244,28 @@ def vulnTest(tests=None, label="vuln"):
         f.flush()
 
     base = "http://%s:%d/" % (address, port)
+    h2base = ""
+
+    # optional HTTP/2 (TLS) endpoint (e.g. for --timeless)
+    if any("<h2base>" in _[0] for _ in TESTS):
+        h2port = port + 1 if port < 65535 else port - 1
+        thread = threading.Thread(target=vulnserver.run_h2, args=(address, h2port))
+        thread.daemon = True
+        thread.start()
+
+        for _ in xrange(20):
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            try:
+                if not s.connect_ex((address, h2port)):
+                    h2base = "https://%s:%d/" % (address, h2port)
+                    break
+            finally:
+                s.close()
+            time.sleep(0.5)
+
+        if not h2base:
+            TESTS = tuple(_ for _ in TESTS if "<h2base>" not in _[0])
+            logger.warning("skipping the HTTP/2 vuln-test entry (unable to start HTTP/2 endpoint)")
     url = "%s?id=1" % base
     direct = "sqlite3://%s" % database
     tmpdir = tempfile.mkdtemp()
@@ -260,10 +290,10 @@ def vulnTest(tests=None, label="vuln"):
             options = options.replace(u"\u0161u\u0107uraj", "sucuraj")
             checks = [check.replace(u"\u0161u\u0107uraj", "sucuraj") for check in checks]
 
-        for tag, value in (("<url>", url), ("<base>", base), ("<direct>", direct), ("<tmpdir>", tmpdir), ("<request>", request), ("<log>", log), ("<multiple>", multiple), ("<config>", config), ("<base64>", url.replace("id=1", "id=MZ=%3d"))):
+        for tag, value in (("<url>", url), ("<base>", base), ("<direct>", direct), ("<tmpdir>", tmpdir), ("<request>", request), ("<log>", log), ("<multiple>", multiple), ("<config>", config), ("<base64>", url.replace("id=1", "id=MZ=%3d")), ("<h2base>", h2base)):
             options = options.replace(tag, value)
 
-        cmd = "%s \"%s\" %s --batch --non-interactive --debug --time-sec=1" % (sys.executable if ' ' not in sys.executable else '"%s"' % sys.executable, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py")), options)
+        cmd = "%s \"%s\" %s --batch --non-interactive --debug%s" % (sys.executable if ' ' not in sys.executable else '"%s"' % sys.executable, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "sqlmap.py")), options, "" if "--time-sec" in options else " --time-sec=1")
 
         if "<tmpfile>" in cmd:
             handle, tmp = tempfile.mkstemp()
