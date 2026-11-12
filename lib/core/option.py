@@ -2119,8 +2119,9 @@ def _cleanupOptions():
     if conf.torType:
         conf.torType = conf.torType.upper()
 
-    if conf.col:
-        conf.col = re.sub(r"\s*,\s*", ',', conf.col)
+    for _ in ("db", "tbl", "col"):
+        if conf.get(_):
+            conf[_] = re.sub(r"\s*,\s*", ',', conf[_])
 
     if conf.exclude:
         regex = False
