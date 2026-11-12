@@ -49,6 +49,16 @@ class Interactsh(object):
     def __init__(self, server=None, token=None):
         self.server = None
         self.token = token or conf.get("oobToken")
+        self._scheme = "https"
+        self._ownServer = bool(server)
+
+        # Note: explicitly provided server can come with a scheme (e.g. 'http://oob.example.com/') - the rest is used as the (callback) host
+        if server:
+            server = server.strip()
+            for scheme in ("https", "http"):
+                if server.lower().startswith("%s://" % scheme):
+                    self._scheme, server = scheme, server[len(scheme) + len("://"):]
+            server = server.rstrip('/')
 
         # Note: (private) token belongs only to an explicitly provided server (i.e. never to be sent to a public one)
         if self.token and not server:
@@ -78,11 +88,14 @@ class Interactsh(object):
             if not candidate:
                 continue
             body = json.dumps({"public-key": pubKey, "secret-key": self.secret, "correlation-id": self.correlationId})
-            if self._request("https://%s/register" % candidate, post=body):
+            if self._request("%s://%s/register" % (self._scheme, candidate), post=body):
                 self.server = candidate
                 self.registered = True
                 logger.debug("registered with OOB interaction server '%s'" % candidate)
                 break
+
+        if self._ownServer and not self.registered:
+            logger.warning("unable to register with the provided OOB server '%s://%s'" % (self._scheme, server))
 
     def _request(self, url, post=None):
         """Direct request to the interactsh server (a fixed service, never the target).
@@ -103,11 +116,10 @@ class Interactsh(object):
 
             handlers = []
             try:
-                # Verify TLS for the (public, valid-cert) interaction server by default;
-                # only skip verification when the user has globally opted out (--force-ssl-verify
-                # off / verifyCert False), matching sqlmap's own TLS posture.
+                # Note: TLS is verified for the (built-in) public interaction servers, while the explicitly
+                # provided (own) server is treated as any other target (i.e. self-signed certificates are fine)
                 context = ssl.create_default_context()
-                if conf.get("verifyCert") is False:
+                if getattr(self, "_ownServer", False):
                     context.check_hostname = False
                     context.verify_mode = ssl.CERT_NONE
                 handlers.append(HTTPSHandler(context=context))
@@ -265,7 +277,7 @@ class Interactsh(object):
         if not self.registered:
             return []
 
-        page = self._request("https://%s/poll?id=%s&secret=%s" % (self.server, self.correlationId, self.secret))
+        page = self._request("%s://%s/poll?id=%s&secret=%s" % (getattr(self, "_scheme", "https"), self.server, self.correlationId, self.secret))
         if not page:
             return []
 
@@ -346,7 +358,7 @@ class Interactsh(object):
     def _deregister(self):
         if self.registered:
             body = json.dumps({"correlation-id": self.correlationId, "secret-key": self.secret})
-            self._request("https://%s/deregister" % self.server, post=body)
+            self._request("%s://%s/deregister" % (getattr(self, "_scheme", "https"), self.server), post=body)
             self.registered = False
 
 
