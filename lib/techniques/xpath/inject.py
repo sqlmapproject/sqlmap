@@ -43,6 +43,7 @@ from lib.core.settings import XQUERY_HARVEST_CHARS
 from lib.core.settings import XQUERY_MAX_FILE_LENGTH
 from lib.request.connect import Connect as Request
 from lib.utils.xrange import xrange
+from thirdparty.six.moves.urllib.parse import quote as _quote
 
 
 SENTINEL = randomStr(length=10, lowercase=True)
@@ -154,7 +155,8 @@ def _send(place, parameter, value):
         time.sleep(conf.delay)
 
     old_params = conf.parameters.get(place, "")
-    conf.parameters[place] = _replaceSegment(place, parameter, value)
+    # Note: POST body is sent as-is (i.e. raw '+', '&', '%' would be misinterpreted), while GET is URL encoded later on
+    conf.parameters[place] = _replaceSegment(place, parameter, _quote(value, safe="") if place == PLACE.POST else value)
 
     try:
         kwargs = {"raise404": False, "silent": True}
