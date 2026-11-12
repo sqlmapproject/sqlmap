@@ -500,7 +500,7 @@ class Connect(object):
                     get = conf.parameters[PLACE.GET]
 
                     if not conf.skipUrlEncode:
-                        get = urlencode(get, limit=True)
+                        get = urlencode(get, safe="%%&=-_%s" % (conf.paramDel or ""), limit=True)
 
                 if get:
                     if '?' in url:
@@ -1678,7 +1678,7 @@ class Connect(object):
                                 cookie += "%s%s=%s" % (conf.cookieDel or DEFAULT_COOKIE_DELIMITER, name, entry)
 
         if not conf.skipUrlEncode:
-            get = urlencode(get, limit=True)
+            get = urlencode(get, safe="%%&=-_%s" % (conf.paramDel or ""), limit=True)
 
         if post is not None:
             if place not in (PLACE.POST, PLACE.CUSTOM_POST) and hasattr(post, UNENCODED_ORIGINAL_VALUE):
