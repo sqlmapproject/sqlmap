@@ -648,6 +648,9 @@ def main():
                 except OSError:
                     pass
 
+        # Note: --time-limit must not interrupt the final cleanup (e.g. session flush or HAR file writing)
+        conf.timeLimit = None
+
         if conf.get("hashDB"):
             conf.hashDB.flush()
             conf.hashDB.close()         # NOTE: because of PyPy
