@@ -367,7 +367,7 @@ class Connect(object):
         threadData = getCurrentThreadData()
         with kb.locks.request:
             kb.requestCounter += 1
-            threadData.lastRequestUID = kb.requestCounter
+            threadData.lastRequestUID = requestUID = kb.requestCounter
 
             if conf.proxyFreq:
                 if kb.requestCounter % conf.proxyFreq == 0:
@@ -1115,8 +1115,10 @@ class Connect(object):
             if kb.postHint == POST_HINT.GRPC_WEB:
                 page = grpcDecodeResponse(page, responseHeaders)
 
-            threadData.lastPage = page
-            threadData.lastCode = code
+            # Note: in case of a (nested) retried request, its (last) response is the relevant one
+            if threadData.lastRequestUID == requestUID:
+                threadData.lastPage = page
+                threadData.lastCode = code
 
             socket.setdefaulttimeout(conf.timeout)
 
