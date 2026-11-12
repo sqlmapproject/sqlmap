@@ -1641,7 +1641,11 @@ def _setHTTPExtraHeaders():
                 header, value = (_.lstrip() for _ in headerValue.split(":", 1))
 
                 if header and value:
-                    conf.httpHeaders.append((header, value))
+                    # Note: Cookie header provided this way is treated as --cookie (i.e. its parameters become testable)
+                    if header.upper() == HTTP_HEADER.COOKIE.upper() and not conf.cookie:
+                        conf.cookie = value
+                    else:
+                        conf.httpHeaders.append((header, value))
             else:
                 errMsg = "invalid header value: %s. Valid header format is 'name:value'" % repr(headerValue).lstrip('u')
                 raise SqlmapSyntaxException(errMsg)
