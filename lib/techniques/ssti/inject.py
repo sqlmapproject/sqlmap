@@ -1019,7 +1019,9 @@ def _executeCommand(place, parameter, engine, cmd):
             payload = payloadTemplate.replace("{CMD}", framedCmd)
             page = getUnicode(_send(place, parameter, original + payload) or "")
             out = _framedOutput(page, start, end)
-            if out is not None:
+            # Note: without a shell (e.g. Java's Runtime.exec) printf recycles its format over the rest of the (unexecuted) command
+            # line (e.g. ';id;printf%s%s'), "reproducing" both markers by itself - leftover format is the telltale
+            if out is not None and "%s%s" not in out:
                 conf.dumper.singleString("\nos-shell (%s) [%s]:\n%s" % (cmd, description, out))
                 return
 
