@@ -1245,8 +1245,9 @@ class Connect(object):
             delimiter = conf.paramDel or (DEFAULT_GET_POST_DELIMITER if place != PLACE.COOKIE else DEFAULT_COOKIE_DELIMITER)
 
             if not disableTampering and kb.tamperFunctions:
+                hints = {}  # Note: shared among all tamper functions (e.g. 'luanginx,space2comment' must keep the former's HINT.PREPEND)
+
                 for function in kb.tamperFunctions:
-                    hints = {}
 
                     try:
                         payload = function(payload=payload, headers=auxHeaders, delimiter=delimiter, hints=hints)
