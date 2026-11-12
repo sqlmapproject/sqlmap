@@ -2757,6 +2757,11 @@ def _setProxyList():
         _, type_, cred, address, port = match.groups()
         conf.proxyList.append("%s://%s%s:%s" % (type_ or "http", ("%s@" % cred) if cred else "", address, port))
 
+    # Note: otherwise sqlmap would silently connect directly (i.e. without any proxy)
+    if not conf.proxyList:
+        errMsg = "no usable proxy entries found in proxy list file '%s' (expected format e.g. 'http://127.0.0.1:8080')" % conf.proxyFile
+        raise SqlmapSyntaxException(errMsg)
+
 def _setTorProxySettings():
     if not conf.tor:
         return
