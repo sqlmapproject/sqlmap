@@ -438,7 +438,8 @@ def _setRequestParams():
                     testableParameters = True
 
             else:
-                condition = intersect(conf.testParameter, [httpHeader], True)
+                # Note: in case of --cookie, its (Cookie) parameters are tested separately (i.e. not the whole header)
+                condition = intersect(conf.testParameter, [httpHeader], True) and not (conf.cookie and httpHeader.upper() == HTTP_HEADER.COOKIE.upper())
 
                 if condition:
                     conf.parameters[PLACE.CUSTOM_HEADER] = str(conf.httpHeaders)
