@@ -636,7 +636,7 @@ def start():
                     skip |= (place == PLACE.REFERER and (kb.testOnlyCustom or conf.level < 3))
 
                     # --param-filter
-                    skip |= (len(conf.paramFilter) > 0 and place.upper() not in conf.paramFilter)
+                    skip |= (len(conf.paramFilter) > 0 and place.upper() not in conf.paramFilter and place.upper().replace("(CUSTOM) ", "") not in conf.paramFilter)  # Note: e.g. POST for JSON/XML (i.e. '(custom) POST') too
 
                     # Test Host header only if
                     # --level >= 5
