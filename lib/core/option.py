@@ -2107,6 +2107,9 @@ def _cleanupOptions():
     if conf.string:
         conf.string = decodeStringEscape(conf.string)
 
+    if conf.notString:
+        conf.notString = decodeStringEscape(conf.notString)
+
     if conf.getAll:
         for _ in WIZARD.ALL:
             conf.__setitem__(_, True)
