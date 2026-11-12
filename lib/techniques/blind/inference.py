@@ -327,7 +327,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
     threadData = getCurrentThreadData()
     threadData.lowCardHit = False  # set when this value is confirmed by the (self-verifying) low-card guess
     timeBasedCompare = (getTechnique() in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED))
-    retVal = hashDBRetrieve(expression, checkConf=True)
+    retVal = hashDBRetrieve(expression, checkConf=True) if not (conf.firstChar or conf.lastChar) else None  # Note: stored (complete) value doesn't correspond to a --first/--last range
 
     if retVal:
         if conf.repair and INFERENCE_UNKNOWN_CHAR in retVal:
@@ -1251,7 +1251,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                     and 0 < len(finalValue) <= PREDICTION_FEEDBACK_MAX_LENGTH
                     and len(kb.commonOutputs.get(kb.partRun) or ()) < PREDICTION_FEEDBACK_MAX_ITEMS):
                 kb.commonOutputs.setdefault(kb.partRun, set()).add(finalValue)
-        elif partialValue:
+        elif partialValue and not (conf.firstChar or conf.lastChar):  # Note: same as above (otherwise resumed as the start of the complete value)
             hashDBWrite(expression, "%s%s" % (PARTIAL_VALUE_MARKER if not conf.hexConvert else PARTIAL_HEX_VALUE_MARKER, partialValue))
 
     if conf.hexConvert and not any((abortedFlag, conf.api, kb.bruteMode)):
