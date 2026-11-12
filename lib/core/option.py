@@ -1394,7 +1394,8 @@ def _setHTTPHandlers():
         debugMsg = "creating HTTP requests opener object"
         logger.debug(debugMsg)
 
-        handlers = filterNone([multipartPostHandler, proxyHandler if proxyHandler.proxies else None, authHandler, redirectHandler, rangeHandler, chunkedHandler if conf.chunked else None, httpsHandler])
+        # Note: (emptied) proxyHandler is kept in case of --ignore-proxy, as otherwise urllib adds its default one (i.e. using environment proxies)
+        handlers = filterNone([multipartPostHandler, proxyHandler if proxyHandler.proxies or conf.ignoreProxy else None, authHandler, redirectHandler, rangeHandler, chunkedHandler if conf.chunked else None, httpsHandler])
 
         if not conf.dropSetCookie:
             if not conf.loadCookies:
@@ -2150,7 +2151,7 @@ def _cleanupOptions():
         conf.binaryFields = re.split(PARAMETER_SPLITTING_REGEX, conf.binaryFields)
 
     envProxy = max(os.environ.get(_, "") for _ in PROXY_ENVIRONMENT_VARIABLES)
-    if re.search(r"\A(https?|socks[45])://.+:\d+\Z", envProxy) and conf.proxy is None:
+    if re.search(r"\A(https?|socks[45])://.+:\d+\Z", envProxy) and conf.proxy is None and not conf.ignoreProxy:
         debugMsg = "using environment proxy '%s'" % envProxy
         logger.debug(debugMsg)
 
