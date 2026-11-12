@@ -1645,7 +1645,7 @@ class Connect(object):
                                 found = True
                                 post = re.sub(regex, r"\g<1>\g<2>%s" % entry.replace('\\', r'\\'), post)
 
-                        regex = r"((\A|%s)%s=).+?(%s|\Z)" % (re.escape(delimiter), re.escape(name), re.escape(delimiter))
+                        regex = r"((\A|%s)%s=).*?(%s|\Z)" % (re.escape(delimiter), re.escape(name), re.escape(delimiter))
                         if not found and re.search(regex, (post or "")):
                             found = True
                             post = re.sub(regex, r"\g<1>%s\g<3>" % entry.replace('\\', r'\\'), post)
@@ -1658,7 +1658,7 @@ class Connect(object):
                             found = True
                             uri = re.sub(regex.replace(r"\A", r"\?"), r"\g<1>%s\g<3>" % entry.replace('\\', r'\\'), uri)
 
-                        regex = r"((\A|%s\s*)%s=).+?(%s|\Z)" % (re.escape(conf.cookieDel or DEFAULT_COOKIE_DELIMITER), re.escape(name), re.escape(conf.cookieDel or DEFAULT_COOKIE_DELIMITER))
+                        regex = r"((\A|%s\s*)%s=).*?(%s|\Z)" % (re.escape(conf.cookieDel or DEFAULT_COOKIE_DELIMITER), re.escape(name), re.escape(conf.cookieDel or DEFAULT_COOKIE_DELIMITER))
                         if re.search(regex, (cookie or "")):
                             found = True
                             cookie = re.sub(regex, r"\g<1>%s\g<3>" % entry.replace('\\', r'\\'), cookie)
