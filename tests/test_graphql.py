@@ -250,7 +250,7 @@ class TestGraphqlBooleanDetection(unittest.TestCase):
         gi.conf = type("C", (), {"url": "http://test/graphql"})()
 
         pages = {"true": MATCH, "false": NOMATCH}
-        def fakeSend(endpoint, query, variables=None):
+        def fakeSend(endpoint, query, variables=None, **kwargs):
             if "'1'='1" in query:
                 return pages["true"], 200
             if "'1'='2" in query:
@@ -276,7 +276,7 @@ class TestGraphqlBooleanDetection(unittest.TestCase):
     def test_graphql_two_true_transport_failures_do_not_confirm(self):
         # the TRUE query fails transport (-> None), the FALSE succeeds: two None trues must NOT be
         # read as a reproducible page that "differs" from false (the classic fabricated confirmation)
-        def fakeSend(endpoint, query, variables=None):
+        def fakeSend(endpoint, query, variables=None, **kwargs):
             if "'1'='1" in query:
                 return None, 0            # transport failure on the true payload
             return NOMATCH, 200
@@ -288,7 +288,7 @@ class TestGraphqlBooleanDetection(unittest.TestCase):
     def test_graphql_false_page_is_replayed(self):
         # a FALSE page that does not reproduce (jitter) must not establish an oracle
         state = {"n": 0}
-        def fakeSend(endpoint, query, variables=None):
+        def fakeSend(endpoint, query, variables=None, **kwargs):
             if "'1'='1" in query:
                 return MATCH, 200
             state["n"] += 1
@@ -304,7 +304,7 @@ class TestGraphqlBooleanDetection(unittest.TestCase):
         # P0-3: the FALSE payload trips a stable HTTP-200 resolver error ({data:null, errors:[...]}),
         # which yields the same {"user":null} observation as a genuine false. That is NOT a boolean
         # oracle (it belongs to error-based detection) - _detectBoolean must reject the errored pair.
-        def fakeSend(endpoint, query, variables=None):
+        def fakeSend(endpoint, query, variables=None, **kwargs):
             if "'1'='1" in query:                                 # true -> real rows
                 return MATCH, 200
             return '{"data":{"user":null},"errors":[{"message":"resolver failed","path":["user"]}]}', 200
@@ -330,7 +330,7 @@ class TestGraphqlErrorDetection(unittest.TestCase):
         self._conf = gi.conf
         gi.conf = type("C", (), {"url": "http://test/graphql"})()
 
-        def fakeSend(endpoint, query, variables=None):
+        def fakeSend(endpoint, query, variables=None, **kwargs):
             if "'" in query and "'1'='1" not in query:
                 return DB_ERROR, 500
             return NOMATCH, 200
@@ -349,7 +349,7 @@ class TestGraphqlErrorDetection(unittest.TestCase):
         # boolean payloads do NOT diverge (both -> NOMATCH) so boolean detection fails; only the error
         # payloads trip a DB error. The reported reproducer must be the WINNING error payload, never the
         # generic ' OR '1'='1 boolean payload.
-        def fakeSend(endpoint, query, variables=None):
+        def fakeSend(endpoint, query, variables=None, **kwargs):
             if "'1'='" in query:               # both boolean payloads ('1'='1 / '1'='2) -> identical, no oracle
                 return NOMATCH, 200
             if "'" in query:                    # error payloads (', '', '") -> DB error
@@ -415,7 +415,7 @@ class TestGraphqlEndpointDetection(unittest.TestCase):
 
     def setUp(self):
         self._gql = gi._gqlSend
-        def fakeSend(endpoint, query, variables=None):
+        def fakeSend(endpoint, query, variables=None, **kwargs):
             if endpoint.endswith("/graphql") and "__typename" in query:
                 return '{"data":{"__typename":"Query"}}', 200
             return 'Not Found', 404
@@ -433,7 +433,7 @@ class TestGraphqlEndpointDetection(unittest.TestCase):
         self.assertEqual(endpoint, "http://test/graphql")
 
     def test_not_graphql_endpoint(self):
-        def fakeSend(endpoint, query, variables=None):
+        def fakeSend(endpoint, query, variables=None, **kwargs):
             return 'Not Found', 404
         gi._gqlSend = fakeSend
         endpoint, page = gi._detectEndpoint("http://test", probePaths=True)
@@ -454,7 +454,7 @@ class TestGraphqlIntrospectionFallback(unittest.TestCase):
 
     def test_fallback_without_specifiedByURL(self):
         calls = []
-        def fakeSend(endpoint, query, variables=None):
+        def fakeSend(endpoint, query, variables=None, **kwargs):
             calls.append(query)
             if "specifiedByURL" in query:
                 return '{"errors":[{"message":"Unknown field specifiedByURL"}]}', 400
@@ -684,7 +684,7 @@ class TestGraphqlInference(unittest.TestCase):
         NOMATCHV = '{"data":{"user":null}}'
         saved = gi._gqlSend
         try:
-            def fakeSend(endpoint, query, variables=None):
+            def fakeSend(endpoint, query, variables=None, **kwargs):
                 if "1=1" in query:
                     return MATCHV, 200
                 if "1=2" in query:
@@ -733,7 +733,7 @@ class TestGraphqlMakeOracle(unittest.TestCase):
     def setUp(self):
         self._gql = gi._gqlSend
 
-        def fakeSend(endpoint, query, variables=None):
+        def fakeSend(endpoint, query, variables=None, **kwargs):
             if "a0:" in query:                                 # batched, aliased request
                 data = {}
                 for m in re.finditer(r'(a\d+):\w+\(\w+:"[^"]*\((1=1|1=2)\)', query):

@@ -357,8 +357,9 @@ def _cell(value):
 
 # --- HTTP transport ---------------------------------------------------------
 
-def _gqlSend(endpoint, query, variables=None):
+def _gqlSend(endpoint, query, variables=None, errorBody=False):
     # POST a JSON GraphQL request to `endpoint`, returning (body, http_code)
+    # Note: errorBody keeps 5xx bodies (e.g. SQL error inside GraphQL 'errors') for error-message fingerprinting
     body = {"query": query}
     if variables:
         body["variables"] = variables
@@ -382,7 +383,7 @@ def _gqlSend(endpoint, query, variables=None):
         return None, 0
     finally:
         kb.postHint = oldPostHint
-    if blockedStatus(code):                 # WAF / rate-limit / 5xx is not a usable oracle sample
+    if blockedStatus(code) and not (errorBody and code >= 500):      # WAF / rate-limit / 5xx is not a usable oracle sample
         return None, code
     return page or "", code
 
@@ -944,16 +945,16 @@ def _detectError(slot, endpoint):
     # influence. Require the signature to be ABSENT from a benign baseline, appear only AFTER the
     # injected value, and REPRODUCE before accepting it.
     benign = _buildQuery(slot, "1")
-    basePage = _gqlSend(endpoint, benign)[0] if benign else None
+    basePage = _gqlSend(endpoint, benign, errorBody=True)[0] if benign else None
     baseErr = _errorText(basePage) or ""
 
     def _appearsOnlyAfterInjection(query, matcher):
         # matcher(text) -> re.Match or None; True only if it hits the injected response, is absent
         # from the benign baseline, and reproduces on a second injected request
-        err = _errorText(_gqlSend(endpoint, query)[0])
+        err = _errorText(_gqlSend(endpoint, query, errorBody=True)[0])
         if not err or not matcher(err) or matcher(baseErr):
             return None
-        err2 = _errorText(_gqlSend(endpoint, query)[0])
+        err2 = _errorText(_gqlSend(endpoint, query, errorBody=True)[0])
         return matcher(err) if (err2 and matcher(err2)) else None
 
     for payload in _SQL_ERROR_PAYLOADS:
@@ -963,7 +964,7 @@ def _detectError(slot, endpoint):
         for pattern in ERROR_PARSING_REGEXES:
             m = _appearsOnlyAfterInjection(query, lambda t, p=pattern: re.search(p, t))
             if m:
-                detail = m.group("result") if "result" in m.groupdict() else _errorText(_gqlSend(endpoint, query)[0])[:200]
+                detail = m.group("result") if "result" in m.groupdict() else _errorText(_gqlSend(endpoint, query, errorBody=True)[0])[:200]
                 return "error-based", detail, payload
 
     for payload in (_NOSQL_NE, _NOSQL_IN):
@@ -972,7 +973,7 @@ def _detectError(slot, endpoint):
             continue
         m = _appearsOnlyAfterInjection(query, lambda t: re.search(NOSQL_ERROR_REGEX, t))
         if m:
-            return "nosql-error-based", (_errorText(_gqlSend(endpoint, query)[0]) or "")[:200], payload
+            return "nosql-error-based", (_errorText(_gqlSend(endpoint, query, errorBody=True)[0]) or "")[:200], payload
 
     return None, None, None
 
