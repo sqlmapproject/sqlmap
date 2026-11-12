@@ -1422,10 +1422,10 @@ class Connect(object):
                     match = re.search(r"(?i)<input[^>]+\bvalue=[\"']?(?P<value>[^>'\"]*)[\"']?[^>]*\bname=[\"']?(?P<name>%s)\b" % conf.csrfToken, page or "", re.I)
 
                     if not match:
-                        match = re.search(r"(?P<name>%s)[\"']:[\"'](?P<value>[^\"']+)" % conf.csrfToken, page or "", re.I)
+                        match = re.search(r"(?P<name>%s)[\"']\s*:\s*[\"'](?P<value>[^\"']+)" % conf.csrfToken, page or "", re.I)
 
                         if not match:
-                            match = re.search(r"\b(?P<name>%s)\s*[:=]\s*(?P<value>\w+)" % conf.csrfToken, getUnicode(headers), re.I)
+                            match = re.search(r"\b(?P<name>%s)\s*[:=]\s*(?P<value>[^\s;,]+)" % conf.csrfToken, getUnicode(headers), re.I)
 
                             if not match:
                                 match = re.search(r"\b(?P<name>%s)\s*=\s*['\"]?(?P<value>[^;'\"]+)" % conf.csrfToken, page or "", re.I)
