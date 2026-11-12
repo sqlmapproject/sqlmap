@@ -1073,6 +1073,9 @@ class Agent(object):
 
         topLimit = re.search(r"TOP\s+([\d]+)\s+", expression, re.I)
 
+        # Note: Microsoft SQL Server 2012+ paging (e.g. 'ORDER BY id OFFSET 2 ROWS FETCH NEXT 2 ROWS ONLY')
+        offsetFetch = re.search(r"(?i)\s+OFFSET\s+(?P<start>\d+)\s+ROWS?\s+FETCH\s+(?:NEXT|FIRST)\s+(?P<stop>\d+)\s+ROWS?\s+ONLY", expression) if Backend.isDbms(DBMS.MSSQL) else None
+
         limitRegExp = re.search(queries[Backend.getIdentifiedDbms()].limitregexp.query, expression, re.I)
 
         if hasattr(queries[Backend.getIdentifiedDbms()].limitregexp, "query2"):
@@ -1086,7 +1089,7 @@ class Agent(object):
         # ClickHouse) and per-row extraction (blind/error) reads bogus offsets - only UNION was unaffected.
         limitOffsetAppendDbmses = (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE, DBMS.H2, DBMS.CLICKHOUSE, DBMS.CRATEDB, DBMS.SPANNER, DBMS.HANA)
 
-        if (limitRegExp or limitRegExp2) or (Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) and topLimit):
+        if (limitRegExp or limitRegExp2 or offsetFetch) or (Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE) and topLimit):
             if Backend.getIdentifiedDbms() in limitOffsetAppendDbmses:
                 limitGroupStart = queries[Backend.getIdentifiedDbms()].limitgroupstart.query
                 limitGroupStop = queries[Backend.getIdentifiedDbms()].limitgroupstop.query
@@ -1109,7 +1112,11 @@ class Agent(object):
                 limitCond = int(stopLimit) > 1
 
             elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
-                if limitRegExp:
+                if offsetFetch:
+                    startLimit = int(offsetFetch.group("start"))
+                    stopLimit = offsetFetch.group("stop")
+                    limitCond = int(stopLimit) > 1
+                elif limitRegExp:
                     limitGroupStart = queries[Backend.getIdentifiedDbms()].limitgroupstart.query
                     limitGroupStop = queries[Backend.getIdentifiedDbms()].limitgroupstop.query
 
@@ -1130,7 +1137,7 @@ class Agent(object):
         # (or equivalent depending on the back-end DBMS) can return
         # multiple entries
         if limitCond:
-            if (limitRegExp or limitRegExp2) and stopLimit is not None:
+            if (limitRegExp or limitRegExp2 or offsetFetch) and stopLimit is not None:
                 stopLimit = int(stopLimit)
 
                 # From now on we need only the expression until the " LIMIT "
@@ -1147,6 +1154,8 @@ class Agent(object):
 
                 elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
                     stopLimit += startLimit
+                    if offsetFetch:
+                        expression = expression[:offsetFetch.start()]
             elif dump:
                 if conf.limitStart:
                     startLimit = conf.limitStart - 1
