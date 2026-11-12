@@ -5748,6 +5748,12 @@ def parseRequestFile(reqFile, checkParams=True):
             else:
                 scheme, port = None, None
 
+                # Note: Burp's entry header line (e.g. '16:20:47  https://www.target.com:443  [1.2.3.4]') is right above the request's separator
+                if not isinstance(match, six.string_types):
+                    _ = re.search(r"(?P<scheme>https?)://[^\s/]+:(?P<port>\d+)\s+\[[^\]]*\]\s*\Z", content[:match.start()].rstrip("=\r\n\t "), re.I)
+                    if _:
+                        scheme, port = _.group("scheme"), _.group("port")
+
             if "HTTP/" not in request:
                 continue
 
@@ -5823,11 +5829,12 @@ def parseRequestFile(reqFile, checkParams=True):
                         if '://' in value:
                             scheme, value = value.split('://')[:2]
 
-                        port = extractRegexResult(r":(?P<result>\d+)\Z", value)
-                        if port:
+                        _ = extractRegexResult(r":(?P<result>\d+)\Z", value)
+                        if _:
+                            port = _
                             host = value[:-(1 + len(port))]
                         else:
-                            host = value
+                            host = value    # Note: keeping port (if any) from e.g. Burp's entry header line
 
                     # Avoid to add a static content length header to
                     # headers and consider the following lines as
