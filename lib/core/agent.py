@@ -1069,6 +1069,7 @@ class Agent(object):
         topLimit = re.search(r"TOP\s+([\d]+)\s+", expression, re.I)
 
         limitRegExp = re.search(queries[Backend.getIdentifiedDbms()].limitregexp.query, expression, re.I)
+        limitClause = None
 
         if hasattr(queries[Backend.getIdentifiedDbms()].limitregexp, "query2"):
             limitRegExp2 = re.search(queries[Backend.getIdentifiedDbms()].limitregexp.query2, expression, re.I)
@@ -1099,6 +1100,12 @@ class Agent(object):
 
             elif Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.SYBASE):
                 if limitRegExp:
+
+                # Note: standard 'LIMIT n OFFSET m' (or 'OFFSET m LIMIT n') isn't (fully) covered by limitregexp (e.g. OFFSET was silently ignored on MySQL)
+                limitClause = re.search(r"(?i)\s+LIMIT\s+(?P<stop>\d+)\s+OFFSET\s+(?P<start>\d+)", expression) or re.search(r"(?i)\s+OFFSET\s+(?P<start>\d+)\s+LIMIT\s+(?P<stop>\d+)", expression)
+                if limitClause:
+                    startLimit, stopLimit = int(limitClause.group("start")), limitClause.group("stop")
+
                     limitGroupStart = queries[Backend.getIdentifiedDbms()].limitgroupstart.query
                     limitGroupStop = queries[Backend.getIdentifiedDbms()].limitgroupstop.query
 
@@ -1126,7 +1133,9 @@ class Agent(object):
                 # (or equivalent, depending on the back-end DBMS) word
                 if Backend.getIdentifiedDbms() in limitOffsetAppendDbmses:
                     stopLimit += startLimit
-                    if expression.find(queries[Backend.getIdentifiedDbms()].limitstring.query) > 0:
+                    if limitClause:
+                        _ = limitClause.start()
+                    elif expression.find(queries[Backend.getIdentifiedDbms()].limitstring.query) > 0:
                         _ = expression.index(queries[Backend.getIdentifiedDbms()].limitstring.query)
                     else:
                         _ = re.search(r"\bLIMIT\b", expression, re.I).start()
