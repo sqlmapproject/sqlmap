@@ -68,6 +68,7 @@ class _Handler(BaseHTTPServer.BaseHTTPRequestHandler):
     def do_POST(self):
         body = self.rfile.read(int(self.headers.get('Content-Length', '0')))
         token = self.headers.get('X-Auth-Token')
+        self.server.credentials = (self.headers.get('Cookie'), self.headers.get('Authorization'))
         if self.path == '/refresh':
             self.server.refreshes += 1
             code, body = 200, b'{"token":"fresh"}'
@@ -265,6 +266,28 @@ class TestAuthRefresh(unittest.TestCase):
             Connect.getPage(url=conf.url.replace('/test', '/redirect'))
             self.assertEqual(other.requests, [('/landing', b'', None)])
             self.assertEqual(self.server.refreshes, 1)
+        finally:
+            other.shutdown()
+            other.server_close()
+            thread.join(5)
+
+    def test_redirect_to_another_host_does_not_receive_credentials(self):
+        # Note: user-supplied Cookie/Authorization must not leak to a different host (#6185), while the same host keeps them
+        conf.authRefresh = None
+        conf.httpHeaders = [('X-Auth-Token', 'fresh'), ('Cookie', 'session=secret'), ('Authorization', 'Bearer secret')]
+        other = _Server(('127.0.0.1', 0), _Handler)
+        other.requests, other.token, other.expired = [], 'fresh', 0
+        other.lock = threading.Lock()
+        other.syncExpired = False
+        thread = threading.Thread(target=other.serve_forever)
+        thread.daemon = True
+        thread.start()
+        try:
+            for host, expected in (('localhost', (None, None)), ('127.0.0.1', ('session=secret', 'Bearer secret'))):
+                other.credentials = None
+                self.server.redirect = 'http://%s:%d/landing' % (host, other.server_port)
+                Connect.getPage(url=conf.url.replace('/test', '/redirect'))
+                self.assertEqual(other.credentials, expected)
         finally:
             other.shutdown()
             other.server_close()

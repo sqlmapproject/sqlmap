@@ -10,6 +10,7 @@ import re
 import time
 import types
 
+from lib.core.common import checkSameHost
 from lib.core.common import getHostHeader
 from lib.core.common import getSafeExString
 from lib.core.common import logHTTPTraffic
@@ -180,6 +181,10 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
                 if conf.authRefresh and not authrefresh.sameOrigin(req.get_full_url(), redurl):
                     req.headers = authrefresh.stripHeaders(req.headers)
                     req.unredirected_hdrs = authrefresh.stripHeaders(req.unredirected_hdrs)
+
+                # Note: credentials are not to be forwarded to a different host (like browsers, curl and requests do) (#6185)
+                if not checkSameHost(req.get_full_url(), redurl):
+                    req.headers = dict((key, value) for key, value in req.headers.items() if key.upper() not in (HTTP_HEADER.COOKIE.upper(), HTTP_HEADER.AUTHORIZATION.upper()))
                 result = _urllib.request.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)
             except _urllib.error.HTTPError as ex:
                 result = error = ex
