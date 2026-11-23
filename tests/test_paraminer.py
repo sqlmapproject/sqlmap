@@ -35,7 +35,7 @@ CHANGED = ("<html><head><title>Index</title></head><body><h1>Welcome</h1><p>Noth
 
 class TestMineParametersJitterProbe(unittest.TestCase):
     def setUp(self):
-        self._origGetPage = paraminer.Request.getPage
+        self._origGetPage = paraminer.Request.__dict__["getPage"]
         self._origGetFileItems = paraminer.getFileItems
         self._origParameters = dict(conf.parameters)
         self._origParamDict = dict(conf.paramDict)
@@ -47,7 +47,7 @@ class TestMineParametersJitterProbe(unittest.TestCase):
         conf.paramDict[PLACE.GET] = {"id": "1"}
 
         # keep the candidate list to the one name under test instead of all of common-params.txt
-        paraminer.getFileItems = staticmethod(lambda path, unique=False: ["debug"])
+        paraminer.getFileItems = lambda path, unique=False: ["debug"]
 
     def tearDown(self):
         paraminer.Request.getPage = self._origGetPage
