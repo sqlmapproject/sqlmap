@@ -186,7 +186,8 @@ def mineParameters():
         singleTimeWarnMessage("could not obtain a baseline response, skipping parameter mining")
         return
 
-    floor = _ratio(base, _fetch(baseGet)[0])            # the target's own between-request jitter
+    jitter = _fetch(baseGet)[0]
+    floor = _ratio(base, jitter) if jitter else 1.0     # the target's own between-request jitter; an unanswered probe leaves it unmeasured, so assume none (_ratio() would say 0.0, which turns _differs() off for the whole run)
 
     found = _discover(candidates, baseGet, base, floor)
 
