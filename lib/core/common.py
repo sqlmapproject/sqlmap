@@ -4141,6 +4141,29 @@ def pythonBuildInfo():
 
     return ", ".join(retVal)
 
+def getCpuInfo():
+    """
+    Returns CPU identification (e.g. 'Intel(R) Core(TM) i9-13900K (GenuineIntel Family 6 Model 183 Stepping 1, microcode 0x12b)')
+
+    >>> isinstance(getCpuInfo(), str)
+    True
+    """
+
+    retVal = None
+
+    try:
+        if os.path.isfile("/proc/cpuinfo"):
+            with open("/proc/cpuinfo") as f:
+                fields = dict(re.findall(r"(?m)^([^\t:\n]+?)\s*:\s*(.*)$", f.read().split("\n\n")[0]))
+            if "cpu family" in fields:
+                retVal = "%s (%s Family %s Model %s Stepping %s%s)" % (fields.get("model name"), fields.get("vendor_id"), fields["cpu family"], fields.get("model"), fields.get("stepping"), (", microcode %s" % fields["microcode"]) if "microcode" in fields else "")
+            else:
+                retVal = fields.get("model name") or fields.get("Hardware") or fields.get("Processor")
+    except:
+        pass
+
+    return str(retVal or platform.processor() or platform.machine() or "unknown")
+
 def unhandledExceptionMessage():
     """
     Returns detailed message about occurred unhandled exception
@@ -4164,6 +4187,7 @@ def unhandledExceptionMessage():
     errMsg += "Running version: %s%s\n" % (VERSION_STRING[VERSION_STRING.find('/') + 1:], (" (%s)" % revision) if revision else "")
     errMsg += "Python version: %s%s\n" % (PYVERSION, (" (%s)" % buildInfo) if buildInfo else "")
     errMsg += "Operating system: %s\n" % platform.platform()
+    errMsg += "CPU: %s\n" % getCpuInfo()
     errMsg += "Command line: %s\n" % re.sub(r".+?\bsqlmap\.py\b", "sqlmap.py", getUnicode(" ".join(sys.argv), encoding=getattr(sys.stdin, "encoding", None)))
     errMsg += "Technique: %s\n" % (enumValueToNameLookup(PAYLOAD.TECHNIQUE, getTechnique()) if getTechnique() is not None else ("DIRECT" if conf.get("direct") else None))
     errMsg += "Back-end DBMS:"

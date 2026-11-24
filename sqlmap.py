@@ -583,6 +583,17 @@ def main():
             dataToStdout(excMsg)
             raise SystemExit
 
+        elif re.search(r"(?m)^CPU: .*Intel.*\bFamily 6 Model (183|191)\b", errMsg):
+            errMsg = "your CPU is an Intel 13th/14th Gen desktop processor, prone to the Vmin Shift instability "
+            errMsg += "which makes programs raise exceptions that the executed code cannot produce "
+            errMsg += "(Reference: 'https://www.intel.com/content/www/us/en/support/articles/000102331/processors.html'). "
+            errMsg += "Please update your BIOS (microcode 0x12F or later), use 'Intel Default Settings' and "
+            errMsg += "report the problem only if it is consistently reproducible"
+            logger.critical(errMsg)
+            print()
+            dataToStdout(excMsg)
+            raise SystemExit
+
         for match in re.finditer(r'File "(.+?)", line', excMsg):
             file_ = match.group(1)
             try:
